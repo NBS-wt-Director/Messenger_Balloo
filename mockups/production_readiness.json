@@ -3,12 +3,12 @@
     "document": "tickets/production-readiness-migration.md",
     "title": "Production Readiness — статус миграции",
     "created": "2025-08-14",
-    "updated": "2026-08-14",
+    "updated": "2026-08-15",
     "total_tickets": 12,
-    "tickets_completed": 0,
-    "tickets_in_progress": 1,
+    "tickets_completed": 1,
+    "tickets_in_progress": 0,
     "tickets_pending": 11,
-    "overall_progress_percent": 6
+    "overall_progress_percent": 8
   },
   "components": {
     "web": { "code_percent": 80, "tests_percent": 15, "docker": true, "ci_cd": true, "docs": true, "ready_percent": 70, "status": "staging" },
@@ -23,8 +23,8 @@
       "id": 1,
       "title": "Git-репозиторий + .gitignore + CI/CD настройка",
       "priority": "critical",
-      "status": "progress",
-      "progress_percent": 70,
+      "status": "done",
+      "progress_percent": 100,
       "dependencies": [],
       "files": ["/ (git init)", "/.gitignore", "/.github/workflows/ci.yml", "/.github/workflows/cd.yml", "/.github/workflows/release.yml"]
     },
