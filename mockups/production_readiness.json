@@ -3,11 +3,12 @@
     "document": "tickets/production-readiness-migration.md",
     "title": "Production Readiness — статус миграции",
     "created": "2025-08-14",
+    "updated": "2026-08-14",
     "total_tickets": 12,
     "tickets_completed": 0,
-    "tickets_in_progress": 0,
-    "tickets_pending": 12,
-    "overall_progress_percent": 0
+    "tickets_in_progress": 1,
+    "tickets_pending": 11,
+    "overall_progress_percent": 6
   },
   "components": {
     "web": { "code_percent": 80, "tests_percent": 15, "docker": true, "ci_cd": true, "docs": true, "ready_percent": 70, "status": "staging" },
@@ -15,15 +16,15 @@
     "desktop": { "code_percent": 25, "tests_percent": 0, "docker": false, "ci_cd": true, "docs": true, "ready_percent": 20, "status": "not_ready" },
     "android": { "code_percent": 30, "tests_percent": 0, "docker": false, "ci_cd": false, "docs": true, "ready_percent": 25, "status": "not_ready" },
     "ios": { "code_percent": 0, "tests_percent": 0, "docker": false, "ci_cd": false, "docs": true, "ready_percent": 0, "status": "not_started" },
-    "git": { "code_percent": 0, "tests_percent": 0, "docker": false, "ci_cd": false, "docs": false, "ready_percent": 0, "status": "not_started" }
+    "git": { "code_percent": 100, "tests_percent": 0, "docker": false, "ci_cd": true, "docs": true, "ready_percent": 50, "status": "not_ready" }
   },
   "tickets": [
     {
       "id": 1,
       "title": "Git-репозиторий + .gitignore + CI/CD настройка",
       "priority": "critical",
-      "status": "pending",
-      "progress_percent": 0,
+      "status": "progress",
+      "progress_percent": 70,
       "dependencies": [],
       "files": ["/ (git init)", "/.gitignore", "/.github/workflows/ci.yml", "/.github/workflows/cd.yml", "/.github/workflows/release.yml"]
     },
