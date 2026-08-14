@@ -56,6 +56,9 @@ Thumbs.db
 # Prisma
 # ВАЖНО: prisma/migrations/ коммитится в git (миграции — часть кода). НЕ исключать!
 
+# Desktop build artifacts (large binaries, not for git)
+packages/desktop/release/
+
 # Docker
 docker/data/
 
