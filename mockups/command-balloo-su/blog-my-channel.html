@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Command — Мой канал</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--info);">C</div><span>Command</span>
+    <div class="topbar__dropdown"></div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Мой канал</div>
+  <div class="topbar__right"></div>
+</div>
+<div class="main">
+  <div class="sidebar sidebar--narrow">
+    <div class="list">
+      <div class="list__item">🏠 Дашборд</div>
+      <div class="list__item">💬 Внутренний чат</div>
+      <div class="list__item">📅 Совещания</div>
+      <div class="list__item">📋 Задачи</div>
+      <div class="list__item">🏢 Мой отдел</div>
+      <div class="list__item">🏛️ Подразделения</div>
+      <div class="list__item">👥 HR</div>
+      <div class="list__item">📚 База знаний</div>
+      <div class="list__item">🎯 Найм</div>
+      <div class="list__item">📊 Мониторинг</div>
+      <div class="list__item" style="border-top:1px solid var(--border-color);margin-top:8px;padding-top:12px;">📝 Мои статьи</div>
+      <div class="list__item list__item--active">✍️ Мой канал</div>
+      <div class="list__item">⚙️ Настройки канала</div>
+      <div class="list__item" style="border-top:1px solid var(--border-color);margin-top:8px;padding-top:12px;">💼 Вакансии</div>
+      <div class="list__item">⭐ Почему мы</div>
+    </div>
+  </div>
+  <div class="content overflow-y-auto"><div class="page-container">
+    <h1 class="page-title">✍️ Мой канал</h1>
+    <p class="page-subtitle">Блог Ивана Воронова — вы автор и модератор</p>
+
+    <!-- Moderator info -->
+    <div class="card mb-4" style="background:rgba(45,184,77,0.06);border-color:var(--accent);">
+      <div class="flex items-center gap-3">
+        <span style="font-size:20px;">👤</span>
+        <div class="flex-1">
+          <div class="text-sm font-bold" style="color:var(--text-primary);">Модератор: Иван Воронов (совпадает с автором)</div>
+          <div class="text-xs text-secondary">Для личных каналов модератор всегда совпадает с автором. Отдельная настройка модератора недоступна.</div>
+        </div>
+        <span class="chip chip--accent">Личный канал</span>
+      </div>
+    </div>
+
+    <!-- Channel stats -->
+    <div class="flex gap-4 mb-6" style="flex-wrap:wrap;">
+      <div class="card flex-1" style="min-width:140px;"><div class="text-xs text-muted">Статей</div><div style="font-size:24px;font-weight:800;color:var(--accent);">12</div></div>
+      <div class="card flex-1" style="min-width:140px;"><div class="text-xs text-muted">Просмотров</div><div style="font-size:24px;font-weight:800;color:var(--info);">8.4K</div></div>
+      <div class="card flex-1" style="min-width:140px;"><div class="text-xs text-muted">Реакций</div><div style="font-size:24px;font-weight:800;color:var(--warning);">324</div></div>
+      <div class="card flex-1" style="min-width:140px;"><div class="text-xs text-muted">Комментариев</div><div style="font-size:24px;font-weight:800;color:#a855f7;">89</div></div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs mb-4" data-tab-group="channel">
+      <div class="tab tab--active" onclick="switchTab('channel',0)">📄 Статьи</div>
+      <div class="tab" onclick="switchTab('channel',1)">💬 Модерация комментариев</div>
+      <div class="tab" onclick="switchTab('channel',2)">📊 Статистика</div>
+    </div>
+
+    <!-- Tab 0: Articles -->
+    <div class="tab-panel" style="display:block;">
+      <div class="card mb-4">
+        <table class="table">
+          <thead><tr><th>Статья</th><th>Статус</th><th>Дата</th><th>Просмотры</th><th>Реакции</th><th>Коммент.</th></tr></thead>
+          <tbody>
+            <tr class="table__row"><td><strong>5 лет с DevOps</strong></td><td><span class="chip chip--accent">Опубликован</span></td><td class="text-xs text-muted">9 июля</td><td>1 100</td><td>45</td><td>12</td></tr>
+            <tr class="table__row"><td><strong>WebSocket масштабирование</strong></td><td><span class="chip chip--accent">Опубликован</span></td><td class="text-xs text-muted">12 июля</td><td>2 100</td><td>45</td><td>8</td></tr>
+            <tr class="table__row"><td>Docker для новичков</td><td><span class="chip" style="background:var(--danger-bg);color:var(--danger);border-color:var(--danger);">Нужны правки</span></td><td class="text-xs text-muted">11 июля</td><td>—</td><td>—</td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tab 1: Comment moderation -->
+    <div class="tab-panel" style="display:none;">
+      <div class="card mb-4">
+        <h3 class="card__title mb-4">Комментарии на модерацию (3)</h3>
+        <div style="padding:12px 0;border-bottom:1px solid var(--border-color);">
+          <div class="flex items-center gap-2 mb-2">
+            <div class="avatar avatar--xs avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>АП</span></div></div>
+            <span class="font-semibold text-sm">Анна Петрова</span>
+            <span class="text-xs text-muted">на «5 лет с DevOps» · 2 часа назад</span>
+          </div>
+          <p class="text-sm text-secondary" style="padding-left:40px;margin-bottom:8px;">Отличная статья! Поделитесь опытом с Helm?</p>
+          <div class="flex gap-2" style="padding-left:40px;">
+            <button class="btn btn--primary btn--sm">✓ Оставить</button>
+            <button class="btn btn--danger btn--sm">🗑 Скрыть</button>
+          </div>
+        </div>
+        <div style="padding:12px 0;border-bottom:1px solid var(--border-color);">
+          <div class="flex items-center gap-2 mb-2">
+            <div class="avatar avatar--xs avatar--bordered avatar--status-offline avatar--ctx-contact"><div class="avatar__inner"><span>ГС</span></div></div>
+            <span class="font-semibold text-sm">Гость</span>
+            <span class="text-xs text-muted">на «WebSocket» · 5 часов назад</span>
+          </div>
+          <p class="text-sm text-secondary" style="padding-left:40px;margin-bottom:8px;">А почему не NATS вместо Redis?</p>
+          <div class="flex gap-2" style="padding-left:40px;">
+            <button class="btn btn--primary btn--sm">✓ Оставить</button>
+            <button class="btn btn--danger btn--sm">🗑 Скрыть</button>
+          </div>
+        </div>
+        <div style="padding:12px 0;">
+          <div class="flex items-center gap-2 mb-2">
+            <div class="avatar avatar--xs avatar--bordered avatar--status-offline avatar--ctx-contact"><div class="avatar__inner"><span>СП</span></div></div>
+            <span class="font-semibold text-sm">Спамер</span>
+            <span class="text-xs text-muted">на «Docker» · 1 день назад</span>
+          </div>
+          <p class="text-sm text-secondary" style="padding-left:40px;margin-bottom:8px;">КУПИТЬ ДИПЛОМ НЕДОРОГО visit site...</p>
+          <div class="flex gap-2" style="padding-left:40px;">
+            <button class="btn btn--primary btn--sm">✓ Оставить</button>
+            <button class="btn btn--danger btn--sm">🗑 Скрыть</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 2: Stats -->
+    <div class="tab-panel" style="display:none;">
+      <div class="card mb-4">
+        <h3 class="card__title mb-4">Просмотры за 30 дней</h3>
+        <div style="display:flex;align-items:flex-end;gap:4px;height:120px;">
+          <div style="flex:1;background:var(--accent);height:40%;"></div>
+          <div style="flex:1;background:var(--accent);height:55%;"></div>
+          <div style="flex:1;background:var(--accent);height:30%;"></div>
+          <div style="flex:1;background:var(--accent);height:70%;"></div>
+          <div style="flex:1;background:var(--accent);height:85%;"></div>
+          <div style="flex:1;background:var(--accent);height:60%;"></div>
+          <div style="flex:1;background:var(--accent);height:90%;"></div>
+          <div style="flex:1;background:var(--accent);height:45%;"></div>
+          <div style="flex:1;background:var(--accent);height:65%;"></div>
+          <div style="flex:1;background:var(--accent);height:75%;"></div>
+        </div>
+        <div class="flex justify-between text-xs text-muted mt-2">
+          <span>7 июля</span><span>17 июля</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3 class="card__title mb-4">Топ статьи по просмотрам</h3>
+        <div class="list__item" style="border:none;"><span class="flex-1">WebSocket масштабирование</span><span class="font-bold text-accent">2 100</span></div>
+        <div class="list__item" style="border:none;"><span class="flex-1">5 лет с DevOps</span><span class="font-bold text-accent">1 100</span></div>
+        <div class="list__item" style="border:none;"><span class="flex-1">Prisma + Flyway</span><span class="font-bold text-accent">1 500</span></div>
+      </div>
+    </div>
+  </div></div>
+</div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobile — 2FA (email-код)</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    html { overflow-y: auto; height: auto; }
+    body { overflow-y: auto; height: auto; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 40px 24px; }
+    .phone-frame { width:360px; height:760px; background:var(--bg-secondary); border:3px solid var(--border-strong); border-radius:36px; overflow:hidden; position:relative; display:flex; flex-direction:column; box-shadow:var(--shadow-glass); }
+    .phone-frame__notch { position:absolute; top:0; left:50%; transform:translateX(-50%); width:130px; height:26px; background:var(--bg-primary); border-bottom-left-radius:18px; border-bottom-right-radius:18px; z-index:10; }
+    .phone-frame__statusbar { height:30px; padding:4px 20px 0; display:flex; align-items:center; justify-content:space-between; font-size:12px; color:var(--text-secondary); background:var(--bg-secondary); }
+    .phone-frame__screen { flex:1; overflow:hidden; background:var(--bg-primary); display:flex; flex-direction:column; }
+    .phone-frame__home-bar { height:5px; width:120px; margin:0 auto 8px; background:var(--text-muted); border-radius:3px; }
+    .annotation { max-width:360px; margin:0 auto 8px; padding:0 8px; font-size:12px; color:var(--text-muted); }
+    .annotation strong { color:var(--accent); }
+  </style>
+</head>
+<body>
+<div class="annotation" style="margin-top:24px;"><strong>Mobile — 2FA (email-код)</strong> КОПИЯ WEB: balloo-su/two-factor.html — ВАЖНО: 2FA через email-код (не TOTP, без QR, без backup-кодов)</div>
+<div class="phone-frame">
+  <div class="phone-frame__notch"></div>
+  <div class="phone-frame__statusbar"><span>9:41</span><span>📶 🔋</span></div>
+  <div class="phone-frame__screen">
+    <!-- TOPBAR (обязательный) -->
+    <div class="topbar">
+      <div class="topbar__logo">
+        <div class="topbar__logo-icon">B</div><span>Balloo</span>
+        <div class="topbar__dropdown">
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/chats.html'">💬 Balloo</div>
+          <div class="topbar__dropdown-divider"></div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div>
+        </div>
+      </div>
+      <div class="topbar__title">Двухфакторная аутентификация</div>
+      <div class="topbar__right">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact" onclick="window.location.href='profile.html'"><div class="avatar__inner"><span>ИИ</span></div></div>
+        <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+        <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+      </div>
+    </div>
+    <!-- 2FA FORM (email-code, NOT TOTP) -->
+    <div style="flex:1;overflow-y:auto;padding:16px;">
+      <h1 style="font-size:20px;font-weight:800;color:var(--text-primary);margin-bottom:16px;">🔐 Двухфакторная аутентификация</h1>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;">Защитите аккаунт с помощью кода, отправленного на email.</p>
+
+      <!-- Status card -->
+      <div class="card mb-4" style="display:flex;align-items:center;gap:16px;">
+        <div style="width:48px;height:48px;clip-path:var(--octagon-clip);background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:24px;">🔐</div>
+        <div style="flex:1;">
+          <div class="font-bold" style="color:var(--text-primary);">2FA включена</div>
+          <div class="text-sm text-secondary">Код отправляется на email при входе</div>
+        </div>
+        <span class="chip chip--accent">Активна</span>
+      </div>
+
+      <!-- Step 1: Send code -->
+      <div class="card mb-4">
+        <h3 class="card__title mb-3">Шаг 1. Отправить код</h3>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" placeholder="ivan@example.com" id="tf-email">
+        </div>
+        <button class="btn btn--primary btn--block" onclick="sendCode()">📨 Отправить код</button>
+      </div>
+
+      <!-- Step 2: Verify code -->
+      <div class="card mb-4" id="tf-verify-card" style="display:none;">
+        <h3 class="card__title mb-3">Шаг 2. Подтвердить код</h3>
+        <p class="text-sm text-secondary mb-3">📨 На ваш email отправлен код подтверждения.</p>
+        <div class="form-group">
+          <label class="form-label">6-значный код</label>
+          <input type="text" class="form-input" placeholder="000 000" maxlength="6" style="text-align:center;font-size:22px;letter-spacing:6px;" id="tf-code">
+        </div>
+        <button class="btn btn--primary btn--block" onclick="verifyCode()">Подтвердить</button>
+        <p class="text-xs text-muted text-center mt-3">Не пришёл код? <a href="#" class="text-accent" onclick="sendCode();return false;">Отправить снова</a> (через 60 сек)</p>
+      </div>
+
+      <!-- Disable 2FA -->
+      <div class="card mt-4" style="border-color:var(--danger);">
+        <div class="text-sm text-secondary mb-4" style="color:var(--danger);">⚠️ Отключение 2FA снизит безопасность аккаунта.</div>
+        <div class="form-group">
+          <label class="form-label">Введите код из email для подтверждения</label>
+          <input type="text" class="form-input" placeholder="6-значный код" maxlength="6" style="text-align:center;font-size:20px;letter-spacing:6px;">
+        </div>
+        <button class="btn btn--danger btn--block" onclick="if(confirm('Отключить 2FA?'))alert('2FA отключена')">Отключить 2FA</button>
+      </div>
+    </div>
+  </div>
+  <div class="phone-frame__home-bar"></div>
+</div>
+
+<script src="../assets/common.js"></script>
+<script>
+// API: POST /auth/2fa/send-code — отправить код на email
+// API: POST /auth/2fa/verify — подтвердить код
+// API: DELETE /auth/2fa — отключить 2FA (подтверждение email-кодом)
+//
+// НЕТ: POST /auth/2fa/setup (TOTP setup) — удалён
+// НЕТ: POST /auth/2fa/backup-codes/regenerate — удалён
+
+var cooldown = 0;
+
+function sendCode() {
+  var email = document.getElementById('tf-email').value;
+  if (!email) { alert('Введите email'); return; }
+  // API call: POST /auth/2fa/send-code { email }
+  alert('Код отправлен на ' + email + '\n\nAPI: POST /auth/2fa/send-code');
+  document.getElementById('tf-verify-card').style.display = 'block';
+  // Start cooldown
+  cooldown = 60;
+  var btn = document.querySelector('#tf-verify-card a');
+  var interval = setInterval(function() {
+    cooldown--;
+    if (cooldown <= 0) {
+      clearInterval(interval);
+      btn.textContent = 'Отправить снова';
+    } else {
+      btn.textContent = 'Отправить снова (через ' + cooldown + ' сек)';
+    }
+  }, 1000);
+}
+
+function verifyCode() {
+  var code = document.getElementById('tf-code').value;
+  if (code.length !== 6) { alert('Введите 6-значный код'); return; }
+  // API call: POST /auth/2fa/verify { email, code }
+  alert('Код подтверждён!\n\nAPI: POST /auth/2fa/verify');
+}
+</script>
+</body>
+</html>

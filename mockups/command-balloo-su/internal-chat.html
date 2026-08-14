@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Command — Внутренний чат</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--info);">C</div><span>Command</span>
+    <div class="topbar__dropdown"></div>
+  </div>
+  <div class="topbar__title">Внутренний чат</div>
+  <div class="topbar__actions">
+    <div class="topbar__actions-btn" title="Новый чат">✏</div>
+  </div>
+  <div class="topbar__right"><div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИВ</span></div></div></div>
+</div>
+<div class="main">
+  <div class="sidebar">
+    <div class="sidebar__search">
+      <input type="text" class="search-input" placeholder="🔍 Поиск чатов...">
+    </div>
+    <div class="list">
+      <div class="list__item list__item--active">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>РД</span></div></div>
+        <div class="list__item-body"><div class="list__item-title">#разработка</div><div class="list__item-subtitle">Елена: PR #234 смержен ✅</div></div>
+        <div class="list__item-meta"><span class="list__item-time">14:32</span><span class="badge">3</span></div>
+      </div>
+      <div class="list__item">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ОБ</span></div></div>
+        <div class="list__item-body"><div class="list__item-title">#общий</div><div class="list__item-subtitle">Дмитрий: K8s деплой готов</div></div>
+        <div class="list__item-meta"><span class="list__item-time">13:15</span></div>
+      </div>
+      <div class="list__item">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИВ</span></div></div>
+        <div class="list__item-body"><div class="list__item-title">Иван → Мария</div><div class="list__item-subtitle">Макеты готовы, посмотри</div></div>
+        <div class="list__item-meta"><span class="list__item-time">12:40</span></div>
+      </div>
+      <div class="list__item">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-busy avatar--ctx-contact"><div class="avatar__inner"><span>ДЗ</span></div></div>
+        <div class="list__item-body"><div class="list__item-title">#дизайн</div><div class="list__item-subtitle">Мария: Новые иконки готов</div></div>
+        <div class="list__item-meta"><span class="list__item-time">11:20</span><span class="badge">1</span></div>
+      </div>
+      <div class="list__item">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИН</span></div></div>
+        <div class="list__item-body"><div class="list__item-title">#инфраструктура</div><div class="list__item-subtitle">Дмитрий: Мониторинг обновлён</div></div>
+        <div class="list__item-meta"><span class="list__item-time">10:05</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="content">
+    <div class="messages">
+      <div class="message message--receiver">
+        <div class="message__bubble">
+          <div class="message__header"><div class="avatar avatar--xs avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ЕК</span></div></div><span>Елена К.</span><span>14:28</span><span class="message__header-tag message__header-tag--auto">bot</span></div>
+          <div class="message__body message__body--markdown">PR #234 (WebSocket重构) смержен в main ✅ <strong>CI запущен</strong></div>
+          <div class="message__reactions">
+            <span class="message__reaction message__reaction--mine">👍 <span>4</span></span>
+            <span class="message__reaction">🎉 <span>2</span></span>
+          </div>
+        </div>
+      </div>
+      <div class="message message--sender">
+        <div class="message__bubble">
+          <div class="message__header"><span>14:30</span></div>
+          <div class="message__body">Отлично! Деплой на staging?</div>
+        </div>
+        <div class="msg-ticks msg-ticks--read">✓✓</div>
+      </div>
+      <div class="message message--receiver">
+        <div class="message__bubble">
+          <div class="message__header"><div class="avatar avatar--xs avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ЕК</span></div></div><span>Елена К.</span><span>14:32</span></div>
+          <div class="message__body">Да, уже деплоится. Дмитрий настраивает pipeline</div>
+        </div>
+      </div>
+      <div class="message message--receiver">
+        <div class="message__bubble">
+          <div class="message__header"><div class="avatar avatar--xs avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ДС</span></div></div><span>Дмитрий С.</span><span>14:33</span></div>
+          <div class="message__body">Pipeline готов, деплой через 5 минут</div>
+          <div class="message__reactions">
+            <span class="message__reaction">🚀 <span>3</span></span>
+          </div>
+        </div>
+      </div>
+      <div class="typing">
+        <div class="typing__dots"><div class="typing__dot"></div><div class="typing__dot"></div><div class="typing__dot"></div></div>
+        <span>Елена печатает...</span>
+      </div>
+    </div>
+    <div class="input-area" style="position:relative;">
+      <div class="input-hint" id="input-hint">
+        <div class="input-hint__item" data-cmd="deploy"><code>/deploy</code> — запустить деплой</div>
+        <div class="input-hint__item" data-cmd="status"><code>/status</code> — статус сервисов</div>
+        <div class="input-hint__item" data-cmd="standup"><code>/standup</code> — ежедневный статус</div>
+      </div>
+      <button class="input-area__btn" title="Вложить файл">📎</button>
+      <textarea class="input-area__field" placeholder="Сообщение для #разработка..." rows="1"></textarea>
+      <button class="input-area__btn input-area__btn--send" onclick="sendMessage()" title="Отправить">➤</button>
+    </div>
+  </div>
+</div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

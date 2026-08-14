@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo — Донат</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon">B</div><span>Balloo</span>
+    <div class="topbar__dropdown">
+      <div class="topbar__dropdown-item" onclick="window.location.href='chats.html'">💬 Balloo</div>
+      <div class="topbar__dropdown-divider"></div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div>
+      <div class="topbar__dropdown-divider"></div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='my-donates.html'">📋 Мои донаты</div>
+    </div>
+  </div>
+  <div class="topbar__title">Поддержать проект</div>
+  <div class="topbar__right"></div>
+</div>
+<div class="main">
+  <div class="content overflow-y-auto">
+    <div class="page-container">
+
+      <div class="text-center mb-6">
+        <div style="font-size:64px;margin-bottom:12px;">💚</div>
+        <h1 class="page-title" style="text-align:center;">Поддержите Balloo</h1>
+        <p class="page-subtitle" style="text-align:center;">Balloo — независимый мессенджер без рекламы. Ваша поддержка помогает нам развиваться.</p>
+      </div>
+
+      <!-- Progress -->
+      <div class="card mb-6">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="card__title">Цель месяца: серверы + разработка</h3>
+          <span class="chip chip--accent">67%</span>
+        </div>
+        <div style="height:12px;background:var(--bg-tertiary);border:1px solid var(--border-color);margin-bottom:8px;">
+          <div style="height:100%;width:67%;background:var(--accent);"></div>
+        </div>
+        <div class="flex justify-between text-sm">
+          <span class="text-secondary">Собрано: <strong style="color:var(--accent);">134 000 ₽</strong></span>
+          <span class="text-muted">Цель: 200 000 ₽</span>
+        </div>
+      </div>
+
+      <!-- Tiers -->
+      <div class="section-title">Уровни поддержки</div>
+      <div class="flex gap-4 mb-6" style="flex-wrap:wrap;">
+        <div class="card flex-1" style="min-width:220px;">
+          <div style="font-size:32px;margin-bottom:8px;">☕</div>
+          <h3 class="card__title">Кофе разработчику</h3>
+          <div style="font-size:24px;font-weight:800;color:var(--accent);margin:8px 0;">100 ₽</div>
+          <div class="card__body text-sm">Разовая поддержка. Спасибо за кофе!</div>
+          <button class="btn btn--primary btn--block mt-4">Поддержать</button>
+        </div>
+        <div class="card flex-1" style="min-width:220px;border-color:var(--accent);">
+          <span class="chip chip--accent mb-2">Популярный</span>
+          <div style="font-size:32px;margin-bottom:8px;">⭐</div>
+          <h3 class="card__title">Спонсор</h3>
+          <div style="font-size:24px;font-weight:800;color:var(--accent);margin:8px 0;">500 ₽/мес</div>
+          <div class="card__body text-sm">Ежемесячная подписка. Звание «Спонсор» в профиле.</div>
+          <button class="btn btn--primary btn--block mt-4">Стать спонсором</button>
+        </div>
+        <div class="card flex-1" style="min-width:220px;border-color:var(--gold);">
+          <span class="chip chip--warning mb-2">VIP</span>
+          <div style="font-size:32px;margin-bottom:8px;">👑</div>
+          <h3 class="card__title">Платиновый донор</h3>
+          <div style="font-size:24px;font-weight:800;color:var(--accent);margin:8px 0;">5 000 ₽/мес</div>
+          <div class="card__body text-sm">VIP-знак, приоритетная поддержка, ранний доступ к фичам.</div>
+          <button class="btn btn--primary btn--block mt-4">Стать VIP</button>
+        </div>
+        <div class="card flex-1" style="min-width:220px;">
+          <div style="font-size:32px;margin-bottom:8px;">💎</div>
+          <h3 class="card__title">Своя сумма</h3>
+          <div class="card__body text-sm">Любая сумма разово или ежемесячно.</div>
+          <div class="flex gap-2 mt-4">
+            <input type="number" class="form-input" placeholder="Сумма ₽" style="flex:1;">
+            <button class="btn btn--primary">OK</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment methods -->
+      <div class="section-title">Способы оплаты</div>
+      <div class="card mb-6">
+        <div class="flex gap-4" style="flex-wrap:wrap;">
+          <div class="flex items-center gap-2" style="padding:12px 16px;background:var(--bg-tertiary);border:1px solid var(--border-color);">
+            <span style="font-size:24px;">💳</span><span>Банковская карта</span>
+          </div>
+          <div class="flex items-center gap-2" style="padding:12px 16px;background:var(--bg-tertiary);border:1px solid var(--border-color);">
+            <span style="font-size:24px;">📱</span><span>СБП</span>
+          </div>
+          <div class="flex items-center gap-2" style="padding:12px 16px;background:var(--bg-tertiary);border:1px solid var(--border-color);">
+            <span style="font-size:24px;">₿</span><span>Crypto</span>
+          </div>
+          <div class="flex items-center gap-2" style="padding:12px 16px;background:var(--bg-tertiary);border:1px solid var(--border-color);">
+            <span style="font-size:24px;">💰</span><span>ЮMoney</span>
+          </div>
+        </div>
+        <p class="text-xs text-muted mt-4">Все платежи защищены. Balloo не хранит данные карт.</p>
+      </div>
+
+      <!-- Why donate -->
+      <div class="section-title">Почему ваша поддержка важна</div>
+      <div class="card mb-6">
+        <div class="card__body">
+          <ul style="list-style:disc;padding-left:20px;line-height:2;">
+            <li><strong>Нет рекламы</strong> — Balloo не показывает рекламу и не продаёт данные</li>
+            <li><strong>Серверы</strong> — аренда инфраструктуры (MinIO, Yandex Cloud, K8s)</li>
+            <li><strong>Разработка</strong> — оплата труда команды разработчиков</li>
+            <li><strong>Открытый исходный код</strong> — часть модулей будет открыта</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Top donors -->
+      <div class="section-title">Топ доноров месяца</div>
+      <div class="card mb-6">
+        <div class="list__item" style="border:none;">
+          <span style="font-size:20px;">🥇</span>
+          <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>АК</span></div></div>
+          <div class="flex-1"><div class="list__item-title">Анонимный донор</div><div class="list__item-subtitle">Платиновый донор · 5 000 ₽/мес</div></div>
+        </div>
+        <div class="list__item" style="border:none;">
+          <span style="font-size:20px;">🥈</span>
+          <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>МП</span></div></div>
+          <div class="flex-1"><div class="list__item-title">Михаил П.</div><div class="list__item-subtitle">Спонсор · 500 ₽/мес</div></div>
+        </div>
+        <div class="list__item" style="border:none;">
+          <span style="font-size:20px;">🥉</span>
+          <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ЕС</span></div></div>
+          <div class="flex-1"><div class="list__item-title">Елена С.</div><div class="list__item-subtitle">Спонсор · 500 ₽/мес</div></div>
+        </div>
+      </div>
+
+      <div class="text-center mb-4">
+        <button class="btn btn--secondary btn--block" onclick="window.location.href='my-donates.html'">📋 Мои донаты</button>
+      </div>
+
+      <div class="text-center">
+        <p class="text-sm text-muted">Спасибо каждому, кто поддерживает Balloo! 💚</p>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

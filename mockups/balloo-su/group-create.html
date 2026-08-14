@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo — Создание группы</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    .avatar-gradient { background: linear-gradient(135deg, #2db84d, #1565c0, #7c3aed); display:flex; align-items:center; justify-content:center; font-size:48px; color:#fff; font-weight:800; }
+    .regen-btn { font-size:16px; padding:4px 10px; }
+    .cover-preview { width:100%; height:120px; border-radius:8px; overflow:hidden; margin-bottom:12px; background:linear-gradient(135deg,#2d6a4f,#40916c); display:flex; align-items:center; justify-content:center; }
+    .corp-note { background:rgba(59,158,255,0.08); border-color:var(--info); padding:12px; border-radius:6px; font-size:13px; line-height:1.6; }
+    .type-option { padding:14px 16px; border:2px solid var(--border-color); border-radius:8px; cursor:pointer; transition:border-color 0.15s, background 0.15s; margin-bottom:8px; }
+    .type-option:hover { border-color:var(--accent); background:var(--bg-hover); }
+    .type-option--active { border-color:var(--accent); background:rgba(45,184,77,0.06); }
+    .type-option__icon { font-size:24px; margin-bottom:6px; }
+    .type-option__title { font-size:15px; font-weight:700; color:var(--text-primary); }
+    .type-option__desc { font-size:12px; color:var(--text-secondary); margin-top:4px; line-height:1.4; }
+    .type-option__badge { display:inline-block; font-size:10px; font-weight:700; padding:2px 8px; border-radius:10px; margin-top:6px; }
+    .avatar-actions { display:flex; gap:6px; margin-top:8px; }
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon">B</div><span>Balloo</span>
+    <div class="topbar__dropdown"><div class="topbar__dropdown-item" onclick="window.location.href='chats.html'">💬 Balloo</div><div class="topbar__dropdown-divider"></div><div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div><div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div><div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div><div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div><div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div><div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div></div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Создание группы</div>
+  <div class="topbar__right"><div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИИ</span></div></div><span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span><span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span></div>
+</div>
+<div class="main"><div class="content overflow-y-auto"><div class="page-container page-container--narrow">
+  <h1 class="page-title">Создать группу</h1>
+
+  <!-- Cover -->
+  <div class="card mb-4">
+    <h3 class="card__title mb-3">Обложка (необязательно)</h3>
+    <div class="cover-preview" id="cover-preview">
+      <span style="color:rgba(255,255,255,0.7);font-size:14px;">📷 Нажмите для загрузки обложки</span>
+    </div>
+    <button class="btn btn--tertiary btn--sm" onclick="document.getElementById('cover-upload').click()">Загрузить обложку</button>
+    <input type="file" id="cover-upload" style="display:none;" accept="image/*">
+  </div>
+
+  <!-- Avatar -->
+  <div class="card mb-4">
+    <h3 class="card__title mb-3">Аватар группы</h3>
+    <div style="display:flex;align-items:center;gap:20px;">
+      <div style="position:relative;">
+        <div class="avatar avatar--xl avatar--bordered avatar--status-online avatar--ctx-new" style="margin:0;">
+          <div class="avatar__inner avatar-gradient" id="avatar-display">🏢</div>
+        </div>
+        <div style="position:absolute;bottom:-4px;right:-4px;">
+          <button class="btn btn--sm btn--secondary regen-btn" onclick="regenerateAvatar()" title="Перегенерировать аватар">🔄</button>
+        </div>
+      </div>
+      <div>
+        <div class="text-sm text-secondary mb-2">Автоматическая генерация: случайный градиент + абстрактный символ</div>
+        <div class="avatar-actions">
+          <button class="btn btn--secondary btn--sm regen-btn" onclick="regenerateAvatar()">🔄 Перегенерировать</button>
+          <button class="btn btn--tertiary btn--sm" onclick="document.getElementById('avatar-upload').click()">📷 Загрузить свою</button>
+          <input type="file" id="avatar-upload" style="display:none;" accept="image/*">
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <!-- Cover upload -->
+    <div class="form-group">
+      <label class="form-label">Обложка группы</label>
+      <button class="btn btn--tertiary btn--sm" onclick="document.getElementById('cover-upload').click()">📁 Загрузить обложку</button>
+      <input type="file" id="cover-upload" style="display:none;" accept="image/*">
+      <div class="text-xs text-muted mt-1">Рекомендуемый размер: 1500×500px</div>
+    </div>
+  </div>
+
+  <!-- Basic info -->
+  <div class="card mb-4">
+    <div class="form-group"><label class="form-label">Название группы *</label><input type="text" class="form-input" placeholder="Моя группа" required></div>
+    <div class="form-group"><label class="form-label">Описание</label><textarea class="form-textarea" placeholder="О чём эта группа?"></textarea></div>
+  </div>
+
+    <!-- Group type dropdown -->
+    <div class="card mb-4">
+      <h3 class="card__title mb-3">Тип группы *</h3>
+          <div class="form-group">
+            <label class="form-label">Тип группы</label>
+            <select class="form-select" id="group-type-select">
+              <option value="">— Выберите тип —</option>
+              <option value="ordinary">👥 Обычная — закрытая группа для общения, только участники могут писать</option>
+              <option value="public">📢 Публичная — открытая группа, может писать любой, подписка вместо вступления</option>
+              <option value="media">📰 СМИ — канал для публикаций, комментарии включены, нужна верификация</option>
+              <option value="corporate">🏢 Корпоративная — чат клиентов + чат сотрудников + витрина + расписание</option>
+            </select>
+            <div class="form-hint mt-2" id="group-type-hint">С v2 будут преднастроенные типы корпоративных групп. Пока balloo учится каким компаниям что нужно — все функции корпоративных групп бесплатны. С v2 будет доступна реклама вашей продукции.</div>
+          </div>
+    
+    <!-- Corporate note -->
+    <div class="corp-note" id="corp-note" style="display:none;">
+      <div style="font-weight:700;color:var(--info);margin-bottom:6px;">📌 Корпоративная группа</div>
+      <div>С <strong>v2</strong> будут преднастроенные типы корпоративных групп (IT-компания, магазин, сервис и т.д.) с готовыми настройками под каждую нишу.</div>
+      <div style="margin-top:6px;">Пока Balloo учится, каким компаниям что нужно, все функции корпоративных групп <strong>бесплатны</strong>. С v2 будет доступна <strong>реклама вашей продукции</strong> внутри группы.</div>
+    </div>
+
+    <!-- Type-specific options -->
+    <div id="type-specific" style="display:none;margin-top:12px;">
+      <div class="card" style="background:var(--bg-tertiary);border-color:var(--border-color);">
+        <div id="type-specific-content"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings (no link expiration) -->
+  <div class="card mb-4">
+    <h3 class="card__title mb-3">Настройки приватности</h3>
+    <div class="list__item" style="border:none;"><span class="flex-1">Обязательное ознакомление с правилами</span><label class="switch"><input type="checkbox"><span class="switch__slider"></span></label></div>
+    <div class="list__item" style="border:none;"><span class="flex-1">История для новых участников</span><select class="form-select" style="width:auto;"><option>Вся история</option><option>Последние 100</option><option>С момента вступления</option></select></div>
+    <div class="list__item" style="border:none;"><span class="flex-1">Разрешить вложения</span><label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label></div>
+    <div class="text-xs text-muted mt-2">📌 Ссылки-приглашения настраиваются из раздела <a href="settings.html" style="color:var(--accent);">Настройки → Приглашения</a></div>
+  </div>
+
+  <button class="btn btn--secondary btn--block mb-2" onclick="window.location.href='invites.html'">📨 Пригласить участников</button>
+  <button class="btn btn--primary btn--block btn--lg" onclick="window.location.href='chats.html'">Создать группу</button>
+</div></div></div>
+
+<script src="../assets/common.js"></script>
+<script>
+const gradients = [
+  ['#2db84d','#1565c0','#7c3aed'],
+  ['#e76f51','#f4a261','#e9c46a'],
+  ['#264653','#2a9d8f','#a8dadc'],
+  ['#6a040f','#9d0208','#d00000'],
+  ['#003049','#d62828','#f77f00'],
+  ['#3d405b','#81b29a','#f2cc8f'],
+  ['#1d3557','#457b9d','#a8dadc'],
+  ['#2b2d42','#8d99ae','#edf2f4'],
+  ['#001219','#38b000','#70e000'],
+  ['#4a0e4e','#812481','#b239b2']
+];
+const symbols = ['🏢','🌐','💡','📰','🎯','⚡','🔥','🌟','🚀','🎨','📦','💎','🏆','🎪','🌈','🎭','🔮','🧩','🎲','🎸'];
+
+function regenerateAvatar() {
+  const grad = gradients[Math.floor(Math.random() * gradients.length)];
+  const sym = symbols[Math.floor(Math.random() * symbols.length)];
+  const display = document.getElementById('avatar-display');
+  display.style.background = `linear-gradient(135deg, ${grad[0]}, ${grad[1]}, ${grad[2]})`;
+  display.textContent = sym;
+}
+
+function onGroupTypeChange() {
+  const val = document.getElementById('group-type-select').value;
+  const corpNote = document.getElementById('corp-note');
+  const typeSpecific = document.getElementById('type-specific');
+  const typeContent = document.getElementById('type-specific-content');
+  
+  if (val === 'corporate') {
+    corpNote.style.display = 'block';
+    typeSpecific.style.display = 'block';
+    typeContent.innerHTML = `
+      <div class="text-sm text-secondary mb-3">Для корпоративных групп будут доступны:</div>
+      <div class="list__item" style="border:none;padding:6px 0;"><span class="flex-1">🏪 Витрина товаров/услуг</span></div>
+      <div class="list__item" style="border:none;padding:6px 0;"><span class="flex-1">📅 Расписание и адреса офисов</span></div>
+      <div class="list__item" style="border:none;padding:6px 0;"><span class="flex-1">👥 Чат клиентов</span></div>
+      <div class="list__item" style="border:none;padding:6px 0;"><span class="flex-1">👔 Чат сотрудников</span></div>
+      <div class="list__item" style="border:none;padding:6px 0;"><span class="flex-1">📢 Реклама (v2)</span></div>
+      <div class="list__item" style="border:none;padding:6px 0;"><span class="flex-1">📤 Экспорт/импорт настроек</span></div>
+    `;
+  } else if (val === 'ordinary') {
+    corpNote.style.display = 'none';
+    typeSpecific.style.display = 'block';
+    typeContent.innerHTML = `
+      <div class="text-sm text-secondary">Закрытая группа для общения. Только участники могут писать сообщения. Для создания ссылки-приглашения перейдите в <a href="invites.html" style="color:var(--accent);">Настройки → Приглашения</a>.</div>
+    `;
+  } else if (val === 'public') {
+    corpNote.style.display = 'none';
+    typeSpecific.style.display = 'block';
+    typeContent.innerHTML = `
+      <div class="text-sm text-secondary">Открытая группа: может писать любой пользователь. Вместо «вступления» — подписка. Ссылка на группу публична.</div>
+    `;
+  } else if (val === 'media') {
+    corpNote.style.display = 'none';
+    typeSpecific.style.display = 'block';
+    typeContent.innerHTML = `
+      <div class="text-sm text-secondary">Канал для публикаций с комментариями. Нужна верификация как СМИ. В настройках группы — вкладка СМИ с рекламой (пока в разработке).</div>
+    `;
+  } else {
+    corpNote.style.display = 'none';
+    typeSpecific.style.display = 'none';
+  }
+}
+
+// Init random avatar
+regenerateAvatar();
+</script>
+</body>
+</html>

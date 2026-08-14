@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobile — Обзор</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    html { overflow-y: auto; height: auto; }
+    body { overflow-y: auto; height: auto; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 40px 24px; }
+    .phone-frame { width:360px; height:760px; background:var(--bg-secondary); border:3px solid var(--border-strong); border-radius:36px; overflow:hidden; position:relative; display:flex; flex-direction:column; box-shadow:var(--shadow-glass); }
+    .phone-frame__notch { position:absolute; top:0; left:50%; transform:translateX(-50%); width:130px; height:26px; background:var(--bg-primary); border-bottom-left-radius:18px; border-bottom-right-radius:18px; z-index:10; }
+    .phone-frame__statusbar { height:30px; padding:4px 20px 0; display:flex; align-items:center; justify-content:space-between; font-size:12px; color:var(--text-secondary); background:var(--bg-secondary); }
+    .phone-frame__screen { flex:1; overflow:hidden; background:var(--bg-primary); display:flex; flex-direction:column; }
+    .phone-frame__home-bar { height:5px; width:120px; margin:0 auto 8px; background:var(--text-muted); border-radius:3px; }
+    .phone-tabbar { display:flex; height:52px; background:var(--bg-secondary); border-top:1px solid var(--border-color); }
+    .phone-tabbar__item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; font-size:10px; color:var(--text-secondary); cursor:pointer; transition:color 0.15s; }
+    .phone-tabbar__item--active { color:var(--accent); }
+    .phone-tabbar__icon { font-size:20px; line-height:1; }
+    .annotation { max-width:360px; margin:0 auto 8px; padding:0 8px; font-size:12px; color:var(--text-muted); }
+    .annotation strong { color:var(--accent); }
+    .overview-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:16px; }
+    .overview-card { background:var(--bg-glass); border:1px solid var(--border-color); padding:16px; display:flex; flex-direction:column; align-items:center; gap:8px; cursor:pointer; transition:border-color 0.15s; }
+    .overview-card:hover { border-color:var(--accent); }
+    .overview-card__icon { font-size:32px; }
+    .overview-card__title { font-size:13px; font-weight:600; color:var(--text-primary); }
+  </style>
+</head>
+<body>
+<div class="annotation" style="margin-top:24px;"><strong>Mobile — Обзор</strong> Главная страница мобильных макетов</div>
+<div class="phone-frame">
+  <div class="phone-frame__notch"></div>
+  <div class="phone-frame__statusbar"><span>9:41</span><span>📶 🔋</span></div>
+  <div class="phone-frame__screen">
+    <div class="topbar">
+      <div class="topbar__logo">
+        <div class="topbar__logo-icon">B</div><span>Balloo</span>
+        <div class="topbar__dropdown">
+          <div class="topbar__dropdown-item" onclick="window.location.href='balloo-su/chats.html'">💬 Balloo</div>
+          <div class="topbar__dropdown-divider"></div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div>
+        </div>
+      </div>
+      <div class="topbar__title">Balloo Mobile</div>
+      <div class="topbar__right">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact" onclick="window.location.href='profile.html'"><div class="avatar__inner"><span>ИИ</span></div></div>
+        <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+        <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+      </div>
+    </div>
+    <div style="flex:1;overflow-y:auto;">
+      <div class="text-center" style="padding:24px 16px;">
+        <div style="font-size:48px;margin-bottom:8px;">📱</div>
+        <h1 style="font-size:20px;font-weight:800;color:var(--text-primary);">Balloo Messenger</h1>
+        <p style="font-size:13px;color:var(--text-secondary);">Мобильная версия</p>
+      </div>
+      <div class="overview-grid">
+        <div class="overview-card" onclick="window.location.href='chat.html'"><span class="overview-card__icon">💬</span><span class="overview-card__title">Чаты</span></div>
+        <div class="overview-card" onclick="window.location.href='contacts.html'"><span class="overview-card__icon">👥</span><span class="overview-card__title">Контакты</span></div>
+        <div class="overview-card" onclick="window.location.href='stories.html'"><span class="overview-card__icon">📷</span><span class="overview-card__title">Сторис</span></div>
+        <div class="overview-card" onclick="window.location.href='calls-history.html'"><span class="overview-card__icon">📞</span><span class="overview-card__title">Звонки</span></div>
+        <div class="overview-card" onclick="window.location.href='settings.html'"><span class="overview-card__icon">⚙</span><span class="overview-card__title">Настройки</span></div>
+        <div class="overview-card" onclick="window.location.href='profile.html'"><span class="overview-card__icon">👤</span><span class="overview-card__title">Профиль</span></div>
+        <div class="overview-card" onclick="window.location.href='donate.html'"><span class="overview-card__icon">💰</span><span class="overview-card__title">Донат</span></div>
+        <div class="overview-card" onclick="window.location.href='login.html'"><span class="overview-card__icon">🔑</span><span class="overview-card__title">Вход</span></div>
+      </div>
+    </div>
+    <div class="phone-tabbar">
+      <div class="phone-tabbar__item phone-tabbar__item--active" onclick="window.location.href='../mobile/overview.html'"><span class="phone-tabbar__icon">🏠</span>Главная</div>
+      <div class="phone-tabbar__item" onclick="window.location.href='../mobile/chat.html'"><span class="phone-tabbar__icon">💬</span>Чаты</div>
+      <div class="phone-tabbar__item" onclick="window.location.href='../mobile/contacts.html'"><span class="phone-tabbar__icon">👥</span>Контакты</div>
+      <div class="phone-tabbar__item" onclick="window.location.href='../mobile/stories.html'"><span class="phone-tabbar__icon">📷</span>Сторис</div>
+      <div class="phone-tabbar__item" onclick="window.location.href='../mobile/settings.html'"><span class="phone-tabbar__icon">⚙</span>Настройки</div>
+    </div>
+  </div>
+  <div class="phone-frame__home-bar"></div>
+</div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

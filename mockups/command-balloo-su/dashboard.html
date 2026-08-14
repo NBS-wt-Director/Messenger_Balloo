@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Command — Дашборд сотрудника</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--info);">C</div><span>Command</span>
+    <div class="topbar__dropdown"><div class="topbar__dropdown-item">🏢 Command (текущий)</div><div class="topbar__dropdown-divider"></div><div class="topbar__dropdown-item">💬 Balloo</div><div class="topbar__dropdown-item">🛡️ Admin</div><div class="topbar__dropdown-item">💡 Features</div><div class="topbar__dropdown-item">📜 History</div><div class="topbar__dropdown-item">⬇️ Download</div><div class="topbar__dropdown-item">📚 API Docs</div></div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Дашборд</div>
+  <div class="topbar__right"><div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИВ</span></div></div><span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span><span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span></div>
+</div>
+<div class="main">
+  <div class="sidebar sidebar--narrow">
+    <div class="list">
+      <div class="list__item list__item--active">🏠 Дашборд</div>
+      <div class="list__item">💬 Внутренний чат</div>
+      <div class="list__item">📅 Совещания</div>
+      <div class="list__item">📋 Задачи <span class="badge" style="margin-left:auto;">5</span></div>
+      <div class="list__item">🏢 Мой отдел</div>
+      <div class="list__item">🏛️ Подразделения</div>
+      <div class="list__item">👥 HR</div>
+      <div class="list__item">📚 База знаний</div>
+      <div class="list__item">🎯 Найм</div>
+      <div class="list__item">📊 Мониторинг</div>
+      <div class="list__item" style="border-top:1px solid var(--border-color);margin-top:8px;padding-top:12px;">💼 Вакансии</div>
+      <div class="list__item">⭐ Почему мы</div>
+    </div>
+  </div>
+  <div class="content overflow-y-auto"><div class="page-container">
+    <h1 class="page-title">Дашборд сотрудника</h1>
+    <p class="page-subtitle">Добро пожаловать, Иван!</p>
+
+    <div class="flex gap-4 mb-6" style="flex-wrap:wrap;">
+      <div class="card flex-1" style="min-width:180px;"><div class="text-xs text-muted">Активных задач</div><div style="font-size:28px;font-weight:800;color:var(--accent);">5</div><div class="text-xs text-secondary">2 — сегодня</div></div>
+      <div class="card flex-1" style="min-width:180px;"><div class="text-xs text-muted">Pull Requests</div><div style="font-size:28px;font-weight:800;color:var(--info);">3</div><div class="text-xs text-secondary">Ожидают ревью</div></div>
+      <div class="card flex-1" style="min-width:180px;"><div class="text-xs text-muted">Спринт</div><div style="font-size:28px;font-weight:800;color:var(--warning);">8/12</div><div class="text-xs text-secondary">66% завершено</div></div>
+    </div>
+
+    <div class="card mb-4">
+      <h3 class="card__title mb-4">Мои задачи</h3>
+      <div class="list__item" style="border:none;"><span class="chip chip--danger">Срочно</span><span class="flex-1">Завершить макеты мобильного приложения</span><span class="text-xs text-muted">Сегодня</span></div>
+      <div class="list__item" style="border:none;"><span class="chip chip--warning">В работе</span><span class="flex-1">Ревью PR #234 — WebSocket重构</span><span class="text-xs text-muted">Завтра</span></div>
+      <div class="list__item" style="border:none;"><span class="chip chip--info">Бэклог</span><span class="flex-1">Настроить CI/CD pipeline для admin.balloo.su</span><span class="text-xs text-muted">Пт</span></div>
+      <div class="list__item" style="border:none;"><span class="chip chip--info">Бэклог</span><span class="flex-1">Документация API для разработчиков ботов</span><span class="text-xs text-muted">След. неделя</span></div>
+      <div class="list__item" style="border:none;"><span class="chip chip--info">Бэклог</span><span class="flex-1">Миграция БД — добавить таблицу stories</span><span class="text-xs text-muted">След. неделя</span></div>
+    </div>
+
+    <div class="card mb-4">
+      <h3 class="card__title mb-4">Метрики продукта</h3>
+      <div class="list__item" style="border:none;"><span class="flex-1">DAU (Daily Active Users)</span><span class="font-bold text-accent">1 023</span><span class="chip chip--accent">+8%</span></div>
+      <div class="list__item" style="border:none;"><span class="flex-1">MAU (Monthly Active Users)</span><span class="font-bold text-accent">12 345</span><span class="chip chip--accent">+12%</span></div>
+      <div class="list__item" style="border:none;"><span class="flex-1">Retention (7-day)</span><span class="font-bold text-secondary">42%</span><span class="chip chip--warning">-2%</span></div>
+      <div class="list__item" style="border:none;"><span class="flex-1">NPS</span><span class="font-bold text-accent">67</span><span class="chip chip--accent">+5</span></div>
+    </div>
+
+    <div class="card">
+      <h3 class="card__title mb-4">Новости компании</h3>
+      <div class="list__item" style="border:none;"><span class="text-xs text-muted">16 июля</span><div class="flex-1"><div class="font-semibold" style="color:var(--text-primary);">Релиз v1.0.0-beta</div><div class="text-xs text-secondary">Первый бета-релиз мессенджера. 38 экранов готовы.</div></div></div>
+      <div class="list__item" style="border:none;"><span class="text-xs text-muted">15 июля</span><div class="flex-1"><div class="font-semibold" style="color:var(--text-primary);">Новый дизайнер в команде</div><div class="text-xs text-secondary">Мария Андреева присоединилась к команде UI/UX.</div></div></div>
+      <div class="list__item" style="border:none;"><span class="text-xs text-muted">14 июля</span><div class="flex-1"><div class="font-semibold" style="color:var(--text-primary);">Миграция на Kubernetes</div><div class="text-xs text-secondary">Инфраструктура переведена на K8s. Деплой автоматизирован.</div></div></div>
+    </div>
+  </div></div>
+</div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

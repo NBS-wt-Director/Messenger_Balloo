@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog — Статья</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:#a855f7;">📝</div><span>Blog</span>
+    <div class="topbar__dropdown"></div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Статья</div>
+  <div class="topbar__right"></div>
+</div>
+<div class="main">
+  <div class="content overflow-y-auto">
+    <div class="page-container">
+
+      <!-- Neighbor navigation -->
+      <div class="flex justify-between mb-6">
+        <a href="feed.html" class="btn btn--tertiary btn--sm">← Лента</a>
+        <div class="flex gap-2">
+          <a href="post.html?slug=prev" class="btn btn--secondary btn--sm">← Предыдущая</a>
+          <a href="post.html?slug=next" class="btn btn--secondary btn--sm">Следующая →</a>
+        </div>
+      </div>
+
+      <!-- Channel breadcrumb -->
+      <div class="flex items-center gap-2 mb-4">
+        <a href="channel.html?slug=novosti" class="chip" style="cursor:pointer;">📰 Новости</a>
+        <span class="text-muted text-xs">→</span>
+        <span class="text-xs text-secondary">Релиз v1.0.0-beta</span>
+      </div>
+
+      <!-- Cover image -->
+      <div style="width:100%;height:300px;background:linear-gradient(135deg,#1a1d21,#2d3742);display:flex;align-items:center;justify-content:center;font-size:80px;margin-bottom:24px;">🚀</div>
+
+      <!-- Post header -->
+      <h1 class="page-title" style="margin-bottom:8px;">Релиз v1.0.0-beta — первый публичный бета-релиз Balloo</h1>
+      <p class="page-subtitle" style="margin-bottom:16px;">Сегодня мы запускаем первую бета-версию мессенджера Balloo для всех желающих.</p>
+
+      <!-- Author + meta -->
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-3">
+          <a href="../balloo-su/public-profile.html?user=ivan-voronov">
+            <div class="avatar avatar--md avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИВ</span></div></div>
+          </a>
+          <div>
+            <div class="font-semibold" style="color:var(--text-primary);">Иван Воронов</div>
+            <div class="text-xs text-muted">Lead Developer · 16 июля 2026 · 5 мин чтения</div>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <span class="chip">👁 1 234</span>
+          <span class="chip">😀 34</span>
+          <span class="chip">💬 12</span>
+        </div>
+      </div>
+
+      <!-- Post body (markdown rendered) -->
+      <div class="card mb-6">
+        <div class="card__body" style="line-height:1.8;font-size:15px;">
+          <p style="margin-bottom:16px;">Сегодня важный день для нашей команды — мы запускаем <strong>первую бета-версию</strong> мессенджера Balloo. После месяцев разработки, проектирования макетов и настройки инфраструктуры, продукт готов к тестированию широкой аудиторией.</p>
+
+          <h3 style="color:var(--text-primary);margin:24px 0 12px;font-size:18px;">Что внутри беты?</h3>
+          <p style="margin-bottom:16px;">Balloo v1.0.0-beta включает:</p>
+          <ul style="list-style:disc;padding-left:24px;margin-bottom:16px;line-height:2;">
+            <li>Онбординг с 3 приветственными экранами</li>
+            <li>Аутентификация: Email + OAuth (Яндекс, Mail.ru, Rambler)</li>
+            <li>Текстовые сообщения с Markdown, реакции (до 5), вложения</li>
+            <li>1:1 и групповые чаты (4 типа групп)</li>
+            <li>Голосовые и видеозвонки 1:1 (WebRTC)</li>
+            <li>Восьмигранные аватарки с двойной рамкой</li>
+            <li>3 темы оформления: тёмная, светлая, «Наша»</li>
+            <li>6 языков: RU, EN, ZH, FR, BE, HI</li>
+          </ul>
+
+          <blockquote style="border-left:3px solid var(--accent);padding:12px 16px;background:var(--bg-tertiary);margin:16px 0;color:var(--text-secondary);">
+            Balloo — это не просто мессенджер. Это российская технологическая платформа с уникальной визуальной идентичностью.
+          </blockquote>
+
+          <h3 style="color:var(--text-primary);margin:24px 0 12px;font-size:18px;">Что дальше?</h3>
+          <p style="margin-bottom:16px;">В v1.1 мы планируем групповые видеозвонки до 12 человек, а в v2 — P2G threading, истории и бот-маркетплейс. Следите за обновлениями в <a href="../history-balloo-su/version-list.html" class="text-accent">истории версий</a>.</p>
+
+          <p style="margin-bottom:0;">Спасибо всем, кто поддерживал проект на этом этапе! 🙏</p>
+        </div>
+      </div>
+
+      <!-- Tags -->
+      <div class="flex gap-2 mb-6" style="flex-wrap:wrap;">
+        <span class="chip" style="cursor:pointer;">#релиз</span>
+        <span class="chip" style="cursor:pointer;">#beta</span>
+        <span class="chip" style="cursor:pointer;">#v1.0.0</span>
+        <span class="chip" style="cursor:pointer;">#обновление</span>
+      </div>
+
+      <!-- Reactions bar -->
+      <div class="card mb-6">
+        <h3 class="card__title mb-4">Реакции</h3>
+        <div class="flex gap-2" style="flex-wrap:wrap;">
+          <span class="message__reaction message__reaction--mine" style="cursor:pointer;">👍 <span>12</span></span>
+          <span class="message__reaction" style="cursor:pointer;">❤️ <span>8</span></span>
+          <span class="message__reaction" style="cursor:pointer;">🚀 <span>6</span></span>
+          <span class="message__reaction" style="cursor:pointer;">🎉 <span>5</span></span>
+          <span class="message__reaction" style="cursor:pointer;">🔥 <span>3</span></span>
+          <button class="btn btn--tertiary btn--sm">+ Добавить реакцию</button>
+        </div>
+      </div>
+
+      <!-- Comments -->
+      <div class="card mb-6">
+        <h3 class="card__title mb-4">Комментарии (12)</h3>
+
+        <!-- Comment 1 -->
+        <div style="padding:12px 0;border-bottom:1px solid var(--border-color);">
+          <div class="flex items-center gap-2 mb-2">
+            <div class="avatar avatar--xs avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>АП</span></div></div>
+            <span class="font-semibold text-sm">Анна Петрова</span>
+            <span class="text-xs text-muted">2 часа назад</span>
+          </div>
+          <p class="text-sm text-secondary" style="padding-left:40px;">Поздравляю с релизом! Дизайн действительно уникальный, октагоны смотрятся круто 🔥</p>
+          <div class="flex gap-2" style="padding-left:40px;margin-top:6px;">
+            <button class="btn btn--tertiary btn--sm">😀 3</button>
+            <button class="btn btn--tertiary btn--sm">↩ Ответить</button>
+          </div>
+
+          <!-- Nested reply -->
+          <div style="padding-left:40px;margin-top:12px;border-left:2px solid var(--border-color);">
+            <div class="flex items-center gap-2 mb-2" style="padding-left:12px;">
+              <div class="avatar avatar--xs avatar--bordered avatar--status-offline avatar--ctx-contact"><div class="avatar__inner"><span>ИВ</span></div></div>
+              <span class="font-semibold text-sm">Иван Воронов</span>
+              <span class="chip text-xs">Автор</span>
+              <span class="text-xs text-muted">1 час назад</span>
+            </div>
+            <p class="text-sm text-secondary" style="padding-left:52px;">Спасибо, Анна! Мы очень старались 🙏</p>
+          </div>
+        </div>
+
+        <!-- Comment 2 -->
+        <div style="padding:12px 0;">
+          <div class="flex items-center gap-2 mb-2">
+            <div class="avatar avatar--xs avatar--bordered avatar--status-offline avatar--ctx-contact"><div class="avatar__inner"><span>ДС</span></div></div>
+            <span class="font-semibold text-sm">Дмитрий Соколов</span>
+            <span class="text-xs text-muted">3 часа назад</span>
+          </div>
+          <p class="text-sm text-secondary" style="padding-left:40px;">Когда ждать мобильное приложение на iOS?</p>
+          <div class="flex gap-2" style="padding-left:40px;margin-top:6px;">
+            <button class="btn btn--tertiary btn--sm">😀 1</button>
+            <button class="btn btn--tertiary btn--sm">↩ Ответить</button>
+          </div>
+        </div>
+
+        <!-- Comment input -->
+        <div class="input-area mt-4" style="border-top:1px solid var(--border-color);padding-top:16px;">
+          <div class="avatar avatar--xs avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИИ</span></div></div>
+          <textarea class="input-area__field" placeholder="Напишите комментарий…"></textarea>
+          <button class="input-area__btn input-area__btn--send">➤</button>
+        </div>
+      </div>
+
+      <!-- Related posts — 3 шт -->
+      <div class="card">
+        <h3 class="card__title mb-4">📖 Читайте также — 3</h3>
+        <div class="flex gap-4" style="flex-wrap:wrap;">
+          <a href="post.html?slug=dizain-sistema" class="card card--hover flex-1" style="min-width:200px;text-decoration:none;">
+            <div style="font-size:32px;margin-bottom:8px;">🎨</div>
+            <div class="font-semibold text-sm" style="color:var(--text-primary);">Дизайн-система Balloo</div>
+            <div class="text-xs text-muted mt-2">8 мин · 👁 856</div>
+          </a>
+          <a href="post.html?slug=websocket-masshtab" class="card card--hover flex-1" style="min-width:200px;text-decoration:none;">
+            <div style="font-size:32px;margin-bottom:8px;">⚡</div>
+            <div class="font-semibold text-sm" style="color:var(--text-primary);">WebSocket масштабирование</div>
+            <div class="text-xs text-muted mt-2">12 мин · 👁 2.1K</div>
+          </a>
+          <a href="post.html?slug=onboarding-gid" class="card card--hover flex-1" style="min-width:200px;text-decoration:none;">
+            <div style="font-size:32px;margin-bottom:8px;">🚀</div>
+            <div class="font-semibold text-sm" style="color:var(--text-primary);">Онбординг: полное руководство</div>
+            <div class="text-xs text-muted mt-2">5 мин · 👁 432</div>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

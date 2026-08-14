@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo — Создать сторис</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    /* Stories-specific styles */
+    .story-viewer {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 1000;
+      display: none;
+      flex-direction: column;
+    }
+    
+    .story-viewer--visible {
+      display: flex;
+    }
+    
+    .story-viewer--wide .story-viewer__main {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+    
+    .story-viewer__content {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 0;
+    }
+    
+    .story-viewer__frame {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+    
+    .story-viewer__frame--portrait {
+      width: 100%;
+      height: 100%;
+    }
+    
+    .story-viewer__nav-arrow {
+      font-size: 32px;
+      color: rgba(255,255,255,0.7);
+      transition: color 0.15s, transform 0.15s;
+    }
+    
+    .story-viewer__nav:hover .story-viewer__nav-arrow {
+      color: #fff;
+      transform: scale(1.2);
+    }
+    
+    .story-viewer__close {
+      color: #fff;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 8px;
+      transition: color 0.15s, transform 0.15s;
+    }
+    
+    .story-viewer__close:hover {
+      color: var(--accent);
+      transform: scale(1.1);
+    }
+    
+    .story-viewer__progress {
+      display: flex;
+      gap: 4px;
+      padding: 12px 16px 8px;
+      background: rgba(0,0,0,0.3);
+    }
+    
+    .story-viewer__progress-bar {
+      flex: 1;
+      height: 3px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    
+    .story-viewer__progress-fill {
+      height: 100%;
+      background: #fff;
+      width: 0%;
+    }
+    
+    .story-viewer__header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: rgba(0,0,0,0.3);
+    }
+    
+    .story-viewer__avatar {
+      width: 40px;
+      height: 40px;
+      clip-path: var(--octagon-clip);
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+    }
+    
+    .story-viewer__avatar-inner {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .story-viewer__user {
+      flex: 1;
+    }
+    
+    .story-viewer__user-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+    }
+    
+    .story-viewer__user-time {
+      font-size: 11px;
+      color: rgba(255,255,255,0.6);
+    }
+    
+    .story-viewer__footer {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      background: rgba(0,0,0,0.3);
+    }
+    
+    .story-viewer__reply-input {
+      flex: 1;
+      padding: 10px 16px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+      border-radius: 20px;
+    }
+    
+    .story-viewer__reply-input::placeholder {
+      color: rgba(255,255,255,0.5);
+    }
+    
+    .story-viewer__views {
+      color: rgba(255,255,255,0.7);
+      font-size: 13px;
+      cursor: pointer;
+    }
+    
+    /* Stories tray */
+    .stories-tray {
+      display: flex;
+      gap: 16px;
+      padding: 16px;
+      overflow-x: auto;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .story-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      min-width: 72px;
+    }
+    
+    .story-avatar {
+      width: 64px;
+      height: 64px;
+      clip-path: var(--octagon-clip-stories);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    
+    .story-avatar--add {
+      background: var(--accent);
+    }
+    
+    .story-avatar--viewed {
+      background: var(--bg-tertiary);
+      opacity: 0.6;
+    }
+    
+    .story-avatar__inner {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .story-name {
+      font-size: 11px;
+      color: var(--text-secondary);
+      text-align: center;
+      max-width: 72px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+    /* RVP styles */
+    .rvp-section {
+      padding: 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    
+    .rvp-section__title {
+      font-size: 12px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.5);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+    
+    .rvp-section__body {
+      color: rgba(255,255,255,0.85);
+      font-size: 13px;
+    }
+    
+    .story-text-card {
+      background: rgba(0,0,0,0.25);
+      padding: 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .reaction-btn {
+      padding: 6px 12px;
+      border: 2px solid var(--border-color);
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    
+    .reaction-btn.active {
+      border-color: var(--accent);
+      background: rgba(45,184,77,0.15);
+      color: var(--accent);
+    }
+    
+    .reaction-btn:hover {
+      border-color: var(--border-strong);
+      transform: scale(1.05);
+    }
+    
+    /* Story create specific */
+    .story-create-container {
+      display: flex;
+      gap: 24px;
+      padding: 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .story-create__preview {
+      flex: 1;
+      max-width: 400px;
+      position: sticky;
+      top: 80px;
+    }
+    
+    .story-create__editor {
+      flex: 1;
+    }
+    
+    .story-preview-frame {
+      aspect-ratio: 9/16;
+      background: var(--bg-tertiary);
+      border: 2px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      border-radius: 0;
+    }
+    
+    .story-preview-frame--gradient {
+      background: linear-gradient(135deg, #2db84d, #1565c0, #7c3aed);
+    }
+    
+    .story-preview-frame__content {
+      padding: 24px;
+      text-align: center;
+      color: #fff;
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 1.5;
+      z-index: 1;
+    }
+    
+    .story-preview-frame__media {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .story-preview-frame__overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .story-preview-frame__upload {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      color: var(--text-secondary);
+    }
+    
+    .story-preview-frame__upload-icon {
+      font-size: 48px;
+      opacity: 0.5;
+    }
+    
+    .story-create__toolbar {
+      display: flex;
+      gap: 8px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-color);
+      flex-wrap: wrap;
+    }
+    
+    .toolbar-btn {
+      padding: 8px 12px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .toolbar-btn:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+    
+    .toolbar-btn--active {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(45,184,77,0.1);
+    }
+    
+    .color-picker-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+    }
+    
+    .color-swatch {
+      aspect-ratio: 1;
+      border: 2px solid var(--border-color);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    
+    .color-swatch:hover {
+      border-color: var(--accent);
+      transform: scale(1.1);
+    }
+    
+    .color-swatch--active {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px var(--accent);
+    }
+    
+    .story-create__footer {
+      padding: 16px 0;
+      border-top: 1px solid var(--border-color);
+      margin-top: 24px;
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+    
+    /* Mobile styles for stories */
+    @media (max-width: 600px) {
+      .story-viewer--wide .story-viewer__right-panel {
+        display: none;
+      }
+      
+      .story-create-container {
+        flex-direction: column;
+      }
+      
+      .story-create__preview {
+        max-width: 100%;
+        position: static;
+        aspect-ratio: 9/16;
+        max-height: 50vh;
+      }
+    }
+  </style>
+</head>
+<body class="app-flex">
+
+<!-- Top Bar -->
+<div class="topbar">
+  <div class="topbar__logo">
+    <div class="topbar__logo-icon">B</div>
+    <span>Balloo</span>
+    <div class="topbar__dropdown">
+      <div class="topbar__dropdown-item" onclick="window.location.href='chats.html'">💬 Balloo (мессенджер)</div>
+      <div class="topbar__dropdown-divider"></div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div>
+      <div class="topbar__dropdown-divider"></div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='contacts.html'">👤 Контакты</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='search.html'">🔍 Поиск</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='archive.html'">📦 Архив</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='calls.html'">📞 Звонки</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='invites.html'">📨 Приглашения</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='bots.html'">🤖 О ботах</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='about-balloo.html'">ℹ️ О Balloo</div>
+    </div>
+  </div>
+  <div class="topbar__title" onclick="window.location.href='stories.html'">Создать сторис</div>
+  <div class="topbar__actions">
+    <div class="topbar__actions-btn" onclick="window.location.href='stories.html'" title="Назад">←</div>
+  </div>
+  <div class="topbar__right">
+    <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact" onclick="window.location.href='profile.html'">
+      <div class="avatar__inner"><span>ИИ</span></div>
+    </div>
+    <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+    <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+  </div>
+</div>
+
+<!-- Main: Story Create -->
+<div class="main">
+  <div class="content overflow-y-auto">
+    <div class="story-create-container">
+      <!-- Left: Preview -->
+      <div class="story-create__preview">
+        <h3 class="card__title mb-4">📱 Предпросмотр</h3>
+        <div class="story-preview-frame story-preview-frame--gradient" id="story-preview">
+          <div class="story-preview-frame__content" id="preview-text">
+            Ваш текст появится здесь...
+          </div>
+        </div>
+        <div class="text-xs text-muted mt-4">Соотношение сторон: 9:16 · Макс. размер файла: 10 МБ</div>
+      </div>
+      
+      <!-- Right: Editor -->
+      <div class="story-create__editor">
+        <h1 class="page-title mb-6">✨ Новая сторис</h1>
+        
+        <!-- Upload area -->
+        <div class="card mb-6">
+          <h3 class="card__title mb-4">📤 Медиа</h3>
+          <div class="form-group">
+            <label class="form-label">Загрузить фото/видео</label>
+            <div class="flex gap-2">
+              <input type="file" class="form-input flex-1" accept="image/*,video/*" onchange="handleMediaUpload(this)" id="story-file-input">
+              <button class="btn btn--secondary" onclick="document.getElementById('story-file-input').click()" style="white-space:nowrap;" title="Снять через камеру">📷 Камера</button>
+            </div>
+            <div class="form-hint">JPG, PNG, GIF, MP4 · Макс. 10 МБ</div>
+          </div>
+          <div class="form-group">
+            <label class="form-checkbox"><input type="checkbox" onchange="toggleMediaOverlay(this.checked)"><span>Наложить затемнение</span></label>
+          </div>
+        </div>
+        
+        <!-- Text editor -->
+        <div class="card mb-6">
+          <h3 class="card__title mb-4">✏️ Текст</h3>
+          <div class="form-group">
+            <label class="form-label">Введите текст для сторис</label>
+            <textarea class="form-textarea" style="min-height:100px;" placeholder="Напишите что-нибудь..." oninput="updatePreviewText(this.value)"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Шрифт</label>
+            <select class="form-select" onchange="updatePreviewFont(this.value)">
+              <option value="Inter">Inter (по умолчанию)</option>
+              <option value="Manrope">Manrope</option>
+              <option value="Arial Black">Arial Black</option>
+              <option value="Georgia">Georgia</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Размер шрифта</label>
+            <input type="range" min="14" max="32" value="18" oninput="updatePreviewFontSize(this.value)">
+            <div class="text-xs text-muted">Размер: <span id="font-size-value">18</span>px</div>
+          </div>
+        </div>
+        
+        <!-- Background colors -->
+        <div class="card mb-6">
+          <h3 class="card__title mb-4">🎨 Фон</h3>
+          <div class="form-group">
+            <label class="form-label">Градиент</label>
+            <div class="color-picker-grid">
+              <div class="color-swatch color-swatch--active" style="background: linear-gradient(135deg, #2db84d, #1565c0, #7c3aed);" onclick="setGradient(this, 'linear-gradient(135deg, #2db84d, #1565c0, #7c3aed)')"></div>
+              <div class="color-swatch" style="background: linear-gradient(135deg, #f093fb, #f5576c);" onclick="setGradient(this, 'linear-gradient(135deg, #f093fb, #f5576c)')"></div>
+              <div class="color-swatch" style="background: linear-gradient(135deg, #4facfe, #00f2fe);" onclick="setGradient(this, 'linear-gradient(135deg, #4facfe, #00f2fe)')"></div>
+              <div class="color-swatch" style="background: linear-gradient(135deg, #43e97b, #38f9d7);" onclick="setGradient(this, 'linear-gradient(135deg, #43e97b, #38f9d7)')"></div>
+              <div class="color-swatch" style="background: linear-gradient(135deg, #fa709a, #fee140);" onclick="setGradient(this, 'linear-gradient(135deg, #fa709a, #fee140)')"></div>
+              <div class="color-swatch" style="background: linear-gradient(135deg, #a18cd1, #fbc2eb);" onclick="setGradient(this, 'linear-gradient(135deg, #a18cd1, #fbc2eb)')"></div>
+              <div class="color-swatch" style="background: linear-gradient(135deg, #ffecd2, #fcb69f);" onclick="setGradient(this, 'linear-gradient(135deg, #ffecd2, #fcb69f)')"></div>
+              <div class="color-swatch" style="background: linear-gradient(135deg, #667eea, #764ba2);" onclick="setGradient(this, 'linear-gradient(135deg, #667eea, #764ba2)')"></div>
+              <div class="color-swatch" style="background: linear-gradient(135deg, #89f7fe, #66a6ff);" onclick="setGradient(this, 'linear-gradient(135deg, #89f7fe, #66a6ff)')"></div>
+              <div class="color-swatch" style="background: linear-gradient(135deg, #fddb92, #d1fdff);" onclick="setGradient(this, 'linear-gradient(135deg, #fddb92, #d1fdff)')"></div>
+              <div class="color-swatch" style="background: #000000;" onclick="setGradient(this, '#000000')"></div>
+              <div class="color-swatch" style="background: #ffffff;" onclick="setGradient(this, '#ffffff')"></div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Stickers -->
+        <div class="card mb-6">
+          <h3 class="card__title mb-4">😀 Стикеры</h3>
+          <div class="form-group">
+            <label class="form-label">Добавить стикер</label>
+            <div class="flex gap-2 flex-wrap">
+              <button class="toolbar-btn" onclick="addSticker('🔥')">🔥</button>
+              <button class="toolbar-btn" onclick="addSticker('❤️')">❤️</button>
+              <button class="toolbar-btn" onclick="addSticker('😂')">😂</button>
+              <button class="toolbar-btn" onclick="addSticker('👍')">👍</button>
+              <button class="toolbar-btn" onclick="addSticker('🎉')">🎉</button>
+              <button class="toolbar-btn" onclick="addSticker('🚀')">🚀</button>
+              <button class="toolbar-btn" onclick="addSticker('💡')">💡</button>
+              <button class="toolbar-btn" onclick="addSticker('⭐')">⭐</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Visibility settings -->
+        <div class="card mb-6">
+          <h3 class="card__title mb-4">👁 Видимость</h3>
+          <div class="form-group">
+            <label class="form-label">Кто может смотреть</label>
+            <select class="form-select">
+              <option>Все подписчики</option>
+              <option>Друзья</option>
+              <option>Только я</option>
+              <option>Выборочный доступ</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Время хранения</label>
+            <select class="form-select">
+              <option>24 часа (по умолчанию)</option>
+              <option>7 дней</option>
+              <option>30 дней</option>
+            </select>
+            <div class="form-hint">Сторис автоматически удалится после истечения времени</div>
+          </div>
+          <div class="form-group">
+            <label class="form-checkbox"><input type="checkbox" checked><span>Разрешить ответы</span></label>
+          </div>
+          <div class="form-group">
+            <label class="form-checkbox"><input type="checkbox" checked><span>Показывать количество просмотров</span></label>
+          </div>
+        </div>
+        
+        <!-- Footer actions -->
+        <div class="story-create__footer">
+          <button class="btn btn--tertiary" onclick="window.location.href='stories.html'">Отмена</button>
+          <button class="btn btn--secondary" onclick="saveDraft()">💾 Черновик</button>
+          <button class="btn btn--primary" onclick="publishStory()">🚀 Опубликовать</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+<script>
+function updatePreviewText(text) {
+  const preview = document.getElementById('preview-text');
+  preview.textContent = text || 'Ваш текст появится здесь...';
+}
+
+function updatePreviewFont(font) {
+  const preview = document.getElementById('preview-text');
+  preview.style.fontFamily = font;
+}
+
+function updatePreviewFontSize(size) {
+  const preview = document.getElementById('preview-text');
+  preview.style.fontSize = size + 'px';
+  document.getElementById('font-size-value').textContent = size;
+}
+
+function setGradient(el, gradient) {
+  document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('color-swatch--active'));
+  el.classList.add('color-swatch--active');
+  const frame = document.getElementById('story-preview');
+  frame.style.background = gradient;
+}
+
+function handleMediaUpload(input) {
+  if (input.files && input.files[0]) {
+    const file = input.files[0];
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const frame = document.getElementById('story-preview');
+      frame.innerHTML = `<img src="${e.target.result}" class="story-preview-frame__media" alt="Preview">`;
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+function toggleMediaOverlay(checked) {
+  const frame = document.getElementById('story-preview');
+  if (checked) {
+    if (!frame.querySelector('.story-preview-frame__overlay')) {
+      const overlay = document.createElement('div');
+      overlay.className = 'story-preview-frame__overlay';
+      overlay.style.background = 'rgba(0,0,0,0.3)';
+      frame.appendChild(overlay);
+    }
+  } else {
+    const overlay = frame.querySelector('.story-preview-frame__overlay');
+    if (overlay) overlay.remove();
+  }
+}
+
+function addSticker(emoji) {
+  const preview = document.getElementById('story-preview');
+  const sticker = document.createElement('div');
+  sticker.style.cssText = 'position:absolute;font-size:48px;z-index:2;cursor:move;user-select:none;';
+  sticker.textContent = emoji;
+  sticker.style.top = '50%';
+  sticker.style.left = '50%';
+  sticker.style.transform = 'translate(-50%, -50%)';
+  preview.appendChild(sticker);
+}
+
+function saveDraft() {
+  showToast('Черновик сохранён', 'success');
+}
+
+function publishStory() {
+  if (confirm('Опубликовать сторис?')) {
+    showToast('Сторис опубликовано!', 'success');
+    setTimeout(() => {
+      window.location.href = 'stories.html';
+    }, 1000);
+  }
+}
+</script>
+
+</body>
+</html>

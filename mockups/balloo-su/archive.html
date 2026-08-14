@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo — Архив</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon">B</div><span>Balloo</span>
+    <div class="topbar__dropdown"><div class="topbar__dropdown-item" onclick="window.location.href='chats.html'">💬 Balloo</div><div class="topbar__dropdown-divider"></div><div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div><div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div><div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div><div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div><div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div><div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div></div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Архив</div>
+  <div class="topbar__right">
+    <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИИ</span></div></div>
+    <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span><span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+  </div>
+</div>
+
+<div class="main">
+  <div class="content overflow-y-auto">
+    <div class="page-container">
+      <h1 class="page-title">Архив чатов</h1>
+      <p class="page-subtitle">2 архивированных чата</p>
+
+      <div class="list">
+        <div class="list__item">
+          <div class="avatar avatar--md avatar--bordered avatar--status-offline avatar--ctx-new"><div class="avatar__inner"><span>СТ</span></div></div>
+          <div class="list__item-body"><div class="list__item-title">Старый проект</div><div class="list__item-subtitle">Архивирован 10.07.2026</div></div>
+          <button class="btn btn--secondary btn--sm">↩ Восстановить</button>
+          <button class="btn btn--tertiary btn--sm text-danger">🗑</button>
+        </div>
+        <div class="list__item">
+          <div class="avatar avatar--md avatar--bordered avatar--status-offline avatar--ctx-contact"><div class="avatar__inner"><span>ВП</span></div></div>
+          <div class="list__item-body"><div class="list__item-title">Виктор Петров</div><div class="list__item-subtitle">Архивирован 05.07.2026</div></div>
+          <button class="btn btn--secondary btn--sm">↩ Восстановить</button>
+          <button class="btn btn--tertiary btn--sm text-danger">🗑</button>
+        </div>
+      </div>
+
+      <div class="empty-state mt-6">
+        <div class="empty-state__animation">📦</div>
+        <div class="empty-state__title">Нет архивированных чатов</div>
+        <div class="empty-state__subtitle">Архивируйте чат через меню ⋮ → "В архив"</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

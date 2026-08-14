@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo — Контакты</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo">
+    <div class="topbar__logo-icon">B</div><span>Balloo</span>
+    <div class="topbar__dropdown">
+      <div class="topbar__dropdown-item" onclick="window.location.href='chats.html'">💬 Balloo</div>
+      <div class="topbar__dropdown-divider"></div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div>
+    </div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Контакты</div>
+  <div class="topbar__actions"><div class="topbar__actions-btn" onclick="window.location.href='invites.html'">📨</div></div>
+  <div class="topbar__right">
+    <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact" onclick="window.location.href='profile.html'"><div class="avatar__inner"><span>ИИ</span></div></div>
+    <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+    <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+  </div>
+</div>
+
+<div class="main">
+  <div class="sidebar">
+    <div class="sidebar__search"><input type="text" class="search-input" placeholder="🔍 Поиск контактов..."></div>
+    <div class="list">
+      <div class="list__item">
+        <div class="avatar avatar--md avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>МА</span></div></div>
+        <div class="list__item-body"><div class="list__item-title">Мария Андреева</div><div class="list__item-subtitle">в сети</div></div>
+        <div class="list__item-meta">
+          <span class="badge">3</span>
+          <span class="badge badge--square-filled" title="2 пропущенных звонка">📞 2</span>
+        </div>
+      </div>
+      <div class="list__item">
+        <div class="avatar avatar--md avatar--bordered avatar--status-online avatar--ctx-family"><div class="avatar__inner"><span>СМ</span></div></div>
+        <div class="list__item-body"><div class="list__item-title">Семья ❤️</div><div class="list__item-subtitle">в сети • Группа</div></div>
+        <div class="list__item-meta">
+          <span class="badge">5</span>
+        </div>
+      </div>
+      <div class="list__item">
+        <div class="avatar avatar--md avatar--bordered avatar--status-offline avatar--ctx-contact"><div class="avatar__inner"><span>АК</span></div></div>
+        <div class="list__item-body"><div class="list__item-title">Алексей Козлов</div><div class="list__item-subtitle">был 2 часа назад</div></div>
+        <button class="btn btn--secondary btn--sm">💬</button>
+      </div>
+      <div class="list__item">
+        <div class="avatar avatar--md avatar--bordered avatar--status-dnd avatar--ctx-contact"><div class="avatar__inner"><span>ДП</span></div></div>
+        <div class="list__item-body"><div class="list__item-title">Дмитрий Петров</div><div class="list__item-subtitle">🔇 Не беспокоить</div></div>
+        <div class="list__item-meta">
+          <span class="badge badge--square-filled" title="1 пропущенный звонок">📞 1</span>
+        </div>
+      </div>
+      <div class="list__item">
+        <div class="avatar avatar--md avatar--bordered avatar--status-busy avatar--ctx-contact"><div class="avatar__inner"><span>ОС</span></div></div>
+        <div class="list__item-body"><div class="list__item-title">Ольга Смирнова</div><div class="list__item-subtitle">🔴 Занята (в звонке)</div></div>
+        <button class="btn btn--secondary btn--sm">💬</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="page-container">
+      <h1 class="page-title">Контакты</h1>
+
+      <!-- Tabs -->
+      <div class="flex gap-2 mb-4">
+        <button class="btn btn--primary btn--sm">Контакты</button>
+        <button class="btn btn--tertiary btn--sm">👥 Группы</button>
+        <button class="btn btn--tertiary btn--sm">🚫 Чёрный список</button>
+      </div>
+
+      <p class="page-subtitle">5 контактов • 2 группы</p>
+
+      <div class="card mb-4">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="avatar avatar--lg avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>МА</span></div></div>
+          <div class="flex-1">
+            <h3 class="font-bold" style="color:var(--text-primary);">Мария Андреева</h3>
+            <p class="text-sm text-secondary">Дизайнер • Москва</p>
+            <p class="text-xs text-muted mt-2">🟢 В сети • Статус: На работе</p>
+          </div>
+          <button class="btn btn--primary" onclick="window.location.href='chats.html'">💬 Написать</button>
+          <button class="btn btn--secondary btn--icon" title="Аудиозвонок" onclick="openCall('audio')">📞</button>
+          <button class="btn btn--secondary btn--icon" title="Видеозвонок" onclick="openCall('video')">📹</button>
+        </div>
+        <div class="divider"></div>
+        <div class="text-sm text-secondary">
+          <p class="mb-2"><strong style="color:var(--text-primary);">Био:</strong> UI/UX дизайнер. Люблю восьмигранники и геометрию.</p>
+          <p class="mb-2"><strong style="color:var(--text-primary);">Дата рождения:</strong> 15 марта 1995</p>
+          <p class="mb-2"><strong style="color:var(--text-primary);">Дата регистрации:</strong> 1 января 2026</p>
+          <div class="flex gap-2 mt-3">
+            <span class="chip chip--accent">💬 3 новых сообщения</span>
+            <span class="chip chip--danger">📞 2 пропущенных звонка</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn--primary btn--block" onclick="window.location.href='invites.html'">📨 Пригласить друга</button>
+    </div>
+  </div>
+</div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

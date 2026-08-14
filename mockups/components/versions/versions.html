@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Компонент: Versions — Версии</title>
+  <link rel="stylesheet" href="../../assets/common.css">
+  <style>
+    .component-demo { padding: 24px; max-width: 640px; margin: 0 auto; }
+    .component-demo h1 { font-size: 20px; margin-bottom: 16px; }
+    .component-demo .demo-section { margin-bottom: 24px; }
+    .component-demo .demo-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+
+    .versions-list { display: flex; flex-direction: column; gap: 2px; position: relative; }
+    .versions-list::before {
+      content: '';
+      position: absolute;
+      left: 23px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--border-color);
+    }
+    .version-item {
+      display: flex;
+      gap: 16px;
+      padding: 16px 0;
+      position: relative;
+    }
+    .version-item__dot {
+      width: 12px; height: 12px;
+      clip-path: var(--octagon-clip);
+      background: var(--accent);
+      flex-shrink: 0;
+      margin-left: 18px;
+      margin-top: 4px;
+      z-index: 1;
+    }
+    .version-item__dot--archived { background: var(--text-muted); }
+    .version-item__content { flex: 1; }
+    .version-item__header { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+    .version-item__version { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+    .version-item__date { font-size: 12px; color: var(--text-muted); }
+    .version-item__desc { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+    .version-item__changelog { margin-top: 8px; padding-left: 12px; }
+    .version-item__changelog li { font-size: 13px; color: var(--text-secondary); padding: 2px 0; list-style: none; }
+    .version-item__changelog li::before { content: '• '; color: var(--accent); }
+  </style>
+</head>
+<body>
+  <div class="component-demo">
+    <h1>📦 Компонент: Versions (Версии)</h1>
+
+    <div class="demo-section">
+      <div class="demo-label">История версий</div>
+      <div class="versions-list">
+        <div class="version-item">
+          <div class="version-item__dot"></div>
+          <div class="version-item__content">
+            <div class="version-item__header">
+              <span class="version-item__version">v2.4.0</span>
+              <span class="version-item__date">23 июля 2026</span>
+            </div>
+            <div class="version-item__desc">Реестр решений v2 — принятие экранов и подготовка к разработке</div>
+            <ul class="version-item__changelog">
+              <li>Добавлены 43 принятых экрана</li>
+              <li>Обновлена дизайн-система</li>
+              <li>Новые компоненты</li>
+            </ul>
+          </div>
+        </div>
+        <div class="version-item">
+          <div class="version-item__dot"></div>
+          <div class="version-item__content">
+            <div class="version-item__header">
+              <span class="version-item__version">v2.3.0</span>
+              <span class="version-item__date">15 июля 2026</span>
+            </div>
+            <div class="version-item__desc">Улучшения чата и сторис</div>
+            <ul class="version-item__changelog">
+              <li>Новый интерфейс сторис</li>
+              <li>Улучшена доставка сообщений</li>
+            </ul>
+          </div>
+        </div>
+        <div class="version-item">
+          <div class="version-item__dot version-item__dot--archived"></div>
+          <div class="version-item__content">
+            <div class="version-item__header">
+              <span class="version-item__version">v2.2.0</span>
+              <span class="version-item__date">01 июля 2026</span>
+            </div>
+            <div class="version-item__desc">Тёмная тема и русский стиль</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="../../assets/common.js"></script>
+</body>
+</html>

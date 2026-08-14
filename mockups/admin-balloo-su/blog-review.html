@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Ревью статьи</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--warning);">A</div><span>Admin</span>
+    <div class="topbar__dropdown"></div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Ревью статьи</div>
+  <div class="topbar__right"></div>
+</div>
+<div class="main">
+  <div class="sidebar sidebar--narrow">
+    <div class="list">
+      <div class="list__item">📊 Дашборд</div>
+      <div class="list__item">👤 Пользователи</div>
+      <div class="list__item">🚩 Жалобы <span class="badge" style="margin-left:auto;">12</span></div>
+      <div class="list__item">🔨 Баны</div>
+      <div class="list__item">📈 Метрики</div>
+      <div class="list__item">🎛️ Feature Flags</div>
+      <div class="list__item">📁 Файлы</div>
+      <div class="list__item">📝 Тексты</div>
+      <div class="list__item" style="border-top:1px solid var(--border-color);margin-top:8px;padding-top:12px;">🏢 Отделы</div>
+      <div class="list__item">👤 Сотрудники</div>
+      <div class="list__item">💼 Вакансии</div>
+      <div class="list__item">📜 Версии</div>
+      <div class="list__item">💡 Фичи (модерация)</div>
+      <div class="list__item">💚 Донаты</div>
+      <div class="list__item list__item--active" style="border-top:1px solid var(--border-color);margin-top:8px;padding-top:12px;">📝 Блог: Очередь</div>
+      <div class="list__item">📡 Блог: Каналы</div>
+      <div class="list__item">🏷️ Блог: Категории</div>
+      <div class="list__item">📊 Блог: Статистика</div>
+    </div>
+  </div>
+  <div class="content overflow-y-auto"><div class="page-container">
+    <div class="flex justify-between mb-6">
+      <a href="blog-queue.html" class="btn btn--tertiary btn--sm">← Очередь</a>
+      <div class="flex gap-2">
+        <button class="btn btn--secondary btn--sm">👁 Предпросмотр</button>
+      </div>
+    </div>
+
+    <h1 class="page-title">Ревью статьи</h1>
+    <span class="chip chip--warning mb-6" style="display:inline-flex;">На ревью</span>
+
+    <!-- Article metadata -->
+    <div class="card mb-6">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-3">
+          <div class="avatar avatar--md avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИВ</span></div></div>
+          <div>
+            <div class="font-semibold" style="color:var(--text-primary);">Иван Воронов</div>
+            <div class="text-xs text-muted">Lead Developer · подал 15 июля 2026</div>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <span class="chip">⚙️ Технологии</span>
+          <span class="chip">Технологии</span>
+        </div>
+      </div>
+      <h2 style="font-size:20px;font-weight:800;color:var(--text-primary);margin-bottom:8px;">Архитектура realtime: WebSocket, Redis Pub/Sub и очереди</h2>
+      <p class="text-secondary text-sm">Как устроена realtime-обработка сообщений в Balloo: WebSocket gateway, Redis Pub/Sub, воркеры и очереди.</p>
+    </div>
+
+    <!-- Article preview -->
+    <div class="card mb-6">
+      <h3 class="card__title mb-4">📄 Содержание статьи</h3>
+      <div class="card__body" style="line-height:1.8;font-size:14px;background:var(--bg-tertiary);padding:16px;">
+        <h4 style="color:var(--text-primary);margin-bottom:8px;">## Введение</h4>
+        <p style="margin-bottom:12px;">В Balloo realtime-обновления — основа UX. Сообщения, реакции, статусы — всё должно доходить мгновенно.</p>
+        <h4 style="color:var(--text-primary);margin-bottom:8px;">## Архитектура</h4>
+        <p style="margin-bottom:12px;">Мы используем <strong>Hono + uWebSockets.js</strong> для WebSocket-сервера...</p>
+        <p style="margin-bottom:0;color:var(--text-muted);font-style:italic;">[... продолжение статьи ...]</p>
+      </div>
+    </div>
+
+    <!-- Tags -->
+    <div class="card mb-6">
+      <h3 class="card__title mb-4">Теги</h3>
+      <div class="flex gap-2" style="flex-wrap:wrap;">
+        <span class="chip">#websocket</span>
+        <span class="chip">#redis</span>
+        <span class="chip">#архитектура</span>
+        <span class="chip">#realtime</span>
+      </div>
+    </div>
+
+    <!-- Review decision -->
+    <div class="card" style="border-left:3px solid var(--accent);">
+      <h3 class="card__title mb-4">Решение по статье</h3>
+      <div class="form-group">
+        <label class="form-label">Комментарий автору (обязательно при отклонении / правках)</label>
+        <textarea class="form-textarea" placeholder="Напишите комментарий для автора…" style="min-height:80px;"></textarea>
+      </div>
+      <div class="flex gap-2">
+        <button class="btn btn--primary">✓ Одобрить и опубликовать</button>
+        <button class="btn btn--secondary" onclick="openModal('modal-request-fixes')">⚠ Запросить правки</button>
+        <button class="btn btn--danger">✕ Отклонить</button>
+      </div>
+    </div>
+  </div></div>
+</div>
+<script src="../assets/common.js"></script>
+
+<!-- Modal: Request fixes -->
+<div class="modal-overlay" id="modal-overlay"></div>
+<div class="modal modal--status-warning" id="modal-request-fixes">
+  <div class="modal__header"><span class="modal__title">⚠ Запросить правки</span><div class="modal__close" onclick="closeModal('modal-request-fixes')">✕</div></div>
+  <div class="modal__body">
+    <p class="text-sm text-secondary mb-4">Укажите что именно нужно исправить. Автор получит уведомление.</p>
+    <div class="form-group">
+      <label class="form-label">Что нужно исправить? *</label>
+      <textarea class="form-textarea" placeholder="Опишите правки подробно: например, 'Заменить заголовок', 'Добавить примеры кода', 'Исправить ошибки'..." style="min-height:120px;" required></textarea>
+    </div>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--tertiary" onclick="closeModal('modal-request-fixes')">Отмена</button>
+    <button class="btn btn--warning" onclick="closeModal('modal-request-fixes')">Отправить правки</button>
+  </div>
+</div>
+</script>
+</body>
+</html>

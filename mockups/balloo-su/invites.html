@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo — Приглашения</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    .invite-card--inactive { opacity: 0.4; pointer-events: none; }
+    .invite-card--active { border-left: 3px solid var(--accent); }
+    .duration-toggle { display: flex; gap: 4px; }
+    .duration-toggle .btn.active { background: var(--accent); color: white; }
+    .qr-preview { text-align: center; padding: 20px; }
+    .referral-badge { background: linear-gradient(135deg, var(--accent), #1a8a3a); color: white; padding: 4px 12px; border-radius: 4px; font-size: 12px; }
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon">B</div><span>Balloo</span>
+    <div class="topbar__dropdown"><div class="topbar__dropdown-item" onclick="window.location.href='chats.html'">💬 Balloo</div><div class="topbar__dropdown-divider"></div><div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div><div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div><div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div><div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div><div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div><div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div></div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Приглашения</div>
+  <div class="topbar__actions"><div class="topbar__actions-btn" onclick="openModal('modal-create-invite')">✏</div></div>
+  <div class="topbar__right"><div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИИ</span></div></div><span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span><span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span></div>
+</div>
+<div class="main"><div class="content overflow-y-auto"><div class="page-container">
+  <h1 class="page-title">Приглашения</h1>
+  <p class="page-subtitle">Создавайте ссылки-приглашения для групп и отдельных пользователей</p>
+
+  <!-- Referral badge (v2 preview) -->
+  <div class="card mb-4" style="background:linear-gradient(135deg, rgba(45,184,77,0.08), rgba(45,184,77,0.02));border-color:var(--accent);">
+    <div class="flex items-center gap-3">
+      <span style="font-size:24px;">🚀</span>
+      <div>
+        <div class="text-sm font-bold">Реферальная программа — v2</div>
+        <div class="text-xs text-secondary">В следующем обновлении: бонусы за приглашённых, реферальные ссылки с отслеживанием</div>
+      </div>
+    </div>
+  </div>
+
+  <div data-tab-group="invites" class="mb-4">
+    <div class="tabs">
+      <div class="tab tab--active" onclick="switchTab('invites',0)">Мои приглашения</div>
+      <div class="tab" onclick="switchTab('invites',1)">Создать</div>
+    </div>
+
+    <!-- Tab: Мои приглашения -->
+    <div class="tab-panel" style="display:block;">
+      <!-- Filters and stats -->
+      <div class="flex gap-3 mb-4" style="flex-wrap:wrap;">
+        <select class="form-select" style="width:auto;" onchange="filterInvites(this.value)">
+          <option value="all">Все статусы</option>
+          <option value="active">Активные</option>
+          <option value="accepted">Принято</option>
+          <option value="expired">Истекло</option>
+        </select>
+      </div>
+      <div class="flex gap-3 mb-4" style="flex-wrap:wrap;">
+        <div class="card flex-1" style="min-width:100px;"><div class="text-xs text-muted">Отправлено</div><div style="font-size:20px;font-weight:800;">8</div></div>
+        <div class="card flex-1" style="min-width:100px;"><div class="text-xs text-muted">Принято</div><div style="font-size:20px;font-weight:800;color:var(--accent);">12</div></div>
+        <div class="card flex-1" style="min-width:100px;"><div class="text-xs text-muted">Истекло</div><div style="font-size:20px;font-weight:800;color:var(--text-muted);">3</div></div>
+      </div>
+
+      <!-- Active invites -->
+      <div class="card invite-card--active mb-4">
+        <div class="flex items-center justify-between mb-2">
+          <div>
+            <span class="font-bold" style="color:var(--text-primary);">Ссылка для группы "Команда разработки"</span>
+            <span class="chip chip--accent ml-2">Активно</span>
+          </div>
+          <div class="flex gap-1">
+            <button class="btn btn--tertiary btn--xs" onclick="copyInviteLink('devteam')" title="Копировать ссылку">📋 Копировать</button>
+            <button class="btn btn--tertiary btn--xs" onclick="openModal('modal-qr-code')" title="Загрузить QR-код">📱 QR</button>
+            <button class="btn btn--tertiary btn--xs" onclick="deactivateInvite(this)" title="Деактивировать">⏸</button>
+          </div>
+        </div>
+        <p class="text-sm text-secondary">Группа: Команда разработки (неизменяемая) · Добавлять в контакты: ✅</p>
+        <p class="text-xs text-muted mb-2">Тип: Безлимит · Создано: 01.07.2026</p>
+        <div class="flex gap-2">
+          <span class="text-xs text-muted">Приглашено: 8 / ∞</span>
+          <span class="text-xs text-muted">Осталось: пока группа существует</span>
+        </div>
+      </div>
+
+      <div class="card invite-card--active mb-4">
+        <div class="flex items-center justify-between mb-2">
+          <div>
+            <span class="font-bold" style="color:var(--text-primary);">Ссылка для "Семья ❤️"</span>
+            <span class="chip chip--accent ml-2">Активно</span>
+          </div>
+          <div class="flex gap-1">
+            <button class="btn btn--tertiary btn--xs" onclick="copyInviteLink('family')" title="Копировать ссылку">📋 Копировать</button>
+            <button class="btn btn--tertiary btn--xs" onclick="openModal('modal-qr-code')" title="Загрузить QR-код">📱 QR</button>
+            <button class="btn btn--tertiary btn--xs" onclick="deactivateInvite(this)" title="Деактивировать">⏸</button>
+          </div>
+        </div>
+        <p class="text-sm text-secondary">Группа: Семья ❤️ (неизменяемая) · Добавлять в контакты: ❌</p>
+        <p class="text-xs text-muted mb-2">Тип: Количество · Лимит: 10 · Создано: 10.07.2026</p>
+        <div class="flex gap-2">
+          <span class="text-xs text-muted">Приглашено: 3 / 10</span>
+          <span class="chip chip--info">осталось 7 мест</span>
+        </div>
+      </div>
+
+      <div class="card invite-card--active mb-4">
+        <div class="flex items-center justify-between mb-2">
+          <div>
+            <span class="font-bold" style="color:var(--text-primary);">Ссылка для "Технологии будущего"</span>
+            <span class="chip chip--warning ml-2">Активно</span>
+          </div>
+          <div class="flex gap-1">
+            <button class="btn btn--tertiary btn--xs" onclick="copyInviteLink('tech')" title="Копировать ссылку">📋 Копировать</button>
+            <button class="btn btn--tertiary btn--xs" onclick="openModal('modal-qr-code')" title="Загрузить QR-код">📱 QR</button>
+            <button class="btn btn--tertiary btn--xs" onclick="deactivateInvite(this)" title="Деактивировать">⏸</button>
+          </div>
+        </div>
+        <p class="text-sm text-secondary">Группа: Технологии будущего (неизменяемая) · Добавлять в контакты: ✅</p>
+        <p class="text-xs text-muted mb-2">Тип: Срок · Истекает: 25.07.2026 14:30 · Создано: 15.07.2026</p>
+        <div class="flex gap-2">
+          <span class="text-xs text-muted">Приглашено: 1 / ∞</span>
+          <span class="text-xs text-muted">Осталось: 5 дней 18 часов</span>
+        </div>
+      </div>
+
+      <!-- Inactive invites -->
+      <div class="card invite-card--inactive mb-4">
+        <div class="flex items-center justify-between mb-2">
+          <div>
+            <span class="font-bold" style="color:var(--text-primary);">Ссылка для "Баллоо Блог"</span>
+            <span class="chip chip--info ml-2">Деактивирована</span>
+          </div>
+        </div>
+        <p class="text-sm text-secondary">Группа: Баллоо Блог · Создано: 01.06.2026 · Деактивирована: 15.06.2026</p>
+      </div>
+
+      <div class="card invite-card--inactive mb-4">
+        <div class="flex items-center justify-between mb-2">
+          <div>
+            <span class="font-bold" style="color:var(--text-primary);">Ссылка для "Стартап 2025"</span>
+            <span class="chip chip--info ml-2">Истекла</span>
+          </div>
+        </div>
+        <p class="text-sm text-secondary">Группа: Стартап 2025 · Срок: 30.06.2026 · Истекла: 30.06.2026</p>
+      </div>
+    </div>
+
+    <!-- Tab: Создать приглашение -->
+    <div class="tab-panel" style="display:none;">
+      <div class="card">
+        <h3 class="card__title mb-4">➕ Новое приглашение</h3>
+        <!-- Group selection -->
+        <div class="form-group mb-4">
+          <label class="form-label">Выберите группу</label>
+          <div style="position:relative;">
+            <input type="text" class="form-input" id="invite-groups-display" placeholder="Выберите группы..." value="Команда разработки" readonly onclick="document.getElementById('invite-groups-dd').style.display='block'" style="cursor:pointer;">
+            <div id="invite-groups-dd" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg-secondary);border:1px solid var(--border-color);z-index:10;max-height:200px;overflow-y:auto;">
+              <label class="form-checkbox" style="padding:8px 14px;cursor:pointer;" onclick="event.stopPropagation()"><input type="checkbox" checked data-group="Команда разработки" onchange="updateInviteGroups()"><span>Команда разработки (создатель)</span></label>
+              <label class="form-checkbox" style="padding:8px 14px;cursor:pointer;" onclick="event.stopPropagation()"><input type="checkbox" data-group="Технологии будущего" onchange="updateInviteGroups()"><span>Технологии будущего (админ)</span></label>
+              <label class="form-checkbox" style="padding:8px 14px;cursor:pointer;" onclick="event.stopPropagation()"><input type="checkbox" data-group="Семья ❤️" onchange="updateInviteGroups()"><span>Семья ❤️ (админ)</span></label>
+              <label class="form-checkbox" style="padding:8px 14px;cursor:pointer;" onclick="event.stopPropagation()"><input type="checkbox" data-group="Баллоо Блог" onchange="updateInviteGroups()"><span>Баллоо Блог (модератор)</span></label>
+            </div>
+          </div>
+          <p class="form-hint">Администраторы групп могут запретить добавление в приглашения. Группы, выбранные из приглашения, неудаляемые.</p>
+        </div>
+        <!-- Add to contacts -->
+        <div class="form-group mb-4">
+          <label class="form-label">Добавлять приглашённых в контакты</label>
+          <label class="form-checkbox"><input type="checkbox" checked><span>Автоматически добавлять в контакты создавшего</span></label>
+        </div>
+        <!-- Custom text (optional) -->
+        <div class="form-group mb-4">
+          <label class="form-label">Текст на странице приглашения <span class="text-muted">(опционально)</span></label>
+          <textarea class="form-textarea" style="min-height:60px;" placeholder="Привет! Присоединяйся к нашей группе..."></textarea>
+        </div>
+        <!-- Duration toggle -->
+        <div class="form-group mb-4">
+          <label class="form-label">Тип действия приглашения</label>
+          <div class="duration-toggle mb-3">
+            <button class="btn btn--primary btn--sm active" id="dur-unlimited" onclick="setDuration('unlimited',this)">🔄 Безлимит</button>
+            <button class="btn btn--tertiary btn--sm" id="dur-count" onclick="setDuration('count',this)">🔢 Количество</button>
+            <button class="btn btn--tertiary btn--sm" id="dur-time" onclick="setDuration('time',this)">⏰ Срок</button>
+          </div>
+          <!-- Count options -->
+          <div id="dur-count-options" style="display:none;">
+            <div class="flex items-center gap-3">
+              <span class="text-sm">Лимит приглашённых:</span>
+              <input type="number" class="form-input" style="width:100px;" value="10" min="1" max="999">
+              <span class="text-xs text-muted">больше не пригласить</span>
+            </div>
+          </div>
+          <!-- Time options -->
+          <div id="dur-time-options" style="display:none;">
+            <div class="form-group">
+              <label class="form-label">Дата и время истечения</label>
+              <input type="datetime-local" class="form-input">
+            </div>
+            <div class="text-xs text-muted mt-1">или через N дней/часов:</div>
+            <div class="flex gap-2 mt-2">
+              <input type="number" class="form-input" style="width:80px;" placeholder="7" value="7">
+              <select class="form-select" style="width:auto;"><option>дней</option><option>часов</option><option>недель</option></select>
+            </div>
+          </div>
+        </div>
+        <!-- Buttons -->
+        <div class="flex gap-3">
+          <button class="btn btn--primary" onclick="createInvite()">💾 Сохранить</button>
+          <button class="btn btn--tertiary">Отмена</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></div></div>
+
+<!-- Modal: QR Code -->
+<div class="modal" id="modal-qr-code">
+  <div class="modal__header"><span class="modal__title">📱 QR-код приглашения</span><div class="modal__close" onclick="closeModal('modal-qr-code')">✕</div></div>
+  <div class="modal__body">
+    <div class="qr-preview">
+      <div style="width:200px;height:200px;background:white;margin:0 auto;padding:10px;display:flex;align-items:center;justify-content:center;">
+        <div style="width:100%;height:100%;display:grid;grid-template-columns:repeat(21,1fr);grid-template-rows:repeat(21,1fr);">
+          <!-- QR pattern placeholder -->
+          <div style="grid-column:1/7;grid-row:1/7;background:#000;"></div>
+          <div style="grid-column:1/3;grid-row:7/19;background:#000;"></div>
+          <div style="grid-column:16/22;grid-row:1/7;background:#000;"></div>
+          <div style="grid-column:1/3;grid-row:14/20;background:#000;"></div>
+          <div style="grid-column:16/22;grid-row:14/20;background:#000;"></div>
+          <div style="grid-column:8/10;grid-row:8/10;background:#000;"></div>
+          <div style="grid-column:12/14;grid-row:12/14;background:#000;"></div>
+        </div>
+      </div>
+      <div style="margin-top:8px;">
+        <div style="width:40px;height:40px;background:var(--accent);border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;">B</div>
+      </div>
+      <p class="text-xs text-muted mt-2">QR-код с логотипом Balloo по центру</p>
+    </div>
+    <button class="btn btn--primary btn--block mt-3" onclick="downloadQR()">📥 Скачать JPG</button>
+  </div>
+</div>
+
+<!-- Modal: Create Invite (for "Пригласить" from group settings) -->
+<div class="modal" id="modal-create-invite">
+  <div class="modal__header"><span class="modal__title">➕ Создать приглашение</span><div class="modal__close" onclick="closeModal('modal-create-invite')">✕</div></div>
+  <div class="modal__body">
+    <div class="form-group mb-4">
+      <label class="form-label">Выберите группу</label>
+      <div style="position:relative;">
+        <input type="text" class="form-input" id="modal-invite-groups-display" placeholder="Выберите группы..." value="" readonly onclick="document.getElementById('modal-invite-groups-dd').style.display='block'" style="cursor:pointer;">
+        <div id="modal-invite-groups-dd" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg-secondary);border:1px solid var(--border-color);z-index:10;max-height:200px;overflow-y:auto;">
+          <label class="form-checkbox" style="padding:8px 14px;cursor:pointer;" onclick="event.stopPropagation()"><input type="checkbox" data-group="Команда разработки" onchange="updateModalInviteGroups()"><span>Команда разработки</span></label>
+          <label class="form-checkbox" style="padding:8px 14px;cursor:pointer;" onclick="event.stopPropagation()"><input type="checkbox" data-group="Технологии будущего" onchange="updateModalInviteGroups()"><span>Технологии будущего</span></label>
+          <label class="form-checkbox" style="padding:8px 14px;cursor:pointer;" onclick="event.stopPropagation()"><input type="checkbox" data-group="Семья ❤️" onchange="updateModalInviteGroups()"><span>Семья ❤️</span></label>
+        </div>
+      </div>
+    </div>
+    <div class="form-group mb-4">
+      <label class="form-label">Добавлять в контакты</label>
+      <label class="form-checkbox"><input type="checkbox" checked><span>Автоматически добавлять в контакты</span></label>
+    </div>
+    <div class="form-group mb-4">
+      <label class="form-label">Текст на странице приглашения <span class="text-muted">(опционально)</span></label>
+      <textarea class="form-textarea" style="min-height:60px;" placeholder="Привет! Присоединяйся..."></textarea>
+    </div>
+    <div class="form-group mb-4">
+      <label class="form-label">Тип действия</label>
+      <div class="duration-toggle mb-3">
+        <button class="btn btn--primary btn--sm active" onclick="setDuration('unlimited',this)">🔄 Безлимит</button>
+        <button class="btn btn--tertiary btn--sm" onclick="setDuration('count',this)">🔢 Количество</button>
+        <button class="btn btn--tertiary btn--sm" onclick="setDuration('time',this)">⏰ Срок</button>
+      </div>
+    </div>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--tertiary" onclick="closeModal('modal-create-invite')">Отмена</button>
+    <button class="btn btn--primary" onclick="closeModal('modal-create-invite')">💾 Сохранить</button>
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+<script>
+function updateInviteGroups() {
+  const checked = document.querySelectorAll('#invite-groups-dd input:checked');
+  const names = Array.from(checked).map(cb => cb.dataset.group);
+  document.getElementById('invite-groups-display').value = names.join(', ');
+}
+
+function updateModalInviteGroups() {
+  const checked = document.querySelectorAll('#modal-invite-groups-dd input:checked');
+  const names = Array.from(checked).map(cb => cb.dataset.group);
+  document.getElementById('modal-invite-groups-display').value = names.join(', ');
+}
+
+function setDuration(type, btn) {
+  btn.parentElement.querySelectorAll('.btn').forEach(b => { b.classList.remove('btn--primary','active'); b.classList.add('btn--tertiary'); });
+  btn.classList.remove('btn--tertiary');
+  btn.classList.add('btn--primary','active');
+  document.getElementById('dur-count-options').style.display = type === 'count' ? 'block' : 'none';
+  document.getElementById('dur-time-options').style.display = type === 'time' ? 'block' : 'none';
+}
+
+function copyInviteLink(id) {
+  navigator.clipboard?.writeText('https://balloo.su/join/' + id);
+  alert('Ссылка скопирована в буфер обмена!');
+}
+
+function deactivateInvite(btn) {
+  const card = btn.closest('.card');
+  if (confirm('Деактивировать это приглашение?')) {
+    card.classList.remove('invite-card--active');
+    card.classList.add('invite-card--inactive');
+    const chip = card.querySelector('.chip');
+    chip.textContent = 'Деактивирована';
+    chip.className = 'chip chip--info ml-2';
+    // Remove action buttons
+    const actions = card.querySelector('.flex.gap-1');
+    if (actions) actions.remove();
+  }
+}
+
+function createInvite() {
+  // In real app: send to API, save, show link copied
+  alert('Приглашение создано! Ссылка скопирована в буфер обмена.');
+  closeModal('modal-create-invite');
+}
+
+function downloadQR() {
+  alert('Отправка запроса на генерацию QR-кода (JPG с логотипом Balloo)...');
+}
+
+// Close dropdowns on outside click
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('#invite-groups-dd') && !e.target.closest('#invite-groups-display')) {
+    document.getElementById('invite-groups-dd').style.display = 'none';
+  }
+  if (!e.target.closest('#modal-invite-groups-dd') && !e.target.closest('#modal-invite-groups-display')) {
+    document.getElementById('modal-invite-groups-dd').style.display = 'none';
+  }
+});
+
+function filterInvites(status) {
+  // In real app: filter invite cards by status
+}
+</script>
+</body>
+</html>

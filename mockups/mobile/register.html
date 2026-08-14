@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobile — Регистрация</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    html { overflow-y: auto; height: auto; }
+    body { overflow-y: auto; height: auto; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 40px 24px; }
+    .phone-frame { width:360px; height:760px; background:var(--bg-secondary); border:3px solid var(--border-strong); border-radius:36px; overflow:hidden; position:relative; display:flex; flex-direction:column; box-shadow:var(--shadow-glass); }
+    .phone-frame__notch { position:absolute; top:0; left:50%; transform:translateX(-50%); width:130px; height:26px; background:var(--bg-primary); border-bottom-left-radius:18px; border-bottom-right-radius:18px; z-index:10; }
+    .phone-frame__statusbar { height:30px; padding:4px 20px 0; display:flex; align-items:center; justify-content:space-between; font-size:12px; color:var(--text-secondary); background:var(--bg-secondary); }
+    .phone-frame__screen { flex:1; overflow:hidden; background:var(--bg-primary); display:flex; flex-direction:column; }
+    .phone-frame__home-bar { height:5px; width:120px; margin:0 auto 8px; background:var(--text-muted); border-radius:3px; }
+    .annotation { max-width:360px; margin:0 auto 8px; padding:0 8px; font-size:12px; color:var(--text-muted); }
+    .annotation strong { color:var(--accent); }
+  </style>
+</head>
+<body>
+<div class="annotation" style="margin-top:24px;"><strong>Mobile — Регистрация</strong> КОПИЯ WEB: balloo-su/register.html</div>
+<div class="phone-frame">
+  <div class="phone-frame__notch"></div>
+  <div class="phone-frame__statusbar"><span>9:41</span><span>📶 🔋</span></div>
+  <div class="phone-frame__screen">
+    <!-- TOPBAR (обязательный) -->
+    <div class="topbar">
+      <div class="topbar__logo">
+        <div class="topbar__logo-icon">B</div><span>Balloo</span>
+        <div class="topbar__dropdown">
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/chats.html'">💬 Balloo</div>
+          <div class="topbar__dropdown-divider"></div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div>
+        </div>
+      </div>
+      <div class="topbar__title">Регистрация</div>
+      <div class="topbar__right">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact" onclick="window.location.href='profile.html'"><div class="avatar__inner"><span>ИИ</span></div></div>
+        <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+        <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+      </div>
+    </div>
+    <!-- AUTH FORM -->
+    <div class="auth-container" style="padding:24px;overflow-y:auto;">
+      <div class="auth-card" style="max-width:100%;">
+        <div class="auth-title">Создать аккаунт</div>
+        <div class="auth-subtitle">Зарегистрируйтесь в Balloo Messenger</div>
+
+        <!-- OAuth -->
+        <div class="auth-oauth">
+          <button class="auth-oauth-btn" onclick="alert('OAuth: Яндекс')">
+            <span style="color:#fc3f1d;">Y</span> Через Яндекс
+          </button>
+          <button class="auth-oauth-btn" onclick="alert('OAuth: Mail.ru')">
+            <span style="color:#005ff9;">@</span> Через Mail.ru
+          </button>
+          <button class="auth-oauth-btn" onclick="alert('OAuth: Rambler')">
+            <span style="color:#ffcc00;">R</span> Через Rambler
+          </button>
+        </div>
+
+        <div class="auth-divider">или email</div>
+
+        <!-- Name -->
+        <div class="form-group">
+          <label class="form-label">Имя</label>
+          <input type="text" class="form-input" placeholder="Иван Иванов" id="reg-name" oninput="updateAvatarPreview()">
+        </div>
+
+        <!-- Auto-avatar preview -->
+        <div class="form-group">
+          <label class="form-label">Аватарка</label>
+          <div class="flex items-center gap-3">
+            <div class="avatar avatar--lg avatar--bordered" id="reg-avatar-preview" style="background:linear-gradient(135deg,#2db84d,#1e9e3e);">
+              <div class="avatar__inner"><span style="font-size:28px;color:#fff;font-weight:700;" id="reg-avatar-letters">ИИ</span></div>
+            </div>
+            <div class="flex-1">
+              <p class="text-xs text-secondary mb-2">Автоаватар генерируется из имени со случайным градиентом фона</p>
+              <button class="btn btn--tertiary btn--sm" onclick="document.getElementById('reg-avatar-file').click()">📷 Загрузить свою</button>
+              <input type="file" id="reg-avatar-file" accept="image/png,image/jpeg,image/svg+xml" style="display:none;">
+            </div>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" placeholder="ivan@example.com">
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label class="form-label">Пароль</label>
+          <input type="password" class="form-input" placeholder="Минимум 8 символов">
+          <p class="form-hint">Латиница, кириллица, цифры и спецсимволы</p>
+        </div>
+
+        <!-- Rules agreement -->
+        <div class="form-group">
+          <label class="form-checkbox">
+            <input type="checkbox">
+            <span class="text-sm text-secondary">Я согласен с <a href="#" style="color:var(--accent);">правилами</a> и политикой конфиденциальности</span>
+          </label>
+        </div>
+
+        <!-- Custom captcha -->
+        <div class="card mb-4" style="padding:12px;">
+          <div class="flex items-center gap-3 mb-2">
+            <div style="width:120px;height:40px;background:var(--bg-tertiary);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;letter-spacing:4px;color:var(--text-secondary);font-family:monospace;user-select:none;" id="reg-captcha-display">
+              A7Км2р
+            </div>
+            <button class="btn btn--tertiary btn--sm" title="Обновить" onclick="alert('Капча обновлена')">🔄</button>
+          </div>
+          <input type="text" class="form-input" placeholder="Введите код с картинки">
+        </div>
+
+        <button class="btn btn--primary btn--block mb-4" id="reg-submit-btn" onclick="showCodeStep()">Зарегистрироваться</button>
+
+        <!-- Email confirmation code step (hidden initially) -->
+        <div id="reg-code-step" style="display:none;">
+          <div class="card mb-4" style="padding:16px;border-left:4px solid var(--accent);">
+            <p class="text-sm text-secondary mb-3">📨 На ваш email отправлен код подтверждения. Введите его ниже:</p>
+            <div class="form-group mb-3">
+              <input type="text" class="form-input" placeholder="6-значный код" maxlength="6" style="text-align:center;font-size:20px;letter-spacing:8px;font-family:monospace;">
+            </div>
+            <button class="btn btn--primary btn--block mb-2">Подтвердить</button>
+            <p class="text-xs text-muted text-center">Не пришёл код? <a href="#" class="text-accent">Отправить снова</a> (через 60 сек)</p>
+          </div>
+        </div>
+
+        <p class="text-center text-sm text-secondary">
+          Уже есть аккаунт? <a href="login.html" style="color:var(--accent);font-weight:600;">Войти</a>
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="phone-frame__home-bar"></div>
+</div>
+
+<script src="../assets/common.js"></script>
+<script>
+function updateAvatarPreview() {
+  var name = document.getElementById('reg-name').value.trim();
+  var preview = document.getElementById('reg-avatar-preview');
+  var letters = document.getElementById('reg-avatar-letters');
+  if (name.length >= 2) {
+    var parts = name.split(/\s+/);
+    var initials = (parts[0][0] || '') + (parts[1] ? parts[1][0] : (parts[0][1] || ''));
+    letters.textContent = initials.toUpperCase();
+  } else if (name.length === 1) {
+    letters.textContent = name.toUpperCase();
+  } else {
+    letters.textContent = 'ИИ';
+  }
+  // Random gradient
+  var colors = [
+    ['#2db84d','#1e9e3e'], ['#3b82f6','#1d4ed8'], ['#8b5cf6','#6d28d9'],
+    ['#f59e0b','#d97706'], ['#ef4444','#b91c1c'], ['#06b6d4','#0891b2']
+  ];
+  var c = colors[Math.floor(Math.random() * colors.length)];
+  preview.style.background = 'linear-gradient(135deg, ' + c[0] + ', ' + c[1] + ')';
+}
+
+function showCodeStep() {
+  document.getElementById('reg-code-step').style.display = 'block';
+  document.getElementById('reg-submit-btn').style.display = 'none';
+}
+</script>
+</body>
+</html>

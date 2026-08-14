@@ -1,0 +1,140 @@
+{
+  "multiticket": {
+    "id": "restore-2025-08-08",
+    "title": "Восстановление проекта Balloo",
+    "date": "2025-08-08",
+    "status": "critical",
+    "total_tickets": 7,
+    "estimated_hours": 10,
+    "priority": "P0"
+  },
+  "tickets": [
+    {
+      "id": 1,
+      "title": "Поиск файлов на компьютере",
+      "status": "not_started",
+      "priority": "critical",
+      "estimated_hours": 0.5,
+      "result_file": "tickets/step1_findings.md"
+    },
+    {
+      "id": 2,
+      "title": "Проверка Git-истории",
+      "status": "not_started",
+      "priority": "critical",
+      "estimated_hours": 0.5,
+      "result_file": "tickets/step2_git.md"
+    },
+    {
+      "id": 3,
+      "title": "Восстановление структуры",
+      "status": "not_started",
+      "priority": "critical",
+      "estimated_hours": 2,
+      "result_file": "tickets/step3_structure.md"
+    },
+    {
+      "id": 4,
+      "title": "Создание package.json",
+      "status": "not_started",
+      "priority": "critical",
+      "estimated_hours": 1,
+      "result_file": "tickets/step4_package_json.md"
+    },
+    {
+      "id": 5,
+      "title": "Восстановление документации",
+      "status": "not_started",
+      "priority": "medium",
+      "estimated_hours": 1,
+      "result_file": "tickets/step5_docs.md"
+    },
+    {
+      "id": 6,
+      "title": "Проверка путей",
+      "status": "not_started",
+      "priority": "medium",
+      "estimated_hours": 1,
+      "result_file": "tickets/step6_paths.md"
+    },
+    {
+      "id": 7,
+      "title": "Итоговая проверка",
+      "status": "not_started",
+      "priority": "medium",
+      "estimated_hours": 1,
+      "result_file": "tickets/step7_final.md"
+    }
+  ],
+  "facts": [
+    {
+      "id": 1,
+      "description": "В начале сессии в packages/ было 736 TS/TSX файлов",
+      "evidence": "find packages -name \"*.ts\" | wc -l → 736"
+    },
+    {
+      "id": 2,
+      "description": "Файл packages/server/src/routes/auth.ts существовал",
+      "evidence": "Прочитан через read_file"
+    },
+    {
+      "id": 3,
+      "description": "Файл packages/server/src/services/authService.ts существовал и редактировался",
+      "evidence": "Прочитан и изменён (добавлен max в провайдеры)"
+    },
+    {
+      "id": 4,
+      "description": "Файл packages/shared/prisma/schema.prisma существовал (1059 строк)",
+      "evidence": "Прочитан через read_file"
+    },
+    {
+      "id": 5,
+      "description": "Файл docker-compose.yml существовал с полной конфигурацией",
+      "evidence": "Прочитан через read_file"
+    },
+    {
+      "id": 6,
+      "description": "Сейчас packages/ содержит только shared/ и web/",
+      "evidence": "Команда ls packages/"
+    },
+    {
+      "id": 7,
+      "description": "Сейчас packages/shared/src/ содержит только config.ts",
+      "evidence": "Команда ls packages/shared/src/"
+    },
+    {
+      "id": 8,
+      "description": "Сейчас нет package.json нигде в проекте",
+      "evidence": "Команда find . -name \"package.json\" → пусто"
+    },
+    {
+      "id": 9,
+      "description": "Сейчас нет Dockerfile.server, Dockerfile.web",
+      "evidence": "Команда ls docker/"
+    },
+    {
+      "id": 10,
+      "description": "Сейчас нет .github/, .husky/, AGENTS.md, README.md",
+      "evidence": "Команда ls -la"
+    },
+    {
+      "id": 11,
+      "description": "Сейчас нет mockups (только general_docs/)",
+      "evidence": "Команда ls mockups/"
+    },
+    {
+      "id": 12,
+      "description": "Git-репозиторий инициализирован, но пустой (только 18 файлов)",
+      "evidence": "Команда git status"
+    }
+  ],
+  "commands": [
+    "прочитай документ: tickets/multiticket_restore.md и выполни команду: выполнить тикет №1",
+    "прочитай документ: tickets/multiticket_restore.md и выполни команду: выполнить тикет №2",
+    "прочитай документ: tickets/multiticket_restore.md и выполни команду: выполнить тикет №3",
+    "прочитай документ: tickets/multiticket_restore.md и выполни команду: выполнить тикет №4",
+    "прочитай документ: tickets/multiticket_restore.md и выполни команду: выполнить тикет №5",
+    "прочитай документ: tickets/multiticket_restore.md и выполни команду: выполнить тикет №6",
+    "прочитай документ: tickets/multiticket_restore.md и выполни команду: выполнить тикет №7"
+  ]
+}

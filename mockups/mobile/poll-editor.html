@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobile — Создание опроса</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    html { overflow-y: auto; height: auto; }
+    body { overflow-y: auto; height: auto; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 40px 24px; }
+    .phone-frame { width:360px; height:760px; background:var(--bg-secondary); border:3px solid var(--border-strong); border-radius:36px; overflow:hidden; position:relative; display:flex; flex-direction:column; box-shadow:var(--shadow-glass); }
+    .phone-frame__notch { position:absolute; top:0; left:50%; transform:translateX(-50%); width:130px; height:26px; background:var(--bg-primary); border-bottom-left-radius:18px; border-bottom-right-radius:18px; z-index:10; }
+    .phone-frame__statusbar { height:30px; padding:4px 20px 0; display:flex; align-items:center; justify-content:space-between; font-size:12px; color:var(--text-secondary); background:var(--bg-secondary); }
+    .phone-frame__screen { flex:1; overflow:hidden; background:var(--bg-primary); display:flex; flex-direction:column; }
+    .phone-frame__home-bar { height:5px; width:120px; margin:0 auto 8px; background:var(--text-muted); border-radius:3px; }
+    .phone-tabbar { display:flex; height:52px; background:var(--bg-secondary); border-top:1px solid var(--border-color); }
+    .phone-tabbar__item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; font-size:10px; color:var(--text-secondary); cursor:pointer; transition:color 0.15s; }
+    .phone-tabbar__item--active { color:var(--accent); }
+    .phone-tabbar__icon { font-size:20px; line-height:1; }
+    .phone-scroll { flex:1; overflow-y:auto; }
+  </style>
+</head>
+<body>
+<div class="phone-frame">
+  <div class="phone-frame__notch"></div>
+  <div class="phone-frame__statusbar"><span>9:41</span><span>📶 🔋</span></div>
+  <div class="phone-frame__screen">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar__logo">
+        <div class="topbar__logo-icon">B</div><span>Balloo</span>
+        <div class="topbar__dropdown">
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/chats.html'">💬 Balloo</div>
+          <div class="topbar__dropdown-divider"></div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div>
+          <div class="topbar__dropdown-divider"></div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/contacts.html'">👤 Контакты</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/search.html'">🔍 Поиск</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/archive.html'">📦 Архив</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/calls.html'">📞 Звонки</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/invites.html'">📨 Приглашения</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/bots.html'">🤖 О ботах</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/about-balloo.html'">ℹ️ О Balloo</div>
+        </div>
+      </div>
+      <div class="topbar__title">Создание опроса</div>
+      <div class="topbar__right">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact" onclick="window.location.href='profile.html'"><div class="avatar__inner"><span>ИИ</span></div></div>
+        <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+        <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="phone-scroll">
+      <div style="padding:12px;">
+
+        <h1 style="font-size:20px;font-weight:800;color:var(--text-primary);margin-bottom:12px;">📊 Создать интерактив</h1>
+
+        <!-- Type tabs (5 types) -->
+        <div class="tabs mb-3" style="overflow-x:auto;flex-wrap:nowrap;">
+          <div class="tab tab--active" data-type="poll" onclick="selectPollType(this,'poll')">📊 Опрос</div>
+          <div class="tab" data-type="quiz" onclick="selectPollType(this,'quiz')">🎯 Квиз</div>
+          <div class="tab" data-type="active_list" onclick="selectPollType(this,'active_list')">✅ Актив. список</div>
+          <div class="tab" data-type="passive_list" onclick="selectPollType(this,'passive_list')">📋 Пассив. список</div>
+          <div class="tab" data-type="personali" onclick="selectPollType(this,'personali')">👤 Персонали</div>
+        </div>
+
+        <!-- Question -->
+        <div class="card mb-3">
+          <div class="form-group">
+            <label class="form-label">Вопрос / заголовок</label>
+            <input type="text" class="form-input" placeholder="Введите вопрос..." value="Какой цвет для акцента?" style="font-size:13px;">
+          </div>
+        </div>
+
+        <!-- Options -->
+        <div class="card mb-3">
+          <div class="form-group">
+            <label class="form-label">Варианты ответа</label>
+            <div id="options-list">
+              <div style="display:flex;gap:6px;margin-bottom:6px;">
+                <input type="text" class="form-input" placeholder="Вариант 1" value="Зелёный" style="font-size:13px;">
+                <button class="topbar__actions-btn" title="Удалить">🗑</button>
+              </div>
+              <div style="display:flex;gap:6px;margin-bottom:6px;">
+                <input type="text" class="form-input" placeholder="Вариант 2" value="Мятный" style="font-size:13px;">
+                <button class="topbar__actions-btn" title="Удалить">🗑</button>
+              </div>
+              <div style="display:flex;gap:6px;margin-bottom:6px;">
+                <input type="text" class="form-input" placeholder="Вариант 3" value="Бирюзовый" style="font-size:13px;">
+                <button class="topbar__actions-btn" title="Удалить">🗑</button>
+              </div>
+            </div>
+            <button class="btn btn--tertiary btn--sm mt-2">+ Добавить вариант</button>
+          </div>
+        </div>
+
+        <!-- Quiz-only: correct answer -->
+        <div class="card mb-3" id="quiz-correct" style="display:none;">
+          <div class="form-group">
+            <label class="form-label">Правильный ответ (квиз)</label>
+            <select class="form-select" style="font-size:13px;">
+              <option>Зелёный</option><option>Мятный</option><option>Бирюзовый</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Settings -->
+        <div class="card mb-3">
+          <div class="form-group">
+            <label class="form-checkbox"><input type="checkbox" checked> <span>Анонимное голосование</span></label>
+          </div>
+          <div class="form-group">
+            <label class="form-checkbox"><input type="checkbox"> <span>Множественный выбор</span></label>
+          </div>
+          <div class="form-group">
+            <label class="form-checkbox"><input type="checkbox" checked> <span>Можно переслать</span></label>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Срок действия</label>
+            <select class="form-select" style="font-size:13px;">
+              <option>24 часа</option><option>12 часов</option><option>1 час</option><option>Без ограничений</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn--tertiary" style="flex:1;" onclick="window.location.href='chat.html'">Отмена</button>
+          <button class="btn btn--primary" style="flex:1;" onclick="window.location.href='chat.html'">Создать</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABBAR -->
+    <div class="phone-tabbar">
+      <div class="phone-tabbar__item phone-tabbar__item--active" onclick="window.location.href='chat.html'"><span class="phone-tabbar__icon">💬</span>Чаты</div>
+      <div class="phone-tabbar__item" onclick="window.location.href='contacts.html'"><span class="phone-tabbar__icon">👥</span>Контакты</div>
+      <div class="phone-tabbar__item" onclick="window.location.href='stories.html'"><span class="phone-tabbar__icon">📷</span>Сторис</div>
+      <div class="phone-tabbar__item" onclick="window.location.href='calls-history.html'"><span class="phone-tabbar__icon">📞</span>Звонки</div>
+      <div class="phone-tabbar__item" onclick="window.location.href='settings.html'"><span class="phone-tabbar__icon">⚙</span>Настройки</div>
+    </div>
+
+  </div>
+  <div class="phone-frame__home-bar"></div>
+</div>
+
+<script src="../assets/common.js"></script>
+<script>
+function selectPollType(el, type) {
+  document.querySelectorAll('.tab[data-type]').forEach(t => t.classList.remove('tab--active'));
+  el.classList.add('tab--active');
+  document.getElementById('quiz-correct').style.display = (type === 'quiz') ? 'block' : 'none';
+}
+</script>
+</body>
+</html>

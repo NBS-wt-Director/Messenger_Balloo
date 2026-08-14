@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Command — Вход</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--info);">C</div><span>Command</span>
+    <div class="topbar__dropdown"><div class="topbar__dropdown-item">🏢 Command</div><div class="topbar__dropdown-divider"></div><div class="topbar__dropdown-item">💬 Balloo</div><div class="topbar__dropdown-item">🛡️ Admin</div><div class="topbar__dropdown-item">💡 Features</div><div class="topbar__dropdown-item">📜 History</div><div class="topbar__dropdown-item">⬇️ Download</div><div class="topbar__dropdown-item">📚 API Docs</div></div>
+  </div>
+  <div class="topbar__title">Вход для сотрудников</div>
+  <div class="topbar__right"><span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span><span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span></div>
+</div>
+<div class="auth-container">
+  <div class="auth-card" style="border-color:var(--info);">
+    <div class="text-center mb-4">
+      <div class="topbar__logo-icon" style="background:var(--info);width:48px;height:48px;font-size:24px;margin:0 auto;">C</div>
+    </div>
+    <h1 class="auth-title">Портал сотрудников</h1>
+    <p class="auth-subtitle">Вход для сотрудников компании Balloo</p>
+
+    <div class="auth-oauth">
+      <button class="auth-oauth-btn">
+        <span style="color:#fc3f1d;">Y</span> Войти через Яндекс (корпоративный)
+      </button>
+      <button class="auth-oauth-btn">
+        <span style="color:var(--info);">B</span> Войти через Balloo SSO
+      </button>
+    </div>
+
+    <div class="auth-divider">или</div>
+
+    <div class="form-group">
+      <label class="form-label">Корпоративный Email</label>
+      <input type="email" class="form-input" placeholder="name@balloo.su">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Пароль</label>
+      <input type="password" class="form-input" placeholder="••••••••">
+    </div>
+
+    <button class="btn btn--primary btn--block mb-4" style="background:var(--info);">Войти</button>
+
+    <div class="divider"></div>
+
+    <div class="text-center">
+      <p class="text-sm text-secondary mb-3">Уже вошли на другом устройстве?</p>
+      <button class="btn btn--secondary btn--block" onclick="alert('QR-код для привязки устройства. Отсканируйте камерой мобильного.')">📱 Войти через другое устройство (QR)</button>
+      <p class="text-xs text-muted mt-2">Корпоративный SSO — единая сессия для всех узлов</p>
+    </div>
+
+    <div class="divider"></div>
+    <p class="text-center text-xs text-muted">
+      Доступ только для действующих сотрудников. При увольнении доступ аннулируется автоматически.
+    </p>
+    <div class="divider"></div>
+    <div class="text-center">
+      <p class="text-sm text-secondary mb-2">Не сотрудник, но хотите_join команду?</p>
+      <a href="vacancies.html" class="btn btn--secondary btn--block">💼 Смотреть вакансии</a>
+      <p class="text-xs text-muted mt-2">При попытке входа без прав сотрудника — переадресация на страницу вакансий</p>
+    </div>
+  </div>
+</div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

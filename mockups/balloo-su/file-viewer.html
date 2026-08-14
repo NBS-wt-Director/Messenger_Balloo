@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo — Просмотр файла</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    .viewer-container { position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:600;display:none;flex-direction:column; }
+    .viewer-container--visible { display:flex; }
+    .viewer-toolbar { display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:rgba(0,0,0,0.6);backdrop-filter:blur(12px);z-index:10; }
+    .viewer-content { flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative; }
+    .viewer-content img { max-width:90vw;max-height:80vh;object-fit:contain; }
+    .viewer-nav { position:absolute;top:50%;transform:translateY(-50%);width:48px;height:48px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);color:#fff;font-size:24px;cursor:pointer;transition:background 0.15s; }
+    .viewer-nav:hover { background:rgba(0,0,0,0.7); }
+    .viewer-nav--prev { left:16px; }
+    .viewer-nav--next { right:16px; }
+    .viewer-info { position:absolute;bottom:0;left:0;right:0;padding:16px 20px;background:linear-gradient(transparent,rgba(0,0,0,0.8));color:#fff; }
+    .viewer-counter { font-size:13px;color:rgba(255,255,255,0.7); }
+    .viewer-sidebar { position:absolute;right:0;top:56px;bottom:0;width:320px;background:var(--bg-glass);backdrop-filter:blur(16px);border-left:1px solid var(--border-color);overflow-y:auto;display:none; }
+    .viewer-sidebar--open { display:block; }
+    .file-thumb { width:60px;height:60px;clip-path:var(--hexagon-clip);display:inline-flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;transition:opacity 0.15s; }
+    .file-thumb:hover { opacity:0.7; }
+    .file-thumb--active { outline:2px solid var(--accent);outline-offset:2px; }
+  </style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon">B</div><span>Balloo</span>
+    <div class="topbar__dropdown">
+      <div class="topbar__dropdown-item" onclick="window.location.href='chats.html'">💬 Balloo</div>
+      <div class="topbar__dropdown-divider"></div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div>
+    </div>
+  </div>
+  <div class="topbar__title">Чаты</div>
+  <div class="topbar__right">
+    <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИИ</span></div></div>
+    <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+    <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <div class="sidebar">
+    <div class="sidebar__search"><input type="text" class="search-input" placeholder="🔍 Поиск чатов..."></div>
+    <div class="list">
+      <div class="list__item list__item--active">
+        <div class="avatar avatar--md avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>МА</span></div></div>
+        <div class="list__item-body"><div class="list__item-title">Мария Андреева</div><div class="list__item-subtitle">отправила файл</div></div>
+        <div class="list__item-meta"><span class="list__item-time">14:32</span></div>
+      </div>
+      <div class="list__item">
+        <div class="avatar avatar--md avatar--bordered avatar--status-online avatar--ctx-new"><div class="avatar__inner"><span>РД</span></div></div>
+        <div class="list__item-body"><div class="list__item-title">Команда разработки</div><div class="list__item-subtitle">3 вложения</div></div>
+        <div class="list__item-meta"><span class="list__item-time">14:15</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="content">
+    <div style="padding:12px 16px;border-bottom:1px solid var(--border-color);display:flex;align-items:center;gap:12px;background:var(--bg-secondary);">
+      <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>МА</span></div></div>
+      <div class="flex-1"><div class="font-semibold" style="color:var(--text-primary);">Мария Андреева</div><div class="text-xs text-muted">в сети</div></div>
+      <button class="topbar__actions-btn" onclick="openCall('audio')">📞</button>
+      <button class="topbar__actions-btn" onclick="openCall('video')">📹</button>
+    </div>
+    <div class="messages">
+      <div style="text-align:center;padding:8px;"><span class="chip">16 июля 2026</span></div>
+      <div class="message message--receiver">
+        <div class="message__bubble">
+          <div class="message__header"><span>14:30</span></div>
+          <div class="message__body">Смотри новые макеты!</div>
+          <!-- Attachment thumbnails in chat -->
+          <div class="message__attachments message__attachments--open">
+            <div class="message__attachments-content" style="display:flex;">
+              <div class="file-thumb" style="background:linear-gradient(135deg,#2db84d,#1e9e3e);" onclick="openViewer(0)" title="macos.png">🖼</div>
+              <div class="file-thumb" style="background:linear-gradient(135deg,#3b9eff,#1565c0);" onclick="openViewer(1)" title="design.png">🖼</div>
+              <div class="file-thumb" style="background:linear-gradient(135deg,#a855f7,#7c3aed);" onclick="openViewer(2)" title="demo.mp4">🎥</div>
+            </div>
+          </div>
+          <div class="message__actions">
+            <button class="message__action-btn" title="Ответить">↩</button>
+            <button class="message__action-btn" title="Переслать">📤</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="input-area">
+      <button class="input-area__btn" title="Прикрепить файл">📎</button>
+      <button class="input-area__btn" title="Фото/видео">🖼</button>
+      <button class="input-area__btn" title="Голосовое">🎤</button>
+      <textarea class="input-area__field" placeholder="Напишите сообщение..." rows="1"></textarea>
+      <button class="input-area__btn input-area__btn--send" onclick="sendMessage()" title="Отправить">➤</button>
+    </div>
+  </div>
+</div>
+
+<!-- Fullscreen Viewer Modal -->
+<div class="viewer-container" id="file-viewer">
+  <!-- Toolbar -->
+  <div class="viewer-toolbar">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button class="btn btn--tertiary" onclick="closeViewer()" title="Закрыть (Esc)">✕ Закрыть</button>
+      <div>
+        <div class="font-semibold" style="font-size:14px;" id="viewer-filename">macos.png</div>
+        <div class="viewer-counter" id="viewer-counter">1 / 3 · 240 КБ</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn--tertiary" onclick="toggleZoom()" title="Масштаб">🔍</button>
+      <button class="btn btn--tertiary" onclick="toggleSidebar()" title="Свойства файла">ℹ️</button>
+      <button class="btn btn--tertiary" onclick="downloadFile()" title="Скачать">📥</button>
+      <button class="btn btn--tertiary" onclick="shareFile()" title="Переслать">📤</button>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="viewer-content">
+    <div class="viewer-nav viewer-nav--prev" onclick="prevImage()">‹</div>
+    <!-- Image placeholder (gradient since no real images) -->
+    <div id="viewer-image" style="width:70vw;height:70vh;background:linear-gradient(135deg,#2db84d,#1e9e3e);display:flex;align-items:center;justify-content:center;color:#fff;font-size:48px;clip-path:var(--hexagon-clip);">🖼</div>
+    <div class="viewer-nav viewer-nav--next" onclick="nextImage()">›</div>
+
+    <!-- File info sidebar -->
+    <div class="viewer-sidebar" id="viewer-sidebar">
+      <div style="padding:16px;">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="card__title mb-0">ℹ️ Свойства файла</h3>
+          <button class="btn btn--tertiary btn--icon" onclick="toggleSidebar()">✕</button>
+        </div>
+        <div class="form-group"><label class="form-label">Имя файла</label><div class="text-sm" id="sidebar-filename">macos.png</div></div>
+        <div class="form-group"><label class="form-label">Тип</label><div class="text-sm" id="sidebar-type">PNG Image</div></div>
+        <div class="form-group"><label class="form-label">Размер</label><div class="text-sm" id="sidebar-size">240 КБ</div></div>
+        <div class="form-group"><label class="form-label">Разрешение</label><div class="text-sm" id="sidebar-resolution">1920 × 1080</div></div>
+        <div class="form-group"><label class="form-label">Отправил</label><div class="text-sm">Мария Андреева</div></div>
+        <div class="form-group"><label class="form-label">Дата</label><div class="text-sm" id="sidebar-date">16.07.2026 14:30</div></div>
+        <div class="divider"></div>
+        <button class="btn btn--secondary btn--block btn--sm mb-2">📥 Скачать</button>
+        <button class="btn btn--danger btn--block btn--sm">🗑 Удалить</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom thumbnails strip -->
+  <div style="padding:12px 20px;background:rgba(0,0,0,0.6);display:flex;gap:8px;justify-content:center;">
+    <div class="file-thumb file-thumb--active" style="background:linear-gradient(135deg,#2db84d,#1e9e3e);" onclick="openViewer(0)" title="macos.png">🖼</div>
+    <div class="file-thumb" style="background:linear-gradient(135deg,#3b9eff,#1565c0);" onclick="openViewer(1)" title="design.png">🖼</div>
+    <div class="file-thumb" style="background:linear-gradient(135deg,#a855f7,#7c3aed);" onclick="openViewer(2)" title="demo.mp4">🎥</div>
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+<script>
+const files = [
+  { name: 'macos.png', type: 'PNG Image', size: '240 КБ', resolution: '1920 × 1080', date: '16.07.2026 14:30', color: 'linear-gradient(135deg,#2db84d,#1e9e3e)', icon: '🖼' },
+  { name: 'design.png', type: 'PNG Image', size: '1.2 МБ', resolution: '3840 × 2160', date: '16.07.2026 14:30', color: 'linear-gradient(135deg,#3b9eff,#1565c0)', icon: '🖼' },
+  { name: 'demo.mp4', type: 'MP4 Video', size: '15 МБ', resolution: '1920 × 1080 · 02:34', date: '16.07.2026 14:30', color: 'linear-gradient(135deg,#a855f7,#7c3aed)', icon: '🎥' }
+];
+
+let currentIndex = 0;
+
+function openViewer(index) {
+  currentIndex = index;
+  updateViewer();
+  document.getElementById('file-viewer').classList.add('viewer-container--visible');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeViewer() {
+  document.getElementById('file-viewer').classList.remove('viewer-container--visible');
+  document.body.style.overflow = '';
+}
+
+function updateViewer() {
+  const f = files[currentIndex];
+  document.getElementById('viewer-filename').textContent = f.name;
+  document.getElementById('viewer-counter').textContent = `${currentIndex + 1} / ${files.length} · ${f.size}`;
+  document.getElementById('viewer-image').style.background = f.color;
+  document.getElementById('viewer-image').textContent = f.icon;
+  document.getElementById('sidebar-filename').textContent = f.name;
+  document.getElementById('sidebar-type').textContent = f.type;
+  document.getElementById('sidebar-size').textContent = f.size;
+  document.getElementById('sidebar-resolution').textContent = f.resolution;
+  document.getElementById('sidebar-date').textContent = f.date;
+  // Update thumbnail active state
+  document.querySelectorAll('.viewer-container .file-thumb').forEach((t, i) => {
+    t.classList.toggle('file-thumb--active', i === currentIndex);
+  });
+}
+
+function prevImage() {
+  if (currentIndex > 0) { currentIndex--; updateViewer(); }
+}
+
+function nextImage() {
+  if (currentIndex < files.length - 1) { currentIndex++; updateViewer(); }
+}
+
+function toggleSidebar() {
+  document.getElementById('viewer-sidebar').classList.toggle('viewer-sidebar--open');
+}
+
+function toggleZoom() {
+  const img = document.getElementById('viewer-image');
+  const current = img.style.transform || 'scale(1)';
+  const scale = current.includes('2') ? 'scale(1)' : 'scale(1.5)';
+  img.style.transform = scale;
+  showToast(current.includes('2') ? 'Масштаб: 100%' : 'Масштаб: 150%', 'info');
+}
+
+function downloadFile() {
+  showToast(`Скачивание: ${files[currentIndex].name}`, 'success');
+}
+
+function shareFile() {
+  openModal('modal-forward');
+}
+
+function showToast(msg, type) {
+  const toast = document.createElement('div');
+  toast.style.cssText = `position:fixed;top:80px;left:50%;transform:translateX(-50%);padding:10px 20px;background:var(--bg-glass);backdrop-filter:blur(16px);border:1px solid var(--border-strong);color:var(--text-primary);font-size:14px;z-index:999;box-shadow:var(--shadow-glass);`;
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2500);
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+  const viewer = document.getElementById('file-viewer');
+  if (!viewer.classList.contains('viewer-container--visible')) return;
+  if (e.key === 'Escape') closeViewer();
+  if (e.key === 'ArrowLeft') prevImage();
+  if (e.key === 'ArrowRight') nextImage();
+  if (e.key === '+' || e.key === '=') toggleZoom();
+});
+</script>
+</body>
+</html>

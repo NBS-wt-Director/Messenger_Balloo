@@ -1,0 +1,1574 @@
+{
+  "project": "Balloo Messenger",
+  "version": "1.0.0",
+  "last_updated": "2026-07-30",
+  "total_screens": 173,
+  "screens_unviewed": 0,
+  "nodes": [
+    {
+      "id": "у_00",
+      "name": "shared",
+      "icon": "🔗",
+      "domain": "Общие экраны",
+      "total_screens": 8,
+      "viewed": 8,
+      "edits_specific": 0,
+      "edits_global_accepted": 0,
+      "components_private": 8,
+      "components_global": 5,
+      "app_functions_count": 0,
+      "app_functions": [],
+      "status": "задокументирован",
+      "doc_md": null,
+      "screens": [
+        {
+          "id": "1_00_08",
+          "name": "Обжалование бана (оверлей)",
+          "file": "shared/ban-appeal.html",
+          "status": "Просмотрен",
+          "doc_md": "shared/ban-appeal.md"
+        },
+        {
+          "id": "1_00_02",
+          "name": "Ошибка 403 (доступ запрещён)",
+          "file": "shared/error-403.html",
+          "status": "Просмотрен",
+          "doc_md": "shared/error-403.md"
+        },
+        {
+          "id": "1_00_01",
+          "name": "Ошибка 404 (не найдено)",
+          "file": "shared/error-404.html",
+          "status": "Просмотрен",
+          "doc_md": "shared/error-404.md"
+        },
+        {
+          "id": "1_00_03",
+          "name": "Ошибка 500 (внутренняя ошибка)",
+          "file": "shared/error-500.html",
+          "status": "Просмотрен",
+          "doc_md": "shared/error-500.md"
+        },
+        {
+          "id": "1_00_04",
+          "name": "Ошибка 503 (сервис недоступен)",
+          "file": "shared/error-503.html",
+          "status": "Просмотрен",
+          "doc_md": "shared/error-503.md"
+        },
+        {
+          "id": "1_00_07",
+          "name": "Ошибка 555 (аккаунт заблокирован)",
+          "file": "shared/error-555.html",
+          "status": "Просмотрен",
+          "doc_md": "shared/error-555.md"
+        },
+        {
+          "id": "1_00_05",
+          "name": "Офлайн (авторизованный)",
+          "file": "shared/offline-authed.html",
+          "status": "Просмотрен",
+          "doc_md": "shared/offline-authed.md"
+        },
+        {
+          "id": "1_00_06",
+          "name": "Офлайн (гость / неавторизованный)",
+          "file": "shared/offline-guest.html",
+          "status": "Просмотрен",
+          "doc_md": "shared/offline-guest.md"
+        }
+      ]
+    },
+    {
+      "id": "у_01",
+      "name": "balloo.su",
+      "icon": "💬",
+      "domain": "Основной мессенджер",
+      "total_screens": 41,
+      "viewed": 41,
+      "edits_specific": 11,
+      "edits_global_accepted": 3,
+      "components_private": 41,
+      "components_global": 5,
+      "app_functions_count": 27,
+      "app_functions": [
+        "Аутентификация",
+        "Управление устройствами",
+        "Мультиаккаунт",
+        "Онбординг",
+        "Текстовый чат",
+        "Групповые чаты",
+        "Звонки",
+        "Приглашения",
+        "Поиск",
+        "Архив чатов",
+        "Профиль",
+        "Публичный профиль",
+        "Боты",
+        "Техподдержка",
+        "Настройки приложения",
+        "Правила",
+        "О компании",
+        "О Balloo",
+        "Донат",
+        "Вложения",
+        "Жалобы",
+        "Сторис",
+        "Опросы",
+        "Создание групп",
+        "Создание каналов",
+        "Редактор сообщения",
+        "Просмотр файлов"
+      ],
+      "status": "задокументирован",
+      "doc_md": null,
+      "screens": [
+        {
+          "id": "1_01_17",
+          "name": "О Balloo",
+          "file": "balloo-su/about-balloo.html",
+          "status": "Принят",
+          "doc_md": "balloo-su/about-balloo.md"
+        },
+        {
+          "id": "1_01_16",
+          "name": "О компании",
+          "file": "balloo-su/about-company.html",
+          "status": "Принят",
+          "doc_md": "balloo-su/about-company.md"
+        },
+        {
+          "id": "1_01_22",
+          "name": "Мультиаккаунт",
+          "file": "balloo-su/accounts.html",
+          "status": "Просмотрен",
+          "doc_md": "balloo-su/accounts.md"
+        },
+        {
+          "id": "1_01_11",
+          "name": "Активный звонок",
+          "file": "balloo-su/active-call.html",
+          "status": "Принят",
+          "doc_md": "balloo-su/active-call.md"
+        },
+        {
+          "id": "1_01_23",
+          "name": "Добавить устройство",
+          "file": "balloo-su/add-device.html",
+          "status": "Просмотрен",
+          "doc_md": "balloo-su/add-device.md"
+        },
+        {
+          "id": "1_01_07",
+          "name": "Архив чатов",
+          "file": "balloo-su/archive.html",
+          "status": "Просмотрен",
+          "doc_md": "balloo-su/archive.md"
+        },
+        {
+          "id": "1_01_40",
+          "name": "Панель вложений",
+          "file": "balloo-su/attachment-panel.html",
+          "status": "Просмотрен",
+          "doc_md": "balloo-su/attachment-panel.md"
+        },
+        {
+          "id": "1_01_38",
+          "name": "Блокированные пользователи",
+          "file": "balloo-su/blocked-users.html",
+          "status": "Просмотрен",
+          "doc_md": "balloo-su/blocked-users.md"
+        },
+        {
+          "id": "1_01_15",
+          "name": "Боты",
+          "file": "balloo-su/bots.html",
+          "status": "Принят",
+          "doc_md": "balloo-su/bots.md"
+        },
+        {
+          "id": "1_01_10",
+          "name": "Звонки",
+          "file": "balloo-su/calls.html",
+          "status": "Просмотрен",
+          "doc_md": "balloo-su/calls.md"
+        },
+        {
+          "id": "1_01_35",
+          "name": "Создание канала",
+          "file": "balloo-su/channel-create.html",
+          "status": "Просмотрен",
+          "doc_md": "balloo-su/channel-create.md"
+        },
+        {
+          "id": "1_01_25",
+          "name": "Вложения чата",
+          "file": "balloo-su/chat-attachments.html",
+          "status": "Принят",
+          "doc_md": "balloo-su/chat-attachments.md"
+        },
+        {
+          "id": "1_01_04",
+          "name": "Список чатов",
+          "file": "balloo-su/chats.html",
+          "status": "Просмотрен",
+          "doc_md": "balloo-su/chats.md"
+        },
+        {
+          "id": "1_01_05",
+          "name": "Контакты",
+          "file": "balloo-su/contacts.html",
+          "status": "Просмотрен",
+          "doc_md": "balloo-su/contacts.md"
+        },
+        {
+          "id": "1_01_24",
+          "name": "Донат",
+          "file": "balloo-su/donate.html",
+          "status": "Принят",
+          "doc_md": "balloo-su/donate.md"
+        },
+        {
+          "id": "1_01_36",
+          "name": "Пустой чат",
+          "file": "balloo-su/empty-chat.html",
+          "status": "Просмотрен",
+          "doc_md": "balloo-su/empty-chat.md"
+        },
+        {
+          "id": "1_01_33",
+          "name": "Просмотр файла/изображения",
+          "file": "balloo-su/file-viewer.html",
+          "status": "Просмотрен",
+          "doc_md": "balloo-su/file-viewer.md"
+        },
+        {
+          "id": "1_01_18",
+          "name": "Создание группы",
+          "file": "balloo-su/group-create.html",
+          "status": "Просмотрен",
+          "doc_md": "balloo-su/group-create.md"
+        },
+        {
+          "id": "1_01_19",
+          "name": "Настройки группы",
+          "file": "balloo-su/group-settings.html",
+          "status": "Просмотрен",
+          "doc_md": "balloo-su/group-settings.md"
+        },
+        {
+          "id": "1_01_13",
+          "name": "Приглашения",
+          "file": "balloo-su/invites.html",
+          "status": "Принят",
+          "doc_md": "balloo-su/invites.md"
+        },
+        {
+          "id": "1_01_02",
+          "name": "Вход",
+          "file": "balloo-su/login.html",
+          "status": "Просмотрен",
+          "doc_md": "balloo-su/login.md"
+        },
+        {
+          "id": "1_01_32",
+          "name": "Редактор сообщения",
+          "file": "balloo-su/message-editor.html",
+          "status": "Просмотрен",
+          "doc_md": "balloo-su/message-editor.md"
+        },
+        {
+          "id": "1_01_21",
+          "name": "Мои устройства",
+          "file": "balloo-su/my-devices.html",
+          "status": "Просмотрен",
+          "doc_md": "balloo-su/my-devices.md"
+        },
+        {
+          "id": "1_01_31",
+          "name": "Мои донаты",
+          "file": "balloo-su/my-donates.html",
+          "status": "Просмотрен",
+          "doc_md": "balloo-su/my-donates.md"
+        },
+        {
+          "id": "1_01_34",
+          "name": "Настройки уведомлений",
+          "file": "balloo-su/notification-settings.html",
+          "status": "Просмотрен",
+          "doc_md": "balloo-su/notification-settings.md"
+        },
+        {
+          "id": "1_01_01",
+          "name": "Онбординг",
+          "file": "balloo-su/onboarding.html",
+          "status": "Принят",
+          "doc_md": "balloo-su/onboarding.md"
+        },
+        {
+          "id": "1_01_29",
+          "name": "Восстановление пароля",
+          "file": "balloo-su/password-reset.html",
+          "status": "Просмотрен",
+          "doc_md": "balloo-su/password-reset.md"
+        },
+        {
+          "id": "1_01_28",
+          "name": "Редактор опроса",
+          "file": "balloo-su/poll-editor.html",
+          "status": "Принят",
+          "doc_md": "balloo-su/poll-editor.md"
+        },
+        {
+          "id": "1_01_37",
+          "name": "Настройки приватности",
+          "file": "balloo-su/privacy-settings.html",
+          "status": "Просмотрен",
+          "doc_md": "balloo-su/privacy-settings.md"
+        },
+        {
+          "id": "1_01_08",
+          "name": "Профиль",
+          "file": "balloo-su/profile.html",
+          "status": "Просмотрен",
+          "doc_md": "balloo-su/profile.md"
+        },
+        {
+          "id": "1_01_09",
+          "name": "Публичный профиль",
+          "file": "balloo-su/public-profile.html",
+          "status": "Просмотрен",
+          "doc_md": "balloo-su/public-profile.md"
+        },
+        {
+          "id": "1_01_03",
+          "name": "Регистрация",
+          "file": "balloo-su/register.html",
+          "status": "Просмотрен",
+          "doc_md": "balloo-su/register.md"
+        },
+        {
+          "id": "1_01_26",
+          "name": "Жалоба на сообщение",
+          "file": "balloo-su/report-message.html",
+          "status": "Принят",
+          "doc_md": "balloo-su/report-message.md"
+        },
+        {
+          "id": "1_01_12",
+          "name": "Правила платформы",
+          "file": "balloo-su/rules.html",
+          "status": "Принят",
+          "doc_md": "balloo-su/rules.md"
+        },
+        {
+          "id": "1_01_06",
+          "name": "Глобальный поиск",
+          "file": "balloo-su/search.html",
+          "status": "Просмотрен",
+          "doc_md": "balloo-su/search.md"
+        },
+        {
+          "id": "1_01_20",
+          "name": "Настройки приложения",
+          "file": "balloo-su/settings.html",
+          "status": "Просмотрен",
+          "doc_md": "balloo-su/settings.md"
+        },
+        {
+          "id": "1_01_27",
+          "name": "Сторис",
+          "file": "balloo-su/stories.html",
+          "status": "Просмотрен",
+          "doc_md": "balloo-su/stories.md"
+        },
+        {
+          "id": "1_01_41",
+          "name": "Создание историй",
+          "file": "balloo-su/story-create.html",
+          "status": "Просмотрен",
+          "doc_md": "balloo-su/story-create.md"
+        },
+        {
+          "id": "1_01_14",
+          "name": "Техподдержка",
+          "file": "balloo-su/support.html",
+          "status": "Принят",
+          "doc_md": "balloo-su/support.md"
+        },
+        {
+          "id": "1_01_30",
+          "name": "Двухфакторная аутентификация",
+          "file": "balloo-su/two-factor.html",
+          "status": "Просмотрен",
+          "doc_md": "balloo-su/two-factor.md"
+        },
+        {
+          "id": "1_01_39",
+          "name": "Запись голосового",
+          "file": "balloo-su/voice-message.html",
+          "status": "Просмотрен",
+          "doc_md": "balloo-su/voice-message.md"
+        }
+      ]
+    },
+    {
+      "id": "у_02",
+      "name": "admin.balloo.su",
+      "icon": "🛡️",
+      "domain": "Админ-панель",
+      "total_screens": 25,
+      "viewed": 25,
+      "edits_specific": 1,
+      "edits_global_accepted": 4,
+      "components_private": 25,
+      "components_global": 5,
+      "app_functions_count": 21,
+      "app_functions": [
+        "Аутентификация админа",
+        "Дашборд админа",
+        "Управление сотрудниками",
+        "Управление бан-листом",
+        "Feature flags",
+        "Управление фичами",
+        "Аудит-лог",
+        "Управление группами",
+        "Донаты",
+        "Файлы",
+        "Управление отделами",
+        "Вакансии",
+        "Отчёты",
+        "Статус сервиса",
+        "Тексты",
+        "Категории блога",
+        "Каналы блога",
+        "Миграция блога",
+        "Очередь блога",
+        "Ревью блога",
+        "Статистика блога",
+        "Управление ботами"
+      ],
+      "status": "задокументирован",
+      "doc_md": null,
+      "screens": [
+        {
+          "id": "1_02_01",
+          "name": "Объявления",
+          "file": "admin-balloo-su/announcements.html",
+          "status": "Просмотрен",
+          "doc_md": "admin-balloo-su/announcements.md"
+        },
+        {
+          "id": "1_02_02",
+          "name": "Аудит-лог",
+          "file": "admin-balloo-su/audit-log.html",
+          "status": "Просмотрен",
+          "doc_md": "admin-balloo-su/audit-log.md"
+        },
+        {
+          "id": "1_02_03",
+          "name": "Бан-лист",
+          "file": "admin-balloo-su/bans.html",
+          "status": "Просмотрен",
+          "doc_md": "admin-balloo-su/bans.md"
+        },
+        {
+          "id": "1_02_05",
+          "name": "Каналы блога",
+          "file": "admin-balloo-su/blog-channels.html",
+          "status": "Просмотрен",
+          "doc_md": "admin-balloo-su/blog-channels.md"
+        },
+        {
+          "id": "1_02_06",
+          "name": "Миграция блога",
+          "file": "admin-balloo-su/blog-migrate.html",
+          "status": "Просмотрен",
+          "doc_md": "admin-balloo-su/blog-migrate.md"
+        },
+        {
+          "id": "1_02_07",
+          "name": "Очередь блога",
+          "file": "admin-balloo-su/blog-queue.html",
+          "status": "Просмотрен",
+          "doc_md": "admin-balloo-su/blog-queue.md"
+        },
+        {
+          "id": "1_02_08",
+          "name": "Ревью блога",
+          "file": "admin-balloo-su/blog-review.html",
+          "status": "Просмотрен",
+          "doc_md": "admin-balloo-su/blog-review.md"
+        },
+        {
+          "id": "1_02_09",
+          "name": "Статистика блога",
+          "file": "admin-balloo-su/blog-stats.html",
+          "status": "Просмотрен",
+          "doc_md": "admin-balloo-su/blog-stats.md"
+        },
+        {
+          "id": "1_02_10",
+          "name": "Управление ботами",
+          "file": "admin-balloo-su/bots-mgmt.html",
+          "status": "Просмотрен",
+          "doc_md": "admin-balloo-su/bots-mgmt.md"
+        },
+        {
+          "id": "1_03_02",
+          "name": "Дашборд",
+          "file": "command-balloo-su/dashboard.html",
+          "status": "Принят",
+          "doc_md": "admin-balloo-su/dashboard.md"
+        },
+        {
+          "id": "1_03_15",
+          "name": "Отделы",
+          "file": "command-balloo-su/departments.html",
+          "status": "Принят",
+          "doc_md": "admin-balloo-su/departments.md"
+        },
+        {
+          "id": "1_02_13",
+          "name": "Донаты",
+          "file": "admin-balloo-su/donations.html",
+          "status": "Просмотрен",
+          "doc_md": "admin-balloo-su/donations.md"
+        },
+        {
+          "id": "1_02_14",
+          "name": "Сотрудники",
+          "file": "admin-balloo-su/employees.html",
+          "status": "Просмотрен",
+          "doc_md": "admin-balloo-su/employees.md"
+        },
+        {
+          "id": "1_02_15",
+          "name": "Feature flags",
+          "file": "admin-balloo-su/features-flags.html",
+          "status": "Просмотрен",
+          "doc_md": "admin-balloo-su/features-flags.md"
+        },
+        {
+          "id": "1_02_16",
+          "name": "Управление фичами",
+          "file": "admin-balloo-su/features-mgmt.html",
+          "status": "Просмотрен",
+          "doc_md": "admin-balloo-su/features-mgmt.md"
+        },
+        {
+          "id": "1_02_17",
+          "name": "Файлы",
+          "file": "admin-balloo-su/files.html",
+          "status": "Просмотрен",
+          "doc_md": "admin-balloo-su/files.md"
+        },
+        {
+          "id": "1_02_18",
+          "name": "Управление группами",
+          "file": "admin-balloo-su/groups-mgmt.html",
+          "status": "Просмотрен",
+          "doc_md": "admin-balloo-su/groups-mgmt.md"
+        },
+        {
+          "id": "1_01_02",
+          "name": "Вход",
+          "file": "balloo-su/login.html",
+          "status": "Просмотрен",
+          "doc_md": "admin-balloo-su/login.md"
+        },
+        {
+          "id": "1_02_20",
+          "name": "Метрики",
+          "file": "admin-balloo-su/metrics.html",
+          "status": "Просмотрен",
+          "doc_md": "admin-balloo-su/metrics.md"
+        },
+        {
+          "id": "1_02_21",
+          "name": "Отчёты",
+          "file": "admin-balloo-su/reports.html",
+          "status": "Просмотрен",
+          "doc_md": "admin-balloo-su/reports.md"
+        },
+        {
+          "id": "1_02_22",
+          "name": "Статус сервиса",
+          "file": "admin-balloo-su/service-status.html",
+          "status": "Просмотрен",
+          "doc_md": "admin-balloo-su/service-status.md"
+        },
+        {
+          "id": "1_02_23",
+          "name": "Тексты",
+          "file": "admin-balloo-su/texts.html",
+          "status": "Просмотрен",
+          "doc_md": "admin-balloo-su/texts.md"
+        },
+        {
+          "id": "1_02_24",
+          "name": "Пользователи",
+          "file": "admin-balloo-su/users.html",
+          "status": "Просмотрен",
+          "doc_md": "admin-balloo-su/users.md"
+        },
+        {
+          "id": "1_03_07",
+          "name": "Вакансии",
+          "file": "command-balloo-su/vacancies.html",
+          "status": "Принят",
+          "doc_md": "admin-balloo-su/vacancies.md"
+        },
+        {
+          "id": "1_02_26",
+          "name": "Версии",
+          "file": "admin-balloo-su/versions.html",
+          "status": "Просмотрен",
+          "doc_md": "admin-balloo-su/versions.md"
+        }
+      ]
+    },
+    {
+      "id": "у_03",
+      "name": "command.balloo.su",
+      "icon": "🏢",
+      "domain": "Портал сотрудников",
+      "total_screens": 26,
+      "viewed": 26,
+      "edits_specific": 0,
+      "edits_global_accepted": 4,
+      "components_private": 26,
+      "components_global": 5,
+      "app_functions_count": 22,
+      "app_functions": [
+        "Аутентификация сотрудников",
+        "Дашборд сотрудника",
+        "HR-модуль",
+        "База знаний",
+        "Найм",
+        "Мониторинг продукта",
+        "Вакансии",
+        "Анкеты кандидатов",
+        "Почему мы",
+        "Внутренний чат",
+        "Встречи",
+        "Мои задачи",
+        "Мой отдел",
+        "Отделы",
+        "Управление отделами",
+        "Мои публикации",
+        "Редактор блога",
+        "Мой канал",
+        "Настройки канала",
+        "Профиль сотрудника",
+        "Календарь",
+        "Интервью",
+        "Дашборд руководителя",
+        "Отпуска"
+      ],
+      "status": "задокументирован",
+      "doc_md": null,
+      "screens": [
+        {
+          "id": "1_03_09",
+          "name": "Анкета кандидата",
+          "file": "command-balloo-su/application-form.html",
+          "status": "Принят",
+          "doc_md": "command-balloo-su/application-form.md"
+        },
+        {
+          "id": "1_03_20",
+          "name": "Настройки канала",
+          "file": "command-balloo-su/blog-channel-settings.html",
+          "status": "Принят",
+          "doc_md": "command-balloo-su/blog-channel-settings.md"
+        },
+        {
+          "id": "1_03_18",
+          "name": "Редактор блога",
+          "file": "command-balloo-su/blog-editor.html",
+          "status": "Принят",
+          "doc_md": "command-balloo-su/blog-editor.md"
+        },
+        {
+          "id": "1_03_19",
+          "name": "Мой канал",
+          "file": "command-balloo-su/blog-my-channel.html",
+          "status": "Принят",
+          "doc_md": "command-balloo-su/blog-my-channel.md"
+        },
+        {
+          "id": "1_03_17",
+          "name": "Мои публикации",
+          "file": "command-balloo-su/blog-my-posts.html",
+          "status": "Принят",
+          "doc_md": "command-balloo-su/blog-my-posts.md"
+        },
+        {
+          "id": "1_03_22",
+          "name": "Календарь",
+          "file": "command-balloo-su/calendar.html",
+          "status": "Принят",
+          "doc_md": "command-balloo-su/calendar.md"
+        },
+        {
+          "id": "1_03_24",
+          "name": "Карточка кандидата (интервью)",
+          "file": "command-balloo-su/candidate-interview.html",
+          "status": "Просмотрен",
+          "doc_md": "command-balloo-su/candidate-interview.md"
+        },
+        {
+          "id": "1_03_23",
+          "name": "Карточка кандидата",
+          "file": "command-balloo-su/candidate.html",
+          "status": "Принят",
+          "doc_md": "command-balloo-su/candidate.md"
+        },
+        {
+          "id": "1_03_02",
+          "name": "Дашборд",
+          "file": "command-balloo-su/dashboard.html",
+          "status": "Принят",
+          "doc_md": "command-balloo-su/dashboard.md"
+        },
+        {
+          "id": "1_03_16",
+          "name": "Управление отделами",
+          "file": "command-balloo-su/department-management.html",
+          "status": "Принят",
+          "doc_md": "command-balloo-su/department-management.md"
+        },
+        {
+          "id": "1_03_15",
+          "name": "Отделы",
+          "file": "command-balloo-su/departments.html",
+          "status": "Принят",
+          "doc_md": "command-balloo-su/departments.md"
+        },
+        {
+          "id": "1_03_21",
+          "name": "Профиль сотрудника",
+          "file": "command-balloo-su/employee-profile.html",
+          "status": "Принят",
+          "doc_md": "command-balloo-su/employee-profile.md"
+        },
+        {
+          "id": "1_03_05",
+          "name": "Найм",
+          "file": "command-balloo-su/hiring.html",
+          "status": "Принят",
+          "doc_md": "command-balloo-su/hiring.md"
+        },
+        {
+          "id": "1_03_03",
+          "name": "HR-модуль",
+          "file": "command-balloo-su/hr.html",
+          "status": "Принят",
+          "doc_md": "command-balloo-su/hr.md"
+        },
+        {
+          "id": "1_03_11",
+          "name": "Внутренний чат",
+          "file": "command-balloo-su/internal-chat.html",
+          "status": "Принят",
+          "doc_md": "command-balloo-su/internal-chat.md"
+        },
+        {
+          "id": "1_03_04",
+          "name": "База знаний",
+          "file": "command-balloo-su/knowledge-base.html",
+          "status": "Принят",
+          "doc_md": "command-balloo-su/knowledge-base.md"
+        },
+        {
+          "id": "1_03_01",
+          "name": "Вход",
+          "file": "command-balloo-su/login.html",
+          "status": "Принят",
+          "doc_md": "command-balloo-su/login.md"
+        },
+        {
+          "id": "1_03_25",
+          "name": "Дашборд руководителя",
+          "file": "command-balloo-su/manager-dashboard.html",
+          "status": "Просмотрен",
+          "doc_md": "command-balloo-su/manager-dashboard.md"
+        },
+        {
+          "id": "1_03_12",
+          "name": "Встречи",
+          "file": "command-balloo-su/meetings.html",
+          "status": "Принят",
+          "doc_md": "command-balloo-su/meetings.md"
+        },
+        {
+          "id": "1_03_06",
+          "name": "Мониторинг продукта",
+          "file": "command-balloo-su/monitoring.html",
+          "status": "Принят",
+          "doc_md": "command-balloo-su/monitoring.md"
+        },
+        {
+          "id": "1_03_14",
+          "name": "Мой отдел",
+          "file": "command-balloo-su/my-department.html",
+          "status": "Принят",
+          "doc_md": "command-balloo-su/my-department.md"
+        },
+        {
+          "id": "1_03_26",
+          "name": "Отпуска и отсутствие",
+          "file": "command-balloo-su/time-off.html",
+          "status": "Просмотрен",
+          "doc_md": "command-balloo-su/time-off.md"
+        },
+        {
+          "id": "1_03_13",
+          "name": "Мои задачи",
+          "file": "command-balloo-su/todo.html",
+          "status": "Реализован",
+          "doc_md": "command-balloo-su/todo.md",
+          "component": "packages/web/src/screens/command/TasksScreen.tsx"
+        },
+        {
+          "id": "1_03_07",
+          "name": "Вакансии",
+          "file": "command-balloo-su/vacancies.html",
+          "status": "Принят",
+          "doc_md": "command-balloo-su/vacancies.md"
+        },
+        {
+          "id": "1_03_08",
+          "name": "Детали вакансии",
+          "file": "command-balloo-su/vacancy-detail.html",
+          "status": "Принят",
+          "doc_md": "command-balloo-su/vacancy-detail.md"
+        },
+        {
+          "id": "1_03_10",
+          "name": "Почему мы",
+          "file": "command-balloo-su/why-us.html",
+          "status": "Принят",
+          "doc_md": "command-balloo-su/why-us.md"
+        }
+      ]
+    },
+    {
+      "id": "у_04",
+      "name": "features.balloo.su",
+      "icon": "💡",
+      "domain": "Фич-реквесты",
+      "total_screens": 5,
+      "viewed": 6,
+      "edits_specific": 0,
+      "edits_global_accepted": 4,
+      "components_private": 5,
+      "components_global": 5,
+      "app_functions_count": 5,
+      "app_functions": [
+        "Аутентификация",
+        "Список фич-реквестов",
+        "Создание фич-реквеста",
+        "Детали фич-реквеста",
+        "Донат"
+      ],
+      "status": "задокументирован",
+      "doc_md": null,
+      "screens": [
+        {
+          "id": "1_01_24",
+          "name": "Донат",
+          "file": "balloo-su/donate.html",
+          "status": "Принят",
+          "doc_md": "features-balloo-su/donate.md"
+        },
+        {
+          "id": "1_04_02",
+          "name": "Детали фич-реквеста",
+          "file": "features-balloo-su/feature-detail.html",
+          "status": "Просмотрен",
+          "doc_md": "features-balloo-su/feature-detail.md"
+        },
+        {
+          "id": "1_04_03",
+          "name": "Список фич-реквестов",
+          "file": "features-balloo-su/list.html",
+          "status": "Принят",
+          "doc_md": "features-balloo-su/list.md"
+        },
+        {
+          "id": "1_01_02",
+          "name": "Вход",
+          "file": "balloo-su/login.html",
+          "status": "Просмотрен",
+          "doc_md": "features-balloo-su/login.md"
+        },
+        {
+          "id": "1_04_05",
+          "name": "Отправить фич-реквест",
+          "file": "features-balloo-su/submit.html",
+          "status": "Принят",
+          "doc_md": "features-balloo-su/submit.md"
+        },
+        {
+          "id": "1_04_04",
+          "name": "Голосование по фичам",
+          "file": "features-balloo-su/vote.html",
+          "status": "Просмотрен",
+          "doc_md": "features-balloo-su/vote.md"
+        }
+      ]
+    },
+    {
+      "id": "у_05",
+      "name": "history.balloo.su",
+      "icon": "📜",
+      "domain": "История версий",
+      "total_screens": 3,
+      "viewed": 3,
+      "edits_specific": 0,
+      "edits_global_accepted": 3,
+      "components_private": 3,
+      "components_global": 5,
+      "app_functions_count": 4,
+      "app_functions": [
+        "Список версий",
+        "Детали версии",
+        "Донат"
+      ],
+      "status": "задокументирован",
+      "doc_md": null,
+      "screens": [
+        {
+          "id": "1_01_24",
+          "name": "Донат",
+          "file": "balloo-su/donate.html",
+          "status": "Принят",
+          "doc_md": "history-balloo-su/donate.md"
+        },
+        {
+          "id": "1_05_02",
+          "name": "Детали версии",
+          "file": "history-balloo-su/version-detail.html",
+          "status": "Просмотрен",
+          "doc_md": "history-balloo-su/version-detail.md"
+        },
+        {
+          "id": "1_05_03",
+          "name": "Список версий",
+          "file": "history-balloo-su/version-list.html",
+          "status": "Принят",
+          "doc_md": "history-balloo-su/version-list.md"
+        }
+      ]
+    },
+    {
+      "id": "у_06",
+      "name": "download.balloo.su",
+      "icon": "⬇️",
+      "domain": "Загрузки",
+      "total_screens": 2,
+      "viewed": 2,
+      "edits_specific": 0,
+      "edits_global_accepted": 2,
+      "components_private": 2,
+      "components_global": 5,
+      "app_functions_count": 2,
+      "app_functions": [
+        "Загрузки",
+        "Донат"
+      ],
+      "status": "задокументирован",
+      "doc_md": null,
+      "screens": [
+        {
+          "id": "1_01_24",
+          "name": "Донат",
+          "file": "balloo-su/donate.html",
+          "status": "Принят",
+          "doc_md": "download-balloo-su/donate.md"
+        },
+        {
+          "id": "1_06_02",
+          "name": "Загрузки",
+          "file": "download-balloo-su/downloads.html",
+          "status": "Просмотрен",
+          "doc_md": "download-balloo-su/downloads.md"
+        }
+      ]
+    },
+    {
+      "id": "у_07",
+      "name": "docs.balloo.su",
+      "icon": "📚",
+      "domain": "API документация",
+      "total_screens": 1,
+      "viewed": 1,
+      "edits_specific": 0,
+      "edits_global_accepted": 0,
+      "components_private": 1,
+      "components_global": 5,
+      "app_functions_count": 1,
+      "app_functions": [
+        "Документация API"
+      ],
+      "status": "задокументирован",
+      "doc_md": null,
+      "screens": [
+        {
+          "id": "1_07_01",
+          "name": "Документация API",
+          "file": "docs-balloo-su/api-docs.html",
+          "status": "Просмотрен",
+          "doc_md": "docs-balloo-su/api-docs.md"
+        }
+      ]
+    },
+    {
+      "id": "у_08",
+      "name": "mobile (сборные)",
+      "icon": "📱",
+      "domain": "Мобильные макеты",
+      "total_screens": 23,
+      "viewed": 23,
+      "edits_specific": 8,
+      "edits_global_accepted": 5,
+      "components_private": 23,
+      "components_global": 5,
+      "app_functions_count": 13,
+      "app_functions": [
+        "Мобильный чат",
+        "История звонков",
+        "Мобильные настройки",
+        "Устройства",
+        "QR-привязка",
+        "Донат",
+        "Вложения чата",
+        "Жалобы",
+        "Вход/Регистрация",
+        "Сторис",
+        "Архив",
+        "Контакты",
+        "Профиль"
+      ],
+      "status": "задокументирован",
+      "doc_md": null,
+      "screens": [
+        {
+          "id": "1_08_06",
+          "name": "Добавить устройство",
+          "file": "mobile/add-device.html",
+          "status": "Принят",
+          "doc_md": "mobile/add-device.md"
+        },
+        {
+          "id": "1_08_16",
+          "name": "Архив чатов",
+          "file": "mobile/archive.html",
+          "status": "Принят",
+          "doc_md": "mobile/archive.md"
+        },
+        {
+          "id": "1_08_03",
+          "name": "История звонков",
+          "file": "mobile/calls-history.html",
+          "status": "Принят",
+          "doc_md": "mobile/calls-history.md"
+        },
+        {
+          "id": "1_08_08",
+          "name": "Вложения чата",
+          "file": "mobile/chat-attachments.html",
+          "status": "Принят",
+          "doc_md": "mobile/chat-attachments.md"
+        },
+        {
+          "id": "1_08_02",
+          "name": "Чат",
+          "file": "mobile/chat.html",
+          "status": "Принят",
+          "doc_md": "mobile/chat.md"
+        },
+        {
+          "id": "1_08_17",
+          "name": "Контакты",
+          "file": "mobile/contacts.html",
+          "status": "Принят",
+          "doc_md": "mobile/contacts.md"
+        },
+        {
+          "id": "1_08_07",
+          "name": "Донат",
+          "file": "mobile/donate.html",
+          "status": "Принят",
+          "doc_md": "mobile/donate.md"
+        },
+        {
+          "id": "1_08_21",
+          "name": "Пустой чат",
+          "file": "mobile/empty-chat.html",
+          "status": "Просмотрен",
+          "doc_md": "mobile/empty-chat.md"
+        },
+        {
+          "id": "1_08_19",
+          "name": "Создание группы",
+          "file": "mobile/group-create.html",
+          "status": "Принят",
+          "doc_md": "mobile/group-create.md"
+        },
+        {
+          "id": "1_08_10",
+          "name": "Вход",
+          "file": "mobile/login.html",
+          "status": "Принят",
+          "doc_md": "mobile/login.md"
+        },
+        {
+          "id": "1_08_22",
+          "name": "Полноэкранный просмотрщик медиа",
+          "file": "mobile/media-viewer.html",
+          "status": "Просмотрен",
+          "doc_md": "mobile/media-viewer.md"
+        },
+        {
+          "id": "1_08_05",
+          "name": "Мои устройства",
+          "file": "mobile/my-devices.html",
+          "status": "Принят",
+          "doc_md": "mobile/my-devices.md"
+        },
+        {
+          "id": "1_08_14",
+          "name": "Мои донаты",
+          "file": "mobile/my-donates.html",
+          "status": "Принят",
+          "doc_md": "mobile/my-donates.md"
+        },
+        {
+          "id": "1_08_01",
+          "name": "Обзор / Приветствие",
+          "file": "mobile/overview.html",
+          "status": "Принят",
+          "doc_md": "mobile/overview.md"
+        },
+        {
+          "id": "1_08_12",
+          "name": "Восстановление пароля",
+          "file": "mobile/password-reset.html",
+          "status": "Принят",
+          "doc_md": "mobile/password-reset.md"
+        },
+        {
+          "id": "1_08_20",
+          "name": "Редактор опроса",
+          "file": "mobile/poll-editor.html",
+          "status": "Принят",
+          "doc_md": "mobile/poll-editor.md"
+        },
+        {
+          "id": "1_08_18",
+          "name": "Профиль",
+          "file": "mobile/profile.html",
+          "status": "Принят",
+          "doc_md": "mobile/profile.md"
+        },
+        {
+          "id": "1_08_11",
+          "name": "Регистрация",
+          "file": "mobile/register.html",
+          "status": "Принят",
+          "doc_md": "mobile/register.md"
+        },
+        {
+          "id": "1_08_09",
+          "name": "Жалоба на сообщение",
+          "file": "mobile/report-message.html",
+          "status": "Принят",
+          "doc_md": "mobile/report-message.md"
+        },
+        {
+          "id": "1_08_04",
+          "name": "Настройки приложения",
+          "file": "mobile/settings.html",
+          "status": "Принят",
+          "doc_md": "mobile/settings.md"
+        },
+        {
+          "id": "1_08_15",
+          "name": "Сторис",
+          "file": "mobile/stories.html",
+          "status": "Принят",
+          "doc_md": "mobile/stories.md"
+        },
+        {
+          "id": "1_08_13",
+          "name": "Двухфакторная аутентификация",
+          "file": "mobile/two-factor.html",
+          "status": "Принят",
+          "doc_md": "mobile/two-factor.md"
+        },
+        {
+          "id": "1_08_23",
+          "name": "Запись голосового (mobile)",
+          "file": "mobile/voice-record.html",
+          "status": "Просмотрен",
+          "doc_md": "mobile/voice-record.md"
+        }
+      ]
+    },
+    {
+      "id": "у_09",
+      "name": "desktop (генеральный)",
+      "icon": "🖥️",
+      "domain": "ПК обёртки",
+      "total_screens": 23,
+      "viewed": 23,
+      "edits_specific": 2,
+      "edits_global_accepted": 3,
+      "components_private": 23,
+      "components_global": 5,
+      "app_functions_count": 16,
+      "app_functions": [
+        "Окно приложения",
+        "Режимы окна",
+        "Системная интеграция",
+        "Многоканальность",
+        "Мои устройства",
+        "Донат",
+        "Вложения чата",
+        "Жалобы",
+        "Вход/Регистрация",
+        "Сторис",
+        "Архив",
+        "Контакты",
+        "Профиль",
+        "Настройки",
+        "Настройки уведомлений",
+        "Просмотр медиа"
+      ],
+      "status": "задокументирован",
+      "doc_md": null,
+      "screens": [
+        {
+          "id": "1_09_04",
+          "name": "Добавить устройство",
+          "file": "desktop/add-device.html",
+          "status": "Принят",
+          "doc_md": "desktop/add-device.md"
+        },
+        {
+          "id": "1_09_14",
+          "name": "Архив чатов",
+          "file": "desktop/archive.html",
+          "status": "Принят",
+          "doc_md": "desktop/archive.md"
+        },
+        {
+          "id": "1_09_13",
+          "name": "История звонков",
+          "file": "desktop/calls-history.html",
+          "status": "Принят",
+          "doc_md": "desktop/calls-history.md"
+        },
+        {
+          "id": "1_09_06",
+          "name": "Вложения чата",
+          "file": "desktop/chat-attachments.html",
+          "status": "Принят",
+          "doc_md": "desktop/chat-attachments.md"
+        },
+        {
+          "id": "1_09_11",
+          "name": "Чат",
+          "file": "desktop/chat.html",
+          "status": "Принят",
+          "doc_md": "desktop/chat.md"
+        },
+        {
+          "id": "1_09_15",
+          "name": "Контакты",
+          "file": "desktop/contacts.html",
+          "status": "Принят",
+          "doc_md": "desktop/contacts.md"
+        },
+        {
+          "id": "1_09_05",
+          "name": "Донат",
+          "file": "desktop/donate.html",
+          "status": "Принят",
+          "doc_md": "desktop/donate.md"
+        },
+        {
+          "id": "1_09_16",
+          "name": "Создание группы",
+          "file": "desktop/group-create.html",
+          "status": "Принят",
+          "doc_md": "desktop/group-create.md"
+        },
+        {
+          "id": "1_01_02",
+          "name": "Вход",
+          "file": "balloo-su/login.html",
+          "status": "Просмотрен",
+          "doc_md": "desktop/login.md"
+        },
+        {
+          "id": "1_09_21",
+          "name": "Полноэкранный просмотрщик медиа",
+          "file": "desktop/media-viewer.html",
+          "status": "Просмотрен",
+          "doc_md": "desktop/media-viewer.md"
+        },
+        {
+          "id": "1_09_02",
+          "name": "Modes",
+          "file": "desktop/modes.html",
+          "status": "Принят",
+          "doc_md": "desktop/modes.md"
+        },
+        {
+          "id": "1_09_03",
+          "name": "Мои устройства",
+          "file": "desktop/my-devices.html",
+          "status": "Принят",
+          "doc_md": "desktop/my-devices.md"
+        },
+        {
+          "id": "1_09_10",
+          "name": "Мои донаты",
+          "file": "desktop/my-donates.html",
+          "status": "Принят",
+          "doc_md": "desktop/my-donates.md"
+        },
+        {
+          "id": "1_09_20",
+          "name": "Настройки уведомлений",
+          "file": "desktop/notification-settings.html",
+          "status": "Просмотрен",
+          "doc_md": "desktop/notification-settings.md"
+        },
+        {
+          "id": "1_09_01",
+          "name": "Обзор / Приветствие",
+          "file": "desktop/overview.html",
+          "status": "Принят",
+          "doc_md": "desktop/overview.md"
+        },
+        {
+          "id": "1_09_08",
+          "name": "Восстановление пароля",
+          "file": "desktop/password-reset.html",
+          "status": "Просмотрен",
+          "doc_md": "desktop/password-reset.md"
+        },
+        {
+          "id": "1_09_17",
+          "name": "Редактор опроса",
+          "file": "desktop/poll-editor.html",
+          "status": "Принят",
+          "doc_md": "desktop/poll-editor.md"
+        },
+        {
+          "id": "1_09_19",
+          "name": "Профиль",
+          "file": "desktop/profile.html",
+          "status": "Принят",
+          "doc_md": "desktop/profile.md"
+        },
+        {
+          "id": "1_01_03",
+          "name": "Регистрация",
+          "file": "balloo-su/register.html",
+          "status": "Просмотрен",
+          "doc_md": "desktop/register.md"
+        },
+        {
+          "id": "1_09_07",
+          "name": "Жалоба на сообщение",
+          "file": "desktop/report-message.html",
+          "status": "Принят",
+          "doc_md": "desktop/report-message.md"
+        },
+        {
+          "id": "1_09_18",
+          "name": "Настройки приложения",
+          "file": "desktop/settings.html",
+          "status": "Принят",
+          "doc_md": "desktop/settings.md"
+        },
+        {
+          "id": "1_09_12",
+          "name": "Сторис",
+          "file": "desktop/stories.html",
+          "status": "Принят",
+          "doc_md": "desktop/stories.md"
+        },
+        {
+          "id": "1_09_09",
+          "name": "Двухфакторная аутентификация",
+          "file": "desktop/two-factor.html",
+          "status": "Просмотрен",
+          "doc_md": "desktop/two-factor.md"
+        }
+      ]
+    },
+    {
+      "id": "у_10",
+      "name": "specifity.balloo.su",
+      "icon": "📐",
+      "domain": "Спецификация",
+      "total_screens": 7,
+      "viewed": 7,
+      "edits_specific": 0,
+      "edits_global_accepted": 0,
+      "components_private": 7,
+      "components_global": 5,
+      "app_functions_count": 7,
+      "app_functions": [
+        "Главная",
+        "Экраны",
+        "Эндпоинты",
+        "Данные",
+        "Компоненты",
+        "Правила",
+        "Спецификация"
+      ],
+      "status": "задокументирован",
+      "doc_md": null,
+      "screens": [
+        {
+          "id": "1_10_01",
+          "name": "Компоненты",
+          "file": "specifity-balloo-su/components.html",
+          "status": "Принят",
+          "doc_md": "specifity-balloo-su/components.md"
+        },
+        {
+          "id": "1_10_02",
+          "name": "Данные",
+          "file": "specifity-balloo-su/data.html",
+          "status": "Принят",
+          "doc_md": "specifity-balloo-su/data.md"
+        },
+        {
+          "id": "1_10_03",
+          "name": "Эндпоинты",
+          "file": "specifity-balloo-su/endpoints.html",
+          "status": "Принят",
+          "doc_md": "specifity-balloo-su/endpoints.md"
+        },
+        {
+          "id": "1_10_04",
+          "name": "Главная спецификации",
+          "file": "specifity-balloo-su/home.html",
+          "status": "Принят",
+          "doc_md": "specifity-balloo-su/home.md"
+        },
+        {
+          "id": "1_01_12",
+          "name": "Правила платформы",
+          "file": "balloo-su/rules.html",
+          "status": "Принят",
+          "doc_md": "specifity-balloo-su/rules.md"
+        },
+        {
+          "id": "1_10_06",
+          "name": "Экраны",
+          "file": "specifity-balloo-su/screens.html",
+          "status": "Принят",
+          "doc_md": "specifity-balloo-su/screens.md"
+        },
+        {
+          "id": "1_10_07",
+          "name": "Спецификация",
+          "file": "specifity-balloo-su/specification.html",
+          "status": "Принят",
+          "doc_md": "specifity-balloo-su/specification.md"
+        }
+      ]
+    },
+    {
+      "id": "у_11",
+      "name": "blog.balloo.su",
+      "icon": "📝",
+      "domain": "Корпоративный блог",
+      "total_screens": 6,
+      "viewed": 6,
+      "edits_specific": 0,
+      "edits_global_accepted": 1,
+      "components_private": 6,
+      "components_global": 5,
+      "app_functions_count": 2,
+      "app_functions": [
+        "Лента блога",
+        "Поиск"
+      ],
+      "status": "задокументирован",
+      "doc_md": null,
+      "screens": [
+        {
+          "id": "1_11_01",
+          "name": "Категория блога",
+          "file": "blog-balloo-su/category.html",
+          "status": "Просмотрен",
+          "doc_md": "blog-balloo-su/category.md"
+        },
+        {
+          "id": "1_11_02",
+          "name": "Канал блога",
+          "file": "blog-balloo-su/channel.html",
+          "status": "Принят",
+          "doc_md": "blog-balloo-su/channel.md"
+        },
+        {
+          "id": "1_11_03",
+          "name": "Лента блога",
+          "file": "blog-balloo-su/feed.html",
+          "status": "Принят",
+          "doc_md": "blog-balloo-su/feed.md"
+        },
+        {
+          "id": "1_11_04",
+          "name": "Персональная лента",
+          "file": "blog-balloo-su/personal-feed.html",
+          "status": "Принят",
+          "doc_md": "blog-balloo-su/personal-feed.md"
+        },
+        {
+          "id": "1_11_05",
+          "name": "Пост блога",
+          "file": "blog-balloo-su/post.html",
+          "status": "Принят",
+          "doc_md": "blog-balloo-su/post.md"
+        },
+        {
+          "id": "1_01_06",
+          "name": "Глобальный поиск",
+          "file": "balloo-su/search.html",
+          "status": "Просмотрен",
+          "doc_md": "blog-balloo-su/search.md"
+        }
+      ]
+    }
+  ],
+  "api": {
+    "groups_count": 16,
+    "endpoints_total": 150,
+    "websocket_events": 24,
+    "auth_types": 5,
+    "schema_file": "api_schema.json",
+    "doc_file": "api_schema.md"
+  },
+  "data": {
+    "tables_count": 0,
+    "seed_tables": 10,
+    "schema_file": "data_schema.json",
+    "seed_file": "pre_filled_data.json"
+  },
+  "components": {
+    "global_count": 5,
+    "private_total": 173
+  }
+}

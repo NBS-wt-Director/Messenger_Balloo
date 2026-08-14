@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Specifity — Экраны по узлам</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <link rel="stylesheet" href="spec.css">
+  <style>
+    .spec-screens-group { margin-bottom: 14px; }
+    .spec-screens-group > summary {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 16px; cursor: pointer; user-select: none;
+      background: var(--bg-glass); backdrop-filter: blur(var(--blur));
+      border: 1px solid var(--border-color);
+      font-size: 14px; font-weight: 700; color: var(--text-primary);
+    }
+    .spec-screens-group > summary:hover { border-color: var(--accent); }
+    .spec-screens-group[open] > summary { border-bottom: 1px solid var(--border-color); }
+    .spec-screens-group__count { margin-left: auto; font-size: 12px; color: var(--text-muted); font-weight: 700; }
+    .spec-screens-group__body { padding: 0; }
+  </style>
+</head>
+<body class="app-flex">
+
+<div class="topbar">
+  <div class="topbar__logo">
+    <div class="topbar__logo-icon" style="background:var(--accent);">S</div>
+    <span>Specifity</span>
+    <div class="topbar__dropdown">
+      <div class="topbar__dropdown-item topbar__dropdown-item--node topbar__dropdown-item--node--current">📐 Specifity (текущий)</div>
+      <div class="topbar__dropdown-divider"></div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">💬 Balloo</div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">🛡️ Admin</div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">🏢 Command</div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">💡 Features</div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">📜 History</div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">⬇️ Download</div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">📚 API Docs</div>
+    </div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Экраны · каталог по узлам</div>
+  <div class="topbar__right">
+    <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+    <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+  </div>
+</div>
+
+<div class="spec-app">
+  <div class="spec-sidebar">
+    <div class="spec-sidebar__search"><input type="text" class="search-input" placeholder="🔍 Поиск по спецификации..."></div>
+    <div class="spec-sidebar__group">Разделы</div>
+    <a class="spec-sidebar__item" href="home.html"><span class="spec-sidebar__item-icon">🏠</span> Главная</a>
+    <a class="spec-sidebar__item" href="rules.html"><span class="spec-sidebar__item-icon">📋</span> Правила</a>
+    <a class="spec-sidebar__item spec-sidebar__item--active" href="screens.html"><span class="spec-sidebar__item-icon">🖼️</span> Экраны <span class="spec-sidebar__item-num">110</span></a>
+    <a class="spec-sidebar__item" href="endpoints.html"><span class="spec-sidebar__item-icon">🔌</span> Эндпоинты</a>
+    <a class="spec-sidebar__item" href="data.html"><span class="spec-sidebar__item-icon">🗄️</span> Данные <span class="spec-sidebar__item-num">34</span></a>
+    <a class="spec-sidebar__item" href="components.html"><span class="spec-sidebar__item-icon">🧩</span> Компоненты <span class="spec-sidebar__item-num">241</span></a>
+    <div class="spec-sidebar__divider"></div>
+    <a class="spec-sidebar__item" href="specification.html"><span class="spec-sidebar__item-icon">📐</span> Спецификация экрана</a>
+  </div>
+
+  <div class="spec-content">
+    <div class="spec-pagehead">
+      <div class="spec-pagehead__id">ID: 1_10_04 · узел у_10 (specifity)</div>
+      <h1>Экраны · каталог по узлам</h1>
+      <p>Полный каталог экранов монорепо, сгруппированный по узлам. Каждый экран имеет ID <code>1_xx_yy</code>, файл макета и статус. Полный машиночитаемый список — в <code>index_ecrans.json</code>; клик по экрану открывает split-view спецификацию (<a href="specification.html" style="color:var(--accent);">1_10_01</a>).</p>
+    </div>
+
+    <div class="spec-filters">
+      <span class="spec-filter spec-filter--active">Все (110)</span>
+      <span class="spec-filter">shared (8)</span>
+      <span class="spec-filter">balloo.su (26)</span>
+      <span class="spec-filter">admin (21)</span>
+      <span class="spec-filter">command (20)</span>
+      <span class="spec-filter">features (5)</span>
+      <span class="spec-filter">history (4)</span>
+      <span class="spec-filter">download (2)</span>
+      <span class="spec-filter">docs (1)</span>
+      <span class="spec-filter">mobile (9)</span>
+      <span class="spec-filter">desktop (7)</span>
+      <span class="spec-filter">specifity (7)</span>
+      <span class="spec-filter">blog (6)</span>
+    </div>
+
+    <!-- shared -->
+    <details class="spec-screens-group" open>
+      <summary>🔗 shared — общие экраны <span class="spec-screens-group__count">8 экранов · у_00</span></summary>
+      <div class="spec-screens-group__body">
+        <table class="spec-table">
+          <thead><tr><th>ID</th><th>Экран</th><th>Файл</th><th>Статус</th></tr></thead>
+          <tbody>
+            <tr><td><code>1_00_01</code></td><td>Ошибка 404</td><td><code>shared/404.html</code></td><td><span class="chip">запланирован</span></td></tr>
+            <tr><td><code>1_00_02</code></td><td>Ошибка 403</td><td><code>shared/403.html</code></td><td><span class="chip">запланирован</span></td></tr>
+            <tr><td><code>1_00_03</code></td><td>Ошибка 500</td><td><code>shared/500.html</code></td><td><span class="chip">запланирован</span></td></tr>
+            <tr><td><code>1_00_04</code></td><td>Ошибка 503</td><td><code>shared/503.html</code></td><td><span class="chip">запланирован</span></td></tr>
+            <tr><td><code>1_00_05</code></td><td>Офлайн (авторизованный)</td><td><code>shared/offline-auth.html</code></td><td><span class="chip">запланирован</span></td></tr>
+            <tr><td><code>1_00_06</code></td><td>Офлайн (гость)</td><td><code>shared/offline-guest.html</code></td><td><span class="chip">запланирован</span></td></tr>
+            <tr><td><code>1_00_07</code></td><td>Бан (555)</td><td><code>shared/ban.html</code></td><td><span class="chip">запланирован</span></td></tr>
+            <tr><td><code>1_00_08</code></td><td>Обжалование бана</td><td><code>shared/ban-appeal.html</code></td><td><span class="chip">запланирован</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+
+    <!-- balloo.su -->
+    <details class="spec-screens-group">
+      <summary>💬 balloo.su — мессенджер <span class="spec-screens-group__count">26 экранов · у_01</span></summary>
+      <div class="spec-screens-group__body">
+        <table class="spec-table">
+          <thead><tr><th>ID</th><th>Экран</th><th>Файл</th><th>Статус</th></tr></thead>
+          <tbody>
+            <tr><td><code>1_01_01</code></td><td>Онбординг</td><td><code>balloo-su/onboarding.html</code></td><td><span class="chip">спроектирован</span></td></tr>
+            <tr><td><code>1_01_02</code></td><td>Вход</td><td><code>balloo-su/login.html</code></td><td><span class="chip">спроектирован</span></td></tr>
+            <tr><td><code>1_01_03</code></td><td>Регистрация</td><td><code>balloo-su/register.html</code></td><td><span class="chip">спроектирован</span></td></tr>
+            <tr><td><code>1_01_04</code></td><td>Чаты</td><td><code>balloo-su/chats.html</code></td><td><span class="chip">спроектирован</span></td></tr>
+            <tr><td><code>1_01_05</code></td><td>Профиль</td><td><code>balloo-su/profile.html</code></td><td><span class="chip">спроектирован</span></td></tr>
+            <tr><td><code>1_01_24</code></td><td>Донат</td><td><code>balloo-su/donate.html</code></td><td><span class="chip">спроектирован</span></td></tr>
+            <tr><td colspan="4" style="color:var(--text-muted);font-size:12px;">…ещё 20 экранов (настройки, устройства, звонки, группы, поиск, архив, блокировки и др.) — полный список в <code>index_ecrans.md</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+
+    <!-- admin -->
+    <details class="spec-screens-group">
+      <summary>🛡️ admin.balloo.su — админ-панель <span class="spec-screens-group__count">21 экран · у_02</span></summary>
+      <div class="spec-screens-group__body">
+        <table class="spec-table">
+          <thead><tr><th>ID</th><th>Экран</th><th>Файл</th><th>Статус</th></tr></thead>
+          <tbody>
+            <tr><td><code>1_02_01</code></td><td>Вход админа (2FA)</td><td><code>admin-balloo-su/login.html</code></td><td><span class="chip">спроектирован</span></td></tr>
+            <tr><td><code>1_02_02</code></td><td>Дашборд</td><td><code>admin-balloo-su/dashboard.html</code></td><td><span class="chip">спроектирован</span></td></tr>
+            <tr><td><code>1_02_03</code></td><td>Модерация жалоб</td><td><code>admin-balloo-su/reports.html</code></td><td><span class="chip">спроектирован</span></td></tr>
+            <tr><td colspan="4" style="color:var(--text-muted);font-size:12px;">…ещё 18 экранов (баны, пользователи, аналитика, настройки, логи и др.)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+
+    <!-- command -->
+    <details class="spec-screens-group">
+      <summary>🏢 command.balloo.su — портал сотрудников <span class="spec-screens-group__count">20 экранов · у_03</span></summary>
+      <div class="spec-screens-group__body">
+        <table class="spec-table">
+          <thead><tr><th>ID</th><th>Экран</th><th>Файл</th><th>Статус</th></tr></thead>
+          <tbody>
+            <tr><td><code>1_03_01</code></td><td>Главная портала</td><td><code>command-balloo-su/home.html</code></td><td><span class="chip">спроектирован</span></td></tr>
+            <tr><td><code>1_03_07</code></td><td>Вакансии</td><td><code>command-balloo-su/vacancies.html</code></td><td><span class="chip">спроектирован</span></td></tr>
+            <tr><td colspan="4" style="color:var(--text-muted);font-size:12px;">…ещё 18 экранов (отделы, сотрудники, инструменты, отчёты и др.)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+
+    <!-- features -->
+    <details class="spec-screens-group">
+      <summary>💡 features.balloo.su — фич-реквесты <span class="spec-screens-group__count">5 экранов · у_04</span></summary>
+      <div class="spec-screens-group__body">
+        <table class="spec-table">
+          <thead><tr><th>ID</th><th>Экран</th><th>Файл</th><th>Статус</th></tr></thead>
+          <tbody>
+            <tr><td><code>1_04_01</code></td><td>Лента фич-реквестов</td><td><code>features-balloo-su/feed.html</code></td><td><span class="chip">спроектирован</span></td></tr>
+            <tr><td><code>1_04_02</code></td><td>Карточка реквеста</td><td><code>features-balloo-su/request.html</code></td><td><span class="chip">спроектирован</span></td></tr>
+            <tr><td colspan="4" style="color:var(--text-muted);font-size:12px;">…ещё 3 экрана (дорожная карта, создание, профиль автора)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+
+    <!-- history -->
+    <details class="spec-screens-group">
+      <summary>📜 history.balloo.su — история версий <span class="spec-screens-group__count">4 экрана · у_05</span></summary>
+      <div class="spec-screens-group__body">
+        <table class="spec-table">
+          <thead><tr><th>ID</th><th>Экран</th><th>Файл</th><th>Статус</th></tr></thead>
+          <tbody>
+            <tr><td><code>1_05_01</code></td><td>Лента релизов</td><td><code>history-balloo-su/feed.html</code></td><td><span class="chip">спроектирован</span></td></tr>
+            <tr><td colspan="4" style="color:var(--text-muted);font-size:12px;">…ещё 3 экрана (релиз, сравнение, архив)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+
+    <!-- download -->
+    <details class="spec-screens-group">
+      <summary>⬇️ download.balloo.su — загрузки <span class="spec-screens-group__count">2 экрана · у_06</span></summary>
+      <div class="spec-screens-group__body">
+        <table class="spec-table">
+          <thead><tr><th>ID</th><th>Экран</th><th>Файл</th><th>Статус</th></tr></thead>
+          <tbody>
+            <tr><td><code>1_06_01</code></td><td>Главная загрузок</td><td><code>download-balloo-su/index.html</code></td><td><span class="chip chip--accent">принят</span></td></tr>
+            <tr><td><code>1_06_02</code></td><td>Спасибо за установку</td><td><code>download-balloo-su/thanks.html</code></td><td><span class="chip chip--accent">принят</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+
+    <!-- docs -->
+    <details class="spec-screens-group">
+      <summary>📚 docs.balloo.su — API-документация <span class="spec-screens-group__count">1 экран · у_07</span></summary>
+      <div class="spec-screens-group__body">
+        <table class="spec-table">
+          <thead><tr><th>ID</th><th>Экран</th><th>Файл</th><th>Статус</th></tr></thead>
+          <tbody>
+            <tr><td><code>1_07_01</code></td><td>API Documentation</td><td><code>docs-balloo-su/api-docs.html</code></td><td><span class="chip chip--accent">принят</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+
+    <!-- mobile -->
+    <details class="spec-screens-group">
+      <summary>📱 mobile — сборные мобильные макеты <span class="spec-screens-group__count">9 экранов · у_08</span></summary>
+      <div class="spec-screens-group__body">
+        <table class="spec-table">
+          <thead><tr><th>ID</th><th>Экран</th><th>Файл</th><th>Статус</th></tr></thead>
+          <tbody>
+            <tr><td><code>1_08_01</code></td><td>Онбординг (mobile)</td><td><code>mobile/onboarding.html</code></td><td><span class="chip chip--accent">принят</span></td></tr>
+            <tr><td><code>1_08_02</code></td><td>Мобильный чат</td><td><code>mobile/chat.html</code></td><td><span class="chip chip--accent">принят</span></td></tr>
+            <tr><td colspan="4" style="color:var(--text-muted);font-size:12px;">…ещё 7 экранов (профиль, звонки, настройки, жесты и др.)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+
+    <!-- desktop -->
+    <details class="spec-screens-group">
+      <summary>🖥️ desktop — обёртки окна ПК <span class="spec-screens-group__count">7 экранов · у_09</span></summary>
+      <div class="spec-screens-group__body">
+        <table class="spec-table">
+          <thead><tr><th>ID</th><th>Экран</th><th>Файл</th><th>Статус</th></tr></thead>
+          <tbody>
+            <tr><td><code>1_09_01</code></td><td>Обёртка окна</td><td><code>desktop/overview.html</code></td><td><span class="chip chip--accent">принят</span></td></tr>
+            <tr><td colspan="4" style="color:var(--text-muted);font-size:12px;">…ещё 6 экранов (titlebar, tray, настройки окна, ярлыки и др.)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+
+    <!-- specifity -->
+    <details class="spec-screens-group" open>
+      <summary>📐 specifity.balloo.su — спецификация <span class="spec-screens-group__count">7 экранов · у_10</span></summary>
+      <div class="spec-screens-group__body">
+        <table class="spec-table">
+          <thead><tr><th>ID</th><th>Экран</th><th>Файл</th><th>Статус</th></tr></thead>
+          <tbody>
+            <tr><td><code>1_10_01</code></td><td>Спецификация экрана (split-view)</td><td><code>specifity-balloo-su/specification.html</code></td><td><span class="chip">спроектирован</span></td></tr>
+            <tr><td><code>1_10_02</code></td><td>Главная · обзор монорепо</td><td><code>specifity-balloo-su/home.html</code></td><td><span class="chip">спроектирован</span></td></tr>
+            <tr><td><code>1_10_03</code></td><td>Правила проектирования и разработки</td><td><code>specifity-balloo-su/rules.html</code></td><td><span class="chip">спроектирован</span></td></tr>
+            <tr><td><code>1_10_04</code></td><td>Экраны (каталог по узлам)</td><td><code>specifity-balloo-su/screens.html</code></td><td><span class="chip">спроектирован</span></td></tr>
+            <tr><td><code>1_10_05</code></td><td>Эндпоинты (API)</td><td><code>specifity-balloo-su/endpoints.html</code></td><td><span class="chip">спроектирован</span></td></tr>
+            <tr><td><code>1_10_06</code></td><td>Данные (сущности БД)</td><td><code>specifity-balloo-su/data.html</code></td><td><span class="chip">спроектирован</span></td></tr>
+            <tr><td><code>1_10_07</code></td><td>Компоненты (каталог)</td><td><code>specifity-balloo-su/components.html</code></td><td><span class="chip">спроектирован</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+
+    <!-- blog -->
+    <details class="spec-screens-group">
+      <summary>📝 blog.balloo.su — корпоративный блог <span class="spec-screens-group__count">6 экранов · у_11</span></summary>
+      <div class="spec-screens-group__body">
+        <table class="spec-table">
+          <thead><tr><th>ID</th><th>Экран</th><th>Файл</th><th>Статус</th></tr></thead>
+          <tbody>
+            <tr><td><code>1_11_01</code></td><td>Лента блога</td><td><code>blog-balloo-su/feed.html</code></td><td><span class="chip">спроектирован</span></td></tr>
+            <tr><td><code>1_11_02</code></td><td>Статья</td><td><code>blog-balloo-su/post.html</code></td><td><span class="chip">спроектирован</span></td></tr>
+            <tr><td colspan="4" style="color:var(--text-muted);font-size:12px;">…ещё 4 экрана (канал, категория, поиск, личная лента)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+
+    <p style="font-size:12px;color:var(--text-muted);margin-top:20px;line-height:1.6;">📋 Полный машиночитаемый список экранов (110) — в <code>mockups/index_ecrans.md</code> и <code>index_ecrans.json</code>. В продакшене генерируется из метаданных при сборке.</p>
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo — Поддержка</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon">B</div><span>Balloo</span>
+    <div class="topbar__dropdown"><div class="topbar__dropdown-item" onclick="window.location.href='chats.html'">💬 Balloo</div><div class="topbar__dropdown-divider"></div><div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div><div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div><div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div><div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div><div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div><div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div></div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Чат с поддержкой</div>
+  <div class="topbar__right"><div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИИ</span></div></div><span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span><span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span></div>
+</div>
+<div class="main">
+  <div class="content">
+    <div style="padding:12px 16px;border-bottom:1px solid var(--border-color);display:flex;align-items:center;gap:12px;background:var(--bg-secondary);">
+      <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-new"><div class="avatar__inner"><span>🦊</span></div></div>
+      <div class="flex-1"><div class="font-semibold" style="color:var(--text-primary);">Техподдержка Balloo</div><div class="text-xs text-muted">🟢 Онлайн • Среднее время ответа: 5 мин</div></div>
+      <span class="chip chip--accent">Приоритет: Обычный</span>
+    </div>
+    <div class="messages">
+      <div style="text-align:center;padding:8px;"><span class="chip">16 июля 2026</span></div>
+      <div class="message message--receiver">
+        <div class="message__bubble">
+          <div class="message__header"><span>14:00</span><span class="message__header-tag message__header-tag--auto">⚙ Автоответ</span></div>
+          <div class="message__body">Здравствуйте! Опишите вашу проблему, мы ответим в ближайшее время.</div>
+        </div>
+      </div>
+      <div class="message message--sender">
+        <div class="message__bubble">
+          <div class="message__header"><span>14:05</span></div>
+          <div class="message__body">Не могу подключить Yandex Disk. Получаю ошибку "токен истёк".</div>
+        </div>
+        <div class="msg-ticks msg-ticks--read">✓✓</div>
+      </div>
+      <div class="message message--receiver">
+        <div class="message__bubble">
+          <div class="message__header"><span>14:08</span></div>
+          <div class="message__body">Переподключите диск через Профиль → Yandex Disk → Отключить, затем подключить заново. Если не поможет — очистите кэш приложения.</div>
+          <div class="message__actions"><button class="message__action-btn">📋</button><button class="message__action-btn">😊</button></div>
+        </div>
+      </div>
+    </div>
+    <div class="input-area">
+      <button class="input-area__btn">📎</button>
+      <textarea class="input-area__field" placeholder="Опишите проблему..." rows="1"></textarea>
+      <button class="input-area__btn input-area__btn--send" onclick="sendMessage()">➤</button>
+    </div>
+  </div>
+</div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

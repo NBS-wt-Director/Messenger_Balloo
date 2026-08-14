@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Компонент: Notification Settings Desktop — Настройки уведомлений (desktop)</title>
+  <link rel="stylesheet" href="../../assets/common.css">
+  <style>
+    .component-demo { padding: 24px; max-width: 560px; margin: 0 auto; }
+    .component-demo h1 { font-size: 20px; margin-bottom: 16px; }
+    .component-demo .demo-section { margin-bottom: 24px; }
+    .component-demo .demo-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+
+    .notif-settings-desktop {
+      background: var(--bg-glass);
+      backdrop-filter: blur(var(--blur));
+      border: 1px solid var(--border-strong);
+      box-shadow: var(--shadow-glass);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .notif-settings-desktop__section { padding-bottom: 16px; border-bottom: 1px solid var(--border-color); }
+    .notif-settings-desktop__section:last-child { border-bottom: none; }
+    .notif-settings-desktop__section-title { font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 14px; }
+    .notif-settings-desktop__row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+    }
+    .notif-settings-desktop__row-label { font-size: 14px; color: var(--text-primary); }
+    .notif-settings-desktop__row-desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .notif-settings-desktop__time-inputs { display: flex; align-items: center; gap: 8px; }
+    .notif-settings-desktop__time-input {
+      width: 64px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 6px 10px;
+      font-size: 14px;
+      text-align: center;
+      outline: none;
+    }
+    .notif-settings-desktop__time-input:focus { border-color: var(--accent); }
+  </style>
+</head>
+<body>
+  <div class="component-demo">
+    <h1>🖥 Компонент: Notification Settings Desktop (Настройки уведомлений — desktop)</h1>
+
+    <div class="demo-section">
+      <div class="demo-label">Настройки уведомлений — десктопное модальное окно</div>
+      <div class="notif-settings-desktop">
+        <div class="notif-settings-desktop__section">
+          <div class="notif-settings-desktop__section-title">Общие</div>
+          <div class="notif-settings-desktop__row">
+            <div>
+              <div class="notif-settings-desktop__row-label">Push-уведомления</div>
+              <div class="notif-settings-desktop__row-desc">Включить уведомления на рабочем столе</div>
+            </div>
+            <label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label>
+          </div>
+          <div class="notif-settings-desktop__row">
+            <div>
+              <div class="notif-settings-desktop__row-label">Звук сообщений</div>
+              <div class="notif-settings-desktop__row-desc">Воспроизводить звук при новых сообщениях</div>
+            </div>
+            <label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label>
+          </div>
+          <div class="notif-settings-desktop__row">
+            <div>
+              <div class="notif-settings-desktop__row-label">Показывать текст</div>
+              <div class="notif-settings-desktop__row-desc">Отображать содержимое в push-уведомлении</div>
+            </div>
+            <label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label>
+          </div>
+        </div>
+        <div class="notif-settings-desktop__section">
+          <div class="notif-settings-desktop__section-title">Тихий час</div>
+          <div class="notif-settings-desktop__row">
+            <div>
+              <div class="notif-settings-desktop__row-label">Включить тихий час</div>
+              <div class="notif-settings-desktop__row-desc">Отключить уведомления в заданное время</div>
+            </div>
+            <label class="switch"><input type="checkbox"><span class="switch__slider"></span></label>
+          </div>
+          <div class="notif-settings-desktop__row">
+            <div class="notif-settings-desktop__row-label">Период</div>
+            <div class="notif-settings-desktop__time-inputs">
+              <input class="notif-settings-desktop__time-input" type="text" value="23:00">
+              <span style="color:var(--text-muted)">—</span>
+              <input class="notif-settings-desktop__time-input" type="text" value="08:00">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="../../assets/common.js"></script>
+</body>
+</html>

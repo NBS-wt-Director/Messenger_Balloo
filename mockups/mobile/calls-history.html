@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobile — История звонков</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    html { overflow-y: auto; height: auto; }
+    body { overflow-y: auto; height: auto; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 40px 24px; }
+    .phone-frame { width:360px; height:760px; background:var(--bg-secondary); border:3px solid var(--border-strong); border-radius:36px; overflow:hidden; position:relative; display:flex; flex-direction:column; box-shadow:var(--shadow-glass); }
+    .phone-frame__notch { position:absolute; top:0; left:50%; transform:translateX(-50%); width:130px; height:26px; background:var(--bg-primary); border-bottom-left-radius:18px; border-bottom-right-radius:18px; z-index:10; }
+    .phone-frame__statusbar { height:30px; padding:4px 20px 0; display:flex; align-items:center; justify-content:space-between; font-size:12px; color:var(--text-secondary); background:var(--bg-secondary); }
+    .phone-frame__screen { flex:1; overflow:hidden; background:var(--bg-primary); display:flex; flex-direction:column; }
+    .phone-frame__home-bar { height:5px; width:120px; margin:0 auto 8px; background:var(--text-muted); border-radius:3px; }
+    .phone-tabbar { display:flex; height:52px; background:var(--bg-secondary); border-top:1px solid var(--border-color); }
+    .phone-tabbar__item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; font-size:10px; color:var(--text-secondary); cursor:pointer; transition:color 0.15s; }
+    .phone-tabbar__item:hover { color:var(--text-primary); }
+    .phone-tabbar__item--active { color:var(--accent); }
+    .phone-tabbar__icon { font-size:20px; line-height:1; }
+  </style>
+</head>
+<body>
+
+<div class="phone-frame">
+  <div class="phone-frame__notch"></div>
+  <div class="phone-frame__statusbar"><span>9:41</span><span>📶 🔋</span></div>
+  <div class="phone-frame__screen">
+    <!-- TOPBAR (обязательный) -->
+    <div class="topbar">
+      <div class="topbar__logo">
+        <div class="topbar__logo-icon">B</div>
+        <span>Balloo</span>
+        <div class="topbar__dropdown">
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/chats.html'">💬 Balloo</div>
+          <div class="topbar__dropdown-divider"></div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div>
+          <div class="topbar__dropdown-divider"></div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/contacts.html'">👤 Контакты</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/search.html'">🔍 Поиск</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/archive.html'">📦 Архив</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/calls.html'">📞 Звонки</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/invites.html'">📨 Приглашения</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/bots.html'">🤖 О ботах</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/about-balloo.html'">ℹ️ О Balloo</div>
+        </div>
+      </div>
+      <div class="topbar__title">Звонки</div>
+      <div class="topbar__right">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact" onclick="window.location.href='../balloo-su/profile.html'">
+          <div class="avatar__inner"><span>ИИ</span></div>
+        </div>
+        <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+        <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+      </div>
+    </div>
+
+    <!-- Контент: История звонков -->
+    <div style="flex:1;overflow-y:auto;">
+      <div style="padding:16px;">
+        <h1 style="font-size:20px;font-weight:800;color:var(--text-primary);">Звонки</h1>
+        <p style="font-size:13px;color:var(--text-secondary);margin-top:4px;">История всех звонков</p>
+      </div>
+
+      <div style="display:flex;gap:8px;padding:0 16px 12px;">
+        <button class="btn btn--primary btn--icon" onclick="openCall('audio')" title="Аудиозвонок">📞</button>
+        <button class="btn btn--secondary btn--icon" onclick="openCall('video')" title="Видеозвонок">📹</button>
+      </div>
+
+      <div class="list">
+        <div class="list__item">
+          <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>МА</span></div></div>
+          <div class="list__item-body"><div class="list__item-title">Мария Андреева</div><div class="list__item-subtitle">📹 Видео • Принятый • 12:30 • 0:45:23</div></div>
+          <span class="chip chip--accent">✅ Принят</span>
+        </div>
+        <div class="list__item">
+          <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-new"><div class="avatar__inner"><span>РД</span></div></div>
+          <div class="list__item-body"><div class="list__item-title">Команда разработки</div><div class="list__item-subtitle">📹 Видео группа • Пропущенный • 11:00 • 0:02:15</div></div>
+          <span class="chip chip--danger">❌ Пропущен</span>
+        </div>
+        <div class="list__item">
+          <div class="avatar avatar--sm avatar--bordered avatar--status-offline avatar--ctx-contact"><div class="avatar__inner"><span>АК</span></div></div>
+          <div class="list__item-body"><div class="list__item-title">Алексей Козлов</div><div class="list__item-subtitle">📞 Аудио • Исходящий • Вчера • 0:15:42</div></div>
+          <span class="chip chip--accent">✅ Принят</span>
+        </div>
+        <div class="list__item">
+          <div class="avatar avatar--sm avatar--bordered avatar--status-busy avatar--ctx-contact"><div class="avatar__inner"><span>ОС</span></div></div>
+          <div class="list__item-body"><div class="list__item-title">Ольга Смирнова</div><div class="list__item-subtitle">📹 Видео • Пропущенный • 15.07 • 0:00:30</div></div>
+          <span class="chip chip--danger">❌ Пропущен</span>
+        </div>
+        <div class="list__item">
+          <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-new"><div class="avatar__inner"><span>ТГ</span></div></div>
+          <div class="list__item-body"><div class="list__item-title">Технологии будущего</div><div class="list__item-subtitle">📞 Аудио группа • Принятый • 14.07 • 1:23:05</div></div>
+          <span class="chip chip--accent">✅ Принят</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabbar — активен Звонки -->
+    <div class="phone-tabbar">
+      <div class="phone-tabbar__item" onclick="window.location.href='chat.html'">
+        <span class="phone-tabbar__icon">💬</span>Чаты
+      </div>
+      <div class="phone-tabbar__item" onclick="window.location.href='contacts.html'">
+        <span class="phone-tabbar__icon">👥</span>Контакты
+      </div>
+      <div class="phone-tabbar__item" onclick="window.location.href='stories.html'">
+        <span class="phone-tabbar__icon">📷</span>Сторис
+      </div>
+      <div class="phone-tabbar__item phone-tabbar__item--active" onclick="window.location.href='calls-history.html'">
+        <span class="phone-tabbar__icon">📞</span>Звонки
+      </div>
+      <div class="phone-tabbar__item" onclick="window.location.href='settings.html'">
+        <span class="phone-tabbar__icon">⚙</span>Настройки
+      </div>
+    </div>
+  </div>
+  <div class="phone-frame__home-bar"></div>
+</div>
+
+<!-- Call Overlay (из web-источника balloo-su/chats.html) -->
+<div class="call-overlay" id="call-overlay">
+  <div class="call-overlay__header">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div class="avatar avatar--sm avatar--bordered avatar--status-busy avatar--ctx-contact">
+        <div class="avatar__inner"><span>МА</span></div>
+      </div>
+      <div>
+        <div class="font-semibold" style="color:var(--text-primary);">Мария Андреева</div>
+        <div class="call-overlay__timer" id="call-timer">00:00</div>
+      </div>
+    </div>
+    <button class="btn btn--tertiary" onclick="closeCall()">Свернуть</button>
+  </div>
+  <div class="call-overlay__participants">
+    <div class="call-participant">
+      <div class="call-participant__video call-participant__video--speaking">
+        <div class="avatar avatar--lg avatar--bordered avatar--status-busy avatar--ctx-contact">
+          <div class="avatar__inner"><span>МА</span></div>
+        </div>
+      </div>
+      <span class="call-participant__name">Мария (говорит)</span>
+    </div>
+    <div class="call-participant">
+      <div class="call-participant__video">
+        <div class="avatar avatar--lg avatar--bordered avatar--status-busy avatar--ctx-contact">
+          <div class="avatar__inner"><span>ИИ</span></div>
+        </div>
+      </div>
+      <span class="call-participant__name">Вы</span>
+    </div>
+  </div>
+  <div class="call-overlay__controls">
+    <div class="call-control call-control--mute" id="call-mute" onclick="toggleMute()" title="Микрофон">🎤</div>
+    <div class="call-control call-control--video" id="call-video" onclick="toggleVideo()" title="Камера">📹</div>
+    <div class="call-control call-control--screen" id="call-screen" onclick="toggleScreen()" title="Демонстрация">🖥</div>
+    <div class="call-control call-control--hangup" onclick="closeCall()" title="Завершить">📞</div>
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+<script>
+function openCall(type) { document.getElementById('call-overlay').classList.add('call-overlay--visible'); }
+function closeCall() { document.getElementById('call-overlay').classList.remove('call-overlay--visible'); }
+function toggleMute() { const btn=document.getElementById('call-mute'); btn.classList.toggle('call-control--active'); btn.style.opacity=btn.classList.contains('call-control--active')?'0.5':'1'; }
+function toggleVideo() { const btn=document.getElementById('call-video'); btn.classList.toggle('call-control--active'); btn.style.opacity=btn.classList.contains('call-control--active')?'0.5':'1'; }
+function toggleScreen() { showToast('Демонстрация экрана','info'); }
+</script>
+</body>
+</html>

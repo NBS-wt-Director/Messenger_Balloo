@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobile — Контакты</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    html { overflow-y: auto; height: auto; }
+    body { overflow-y: auto; height: auto; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 40px 24px; }
+    .phone-frame { width:360px; height:760px; background:var(--bg-secondary); border:3px solid var(--border-strong); border-radius:36px; overflow:hidden; position:relative; display:flex; flex-direction:column; box-shadow:var(--shadow-glass); }
+    .phone-frame__notch { position:absolute; top:0; left:50%; transform:translateX(-50%); width:130px; height:26px; background:var(--bg-primary); border-bottom-left-radius:18px; border-bottom-right-radius:18px; z-index:10; }
+    .phone-frame__statusbar { height:30px; padding:4px 20px 0; display:flex; align-items:center; justify-content:space-between; font-size:12px; color:var(--text-secondary); background:var(--bg-secondary); }
+    .phone-frame__screen { flex:1; overflow:hidden; background:var(--bg-primary); display:flex; flex-direction:column; }
+    .phone-frame__home-bar { height:5px; width:120px; margin:0 auto 8px; background:var(--text-muted); border-radius:3px; }
+    .phone-tabbar { display:flex; height:52px; background:var(--bg-secondary); border-top:1px solid var(--border-color); }
+    .phone-tabbar__item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; font-size:10px; color:var(--text-secondary); cursor:pointer; transition:color 0.15s; }
+    .phone-tabbar__item--active { color:var(--accent); }
+    .phone-tabbar__icon { font-size:20px; line-height:1; }
+    .phone-scroll { flex:1; overflow-y:auto; }
+  </style>
+</head>
+<body>
+<div class="phone-frame">
+  <div class="phone-frame__notch"></div>
+  <div class="phone-frame__statusbar"><span>9:41</span><span>📶 🔋</span></div>
+  <div class="phone-frame__screen">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar__logo">
+        <div class="topbar__logo-icon">B</div><span>Balloo</span>
+        <div class="topbar__dropdown">
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/chats.html'">💬 Balloo</div>
+          <div class="topbar__dropdown-divider"></div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div>
+          <div class="topbar__dropdown-divider"></div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/contacts.html'">👤 Контакты</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/search.html'">🔍 Поиск</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/archive.html'">📦 Архив</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/calls.html'">📞 Звонки</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/invites.html'">📨 Приглашения</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/bots.html'">🤖 О ботах</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/about-balloo.html'">ℹ️ О Balloo</div>
+        </div>
+      </div>
+      <div class="topbar__title">Контакты</div>
+      <div class="topbar__right">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact" onclick="window.location.href='profile.html'"><div class="avatar__inner"><span>ИИ</span></div></div>
+        <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+        <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div style="padding:8px 12px;border-bottom:1px solid var(--border-color);">
+      <input type="text" class="search-input" placeholder="🔍 Поиск контактов...">
+    </div>
+
+    <!-- Tabs -->
+    <div style="display:flex;gap:6px;padding:8px 12px;border-bottom:1px solid var(--border-color);overflow-x:auto;">
+      <button class="btn btn--primary btn--sm" onclick="switchContactsTab('contacts')">Контакты</button>
+      <button class="btn btn--tertiary btn--sm" onclick="switchContactsTab('groups')">👥 Группы</button>
+      <button class="btn btn--tertiary btn--sm" onclick="switchContactsTab('blocked')">🚫 Чёрный список</button>
+    </div>
+
+    <!-- Content -->
+    <div class="phone-scroll" id="contacts-content">
+      <p style="font-size:12px;color:var(--text-secondary);padding:8px 12px 4px;">5 контактов • 2 группы</p>
+
+      <!-- Detail card (Мария Андреева) -->
+      <div style="padding:0 12px 8px;">
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <div class="avatar avatar--lg avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>МА</span></div></div>
+            <div style="flex:1;">
+              <div style="font-size:14px;font-weight:700;color:var(--text-primary);">Мария Андреева</div>
+              <div style="font-size:11px;color:var(--text-secondary);">Дизайнер • Москва</div>
+              <div style="font-size:10px;color:var(--text-muted);margin-top:4px;">🟢 В сети • Статус: На работе</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;margin-bottom:10px;">
+            <button class="btn btn--primary btn--sm" style="flex:1;" onclick="window.location.href='chat.html'">💬 Написать</button>
+            <button class="btn btn--secondary btn--icon btn--sm" title="Аудиозвонок" onclick="openCall('audio')">📞</button>
+            <button class="btn btn--secondary btn--icon btn--sm" title="Видеозвонок" onclick="openCall('video')">📹</button>
+          </div>
+          <div class="divider"></div>
+          <div style="font-size:11px;color:var(--text-secondary);line-height:1.6;">
+            <p style="margin-bottom:6px;"><strong style="color:var(--text-primary);">Био:</strong> UI/UX дизайнер. Люблю восьмигранники и геометрию.</p>
+            <p style="margin-bottom:6px;"><strong style="color:var(--text-primary);">Дата рождения:</strong> 15 марта 1995</p>
+            <p style="margin-bottom:6px;"><strong style="color:var(--text-primary);">Регистрация:</strong> 1 января 2026</p>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">
+              <span class="chip chip--accent">💬 3 новых</span>
+              <span class="chip chip--danger">📞 2 пропущ.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contacts list -->
+      <div class="list">
+        <div class="list__item" onclick="window.location.href='chat.html'">
+          <div class="avatar avatar--md avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>МА</span></div></div>
+          <div class="list__item-body"><div class="list__item-title">Мария Андреева</div><div class="list__item-subtitle">в сети</div></div>
+          <div class="list__item-meta"><span class="badge">3</span><span class="badge badge--square-filled" title="2 пропущенных звонка">📞 2</span></div>
+        </div>
+        <div class="list__item" onclick="window.location.href='chat.html'">
+          <div class="avatar avatar--md avatar--bordered avatar--status-online avatar--ctx-family"><div class="avatar__inner"><span>СМ</span></div></div>
+          <div class="list__item-body"><div class="list__item-title">Семья ❤️</div><div class="list__item-subtitle">в сети • Группа</div></div>
+          <div class="list__item-meta"><span class="badge">5</span></div>
+        </div>
+        <div class="list__item" onclick="window.location.href='chat.html'">
+          <div class="avatar avatar--md avatar--bordered avatar--status-offline avatar--ctx-contact"><div class="avatar__inner"><span>АК</span></div></div>
+          <div class="list__item-body"><div class="list__item-title">Алексей Козлов</div><div class="list__item-subtitle">был 2 часа назад</div></div>
+          <button class="btn btn--secondary btn--sm" onclick="event.stopPropagation();window.location.href='chat.html'">💬</button>
+        </div>
+        <div class="list__item" onclick="window.location.href='chat.html'">
+          <div class="avatar avatar--md avatar--bordered avatar--status-dnd avatar--ctx-contact"><div class="avatar__inner"><span>ДП</span></div></div>
+          <div class="list__item-body"><div class="list__item-title">Дмитрий Петров</div><div class="list__item-subtitle">🔇 Не беспокоить</div></div>
+          <div class="list__item-meta"><span class="badge badge--square-filled" title="1 пропущенный звонок">📞 1</span></div>
+        </div>
+        <div class="list__item" onclick="window.location.href='chat.html'">
+          <div class="avatar avatar--md avatar--bordered avatar--status-busy avatar--ctx-contact"><div class="avatar__inner"><span>ОС</span></div></div>
+          <div class="list__item-body"><div class="list__item-title">Ольга Смирнова</div><div class="list__item-subtitle">🔴 Занята (в звонке)</div></div>
+          <button class="btn btn--secondary btn--sm" onclick="event.stopPropagation();window.location.href='chat.html'">💬</button>
+        </div>
+      </div>
+
+      <div style="padding:10px 12px;">
+        <button class="btn btn--primary btn--block btn--sm" onclick="window.location.href='../balloo-su/invites.html'">📨 Пригласить друга</button>
+      </div>
+    </div>
+
+    <!-- TABBAR -->
+    <div class="phone-tabbar">
+      <div class="phone-tabbar__item" onclick="window.location.href='chat.html'"><span class="phone-tabbar__icon">💬</span>Чаты</div>
+      <div class="phone-tabbar__item phone-tabbar__item--active" onclick="window.location.href='contacts.html'"><span class="phone-tabbar__icon">👥</span>Контакты</div>
+      <div class="phone-tabbar__item" onclick="window.location.href='stories.html'"><span class="phone-tabbar__icon">📷</span>Сторис</div>
+      <div class="phone-tabbar__item" onclick="window.location.href='calls-history.html'"><span class="phone-tabbar__icon">📞</span>Звонки</div>
+      <div class="phone-tabbar__item" onclick="window.location.href='settings.html'"><span class="phone-tabbar__icon">⚙</span>Настройки</div>
+    </div>
+
+  </div>
+  <div class="phone-frame__home-bar"></div>
+</div>
+
+<!-- Call overlay -->
+<div class="modal-overlay" id="call-overlay" style="display:none;">
+  <div class="card" style="width:300px;text-align:center;">
+    <div class="avatar avatar--xl avatar--bordered avatar--status-online avatar--ctx-contact" style="margin:0 auto 12px;"><div class="avatar__inner"><span>МА</span></div></div>
+    <div style="font-size:16px;font-weight:700;color:var(--text-primary);">Мария Андреева</div>
+    <div id="call-type-label" style="font-size:12px;color:var(--text-secondary);margin-top:4px;">📞 Аудиозвонок...</div>
+    <div style="display:flex;gap:10px;justify-content:center;margin-top:16px;">
+      <button class="btn btn--secondary btn--icon" title="Микрофон">🎤</button>
+      <button class="btn btn--danger btn--icon" onclick="closeCall()" title="Завершить">✕</button>
+      <button class="btn btn--secondary btn--icon" title="Динамик">🔊</button>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+<script>
+function switchContactsTab(tab) {
+  // stub: в реальном приложении переключает список
+  showToast('Вкладка: ' + tab, 'info');
+}
+
+function openCall(type) {
+  const overlay = document.getElementById('call-overlay');
+  const label = document.getElementById('call-type-label');
+  label.textContent = (type === 'video') ? '📹 Видеозвонок...' : '📞 Аудиозвонок...';
+  overlay.style.display = 'flex';
+}
+function closeCall() {
+  document.getElementById('call-overlay').style.display = 'none';
+}
+</script>
+</body>
+</html>

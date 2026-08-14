@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Features — Детали фичи</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--accent);">F</div><span>Features</span>
+    <div class="topbar__dropdown"><div class="topbar__dropdown-item">💡 Features (текущий)</div><div class="topbar__dropdown-divider"></div><div class="topbar__dropdown-item">💬 Balloo</div><div class="topbar__dropdown-item">🛡️ Admin</div><div class="topbar__dropdown-item">🏢 Command</div><div class="topbar__dropdown-item">📜 History</div><div class="topbar__dropdown-item">⬇️ Download</div><div class="topbar__dropdown-item">📚 API Docs</div></div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Детали фичи</div>
+  <div class="topbar__actions">
+    <div class="topbar__actions-btn" onclick="window.location.href='list.html'" title="Назад">←</div>
+  </div>
+  <div class="topbar__right">
+    <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИИ</span></div></div>
+    <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+    <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+  </div>
+</div>
+<div class="main">
+  <div class="content overflow-y-auto">
+    <div class="page-container">
+      <a href="list.html" class="text-sm text-secondary mb-4" style="display:inline-block;">← Назад к списку</a>
+
+      <div class="card mb-6">
+        <div class="flex items-center gap-4 mb-4">
+          <div class="flex flex-col items-center" style="min-width:56px;">
+            <button class="btn btn--primary" style="width:56px;font-size:18px;">▲</button>
+            <span class="font-bold text-accent" style="font-size:24px;">74</span>
+            <span class="text-xs text-muted">голоса</span>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="chip chip--info">В работе</span>
+              <span class="chip">Звонки</span>
+              <span class="chip">Приоритет: высокий</span>
+            </div>
+            <h1 class="page-title" style="margin-bottom:4px;">Групповые видеозвонки до 12 человек</h1>
+            <div class="text-sm text-muted">Предложил <strong>Иван Иванов</strong> · 12 июня 2026</div>
+          </div>
+          <button class="btn btn--primary btn--lg">▲ Голосовать</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="section-title" style="margin-top:16px;">Описание</div>
+        <p class="card__body" style="font-size:15px;line-height:1.7;">
+          Видео-конференции внутри Balloo с поддержкой до 12 одновременных участников.
+          Сетка участников с автоматическим переключением на активного диктора (active speaker).
+          Встроенное шумоподавление на основе WebRTC. Режим низкой пропускной способности для
+          стабильной работы при слабом интернете. Поддержка демонстрации экрана с выбором окна/вкладки.
+        </p>
+
+        <div class="section-title">Мотивация</div>
+        <p class="card__body" style="font-size:15px;line-height:1.7;">
+          Текущие звонки поддерживают только 1:1. Для групповых чатов не хватает возможности
+          быстро начать видеоконференцию. Конкуренты (Telegram, WhatsApp) уже имеют эту функцию.
+        </p>
+
+        <div class="section-title">Планируемая реализация</div>
+        <div class="card__body" style="font-size:14px;">
+          <ul style="list-style:disc;padding-left:20px;line-height:1.8;">
+            <li>WebRTC mesh для ≤4 участников, SFU для 5–12</li>
+            <li>Сетка 3×4 с автосворачиванием неработающих камер</li>
+            <li>Шумоподавление через RNNoise (WASM)</li>
+            <li>Low bandwidth mode: только аудио + скриншоты каждые 2с</li>
+            <li>Интеграция с существующим call-overlay</li>
+          </ul>
+        </div>
+
+        <div class="flex gap-4 mt-6" style="flex-wrap:wrap;">
+          <div class="meta-item"><span class="meta-item__label">Статус</span><span class="chip chip--info">В работе</span></div>
+          <div class="meta-item"><span class="meta-item__label">Назначена</span><span class="meta-item__value">Команда WebRTC</span></div>
+          <div class="meta-item"><span class="meta-item__label">Ожидаемая версия</span><span class="meta-item__value">v1.1.0</span></div>
+          <div class="meta-item"><span class="meta-item__label">Срок</span><span class="meta-item__value">Q3 2026</span></div>
+        </div>
+      </div>
+
+      <div class="card mb-6">
+        <h3 class="card__title mb-4">Комментарии (18)</h3>
+
+        <div class="list__item" style="border:none;align-items:flex-start;">
+          <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>МА</span></div></div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2"><strong>Мария Андреева</strong><span class="text-xs text-muted">2 дня назад</span></div>
+            <div class="text-sm" style="color:var(--text-primary);margin-top:4px;line-height:1.5;">Очень жду! Было бы здорово добавить виртуальные фоны как в Zoom.</div>
+            <div class="flex gap-2 mt-2"><button class="btn btn--tertiary btn--sm">▲ 12</button><button class="btn btn--tertiary btn--sm">Ответить</button></div>
+          </div>
+        </div>
+
+        <div class="list__item" style="border:none;align-items:flex-start;padding-left:48px;">
+          <div class="avatar avatar--xs avatar--bordered avatar--status-offline"><div class="avatar__inner"><span>ИИ</span></div></div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2"><strong>Иван Иванов</strong><span class="chip chip--accent" style="font-size:10px;">автор</span><span class="text-xs text-muted">2 дня назад</span></div>
+            <div class="text-sm" style="color:var(--text-primary);margin-top:4px;line-height:1.5;">@Мария, виртуальные фоны уже в бэклоге как отдельная фича. Добавлю ссылку.</div>
+          </div>
+        </div>
+
+        <div class="list__item" style="border:none;align-items:flex-start;">
+          <div class="avatar avatar--sm avatar--bordered avatar--status-busy avatar--ctx-new"><div class="avatar__inner"><span>АС</span></div></div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2"><strong>Алексей Смирнов</strong><span class="text-xs text-muted">5 дней назад</span></div>
+            <div class="text-sm" style="color:var(--text-primary);margin-top:4px;line-height:1.5;">12 человек мало для корпоративных групп. Может стоит поднять до 30 с SFU?</div>
+            <div class="flex gap-2 mt-2"><button class="btn btn--tertiary btn--sm">▲ 8</button><button class="btn btn--tertiary btn--sm">Ответить</button></div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="input-area" style="border:none;padding:0;">
+          <textarea class="input-area__field" placeholder="Написать комментарий..."></textarea>
+          <button class="btn btn--primary" onclick="alert('Демо: комментарий отправлен')">Отправить</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

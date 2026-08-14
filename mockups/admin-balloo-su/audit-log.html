@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Журнал аудита</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--warning);">A</div><span>Admin</span>
+    <div class="topbar__dropdown"><div class="topbar__dropdown-item">🛡️ Admin (текущий)</div><div class="topbar__dropdown-divider"></div><div class="topbar__dropdown-item">💬 Balloo</div><div class="topbar__dropdown-item">🏢 Command</div><div class="topbar__dropdown-item">💡 Features</div><div class="topbar__dropdown-item">📜 History</div><div class="topbar__dropdown-item">⬇️ Download</div><div class="topbar__dropdown-item">📚 API Docs</div></div>
+  </div>
+  <div class="topbar__title">Журнал аудита</div>
+  <div class="topbar__right"><div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>АД</span></div></div><span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span><span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span></div>
+</div>
+<div class="main">
+  <div class="sidebar sidebar--narrow">
+    <div class="list">
+      <div class="list__item">📊 Дашборд</div>
+      <div class="list__item">👤 Пользователи</div>
+      <div class="list__item">🚩 Жалобы <span class="badge" style="margin-left:auto;">12</span></div>
+      <div class="list__item">🔨 Баны</div>
+      <div class="list__item">🤖 Боты</div>
+      <div class="list__item">👥 Группы</div>
+      <div class="list__item">📢 Объявления</div>
+      <div class="list__item list__item--active">📋 Журнал аудита</div>
+      <div class="list__item">🚦 Статус сервиса</div>
+      <div class="list__item">📈 Метрики</div>
+      <div class="list__item">💚 Донаты</div>
+    </div>
+  </div>
+  <div class="content overflow-y-auto"><div class="page-container">
+    <h1 class="page-title">📋 Журнал аудита</h1>
+    <p class="page-subtitle">Только чтение. Все действия администраторов фиксируются автоматически.</p>
+
+    <!-- Filters -->
+    <div class="card mb-4">
+      <div class="flex gap-2" style="flex-wrap:wrap;">
+        <input type="text" class="form-input" placeholder="Admin ID" style="flex:1;min-width:140px;">
+        <select class="form-select" style="flex:1;min-width:140px;"><option>Все действия</option><option>ban</option><option>unban</option><option>verify</option><option>suspend</option><option>transfer</option></select>
+        <input type="text" class="form-input" placeholder="Цель (target)" style="flex:1;min-width:140px;">
+        <input type="text" class="form-input" placeholder="С: дд.мм.гггг" style="flex:1;min-width:120px;">
+        <input type="text" class="form-input" placeholder="По: дд.мм.гггг" style="flex:1;min-width:120px;">
+        <button class="btn btn--primary">Применить</button>
+      </div>
+    </div>
+
+    <!-- Audit log table (virtualized) -->
+    <div class="card">
+      <table class="table">
+        <thead><tr><th>Время</th><th>Админ</th><th>Действие</th><th>Цель</th><th>IP</th><th>Детали</th></tr></thead>
+        <tbody>
+          <tr class="table__row"><td>18.07 14:32</td><td>АД (Админ)</td><td><span class="chip chip--danger">ban</span></td><td>user: СП</td><td>85.140.x.x</td><td><button class="btn btn--tertiary btn--sm">👁</button></td></tr>
+          <tr class="table__row"><td>18.07 14:10</td><td>АД (Админ)</td><td><span class="chip chip--info">verify</span></td><td>bot: @weather_bot</td><td>85.140.x.x</td><td><button class="btn btn--tertiary btn--sm">👁</button></td></tr>
+          <tr class="table__row"><td>18.07 13:45</td><td>МА (Mod)</td><td><span class="chip chip--warning">suspend</span></td><td>bot: @spam_helper</td><td>92.53.x.x</td><td><button class="btn btn--tertiary btn--sm">👁</button></td></tr>
+          <tr class="table__row"><td>18.07 12:20</td><td>АД (Админ)</td><td><span class="chip chip--accent">transfer</span></td><td>group: РосГаз</td><td>85.140.x.x</td><td><button class="btn btn--tertiary btn--sm">👁</button></td></tr>
+          <tr class="table__row"><td>17.07 18:00</td><td>АД (Админ)</td><td><span class="chip">announce</span></td><td>announcement: Тех. работы</td><td>85.140.x.x</td><td><button class="btn btn--tertiary btn--sm">👁</button></td></tr>
+          <tr class="table__row"><td>17.07 15:14</td><td>МА (Mod)</td><td><span class="chip chip--danger">ban</span></td><td>user: Спамер2</td><td>92.53.x.x</td><td><button class="btn btn--tertiary btn--sm">👁</button></td></tr>
+        </tbody>
+      </table>
+      <div class="text-xs text-muted text-center p-4">Показано 6 из 4 218 записей · виртуализированная таблица</div>
+    </div>
+  </div></div>
+</div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

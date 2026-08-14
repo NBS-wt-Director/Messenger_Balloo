@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Фичи (модерация)</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--danger);">A</div><span>Admin</span>
+    <div class="topbar__dropdown"></div>
+  </div>
+  <div class="topbar__title">Фичи — модерация</div>
+  <div class="topbar__right"><div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>АД</span></div></div></div>
+</div>
+<div class="main">
+  <div class="sidebar sidebar--narrow">
+    <div class="list">
+      <div class="list__item">📊 Дашборд</div>
+      <div class="list__item">👥 Пользователи</div>
+      <div class="list__item">📋 Жалобы</div>
+      <div class="list__item">🔨 Баны</div>
+      <div class="list__item">📈 Метрики</div>
+      <div class="list__item">🚩 Feature Flags</div>
+      <div class="list__item">📦 Файлы</div>
+      <div class="list__item">📝 Тексты</div>
+      <div class="list__item" style="border-top:1px solid var(--border-color);margin-top:8px;padding-top:12px;">🏢 Отделы</div>
+      <div class="list__item">👤 Сотрудники</div>
+      <div class="list__item">💼 Вакансии</div>
+      <div class="list__item">📜 Версии</div>
+      <div class="list__item list__item--active">💡 Фичи (модерация)</div>
+      <div class="list__item">💚 Донаты</div>
+    </div>
+  </div>
+  <div class="content overflow-y-auto"><div class="page-container">
+    <h1 class="page-title">💡 Фичи — модерация</h1>
+    <p class="page-subtitle">Управление фич-реквестами (данные features.balloo.su)</p>
+
+    <div class="flex gap-4 mb-6" style="flex-wrap:wrap;">
+      <div class="card flex-1" style="min-width:140px;"><div class="text-xs text-muted">Всего фич</div><div style="font-size:28px;font-weight:800;color:var(--accent);">48</div></div>
+      <div class="card flex-1" style="min-width:140px;"><div class="text-xs text-muted">На модерации</div><div style="font-size:28px;font-weight:800;color:var(--warning);">3</div></div>
+      <div class="card flex-1" style="min-width:140px;"><div class="text-xs text-muted">Голосов всего</div><div style="font-size:28px;font-weight:800;color:var(--info);">1 247</div></div>
+    </div>
+
+    <div class="tabs mb-6" data-tab-group="feat">
+      <div class="tab tab--active" onclick="switchTab('feat',0)">На модерации</div>
+      <div class="tab" onclick="switchTab('feat',1)">Все</div>
+      <div class="tab" onclick="switchTab('feat',2)">Отклонённые</div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="flex items-center gap-4">
+        <div class="flex flex-col items-center" style="min-width:48px;">
+          <span class="font-bold text-accent" style="font-size:18px;">45</span>
+          <span class="text-xs text-muted">голосов</span>
+        </div>
+        <div class="flex-1">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="chip chip--warning">На модерации</span>
+            <span class="chip">Боты</span>
+          </div>
+          <div class="card__title">Бот-маркетплейс внутри мессенджера</div>
+          <div class="card__body text-sm">Каталог ботов с поиском, категориями, отзывами и установкой в один клик.</div>
+          <div class="text-xs text-muted mt-2">Автор: user_2837 · 15 комментариев</div>
+        </div>
+        <div class="flex gap-2">
+          <select class="form-select" style="width:170px;"><option value="">Выбрать версию...</option><option>v1.1.0</option><option>v1.2.0</option><option>v2.0.0</option></select>
+          <button class="btn btn--primary btn--sm">Включить</button>
+          <button class="btn btn--danger btn--sm">✕ Отклонить</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="flex items-center gap-4">
+        <div class="flex flex-col items-center" style="min-width:48px;">
+          <span class="font-bold text-accent" style="font-size:18px;">31</span>
+          <span class="text-xs text-muted">голосов</span>
+        </div>
+        <div class="flex-1">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="chip chip--warning">На модерации</span>
+            <span class="chip">UI/UX</span>
+          </div>
+          <div class="card__title">Тёмная тема с OLED-чёрным</div>
+          <div class="card__body text-sm">Отдельная тема с истинно чёрным фоном для OLED-экранов.</div>
+          <div class="text-xs text-muted mt-2">Автор: user_1923 · 8 комментариев</div>
+        </div>
+        <div class="flex gap-2">
+          <select class="form-select" style="width:170px;"><option value="">Выбрать версию...</option><option>v1.1.0</option><option>v1.2.0</option><option>v2.0.0</option></select>
+          <button class="btn btn--primary btn--sm">Включить</button>
+          <button class="btn btn--danger btn--sm">✕ Отклонить</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="flex items-center gap-4">
+        <div class="flex flex-col items-center" style="min-width:48px;">
+          <span class="font-bold text-accent" style="font-size:18px;">22</span>
+          <span class="text-xs text-muted">голосов</span>
+        </div>
+        <div class="flex-1">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="chip chip--warning">На модерации</span>
+            <span class="chip">Мессенджер</span>
+          </div>
+          <div class="card__title">Запланированные сообщения</div>
+          <div class="card__body text-sm">Возможность запланировать отправку сообщения на определённое время.</div>
+          <div class="text-xs text-muted mt-2">Автор: user_4501 · 12 комментариев</div>
+        </div>
+        <div class="flex gap-2">
+          <select class="form-select" style="width:170px;"><option value="">Выбрать версию...</option><option>v1.1.0</option><option>v1.2.0</option><option>v2.0.0</option></select>
+          <button class="btn btn--primary btn--sm">Включить</button>
+          <button class="btn btn--danger btn--sm">✕ Отклонить</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="card__title mb-4">📊 Статусы фич</h3>
+      <table class="table">
+        <thead><tr><th>Статус</th><th>Количество</th><th>Действия</th></tr></thead>
+        <tbody>
+          <tr><td><span class="chip chip--accent">Готово</span></td><td>8</td><td><button class="btn btn--tertiary btn--sm">Просмотр</button></td></tr>
+          <tr><td><span class="chip chip--info">В работе</span></td><td>5</td><td><button class="btn btn--tertiary btn--sm">Просмотр</button></td></tr>
+          <tr><td><span class="chip chip--warning">Запланировано</span></td><td>12</td><td><button class="btn btn--tertiary btn--sm">Просмотр</button></td></tr>
+          <tr><td><span class="chip">Идея</span></td><td>20</td><td><button class="btn btn--tertiary btn--sm">Просмотр</button></td></tr>
+          <tr><td><span class="chip chip--danger">Отклонено</span></td><td>3</td><td><button class="btn btn--tertiary btn--sm">Просмотр</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div></div>
+</div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

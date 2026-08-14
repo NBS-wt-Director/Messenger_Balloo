@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Command — Дашборд руководителя</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--info);">C</div><span>Command</span>
+    <div class="topbar__dropdown"><div class="topbar__dropdown-item">🏢 Command (текущий)</div><div class="topbar__dropdown-divider"></div><div class="topbar__dropdown-item">💬 Balloo</div><div class="topbar__dropdown-item">🛡️ Admin</div><div class="topbar__dropdown-item">💡 Features</div><div class="topbar__dropdown-item">📜 History</div><div class="topbar__dropdown-item">⬇️ Download</div><div class="topbar__dropdown-item">📚 API Docs</div></div>
+  </div>
+  <div class="topbar__title">Дашборд руководителя</div>
+  <div class="topbar__actions">
+    <select class="form-select" style="width:auto;padding:6px 10px;font-size:13px;">
+      <option>Команда разработки (8 чел.)</option>
+      <option>Дизайн-команда (4 чел.)</option>
+      <option>DevOps (3 чел.)</option>
+    </select>
+    <button class="btn btn--secondary btn--sm">📤 Отчёт</button>
+  </div>
+  <div class="topbar__right"><div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИИ</span></div></div><span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span><span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span></div>
+</div>
+<div class="main">
+  <!-- Sidebar -->
+  <div class="sidebar sidebar--narrow">
+    <div class="list">
+      <div class="list__item list__item--active">📊 Дашборд</div>
+      <div class="list__item">👤 Профиль</div>
+      <div class="list__item">📝 Задачи</div>
+      <div class="list__item">📅 Календарь</div>
+      <div class="list__item">💬 Внутренний чат</div>
+      <div class="list__item">📞 Совещания</div>
+      <div class="list__item">🏢 Мой отдел</div>
+      <div class="list__item">👥 HR</div>
+      <div class="list__item">🎯 Найм</div>
+      <div class="list__item">📚 База знаний</div>
+    </div>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div class="content overflow-y-auto">
+    <div class="page-container" style="padding-bottom:40px;">
+      <!-- Header with period selector -->
+      <div class="flex justify-between items-center mb-4">
+        <div>
+          <h1 class="page-title" style="margin:0;font-size:22px;">Дашборд руководителя</h1>
+          <p class="page-subtitle" style="margin:4px 0 0;font-size:13px;">Спринт #14 · 07.07 — 20.07.2026</p>
+        </div>
+        <div class="flex gap-2">
+          <div class="tabs" style="border:none;">
+            <div class="tab tab--active">Спринт</div>
+            <div class="tab">Месяц</div>
+            <div class="tab">Квартал</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI Cards -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
+        <div class="card">
+          <div class="text-xs text-muted mb-2">Активные задачи</div>
+          <div class="flex items-end gap-2">
+            <span class="font-bold" style="font-size:28px;color:var(--info);">23</span>
+            <span class="text-xs text-secondary mb-1">из 35</span>
+          </div>
+          <div class="text-xs text-muted mt-1">Закрыто: 12</div>
+        </div>
+        <div class="card">
+          <div class="text-xs text-muted mb-2">Задачи завершены</div>
+          <div class="flex items-end gap-2">
+            <span class="font-bold" style="font-size:28px;color:var(--accent);">12</span>
+            <span class="text-xs text-secondary mb-1">за спринт</span>
+          </div>
+          <div class="text-xs text-muted mt-1">78% в срок</div>
+        </div>
+        <div class="card">
+          <div class="text-xs text-muted mb-2">Просрочено</div>
+          <div class="flex items-end gap-2">
+            <span class="font-bold" style="font-size:28px;color:var(--danger);">3</span>
+            <span class="text-xs text-secondary mb-1">задач</span>
+          </div>
+          <div class="text-xs text-muted mt-1">↑ 2 к прошлой неделе</div>
+        </div>
+        <div class="card">
+          <div class="text-xs text-muted mb-2">Burndown (осталось)</div>
+          <div class="flex items-end gap-2">
+            <span class="font-bold" style="font-size:28px;color:var(--warning);">14</span>
+            <span class="text-xs text-secondary mb-1">стори-пойнтов</span>
+          </div>
+          <div class="text-xs text-muted mt-1">Цель: 8 к пятнице</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:24px;">
+        <!-- Burn-down chart -->
+        <div class="card">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="card__title" style="font-size:14px;margin:0;">Burndown Chart — Спринт #14</h3>
+            <div class="text-xs text-muted">Осталось: 2 дня</div>
+          </div>
+          <!-- SVG Burn-down -->
+          <div style="position:relative;height:200px;background:var(--bg-secondary);border:1px solid var(--border-color);">
+            <svg width="100%" height="100%" viewBox="0 0 600 200" preserveAspectRatio="none">
+              <!-- Grid lines -->
+              <line x1="0" y1="40" x2="600" y2="40" stroke="var(--border-color)" stroke-dasharray="4"/>
+              <line x1="0" y1="80" x2="600" y2="80" stroke="var(--border-color)" stroke-dasharray="4"/>
+              <line x1="0" y1="120" x2="600" y2="120" stroke="var(--border-color)" stroke-dasharray="4"/>
+              <line x1="0" y1="160" x2="600" y2="160" stroke="var(--border-color)" stroke-dasharray="4"/>
+              <!-- Ideal line -->
+              <line x1="0" y1="20" x2="600" y2="180" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="6,3" opacity="0.6"/>
+              <!-- Actual line -->
+              <polyline points="0,20 60,30 120,50 180,70 240,85 300,100 360,115 420,130 480,140 540,150 600,155"
+                fill="none" stroke="var(--info)" stroke-width="2"/>
+              <!-- Area under actual -->
+              <polygon points="0,20 60,30 120,50 180,70 240,85 300,100 360,115 420,130 480,140 540,150 600,155 600,180 0,180"
+                fill="rgba(59,158,255,0.08)"/>
+              <!-- Today marker -->
+              <line x1="480" y1="0" x2="480" y2="180" stroke="var(--warning)" stroke-width="1.5"/>
+              <text x="480" y="15" text-anchor="middle" fill="var(--warning)" font-size="10">Сегодня</text>
+              <!-- Labels -->
+              <text x="10" y="195" fill="var(--text-muted)" font-size="9">Пн</text>
+              <text x="130" y="195" fill="var(--text-muted)" font-size="9">Вт</text>
+              <text x="250" y="195" fill="var(--text-muted)" font-size="9">Ср</text>
+              <text x="370" y="195" fill="var(--text-muted)" font-size="9">Чт</text>
+              <text x="490" y="195" fill="var(--warning)" font-size="9" font-weight="600">Пт</text>
+              <text x="5" y="25" fill="var(--text-muted)" font-size="9">40 SP</text>
+              <text x="5" y="165" fill="var(--text-muted)" font-size="9">0 SP</text>
+            </svg>
+          </div>
+          <div class="flex gap-4 mt-3 text-xs">
+            <div class="flex items-center gap-1"><span style="display:inline-block;width:16px;height:2px;background:var(--accent);"></span> Идеальный</div>
+            <div class="flex items-center gap-1"><span style="display:inline-block;width:16px;height:2px;background:var(--info);"></span> Фактический</div>
+            <div class="flex items-center gap-1"><span style="display:inline-block;width:2px;height:12px;background:var(--warning);"></span> Сегодня</div>
+          </div>
+        </div>
+
+        <!-- Team status -->
+        <div class="card">
+          <h3 class="card__title mb-4" style="font-size:14px;">Статус команды</h3>
+          <div class="flex flex-col gap-3">
+            <div class="flex items-center gap-3">
+              <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИИ</span></div></div>
+              <div class="flex-1 min-w-0"><div class="text-sm font-semibold" style="color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Иван Иванов</div><div class="text-xs text-accent">3 задачи · В работе</div></div>
+              <span class="chip chip--accent" style="font-size:10px;">●</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ЕК</span></div></div>
+              <div class="flex-1 min-w-0"><div class="text-sm font-semibold" style="color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Елена Киселёва</div><div class="text-xs text-secondary">5 задач · Завершает</div></div>
+              <span class="chip chip--accent" style="font-size:10px;">●</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="avatar avatar--sm avatar--bordered avatar--status-busy avatar--ctx-contact"><div class="avatar__inner"><span>АП</span></div></div>
+              <div class="flex-1 min-w-0"><div class="text-sm font-semibold" style="color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Антон Петров</div><div class="text-xs text-danger">2 задачи · Блок</div></div>
+              <span class="chip chip--danger" style="font-size:10px;">●</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>СМ</span></div></div>
+              <div class="flex-1 min-w-0"><div class="text-sm font-semibold" style="color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Сергей Морозов</div><div class="text-xs text-secondary">4 задачи · В работе</div></div>
+              <span class="chip chip--accent" style="font-size:10px;">●</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="avatar avatar--sm avatar--bordered avatar--status-offline avatar--ctx-contact"><div class="avatar__inner"><span>ОЗ</span></div></div>
+              <div class="flex-1 min-w-0"><div class="text-sm font-semibold" style="color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Ольга Зайцева</div><div class="text-xs text-muted">0 задач · В отпуске</div></div>
+              <span class="chip" style="font-size:10px;background:rgba(107,119,133,0.15);color:#6b7785;border-color:#6b7785;">●</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-new"><div class="avatar__inner"><span>ДВ</span></div></div>
+              <div class="flex-1 min-w-0"><div class="text-sm font-semibold" style="color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Дмитрий Волков</div><div class="text-xs text-info">1 задача · Начало</div></div>
+              <span class="chip chip--info" style="font-size:10px;">●</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tasks & Deadlines -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <!-- Urgent tasks -->
+        <div class="card">
+          <h3 class="card__title mb-4" style="font-size:14px;">⚡ Срочные задачи</h3>
+          <div class="flex flex-col gap-2">
+            <div class="flex items-center gap-3" style="padding:10px;background:var(--danger-bg);border:1px solid var(--danger);">
+              <span style="color:var(--danger);">🔥</span>
+              <div class="flex-1"><div class="text-sm font-semibold" style="color:var(--danger);">Исправить утечку памяти в WebSocket</div><div class="text-xs text-muted">АН · Дедлайн: сегодня</div></div>
+              <span class="chip chip--danger">Критично</span>
+            </div>
+            <div class="flex items-center gap-3" style="padding:10px;background:var(--danger-bg);border:1px solid var(--danger);">
+              <span style="color:var(--danger);">🔥</span>
+              <div class="flex-1"><div class="text-sm font-semibold" style="color:var(--danger);">Миграция БД: добавление поля users.avatarUrl</div><div class="text-xs text-muted">ИИ · Дедлайн: завтра</div></div>
+              <span class="chip chip--danger">Критично</span>
+            </div>
+            <div class="flex items-center gap-3" style="padding:10px;">
+              <span style="color:var(--warning);">⏰</span>
+              <div class="flex-1"><div class="text-sm font-semibold" style="color:var(--text-primary);">Code review PR #247 (Stories API)</div><div class="text-xs text-muted">ЕК · Дедлайн: 23.07</div></div>
+              <span class="chip chip--warning">Скоро</span>
+            </div>
+            <div class="flex items-center gap-3" style="padding:10px;">
+              <span style="color:var(--text-muted);">📋</span>
+              <div class="flex-1"><div class="text-sm font-semibold" style="color:var(--text-primary);">Настройка CI/CD pipeline</div><div class="text-xs text-muted">СМ · Дедлайн: 25.07</div></div>
+              <span class="chip">Нормально</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Upcoming deadlines -->
+        <div class="card">
+          <h3 class="card__title mb-4" style="font-size:14px;">📅 Ближайшие дедлайны</h3>
+          <table class="table">
+            <thead><tr><th>Задача</th><th>Дедлайн</th><th>Осталось</th></tr></thead>
+            <tbody>
+              <tr class="table__row"><td>Релиз Stories v1</td><td>23.07</td><td><span class="chip chip--danger">1 день</span></td></tr>
+              <tr class="table__row"><td>Миграция БД</td><td>24.07</td><td><span class="chip chip--warning">2 дня</span></td></tr>
+              <tr class="table__row"><td>Code review PR #247</td><td>23.07</td><td><span class="chip chip--warning">1 день</span></td></tr>
+              <tr class="table__row"><td>Спринт-ретроспектива</td><td>24.07</td><td><span class="chip chip--info">2 дня</span></td></tr>
+              <tr class="table__row"><td>Релиз v2.3.0</td><td>27.07</td><td><span class="chip chip--accent">5 дней</span></td></tr>
+              <tr class="table__row"><td>Планирование спринта #15</td><td>28.07</td><td><span class="chip">6 дней</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

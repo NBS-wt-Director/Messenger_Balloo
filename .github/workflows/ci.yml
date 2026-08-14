@@ -1,0 +1,228 @@
+name: CI
+
+on:
+  push:
+    branches: [dev, main]
+  pull_request:
+    branches: [dev, main]
+
+env:
+  NODE_VERSION: '22'
+  PNPM_VERSION: 'latest'
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # ─── Test, Lint, Build ───
+  test:
+    name: Test & Lint & Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: balloo
+          POSTGRES_PASSWORD: balloo123
+          POSTGRES_DB: balloo
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: |
+          cd packages/shared
+          npx prisma generate
+
+      - name: Run database migrations
+        env:
+          DATABASE_URL: postgresql://balloo:balloo123@localhost:5432/balloo
+        run: |
+          cd packages/shared
+          npx prisma db push --accept-data-loss
+
+      - name: Seed database
+        env:
+          DATABASE_URL: postgresql://balloo:balloo123@localhost:5432/balloo
+        run: |
+          cd packages/shared
+          npx prisma db seed
+
+      - name: Lint (shared)
+        run: pnpm lint:shared || true
+
+      - name: Lint (server)
+        run: pnpm lint:server || true
+
+      - name: Lint (web)
+        run: pnpm lint:web || true
+
+      - name: Test shared
+        run: pnpm test:shared
+
+      - name: Test server
+        env:
+          DATABASE_URL: postgresql://balloo:balloo123@localhost:5432/balloo
+          REDIS_URL: redis://localhost:6379
+        run: pnpm test:server
+
+      - name: Test web
+        run: pnpm test:web
+
+      - name: Build shared
+        run: pnpm build:shared
+
+      - name: Build server
+        run: pnpm build:server
+
+      - name: Build web
+        run: pnpm build:web
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+  # ─── Docker Build (server + web) ───
+  docker-build:
+    name: Docker Build
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev')
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (server)
+        id: meta-server
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/server
+          tags: |
+            type=sha,prefix=server-,format=short
+            type=ref,event=branch
+            type=ref,event=tag
+
+      - name: Build & push server image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/Dockerfile.server
+          push: ${{ github.event_name == 'push' }}
+          tags: ${{ steps.meta-server.outputs.tags }}
+          labels: ${{ steps.meta-server.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            NODE_ENV=production
+
+      - name: Extract metadata (web)
+        id: meta-web
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/web
+          tags: |
+            type=sha,prefix=web-,format=short
+            type=ref,event=branch
+            type=ref,event=tag
+
+      - name: Build & push web image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/Dockerfile.web
+          push: ${{ github.event_name == 'push' }}
+          tags: ${{ steps.meta-web.outputs.tags }}
+          labels: ${{ steps.meta-web.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ─── Deploy to staging (main branch only) ───
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [test, docker-build]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment: staging
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy to staging via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.STAGING_HOST }}
+          username: ${{ secrets.STAGING_USER }}
+          key: ${{ secrets.STAGING_SSH_KEY }}
+          script: |
+            cd /opt/balloo
+            docker compose pull
+            docker compose up -d
+            docker image prune -f
+
+      - name: Run E2E tests on staging
+        uses: cypress-io/github-action@v6
+        with:
+          working-directory: packages/web
+          browser: chrome
+          wait-on: 'http://staging.balloo.su'
+          config: baseUrl=http://staging.balloo.su
+        env:
+          CYPRESS_BASE_URL: http://staging.balloo.su
+
+      - name: Notify team
+        if: always()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_CHANNEL: deployments
+          SLACK_MESSAGE: |
+            ${{ github.event.pull_request.title || github.event.head_commit.message }}
+            ${{ github.sha }} — ${{ job.status == 'success' && '✅' || '❌' }} Staging

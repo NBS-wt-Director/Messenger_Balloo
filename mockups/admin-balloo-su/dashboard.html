@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Дашборд</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--warning);">A</div><span>Admin</span>
+    <div class="topbar__dropdown"><div class="topbar__dropdown-item">🛡️ Admin (текущий)</div><div class="topbar__dropdown-divider"></div><div class="topbar__dropdown-item">💬 Balloo</div><div class="topbar__dropdown-item">🏢 Command</div><div class="topbar__dropdown-item">💡 Features</div><div class="topbar__dropdown-item">📜 History</div><div class="topbar__dropdown-item">⬇️ Download</div><div class="topbar__dropdown-item">📚 API Docs</div></div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Дашборд</div>
+  <div class="topbar__right"><div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>АД</span></div></div><span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span><span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span></div>
+</div>
+<div class="main">
+  <div class="sidebar sidebar--narrow">
+    <div class="list">
+      <div class="list__item list__item--active">📊 Дашборд</div>
+      <div class="list__item">👤 Пользователи</div>
+      <div class="list__item">🚩 Жалобы <span class="badge" style="margin-left:auto;">12</span></div>
+      <div class="list__item">🔨 Баны</div>
+      <div class="list__item">📈 Метрики</div>
+      <div class="list__item">🎛️ Feature Flags</div>
+      <div class="list__item">📁 Файлы</div>
+      <div class="list__item">📝 Тексты</div>
+      <div class="list__item" style="border-top:1px solid var(--border-color);margin-top:8px;padding-top:12px;">🏢 Отделы</div>
+      <div class="list__item">👤 Сотрудники</div>
+      <div class="list__item">💼 Вакансии</div>
+      <div class="list__item">📜 Версии</div>
+      <div class="list__item">💡 Фичи (модерация)</div>
+      <div class="list__item">💚 Донаты</div>
+    </div>
+  </div>
+  <div class="content overflow-y-auto"><div class="page-container">
+    <h1 class="page-title">Дашборд</h1>
+    <div class="flex gap-4 mb-6" style="flex-wrap:wrap;">
+      <div class="card flex-1" style="min-width:200px;"><div class="text-xs text-muted">Пользователей</div><div style="font-size:32px;font-weight:800;color:var(--accent);">12 345</div><div class="text-xs text-secondary">+234 за неделю</div></div>
+      <div class="card flex-1" style="min-width:200px;"><div class="text-xs text-muted">Активных сейчас</div><div style="font-size:32px;font-weight:800;color:var(--info);">1 023</div><div class="text-xs text-secondary">8.3% от всех</div></div>
+      <div class="card flex-1" style="min-width:200px;"><div class="text-xs text-muted">Сообщений сегодня</div><div style="font-size:32px;font-weight:800;color:var(--warning);">45 678</div><div class="text-xs text-secondary">+12% к вчера</div></div>
+      <div class="card flex-1" style="min-width:200px;"><div class="text-xs text-muted">Жалобы</div><div style="font-size:32px;font-weight:800;color:var(--danger);">12</div><div class="text-xs text-secondary">Ожидают рассмотрения</div></div>
+    </div>
+    <div class="card mb-4">
+      <h3 class="card__title mb-4">Активные алерты</h3>
+      <div class="list__item" style="border:none;"><span class="status-dot status-dot--busy"></span><span class="flex-1">Высокая нагрузка на WebSocket сервер</span><span class="chip chip--danger">Критично</span></div>
+      <div class="list__item" style="border:none;"><span class="status-dot status-dot--dnd"></span><span class="flex-1">Бэкап БД завершён успешно</span><span class="chip chip--accent">OK</span></div>
+      <div class="list__item" style="border:none;"><span class="status-dot status-dot--busy"></span><span class="flex-1">MinIO: 78% заполнено</span><span class="chip chip--warning">Внимание</span></div>
+    </div>
+    <div class="card">
+      <h3 class="card__title mb-4">Последние жалобы</h3>
+      <table class="table">
+        <thead><tr><th>Пользователь</th><th>Причина</th><th>Статус</th><th>Действия</th></tr></thead>
+        <tbody>
+          <tr><td>user_abc</td><td>Спам</td><td><span class="chip chip--warning">Ожидает</span></td><td><button class="btn btn--tertiary btn--sm">Рассмотреть</button></td></tr>
+          <tr><td>user_def</td><td>Оскорбления</td><td><span class="chip chip--warning">Ожидает</span></td><td><button class="btn btn--tertiary btn--sm">Рассмотреть</button></td></tr>
+          <tr><td>user_ghi</td><td>Ненормативная лексика</td><td><span class="chip chip--info">В работе</span></td><td><button class="btn btn--tertiary btn--sm">Открыть</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div></div>
+</div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+FROM node:22-slim AS builder
+
+WORKDIR /app
+
+# Install pnpm + typescript globally
+RUN npm install -g pnpm@latest typescript
+
+# Copy workspace config and root package.json
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml* .npmrc ./
+COPY packages/shared/package.json packages/shared/
+COPY packages/server/package.json packages/server/
+
+# Install dependencies (all workspace deps)
+RUN pnpm install --frozen-lockfile || pnpm install
+
+# Copy source
+COPY packages/shared/ packages/shared/
+COPY packages/server/ packages/server/
+
+# Generate Prisma client (needed for tsc and runtime)
+RUN cd packages/shared && npx prisma generate
+
+# Build shared first, then server
+RUN cd packages/shared && tsc
+RUN cd packages/server && tsc
+
+# ---------- Production stage ----------
+FROM node:22-slim
+
+WORKDIR /app
+
+# Install OpenSSL for Prisma compatibility and curl for healthcheck
+RUN apt-get update -y && apt-get install -y openssl ca-certificates curl && rm -rf /var/lib/apt/lists/*
+
+# Copy built artifacts from builder
+COPY --from=builder /app/packages/shared/dist packages/shared/dist
+COPY --from=builder /app/packages/server/dist packages/server/dist
+COPY --from=builder /app/packages/shared/prisma packages/shared/prisma
+
+# Install pnpm
+RUN npm install -g pnpm@latest
+
+# Copy workspace config for fresh prod install
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml* .npmrc ./
+COPY packages/shared/package.json packages/shared/
+COPY packages/server/package.json packages/server/
+
+# Install production dependencies and generate Prisma client
+RUN CI=true pnpm install --prod --frozen-lockfile || CI=true pnpm install --prod
+RUN export DATABASE_URL="postgresql://balloo:balloo@postgres:5432/balloo" && cd packages/shared && npx prisma@5.18.0 generate
+
+# Create non-root user
+RUN groupadd -r app && useradd -r -g app app
+USER app
+
+EXPOSE 3000
+
+CMD ["node", "packages/server/dist/index.js"]

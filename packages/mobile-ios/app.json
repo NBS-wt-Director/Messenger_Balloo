@@ -1,0 +1,40 @@
+{
+  "expo": {
+    "name": "Balloo Messenger",
+    "slug": "balloo-messenger-ios",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "../mobile-android/assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "../mobile-android/assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0d1117"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "su.balloo.messenger",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Balloo использует камеру для отправки фото и видео",
+        "NSPhotoLibraryUsageDescription": "Balloo нужен доступ к галерее для отправки медиафайлов",
+        "NSMicrophoneUsageDescription": "Balloo использует микрофон для голосовых сообщений",
+        "NSLocationWhenInUseUsageDescription": "Balloo использует геолокацию для обмена местоположением"
+      },
+      "entitlements": {
+        "com.apple.developer.networking.wifi-info": true,
+        "com.apple.developer.push-notifications": true
+      }
+    },
+    "android": {
+      "package": "su.balloo.messenger"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "scheme": "balloo"
+  }
+}

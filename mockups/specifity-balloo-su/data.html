@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Specifity — Данные (сущности БД)</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <link rel="stylesheet" href="spec.css">
+</head>
+<body class="app-flex">
+
+<div class="topbar">
+  <div class="topbar__logo">
+    <div class="topbar__logo-icon" style="background:var(--accent);">S</div>
+    <span>Specifity</span>
+    <div class="topbar__dropdown">
+      <div class="topbar__dropdown-item topbar__dropdown-item--node topbar__dropdown-item--node--current">📐 Specifity (текущий)</div>
+      <div class="topbar__dropdown-divider"></div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">💬 Balloo</div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">🛡️ Admin</div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">🏢 Command</div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">💡 Features</div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">📜 History</div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">⬇️ Download</div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">📚 API Docs</div>
+    </div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Данные · сущности БД</div>
+  <div class="topbar__right">
+    <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+    <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+  </div>
+</div>
+
+<div class="spec-app">
+  <div class="spec-sidebar">
+    <div class="spec-sidebar__search"><input type="text" class="search-input" placeholder="🔍 Поиск таблицы..."></div>
+    <div class="spec-sidebar__group">Разделы</div>
+    <a class="spec-sidebar__item" href="home.html"><span class="spec-sidebar__item-icon">🏠</span> Главная</a>
+    <a class="spec-sidebar__item" href="rules.html"><span class="spec-sidebar__item-icon">📋</span> Правила</a>
+    <a class="spec-sidebar__item" href="screens.html"><span class="spec-sidebar__item-icon">🖼️</span> Экраны <span class="spec-sidebar__item-num">110</span></a>
+    <a class="spec-sidebar__item" href="endpoints.html"><span class="spec-sidebar__item-icon">🔌</span> Эндпоинты</a>
+    <a class="spec-sidebar__item spec-sidebar__item--active" href="data.html"><span class="spec-sidebar__item-icon">🗄️</span> Данные <span class="spec-sidebar__item-num">75</span></a>
+    <a class="spec-sidebar__item" href="components.html"><span class="spec-sidebar__item-icon">🧩</span> Компоненты <span class="spec-sidebar__item-num">241</span></a>
+    <div class="spec-sidebar__divider"></div>
+    <a class="spec-sidebar__item" href="specification.html"><span class="spec-sidebar__item-icon">📐</span> Спецификация экрана</a>
+  </div>
+
+  <div class="spec-content">
+    <div class="spec-pagehead">
+      <div class="spec-pagehead__id">ID: 1_10_06 · узел у_10 (specifity)</div>
+      <h1>Данные · сущности БД</h1>
+      <p>Схема БД: <strong>75 таблиц</strong>. СУБД: PostgreSQL 16. ORM: Prisma. Миграции: Flyway (SQL). Инфраструктура: Supabase + PostgREST. Все <code>createdAt</code>/<code>updatedAt</code> — <code>BIGINT</code> (Unix timestamp). Полная схема — в <code>docs/03-database-schema.md</code>.</p>
+    </div>
+
+    <div class="spec-filters">
+      <span class="spec-filter spec-filter--active">Все (75)</span>
+      <span class="data-badge data-badge--seed">🌱 Seed</span>
+      <span class="data-badge data-badge--runtime">⚡ Runtime</span>
+    </div>
+
+    <!-- Auth & Users -->
+    <div class="spec-block">
+      <div class="spec-group__title">Auth &amp; Users — 6 таблиц</div>
+      <table class="spec-table">
+        <thead><tr><th>Таблица</th><th>Модель</th><th>Описание</th><th>Тип</th></tr></thead>
+        <tbody>
+          <tr><td><code>users</code></td><td><code>User</code></td><td>Email, профиль, настройки (тема, язык), роль, Yandex Disk</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>accounts</code></td><td><code>Account</code></td><td>OAuth-провайдеры (email, Yandex, Mail.ru, Rambler, Gov v2)</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>sessions</code></td><td><code>Session</code></td><td>JWT-сессии: access + refresh, IP, user-agent, device</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>devices</code></td><td><code>Device</code></td><td>Устройства: web/desktop/ios/android, push-токены</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>pair_tokens</code></td><td><code>PairToken</code></td><td>QR-токены привязки устройств (TTL 60 сек)</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>account_device_links</code></td><td><code>AccountDeviceLink</code></td><td>Мультиаккаунт: связь аккаунт → устройство</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Chats & Messages -->
+    <div class="spec-block">
+      <div class="spec-group__title">Chats &amp; Messages — 8 таблиц</div>
+      <table class="spec-table">
+        <thead><tr><th>Таблица</th><th>Модель</th><th>Описание</th><th>Тип</th></tr></thead>
+        <tbody>
+          <tr><td><code>chats</code></td><td><code>Chat</code></td><td>Чаты: direct (1:1) или group</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>chat_members</code></td><td><code>ChatMember</code></td><td>Участники: joinedAt, mutedUntil, isArchived</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>messages</code></td><td><code>Message</code></td><td>Текст, reply, forward, флаги (edited/deleted/AI/ad), readAt</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>message_edits</code></td><td><code>MessageEdit</code></td><td>История изменений (oldText, newText, editedAt)</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>message_reads</code></td><td><code>MessageRead</code></td><td>Отметки прочтения</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>attachments</code></td><td><code>Attachment</code></td><td>photo/video/audio/voice/document/file/geo/contact, MinIO или Я.Диск</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>reactions</code></td><td><code>Reaction</code></td><td>До 5 эмодзи на сообщение</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>pinned_messages</code></td><td><code>PinnedMessage</code></td><td>Закреплённые сообщения</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Groups -->
+    <div class="spec-block">
+      <div class="spec-group__title">Groups — 3 таблицы</div>
+      <table class="spec-table">
+        <thead><tr><th>Таблица</th><th>Модель</th><th>Описание</th><th>Тип</th></tr></thead>
+        <tbody>
+          <tr><td><code>groups</code></td><td><code>Group</code></td><td>private/public/topic/media/corporate, правила, лимиты, верификация</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>group_members</code></td><td><code>GroupMember</code></td><td>Участники группы</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>group_roles</code></td><td><code>GroupRole</code></td><td>Роли: super_admin/mod/author/user + права</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Polls -->
+    <div class="spec-block">
+      <div class="spec-group__title">Polls / Quizzes / Lists — 3 таблицы</div>
+      <table class="spec-table">
+        <thead><tr><th>Таблица</th><th>Модель</th><th>Описание</th><th>Тип</th></tr></thead>
+        <tbody>
+          <tr><td><code>polls</code></td><td><code>Poll</code></td><td>Опросы/квизы/активные списки/персонали</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>poll_options</code></td><td><code>PollOption</code></td><td>Варианты ответов</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>poll_votes</code></td><td><code>PollVote</code></td><td>Голоса пользователей</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Contacts & Blocklist -->
+    <div class="spec-block">
+      <div class="spec-group__title">Contacts &amp; Blocklist — 2 таблицы</div>
+      <table class="spec-table">
+        <thead><tr><th>Таблица</th><th>Модель</th><th>Описание</th><th>Тип</th></tr></thead>
+        <tbody>
+          <tr><td><code>contacts</code></td><td><code>Contact</code></td><td>Контакты пользователя (userId → contactId)</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>blocked_users</code></td><td><code>BlockedUser</code></td><td>Заблокированные пользователи</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Reports & Bans -->
+    <div class="spec-block">
+      <div class="spec-group__title">Reports &amp; Bans — 3 таблицы</div>
+      <table class="spec-table">
+        <thead><tr><th>Таблица</th><th>Модель</th><th>Описание</th><th>Тип</th></tr></thead>
+        <tbody>
+          <tr><td><code>reports</code></td><td><code>Report</code></td><td>Жалобы: 7 причин, pending/reviewing/resolved/rejected</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>bans</code></td><td><code>Ban</code></td><td>Баны: temporary/permanent, 4 подтверждения, appealDeadline 72ч</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>ban_appeals</code></td><td><code>BanAppeal</code></td><td>Обжалования: текст до 2000 символов, decision</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Calls -->
+    <div class="spec-block">
+      <div class="spec-group__title">Calls (WebRTC) — 2 таблицы</div>
+      <table class="spec-table">
+        <thead><tr><th>Таблица</th><th>Модель</th><th>Описание</th><th>Тип</th></tr></thead>
+        <tbody>
+          <tr><td><code>calls</code></td><td><code>Call</code></td><td>audio/video, group до 30, ringing/active/ended/missed</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>call_participants</code></td><td><code>CallParticipant</code></td><td>muted, video, screen sharing</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Drafts & Notifications -->
+    <div class="spec-block">
+      <div class="spec-group__title">Drafts &amp; Notifications — 2 таблицы</div>
+      <table class="spec-table">
+        <thead><tr><th>Таблица</th><th>Модель</th><th>Описание</th><th>Тип</th></tr></thead>
+        <tbody>
+          <tr><td><code>drafts</code></td><td><code>Draft</code></td><td>Черновики сообщений (один на чат)</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>notifications</code></td><td><code>Notification</code></td><td>message/call/mention/reaction/system, превью до 20 символов</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Stories -->
+    <div class="spec-block">
+      <div class="spec-group__title">Stories — 2 таблицы</div>
+      <table class="spec-table">
+        <thead><tr><th>Таблица</th><th>Модель</th><th>Описание</th><th>Тип</th></tr></thead>
+        <tbody>
+          <tr><td><code>stories</code></td><td><code>Story</code></td><td>Сторис: photo/video, Yandex Disk, expires 24ч</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>story_views</code></td><td><code>StoryView</code></td><td>Просмотры сторис</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Invites -->
+    <div class="spec-block">
+      <div class="spec-group__title">Invites — 1 таблица</div>
+      <table class="spec-table">
+        <thead><tr><th>Таблица</th><th>Модель</th><th>Описание</th><th>Тип</th></tr></thead>
+        <tbody>
+          <tr><td><code>invites</code></td><td><code>Invite</code></td><td>Приглашения: token, groupIds, pending/accepted/expired</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Bots -->
+    <div class="spec-block">
+      <div class="spec-group__title">Bots — 2 таблицы</div>
+      <table class="spec-table">
+        <thead><tr><th>Таблица</th><th>Модель</th><th>Описание</th><th>Тип</th></tr></thead>
+        <tbody>
+          <tr><td><code>bots</code></td><td><code>Bot</code></td><td>Боты: владелец, @username, аватар, верификация</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>bot_tokens</code></td><td><code>BotToken</code></td><td>Токены ботов: хэш, scopes, отзыв</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Donate -->
+    <div class="spec-block">
+      <div class="spec-group__title">Donate — 3 таблицы</div>
+      <table class="spec-table">
+        <thead><tr><th>Таблица</th><th>Модель</th><th>Описание</th><th>Тип</th></tr></thead>
+        <tbody>
+          <tr><td><code>donations</code></td><td><code>Donation</code></td><td>Пожертвования: сумма, метод, source (узел), type, статус</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>donate_goals</code></td><td><code>DonateGoal</code></td><td>Цели сборов, isActive. Управляется из админки</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>donate_tiers</code></td><td><code>DonateTier</code></td><td>Уровни поддержки (кофе/спонсор/VIP)</td><td><span class="data-badge data-badge--seed">🌱 Seed</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Support -->
+    <div class="spec-block">
+      <div class="spec-group__title">Support — 2 таблицы</div>
+      <table class="spec-table">
+        <thead><tr><th>Таблица</th><th>Модель</th><th>Описание</th><th>Тип</th></tr></thead>
+        <tbody>
+          <tr><td><code>support_tickets</code></td><td><code>SupportTicket</code></td><td>Тикеты поддержки: приоритет, assignedAdminId</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>support_messages</code></td><td><code>SupportMessage</code></td><td>Сообщения чата поддержки, isInternal</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Feature Flags & Admin -->
+    <div class="spec-block">
+      <div class="spec-group__title">Feature Flags &amp; Admin — 5 таблиц</div>
+      <table class="spec-table">
+        <thead><tr><th>Таблица</th><th>Модель</th><th>Описание</th><th>Тип</th></tr></thead>
+        <tbody>
+          <tr><td><code>feature_flags</code></td><td><code>FeatureFlag</code></td><td>Флаги функций: isEnabled, rolloutPercent, targetSegment</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>announcements</code></td><td><code>Announcement</code></td><td>Глобальные объявления, audience, период</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>audit_logs</code></td><td><code>AuditLog</code></td><td>Журнал действий админов (before/after JSON)</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>admin_2fa_secrets</code></td><td><code>Admin2FASecret</code></td><td>TOTP-секреты и backup-коды админов</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>file_storage_stats</code></td><td><code>FileStorageStat</code></td><td>Снимки статистики MinIO/Yandex Disk (time-series)</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Departments & Employees -->
+    <div class="spec-block">
+      <div class="spec-group__title">Departments &amp; Employees — 3 таблицы</div>
+      <table class="spec-table">
+        <thead><tr><th>Таблица</th><th>Модель</th><th>Описание</th><th>Тип</th></tr></thead>
+        <tbody>
+          <tr><td><code>departments</code></td><td><code>Department</code></td><td>Отделы: дерево (parentId), руководитель</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>department_members</code></td><td><code>DepartmentMember</code></td><td>Членство: role, permissions (JSON-матрица)</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>employees</code></td><td><code>Employee</code></td><td>Профиль сотрудника (расширение User)</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Meetings -->
+    <div class="spec-block">
+      <div class="spec-group__title">Meetings — 2 таблицы</div>
+      <table class="spec-table">
+        <thead><tr><th>Таблица</th><th>Модель</th><th>Описание</th><th>Тип</th></tr></thead>
+        <tbody>
+          <tr><td><code>meetings</code></td><td><code>Meeting</code></td><td>Встречи: статус, meetingLink, связь с Call</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>meeting_protocols</code></td><td><code>MeetingProtocol</code></td><td>Протокол встречи (markdown)</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Tasks & Sprints -->
+    <div class="spec-block">
+      <div class="spec-group__title">Tasks &amp; Sprints — 2 таблицы</div>
+      <table class="spec-table">
+        <thead><tr><th>Таблица</th><th>Модель</th><th>Описание</th><th>Тип</th></tr></thead>
+        <tbody>
+          <tr><td><code>tasks</code></td><td><code>Task</code></td><td>Задачи: scope (personal/department), sprintId</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>sprints</code></td><td><code>Sprint</code></td><td>Спринты отдела: период, цель, статус</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Knowledge Base -->
+    <div class="spec-block">
+      <div class="spec-group__title">Knowledge Base — 2 таблицы</div>
+      <table class="spec-table">
+        <thead><tr><th>Таблица</th><th>Модель</th><th>Описание</th><th>Тип</th></tr></thead>
+        <tbody>
+          <tr><td><code>knowledge_articles</code></td><td><code>KnowledgeArticle</code></td><td>Статьи базы знаний (markdown, version)</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>knowledge_categories</code></td><td><code>KnowledgeCategory</code></td><td>Категории базы знаний (дерево)</td><td><span class="data-badge data-badge--seed">🌱 Seed</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Vacancies & Applications -->
+    <div class="spec-block">
+      <div class="spec-group__title">Vacancies &amp; Applications — 4 таблицы</div>
+      <table class="spec-table">
+        <thead><tr><th>Таблица</th><th>Модель</th><th>Описание</th><th>Тип</th></tr></thead>
+        <tbody>
+          <tr><td><code>vacancies</code></td><td><code>Vacancy</code></td><td>Вакансии: departmentId, вилка, type, статус</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>vacancy_translations</code></td><td><code>VacancyTranslation</code></td><td>Переводы вакансий на 6 языков (SSR/SEO)</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>applications</code></td><td><code>Application</code></td><td>Заявки кандидатов, currentStage</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>application_stages</code></td><td><code>ApplicationStage</code></td><td>Этапы воронки найма</td><td><span class="data-badge data-badge--seed">🌱 Seed</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- HR -->
+    <div class="spec-block">
+      <div class="spec-group__title">HR — 1 таблица</div>
+      <table class="spec-table">
+        <thead><tr><th>Таблица</th><th>Модель</th><th>Описание</th><th>Тип</th></tr></thead>
+        <tbody>
+          <tr><td><code>hr_requests</code></td><td><code>HrRequest</code></td><td>HR-заявки (онбординг, рассылки): type, payload (JSON)</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Features (фич-реквесты) -->
+    <div class="spec-block">
+      <div class="spec-group__title">Features (фич-реквесты) — 5 таблиц</div>
+      <table class="spec-table">
+        <thead><tr><th>Таблица</th><th>Модель</th><th>Описание</th><th>Тип</th></tr></thead>
+        <tbody>
+          <tr><td><code>features</code></td><td><code>Feature</code></td><td>Фич-реквесты: статус, votesCount</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>feature_categories</code></td><td><code>FeatureCategory</code></td><td>Категории фич-реквестов</td><td><span class="data-badge data-badge--seed">🌱 Seed</span></td></tr>
+          <tr><td><code>feature_votes</code></td><td><code>FeatureVote</code></td><td>Голоса (userId null для гостя, fingerprint)</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>feature_comments</code></td><td><code>FeatureComment</code></td><td>Комментарии к фичам (дерево)</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>feature_changelogs</code></td><td><code>FeatureChangeLog</code></td><td>История статусов фичи</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Versions -->
+    <div class="spec-block">
+      <div class="spec-group__title">Versions (history.balloo.su) — 3 таблицы</div>
+      <table class="spec-table">
+        <thead><tr><th>Таблица</th><th>Модель</th><th>Описание</th><th>Тип</th></tr></thead>
+        <tbody>
+          <tr><td><code>versions</code></td><td><code>Version</code></td><td>Версии: semver, статус (released/planned), isMajor</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>version_changes</code></td><td><code>VersionChange</code></td><td>Пункты changelog: category, title, order</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>version_translations</code></td><td><code>VersionTranslation</code></td><td>Переводы changelog на 6 языков (SSR/SEO)</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Onboarding & Text Content -->
+    <div class="spec-block">
+      <div class="spec-group__title">Onboarding &amp; Text Content — 4 таблицы</div>
+      <table class="spec-table">
+        <thead><tr><th>Таблица</th><th>Модель</th><th>Описание</th><th>Тип</th></tr></thead>
+        <tbody>
+          <tr><td><code>onboarding_steps</code></td><td><code>OnboardingStep</code></td><td>Шаги онбординга: порядок, иллюстрация, активен</td><td><span class="data-badge data-badge--seed">🌱 Seed</span></td></tr>
+          <tr><td><code>onboarding_step_translations</code></td><td><code>OnboardingStepTranslation</code></td><td>Переводы шагов на 6 языков</td><td><span class="data-badge data-badge--seed">🌱 Seed</span></td></tr>
+          <tr><td><code>text_pages</code></td><td><code>TextPage</code></td><td>Информационные страницы: rules, about-company, about-balloo</td><td><span class="data-badge data-badge--seed">🌱 Seed</span></td></tr>
+          <tr><td><code>text_page_translations</code></td><td><code>TextPageTranslation</code></td><td>Переводы страниц на 6 языков (markdown)</td><td><span class="data-badge data-badge--seed">🌱 Seed</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Blog -->
+    <div class="spec-block">
+      <div class="spec-group__title">Blog (blog.balloo.su) — 11 таблиц</div>
+      <table class="spec-table">
+        <thead><tr><th>Таблица</th><th>Модель</th><th>Описание</th><th>Тип</th></tr></thead>
+        <tbody>
+          <tr><td><code>blog_channels</code></td><td><code>BlogChannel</code></td><td>Каналы: corporate/personal, slug, аватар, баннер, accentColor</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>blog_channel_members</code></td><td><code>BlogChannelMember</code></td><td>Авторы/модераторы каналов (role)</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>blog_posts</code></td><td><code>BlogPost</code></td><td>Статьи: slug, status (draft/pending_review/published/...), publishedAt</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>blog_post_translations</code></td><td><code>BlogPostTranslation</code></td><td>Переводы статей на 6 языков</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>blog_categories</code></td><td><code>BlogCategory</code></td><td>Категории: slug, order, visible</td><td><span class="data-badge data-badge--seed">🌱 Seed</span></td></tr>
+          <tr><td><code>blog_category_translations</code></td><td><code>BlogCategoryTranslation</code></td><td>Переводы категорий на 6 языков</td><td><span class="data-badge data-badge--seed">🌱 Seed</span></td></tr>
+          <tr><td><code>blog_tags</code></td><td><code>BlogTag</code></td><td>Теги (управляются из админки)</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>blog_post_tags</code></td><td><code>BlogPostTag</code></td><td>Связь пост ↔ теги (m2m)</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>blog_reactions</code></td><td><code>BlogReaction</code></td><td>Реакции на статьи (до 5 эмодзи)</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>blog_comments</code></td><td><code>BlogComment</code></td><td>Комментарии: дерево, hidden (модерация)</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+          <tr><td><code>blog_post_views</code></td><td><code>BlogPostView</code></td><td>Просмотры статей (аналитика)</td><td><span class="data-badge data-badge--runtime">⚡ Runtime</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p style="font-size:12px;color:var(--text-muted);margin-top:20px;line-height:1.6;">📋 Полная схема (75 таблиц, индексы, связи) — в <code>docs/03-database-schema.md</code>. Prisma-схема — в <code>packages/server/prisma/schema.prisma</code>.</p>
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+</body>
+</html>

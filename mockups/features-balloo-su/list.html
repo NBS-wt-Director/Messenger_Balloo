@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Features — Список фич</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--accent);">F</div><span>Features</span>
+    <div class="topbar__dropdown"><div class="topbar__dropdown-item">💡 Features (текущий)</div><div class="topbar__dropdown-divider"></div><div class="topbar__dropdown-item">💬 Balloo</div><div class="topbar__dropdown-item">🛡️ Admin</div><div class="topbar__dropdown-item">🏢 Command</div><div class="topbar__dropdown-item">📜 History</div><div class="topbar__dropdown-item">⬇️ Download</div><div class="topbar__dropdown-item">📚 API Docs</div></div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Список фич</div>
+  <div class="topbar__actions">
+    <div class="topbar__actions-btn" onclick="window.location.href='submit.html'" title="Предложить фичу">✏</div>
+  </div>
+  <div class="topbar__right">
+    <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИИ</span></div></div>
+    <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+    <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+  </div>
+</div>
+<div class="main">
+  <div class="sidebar sidebar--narrow">
+    <div class="sidebar__search">
+      <input type="text" class="search-input" placeholder="🔍 Поиск фич...">
+    </div>
+    <div class="list">
+      <div class="list__item list__item--active">📋 Все фичи</div>
+      <div class="list__item">✅ Готово <span class="badge" style="margin-left:auto;">8</span></div>
+      <div class="list__item">🔄 В работе <span class="badge" style="margin-left:auto;">5</span></div>
+      <div class="list__item">📌 Запланировано <span class="badge" style="margin-left:auto;">12</span></div>
+      <div class="list__item">💡 Идеи <span class="badge" style="margin-left:auto;">23</span></div>
+      <div class="list__item" style="border-top:1px solid var(--border-color);margin-top:8px;padding-top:12px;">🏆 Топ голосов</div>
+      <div class="list__item">🔥 Обсуждаемые</div>
+      <div class="list__item">⏱ Свежие</div>
+    </div>
+  </div>
+  <div class="content overflow-y-auto">
+    <div class="page-container">
+      <h1 class="page-title">Фич-реквесты</h1>
+      <p class="page-subtitle">Голосуйте за идеи и предлагайте новые функции для Balloo</p>
+
+      <div class="tabs mb-6" data-tab-group="categories">
+        <div class="tab tab--active" onclick="switchTab('categories',0)">Все</div>
+        <div class="tab" onclick="switchTab('categories',1)">Мессенджер</div>
+        <div class="tab" onclick="switchTab('categories',2)">Звонки</div>
+        <div class="tab" onclick="switchTab('categories',3)">Группы</div>
+        <div class="tab" onclick="switchTab('categories',4)">UI/UX</div>
+        <div class="tab" onclick="switchTab('categories',5)">Боты</div>
+      </div>
+
+      <div class="flex gap-4 mb-6" style="flex-wrap:wrap;">
+        <div class="card flex-1" style="min-width:140px;"><div class="text-xs text-muted">Всего фич</div><div style="font-size:28px;font-weight:800;color:var(--accent);">48</div></div>
+        <div class="card flex-1" style="min-width:140px;"><div class="text-xs text-muted">Готово</div><div style="font-size:28px;font-weight:800;color:var(--accent);">8</div></div>
+        <div class="card flex-1" style="min-width:140px;"><div class="text-xs text-muted">В работе</div><div style="font-size:28px;font-weight:800;color:var(--info);">5</div></div>
+        <div class="card flex-1" style="min-width:140px;"><div class="text-xs text-muted">Голосов всего</div><div style="font-size:28px;font-weight:800;color:var(--warning);">1 247</div></div>
+      </div>
+
+      <div class="card mb-4 card--hover" onclick="window.location.href='feature-detail.html'">
+        <div class="flex items-center gap-4">
+          <div class="flex flex-col items-center" style="min-width:48px;">
+            <button class="btn btn--sm btn--primary" style="width:48px;">▲</button>
+            <span class="font-bold text-accent" style="font-size:18px;">87</span>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="chip chip--accent">Готово</span>
+              <span class="chip">Мессенджер</span>
+            </div>
+            <div class="card__title">Тёмная/светлая/русская темы оформления</div>
+            <div class="card__body">Три темы: тёмная (по умолчанию), светлая и «Наша» с цветами флага РФ и драгоценными металлами.</div>
+            <div class="text-xs text-muted mt-2">32 комментария · обновлено 3 дня назад</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-4 card--hover" onclick="window.location.href='feature-detail.html'">
+        <div class="flex items-center gap-4">
+          <div class="flex flex-col items-center" style="min-width:48px;">
+            <button class="btn btn--sm btn--primary" style="width:48px;">▲</button>
+            <span class="font-bold text-accent" style="font-size:18px;">74</span>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="chip chip--info">В работе</span>
+              <span class="chip">Звонки</span>
+            </div>
+            <div class="card__title">Групповые видеозвонки до 12 человек</div>
+            <div class="card__body">Видео-конференции с сеткой участников, активный динамик, шумоподавление, режим низкой пропускной способности.</div>
+            <div class="text-xs text-muted mt-2">18 комментариев · обновлено вчера</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-4 card--hover" onclick="window.location.href='feature-detail.html'">
+        <div class="flex items-center gap-4">
+          <div class="flex flex-col items-center" style="min-width:48px;">
+            <button class="btn btn--sm btn--primary" style="width:48px;">▲</button>
+            <span class="font-bold text-accent" style="font-size:18px;">61</span>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="chip chip--warning">Запланировано</span>
+              <span class="chip">Группы</span>
+            </div>
+            <div class="card__title">P2G чаты с подразделами (threading)</div>
+            <div class="card__body">Подразделы внутри групповых чатов для организации обсуждений по темам. v2 функция.</div>
+            <div class="text-xs text-muted mt-2">27 комментариев · обновлено неделю назад</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-4 card--hover" onclick="window.location.href='feature-detail.html'">
+        <div class="flex items-center gap-4">
+          <div class="flex flex-col items-center" style="min-width:48px;">
+            <button class="btn btn--sm btn--primary" style="width:48px;">▲</button>
+            <span class="font-bold text-accent" style="font-size:18px;">45</span>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="chip">Идея</span>
+              <span class="chip">Боты</span>
+            </div>
+            <div class="card__title">Бот-маркетплейс внутри мессенджера</div>
+            <div class="card__body">Каталог ботов с поиском, категориями, отзывами и установкой в один клик.</div>
+            <div class="text-xs text-muted mt-2">15 комментариев · обновлено 2 дня назад</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-4 card--hover" onclick="window.location.href='feature-detail.html'">
+        <div class="flex items-center gap-4">
+          <div class="flex flex-col items-center" style="min-width:48px;">
+            <button class="btn btn--sm btn--primary" style="width:48px;">▲</button>
+            <span class="font-bold text-accent" style="font-size:18px;">38</span>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="chip chip--accent">Готово</span>
+              <span class="chip">UI/UX</span>
+            </div>
+            <div class="card__title">Восьмигранные аватарки (октагон)</div>
+            <div class="card__body">Уникальный визуальный стиль — аватарки в форме восьмиугольника с двойной рамкой (контекст + статус).</div>
+            <div class="text-xs text-muted mt-2">9 комментариев · обновлено месяц назад</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center mt-6">
+        <button class="btn btn--secondary btn--lg" onclick="window.location.href='submit.html'">💡 Предложить новую фичу</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

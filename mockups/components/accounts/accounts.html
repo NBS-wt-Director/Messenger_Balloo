@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Компонент: Accounts — Мультиаккаунт</title>
+  <link rel="stylesheet" href="../../assets/common.css">
+  <style>
+    .component-demo { padding: 24px; max-width: 480px; margin: 0 auto; }
+    .component-demo h1 { font-size: 20px; margin-bottom: 16px; }
+    .component-demo .demo-section { margin-bottom: 24px; }
+    .component-demo .demo-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+    .accounts-switcher { display: flex; align-items: center; gap: 12px; }
+    .accounts-switcher .avatar { cursor: pointer; transition: opacity 0.15s; }
+    .accounts-switcher .avatar:hover { opacity: 0.7; }
+    .accounts-switcher .add-btn { width: 36px; height: 36px; clip-path: var(--octagon-clip); background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; }
+    .accounts-list { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+    .accounts-list-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: var(--bg-tertiary); border: 1px solid var(--border-color); cursor: pointer; transition: background 0.15s; }
+    .accounts-list-item:hover { background: var(--bg-hover); }
+    .accounts-list-item--active { border-color: var(--accent); background: rgba(45,184,77,0.08); }
+    .accounts-list-item__info { flex: 1; min-width: 0; }
+    .accounts-list-item__name { font-weight: 600; color: var(--text-primary); font-size: 14px; }
+    .accounts-list-item__phone { font-size: 12px; color: var(--text-secondary); }
+    .accounts-list-item__actions { display: flex; gap: 8px; }
+    .accounts-list-item__action { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); cursor: pointer; }
+    .accounts-list-item__action:hover { color: var(--text-primary); }
+    .accounts-list-item__action--danger:hover { color: var(--danger); }
+  </style>
+</head>
+<body>
+  <div class="component-demo">
+    <h1>📦 Компонент: Accounts (Мультиаккаунт)</h1>
+
+    <div class="demo-section">
+      <div class="demo-label">Переключатель аккаунтов в topbar</div>
+      <div class="accounts-switcher">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИИ</span></div></div>
+        <div class="avatar avatar--sm avatar--bordered avatar--status-offline avatar--ctx-new"><div class="avatar__inner"><span>АК</span></div></div>
+        <div class="add-btn" title="Добавить аккаунт">+</div>
+      </div>
+    </div>
+
+    <div class="demo-section">
+      <div class="demo-label">Список аккаунтов</div>
+      <div class="accounts-list">
+        <div class="accounts-list-item accounts-list-item--active">
+          <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИИ</span></div></div>
+          <div class="accounts-list-item__info">
+            <div class="accounts-list-item__name">Иван Иванов</div>
+            <div class="accounts-list-item__phone">+7 (999) 123-45-67</div>
+          </div>
+          <div class="accounts-list-item__actions">
+            <div class="accounts-list-item__action" title="Редактировать">✏</div>
+            <div class="accounts-list-item__action accounts-list-item__action--danger" title="Удалить">🗑</div>
+          </div>
+        </div>
+        <div class="accounts-list-item">
+          <div class="avatar avatar--sm avatar--bordered avatar--status-offline avatar--ctx-new"><div class="avatar__inner"><span>АК</span></div></div>
+          <div class="accounts-list-item__info">
+            <div class="accounts-list-item__name">Алексей К.</div>
+            <div class="accounts-list-item__phone">+7 (999) 987-65-43</div>
+          </div>
+          <div class="accounts-list-item__actions">
+            <div class="accounts-list-item__action" title="Редактировать">✏</div>
+            <div class="accounts-list-item__action accounts-list-item__action--danger" title="Удалить">🗑</div>
+          </div>
+        </div>
+        <div class="accounts-list-item" style="justify-content:center; color: var(--accent); font-size: 13px; font-weight: 600;">
+          + Добавить аккаунт
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="../../assets/common.js"></script>
+</body>
+</html>

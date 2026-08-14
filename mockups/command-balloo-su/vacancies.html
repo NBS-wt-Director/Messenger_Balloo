@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Command — Вакансии</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--info);">C</div><span>Command</span>
+    <div class="topbar__dropdown"></div>
+  </div>
+  <div class="topbar__title">Вакансии</div>
+  <div class="topbar__right"></div>
+</div>
+<div class="main">
+  <div class="content overflow-y-auto">
+    <div class="page-container">
+      <h1 class="page-title">💼 Вакансии</h1>
+      <p class="page-subtitle">Присоединяйтесь к команде Balloo — создавайте независимый мессенджер</p>
+
+      <div class="flex gap-4 mb-6" style="flex-wrap:wrap;">
+        <div class="card flex-1" style="min-width:140px;"><div class="text-xs text-muted">Открытых вакансий</div><div style="font-size:28px;font-weight:800;color:var(--accent);">6</div></div>
+        <div class="card flex-1" style="min-width:140px;"><div class="text-xs text-muted">Отделов</div><div style="font-size:28px;font-weight:800;color:var(--info);">4</div></div>
+        <div class="card flex-1" style="min-width:140px;"><div class="text-xs text-muted">Сотрудников</div><div style="font-size:28px;font-weight:800;color:var(--warning);">18</div></div>
+      </div>
+
+      <div class="tabs mb-6" data-tab-group="dept">
+        <div class="tab tab--active" onclick="switchTab('dept',0)">Все</div>
+        <div class="tab" onclick="switchTab('dept',1)">Разработка</div>
+        <div class="tab" onclick="switchTab('dept',2)">Дизайн</div>
+        <div class="tab" onclick="switchTab('dept',3)">Инфраструктура</div>
+        <div class="tab" onclick="switchTab('dept',4)">Документация</div>
+      </div>
+
+      <div class="tab-panel" style="display:block;">
+        <div class="card mb-4 card--hover" onclick="window.location.href='vacancy-detail.html?id=1'">
+          <div class="flex items-center gap-4">
+            <span style="font-size:36px;">⚛️</span>
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="chip chip--accent">Активна</span>
+                <span class="chip">Разработка</span>
+                <span class="chip">Удалённо</span>
+              </div>
+              <div class="card__title">Senior Frontend Developer (React 19 / Next.js 15)</div>
+              <div class="card__body text-sm">Создание веб-клиента мессенджера. WebSocket, WebRTC, glassmorphism UI.</div>
+              <div class="text-xs text-muted mt-2">200 000 – 350 000 ₽ · 12 кандидатов</div>
+            </div>
+            <span class="text-muted" style="font-size:20px;">→</span>
+          </div>
+        </div>
+        <div class="card mb-4 card--hover" onclick="window.location.href='vacancy-detail.html?id=2'">
+          <div class="flex items-center gap-4">
+            <span style="font-size:36px;">🔧</span>
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="chip chip--accent">Активна</span>
+                <span class="chip">Разработка</span>
+                <span class="chip">Удалённо</span>
+              </div>
+              <div class="card__title">Backend Developer (Hono / WebSocket)</div>
+              <div class="card__body text-sm">Серверная часть мессенджера. API, WebSocket, PostgreSQL, MinIO.</div>
+              <div class="text-xs text-muted mt-2">180 000 – 300 000 ₽ · 8 кандидатов</div>
+            </div>
+            <span class="text-muted" style="font-size:20px;">→</span>
+          </div>
+        </div>
+        <div class="card mb-4 card--hover" onclick="window.location.href='vacancy-detail.html?id=3'">
+          <div class="flex items-center gap-4">
+            <span style="font-size:36px;">🚀</span>
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="chip chip--accent">Активна</span>
+                <span class="chip">Инфраструктура</span>
+                <span class="chip">Гибрид</span>
+              </div>
+              <div class="card__title">DevOps Engineer (K8s / Docker / CI/CD)</div>
+              <div class="card__body text-sm">Инфраструктура Kubernetes, CI/CD pipelines, мониторинг.</div>
+              <div class="text-xs text-muted mt-2">220 000 – 350 000 ₽ · 5 кандидатов</div>
+            </div>
+            <span class="text-muted" style="font-size:20px;">→</span>
+          </div>
+        </div>
+        <div class="card mb-4 card--hover" onclick="window.location.href='vacancy-detail.html?id=4'">
+          <div class="flex items-center gap-4">
+            <span style="font-size:36px;">🎨</span>
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="chip chip--warning">Почти закрыта</span>
+                <span class="chip">Дизайн</span>
+                <span class="chip">Удалённо</span>
+              </div>
+              <div class="card__title">UI/UX Designer</div>
+              <div class="card__body text-sm">Проектирование интерфейсов мессенджера, дизайн-система.</div>
+              <div class="text-xs text-muted mt-2">150 000 – 250 000 ₽ · 6 кандидатов</div>
+            </div>
+            <span class="text-muted" style="font-size:20px;">→</span>
+          </div>
+        </div>
+        <div class="card mb-4 card--hover" onclick="window.location.href='vacancy-detail.html?id=5'">
+          <div class="flex items-center gap-4">
+            <span style="font-size:36px;">🧪</span>
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="chip chip--accent">Активна</span>
+                <span class="chip">Разработка</span>
+                <span class="chip">Удалённо</span>
+              </div>
+              <div class="card__title">QA Engineer (Playwright / Jest)</div>
+              <div class="card__body text-sm">Автоматизированное и ручное тестирование. E2E, unit, integration.</div>
+              <div class="text-xs text-muted mt-2">120 000 – 200 000 ₽ · 4 кандидата</div>
+            </div>
+            <span class="text-muted" style="font-size:20px;">→</span>
+          </div>
+        </div>
+        <div class="card mb-4 card--hover" onclick="window.location.href='vacancy-detail.html?id=6'">
+          <div class="flex items-center gap-4">
+            <span style="font-size:36px;">📝</span>
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="chip">Новая</span>
+                <span class="chip">Документация</span>
+                <span class="chip">Удалённо</span>
+              </div>
+              <div class="card__title">Technical Writer</div>
+              <div class="card__body text-sm">Документация API, пользовательские гайды, внутренние инструкции.</div>
+              <div class="text-xs text-muted mt-2">100 000 – 180 000 ₽ · 2 кандидата</div>
+            </div>
+            <span class="text-muted" style="font-size:20px;">→</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 1: Разработка -->
+      <div class="tab-panel" style="display:none;">
+        <div class="card mb-4" style="border-left:3px solid var(--accent);">
+          <h3 class="card__title mb-2">⚛️ Отдел разработки</h3>
+          <p class="text-sm text-secondary">Создаём клиентскую и серверную часть мессенджера. React, Node.js, WebSocket, WebRTC. 5 сотрудников, 3 открытые вакансии.</p>
+        </div>
+        <div class="card mb-4 card--hover" onclick="window.location.href='vacancy-detail.html?id=1'">
+          <div class="flex items-center gap-4">
+            <span style="font-size:36px;">⚛️</span>
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-2"><span class="chip chip--accent">Активна</span><span class="chip">Senior</span></div>
+              <div class="card__title">Senior Frontend Developer</div>
+              <div class="card__body text-sm">React 19, Next.js 15, WebSocket, WebRTC</div>
+              <div class="text-xs text-muted mt-2">200 000 – 350 000 ₽ · 12 кандидатов</div>
+            </div>
+            <span class="text-muted" style="font-size:20px;">→</span>
+          </div>
+        </div>
+        <div class="card mb-4 card--hover" onclick="window.location.href='vacancy-detail.html?id=2'">
+          <div class="flex items-center gap-4">
+            <span style="font-size:36px;">🔧</span>
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-2"><span class="chip chip--accent">Активна</span><span class="chip">Middle+</span></div>
+              <div class="card__title">Backend Developer</div>
+              <div class="card__body text-sm">Hono, WebSocket, PostgreSQL, MinIO</div>
+              <div class="text-xs text-muted mt-2">180 000 – 300 000 ₽ · 8 кандидатов</div>
+            </div>
+            <span class="text-muted" style="font-size:20px;">→</span>
+          </div>
+        </div>
+        <div class="card mb-4 card--hover" onclick="window.location.href='vacancy-detail.html?id=5'">
+          <div class="flex items-center gap-4">
+            <span style="font-size:36px;">🧪</span>
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-2"><span class="chip chip--accent">Активна</span><span class="chip">Middle</span></div>
+              <div class="card__title">QA Engineer</div>
+              <div class="card__body text-sm">Playwright, Jest, E2E, unit тесты</div>
+              <div class="text-xs text-muted mt-2">120 000 – 200 000 ₽ · 4 кандидата</div>
+            </div>
+            <span class="text-muted" style="font-size:20px;">→</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Дизайн -->
+      <div class="tab-panel" style="display:none;">
+        <div class="card mb-4" style="border-left:3px solid #a855f7;">
+          <h3 class="card__title mb-2">🎨 Отдел дизайна</h3>
+          <p class="text-sm text-secondary">Проектируем интерфейсы, дизайн-систему, анимации. Figma, прототипы, user research. 3 сотрудника, 1 открытая вакансия.</p>
+        </div>
+        <div class="card mb-4 card--hover" onclick="window.location.href='vacancy-detail.html?id=4'">
+          <div class="flex items-center gap-4">
+            <span style="font-size:36px;">🎨</span>
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-2"><span class="chip chip--warning">Почти закрыта</span><span class="chip">UI/UX</span></div>
+              <div class="card__title">UI/UX Designer</div>
+              <div class="card__body text-sm">Figma, дизайн-система, прототипы</div>
+              <div class="text-xs text-muted mt-2">150 000 – 250 000 ₽ · 6 кандидатов</div>
+            </div>
+            <span class="text-muted" style="font-size:20px;">→</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Инфраструктура -->
+      <div class="tab-panel" style="display:none;">
+        <div class="card mb-4" style="border-left:3px solid var(--info);">
+          <h3 class="card__title mb-2">🚀 Отдел инфраструктуры</h3>
+          <p class="text-sm text-secondary">Kubernetes, Docker, CI/CD, мониторинг, безопасность. 2 сотрудника, 1 открытая вакансия.</p>
+        </div>
+        <div class="card mb-4 card--hover" onclick="window.location.href='vacancy-detail.html?id=3'">
+          <div class="flex items-center gap-4">
+            <span style="font-size:36px;">🚀</span>
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-2"><span class="chip chip--accent">Активна</span><span class="chip">DevOps</span></div>
+              <div class="card__title">DevOps Engineer</div>
+              <div class="card__body text-sm">K8s, Docker, CI/CD, мониторинг</div>
+              <div class="text-xs text-muted mt-2">220 000 – 350 000 ₽ · 5 кандидатов</div>
+            </div>
+            <span class="text-muted" style="font-size:20px;">→</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 4: Документация -->
+      <div class="tab-panel" style="display:none;">
+        <div class="card mb-4" style="border-left:3px solid var(--text-muted);">
+          <h3 class="card__title mb-2">📝 Отдел документации</h3>
+          <p class="text-sm text-secondary">API docs, пользовательские гайды, внутренние инструкции. 1 сотрудник, 1 открытая вакансия.</p>
+        </div>
+        <div class="card mb-4 card--hover" onclick="window.location.href='vacancy-detail.html?id=6'">
+          <div class="flex items-center gap-4">
+            <span style="font-size:36px;">📝</span>
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-2"><span class="chip">Новая</span><span class="chip">Docs</span></div>
+              <div class="card__title">Technical Writer</div>
+              <div class="card__body text-sm">API docs, гайды, инструкции</div>
+              <div class="text-xs text-muted mt-2">100 000 – 180 000 ₽ · 2 кандидата</div>
+            </div>
+            <span class="text-muted" style="font-size:20px;">→</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center mt-6">
+        <a href="why-us.html" class="btn btn--secondary btn--lg">⭐ Почему именно наша команда?</a>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

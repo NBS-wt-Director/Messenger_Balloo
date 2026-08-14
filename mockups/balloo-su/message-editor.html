@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo — Редактор сообщения</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+
+<!-- Top Bar (same pattern as chats.html) -->
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon">B</div><span>Balloo</span>
+    <div class="topbar__dropdown">
+      <div class="topbar__dropdown-item" onclick="window.location.href='chats.html'">💬 Balloo</div>
+      <div class="topbar__dropdown-divider"></div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div>
+    </div>
+  </div>
+  <div class="topbar__title">Редактор сообщения</div>
+  <div class="topbar__right">
+    <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИИ</span></div></div>
+    <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+    <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+  </div>
+</div>
+
+<!-- Main: Sidebar + Content -->
+<div class="main">
+  <!-- Sidebar: Chat List (simplified) -->
+  <div class="sidebar">
+    <div class="sidebar__search"><input type="text" class="search-input" placeholder="🔍 Поиск чатов..."></div>
+    <div class="list">
+      <div class="list__item list__item--active">
+        <div class="avatar avatar--md avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>МА</span></div></div>
+        <div class="list__item-body"><div class="list__item-title">Мария Андреева</div><div class="list__item-subtitle">печатает...</div></div>
+        <div class="list__item-meta"><span class="list__item-time">14:32</span><span class="badge">3</span></div>
+      </div>
+      <div class="list__item">
+        <div class="avatar avatar--md avatar--bordered avatar--status-online avatar--ctx-new"><div class="avatar__inner"><span>РД</span></div></div>
+        <div class="list__item-body"><div class="list__item-title">Команда разработки</div><div class="list__item-subtitle">Алексей: Отправил макеты</div></div>
+        <div class="list__item-meta"><span class="list__item-time">14:15</span></div>
+      </div>
+      <div class="list__item">
+        <div class="avatar avatar--md avatar--bordered avatar--status-offline avatar--ctx-contact"><div class="avatar__inner"><span>АК</span></div></div>
+        <div class="list__item-body"><div class="list__item-title">Алексей Козлов</div><div class="list__item-subtitle">Спасибо!</div></div>
+        <div class="list__item-meta"><span class="list__item-time">Вчера</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content: Chat with message editor modal overlay -->
+  <div class="content">
+    <!-- Chat header -->
+    <div style="padding:12px 16px;border-bottom:1px solid var(--border-color);display:flex;align-items:center;gap:12px;background:var(--bg-secondary);">
+      <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>МА</span></div></div>
+      <div class="flex-1"><div class="font-semibold" style="color:var(--text-primary);">Мария Андреева</div><div class="text-xs text-muted">в сети</div></div>
+      <button class="topbar__actions-btn" onclick="openCall('audio')">📞</button>
+      <button class="topbar__actions-btn" onclick="openCall('video')">📹</button>
+      <button class="topbar__actions-btn">⋮</button>
+    </div>
+
+    <!-- Messages -->
+    <div class="messages">
+      <div style="text-align:center;padding:8px;"><span class="chip">16 июля 2026</span></div>
+
+      <div class="message message--receiver" id="msg-edit-target">
+        <div class="message__bubble">
+          <div class="message__header"><span>14:20</span></div>
+          <div class="message__body message__body--markdown">Да, посмотрела. <strong>Отличная работа!</strong> Особенно понравился <em>дизайн аватарок</em> — восьмигранники.</div>
+          <div class="message__actions">
+            <button class="message__action-btn" onclick="openModal('modal-message-editor')" title="Редактировать">✏</button>
+            <button class="message__action-btn" title="Ответить">↩</button>
+            <button class="message__action-btn" title="Копировать">📋</button>
+            <button class="message__action-btn" title="Реакция">😊</button>
+            <button class="message__action-btn" title="Переслать">📤</button>
+            <a href="report-message.html" class="message__action-btn" title="Жалоба">🚩</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="message message--sender" id="msg-2">
+        <div class="message__bubble">
+          <div class="message__header"><span>14:25</span></div>
+          <div class="message__body message__body--markdown">Спасибо! Завтра отправлю финальную версию.</div>
+          <div class="message__actions">
+            <button class="message__action-btn" onclick="openModal('modal-message-editor')" title="Редактировать">✏</button>
+            <button class="message__action-btn" title="Ответить">↩</button>
+            <button class="message__action-btn" title="Копировать">📋</button>
+            <button class="message__action-btn" title="Реакция">😊</button>
+            <button class="message__action-btn" title="Удалить">🗑</button>
+          </div>
+        </div>
+        <div class="msg-ticks msg-ticks--read">✓✓</div>
+      </div>
+    </div>
+
+    <!-- Input area -->
+    <div class="input-area">
+      <button class="input-area__btn" title="Прикрепить файл">📎</button>
+      <button class="input-area__btn" title="Фото/видео">🖼</button>
+      <button class="input-area__btn" title="Голосовое" onclick="openModal('modal-voice-message')">🎤</button>
+      <textarea class="input-area__field" placeholder="Напишите сообщение..." rows="1"></textarea>
+      <button class="input-area__btn input-area__btn--send" onclick="sendMessage()" title="Отправить">➤</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Message Editor (reply/edit) — top-right modal -->
+<div class="modal-overlay" id="modal-overlay"></div>
+<div class="modal modal--status-info" id="modal-message-editor" style="width:520px;">
+  <div class="modal__header">
+    <span class="modal__title" id="msg-editor-title">✏️ Редактировать сообщение</span>
+    <div class="modal__close" onclick="closeModal('modal-message-editor')">✕</div>
+  </div>
+  <div class="modal__body">
+    <!-- Reply preview (shown when replying to a message) -->
+    <div class="message__reply" id="editor-reply-preview" style="display:none;">
+      <div class="message__reply-author" id="editor-reply-author"></div>
+      <div id="editor-reply-text"></div>
+    </div>
+
+    <!-- Markdown format bar -->
+    <div class="tabs" style="margin-bottom:12px;">
+      <div class="tab tab--active" onclick="toggleFormat(this,'bold')">B</div>
+      <div class="tab" style="font-style:italic;" onclick="toggleFormat(this,'italic')">I</div>
+      <div class="tab" style="text-decoration:underline;" onclick="toggleFormat(this,'underline')">U</div>
+      <div class="tab" onclick="toggleFormat(this,'code')" style="font-family:monospace;">&lt;/&gt;</div>
+      <div class="tab" onclick="toggleFormat(this,'link')">🔗</div>
+      <div class="tab" onclick="toggleFormat(this,'quote')">❝</div>
+      <div class="tab" onclick="toggleFormat(this,'list')">☰</div>
+    </div>
+
+    <!-- Edit area -->
+    <textarea class="form-textarea" id="editor-textarea" style="min-height:150px;font-size:14px;" placeholder="Введите сообщение..."></textarea>
+
+    <!-- Preview toggle -->
+    <div class="flex items-center justify-between mt-2">
+      <div class="flex gap-2">
+        <button class="btn btn--tertiary btn--sm" onclick="toggleEditorPreview()">👁 Превью</button>
+        <button class="btn btn--tertiary btn--sm" onclick="openModal('modal-attachment-panel')">📎 Вложения</button>
+      </div>
+      <div class="text-xs text-muted"><span id="char-count">0</span>/4096</div>
+    </div>
+
+    <!-- Preview area (hidden by default) -->
+    <div id="editor-preview" style="display:none;margin-top:12px;padding:12px;background:var(--bg-tertiary);border:1px solid var(--border-color);border-radius:0;font-size:14px;line-height:1.6;"></div>
+
+    <!-- Edit history indicator -->
+    <div id="edit-history-indicator" style="display:none;margin-top:12px;">
+      <div class="text-xs text-muted mb-2">Было изменено 2 раза</div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;">
+        <span class="chip">✏ 14:25 — «Спасибо! Завтра отправлю»</span>
+        <span class="chip">✏ 14:30 — «...финальную версию»</span>
+      </div>
+    </div>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--tertiary" onclick="closeModal('modal-message-editor')">Отмена</button>
+    <button class="btn btn--danger btn--sm" id="btn-delete-msg" style="display:none;">🗑 Удалить</button>
+    <button class="btn btn--primary" onclick="saveMessage()">💾 Сохранить</button>
+  </div>
+</div>
+
+<!-- Call Overlay -->
+<div class="call-overlay" id="call-overlay">
+  <div class="call-overlay__header">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div class="avatar avatar--sm avatar--bordered avatar--status-busy avatar--ctx-contact"><div class="avatar__inner"><span>МА</span></div></div>
+      <div><div class="font-semibold" style="color:var(--text-primary);">Мария Андреева</div><div class="call-overlay__timer" id="call-timer">00:00</div></div>
+    </div>
+    <button class="btn btn--tertiary" onclick="closeCall()">Свернуть</button>
+  </div>
+  <div class="call-overlay__participants">
+    <div class="call-participant">
+      <div class="call-participant__video call-participant__video--speaking">
+        <div class="avatar avatar--lg avatar--bordered avatar--status-busy avatar--ctx-contact"><div class="avatar__inner"><span>МА</span></div></div>
+      </div>
+      <span class="call-participant__name">Мария (говорит)</span>
+    </div>
+    <div class="call-participant">
+      <div class="call-participant__video">
+        <div class="avatar avatar--lg avatar--bordered avatar--status-busy avatar--ctx-contact"><div class="avatar__inner"><span>ИИ</span></div></div>
+      </div>
+      <span class="call-participant__name">Вы</span>
+    </div>
+  </div>
+  <div class="call-overlay__controls">
+    <div class="call-control call-control--mute" id="call-mute" onclick="toggleMute()">🎤</div>
+    <div class="call-control call-control--video" id="call-video" onclick="toggleVideo()">📹</div>
+    <div class="call-control call-control--screen" id="call-screen" onclick="toggleScreen()">🖥</div>
+    <div class="call-control call-control--hangup" onclick="closeCall()">📞</div>
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+<script>
+function toggleFormat(btn, type) {
+  const ta = document.getElementById('editor-textarea');
+  const start = ta.selectionStart;
+  const end = ta.selectionEnd;
+  const text = ta.value;
+  const selected = text.substring(start, end);
+  let wrapped = '';
+  switch(type) {
+    case 'bold': wrapped = `**${selected || 'жирный текст'}**`; break;
+    case 'italic': wrapped = `_${selected || 'курсив'}_`; break;
+    case 'underline': wrapped = `__${selected || 'подчёркнутый'}__`; break;
+    case 'code': wrapped = `\`${selected || 'код'}\``; break;
+    case 'link': wrapped = `[${selected || 'текст'}](url)`; break;
+    case 'quote': wrapped = `> ${selected || 'цитата'}`; break;
+    case 'list': wrapped = `- ${selected || 'пункт списка'}`; break;
+  }
+  ta.value = text.substring(0, start) + wrapped + text.substring(end);
+  ta.focus();
+  document.getElementById('char-count').textContent = ta.value.length;
+}
+
+function toggleEditorPreview() {
+  const preview = document.getElementById('editor-preview');
+  const textarea = document.getElementById('editor-textarea');
+  if (preview.style.display === 'none') {
+    preview.textContent = textarea.value;
+    preview.style.display = 'block';
+  } else {
+    preview.style.display = 'none';
+  }
+}
+
+function openMessageEditor(mode, text) {
+  document.getElementById('editor-textarea').value = text || '';
+  document.getElementById('char-count').textContent = (text || '').length;
+  if (mode === 'reply') {
+    document.getElementById('msg-editor-title').textContent = '↩ Ответить на сообщение';
+    document.getElementById('editor-reply-preview').style.display = 'block';
+  } else {
+    document.getElementById('msg-editor-title').textContent = '✏️ Редактировать сообщение';
+    document.getElementById('editor-reply-preview').style.display = 'none';
+  }
+  openModal('modal-message-editor');
+}
+
+function saveMessage() {
+  const text = document.getElementById('editor-textarea').value;
+  if (!text.trim()) { alert('Сообщение не может быть пустым'); return; }
+  closeModal('modal-message-editor');
+  showToast('Сообщение сохранено', 'success');
+}
+
+function showToast(msg, type) {
+  // Simple toast notification
+  const toast = document.createElement('div');
+  toast.style.cssText = `position:fixed;bottom:80px;right:20px;padding:12px 20px;background:var(--bg-glass);backdrop-filter:blur(16px);border:1px solid var(--border-strong);color:var(--text-primary);font-size:14px;z-index:999;box-shadow:var(--shadow-glass);`;
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2500);
+}
+</script>
+</body>
+</html>

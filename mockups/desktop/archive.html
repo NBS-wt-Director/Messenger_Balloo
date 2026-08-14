@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo — Архив</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+
+<!-- TOPBAR (обязательный) -->
+<div class="topbar">
+  <div class="topbar__logo">
+    <div class="topbar__logo-icon">B</div>
+    <span>Balloo</span>
+    <div class="topbar__dropdown">
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/index.html'">💬 Balloo</div>
+      <div class="topbar__dropdown-divider"></div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div>
+      <div class="topbar__dropdown-divider"></div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/contacts.html'">👤 Контакты</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/search.html'">🔍 Поиск</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/archive.html'">📦 Архив</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/calls.html'">📞 Звонки</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/invites.html'">📨 Приглашения</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/bots.html'">🤖 О ботах</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/about-balloo.html'">ℹ️ О Balloo</div>
+    </div>
+  </div>
+  <div class="topbar__title">Архив</div>
+  <div class="topbar__right">
+    <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact" onclick="window.location.href='../balloo-su/profile.html'">
+      <div class="avatar__inner"><span>ИИ</span></div>
+    </div>
+    <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+    <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+  </div>
+</div>
+
+<!-- Desktop Window Frame -->
+<div class="window-frame">
+  <!-- Titlebar -->
+  <div class="titlebar">
+    <div class="titlebar__left">
+      <div class="titlebar__icon">B</div>
+      <span class="titlebar__title">Balloo Messenger — Архив</span>
+    </div>
+    <div class="titlebar__menu">
+      <div class="titlebar__menu-item" onclick="window.location.href='chat.html'">Чаты</div>
+      <div class="titlebar__menu-item" onclick="window.location.href='stories.html'">Сторис</div>
+      <div class="titlebar__menu-item" onclick="window.location.href='contacts.html'">Контакты</div>
+      <div class="titlebar__menu-item" onclick="window.location.href='archive.html'">Архив</div>
+      <div class="titlebar__menu-item" onclick="window.location.href='calls-history.html'">Звонки</div>
+      <div class="titlebar__menu-item" onclick="window.location.href='../balloo-su/invites.html'">Приглашения</div>
+    </div>
+    <div class="titlebar__controls">
+      <div class="titlebar__btn" title="Свернуть">─</div>
+      <div class="titlebar__btn" title="Развернуть">▢</div>
+      <div class="titlebar__btn titlebar__btn--close" title="Закрыть">✕</div>
+    </div>
+  </div>
+
+  <div class="window-body">
+    <!-- SIDEBAR: Search + archived chat list -->
+    <div class="window-sidebar">
+      <div style="padding:10px 12px;border-bottom:1px solid var(--border-color);display:flex;align-items:center;gap:8px;">
+        <span style="font-size:13px;font-weight:700;color:var(--text-primary);">📦 Архив</span>
+        <span style="font-size:11px;color:var(--text-muted);margin-left:auto;">2 чата</span>
+      </div>
+      <div style="padding:8px 12px;border-bottom:1px solid var(--border-color);">
+        <input type="text" class="form-input" placeholder="🔍 Поиск в архиве..." style="width:100%;padding:8px 12px;background:var(--bg-tertiary);border:1px solid var(--border-color);border-radius:8px;color:var(--text-primary);font-size:13px;outline:none;">
+      </div>
+      <div style="flex:1;overflow-y:auto;">
+        <!-- Archived chat 1 -->
+        <div class="list__item" style="padding:10px 12px;opacity:0.7;cursor:pointer;" onclick="window.location.href='chat.html'">
+          <div class="avatar avatar--sm avatar--bordered avatar--status-offline"><div class="avatar__inner"><span>СТ</span></div></div>
+          <div class="list__item-body" style="margin-left:8px;">
+            <div class="list__item-title" style="font-size:13px;">Старый проект</div>
+            <div class="list__item-subtitle" style="font-size:11px;color:var(--text-muted);">Архивирован 10.07.2026</div>
+          </div>
+        </div>
+        <!-- Archived chat 2 -->
+        <div class="list__item" style="padding:10px 12px;opacity:0.7;cursor:pointer;" onclick="window.location.href='chat.html'">
+          <div class="avatar avatar--sm avatar--bordered avatar--status-offline"><div class="avatar__inner"><span>ВП</span></div></div>
+          <div class="list__item-body" style="margin-left:8px;">
+            <div class="list__item-title" style="font-size:13px;">Виктор Петров</div>
+            <div class="list__item-subtitle" style="font-size:11px;color:var(--text-muted);">Архивирован 05.07.2026</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENT: Empty state or selected chat -->
+    <div class="window-content" style="display:flex;align-items:center;justify-content:center;">
+      <div class="page-container" style="text-align:center;">
+        <div style="font-size:64px;margin-bottom:16px;opacity:0.5;">📦</div>
+        <div style="font-size:20px;font-weight:700;color:var(--text-secondary);margin-bottom:8px;">Архив чатов</div>
+        <div style="font-size:14px;color:var(--text-muted);margin-bottom:24px;">2 архивированных чата</div>
+
+        <div class="empty-state mt-6">
+          <div class="empty-state__animation">📦</div>
+          <div class="empty-state__title">Нет архивированных чатов</div>
+          <div class="empty-state__subtitle">Архивируйте чат через меню ⋮ → "В архив"</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status bar -->
+  <div class="statusbar">
+    <div><span class="status-dot status-dot--online"></span> Подключено · WebSocket</div>
+    <div class="statusbar__sep">📦 2 архивных чата · v1.0.0-beta</div>
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+</body>
+</html>

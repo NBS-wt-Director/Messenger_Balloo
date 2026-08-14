@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo — Вложения чата</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    /* Layout */
+    body { background: var(--bg-primary); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 40px 24px; }
+    .attachments-panel {
+      width: 800px; max-width: 100%;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-strong);
+      display: flex; flex-direction: column;
+      max-height: 700px;
+      box-shadow: var(--shadow-glass);
+    }
+    .attachments-panel__header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex; align-items: center; gap: 12px;
+    }
+    .attachments-panel__back {
+      font-size: 18px; color: var(--text-secondary); cursor: pointer;
+      transition: color 0.15s;
+    }
+    .attachments-panel__back:hover { color: var(--accent); }
+    .attachments-panel__title {
+      flex: 1;
+      font-size: 18px; font-weight: 700; color: var(--text-primary);
+    }
+    .attachments-panel__close {
+      font-size: 18px; color: var(--text-muted); cursor: pointer;
+      transition: color 0.15s;
+    }
+    .attachments-panel__close:hover { color: var(--danger); }
+
+    /* Tabs */
+    .attachments-tabs {
+      display: flex; gap: 0; border-bottom: 1px solid var(--border-color);
+      padding: 0 20px;
+    }
+    .attachments-tab {
+      padding: 10px 16px;
+      font-size: 13px; font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .attachments-tab:hover { color: var(--text-primary); background: var(--bg-hover); }
+    .attachments-tab--active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .attachments-tab__count {
+      font-size: 11px; padding: 1px 6px;
+      background: var(--bg-glass); color: var(--text-muted);
+    }
+    .attachments-tab--active .attachments-tab__count {
+      background: var(--accent); color: var(--accent-text);
+    }
+
+    /* Search */
+    .attachments-search {
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .attachments-search input {
+      width: 100%; padding: 8px 12px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      font-size: 13px; outline: none;
+    }
+    .attachments-search input:focus { border-color: var(--accent); }
+
+    /* Grid */
+    .attachments-body { flex: 1; overflow-y: auto; padding: 16px 20px; }
+    .attachments-section { margin-bottom: 24px; }
+    .attachments-section__header {
+      font-size: 13px; font-weight: 700; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.5px;
+      margin-bottom: 8px; display: flex; align-items: center; gap: 8px;
+    }
+    .attachments-section__count { font-size: 11px; color: var(--text-muted); font-weight: 400; text-transform: none; }
+
+    /* Media grid */
+    .media-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 6px;
+    }
+    .media-item {
+      aspect-ratio: 1;
+      background: var(--bg-tertiary);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+      transition: transform 0.15s;
+    }
+    .media-item:hover { transform: scale(1.03); }
+    .media-item__duration {
+      position: absolute; bottom: 4px; right: 4px;
+      font-size: 10px; color: #fff;
+      background: rgba(0,0,0,0.6);
+      padding: 1px 4px;
+    }
+    .media-item__type {
+      position: absolute; top: 4px; left: 4px;
+      font-size: 9px; font-weight: 700;
+      padding: 1px 4px;
+      background: rgba(0,0,0,0.5); color: #fff;
+    }
+    .media-item--video { background: linear-gradient(135deg, #1a1a2e, #16213e); }
+    .media-item--audio { background: linear-gradient(135deg, #2d1b69, #1a1a2e); }
+    .media-item--file { background: linear-gradient(135deg, #1e3a5f, #1a1a2e); }
+
+    /* Files list */
+    .files-list { display: flex; flex-direction: column; gap: 4px; }
+    .file-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 8px 12px;
+      background: var(--bg-glass);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .file-item:hover { background: var(--bg-hover); }
+    .file-item__icon {
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      background: var(--bg-tertiary);
+    }
+    .file-item__info { flex: 1; min-width: 0; }
+    .file-item__name {
+      font-size: 14px; font-weight: 600; color: var(--text-primary);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .file-item__meta {
+      font-size: 11px; color: var(--text-muted);
+      display: flex; gap: 8px;
+    }
+    .file-item__size { color: var(--text-secondary); }
+    .file-item__action {
+      font-size: 13px; color: var(--text-muted); cursor: pointer;
+      padding: 4px 8px;
+      transition: color 0.15s;
+    }
+    .file-item__action:hover { color: var(--accent); }
+    .file-item__sender {
+      font-size: 11px; color: var(--text-secondary);
+      display: flex; align-items: center; gap: 4px;
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center; padding: 40px 20px;
+      color: var(--text-muted);
+    }
+    .empty-state__icon { font-size: 48px; margin-bottom: 12px; }
+    .empty-state__title { font-size: 16px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; }
+    .empty-state__desc { font-size: 13px; }
+
+    /* Links section */
+    .links-list { display: flex; flex-direction: column; gap: 6px; }
+    .link-item {
+      padding: 10px 12px;
+      background: var(--bg-glass);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .link-item:hover { background: var(--bg-hover); }
+    .link-item__url {
+      font-size: 13px; color: var(--accent); font-weight: 500;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .link-item__title {
+      font-size: 12px; color: var(--text-secondary);
+      margin-top: 2px;
+    }
+    .link-item__meta {
+      font-size: 11px; color: var(--text-muted);
+      margin-top: 2px; display: flex; gap: 8px;
+    }
+
+    /* Polls section */
+    .polls-list { display: flex; flex-direction: column; gap: 6px; }
+    .poll-item {
+      padding: 12px;
+      background: var(--bg-glass);
+    }
+    .poll-item__question {
+      font-size: 14px; font-weight: 600; color: var(--text-primary);
+      margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
+    }
+    .poll-item__vote-count { font-size: 11px; color: var(--text-muted); font-weight: 400; }
+
+    /* Annotation */
+    .annotation {
+      position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
+      padding: 6px 16px;
+      background: var(--bg-glass); backdrop-filter: blur(var(--blur));
+      border: 1px solid var(--border-color);
+      font-size: 13px; color: var(--text-muted);
+      z-index: 100;
+    }
+    .annotation strong { color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<div class="annotation">
+  <strong>Вложения чата</strong> — открывается по клику на кнопку в заголовке чата. Показывает все медиа, файлы, ссылки, опросы.
+</div>
+
+<div class="attachments-panel">
+  <!-- Header -->
+  <div class="attachments-panel__header">
+    <a href="chats.html" class="attachments-panel__back">←</a>
+    <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact">
+      <div class="avatar__inner"><span>МА</span></div>
+    </div>
+    <div class="attachments-panel__title">Вложения чата — Мария Андреева</div>
+    <a href="chats.html" class="attachments-panel__close">✕</a>
+  </div>
+
+  <!-- Tabs -->
+  <div class="attachments-tabs">
+    <div class="attachments-tab attachments-tab--active">
+      📷 Медиа <span class="attachments-tab__count">14</span>
+    </div>
+    <div class="attachments-tab">
+      🎵 Аудио <span class="attachments-tab__count">5</span>
+    </div>
+    <div class="attachments-tab">
+      📄 Файлы <span class="attachments-tab__count">8</span>
+    </div>
+    <div class="attachments-tab">
+      🔗 Ссылки <span class="attachments-tab__count">11</span>
+    </div>
+    <div class="attachments-tab">
+      📊 Опросы <span class="attachments-tab__count">3</span>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="attachments-search">
+    <input type="text" placeholder="🔍 Поиск во вложениях...">
+  </div>
+
+  <!-- Body -->
+  <div class="attachments-body">
+
+    <!-- Media section -->
+    <div class="attachments-section">
+      <div class="attachments-section__header">
+        📷 Фото и видео <span class="attachments-section__count">14</span>
+      </div>
+      <div class="media-grid">
+        <div class="media-item" style="background:linear-gradient(135deg,#2db84d,#1e9e3e);"></div>
+        <div class="media-item" style="background:linear-gradient(135deg,#3b9eff,#1565c0);"></div>
+        <div class="media-item" style="background:linear-gradient(135deg,#a855f7,#7c3aed);"></div>
+        <div class="media-item media-item--video">
+          🎬
+          <span class="media-item__duration">0:42</span>
+          <span class="media-item__type">MP4</span>
+        </div>
+        <div class="media-item" style="background:linear-gradient(135deg,#f59e0b,#d97706);"></div>
+        <div class="media-item" style="background:linear-gradient(135deg,#ef4444,#dc2626);"></div>
+        <div class="media-item media-item--video">
+          🎬
+          <span class="media-item__duration">2:15</span>
+          <span class="media-item__type">MOV</span>
+        </div>
+        <div class="media-item" style="background:linear-gradient(135deg,#06b6d4,#0891b2);"></div>
+        <div class="media-item" style="background:linear-gradient(135deg,#ec4899,#db2777);"></div>
+        <div class="media-item" style="background:linear-gradient(135deg,#84cc16,#65a30d);"></div>
+      </div>
+    </div>
+
+    <!-- Audio section -->
+    <div class="attachments-section">
+      <div class="attachments-section__header">
+        🎵 Аудио <span class="attachments-section__count">5</span>
+      </div>
+      <div class="files-list">
+        <div class="file-item">
+          <div class="file-item__icon">🎵</div>
+          <div class="file-item__info">
+            <div class="file-item__name">Голосовое сообщение</div>
+            <div class="file-item__meta">
+              <span>0:42</span>
+              <span class="file-item__sender">от Марии · 14:31</span>
+            </div>
+          </div>
+          <span class="file-item__action">▶</span>
+        </div>
+        <div class="file-item">
+          <div class="file-item__icon">🎵</div>
+          <div class="file-item__info">
+            <div class="file-item__name">Голосовое сообщение</div>
+            <div class="file-item__meta">
+              <span>1:23</span>
+              <span class="file-item__sender">от вас · 12:15</span>
+            </div>
+          </div>
+          <span class="file-item__action">▶</span>
+        </div>
+        <div class="file-item">
+          <div class="file-item__icon">🎵</div>
+          <div class="file-item__info">
+            <div class="file-item__name">Подкаст — выпуск 42.mp3</div>
+            <div class="file-item__meta">
+              <span>35.2 МБ · 24:15</span>
+              <span class="file-item__sender">от Марии · вчера</span>
+            </div>
+          </div>
+          <span class="file-item__action">⬇</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Files section -->
+    <div class="attachments-section">
+      <div class="attachments-section__header">
+        📄 Файлы <span class="attachments-section__count">8</span>
+      </div>
+      <div class="files-list">
+        <div class="file-item">
+          <div class="file-item__icon">📄</div>
+          <div class="file-item__info">
+            <div class="file-item__name">Дизайн-система Balloo v3.pdf</div>
+            <div class="file-item__meta">
+              <span class="file-item__size">2.4 МБ</span>
+              <span class="file-item__sender">от Марии · вчера</span>
+            </div>
+          </div>
+          <span class="file-item__action">⬇</span>
+        </div>
+        <div class="file-item">
+          <div class="file-item__icon">📊</div>
+          <div class="file-item__info">
+            <div class="file-item__name">Метрики Q2 2026.xlsx</div>
+            <div class="file-item__meta">
+              <span class="file-item__size">1.8 МБ</span>
+              <span class="file-item__sender">от вас · 2 дня назад</span>
+            </div>
+          </div>
+          <span class="file-item__action">⬇</span>
+        </div>
+        <div class="file-item">
+          <div class="file-item__icon">📝</div>
+          <div class="file-item__info">
+            <div class="file-item__name">Техническое задание — Чат v2.docx</div>
+            <div class="file-item__meta">
+              <span class="file-item__size">856 КБ</span>
+              <span class="file-item__sender">от Марии · 3 дня назад</span>
+            </div>
+          </div>
+          <span class="file-item__action">⬇</span>
+        </div>
+        <div class="file-item">
+          <div class="file-item__icon">🗜</div>
+          <div class="file-item__info">
+            <div class="file-item__name">assets-pack-2026.zip</div>
+            <div class="file-item__meta">
+              <span class="file-item__size">156 МБ</span>
+              <span class="file-item__sender">от вас · 5 дней назад</span>
+            </div>
+          </div>
+          <span class="file-item__action">⬇</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Links section -->
+    <div class="attachments-section">
+      <div class="attachments-section__header">
+        🔗 Ссылки <span class="attachments-section__count">11</span>
+      </div>
+      <div class="links-list">
+        <div class="link-item">
+          <div class="link-item__url">github.com/balloo/messenger/pull/142</div>
+          <div class="link-item__title">PR: Рефакторинг модуля вложений</div>
+          <div class="link-item__meta">от Марии · вчера</div>
+        </div>
+        <div class="link-item">
+          <div class="link-item__url">figma.com/file/Balloo-Design-System-v3</div>
+          <div class="link-item__title">Figma — Дизайн-система Balloo v3</div>
+          <div class="link-item__meta">от вас · 2 дня назад</div>
+        </div>
+        <div class="link-item">
+          <div class="link-item__url">docs.balloo.su/api/messaging</div>
+          <div class="link-item__title">API документация — Обмен сообщениями</div>
+          <div class="link-item__meta">от Марии · 3 дня назад</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Polls section -->
+    <div class="attachments-section">
+      <div class="attachments-section__header">
+        📊 Опросы <span class="attachments-section__count">3</span>
+      </div>
+      <div class="polls-list">
+        <div class="poll-item">
+          <div class="poll-item__question">
+            🎨 Какой цвет для акцента?
+            <span class="poll-item__vote-count">12 голосов</span>
+          </div>
+          <div style="display:flex;gap:8px;font-size:12px;color:var(--text-secondary);">
+            <span>Зелёный 25%</span>
+            <span>Мятный 58%</span>
+            <span>Бирюзовый 17%</span>
+          </div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">от Марии · вчера</div>
+        </div>
+        <div class="poll-item">
+          <div class="poll-item__question">
+            📅 Когда проводить созвон?
+            <span class="poll-item__vote-count">8 голосов</span>
+          </div>
+          <div style="display:flex;gap:8px;font-size:12px;color:var(--text-secondary);">
+            <span>Пн 11:00 50%</span>
+            <span>Ср 14:00 25%</span>
+            <span>Пт 10:00 25%</span>
+          </div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">от вас · 2 дня назад</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+</body>
+</html>

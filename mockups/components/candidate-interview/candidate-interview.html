@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Компонент: Candidate Interview — Карточка кандидата</title>
+  <link rel="stylesheet" href="../../assets/common.css">
+  <style>
+    .component-demo { padding: 24px; max-width: 560px; margin: 0 auto; }
+    .component-demo h1 { font-size: 20px; margin-bottom: 16px; }
+    .component-demo .demo-section { margin-bottom: 24px; }
+    .component-demo .demo-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+
+    .candidate-card { display: flex; flex-direction: column; gap: 16px; }
+    .candidate-card__header { display: flex; align-items: center; gap: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border-color); }
+    .candidate-card__header .avatar { flex-shrink: 0; }
+    .candidate-card__header__name { font-size: 20px; font-weight: 700; color: var(--text-primary); }
+    .candidate-card__header__role { font-size: 14px; color: var(--text-secondary); margin-top: 2px; }
+    .candidate-card__stage { font-size: 12px; padding: 4px 10px; font-weight: 700; margin-top: 4px; display: inline-block; }
+    .candidate-card__stage--screening { background: rgba(59,158,255,0.12); color: var(--info); }
+    .candidate-card__stage--interview { background: rgba(232,163,23,0.12); color: var(--warning); }
+    .candidate-card__stage--offer { background: rgba(45,184,77,0.12); color: var(--accent); }
+    .candidate-card__info { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .candidate-card__info-item { padding: 12px; background: var(--bg-tertiary); border: 1px solid var(--border-color); }
+    .candidate-card__info-item__label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
+    .candidate-card__info-item__value { font-size: 14px; color: var(--text-primary); font-weight: 600; }
+    .candidate-card__notes { padding: 12px; background: var(--bg-tertiary); border: 1px solid var(--border-color); font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+    .candidate-card__actions { display: flex; gap: 8px; }
+  </style>
+</head>
+<body>
+  <div class="component-demo">
+    <h1>📦 Компонент: Candidate Interview (Карточка кандидата)</h1>
+
+    <div class="demo-section">
+      <div class="demo-label">Карточка кандидата</div>
+      <div class="candidate-card">
+        <div class="candidate-card__header">
+          <div class="avatar avatar--lg avatar--bordered avatar--status-online avatar--ctx-contact">
+            <div class="avatar__inner"><span>АП</span></div>
+          </div>
+          <div>
+            <div class="candidate-card__header__name">Анна Петрова</div>
+            <div class="candidate-card__header__role">Frontend-разработчик</div>
+            <div class="candidate-card__stage candidate-card__stage--interview">Интервью</div>
+          </div>
+        </div>
+        <div class="candidate-card__info">
+          <div class="candidate-card__info-item">
+            <div class="candidate-card__info-item__label">Опыт</div>
+            <div class="candidate-card__info-item__value">3 года</div>
+          </div>
+          <div class="candidate-card__info-item">
+            <div class="candidate-card__info-item__label">Зарплата</div>
+            <div class="candidate-card__info-item__value">180 000 ₽</div>
+          </div>
+          <div class="candidate-card__info-item">
+            <div class="candidate-card__info-item__label">Технологии</div>
+            <div class="candidate-card__info-item__value">React, TypeScript</div>
+          </div>
+          <div class="candidate-card__info-item">
+            <div class="candidate-card__info-item__label">Дата интервью</div>
+            <div class="candidate-card__info-item__value">25.07.2026</div>
+          </div>
+        </div>
+        <div class="candidate-card__notes">
+          <strong style="color:var(--text-primary);">Заметки интервьюера:</strong><br>
+          Хороший опыт с React. Знает TypeScript. Понравился проект с микросервисами.
+        </div>
+        <div class="candidate-card__actions">
+          <button class="btn btn--primary btn--sm">Принять</button>
+          <button class="btn btn--secondary btn--sm">Отклонить</button>
+          <button class="btn btn--tertiary btn--sm">Перенести</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="../../assets/common.js"></script>
+</body>
+</html>

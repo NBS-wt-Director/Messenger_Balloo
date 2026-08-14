@@ -1,0 +1,53 @@
+{
+  "name": "@balloo/server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Balloo Messenger — Express + WebSocket server",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/index.ts",
+    "start": "node dist/index.js",
+    "test": "jest --forceExit --detectOpenHandles",
+    "test:watch": "jest --watch",
+    "lint": "echo \"No linter configured yet\""
+  },
+  "dependencies": {
+    "@balloo/shared": "workspace:*",
+    "@prisma/client": "^5.18.0",
+    "@types/ioredis": "^5.0.0",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.0",
+    "express": "^4.19.0",
+    "express-rate-limit": "^7.4.0",
+    "helmet": "^7.0.0",
+    "hpp": "^0.2.3",
+    "ioredis": "^5.11.1",
+    "jsonwebtoken": "^9.0.0",
+    "minio": "^8.0.0",
+    "multer": "^2.2.0",
+    "redis": "^6.1.0",
+    "sharp": "^0.33.0",
+    "ws": "^8.18.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/hpp": "^0.2.7",
+    "@types/jest": "^29.5.0",
+    "@types/jsonwebtoken": "^9.0.0",
+    "@types/multer": "^2.2.0",
+    "@types/node": "^20.14.0",
+    "@types/supertest": "^6.0.0",
+    "@types/ws": "^8.5.0",
+    "jest": "^29.7.0",
+    "prisma": "^5.18.0",
+    "supertest": "^7.0.0",
+    "ts-jest": "^29.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.0"
+  }
+}

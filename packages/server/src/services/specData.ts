@@ -1,0 +1,753 @@
+// SpecData — статичные данные спецификаций экранов (узел 10 — specifity.balloo.su)
+// Тикет №59 — Specifity: спецификация
+// Источник правды: mockups/index_ecrans.json + mockups/<node>/<screen>.md
+
+export interface SpecLinkedItem {
+  type: 'api' | 'data' | 'comp' | 'screen';
+  code: string;
+  label: string;
+}
+
+export interface SpecTechnology {
+  name: string;
+}
+
+export interface SpecScreen {
+  id: string;
+  nodeId: string;
+  nodeName: string;
+  nodeIcon: string;
+  title: string;
+  description: string;
+  mockupUrl: string;
+  status: string;
+  docMd: string | null;
+  linked: SpecLinkedItem[];
+  technologies: SpecTechnology[];
+}
+
+export interface SpecNode {
+  id: string;
+  name: string;
+  icon: string;
+  domain: string;
+  screenCount: number;
+  screens: { id: string; title: string; file: string }[];
+}
+
+// ============================================================
+// Узлы (12 узлов)
+// ============================================================
+export const SPEC_NODES: SpecNode[] = [
+  {
+    id: 'у_01',
+    name: 'balloo.su',
+    icon: '💬',
+    domain: 'Основной мессенджер',
+    screenCount: 7,
+    screens: [
+      { id: '1_01_02', title: 'Вход', file: 'balloo-su/login.html' },
+      { id: '1_01_03', title: 'Регистрация', file: 'balloo-su/register.html' },
+      { id: '1_01_04', title: 'Чаты', file: 'balloo-su/chats.html' },
+      { id: '1_01_08', title: 'Профиль', file: 'balloo-su/profile.html' },
+      { id: '1_01_15', title: 'Настройки', file: 'balloo-su/settings.html' },
+      { id: '1_01_20', title: 'Истории', file: 'balloo-su/stories.html' },
+      { id: '1_01_24', title: 'Донат', file: 'balloo-su/donate.html' },
+    ],
+  },
+  {
+    id: 'у_02',
+    name: 'admin.balloo.su',
+    icon: '🛡️',
+    domain: 'Админ-панель',
+    screenCount: 5,
+    screens: [
+      { id: '1_02_01', title: 'Вход админа', file: 'admin-balloo-su/login.html' },
+      { id: '1_02_02', title: 'Дашборд', file: 'admin-balloo-su/dashboard.html' },
+      { id: '1_02_03', title: 'Пользователи', file: 'admin-balloo-su/users.html' },
+      { id: '1_02_05', title: 'Баны', file: 'admin-balloo-su/bans.html' },
+      { id: '1_02_06', title: 'Жалобы', file: 'admin-balloo-su/reports.html' },
+    ],
+  },
+  {
+    id: 'у_03',
+    name: 'command.balloo.su',
+    icon: '🏢',
+    domain: 'Портал сотрудников',
+    screenCount: 5,
+    screens: [
+      { id: '1_03_01', title: 'Вход сотрудников', file: 'command-balloo-su/login.html' },
+      { id: '1_03_05', title: 'HR', file: 'command-balloo-su/hr.html' },
+      { id: '1_03_07', title: 'Вакансии', file: 'command-balloo-su/vacancies.html' },
+      { id: '1_03_08', title: 'Заявки', file: 'command-balloo-su/applications.html' },
+      { id: '1_03_10', title: 'База знаний', file: 'command-balloo-su/knowledge.html' },
+    ],
+  },
+  {
+    id: 'у_04',
+    name: 'features.balloo.su',
+    icon: '💡',
+    domain: 'Фич-реквесты',
+    screenCount: 3,
+    screens: [
+      { id: '1_04_01', title: 'Список фич-реквестов', file: 'features-balloo-su/list.html' },
+      { id: '1_04_02', title: 'Создание', file: 'features-balloo-su/create.html' },
+      { id: '1_04_03', title: 'Детальная страница', file: 'features-balloo-su/detail.html' },
+    ],
+  },
+  {
+    id: 'у_05',
+    name: 'history.balloo.su',
+    icon: '📜',
+    domain: 'История версий',
+    screenCount: 3,
+    screens: [
+      { id: '1_05_01', title: 'Лента версий', file: 'history-balloo-su/feed.html' },
+      { id: '1_05_02', title: 'Детали версии', file: 'history-balloo-su/detail.html' },
+      { id: '1_05_03', title: 'Сравнение', file: 'history-balloo-su/compare.html' },
+    ],
+  },
+  {
+    id: 'у_06',
+    name: 'download.balloo.su',
+    icon: '⬇️',
+    domain: 'Загрузки',
+    screenCount: 2,
+    screens: [
+      { id: '1_06_01', title: 'Главная загрузок', file: 'download-balloo-su/main.html' },
+      { id: '1_06_02', title: 'Прогресс загрузки', file: 'download-balloo-su/progress.html' },
+    ],
+  },
+  {
+    id: 'у_07',
+    name: 'docs.balloo.su',
+    icon: '📚',
+    domain: 'API документация',
+    screenCount: 1,
+    screens: [
+      { id: '1_07_01', title: 'API документация', file: 'docs-balloo-su/api-docs.html' },
+    ],
+  },
+  {
+    id: 'у_08',
+    name: 'mobile',
+    icon: '📱',
+    domain: 'Сборные мобильные макеты',
+    screenCount: 4,
+    screens: [
+      { id: '1_08_01', title: 'Список чатов (моб)', file: 'mobile/chat-list.html' },
+      { id: '1_08_02', title: 'Чат (моб)', file: 'mobile/chat.html' },
+      { id: '1_08_03', title: 'Профиль (моб)', file: 'mobile/profile.html' },
+      { id: '1_08_04', title: 'Настройки (моб)', file: 'mobile/settings.html' },
+    ],
+  },
+  {
+    id: 'у_09',
+    name: 'desktop',
+    icon: '🖥️',
+    domain: 'Обёртки окна ПК',
+    screenCount: 3,
+    screens: [
+      { id: '1_09_01', title: 'Обёртка окна', file: 'desktop/overview.html' },
+      { id: '1_09_02', title: 'Системный трей', file: 'desktop/tray.html' },
+      { id: '1_09_03', title: 'Окно настроек', file: 'desktop/settings.html' },
+    ],
+  },
+  {
+    id: 'у_10',
+    name: 'specifity.balloo.su',
+    icon: '📐',
+    domain: 'Спецификация',
+    screenCount: 1,
+    screens: [
+      { id: '1_10_01', title: 'Спецификация (split-view)', file: 'specifity-balloo-su/specification.html' },
+    ],
+  },
+  {
+    id: 'у_11',
+    name: 'blog.balloo.su',
+    icon: '✍️',
+    domain: 'Корпоративный блог',
+    screenCount: 4,
+    screens: [
+      { id: '1_11_01', title: 'Лента блога', file: 'blog-balloo-su/feed.html' },
+      { id: '1_11_02', title: 'Пост', file: 'blog-balloo-su/post.html' },
+      { id: '1_11_03', title: 'Категории', file: 'blog-balloo-su/categories.html' },
+      { id: '1_11_04', title: 'Канал', file: 'blog-balloo-su/channel.html' },
+    ],
+  },
+  {
+    id: 'у_00',
+    name: 'shared',
+    icon: '🔗',
+    domain: 'Общие экраны',
+    screenCount: 4,
+    screens: [
+      { id: '1_00_01', title: 'Ошибка 404', file: 'shared/error-404.html' },
+      { id: '1_00_05', title: 'Офлайн (авторизованный)', file: 'shared/offline-authed.html' },
+      { id: '1_00_07', title: 'Ошибка 555 (бан)', file: 'shared/error-555.html' },
+      { id: '1_00_08', title: 'Обжалование бана', file: 'shared/ban-appeal.html' },
+    ],
+  },
+];
+
+// ============================================================
+// Спецификации экранов (детальные)
+// ============================================================
+export const SPEC_SCREENS: Record<string, SpecScreen> = {
+  '1_01_04': {
+    id: '1_01_04',
+    nodeId: 'у_01',
+    nodeName: 'balloo.su',
+    nodeIcon: '💬',
+    title: 'Чаты',
+    description:
+      'Список чатов + окно переписки. Пузыри без скруглений, восьмигранные аватарки, реакции, вложения, typing, галочки доставки/прочтения. WebSocket в реальном времени. Главный экран мессенджера.',
+    mockupUrl: 'balloo-su/chats.html',
+    status: 'спроектирован',
+    docMd: 'balloo-su/chats.md',
+    linked: [
+      { type: 'api', code: 'GET /chats', label: 'Список чатов (пагинация)' },
+      { type: 'api', code: 'POST /chats/:id/messages', label: 'Отправить сообщение' },
+      { type: 'api', code: 'WS message:new', label: 'Новое сообщение (WebSocket)' },
+      { type: 'data', code: 'chats', label: 'Таблица чатов' },
+      { type: 'data', code: 'messages', label: 'Таблица сообщений' },
+      { type: 'data', code: 'reactions', label: 'Реакции на сообщения' },
+      { type: 'comp', code: 'ChatList', label: 'Список чатов' },
+      { type: 'comp', code: 'ChatWindow', label: 'Окно переписки' },
+      { type: 'comp', code: 'MessageBubble', label: 'Пузырь сообщения' },
+      { type: 'screen', code: '1_01_04', label: 'Макет: balloo-su/chats.html' },
+    ],
+    technologies: [
+      { name: 'React 18 + TypeScript' },
+      { name: 'WebSocket (real-time)' },
+      { name: 'Infinite scroll (пагинация по 50)' },
+      { name: 'Optimistic UI updates' },
+    ],
+  },
+  '1_01_02': {
+    id: '1_01_02',
+    nodeId: 'у_01',
+    nodeName: 'balloo.su',
+    nodeIcon: '💬',
+    title: 'Вход',
+    description:
+      'Email + OAuth (Яндекс, VK, Mail.ru), ссылка на регистрацию. JWT + refresh token. Запомнить устройство.',
+    mockupUrl: 'balloo-su/login.html',
+    status: 'спроектирован',
+    docMd: 'balloo-su/login.md',
+    linked: [
+      { type: 'api', code: 'POST /auth/login', label: 'Логин по email+password' },
+      { type: 'api', code: 'POST /auth/oauth/:provider', label: 'OAuth вход' },
+      { type: 'api', code: 'POST /auth/refresh', label: 'Обновление токена' },
+      { type: 'data', code: 'users', label: 'Таблица пользователей' },
+      { type: 'data', code: 'devices', label: 'Устройства' },
+      { type: 'comp', code: 'OAuthButton', label: 'Кнопка OAuth' },
+      { type: 'comp', code: 'PasswordInput', label: 'Поле пароля' },
+      { type: 'screen', code: '1_01_02', label: 'Макет: balloo-su/login.html' },
+    ],
+    technologies: [
+      { name: 'React 18 + TypeScript' },
+      { name: 'JWT (access 15m + refresh 30d)' },
+      { name: 'OAuth 2.0 (Yandex/VK/Mail.ru)' },
+      { name: 'Zod validation' },
+    ],
+  },
+  '1_01_03': {
+    id: '1_01_03',
+    nodeId: 'у_01',
+    nodeName: 'balloo.su',
+    nodeIcon: '💬',
+    title: 'Регистрация',
+    description:
+      'Email + username + password + confirm. OAuth регистрация. Согласие с правилами. Ссылка на вход.',
+    mockupUrl: 'balloo-su/register.html',
+    status: 'спроектирован',
+    docMd: 'balloo-su/register.md',
+    linked: [
+      { type: 'api', code: 'POST /auth/register', label: 'Регистрация нового пользователя' },
+      { type: 'api', code: 'POST /auth/verify-email', label: 'Подтверждение email' },
+      { type: 'data', code: 'users', label: 'Таблица пользователей' },
+      { type: 'comp', code: 'PasswordInput', label: 'Поле пароля' },
+      { type: 'comp', code: 'LegalCheckbox', label: 'Согласие с правилами' },
+      { type: 'screen', code: '1_01_03', label: 'Макет: balloo-su/register.html' },
+    ],
+    technologies: [
+      { name: 'React 18 + TypeScript' },
+      { name: 'Zod validation' },
+      { name: 'Email verification flow' },
+    ],
+  },
+  '1_01_08': {
+    id: '1_01_08',
+    nodeId: 'у_01',
+    nodeName: 'balloo.su',
+    nodeIcon: '💬',
+    title: 'Профиль',
+    description:
+      'Редактирование профиля (avatar, bio, website, socialLinks). Настройки приватности. Активные сессии (устройства).',
+    mockupUrl: 'balloo-su/profile.html',
+    status: 'спроектирован',
+    docMd: 'balloo-su/profile.md',
+    linked: [
+      { type: 'api', code: 'GET /users/me', label: 'Текущий пользователь' },
+      { type: 'api', code: 'PUT /users/me', label: 'Обновление профиля' },
+      { type: 'api', code: 'POST /upload/avatar', label: 'Загрузка аватара' },
+      { type: 'data', code: 'users', label: 'Таблица пользователей' },
+      { type: 'data', code: 'profiles', label: 'Профили' },
+      { type: 'comp', code: 'AvatarUploader', label: 'Загрузка аватара' },
+      { type: 'comp', code: 'SocialLinksEditor', label: 'Редактор соц. ссылок' },
+      { type: 'screen', code: '1_01_08', label: 'Макет: balloo-su/profile.html' },
+    ],
+    technologies: [
+      { name: 'React 18 + TypeScript' },
+      { name: 'MinIO / Yandex Object Storage (avatars)' },
+      { name: 'Sharp (thumbnail generation)' },
+    ],
+  },
+  '1_01_15': {
+    id: '1_01_15',
+    nodeId: 'у_01',
+    nodeName: 'balloo.su',
+    nodeIcon: '💬',
+    title: 'Настройки',
+    description:
+      'Экран настроек: аккаунт, безопасность, уведомления, appearance, язык, приватность, устройства. 13 разделов.',
+    mockupUrl: 'balloo-su/settings.html',
+    status: 'спроектирован',
+    docMd: 'balloo-su/settings.md',
+    linked: [
+      { type: 'api', code: 'GET /users/me', label: 'Данные пользователя' },
+      { type: 'api', code: 'PUT /users/me', label: 'Обновление настроек' },
+      { type: 'api', code: 'POST /auth/2fa/enable', label: 'Включение 2FA' },
+      { type: 'data', code: 'users', label: 'Таблица пользователей' },
+      { type: 'data', code: 'devices', label: 'Устройства' },
+      { type: 'comp', code: 'ThemeSwitcher', label: 'Переключатель тем' },
+      { type: 'comp', code: 'LanguageSwitcher', label: 'Переключатель языков' },
+      { type: 'screen', code: '1_01_15', label: 'Макет: balloo-su/settings.html' },
+    ],
+    technologies: [
+      { name: 'React 18 + TypeScript' },
+      { name: 'Zustand (UI store)' },
+      { name: 'TOTP (2FA)' },
+      { name: '3 темы: dark / light / russian' },
+    ],
+  },
+  '1_01_20': {
+    id: '1_01_20',
+    nodeId: 'у_01',
+    nodeName: 'balloo.su',
+    nodeIcon: '💬',
+    title: 'Истории',
+    description:
+      'Круг историй сверху, лента, fullscreen viewer (swipe), создание (фото/видео/текст), реакции на истории.',
+    mockupUrl: 'balloo-su/stories.html',
+    status: 'спроектирован',
+    docMd: 'balloo-su/stories.md',
+    linked: [
+      { type: 'api', code: 'POST /stories', label: 'Создание истории' },
+      { type: 'api', code: 'GET /stories', label: 'Лента историй' },
+      { type: 'api', code: 'POST /stories/:id/reactions', label: 'Реакция на историю' },
+      { type: 'data', code: 'stories', label: 'Таблица историй' },
+      { type: 'data', code: 'story_views', label: 'Просмотры историй' },
+      { type: 'comp', code: 'StoryViewer', label: 'Fullscreen viewer' },
+      { type: 'comp', code: 'StoryCircle', label: 'Круг истории' },
+      { type: 'screen', code: '1_01_20', label: 'Макет: balloo-su/stories.html' },
+    ],
+    technologies: [
+      { name: 'React 18 + TypeScript' },
+      { name: 'Swipe gestures (touch + click)' },
+      { name: 'Auto-expire (cron job)' },
+      { name: 'MinIO (media storage)' },
+    ],
+  },
+  '1_01_24': {
+    id: '1_01_24',
+    nodeId: 'у_01',
+    nodeName: 'balloo.su',
+    nodeIcon: '💬',
+    title: 'Донат',
+    description:
+      'Поддержка проекта: уровни (кофе/спонсор/VIP), прогресс цели, способы оплаты, топ доноров. Интеграция ЮMoney.',
+    mockupUrl: 'balloo-su/donate.html',
+    status: 'спроектирован',
+    docMd: 'balloo-su/donate.md',
+    linked: [
+      { type: 'api', code: 'POST /payments/donate', label: 'Создание платежа' },
+      { type: 'api', code: 'GET /payments/tiers', label: 'Уровни донатов' },
+      { type: 'api', code: 'POST /payments/webhook/yookassa', label: 'Webhook ЮKassa' },
+      { type: 'data', code: 'donations', label: 'Таблица донатов' },
+      { type: 'data', code: 'donation_tiers', label: 'Уровни донатов' },
+      { type: 'comp', code: 'DonateTierCard', label: 'Карточка уровня' },
+      { type: 'comp', code: 'TopDonors', label: 'Топ доноров' },
+      { type: 'screen', code: '1_01_24', label: 'Макет: balloo-su/donate.html' },
+    ],
+    technologies: [
+      { name: 'React 18 + TypeScript' },
+      { name: 'ЮMoney (checkout form)' },
+      { name: 'Webhook signature verification' },
+    ],
+  },
+  '1_02_02': {
+    id: '1_02_02',
+    nodeId: 'у_02',
+    nodeName: 'admin.balloo.su',
+    nodeIcon: '🛡️',
+    title: 'Дашборд',
+    description:
+      'Общая статистика, графики, активные алерты. Только для администраторов (2FA). KPI cards, charts, activity feed.',
+    mockupUrl: 'admin-balloo-su/dashboard.html',
+    status: 'спроектирован',
+    docMd: 'admin-balloo-su/dashboard.md',
+    linked: [
+      { type: 'api', code: 'GET /admin/metrics', label: 'Метрики сервиса' },
+      { type: 'api', code: 'GET /admin/audit-logs', label: 'Логи действий' },
+      { type: 'data', code: 'audit_logs', label: 'Логи аудита' },
+      { type: 'data', code: 'service_metrics', label: 'Метрики' },
+      { type: 'comp', code: 'StatCard', label: 'Карточка метрики' },
+      { type: 'comp', code: 'AdminChart', label: 'График' },
+      { type: 'comp', code: 'ActivityFeed', label: 'Лента активности' },
+      { type: 'screen', code: '1_02_02', label: 'Макет: admin-balloo-su/dashboard.html' },
+    ],
+    technologies: [
+      { name: 'React 18 + TypeScript' },
+      { name: 'Recharts (графики)' },
+      { name: 'Admin middleware (role check)' },
+    ],
+  },
+  '1_02_03': {
+    id: '1_02_03',
+    nodeId: 'у_02',
+    nodeName: 'admin.balloo.su',
+    nodeIcon: '🛡️',
+    title: 'Пользователи',
+    description:
+      'Таблица пользователей (avatar, email, username, status). Фильтры, search, pagination. Bulk actions: ban, suspend, delete.',
+    mockupUrl: 'admin-balloo-su/users.html',
+    status: 'спроектирован',
+    docMd: 'admin-balloo-su/users.md',
+    linked: [
+      { type: 'api', code: 'GET /admin/users', label: 'Список пользователей' },
+      { type: 'api', code: 'POST /admin/users/:id/ban', label: 'Бан пользователя' },
+      { type: 'data', code: 'users', label: 'Таблица пользователей' },
+      { type: 'data', code: 'user_bans', label: 'Баны' },
+      { type: 'comp', code: 'UsersTable', label: 'Таблица' },
+      { type: 'comp', code: 'UserFilters', label: 'Фильтры' },
+      { type: 'screen', code: '1_02_03', label: 'Макет: admin-balloo-su/users.html' },
+    ],
+    technologies: [
+      { name: 'React 18 + TypeScript' },
+      { name: 'Pagination + filters' },
+      { name: 'Bulk actions' },
+    ],
+  },
+  '1_02_05': {
+    id: '1_02_05',
+    nodeId: 'у_02',
+    nodeName: 'admin.balloo.su',
+    nodeIcon: '🛡️',
+    title: 'Баны',
+    description: 'Список банов (global + chat-specific). Фильтры: type, status, date. Разбан / продлить бан.',
+    mockupUrl: 'admin-balloo-su/bans.html',
+    status: 'спроектирован',
+    docMd: 'admin-balloo-su/bans.md',
+    linked: [
+      { type: 'api', code: 'GET /admin/bans', label: 'Список банов' },
+      { type: 'api', code: 'POST /admin/users/:id/unban', label: 'Снятие бана' },
+      { type: 'data', code: 'user_bans', label: 'Баны пользователей' },
+      { type: 'data', code: 'chat_bans', label: 'Баны в чатах' },
+      { type: 'comp', code: 'BansTable', label: 'Таблица банов' },
+      { type: 'screen', code: '1_02_05', label: 'Макет: admin-balloo-su/bans.html' },
+    ],
+    technologies: [{ name: 'React 18 + TypeScript' }, { name: 'Filters + search' }],
+  },
+  '1_02_06': {
+    id: '1_02_06',
+    nodeId: 'у_02',
+    nodeName: 'admin.balloo.su',
+    nodeIcon: '🛡️',
+    title: 'Жалобы',
+    description: 'Список жалоб. Детали (target, reason, content). Resolve: approve/reject + comment.',
+    mockupUrl: 'admin-balloo-su/reports.html',
+    status: 'спроектирован',
+    docMd: 'admin-balloo-su/reports.md',
+    linked: [
+      { type: 'api', code: 'GET /admin/reports', label: 'Список жалоб' },
+      { type: 'api', code: 'POST /admin/reports/:id/resolve', label: 'Решение по жалобе' },
+      { type: 'data', code: 'reports', label: 'Таблица жалоб' },
+      { type: 'comp', code: 'ReportCard', label: 'Карточка жалобы' },
+      { type: 'screen', code: '1_02_06', label: 'Макет: admin-balloo-su/reports.html' },
+    ],
+    technologies: [{ name: 'React 18 + TypeScript' }, { name: 'Moderation workflow' }],
+  },
+  '1_03_05': {
+    id: '1_03_05',
+    nodeId: 'у_03',
+    nodeName: 'command.balloo.su',
+    nodeIcon: '🏢',
+    title: 'HR',
+    description:
+      'KPI cards: сотрудников, вакансий, кандидатов, онбординг. 3 таба: Заявки / Онбординг / Команда. Модалка рассылки.',
+    mockupUrl: 'command-balloo-su/hr.html',
+    status: 'спроектирован',
+    docMd: 'command-balloo-su/hr.md',
+    linked: [
+      { type: 'api', code: 'GET /hiring/applications', label: 'Заявки' },
+      { type: 'api', code: 'GET /hiring/vacancies', label: 'Вакансии' },
+      { type: 'data', code: 'departments', label: 'Отделы' },
+      { type: 'data', code: 'applications', label: 'Заявки' },
+      { type: 'comp', code: 'KPICard', label: 'KPI карточка' },
+      { type: 'comp', code: 'OnboardingProgress', label: 'Прогресс онбординга' },
+      { type: 'screen', code: '1_03_05', label: 'Макет: command-balloo-su/hr.html' },
+    ],
+    technologies: [{ name: 'React 18 + TypeScript' }, { name: 'Tabs + modals' }],
+  },
+  '1_03_07': {
+    id: '1_03_07',
+    nodeId: 'у_03',
+    nodeName: 'command.balloo.su',
+    nodeIcon: '🏢',
+    title: 'Вакансии',
+    description:
+      'Список вакансий для не-сотрудников. Фильтр по отделам, зарплатная вилка. Карточки вакансий.',
+    mockupUrl: 'command-balloo-su/vacancies.html',
+    status: 'спроектирован',
+    docMd: 'command-balloo-su/vacancies.md',
+    linked: [
+      { type: 'api', code: 'GET /hiring/vacancies', label: 'Список вакансий' },
+      { type: 'data', code: 'vacancies', label: 'Таблица вакансий' },
+      { type: 'data', code: 'departments', label: 'Отделы' },
+      { type: 'comp', code: 'VacancyCard', label: 'Карточка вакансии' },
+      { type: 'screen', code: '1_03_07', label: 'Макет: command-balloo-su/vacancies.html' },
+    ],
+    technologies: [{ name: 'React 18 + TypeScript' }, { name: 'Filters by department' }],
+  },
+  '1_03_08': {
+    id: '1_03_08',
+    nodeId: 'у_03',
+    nodeName: 'command.balloo.su',
+    nodeIcon: '🏢',
+    title: 'Заявки',
+    description: 'Pipeline stats: новые, скрининг, собеседование, оффер, принятые, отклонённые. Таблица заявок.',
+    mockupUrl: 'command-balloo-su/applications.html',
+    status: 'спроектирован',
+    docMd: 'command-balloo-su/applications.md',
+    linked: [
+      { type: 'api', code: 'GET /hiring/applications', label: 'Список заявок' },
+      { type: 'data', code: 'applications', label: 'Заявки' },
+      { type: 'comp', code: 'PipelineStats', label: 'Статистика пайплайна' },
+      { type: 'screen', code: '1_03_08', label: 'Макет: command-balloo-su/applications.html' },
+    ],
+    technologies: [{ name: 'React 18 + TypeScript' }, { name: 'Pipeline view' }],
+  },
+  '1_03_10': {
+    id: '1_03_10',
+    nodeId: 'у_03',
+    nodeName: 'command.balloo.su',
+    nodeIcon: '🏢',
+    title: 'База знаний',
+    description: 'Категории, страницы базы знаний для сотрудников. Rich text, поиск, фильтры по тегам.',
+    mockupUrl: 'command-balloo-su/knowledge.html',
+    status: 'спроектирован',
+    docMd: 'command-balloo-su/knowledge.md',
+    linked: [
+      { type: 'api', code: 'GET /knowledge/pages', label: 'Страницы базы знаний' },
+      { type: 'data', code: 'knowledge_pages', label: 'Страницы знаний' },
+      { type: 'data', code: 'knowledge_categories', label: 'Категории' },
+      { type: 'comp', code: 'KnowledgeCard', label: 'Карточка статьи' },
+      { type: 'screen', code: '1_03_10', label: 'Макет: command-balloo-su/knowledge.html' },
+    ],
+    technologies: [{ name: 'React 18 + TypeScript' }, { name: 'Markdown rendering' }],
+  },
+  '1_04_01': {
+    id: '1_04_01',
+    nodeId: 'у_04',
+    nodeName: 'features.balloo.su',
+    nodeIcon: '💡',
+    title: 'Список фич-реквестов',
+    description:
+      'Список фич-реквестов с фильтрацией по статусу/категории, сортировка по голосам/дате, поиск.',
+    mockupUrl: 'features-balloo-su/list.html',
+    status: 'спроектирован',
+    docMd: 'features-balloo-su/list.md',
+    linked: [
+      { type: 'api', code: 'GET /features', label: 'Список фич-реквестов' },
+      { type: 'api', code: 'POST /features/:id/vote', label: 'Голосование' },
+      { type: 'data', code: 'feature_requests', label: 'Фич-реквесты' },
+      { type: 'comp', code: 'FeatureVoteButton', label: 'Кнопка голосования' },
+      { type: 'screen', code: '1_04_01', label: 'Макет: features-balloo-su/list.html' },
+    ],
+    technologies: [{ name: 'React 18 + TypeScript' }, { name: 'Filters + sort' }],
+  },
+  '1_05_01': {
+    id: '1_05_01',
+    nodeId: 'у_05',
+    nodeName: 'history.balloo.su',
+    nodeIcon: '📜',
+    title: 'Лента версий',
+    description: 'Timeline истории версий. Каждая версия: номер, дата, заголовок, краткое описание.',
+    mockupUrl: 'history-balloo-su/feed.html',
+    status: 'спроектирован',
+    docMd: 'history-balloo-su/feed.md',
+    linked: [
+      { type: 'api', code: 'GET /history/versions', label: 'Список версий' },
+      { type: 'data', code: 'service_versions', label: 'Версии сервиса' },
+      { type: 'comp', code: 'HistoryTimeline', label: 'Timeline компонент' },
+      { type: 'screen', code: '1_05_01', label: 'Макет: history-balloo-su/feed.html' },
+    ],
+    technologies: [{ name: 'React 18 + TypeScript' }, { name: 'Timeline UI' }],
+  },
+  '1_06_01': {
+    id: '1_06_01',
+    nodeId: 'у_06',
+    nodeName: 'download.balloo.su',
+    nodeIcon: '⬇️',
+    title: 'Главная загрузок',
+    description:
+      'Hero секция, автоопределение платформы. Карточки: Windows, macOS, Linux, Android, iOS. Множественные форматы пакетов.',
+    mockupUrl: 'download-balloo-su/main.html',
+    status: 'спроектирован',
+    docMd: 'download-balloo-su/main.md',
+    linked: [
+      { type: 'api', code: 'GET /downloads', label: 'Список файлов' },
+      { type: 'api', code: 'GET /downloads/desktop', label: 'Desktop пакеты' },
+      { type: 'data', code: 'download_files', label: 'Файлы загрузок' },
+      { type: 'comp', code: 'PlatformCard', label: 'Карточка платформы' },
+      { type: 'comp', code: 'PackageOption', label: 'Вариант пакета' },
+      { type: 'screen', code: '1_06_01', label: 'Макет: download-balloo-su/main.html' },
+    ],
+    technologies: [
+      { name: 'React 18 + TypeScript' },
+      { name: 'OS auto-detection' },
+      { name: 'QR code generation' },
+    ],
+  },
+  '1_07_01': {
+    id: '1_07_01',
+    nodeId: 'у_07',
+    nodeName: 'docs.balloo.su',
+    nodeIcon: '📚',
+    title: 'API документация',
+    description:
+      'Sidebar слева: список эндпоинтов по модулям. Основная область: метод, путь, параметры, примеры, ответы.',
+    mockupUrl: 'docs-balloo-su/api-docs.html',
+    status: 'спроектирован',
+    docMd: 'docs-balloo-su/api-docs.md',
+    linked: [
+      { type: 'api', code: 'GET /docs/endpoints', label: 'Список эндпоинтов' },
+      { type: 'api', code: 'GET /docs/spec', label: 'OpenAPI спецификация' },
+      { type: 'comp', code: 'EndpointCard', label: 'Карточка эндпоинта' },
+      { type: 'comp', code: 'MethodBadge', label: 'Badge HTTP метода' },
+      { type: 'comp', code: 'CodeBlock', label: 'Блок кода' },
+      { type: 'screen', code: '1_07_01', label: 'Макет: docs-balloo-su/api-docs.html' },
+    ],
+    technologies: [{ name: 'React 18 + TypeScript' }, { name: 'Syntax highlighting' }],
+  },
+  '1_08_02': {
+    id: '1_08_02',
+    nodeId: 'у_08',
+    nodeName: 'mobile',
+    nodeIcon: '📱',
+    title: 'Мобильный чат',
+    description: 'Чат в мобильном интерфейсе: swipe, long-press, вложения. Bottom sheet для действий.',
+    mockupUrl: 'mobile/chat.html',
+    status: 'спроектирован',
+    docMd: 'mobile/chat.md',
+    linked: [
+      { type: 'api', code: 'WS message:new', label: 'WebSocket сообщения' },
+      { type: 'comp', code: 'MessageBubble', label: 'Пузырь сообщения (моб)' },
+      { type: 'comp', code: 'ChatInput', label: 'Мобильный ввод' },
+      { type: 'comp', code: 'BottomSheet', label: 'Bottom sheet' },
+      { type: 'screen', code: '1_08_02', label: 'Макет: mobile/chat.html' },
+    ],
+    technologies: [
+      { name: 'React Native + Expo' },
+      { name: 'Swipe gestures' },
+      { name: 'WebSocket real-time' },
+    ],
+  },
+  '1_09_01': {
+    id: '1_09_01',
+    nodeId: 'у_09',
+    nodeName: 'desktop',
+    nodeIcon: '🖥️',
+    title: 'Обёртка окна',
+    description:
+      'ПК-версия в оконной рамке: titlebar, tray, системные кнопки, мессенджер внутри. Electron.',
+    mockupUrl: 'desktop/overview.html',
+    status: 'спроектирован',
+    docMd: 'desktop/overview.md',
+    linked: [
+      { type: 'comp', code: 'TitleBar', label: 'Titlebar с drag region' },
+      { type: 'comp', code: 'SystemTray', label: 'Системный трей' },
+      { type: 'comp', code: 'WindowControls', label: 'Кнопки окна' },
+      { type: 'screen', code: '1_09_01', label: 'Макет: desktop/overview.html' },
+    ],
+    technologies: [
+      { name: 'Electron' },
+      { name: 'Native notifications' },
+      { name: 'Auto-updater' },
+    ],
+  },
+  '1_10_01': {
+    id: '1_10_01',
+    nodeId: 'у_10',
+    nodeName: 'specifity.balloo.su',
+    nodeIcon: '📐',
+    title: 'Спецификация (split-view)',
+    description:
+      'Split layout: слева описание спецификации экрана, справа iframe с макетом. Селектор узла/экрана. Resizable.',
+    mockupUrl: 'specifity-balloo-su/specification.html',
+    status: 'спроектирован',
+    docMd: 'specifity-balloo-su/specification.md',
+    linked: [
+      { type: 'api', code: 'GET /specs', label: 'Список спецификаций' },
+      { type: 'api', code: 'GET /specs/:nodeId/:screenId', label: 'Спецификация экрана' },
+      { type: 'comp', code: 'NodeSelector', label: 'Селектор узла' },
+      { type: 'comp', code: 'ScreenSelector', label: 'Селектор экрана' },
+      { type: 'comp', code: 'ResizableSplit', label: 'Resizable split layout' },
+      { type: 'screen', code: '1_10_01', label: 'Макет: specifity-balloo-su/specification.html' },
+    ],
+    technologies: [
+      { name: 'React 18 + TypeScript' },
+      { name: 'Resizable split (drag)' },
+      { name: 'iframe preview' },
+    ],
+  },
+  '1_11_01': {
+    id: '1_11_01',
+    nodeId: 'у_11',
+    nodeName: 'blog.balloo.su',
+    nodeIcon: '✍️',
+    title: 'Лента блога',
+    description: 'Hero секция, featured posts, категории, последние посты, подписка на рассылку.',
+    mockupUrl: 'blog-balloo-su/feed.html',
+    status: 'спроектирован',
+    docMd: 'blog-balloo-su/feed.md',
+    linked: [
+      { type: 'api', code: 'GET /blog-landing/featured', label: 'Избранные посты' },
+      { type: 'api', code: 'GET /blog-landing/posts', label: 'Список постов' },
+      { type: 'data', code: 'blog_posts', label: 'Посты блога' },
+      { type: 'comp', code: 'BlogHero', label: 'Hero секция' },
+      { type: 'comp', code: 'BlogCard', label: 'Карточка поста' },
+      { type: 'screen', code: '1_11_01', label: 'Макет: blog-balloo-su/feed.html' },
+    ],
+    technologies: [{ name: 'React 18 + TypeScript' }, { name: 'Markdown rendering' }],
+  },
+  '1_00_01': {
+    id: '1_00_01',
+    nodeId: 'у_00',
+    nodeName: 'shared',
+    nodeIcon: '🔗',
+    title: 'Ошибка 404',
+    description: 'Страница 404 (не найдено). Общий экран для всех узлов. Параметризация брендингом.',
+    mockupUrl: 'shared/error-404.html',
+    status: 'спроектирован',
+    docMd: 'shared/error-404.md',
+    linked: [
+      { type: 'comp', code: 'ErrorPage', label: 'Общий компонент ошибки' },
+      { type: 'screen', code: '1_00_01', label: 'Макет: shared/error-404.html' },
+    ],
+    technologies: [{ name: 'React 18 + TypeScript' }, { name: 'Shared component' }],
+  },
+};

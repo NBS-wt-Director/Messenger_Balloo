@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo — 2FA</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body class="app-flex">
+
+<!-- Top Bar -->
+<div class="topbar">
+  <div class="topbar__logo">
+    <div class="topbar__logo-icon">B</div>
+    <span>Balloo</span>
+  </div>
+  <div class="topbar__title" onclick="window.location.href='settings.html'">Двухфакторная аутентификация</div>
+  <div class="topbar__right">
+    <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact" onclick="window.location.href='profile.html'">
+      <div class="avatar__inner"><span>ИИ</span></div>
+    </div>
+    <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+  </div>
+</div>
+
+<div class="main">
+  <!-- Sidebar (settings nav) -->
+  <div class="sidebar sidebar--narrow">
+    <div class="list">
+      <div class="list__item" onclick="window.location.href='settings.html'"><div class="list__item-body"><div class="list__item-title text-sm">⚙ Настройки</div></div></div>
+      <div class="list__item" onclick="window.location.href='profile.html'"><div class="list__item-body"><div class="list__item-title text-sm">👤 Профиль</div></div></div>
+      <div class="list__item list__item--active"><div class="list__item-body"><div class="list__item-title text-sm">🔐 2FA</div></div></div>
+      <div class="list__item" onclick="window.location.href='my-donates.html'"><div class="list__item-body"><div class="list__item-title text-sm">💰 Мои донаты</div></div></div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+    <div class="page-container page-container--narrow">
+      <div class="page-title">🔐 Двухфакторная аутентификация</div>
+      <div class="page-subtitle">Защитите аккаунт с помощью TOTP-кода из приложения-аутентификатора.</div>
+
+      <!-- Status card -->
+      <div class="card mb-6" style="display:flex;align-items:center;gap:16px;">
+        <div style="width:48px;height:48px;clip-path:var(--octagon-clip);background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:24px;">🔐</div>
+        <div style="flex:1;">
+          <div class="font-bold" style="color:var(--text-primary);">2FA включена</div>
+          <div class="text-sm text-secondary">Коды обновляются каждые 30 секунд</div>
+        </div>
+        <span class="chip chip--accent">Активна</span>
+      </div>
+
+      <!-- Step 1: QR -->
+      <div class="section-title">Шаг 1. Отсканируйте QR-код</div>
+      <div class="card mb-6" style="text-align:center;">
+        <div style="width:200px;height:200px;margin:0 auto 16px;background:#fff;display:flex;align-items:center;justify-content:center;">
+          <!-- Placeholder QR -->
+          <div style="display:grid;grid-template-columns:repeat(21,1fr);width:180px;height:180px;gap:0;">
+            <div style="background:#000;grid-column:span 21;grid-row:span 7;"></div>
+            <div style="background:#000;grid-column:span 7;grid-row:span 14;"></div>
+            <div style="background:#000;grid-column:span 21;grid-row:span 7;"></div>
+          </div>
+        </div>
+        <div class="text-sm text-secondary mb-2">Или введите секрет вручную:</div>
+        <code style="display:block;padding:10px;background:var(--bg-tertiary);color:var(--accent);font-size:13px;letter-spacing:1px;">JBSWY3DPEHPK3PXP</code>
+      </div>
+
+      <!-- Step 2: verify -->
+      <div class="section-title">Шаг 2. Введите код из приложения</div>
+      <div class="card mb-6">
+        <div class="form-group">
+          <label class="form-label">6-значный код</label>
+          <input type="text" class="form-input" placeholder="000 000" maxlength="7" style="text-align:center;font-size:22px;letter-spacing:6px;">
+        </div>
+        <button class="btn btn--primary btn--block">Подтвердить</button>
+      </div>
+
+      <!-- Step 3: backup codes -->
+      <div class="section-title">Шаг 3. Backup-коды</div>
+      <div class="card mb-6">
+        <div class="text-sm text-secondary mb-4">Сохраните эти коды в надёжном месте. Каждый можно использовать один раз.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-family:monospace;">
+          <code style="padding:8px;background:var(--bg-tertiary);color:var(--text-primary);">8XK2-9PQ1</code>
+          <code style="padding:8px;background:var(--bg-tertiary);color:var(--text-primary);">M4RT-7VW2</code>
+          <code style="padding:8px;background:var(--bg-tertiary);color:var(--text-primary);">B3LD-5NZ8</code>
+          <code style="padding:8px;background:var(--bg-tertiary);color:var(--text-primary);">Q1YH-6KX9</code>
+          <code style="padding:8px;background:var(--bg-tertiary);color:var(--text-primary);">T2WP-8CJ4</code>
+          <code style="padding:8px;background:var(--bg-tertiary);color:var(--text-primary);">F7DM-3RLS</code>
+        </div>
+        <div class="text-xs text-muted mt-4">Осталось: 6 из 10 кодов</div>
+        <button class="btn btn--secondary btn--sm mt-4">🔄 Перегенерировать коды</button>
+      </div>
+
+      <!-- Disable -->
+      <div class="section-title" style="color:var(--danger);">Отключение</div>
+      <div class="card" style="border-color:var(--danger);">
+        <div class="text-sm text-secondary mb-4">Отключение 2FA снизит безопасность аккаунта.</div>
+        <div class="form-group">
+          <label class="form-label">Введите пароль или 2FA-код для подтверждения</label>
+          <input type="password" class="form-input" placeholder="••••••••">
+        </div>
+        <button class="btn btn--danger">Отключить 2FA</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+</body>
+</html>

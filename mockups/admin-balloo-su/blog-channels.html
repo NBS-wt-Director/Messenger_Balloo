@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Каналы блога</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--warning);">A</div><span>Admin</span>
+    <div class="topbar__dropdown"></div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Блог — Каналы</div>
+  <div class="topbar__actions"><div class="topbar__actions-btn" onclick="openModal('modal-new-channel')" title="Создать канал">✏</div></div>
+  <div class="topbar__right"></div>
+</div>
+<div class="main">
+  <div class="sidebar sidebar--narrow">
+    <div class="list">
+      <div class="list__item">📊 Дашборд</div>
+      <div class="list__item">👤 Пользователи</div>
+      <div class="list__item">🚩 Жалобы <span class="badge" style="margin-left:auto;">12</span></div>
+      <div class="list__item">🔨 Баны</div>
+      <div class="list__item">📈 Метрики</div>
+      <div class="list__item">🎛️ Feature Flags</div>
+      <div class="list__item">📁 Файлы</div>
+      <div class="list__item">📝 Тексты</div>
+      <div class="list__item" style="border-top:1px solid var(--border-color);margin-top:8px;padding-top:12px;">🏢 Отделы</div>
+      <div class="list__item">👤 Сотрудники</div>
+      <div class="list__item">💼 Вакансии</div>
+      <div class="list__item">📜 Версии</div>
+      <div class="list__item">💡 Фичи (модерация)</div>
+      <div class="list__item">💚 Донаты</div>
+      <div class="list__item" style="border-top:1px solid var(--border-color);margin-top:8px;padding-top:12px;">📝 Блог: Очередь</div>
+      <div class="list__item list__item--active">📡 Блог: Каналы</div>
+      <div class="list__item">🏷️ Блог: Категории</div>
+      <div class="list__item">📊 Блог: Статистика</div>
+    </div>
+  </div>
+  <div class="content overflow-y-auto"><div class="page-container">
+    <h1 class="page-title">📡 Каналы блога</h1>
+    <p class="page-subtitle">Корпоративные и личные каналы сотрудников</p>
+
+    <div class="flex gap-2 mb-6" style="flex-wrap:wrap;">
+      <button class="btn btn--primary btn--sm">Все (7)</button>
+      <button class="btn btn--tertiary btn--sm">Корпоративные (4)</button>
+      <button class="btn btn--tertiary btn--sm">Личные (3)</button>
+      <button class="btn btn--tertiary btn--sm" onclick="openModal('modal-new-channel')">➕ Создать канал</button>
+      <button class="btn btn--tertiary btn--sm" onclick="openModal('modal-personal-channel')">👤 Выдать личный канал</button>
+    </div>
+
+    <!-- Channels table -->
+    <div class="card mb-4">
+      <table class="table">
+        <thead><tr><th>Канал</th><th>Тип</th><th>Владелец / Авторы</th><th>Модераторы</th><th>Статей</th><th>Статус</th><th>Действия</th></tr></thead>
+        <tbody>
+          <tr class="table__row">
+            <td><strong>📰 Новости</strong></td>
+            <td><span class="chip chip--accent">Корпоративный</span></td>
+            <td class="text-xs">Иван В., Алексей Д.</td>
+            <td class="text-xs">Мария А.</td>
+            <td>24</td>
+            <td><span class="chip chip--accent">Активен</span></td>
+            <td>
+              <button class="btn btn--tertiary btn--sm" onclick="openModal('modal-edit-channel')">✏</button>
+              <button class="btn btn--tertiary btn--sm" onclick="openModal('modal-authors')">👥</button>
+              <button class="btn btn--tertiary btn--sm" onclick="openModal('modal-channel-stats')">📊</button>
+              <button class="btn btn--danger btn--sm" onclick="openModal('modal-delete-channel')">🗑</button>
+            </td>
+          </tr>
+          <tr class="table__row">
+            <td><strong>⚙️ Технологии</strong></td>
+            <td><span class="chip chip--accent">Корпоративный</span></td>
+            <td class="text-xs">Иван В.</td>
+            <td class="text-xs">—</td>
+            <td>18</td>
+            <td><span class="chip chip--accent">Активен</span></td>
+            <td>
+              <button class="btn btn--tertiary btn--sm" onclick="openModal('modal-edit-channel')">✏</button>
+              <button class="btn btn--tertiary btn--sm" onclick="openModal('modal-authors')">👥</button>
+              <button class="btn btn--tertiary btn--sm" onclick="openModal('modal-channel-stats')">📊</button>
+              <button class="btn btn--danger btn--sm" onclick="openModal('modal-delete-channel')">🗑</button>
+            </td>
+          </tr>
+          <tr class="table__row">
+            <td><strong>👥 Команда</strong></td>
+            <td><span class="chip chip--accent">Корпоративный</span></td>
+            <td class="text-xs">Алексей Д.</td>
+            <td class="text-xs">—</td>
+            <td>8</td>
+            <td><span class="chip chip--accent">Активен</span></td>
+            <td>
+              <button class="btn btn--tertiary btn--sm" onclick="openModal('modal-edit-channel')">✏</button>
+              <button class="btn btn--tertiary btn--sm" onclick="openModal('modal-authors')">👥</button>
+              <button class="btn btn--tertiary btn--sm" onclick="openModal('modal-channel-stats')">📊</button>
+              <button class="btn btn--danger btn--sm" onclick="openModal('modal-delete-channel')">🗑</button>
+            </td>
+          </tr>
+          <tr class="table__row">
+            <td><strong>🦊 Блог Ивана Воронова</strong></td>
+            <td><span class="chip" style="background:rgba(168,85,247,0.12);color:#a855f7;border-color:#a855f7;">Личный</span></td>
+            <td class="text-xs">Иван В. (владелец)</td>
+            <td class="text-xs">Иван В.</td>
+            <td>12</td>
+            <td><span class="chip chip--accent">Активен</span></td>
+            <td>
+              <button class="btn btn--tertiary btn--sm" onclick="openModal('modal-migrate')">🔄</button>
+              <button class="btn btn--tertiary btn--sm" onclick="openModal('modal-channel-stats')">📊</button>
+            </td>
+          </tr>
+          <tr class="table__row">
+            <td><strong>🎨 Дизайн-блокнот Марии</strong></td>
+            <td><span class="chip" style="background:rgba(168,85,247,0.12);color:#a855f7;border-color:#a855f7;">Личный</span></td>
+            <td class="text-xs">Мария А. (владелец)</td>
+            <td class="text-xs">Мария А.</td>
+            <td>8</td>
+            <td><span class="chip chip--accent">Активен</span></td>
+            <td>
+              <button class="btn btn--tertiary btn--sm" onclick="openModal('modal-migrate')">🔄</button>
+              <button class="btn btn--tertiary btn--sm" onclick="openModal('modal-channel-stats')">📊</button>
+            </td>
+          </tr>
+          <tr class="table__row">
+            <td><strong>🐳 DevOps заметки Алексея</strong></td>
+            <td><span class="chip" style="background:rgba(168,85,247,0.12);color:#a855f7;border-color:#a855f7;">Личный</span></td>
+            <td class="text-xs">Алексей Д. (владелец) <span class="chip chip--danger text-xs">уволен</span></td>
+            <td class="text-xs">—</td>
+            <td>6</td>
+            <td><span class="chip" style="background:var(--danger-bg);color:var(--danger);border-color:var(--danger);">Требует решения</span></td>
+            <td>
+              <button class="btn btn--danger btn--sm" onclick="openModal('modal-migrate')">🔄 Миграция</button>
+              <button class="btn btn--tertiary btn--sm" onclick="openModal('modal-channel-stats')">📊</button>
+            </td>
+          </tr>
+          <tr class="table__row">
+            <td class="text-secondary">📊 Метрики</td>
+            <td><span class="chip chip--accent">Корпоративный</span></td>
+            <td class="text-xs">—</td>
+            <td class="text-xs">—</td>
+            <td>0</td>
+            <td><span class="chip">Архив</span></td>
+            <td>
+              <button class="btn btn--tertiary btn--sm">♻️ Восстановить</button>
+              <button class="btn btn--tertiary btn--sm" onclick="openModal('modal-channel-stats')">📊</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="text-xs text-secondary">💡 Личные каналы: компания не может удалять посты автора. При увольнении — миграция постов или передача канала.</p>
+  </div></div>
+</div>
+
+<div class="modal-overlay" id="modal-overlay"></div>
+
+<!-- Modal: New corporate channel -->
+<div class="modal modal--status-info" id="modal-new-channel">
+  <div class="modal__header"><span class="modal__title">Новый корпоративный канал</span><div class="modal__close" onclick="closeModal('modal-new-channel')">✕</div></div>
+  <div class="modal__body">
+    <div class="form-group"><label class="form-label">Название</label><input type="text" class="form-input" placeholder="Например: Новости"></div>
+    <div class="form-group"><label class="form-label">URL-слаг</label><input type="text" class="form-input" placeholder="novosti"></div>
+    <div class="form-group"><label class="form-label">Описание</label><textarea class="form-textarea" placeholder="Описание канала…"></textarea></div>
+    <div class="form-group"><label class="form-label">Иконка (эмодзи)</label><input type="text" class="form-input" value="📰" maxlength="2"></div>
+  </div>
+  <div class="modal__footer"><button class="btn btn--tertiary" onclick="closeModal('modal-new-channel')">Отмена</button><button class="btn btn--primary" onclick="closeModal('modal-new-channel')">Создать</button></div>
+</div>
+
+<!-- Modal: Grant personal channel -->
+<div class="modal modal--status-info" id="modal-personal-channel">
+  <div class="modal__header"><span class="modal__title">Выдать личный канал</span><div class="modal__close" onclick="closeModal('modal-personal-channel')">✕</div></div>
+  <div class="modal__body">
+    <div class="form-group"><label class="form-label">Сотрудник</label>
+      <select class="form-select"><option>Иван Воронов (Lead Developer)</option><option>Мария Андреева (UI/UX Designer)</option></select>
+      <div class="form-hint">Сотрудник станет автором и модератором своего канала</div>
+    </div>
+    <div class="form-group"><label class="form-label">Название канала</label><input type="text" class="form-input" placeholder="Блог Ивана Воронова"></div>
+  </div>
+  <div class="modal__footer"><button class="btn btn--tertiary" onclick="closeModal('modal-personal-channel')">Отмена</button><button class="btn btn--primary" onclick="closeModal('modal-personal-channel')">Выдать канал</button></div>
+</div>
+
+<!-- Modal: Assign authors/moderators -->
+<div class="modal modal--status-info" id="modal-authors">
+  <div class="modal__header"><span class="modal__title">Авторы и модераторы — Новости</span><div class="modal__close" onclick="closeModal('modal-authors')">✕</div></div>
+  <div class="modal__body">
+    <h4 class="text-sm font-bold mb-2">Авторы</h4>
+    <div class="flex gap-2 mb-4" style="flex-wrap:wrap;">
+      <span class="chip chip--accent">Иван В. ✕</span>
+      <span class="chip chip--accent">Алексей Д. ✕</span>
+      <button class="btn btn--tertiary btn--sm">➕ Добавить автора</button>
+    </div>
+    <h4 class="text-sm font-bold mb-2">Модераторы</h4>
+    <div class="flex gap-2" style="flex-wrap:wrap;">
+      <span class="chip chip--accent">Мария А. ✕</span>
+      <button class="btn btn--tertiary btn--sm">➕ Добавить модератора</button>
+    </div>
+  </div>
+  <div class="modal__footer"><button class="btn btn--primary" onclick="closeModal('modal-authors')">Готово</button></div>
+</div>
+
+<!-- Modal: Migrate posts (on dismissal) -->
+<div class="modal modal--status-warning" id="modal-migrate">
+  <div class="modal__header"><span class="modal__title">🔄 Миграция постов — DevOps заметки Алексея</span><div class="modal__close" onclick="closeModal('modal-migrate')">✕</div></div>
+  <div class="modal__body">
+    <p class="text-sm text-secondary mb-4">Сотрудник уволен. Выберите действие для 6 постов в личном канале:</p>
+    <div class="form-group">
+      <label class="form-checkbox"><input type="radio" name="migrate" checked><span>Перенести посты в другой канал</span></label>
+      <select class="form-select mt-2"><option>⚙️ Технологии (корпоративный)</option><option>📰 Новости (корпоративный)</option></select>
+    </div>
+    <div class="form-group">
+      <label class="form-checkbox"><input type="radio" name="migrate"><span>Передать канал другому сотруднику</span></label>
+    </div>
+    <div class="form-group">
+      <label class="form-checkbox"><input type="radio" name="migrate"><span>Архивировать канал целиком</span></label>
+    </div>
+  </div>
+  <div class="modal__footer"><button class="btn btn--tertiary" onclick="closeModal('modal-migrate')">Отмена</button><button class="btn btn--primary" onclick="closeModal('modal-migrate')">Применить</button></div>
+</div>
+
+<!-- Modal: Edit channel -->
+<div class="modal modal--status-info" id="modal-edit-channel">
+  <div class="modal__header"><span class="modal__title">Редактировать канал</span><div class="modal__close" onclick="closeModal('modal-edit-channel')">✕</div></div>
+  <div class="modal__body">
+    <div class="form-group"><label class="form-label">Название</label><input type="text" class="form-input" value="Новости"></div>
+    <div class="form-group"><label class="form-label">Описание</label><textarea class="form-textarea">Официальные новости компании Balloo</textarea></div>
+    <div class="form-group"><label class="form-label">Видимость</label><label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label></div>
+  </div>
+  <div class="modal__footer"><button class="btn btn--tertiary" onclick="closeModal('modal-edit-channel')">Отмена</button><button class="btn btn--primary" onclick="closeModal('modal-edit-channel')">Сохранить</button></div>
+</div>
+
+<!-- A3.6 Подтверждение удаления канала -->
+<div class="modal modal--status-danger" id="modal-delete-channel">
+  <div class="modal__header">
+    <span class="modal__title">🗑 Удалить канал «Новости»</span>
+    <div class="modal__close" onclick="closeModal('modal-delete-channel')">✕</div>
+  </div>
+  <div class="modal__body">
+    <p class="text-sm text-secondary mb-4">Вы уверены, что хотите удалить канал «Новости»? Это действие необратимо.</p>
+    <div class="form-group">
+      <label class="form-label">Что делать с 24 оставшимися статьями?</label>
+      <div class="form-group">
+        <label class="form-checkbox"><input type="radio" name="delete-action" checked><span>Удалить все статьи</span></label>
+      </div>
+      <div class="form-group">
+        <label class="form-checkbox"><input type="radio" name="delete-action"><span>Перенести в архив</span></label>
+      </div>
+      <div class="form-group">
+        <label class="form-checkbox"><input type="radio" name="delete-action"><span>Перенести в другой канал</span></label>
+        <select class="form-select mt-2"><option>⚙️ Технологии</option><option>👥 Команда</option></select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-checkbox"><input type="checkbox"><span>Я подтверждаю удаление</span></label>
+    </div>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--tertiary" onclick="closeModal('modal-delete-channel')">Отмена</button>
+    <button class="btn btn--danger" onclick="closeModal('modal-delete-channel'); showToast('Канал удалён', 'error')">🗑 Удалить канал</button>
+  </div>
+</div>
+
+<!-- A3.6 Просмотр статистики канала -->
+<div class="modal modal--status-info" id="modal-channel-stats">
+  <div class="modal__header">
+    <span class="modal__title">📊 Статистика канала «Новости»</span>
+    <div class="modal__close" onclick="closeModal('modal-channel-stats')">✕</div>
+  </div>
+  <div class="modal__body">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-card__value">24</div>
+        <div class="stat-card__label">Статей</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__value">1.2K</div>
+        <div class="stat-card__label">Подписчиков</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__value">8.5K</div>
+        <div class="stat-card__label">Просмотров</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__value">342</div>
+        <div class="stat-card__label">Лайков</div>
+      </div>
+    </div>
+    <h4 class="text-sm font-bold mb-2">Топ-5 статей</h4>
+    <div class="mb-2">
+      <div class="flex justify-between text-xs mb-1"><span>Релиз v1.0</span><span class="text-accent">1.2K просм.</span></div>
+      <div style="height:6px;background:var(--bg-tertiary);"><div style="width:100%;height:100%;background:var(--accent);"></div></div>
+    </div>
+    <div class="mb-2">
+      <div class="flex justify-between text-xs mb-1"><span>Набор сотрудников</span><span class="text-accent">890 просм.</span></div>
+      <div style="height:6px;background:var(--bg-tertiary);"><div style="width:74%;height:100%;background:var(--info);"></div></div>
+    </div>
+    <div class="mb-2">
+      <div class="flex justify-between text-xs mb-1"><span>Итоги квартала</span><span class="text-accent">756 просм.</span></div>
+      <div style="height:6px;background:var(--bg-tertiary);"><div style="width:63%;height:100%;background:var(--warning);"></div></div>
+    </div>
+    <div class="mb-2">
+      <div class="flex justify-between text-xs mb-1"><span>Новый офис</span><span class="text-accent">654 просм.</span></div>
+      <div style="height:6px;background:var(--bg-tertiary);"><div style="width:54%;height:100%;background:var(--border-strong);"></div></div>
+    </div>
+    <div>
+      <div class="flex justify-between text-xs mb-1"><span>Корпоратив</span><span class="text-accent">543 просм.</span></div>
+      <div style="height:6px;background:var(--bg-tertiary);"><div style="width:45%;height:100%;background:var(--text-muted);"></div></div>
+    </div>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--tertiary" onclick="closeModal('modal-channel-stats')">Закрыть</button>
+    <button class="btn btn--primary" onclick="closeModal('modal-channel-stats'); showToast('Экспорт статистики начат', 'success')">📤 Экспорт</button>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+/* Toast notifications */
+function showToast(text, type) {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+  toast.className = 'toast toast--' + (type || 'info');
+  toast.innerHTML =
+    '<span class="toast__icon">' + (icons[type] || 'ℹ️') + '</span>' +
+    '<span class="toast__text">' + text + '</span>' +
+    '<span class="toast__close" onclick="this.parentElement.remove()">✕</span>';
+  container.appendChild(toast);
+  requestAnimationFrame(() => toast.classList.add('toast--visible'));
+  setTimeout(() => {
+    toast.classList.remove('toast--visible');
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+</script>
+
+<script src="../assets/common.js"></script>
+</body>
+</html>

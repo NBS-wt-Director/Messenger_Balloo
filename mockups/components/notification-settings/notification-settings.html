@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Компонент: Notification Settings — Настройки уведомлений</title>
+  <link rel="stylesheet" href="../../assets/common.css">
+  <style>
+    .component-demo { padding: 24px; max-width: 480px; margin: 0 auto; }
+    .component-demo h1 { font-size: 20px; margin-bottom: 16px; }
+    .component-demo .demo-section { margin-bottom: 24px; }
+    .component-demo .demo-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+
+    .notif-settings { display: flex; flex-direction: column; }
+    .notif-settings__section { padding: 12px 0; border-bottom: 1px solid var(--border-color); }
+    .notif-settings__section-title { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+    .notif-settings__row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+    }
+    .notif-settings__row-label { font-size: 14px; color: var(--text-primary); }
+    .notif-settings__row-desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .notif-settings__select {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 6px 10px;
+      font-size: 13px;
+      outline: none;
+    }
+    .notif-settings__select option { background: var(--bg-tertiary); }
+  </style>
+</head>
+<body>
+  <div class="component-demo">
+    <h1>📦 Компонент: Notification Settings (Настройки уведомлений)</h1>
+
+    <div class="demo-section">
+      <div class="demo-label">Настройки уведомлений</div>
+      <div class="notif-settings">
+        <div class="notif-settings__section">
+          <div class="notif-settings__section-title">Общие</div>
+          <div class="notif-settings__row">
+            <div>
+              <div class="notif-settings__row-label">Уведомления</div>
+              <div class="notif-settings__row-desc">Включить push-уведомления</div>
+            </div>
+            <label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label>
+          </div>
+          <div class="notif-settings__row">
+            <div>
+              <div class="notif-settings__row-label">Звук</div>
+              <div class="notif-settings__row-desc">Звук сообщений</div>
+            </div>
+            <label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label>
+          </div>
+          <div class="notif-settings__row">
+            <div>
+              <div class="notif-settings__row-label">Вибрация</div>
+              <div class="notif-settings__row-desc">Вибрация при уведомлении</div>
+            </div>
+            <label class="switch"><input type="checkbox"><span class="switch__slider"></span></label>
+          </div>
+        </div>
+
+        <div class="notif-settings__section">
+          <div class="notif-settings__section-title">Детали</div>
+          <div class="notif-settings__row">
+            <div>
+              <div class="notif-settings__row-label">Показывать текст</div>
+              <div class="notif-settings__row-desc">Отображать содержимое в push</div>
+            </div>
+            <label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label>
+          </div>
+          <div class="notif-settings__row">
+            <div>
+              <div class="notif-settings__row-label">Звук по умолчанию</div>
+            </div>
+            <select class="notif-settings__select">
+              <option>Стандартный</option>
+              <option>Тихий</option>
+              <option>Громкий</option>
+            </select>
+          </div>
+          <div class="notif-settings__row">
+            <div>
+              <div class="notif-settings__row-label">Тихий час</div>
+              <div class="notif-settings__row-desc">С 23:00 до 08:00</div>
+            </div>
+            <label class="switch"><input type="checkbox"><span class="switch__slider"></span></label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="../../assets/common.js"></script>
+</body>
+</html>

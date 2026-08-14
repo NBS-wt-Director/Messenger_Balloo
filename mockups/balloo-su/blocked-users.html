@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo — Блокированные пользователи</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon">B</div><span>Balloo</span>
+    <div class="topbar__dropdown">
+      <div class="topbar__dropdown-item" onclick="window.location.href='chats.html'">💬 Balloo</div>
+      <div class="topbar__dropdown-divider"></div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div>
+    </div>
+  </div>
+  <div class="topbar__title">Блокированные пользователи</div>
+  <div class="topbar__right">
+    <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИИ</span></div></div>
+    <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+    <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <!-- Sidebar: Settings nav -->
+  <div class="sidebar">
+    <div class="list">
+      <div class="list__item" onclick="window.location.href='settings.html'">🔔 Уведомления</div>
+      <div class="list__item" onclick="window.location.href='settings.html'">🎨 Оформление</div>
+      <div class="list__item" onclick="window.location.href='settings.html'">🌍 Язык</div>
+      <div class="list__item list__item--active" onclick="window.location.href='privacy-settings.html'">🔒 Приватность</div>
+      <div class="list__item" onclick="window.location.href='settings.html'">💾 Хранилище</div>
+      <div class="list__item" onclick="window.location.href='settings.html'">📱 Устройства</div>
+      <div class="list__item" onclick="window.location.href='settings.html'">🔐 Безопасность</div>
+    </div>
+  </div>
+
+  <!-- Content: Blacklist -->
+  <div class="content"><div class="page-container page-container--narrow">
+    
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h1 class="page-title mb-1">🚫 Блокированные пользователи</h1>
+        <p class="text-sm text-secondary">Пользователи, которых вы заблокировали. Они не видят ваш профиль и не могут вам написать.</p>
+      </div>
+      <button class="btn btn--primary" onclick="openModal('modal-block-user')">➕ Заблокировать</button>
+    </div>
+
+    <!-- Stats -->
+    <div class="flex gap-3 mb-6" style="flex-wrap:wrap;">
+      <div class="card flex-1" style="min-width:140px;">
+        <div class="text-xs text-muted">Всего заблокировано</div>
+        <div style="font-size:24px;font-weight:800;color:var(--danger);">3</div>
+      </div>
+      <div class="card flex-1" style="min-width:140px;">
+        <div class="text-xs text-muted">Попыток написать</div>
+        <div style="font-size:24px;font-weight:800;color:var(--warning);">12</div>
+        <div class="text-xs text-muted">за последние 7 дней</div>
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div class="form-group mb-4">
+      <input type="text" class="form-input" placeholder="🔍 Поиск по блокированным...">
+    </div>
+
+    <!-- Blocked list -->
+    <div class="card mb-4">
+      <div class="list__item" style="border:none;padding:12px;">
+        <div class="flex items-center gap-3">
+          <div class="avatar avatar--md avatar--bordered avatar--status-offline avatar--ctx-blocked"><div class="avatar__inner"><span>ББ</span></div></div>
+          <div class="flex-1">
+            <div class="text-sm font-bold" style="color:var(--text-primary);">Блокированный пользователь 1</div>
+            <div class="text-xs text-muted">📞 +7 (999) ***-**-01 · Заблокирован: 10.07.2026 14:30</div>
+            <div class="text-xs text-muted mt-1">Попыток написать: 5</div>
+          </div>
+          <button class="btn btn--secondary btn--sm" onclick="unblockUser('Блокированный пользователь 1')">Разблокировать</button>
+        </div>
+      </div>
+      <div class="list__item" style="border:none;padding:12px;">
+        <div class="flex items-center gap-3">
+          <div class="avatar avatar--md avatar--bordered avatar--status-offline avatar--ctx-blocked"><div class="avatar__inner"><span>СС</span></div></div>
+          <div class="flex-1">
+            <div class="text-sm font-bold" style="color:var(--text-primary);">Блокированный пользователь 2</div>
+            <div class="text-xs text-muted">📞 +7 (999) ***-**-02 · Заблокирован: 05.07.2026 09:15</div>
+            <div class="text-xs text-muted mt-1">Попыток написать: 4</div>
+          </div>
+          <button class="btn btn--secondary btn--sm" onclick="unblockUser('Блокированный пользователь 2')">Разблокировать</button>
+        </div>
+      </div>
+      <div class="list__item" style="border:none;padding:12px;">
+        <div class="flex items-center gap-3">
+          <div class="avatar avatar--md avatar--bordered avatar--status-offline avatar--ctx-blocked"><div class="avatar__inner"><span>ДД</span></div></div>
+          <div class="flex-1">
+            <div class="text-sm font-bold" style="color:var(--text-primary);">Блокированный пользователь 3</div>
+            <div class="text-xs text-muted">📞 +7 (999) ***-**-03 · Заблокирован: 01.07.2026 18:45</div>
+            <div class="text-xs text-muted mt-1">Попыток написать: 3</div>
+          </div>
+          <button class="btn btn--secondary btn--sm" onclick="unblockUser('Блокированный пользователь 3')">Разблокировать</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Blocked channels/groups -->
+    <div class="card mb-4">
+      <h3 class="card__title mb-4">🚫 Заблокированные каналы</h3>
+      <div class="list__item" style="border:none;padding:12px;">
+        <div class="flex items-center gap-3">
+          <div class="avatar avatar--md avatar--bordered avatar--status-offline avatar--ctx-blocked" style="background:var(--bg-tertiary);"><div class="avatar__inner"><span>📢</span></div></div>
+          <div class="flex-1">
+            <div class="text-sm font-bold" style="color:var(--text-primary);">Спам-канал</div>
+            <div class="text-xs text-muted">Заблокирован: 12.07.2026</div>
+          </div>
+          <button class="btn btn--secondary btn--sm" onclick="showToast('Канал разблокирован','success')">Разблокировать</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info -->
+    <div class="card">
+      <h3 class="card__title mb-4">ℹ️ О блокировке</h3>
+      <ul class="text-sm text-secondary" style="padding-left:20px;">
+        <li>Заблокированный пользователь не видит ваш профиль</li>
+        <li>Не видит ваш статус «в сети»</li>
+        <li>Ваши сообщения от него не доставляются</li>
+        <li>Он не может вам позвонить</li>
+        <li>Он не может добавить вас в группы</li>
+        <li>Вы не получаете от него уведомления</li>
+      </ul>
+    </div>
+
+  </div></div>
+</div>
+
+<!-- Modal: Block User -->
+<div class="modal-overlay" id="modal-overlay"></div>
+<div class="modal" id="modal-block-user">
+  <div class="modal__header">
+    <span class="modal__title">🚫 Заблокировать пользователя</span>
+    <div class="modal__close" onclick="closeModal('modal-block-user')">✕</div>
+  </div>
+  <div class="modal__body">
+    <div class="form-group">
+      <input type="text" class="form-input" placeholder="🔍 Поиск по имени, номеру или @username...">
+    </div>
+    <div class="text-sm text-secondary mb-3">Введите имя пользователя для блокировки</div>
+    <div class="list">
+      <div class="list__item" onclick="showToast('Выбран пользователь','info')">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>АН</span></div></div>
+        <div class="list__item-body">
+          <div class="list__item-title">Андрей Новиков</div>
+          <div class="list__item-subtitle">@novikov · в сети</div>
+        </div>
+      </div>
+      <div class="list__item" onclick="showToast('Выбран пользователь','info')">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-offline avatar--ctx-contact"><div class="avatar__inner"><span>ЕК</span></div></div>
+        <div class="list__item-body">
+          <div class="list__item-title">Елена Козлова</div>
+          <div class="list__item-subtitle">@kozlova · была 1 час назад</div>
+        </div>
+      </div>
+    </div>
+    <div class="form-group mt-4">
+      <label class="form-checkbox"><input type="checkbox" checked><span>Заблокировать и предотвратить повторное вступление в группы</span></label>
+    </div>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--tertiary" onclick="closeModal('modal-block-user')">Отмена</button>
+    <button class="btn btn--danger" onclick="closeModal('modal-block-user'); showToast('Пользователь заблокирован','error');">🚫 Заблокировать</button>
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+<script>
+function unblockUser(name) {
+  if (confirm('Разблокировать ' + name + '? Он снова сможет видеть ваш профиль и писать вам.')) {
+    showToast(name + ' разблокирован(а)', 'success');
+  }
+}
+</script>
+</body>
+</html>

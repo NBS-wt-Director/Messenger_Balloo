@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Command — Совещания</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--info);">C</div><span>Command</span>
+    <div class="topbar__dropdown"></div>
+  </div>
+  <div class="topbar__title">Совещания</div>
+  <div class="topbar__actions">
+    <div class="topbar__actions-btn" onclick="alert('Создание встречи: выбор участников, дата, время, повестка')" title="Новое совещание">📅</div>
+  </div>
+  <div class="topbar__right"><div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИВ</span></div></div></div>
+</div>
+<div class="main">
+  <div class="sidebar sidebar--narrow">
+    <div class="list">
+      <div class="list__item list__item--active">📅 Предстоящие <span class="badge" style="margin-left:auto;">3</span></div>
+      <div class="list__item">✅ Прошедшие</div>
+      <div class="list__item">🔄 Повторяющиеся</div>
+      <div class="list__item">📋 Повестки</div>
+    </div>
+  </div>
+  <div class="content overflow-y-auto"><div class="page-container">
+    <h1 class="page-title">Совещания</h1>
+    <p class="page-subtitle">Корпоративные звонки и встречи команды</p>
+
+    <!-- Active meeting banner -->
+    <div class="card mb-6" style="border-color:var(--accent);background:rgba(45,184,77,0.08);">
+      <div class="flex items-center gap-4">
+        <span style="font-size:36px;">🔴</span>
+        <div class="flex-1">
+          <div class="font-bold" style="color:var(--accent);">Идёт сейчас: Еженедельный статус разработки</div>
+          <div class="text-sm text-secondary">Участников: 8 · Длится: 12:34</div>
+        </div>
+        <button class="btn btn--primary" onclick="alert('Подключение к корпоративному звонку (WebRTC)')">Присоединиться</button>
+      </div>
+    </div>
+
+    <!-- Upcoming -->
+    <div class="section-title">Предстоящие встречи</div>
+
+    <div class="card mb-4 card--hover">
+      <div class="flex items-center gap-4">
+        <div style="text-align:center;min-width:60px;">
+          <div style="font-size:20px;font-weight:800;color:var(--accent);">17</div>
+          <div class="text-xs text-muted">Июл</div>
+        </div>
+        <div class="flex-1">
+          <div class="font-semibold" style="color:var(--text-primary);">Демо-релиз v1.0.0-beta</div>
+          <div class="text-xs text-secondary mt-2">16:00 МСК · 45 мин · Повестка: демо новых функций, метрики</div>
+          <div class="flex gap-2 mt-2">
+            <span class="chip chip--info">Встреча</span>
+            <span class="chip">8 участников</span>
+          </div>
+        </div>
+        <button class="btn btn--secondary btn--sm">Принять</button>
+      </div>
+    </div>
+
+    <div class="card mb-4 card--hover">
+      <div class="flex items-center gap-4">
+        <div style="text-align:center;min-width:60px;">
+          <div style="font-size:20px;font-weight:800;color:var(--accent);">18</div>
+          <div class="text-xs text-muted">Июл</div>
+        </div>
+        <div class="flex-1">
+          <div class="font-semibold" style="color:var(--text-primary);">Планирование спринта #12</div>
+          <div class="text-xs text-secondary mt-2">11:00 МСК · 1 час · Повестка: задачи, приоритеты</div>
+          <div class="flex gap-2 mt-2">
+            <span class="chip chip--info">Встреча</span>
+            <span class="chip">12 участников</span>
+          </div>
+        </div>
+        <button class="btn btn--secondary btn--sm">Принять</button>
+      </div>
+    </div>
+
+    <div class="card mb-4 card--hover">
+      <div class="flex items-center gap-4">
+        <div style="text-align:center;min-width:60px;">
+          <div style="font-size:20px;font-weight:800;color:var(--accent);">19</div>
+          <div class="text-xs text-muted">Июл</div>
+        </div>
+        <div class="flex-1">
+          <div class="font-semibold" style="color:var(--text-primary);">1:1 с руководителем отдела</div>
+          <div class="text-xs text-secondary mt-2">14:00 МСК · 30 мин · Повестка: прогресс, обратная связь</div>
+          <div class="flex gap-2 mt-2">
+            <span class="chip">1:1</span>
+            <span class="chip">2 участника</span>
+          </div>
+        </div>
+        <button class="btn btn--secondary btn--sm">Принять</button>
+      </div>
+    </div>
+
+    <!-- Past meetings -->
+    <div class="section-title">Недавние встречи</div>
+
+    <div class="card mb-4">
+      <div class="flex items-center gap-4">
+        <div style="text-align:center;min-width:60px;">
+          <div style="font-size:20px;font-weight:800;color:var(--text-muted);">16</div>
+          <div class="text-xs text-muted">Июл</div>
+        </div>
+        <div class="flex-1">
+          <div class="font-semibold" style="color:var(--text-secondary);">Еженедельный статус разработки</div>
+          <div class="text-xs text-muted mt-2">14:00 · 52 мин · 8 участников · Запись доступна</div>
+        </div>
+        <button class="btn btn--tertiary btn--sm">📹 Запись</button>
+        <button class="btn btn--tertiary btn--sm">📋 Протокол</button>
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="flex items-center gap-4">
+        <div style="text-align:center;min-width:60px;">
+          <div style="font-size:20px;font-weight:800;color:var(--text-muted);">15</div>
+          <div class="text-xs text-muted">Июл</div>
+        </div>
+        <div class="flex-1">
+          <div class="font-semibold" style="color:var(--text-secondary);">Ретроспектива спринта #11</div>
+          <div class="text-xs text-muted mt-2">16:00 · 1.5 часа · 10 участников · Запись доступна</div>
+        </div>
+        <button class="btn btn--tertiary btn--sm">📹 Запись</button>
+        <button class="btn btn--tertiary btn--sm">📋 Протокол</button>
+      </div>
+    </div>
+  </div></div>
+</div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

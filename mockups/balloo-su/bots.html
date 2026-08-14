@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo — О ботах</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon">B</div><span>Balloo</span>
+    <div class="topbar__dropdown"><div class="topbar__dropdown-item" onclick="window.location.href='chats.html'">💬 Balloo</div><div class="topbar__dropdown-divider"></div><div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div><div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div><div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div><div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div><div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div><div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div></div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">О ботах</div>
+  <div class="topbar__right"><div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИИ</span></div></div><span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span><span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span></div>
+</div>
+<div class="main"><div class="content overflow-y-auto"><div class="page-container">
+  <h1 class="page-title">🤖 Боты в Balloo</h1>
+  <p class="page-subtitle">Создавайте ботов для автоматизации, уведомлений и интеграций</p>
+
+  <div class="card mb-4">
+    <h3 class="card__title mb-4">Создать бота</h3>
+    <div class="form-group"><label class="form-label">Имя бота</label><input type="text" class="form-input" placeholder="My Bot"></div>
+    <div class="form-group"><label class="form-label">Описание</label><input type="text" class="form-input" placeholder="Что делает бот?"></div>
+    <div class="form-group"><label class="form-label">Webhook URL</label><input type="text" class="form-input" placeholder="https://example.com/bot/webhook"></div>
+    <button class="btn btn--primary btn--block">Создать бота</button>
+  </div>
+
+  <div class="card mb-4">
+    <h3 class="card__title mb-4">Мои боты</h3>
+    <div class="list__item" style="border:none;">
+      <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-new"><div class="avatar__inner">🤖</div></div>
+      <div class="list__item-body"><div class="list__item-title">NotifyBot</div><div class="list__item-subtitle">Токен: ••••••••••••ab3f</div></div>
+      <button class="btn btn--tertiary btn--sm">📋 Копировать токен</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="card__title mb-4">API документация</h3>
+    <p class="card__body mb-4">Balloo Bot API основан на REST. Боты получают обновления через Webhook.</p>
+    <div class="text-sm text-secondary" style="background:var(--bg-tertiary);padding:12px;font-family:monospace;margin-bottom:12px;">
+      POST /api/v1/bots/{token}/sendMessage<br>
+      { "chat_id": "...", "text": "Привет!" }
+    </div>
+    <button class="btn btn--secondary" onclick="window.location.href='../docs-balloo-su/api-docs.html'">📚 Полная документация API →</button>
+  </div>
+</div></div></div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

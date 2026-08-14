@@ -1,0 +1,1550 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo v2+ — Аудит функционала</title>
+  <style>
+    :root {
+      --accent: #2db84d;
+      --bg: #1a1a2e;
+      --bg2: #16213e;
+      --bg3: #0f3460;
+      --text: #e0e0e0;
+      --text2: #a0a0a0;
+      --border: #2a2a4a;
+      --green: #2db84d;
+      --orange: #e6a817;
+      --red: #e74c3c;
+      --critical: #e74c3c;
+      --medium: #e6a817;
+      --low: #3498db;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', 'Manrope', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+    header {
+      text-align: center;
+      padding: 3rem 2rem;
+      background: linear-gradient(135deg, var(--bg2), var(--bg3));
+      border-bottom: 2px solid var(--accent);
+      margin-bottom: 2rem;
+    }
+    header h1 {
+      font-size: 2.5rem;
+      background: linear-gradient(90deg, var(--accent), #4ade80);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+    }
+    header p { color: var(--text2); font-size: 1.1rem; }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      text-align: center;
+    }
+    .stat-card .number {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .stat-card .label {
+      color: var(--text2);
+      font-size: 0.9rem;
+    }
+    .progress-bar {
+      background: var(--bg2);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      border: 1px solid var(--border);
+    }
+    .progress-bar h3 { margin-bottom: 1rem; }
+    .progress-track {
+      height: 24px;
+      background: var(--bg);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+    }
+    .progress-segment {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: white;
+      transition: width 0.5s;
+    }
+    .section { margin-bottom: 2rem; }
+    .section h2 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--bg2);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+    th {
+      background: var(--bg3);
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text2);
+    }
+    td {
+      padding: 0.6rem 1rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.9rem;
+    }
+    tr.node-header {
+      background: var(--bg3);
+      font-weight: 600;
+    }
+    tr.node-header td { padding: 0.5rem 1rem; }
+    .priority-critical { border-left: 3px solid var(--critical); }
+    .priority-medium { border-left: 3px solid var(--medium); }
+    .priority-low { border-left: 3px solid var(--low); }
+    code {
+      background: var(--bg);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.85em;
+      color: var(--accent);
+    }
+    .filters {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.4rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+    .filter-btn:hover, .filter-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+    .print-btn {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(45, 184, 77, 0.4);
+      transition: all 0.3s;
+      z-index: 100;
+    }
+    .print-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(45, 184, 77, 0.6);
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .badge-green { background: rgba(45, 184, 77, 0.2); color: var(--green); }
+    .badge-orange { background: rgba(230, 168, 23, 0.2); color: var(--orange); }
+    .badge-red { background: rgba(231, 76, 60, 0.2); color: var(--red); }
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text2);
+      font-size: 0.85rem;
+      border-top: 1px solid var(--border);
+      margin-top: 2rem;
+    }
+    @media print {
+      .print-btn { display: none; }
+      body { background: white; color: black; }
+      .stat-card, table, .progress-bar { background: #f9f9f9; border-color: #ddd; }
+      header { background: linear-gradient(135deg, #f0f0f0, #e0e0e0); }
+      header h1 { -webkit-text-fill-color: var(--accent); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🚀 Balloo Messenger v2+</h1>
+    <p>Аудит функционала и экранов</p>
+    <p style="margin-top:0.5rem; font-size:0.9rem;">Создан: 2026-07-31 | Версия: v1.0.0 → v2+</p>
+  </header>
+  
+  <div class="container">
+    <!-- Статистика -->
+    <div class="stats">
+      <div class="stat-card">
+        <div class="number">171</div>
+        <div class="label">Всего экранов</div>
+      </div>
+      <div class="stat-card">
+        <div class="number">0</div>
+        <div class="label">Готово (v1)</div>
+      </div>
+      <div class="stat-card">
+        <div class="number">27</div>
+        <div class="label">v2+ функций</div>
+      </div>
+      <div class="stat-card">
+        <div class="number">12</div>
+        <div class="label">Узлов</div>
+      </div>
+    </div>
+    
+    <!-- Прогресс-бар -->
+    <div class="progress-bar">
+      <h3>Прогресс реализации v1</h3>
+      <div class="progress-track">
+        <div class="progress-segment" style="width:46.2%;background:var(--red)">46.2%</div><div class="progress-segment" style="width:53.2%;background:var(--red)">53.2%</div><div class="progress-segment" style="width:0.6%;background:var(--red)"></div>
+      </div>
+      <div style="display:flex;gap:1rem;margin-top:0.5rem;flex-wrap:wrap;">
+        <span style="font-size:0.8rem;"><span style="color:var(--red)">●</span> Просмотрен: 79</span><span style="font-size:0.8rem;"><span style="color:var(--red)">●</span> Принят: 91</span><span style="font-size:0.8rem;"><span style="color:var(--red)">●</span> Реализован: 1</span>
+      </div>
+    </div>
+    
+    <!-- v2+ Функции -->
+    <div class="section">
+      <h2>📋 v2+ Функции (27)</h2>
+      <div class="filters">
+        <button class="filter-btn active" onclick="filterV2('all')">Все</button>
+        <button class="filter-btn" onclick="filterV2('critical')">🔴 Критические</button>
+        <button class="filter-btn" onclick="filterV2('medium')">🟡 Средние</button>
+        <button class="filter-btn" onclick="filterV2('low')">🟢 Низкие</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Функция</th>
+            <th>Приоритет</th>
+            <th>Зависит от</th>
+            <th>Описание</th>
+          </tr>
+        </thead>
+        <tbody id="v2-table">
+          
+      <tr class="critical">
+        <td><code>67</code></td>
+        <td>Дополнение i18n — переводы на 18 языков</td>
+        <td>🔴 Критический  </td>
+        <td>Нет</td>
+        <td>Нет описания</td>
+      </tr>
+      <tr class="critical">
+        <td><code>68</code></td>
+        <td>Проверка тем оформления</td>
+        <td>🔴 Критический  </td>
+        <td>Нет</td>
+        <td>Нет описания</td>
+      </tr>
+      <tr class="critical">
+        <td><code>69</code></td>
+        <td>Платёжный сервис (ЮMoney)</td>
+        <td>🔴 Критический  </td>
+        <td>Нет</td>
+        <td>Нет описания</td>
+      </tr>
+      <tr class="medium">
+        <td><code>v2-001</code></td>
+        <td>Исправить все TypeScript ошибки</td>
+        <td>🟡 Средний (после 67, 68, 69)</td>
+        <td>Нет</td>
+        <td>Нет описания</td>
+      </tr>
+      <tr class="medium">
+        <td><code>v2-002</code></td>
+        <td>Реальные API вызовы вместо mock-данных</td>
+        <td>🟡 Средний  </td>
+        <td>Нет</td>
+        <td>Нет описания</td>
+      </tr>
+      <tr class="medium">
+        <td><code>v2-003</code></td>
+        <td>Service Worker для офлайн-режима</td>
+        <td>🟡 Средний  </td>
+        <td>Нет</td>
+        <td>Нет описания</td>
+      </tr>
+      <tr class="medium">
+        <td><code>v2-004</code></td>
+        <td>Code signing для desktop и mobile</td>
+        <td>🟡 Средний  </td>
+        <td>Нет</td>
+        <td>Нет описания</td>
+      </tr>
+      <tr class="medium">
+        <td><code>v2-005</code></td>
+        <td>Auto-updater для desktop</td>
+        <td>🟡 Средний  </td>
+        <td>Нет</td>
+        <td>Нет описания</td>
+      </tr>
+      <tr class="low">
+        <td><code>v2-006</code></td>
+        <td>Расширить тестовое покрытие</td>
+        <td>🟢 Низкий  </td>
+        <td>Нет</td>
+        <td>Нет описания</td>
+      </tr>
+      <tr class="medium">
+        <td><code>v2-018</code></td>
+        <td>40 дополнительных тем оформления</td>
+        <td>🟡 Средний  </td>
+        <td>Нет</td>
+        <td>Нет описания</td>
+      </tr>
+      <tr class="medium">
+        <td><code>v2-019</code></td>
+        <td>Пользовательская тема (Custom Theme)</td>
+        <td>🟡 Средний  </td>
+        <td>Нет</td>
+        <td>Нет описания</td>
+      </tr>
+      <tr class="medium">
+        <td><code>v2-020</code></td>
+        <td>Платные фоны (Premium Backgrounds)</td>
+        <td>🟡 Средний  </td>
+        <td>Нет</td>
+        <td>Нет описания</td>
+      </tr>
+      <tr class="medium">
+        <td><code>v2-021</code></td>
+        <td>Premium подписка</td>
+        <td>🟡 Средний  </td>
+        <td>Нет</td>
+        <td>Нет описания</td>
+      </tr>
+      <tr class="low">
+        <td><code>v2-007</code></td>
+        <td>Сбор метрик после релиза</td>
+        <td>🟢 Низкий  </td>
+        <td>Нет</td>
+        <td>Нет описания</td>
+      </tr>
+      <tr class="low">
+        <td><code>v2-008</code></td>
+        <td>A/B тесты</td>
+        <td>🟢 Низкий  </td>
+        <td>Нет</td>
+        <td>Нет описания</td>
+      </tr>
+      <tr class="low">
+        <td><code>v2-009</code></td>
+        <td>Roadmap v2</td>
+        <td>🟢 Низкий  </td>
+        <td>Нет</td>
+        <td>Нет описания</td>
+      </tr>
+      <tr class="medium">
+        <td><code>v2-010</code></td>
+        <td>Полное покрытие надписей переводами на всех узлах</td>
+        <td>🟡 Средний  </td>
+        <td>Нет</td>
+        <td>Нет описания</td>
+      </tr>
+      <tr class="low">
+        <td><code>v2-022</code></td>
+        <td>Добавить 5 шуточных языков</td>
+        <td>🟢 Низкий  </td>
+        <td>Нет</td>
+        <td>Нет описания</td>
+      </tr>
+      <tr class="medium">
+        <td><code>v2-023</code></td>
+        <td>Добавить 90 иностранных языков</td>
+        <td>🟡 Средний  </td>
+        <td>Нет</td>
+        <td>Нет описания</td>
+      </tr>
+      <tr class="medium">
+        <td><code>v2-024</code></td>
+        <td>Автоперевод контента (ИИ)</td>
+        <td>🟡 Средний  </td>
+        <td>Нет</td>
+        <td>Пользователь получает контент (сообщения, посты блога, комментарии) на чужом языке — система автомат...</td>
+      </tr>
+      <tr class="low">
+        <td><code>v2-011</code></td>
+        <td>Полная реализация iOS</td>
+        <td>🟢 Низкий  </td>
+        <td>Нет</td>
+        <td>Нет описания</td>
+      </tr>
+      <tr class="low">
+        <td><code>v2-012</code></td>
+        <td>Native сборки для mobile</td>
+        <td>🟢 Низкий  </td>
+        <td>Нет</td>
+        <td>Нет описания</td>
+      </tr>
+      <tr class="medium">
+        <td><code>v2-013</code></td>
+        <td>Внешний пентест</td>
+        <td>🟡 Средний  </td>
+        <td>Нет</td>
+        <td>Нет описания</td>
+      </tr>
+      <tr class="low">
+        <td><code>v2-014</code></td>
+        <td>Bug Bounty программа</td>
+        <td>🟢 Низкий  </td>
+        <td>Нет</td>
+        <td>Нет описания</td>
+      </tr>
+      <tr class="low">
+        <td><code>v2-015</code></td>
+        <td>Сертификация ФСТЭК</td>
+        <td>🟢 Низкий  </td>
+        <td>Нет</td>
+        <td>Нет описания</td>
+      </tr>
+      <tr class="medium">
+        <td><code>v2-016</code></td>
+        <td>Web Workers для клиента</td>
+        <td>🟡 Средний  </td>
+        <td>Нет</td>
+        <td>Нет описания</td>
+      </tr>
+      <tr class="low">
+        <td><code>v2-017</code></td>
+        <td>Native сборка</td>
+        <td>🟢 Низкий  </td>
+        <td>Нет</td>
+        <td>Нет описания</td>
+      </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- Экраны по узлам -->
+    <div class="section">
+      <h2>📱 Экраны по узлам (171)</h2>
+      <div class="filters">
+        <button class="filter-btn active" onclick="filterScreens('all')">Все</button>
+        <button class="filter-btn" onclick="filterScreens('Просмотрен')">Просмотрен (79)</button><button class="filter-btn" onclick="filterScreens('Принят')">Принят (91)</button><button class="filter-btn" onclick="filterScreens('Реализован')">Реализован (1)</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Название</th>
+            <th>Статус</th>
+            <th>Путь</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="4" class="node-header">shared (у_00)</td></tr>
+        <tr>
+          <td>1_00_08</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_00_02</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_00_01</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_00_03</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_00_04</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_00_07</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_00_05</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_00_06</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr><tr><td colspan="4" class="node-header">balloo.su (у_01)</td></tr>
+        <tr>
+          <td>1_01_17</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_16</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_22</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_11</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_23</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_07</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_40</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_38</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_15</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_10</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_35</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_25</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_04</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_05</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_24</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_36</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_33</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_18</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_19</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_13</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_02</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_32</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_21</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_31</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_34</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_01</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_29</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_28</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_37</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_08</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_09</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_03</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_26</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_12</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_06</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_20</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_27</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_41</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_14</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_30</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_39</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr><tr><td colspan="4" class="node-header">admin.balloo.su (у_02)</td></tr>
+        <tr>
+          <td>1_02_01</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_02_02</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_02_03</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_02_05</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_02_06</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_02_07</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_02_08</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_02_09</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_02_10</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_03_02</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_03_15</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_02_13</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_02_14</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_02_15</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_02_16</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_02_17</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_02_18</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_02</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_02_20</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_02_21</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_02_22</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_02_23</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_02_24</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_03_07</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_02_26</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr><tr><td colspan="4" class="node-header">command.balloo.su (у_03)</td></tr>
+        <tr>
+          <td>1_03_09</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_03_20</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_03_18</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_03_19</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_03_17</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_03_22</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_03_24</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_03_23</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_03_02</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_03_16</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_03_15</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_03_21</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_03_05</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_03_03</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_03_11</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_03_04</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_03_01</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_03_25</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_03_12</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_03_06</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_03_14</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_03_26</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_03_13</td>
+          <td>undefined</td>
+          <td>Реализован</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_03_07</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_03_08</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_03_10</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr><tr><td colspan="4" class="node-header">features.balloo.su (у_04)</td></tr>
+        <tr>
+          <td>1_01_24</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_04_02</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_04_03</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_02</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_04_05</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_04_04</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr><tr><td colspan="4" class="node-header">history.balloo.su (у_05)</td></tr>
+        <tr>
+          <td>1_01_24</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_05_02</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_05_03</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr><tr><td colspan="4" class="node-header">download.balloo.su (у_06)</td></tr>
+        <tr>
+          <td>1_01_24</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_06_02</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr><tr><td colspan="4" class="node-header">docs.balloo.su (у_07)</td></tr>
+        <tr>
+          <td>1_07_01</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr><tr><td colspan="4" class="node-header">mobile (сборные) (у_08)</td></tr>
+        <tr>
+          <td>1_08_06</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_08_16</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_08_03</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_08_08</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_08_02</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_08_17</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_08_07</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_08_21</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_08_19</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_08_10</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_08_22</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_08_05</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_08_14</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_08_01</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_08_12</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_08_20</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_08_18</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_08_11</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_08_09</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_08_04</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_08_15</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_08_13</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_08_23</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr><tr><td colspan="4" class="node-header">desktop (генеральный) (у_09)</td></tr>
+        <tr>
+          <td>1_09_04</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_09_14</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_09_13</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_09_06</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_09_11</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_09_15</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_09_05</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_09_16</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_02</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_09_21</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_09_02</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_09_03</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_09_10</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_09_20</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_09_01</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_09_08</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_09_17</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_09_19</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_03</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_09_07</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_09_18</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_09_12</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_09_09</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr><tr><td colspan="4" class="node-header">specifity.balloo.su (у_10)</td></tr>
+        <tr>
+          <td>1_10_01</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_10_02</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_10_03</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_10_04</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_12</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_10_06</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_10_07</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr><tr><td colspan="4" class="node-header">blog.balloo.su (у_11)</td></tr>
+        <tr>
+          <td>1_11_01</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_11_02</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_11_03</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_11_04</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_11_05</td>
+          <td>undefined</td>
+          <td>Принят</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>1_01_06</td>
+          <td>undefined</td>
+          <td>Просмотрен</td>
+          <td>—</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- Сводка по узлам -->
+    <div class="section">
+      <h2>🔗 Сводка по узлам</h2>
+      <table>
+        <thead>
+          <tr><th>Узел</th><th>ID</th><th>Экранов</th><th>v2+ функций</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>shared</td><td>у_00</td><td>8</td><td>0</td></tr><tr><td>balloo.su</td><td>у_01</td><td>41</td><td>0</td></tr><tr><td>admin.balloo.su</td><td>у_02</td><td>25</td><td>0</td></tr><tr><td>command.balloo.su</td><td>у_03</td><td>26</td><td>0</td></tr><tr><td>features.balloo.su</td><td>у_04</td><td>6</td><td>0</td></tr><tr><td>history.balloo.su</td><td>у_05</td><td>3</td><td>0</td></tr><tr><td>download.balloo.su</td><td>у_06</td><td>2</td><td>0</td></tr><tr><td>docs.balloo.su</td><td>у_07</td><td>1</td><td>0</td></tr><tr><td>mobile (сборные)</td><td>у_08</td><td>23</td><td>0</td></tr><tr><td>desktop (генеральный)</td><td>у_09</td><td>23</td><td>0</td></tr><tr><td>specifity.balloo.su</td><td>у_10</td><td>7</td><td>0</td></tr><tr><td>blog.balloo.su</td><td>у_11</td><td>6</td><td>0</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+  <button class="print-btn" onclick="window.print()">🖨️ Печать в PDF</button>
+  
+  <footer>
+    <p>Balloo Messenger v2+ Audit Report | Сгенерировано 2026-07-31</p>
+    <p>© 2026 Balloo.su — Российский мессенджер нового поколения</p>
+  </footer>
+  
+  <script>
+    function filterV2(type) {
+      document.querySelectorAll('.filters .filter-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+      const rows = document.querySelectorAll('#v2-table tr');
+      rows.forEach(row => {
+        if (type === 'all') { row.style.display = ''; return; }
+        row.style.display = row.classList.contains('priority-' + type) ? '' : 'none';
+      });
+    }
+    function filterScreens(status) {
+      document.querySelectorAll('.section:last-child .filters .filter-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+      const rows = document.querySelectorAll('.section:last-child tbody tr');
+      rows.forEach(row => {
+        if (status === 'all') { row.style.display = ''; return; }
+        const cell = row.querySelector('td:nth-child(3)');
+        row.style.display = cell && cell.textContent === status ? '' : 'none';
+      });
+    }
+  </script>
+</body>
+</html>

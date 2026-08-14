@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo — Настройки приватности</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon">B</div><span>Balloo</span>
+    <div class="topbar__dropdown">
+      <div class="topbar__dropdown-item" onclick="window.location.href='chats.html'">💬 Balloo</div>
+      <div class="topbar__dropdown-divider"></div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div>
+    </div>
+  </div>
+  <div class="topbar__title">Настройки приватности</div>
+  <div class="topbar__right">
+    <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИИ</span></div></div>
+    <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+    <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <div class="sidebar">
+    <div class="list">
+      <div class="list__item list__item--active" onclick="switchPrivTab(0)">👁 Видимость</div>
+      <div class="list__item" onclick="switchPrivTab(1)">🔒 Безопасность</div>
+      <div class="list__item" onclick="switchPrivTab(2)">🚫 Чёрный список</div>
+      <div class="list__item" onclick="switchPrivTab(3)">🔐 Секретные чаты</div>
+      <div class="list__item" onclick="switchPrivTab(4)">📊 История</div>
+    </div>
+  </div>
+
+  <div class="content"><div class="page-container page-container--narrow">
+    
+    <!-- Tab 0: Видимость -->
+    <div class="priv-tab" style="display:block;">
+      <h1 class="page-title">👁 Видимость</h1>
+      
+      <div class="card mb-4">
+        <h3 class="card__title mb-4">Профиль</h3>
+        <div class="form-group">
+          <label class="form-label">Кто видит мой профиль</label>
+          <select class="form-select" onchange="togglePrivacyCombo(this,'profile-combo')">
+            <option value="all">Все</option>
+            <option value="contacts">Только контакты</option>
+            <option value="except">Все кроме...</option>
+            <option value="specific">Только...</option>
+          </select>
+          <div id="profile-combo" style="display:none;margin-top:8px;">
+            <input type="text" class="form-input" placeholder="🔍 Поиск контактов...">
+            <div style="max-height:120px;overflow-y:auto;border:1px solid var(--border-color);margin-top:4px;">
+              <label class="form-checkbox" style="padding:4px 8px;"><input type="checkbox"> Анна Иванова</label>
+              <label class="form-checkbox" style="padding:4px 8px;"><input type="checkbox"> Сергей Морозов</label>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Кто видит номер телефона</label>
+          <select class="form-select" onchange="togglePrivacyCombo(this,'phone-combo')">
+            <option value="nobody">Никто</option>
+            <option value="contacts">Только контакты</option>
+            <option value="nobody-except">Никто кроме...</option>
+          </select>
+          <div id="phone-combo" style="display:none;margin-top:8px;">
+            <input type="text" class="form-input" placeholder="🔍 Поиск контактов...">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Кто видит статус «в сети»</label>
+          <select class="form-select" onchange="togglePrivacyCombo(this,'online-combo')">
+            <option value="all">Все</option>
+            <option value="contacts">Только контакты</option>
+            <option value="nobody">Никто</option>
+            <option value="except">Все кроме...</option>
+          </select>
+          <div id="online-combo" style="display:none;margin-top:8px;">
+            <input type="text" class="form-input" placeholder="🔍 Поиск контактов...">
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <h3 class="card__title mb-4">Сообщения</h3>
+        <div class="list__item" style="border:none;"><span class="flex-1">Кто может мне писать</span><select class="form-select" style="width:auto;"><option>Все</option><option>Только контакты</option><option>Никто</option></select></div>
+        <div class="list__item" style="border:none;"><span class="flex-1">Кто может добавлять в группы</span><select class="form-select" style="width:auto;"><option>Все</option><option>Только контакты</option><option>Никто</option></select></div>
+        <div class="list__item" style="border:none;"><span class="flex-1">Кто видит последние seen</span><select class="form-select" style="width:auto;"><option>Все</option><option>Только контакты</option><option>Никто</option></select></div>
+        <div class="list__item" style="border:none;"><span class="flex-1">Кто видит «печатает»</span><select class="form-select" style="width:auto;"><option>Все</option><option>Только контакты</option><option>Никто</option></select></div>
+      </div>
+
+      <div class="card mb-4">
+        <h3 class="card__title mb-4">Данные</h3>
+        <div class="list__item" style="border:none;"><span class="flex-1">Кто видит историю сообщений</span><select class="form-select" style="width:auto;"><option>Все</option><option>Только я</option><option>Никто</option></select></div>
+        <div class="list__item" style="border:none;"><span class="flex-1">Кто видит мои Stories</span><select class="form-select" style="width:auto;"><option>Все</option><option>Только контакты</option><option>Все кроме...</option></select></div>
+        <div class="list__item" style="border:none;"><span class="flex-1">Разрешить поисковым системам индексировать профиль</span><label class="switch"><input type="checkbox"><span class="switch__slider"></span></label></div>
+      </div>
+
+      <div class="card">
+        <h3 class="card__title mb-4">🔗 Ссылка-профиль</h3>
+        <div class="form-group">
+          <label class="form-label">Ваш @username</label>
+          <div class="flex gap-2">
+            <input type="text" class="form-input flex-1" value="@ivanov" placeholder="@username">
+            <button class="btn btn--tertiary btn--sm">Копировать</button>
+          </div>
+          <div class="form-hint">По этой ссылке вас найдут: https://balloo.su/ivanov</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 1: Безопасность -->
+    <div class="priv-tab" style="display:none;">
+      <h1 class="page-title">🔒 Безопасность</h1>
+      
+      <div class="card mb-4">
+        <h3 class="card__title mb-4">End-to-End шифрование</h3>
+        <div class="list__item" style="border:none;">
+          <div class="flex-1">
+            <div class="text-sm font-bold">🔐 Секретные чаты</div>
+            <div class="text-xs text-secondary">Сквозное шифрование. Сообщения не хранятся на сервере.</div>
+          </div>
+          <button class="btn btn--primary btn--sm">Начать</button>
+        </div>
+        <div class="list__item" style="border:none;">
+          <div class="flex-1">
+            <div class="text-sm font-bold">🛡️ Обычные чаты</div>
+            <div class="text-xs text-secondary">Защищённые серверные сообщения. Хранятся на сервере.</div>
+          </div>
+          <span class="chip chip--accent">Активно</span>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <h3 class="card__title mb-4">Удаление сообщений</h3>
+        <div class="form-group">
+          <label class="form-label">Автоудаление сообщений (личные чаты)</label>
+          <select class="form-select">
+            <option>Не удалять</option>
+            <option>Через 1 день</option>
+            <option>Через 1 неделю</option>
+            <option>Через 1 месяц</option>
+            <option>Через 1 год</option>
+          </select>
+        </div>
+        <div class="list__item" style="border:none;"><span class="flex-1">Удалить для всех при выходе</span><label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label></div>
+      </div>
+
+      <div class="card mb-4">
+        <h3 class="card__title mb-4">Входящие запросы</h3>
+        <div class="list__item" style="border:none;"><span class="flex-1">Принимать запросы только от контактов</span><label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label></div>
+        <div class="list__item" style="border:none;"><span class="flex-1">Подтверждать加入 групп</span><label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label></div>
+      </div>
+
+      <div class="card">
+        <h3 class="card__title mb-4">🔑 Двухфакторная аутентификация</h3>
+        <div class="list__item" style="border:none;"><span class="flex-1">2FA TOTP</span><label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label></div>
+        <div class="list__item" style="border:none;"><span class="flex-1">Резервные коды</span><a href="#" style="color:var(--accent);">📥 Скачать</a></div>
+        <button class="btn btn--secondary btn--block mt-3" onclick="window.location.href='two-factor.html'">⚙️ Управление 2FA</button>
+      </div>
+    </div>
+
+    <!-- Tab 2: Чёрный список -->
+    <div class="priv-tab" style="display:none;">
+      <h1 class="page-title">🚫 Чёрный список</h1>
+      
+      <div class="card mb-4">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="card__title mb-0">Заблокированные пользователи</h3>
+          <button class="btn btn--primary btn--sm" onclick="openModal('modal-block-user')">➕ Заблокировать</button>
+        </div>
+        <div class="list__item" style="border:none;padding:12px;">
+          <div class="flex items-center gap-3">
+            <div class="avatar avatar--sm avatar--bordered avatar--status-offline avatar--ctx-blocked"><div class="avatar__inner"><span>ББ</span></div></div>
+            <div class="flex-1">
+              <div class="text-sm font-bold">Блокированный 1</div>
+              <div class="text-xs text-muted">Заблокирован: 10.07.2026</div>
+            </div>
+            <button class="btn btn--secondary btn--sm" onclick="showToast('Разблокирован','success')">Разблокировать</button>
+          </div>
+        </div>
+        <div class="list__item" style="border:none;padding:12px;">
+          <div class="flex items-center gap-3">
+            <div class="avatar avatar--sm avatar--bordered avatar--status-offline avatar--ctx-blocked"><div class="avatar__inner"><span>СС</span></div></div>
+            <div class="flex-1">
+              <div class="text-sm font-bold">Блокированный 2</div>
+              <div class="text-xs text-muted">Заблокирован: 05.07.2026</div>
+            </div>
+            <button class="btn btn--secondary btn--sm" onclick="showToast('Разблокирован','success')">Разблокировать</button>
+          </div>
+        </div>
+        <div class="list__item" style="border:none;padding:12px;">
+          <div class="flex items-center gap-3">
+            <div class="avatar avatar--sm avatar--bordered avatar--status-offline avatar--ctx-blocked"><div class="avatar__inner"><span>ДД</span></div></div>
+            <div class="flex-1">
+              <div class="text-sm font-bold">Блокированный 3</div>
+              <div class="text-xs text-muted">Заблокирован: 01.07.2026</div>
+            </div>
+            <button class="btn btn--secondary btn--sm" onclick="showToast('Разблокирован','success')">Разблокировать</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="card__title mb-4">ℹ️ Что происходит при блокировке</h3>
+        <ul class="text-sm text-secondary" style="padding-left:20px;">
+          <li>Заблокированный не видит ваш профиль</li>
+          <li>Заблокированный не видит ваш статус «в сети»</li>
+          <li>Сообщения от него не доставляются</li>
+          <li>Он не может вам позвонить</li>
+          <li>Он не может добавить вас в группы</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Tab 3: Секретные чаты -->
+    <div class="priv-tab" style="display:none;">
+      <h1 class="page-title">🔐 Секретные чаты</h1>
+      
+      <div class="card mb-4">
+        <h3 class="card__title mb-4">О секретных чатах</h3>
+        <p class="text-sm text-secondary">Секретные чаты используют сквозное шифрование (E2EE). Сообщения хранятся только на устройствах участников и не сохраняются на сервере.</p>
+        <div class="list__item" style="border:none;margin-top:12px;"><span class="flex-1">🔑 End-to-End шифрование</span><span class="chip chip--accent">Активно</span></div>
+        <div class="list__item" style="border:none;"><span class="flex-1">🚫 Нет пересылки</span><span class="chip chip--accent">Включено</span></div>
+        <div class="list__item" style="border:none;"><span class="flex-1">📸 Запрет скриншотов</span><label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label></div>
+        <div class="list__item" style="border:none;"><span class="flex-1">⏰ Саморазрушение</span><select class="form-select" style="width:auto;"><option>Выкл</option><option>1 секунда</option><option>5 секунд</option><option>30 секунд</option><option>1 минута</option><option>1 день</option></select></div>
+      </div>
+
+      <div class="card">
+        <h3 class="card__title mb-4">🔑 Код безопасности</h3>
+        <div class="text-center">
+          <div class="text-sm text-secondary mb-2">Сравните этот код с собеседником для подтверждения E2EE</div>
+          <div class="card" style="display:inline-block;padding:16px;background:var(--bg-tertiary);">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:20px;letter-spacing:2px;color:var(--accent);">🔒 4A 7B 2C 9D E1 F3</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 4: История -->
+    <div class="priv-tab" style="display:none;">
+      <h1 class="page-title">📊 История сообщений</h1>
+      
+      <div class="card mb-4">
+        <h3 class="card__title mb-4">Хранение истории</h3>
+        <div class="list__item" style="border:none;"><span class="flex-1">Хранить историю на сервере</span><label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label></div>
+        <div class="list__item" style="border:none;"><span class="flex-1">Автоудаление старых сообщений</span><label class="switch"><input type="checkbox"><span class="switch__slider"></span></label></div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="form-label">Удалять после</label>
+          <select class="form-select">
+            <option>Никогда</option>
+            <option>30 дней</option>
+            <option>90 дней</option>
+            <option>180 дней</option>
+            <option>1 год</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="card__title mb-4">Экспорт истории</h3>
+        <p class="text-sm text-secondary mb-3">Скачайте всю историю сообщений</p>
+        <div class="flex gap-2">
+          <button class="btn btn--primary btn--sm">📄 Экспорт в JSON</button>
+          <button class="btn btn--secondary btn--sm">📋 Экспорт в TXT</button>
+          <button class="btn btn--secondary btn--sm">📑 Экспорт в PDF</button>
+        </div>
+      </div>
+    </div>
+
+  </div></div>
+</div>
+
+<!-- Modal: Block User -->
+<div class="modal-overlay" id="modal-overlay"></div>
+<div class="modal" id="modal-block-user">
+  <div class="modal__header">
+    <span class="modal__title">🚫 Заблокировать пользователя</span>
+    <div class="modal__close" onclick="closeModal('modal-block-user')">✕</div>
+  </div>
+  <div class="modal__body">
+    <div class="form-group">
+      <input type="text" class="form-input" placeholder="🔍 Поиск по имени или номеру...">
+    </div>
+    <div class="text-sm text-secondary">Введите имя пользователя, которого хотите заблокировать</div>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--tertiary" onclick="closeModal('modal-block-user')">Отмена</button>
+    <button class="btn btn--danger" onclick="closeModal('modal-block-user'); showToast('Пользователь заблокирован','error');">🚫 Заблокировать</button>
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+<script>
+function switchPrivTab(index) {
+  document.querySelectorAll('.priv-tab').forEach((t, i) => {
+    t.style.display = (i === index) ? 'block' : 'none';
+  });
+  document.querySelectorAll('.sidebar .list__item').forEach((item, i) => {
+    item.classList.toggle('list__item--active', i === index);
+  });
+}
+
+function togglePrivacyCombo(select, comboId) {
+  const combo = document.getElementById(comboId);
+  if (!combo) return;
+  combo.style.display = ['except', 'specific', 'nobody-except'].includes(select.value) ? 'block' : 'none';
+}
+</script>
+</body>
+</html>

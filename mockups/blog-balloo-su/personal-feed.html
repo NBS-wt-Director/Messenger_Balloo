@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog — Личные каналы</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:#a855f7;">📝</div><span>Blog</span>
+    <div class="topbar__dropdown"></div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Личные каналы</div>
+  <div class="topbar__right"></div>
+</div>
+<div class="main">
+  <div class="content overflow-y-auto">
+    <div class="page-container">
+      <h1 class="page-title">✍️ Личные каналы сотрудников</h1>
+      <p class="page-subtitle">Блоги сотрудников Balloo — личные мнения, гайды, размышления</p>
+
+      <!-- Channel list (personal channels) -->
+      <div class="card mb-4 card--hover" onclick="window.location.href='channel.html?slug=ivan-voronov'">
+        <div class="flex items-center gap-4">
+          <div style="width:64px;height:64px;clip-path:var(--octagon-clip);background:linear-gradient(135deg,#2db84d,#166534);display:flex;align-items:center;justify-content:center;font-size:28px;border:2px solid var(--accent);">🦊</div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-2">
+              <h3 style="font-size:17px;font-weight:700;color:var(--text-primary);">Блог Ивана Воронова</h3>
+              <span class="chip" style="background:rgba(168,85,247,0.12);color:#a855f7;border-color:#a855f7;">Личный</span>
+            </div>
+            <p class="text-xs text-secondary">Lead Developer. Пишу про архитектуру, WebSocket, DevOps и разработку.</p>
+            <div class="flex gap-2 mt-2">
+              <span class="chip text-xs">📄 12 статей</span>
+              <span class="chip text-xs">👁 8.4K</span>
+            </div>
+          </div>
+          <span class="text-muted">→</span>
+        </div>
+      </div>
+
+      <div class="card mb-4 card--hover" onclick="window.location.href='channel.html?slug=maria-andreeva'">
+        <div class="flex items-center gap-4">
+          <div style="width:64px;height:64px;clip-path:var(--octagon-clip);background:linear-gradient(135deg,#a855f7,#6b21a8);display:flex;align-items:center;justify-content:center;font-size:28px;border:2px solid var(--accent);">🎨</div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-2">
+              <h3 style="font-size:17px;font-weight:700;color:var(--text-primary);">Дизайн-блокнот Марии</h3>
+              <span class="chip" style="background:rgba(168,85,247,0.12);color:#a855f7;border-color:#a855f7;">Личный</span>
+            </div>
+            <p class="text-xs text-secondary">UI/UX дизайнер. Дизайн-система, компоненты, насмотренность.</p>
+            <div class="flex gap-2 mt-2">
+              <span class="chip text-xs">📄 8 статей</span>
+              <span class="chip text-xs">👁 5.1K</span>
+            </div>
+          </div>
+          <span class="text-muted">→</span>
+        </div>
+      </div>
+
+      <div class="card mb-4 card--hover" onclick="window.location.href='channel.html?slug=alexey-drozd'">
+        <div class="flex items-center gap-4">
+          <div style="width:64px;height:64px;clip-path:var(--octagon-clip);background:linear-gradient(135deg,#3b9eff,#1565c0);display:flex;align-items:center;justify-content:center;font-size:28px;border:2px solid var(--accent);">🐳</div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-2">
+              <h3 style="font-size:17px;font-weight:700;color:var(--text-primary);">DevOps заметки Алексея</h3>
+              <span class="chip" style="background:rgba(168,85,247,0.12);color:#a855f7;border-color:#a855f7;">Личный</span>
+            </div>
+            <p class="text-xs text-secondary">DevOps инженер. Docker, K8s, CI/CD, мониторинг.</p>
+            <div class="flex gap-2 mt-2">
+              <span class="chip text-xs">📄 6 статей</span>
+              <span class="chip text-xs">👁 3.2K</span>
+            </div>
+          </div>
+          <span class="text-muted">→</span>
+        </div>
+      </div>
+
+      <!-- Latest posts from all personal channels -->
+      <h3 class="section-title">Последние статьи из личных каналов</h3>
+
+      <div class="card mb-4 card--hover" onclick="window.location.href='post.html?slug=moi-5-let-s-devops'">
+        <div class="flex gap-4">
+          <div style="width:100px;height:100px;background:linear-gradient(135deg,#3b9eff,#1565c0);display:flex;align-items:center;justify-content:center;font-size:36px;flex-shrink:0;">🐳</div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-2">
+              <a href="channel.html?slug=alexey-drozd" class="chip" style="cursor:pointer;">DevOps заметки Алексея</a>
+            </div>
+            <h3 style="font-size:16px;font-weight:700;color:var(--text-primary);margin-bottom:6px;">5 лет с DevOps: что я понял о CI/CD</h3>
+            <p class="text-xs text-secondary" style="margin-bottom:8px;">Личный опыт работы с пайплайнами, мониторингом и инцидентами…</p>
+            <span class="text-xs text-muted">Алексей Дрозд · 9 июля · 10 мин · 👁 1.1K</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-4 card--hover" onclick="window.location.href='post.html?slug=komponenty-balloo'">
+        <div class="flex gap-4">
+          <div style="width:100px;height:100px;background:linear-gradient(135deg,#a855f7,#6b21a8);display:flex;align-items:center;justify-content:center;font-size:36px;flex-shrink:0;">🧩</div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-2">
+              <a href="channel.html?slug=maria-andreeva" class="chip" style="cursor:pointer;">Дизайн-блокнот Марии</a>
+            </div>
+            <h3 style="font-size:16px;font-weight:700;color:var(--text-primary);margin-bottom:6px;">Как мы строим библиотеку компонентов Balloo</h3>
+            <p class="text-xs text-secondary" style="margin-bottom:8px;">Процесс проектирования, документирования и тестирования UI-компонентов…</p>
+            <span class="text-xs text-muted">Мария Андреева · 7 июля · 6 мин · 👁 723</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5 последних статей из подписок -->
+    <div class="card mb-6" style="border-left:3px solid var(--info);">
+      <h3 class="card__title mb-3">📰 5 последних статей из ваших подписок</h3>
+      <div class="list">
+        <div class="list__item" style="border:none;padding:8px 0;"><div class="list__item-body"><div class="list__item-title text-sm">Balloo v1.0.0-beta: что нового</div><div class="text-xs text-muted">Balloo Team · 5 июля</div></div></div>
+        <div class="list__item" style="border:none;padding:8px 0;"><div class="list__item-body"><div class="list__item-title text-sm">Как создать бота для Balloo</div><div class="text-xs text-muted">@botmaster · 3 июля</div></div></div>
+        <div class="list__item" style="border:none;padding:8px 0;"><div class="list__item-body"><div class="list__item-title text-sm">Дизайн-система Balloo</div><div class="text-xs text-muted">Design Team · 1 июля</div></div></div>
+        <div class="list__item" style="border:none;padding:8px 0;"><div class="list__item-body"><div class="list__item-title text-sm">Безопасность в мессенджерах</div><div class="text-xs text-muted">Security Blog · 28 июня</div></div></div>
+        <div class="list__item" style="border:none;padding:8px 0;"><div class="list__item-body"><div class="list__item-title text-sm">Обзор фич v0.9.0</div><div class="text-xs text-muted">Balloo Team · 20 июня</div></div></div>
+      </div>
+    </div>
+
+    <!-- Infinite scroll / Load more -->
+    <div class="text-center mt-6">
+      <button class="btn btn--secondary btn--sm" onclick="alert('Загрузка ещё статей...')">Загрузить ещё ↓</button>
+      <div class="text-xs text-muted mt-2">Бесконечная загрузка (IntersectionObserver)</div>
+    </div>
+  </div>
+</div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

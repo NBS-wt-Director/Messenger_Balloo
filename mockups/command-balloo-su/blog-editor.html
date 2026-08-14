@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Command — Редактор статьи</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--info);">C</div><span>Command</span>
+    <div class="topbar__dropdown"></div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Редактор статьи</div>
+  <div class="topbar__right"></div>
+</div>
+<div class="main">
+  <div class="sidebar sidebar--narrow">
+    <div class="list">
+      <div class="list__item">🏠 Дашборд</div>
+      <div class="list__item">💬 Внутренний чат</div>
+      <div class="list__item">📅 Совещания</div>
+      <div class="list__item">📋 Задачи</div>
+      <div class="list__item">🏢 Мой отдел</div>
+      <div class="list__item">🏛️ Подразделения</div>
+      <div class="list__item">👥 HR</div>
+      <div class="list__item">📚 База знаний</div>
+      <div class="list__item">🎯 Найм</div>
+      <div class="list__item">📊 Мониторинг</div>
+      <div class="list__item list__item--active" style="border-top:1px solid var(--border-color);margin-top:8px;padding-top:12px;">📝 Мои статьи</div>
+      <div class="list__item">✍️ Мой канал</div>
+      <div class="list__item">⚙️ Настройки канала</div>
+      <div class="list__item" style="border-top:1px solid var(--border-color);margin-top:8px;padding-top:12px;">💼 Вакансии</div>
+      <div class="list__item">⭐ Почему мы</div>
+    </div>
+  </div>
+  <div class="content overflow-y-auto"><div class="page-container">
+    <div class="flex justify-between mb-6">
+      <a href="blog-my-posts.html" class="btn btn--tertiary btn--sm">← Мои статьи</a>
+      <div class="flex gap-2">
+        <button class="btn btn--secondary btn--sm">👁 Предпросмотр</button>
+        <button class="btn btn--secondary btn--sm">💾 Сохранить черновик</button>
+        <button class="btn btn--primary btn--sm">📤 Отправить на ревью</button>
+      </div>
+    </div>
+
+    <h1 class="page-title">Новая статья</h1>
+    <span class="chip mb-6" style="display:inline-flex;">Черновик</span>
+
+    <!-- Channel selector -->
+    <div class="form-group">
+      <label class="form-label">Канал</label>
+      <select class="form-select">
+        <option>📰 Новости (корпоративный)</option>
+        <option>⚙️ Технологии (корпоративный)</option>
+        <option>✍️ Мой личный канал</option>
+      </select>
+      <div class="form-hint">Выберите канал, в котором вы являетесь автором</div>
+    </div>
+
+    <!-- Cover image -->
+    <div class="form-group">
+      <label class="form-label">Обложка</label>
+      <div style="border:2px dashed var(--border-strong);padding:32px;text-align:center;color:var(--text-muted);cursor:pointer;">
+        <div style="font-size:40px;margin-bottom:8px;">📷</div>
+        <div class="text-sm">Перетащите изображение или нажмите для выбора</div>
+        <div class="text-xs text-muted">PNG, JPG до 5 МБ · рекомендуется 1200×630</div>
+      </div>
+    </div>
+
+    <!-- Title -->
+    <div class="form-group">
+      <label class="form-label">Заголовок</label>
+      <input type="text" class="form-input" style="font-size:18px;font-weight:700;" placeholder="Введите заголовок статьи…" value="Архитектура realtime: WebSocket, Redis Pub/Sub">
+    </div>
+
+    <!-- Excerpt -->
+    <div class="form-group">
+      <label class="form-label">Анонс (краткое описание)</label>
+      <textarea class="form-textarea" placeholder="2-3 предложения для ленты…" style="min-height:60px;">Как устроена realtime-обработка сообщений в Balloo: WebSocket gateway, Redis Pub/Sub, воркеры и очереди.</textarea>
+      <div class="form-hint">Показывается в ленте блога. Максимум 300 символов.</div>
+    </div>
+
+    <!-- Markdown editor -->
+    <div class="form-group">
+      <label class="form-label">Текст статьи (Markdown)</label>
+      <div class="flex gap-2 mb-2">
+        <button class="btn btn--tertiary btn--sm" title="Жирный">B</button>
+        <button class="btn btn--tertiary btn--sm" title="Курсив">I</button>
+        <button class="btn btn--tertiary btn--sm" title="Заголовок">H</button>
+        <button class="btn btn--tertiary btn--sm" title="Ссылка">🔗</button>
+        <button class="btn btn--tertiary btn--sm" title="Изображение">📷</button>
+        <button class="btn btn--tertiary btn--sm" title="Код">{ }</button>
+        <button class="btn btn--tertiary btn--sm" title="Цитата">"</button>
+        <button class="btn btn--tertiary btn--sm" title="Список">•</button>
+      </div>
+      <textarea class="form-textarea" style="min-height:400px;font-family:'Fira Code',monospace;font-size:13px;line-height:1.6;" placeholder="## Введение&#10;&#10;Текст статьи в Markdown...">## Введение
+
+В Balloo realtime-обновления — основа UX. Сообщения, реакции, статусы — всё должно доходить мгновенно.
+
+## Архитектура
+
+### WebSocket Gateway
+
+Мы используем **Hono + uWebSockets.js** для WebSocket-сервера...
+
+### Redis Pub/Sub
+
+Для масштабирования на несколько инстансов — Redis Pub/Sub...
+
+### Очереди
+
+Тяжёлые операции (вложения, push-уведомления) уходят в очередь...</textarea>
+    </div>
+
+    <!-- Category and tags -->
+    <div class="flex gap-4 mb-6" style="flex-wrap:wrap;">
+      <div class="form-group flex-1" style="min-width:200px;">
+        <label class="form-label">Категория</label>
+        <select class="form-select">
+          <option>⚙️ Технологии</option>
+          <option>📰 Новости</option>
+          <option>👥 Команда</option>
+          <option>📊 Метрики</option>
+        </select>
+      </div>
+      <div class="form-group flex-1" style="min-width:200px;">
+        <label class="form-label">Теги</label>
+        <input type="text" class="form-input" placeholder="через запятую…" value="websocket, redis, архитектура, realtime">
+      </div>
+    </div>
+
+    <!-- Translations -->
+    <div class="card mb-4">
+      <h3 class="card__title mb-4">🌐 Локализация</h3>
+      <p class="text-xs text-secondary mb-4">Статья может иметь переводы для 6 языков. Если перевод отсутствует — показывается язык по умолчанию (RU).</p>
+      <table class="table">
+        <thead><tr><th>Язык</th><th>Статус</th><th>Действие</th></tr></thead>
+        <tbody>
+          <tr><td>🇷🇺 Русский</td><td><span class="chip chip--accent">✓ Основной</span></td><td><button class="btn btn--tertiary btn--sm">✏</button></td></tr>
+          <tr><td>🇬🇧 English</td><td><span class="chip">—</span></td><td><button class="btn btn--tertiary btn--sm">➕ Добавить</button></td></tr>
+          <tr><td>🇨🇳 中文</td><td><span class="chip">—</span></td><td><button class="btn btn--tertiary btn--sm">➕ Добавить</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex gap-2">
+      <button class="btn btn--secondary">💾 Сохранить черновик</button>
+      <button class="btn btn--primary">📤 Отправить на ревью</button>
+      <button class="btn btn--tertiary">🗑 Удалить</button>
+    </div>
+  </div></div>
+</div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

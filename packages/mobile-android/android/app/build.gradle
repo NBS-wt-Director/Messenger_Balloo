@@ -1,0 +1,112 @@
+// ============================================================
+// Balloo Messenger — Android Build Configuration
+// ============================================================
+// ВНИМАНИЕ: Этот файл вступает в силу после выполнения:
+//   npx expo prebuild --platform android
+//
+// После prebuild скопируйте этот файл:
+//   cp android/app/build.gradle.android android/app/build.gradle
+//
+// Или вручную примените изменения из этого файла
+// к сгенерированному android/app/build.gradle
+// ============================================================
+
+android {
+    defaultConfig {
+        applicationId "su.balloo.messenger"
+        minSdkVersion 24
+        targetSdkVersion 34
+        
+        // Поддержка ABI для Android
+        ndk {
+            abiFilters "arm64-v8a", "armeabi-v7a", "x86_64"
+        }
+    }
+
+    // Настройки подписи для релизной сборки
+    signingConfigs {
+        release {
+            storeFile file("balloo-keystore.jks")
+            storePassword System.getenv("ANDROID_KEYSTORE_PASSWORD")
+            keyAlias System.getenv("ANDROID_KEY_ALIAS")
+            keyPassword System.getenv("ANDROID_KEY_PASSWORD")
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+            
+            // Debug-символы для Crashlytics
+            debuggable false
+            jniDebuggable false
+            renderscriptDebuggable false
+        }
+        debug {
+            // Подпись отладки по умолчанию (Android Studio)
+            debuggable true
+        }
+    }
+
+    // AAB настройки: разделение по ABI, но не по языку/плотности
+    bundle {
+        language {
+            enableSplit = false // Все языки в одном пакете
+        }
+        density {
+            enableSplit = false // Все плотности в одном пакете
+        }
+        abi {
+            enableSplit = true // ABI-разделение для AAB
+        }
+    }
+
+    // Split APKs по архитектурам (для download.balloo.su)
+    // Использовать: ./gradlew assembleRelease -PabiSplit=true
+    if (project.hasProperty('abiSplit') && project.property('abiSplit') == 'true') {
+        splits {
+            abi {
+                enable true
+                reset()
+                include "arm64-v8a", "armeabi-v7a", "x86_64"
+                universalApk true // Универсальный APK (все ABI)
+            }
+        }
+        
+        // Переименование split APK
+        applicationVariants.all { variant ->
+            variant.outputs.each { output ->
+                def abi = output.getFilter(com.android.build.OutputFile.ABI)
+                if (abi != null) {
+                    output.outputFileName = "app-${abi}-${variant.name}.apk"
+                }
+            }
+        }
+    }
+
+    // Оптимизация для AAB
+    optimization {
+        // Удаление ненужных ресурсов
+        shrinkResources = true
+    }
+
+    // Компиляция
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+// Зависимости для сборки
+dependencies {
+    // Sentry (self-hosted) — опционально, для мониторинга
+    // implementation 'io.sentry:sentry-android:7.+'
+    
+    // WebP support для Android 4.0+
+    implementation 'com.android.support:support-annotations:28.0.0'
+    
+    // ANR-WatchDog для диагностики
+    // implementation 'com.github.anrwatchdog:anrwatchdog:1.4.0'
+}

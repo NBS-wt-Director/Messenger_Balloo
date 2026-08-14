@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Компонент: Privacy Settings — Настройки приватности</title>
+  <link rel="stylesheet" href="../../assets/common.css">
+  <style>
+    .component-demo { padding: 24px; max-width: 480px; margin: 0 auto; }
+    .component-demo h1 { font-size: 20px; margin-bottom: 16px; }
+    .component-demo .demo-section { margin-bottom: 24px; }
+    .component-demo .demo-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+
+    .privacy-settings { display: flex; flex-direction: column; }
+    .privacy-settings__section { padding: 12px 0; border-bottom: 1px solid var(--border-color); }
+    .privacy-settings__section-title { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+    .privacy-settings__row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+    }
+    .privacy-settings__row-label { font-size: 14px; color: var(--text-primary); }
+    .privacy-settings__row-desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .privacy-settings__select {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 6px 10px;
+      font-size: 13px;
+      outline: none;
+    }
+    .privacy-settings__select option { background: var(--bg-tertiary); }
+  </style>
+</head>
+<body>
+  <div class="component-demo">
+    <h1>📦 Компонент: Privacy Settings (Настройки приватности)</h1>
+
+    <div class="demo-section">
+      <div class="demo-label">Настройки приватности</div>
+      <div class="privacy-settings">
+        <div class="privacy-settings__section">
+          <div class="privacy-settings__section-title">Аккаунт</div>
+          <div class="privacy-settings__row">
+            <div>
+              <div class="privacy-settings__row-label">Кто видит мой номер</div>
+              <div class="privacy-settings__row-desc">Никто / Контакты / Все</div>
+            </div>
+            <select class="privacy-settings__select">
+              <option>Никто</option>
+              <option>Контакты</option>
+              <option>Все</option>
+            </select>
+          </div>
+          <div class="privacy-settings__row">
+            <div>
+              <div class="privacy-settings__row-label">Кто видит мою дату рождения</div>
+            </div>
+            <select class="privacy-settings__select">
+              <option>Только я</option>
+              <option>Контакты</option>
+              <option>Все</option>
+            </select>
+          </div>
+          <div class="privacy-settings__row">
+            <div>
+              <div class="privacy-settings__row-label">Кто видит мою ссылку</div>
+            </div>
+            <select class="privacy-settings__select">
+              <option>Все</option>
+              <option>Контакты</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="privacy-settings__section">
+          <div class="privacy-settings__section-title">Статус</div>
+          <div class="privacy-settings__row">
+            <div>
+              <div class="privacy-settings__row-label">Кто видит мой статус</div>
+              <div class="privacy-settings__row-desc">В сети / В последний раз</div>
+            </div>
+            <select class="privacy-settings__select">
+              <option>Все</option>
+              <option>Контакты</option>
+              <option>Никто</option>
+            </select>
+          </div>
+          <div class="privacy-settings__row">
+            <div>
+              <div class="privacy-settings__row-label">Кто видит мою фотографию</div>
+            </div>
+            <select class="privacy-settings__select">
+              <option>Все</option>
+              <option>Контакты</option>
+              <option>Никто</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="privacy-settings__section">
+          <div class="privacy-settings__section-title">Безопасность</div>
+          <div class="privacy-settings__row">
+            <div>
+              <div class="privacy-settings__row-label">Двухфакторная аутентификация</div>
+              <div class="privacy-settings__row-desc">Дополнительная защита аккаунта</div>
+            </div>
+            <label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label>
+          </div>
+          <div class="privacy-settings__row">
+            <div>
+              <div class="privacy-settings__row-label">Запрос кода при входе</div>
+            </div>
+            <label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="../../assets/common.js"></script>
+</body>
+</html>

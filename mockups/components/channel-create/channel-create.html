@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Компонент: Channel Create — Создание канала</title>
+  <link rel="stylesheet" href="../../assets/common.css">
+  <style>
+    .component-demo { padding: 24px; max-width: 480px; margin: 0 auto; }
+    .component-demo h1 { font-size: 20px; margin-bottom: 16px; }
+    .component-demo .demo-section { margin-bottom: 24px; }
+    .component-demo .demo-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+    .channel-create-form { display: flex; flex-direction: column; gap: 16px; }
+    .channel-create-form .form-input { background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary); padding: 10px 14px; font-size: 14px; outline: none; }
+    .channel-create-form .form-input:focus { border-color: var(--accent); }
+    .channel-create-form .form-input::placeholder { color: var(--text-muted); }
+    .channel-create-form textarea.form-input { min-height: 80px; resize: vertical; }
+    .channel-create-form .form-select { background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary); padding: 10px 14px; font-size: 14px; outline: none; width: 100%; }
+    .channel-create-form .form-select option { background: var(--bg-tertiary); color: var(--text-primary); }
+    .channel-create-form .form-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; display: block; }
+    .channel-create-form .avatar-upload { width: 72px; height: 72px; clip-path: var(--octagon-clip); background: var(--bg-tertiary); border: 2px dashed var(--border-strong); display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--text-muted); cursor: pointer; margin-bottom: 8px; }
+    .channel-create-form .checkbox-row { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+    .channel-create-form .checkbox-row input { accent-color: var(--accent); }
+    .channel-create-form .checkbox-row label { font-size: 14px; color: var(--text-secondary); }
+  </style>
+</head>
+<body>
+  <div class="component-demo">
+    <h1>📦 Компонент: Channel Create (Создание канала)</h1>
+
+    <div class="demo-section">
+      <div class="demo-label">Форма создания канала</div>
+      <div class="channel-create-form">
+        <div class="avatar-upload" title="Загрузить аватар">📷</div>
+        <div>
+          <div class="form-label">Название канала</div>
+          <input class="form-input" type="text" placeholder="Введите название">
+        </div>
+        <div>
+          <div class="form-label">Описание</div>
+          <textarea class="form-input" placeholder="О чём ваш канал?"></textarea>
+        </div>
+        <div>
+          <div class="form-label">Тип канала</div>
+          <select class="form-select">
+            <option>Публичный</option>
+            <option>Приватный</option>
+          </select>
+        </div>
+        <div class="checkbox-row">
+          <input type="checkbox" id="allow-comments" checked>
+          <label for="allow-comments">Разрешить комментарии</label>
+        </div>
+        <button class="btn btn--primary btn--block" style="margin-top: 8px;">Создать канал</button>
+      </div>
+    </div>
+  </div>
+  <script src="../../assets/common.js"></script>
+</body>
+</html>

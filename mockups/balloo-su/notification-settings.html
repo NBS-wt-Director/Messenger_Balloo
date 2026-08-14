@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo — Настройки уведомлений</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon">B</div><span>Balloo</span>
+    <div class="topbar__dropdown">
+      <div class="topbar__dropdown-item" onclick="window.location.href='chats.html'">💬 Balloo</div>
+      <div class="topbar__dropdown-divider"></div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div>
+    </div>
+  </div>
+  <div class="topbar__title">Настройки уведомлений</div>
+  <div class="topbar__right">
+    <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИИ</span></div></div>
+    <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+    <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+  </div>
+</div>
+
+<!-- Main: Sidebar + Content -->
+<div class="main">
+  <!-- Sidebar: Settings navigation -->
+  <div class="sidebar">
+    <div class="list">
+      <div class="list__item list__item--active" onclick="switchNotifTab(0)">🔔 Общие</div>
+      <div class="list__item" onclick="switchNotifTab(1)">💬 Чаты</div>
+      <div class="list__item" onclick="switchNotifTab(2)">👥 Группы</div>
+      <div class="list__item" onclick="switchNotifTab(3)">📢 Каналы</div>
+      <div class="list__item" onclick="switchNotifTab(4)">📞 Звонки</div>
+      <div class="list__item" onclick="switchNotifTab(5)">⏰ Отложенные</div>
+      <div class="list__item" onclick="switchNotifTab(6)">🔕 Mute-список</div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="content"><div class="page-container page-container--narrow">
+    
+    <!-- Tab 0: Общие -->
+    <div class="notif-tab" style="display:block;">
+      <h1 class="page-title">🔔 Уведомления</h1>
+      
+      <div class="card mb-4">
+        <h3 class="card__title mb-4">Push-уведомления</h3>
+        <div class="list__item" style="border:none;"><span class="flex-1">Включить push-уведомления</span><label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label></div>
+        <div class="list__item" style="border:none;"><span class="flex-1">Превью текста</span><select class="form-select" style="width:auto;"><option>20 символов</option><option>50 символов</option><option>100 символов</option><option>Скрыть текст</option></select></div>
+        <div class="list__item" style="border:none;"><span class="flex-1">Показывать имя отправителя</span><label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label></div>
+        <div class="list__item" style="border:none;"><span class="flex-1">Звук уведомлений</span><select class="form-select" style="width:auto;"><option>Стандартный 1</option><option>Стандартный 2</option><option>Стандартный 3</option><option>Свой звук...</option><option>Без звука</option></select></div>
+        <div class="list__item" style="border:none;"><span class="flex-1">Вибрация</span><select class="form-select" style="width:auto;"><option>Слабая</option><option>Средняя</option><option>Сильная</option><option>Без вибрации</option></select></div>
+        <div class="list__item" style="border:none;"><span class="flex-1">Блок-экран (Lock screen)</span><label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label></div>
+        <div class="list__item" style="border:none;"><span class="flex-1">Уведомления в центре уведомлений</span><label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label></div>
+      </div>
+
+      <div class="card mb-4">
+        <h3 class="card__title mb-4">Группировка уведомлений</h3>
+        <div class="list__item" style="border:none;"><span class="flex-1">Группировать по чатам</span><label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label></div>
+        <div class="list__item" style="border:none;"><span class="flex-1">Макс. сообщений в группе</span><select class="form-select" style="width:auto;"><option>3</option><option selected>5</option><option>10</option><option>20</option></select></div>
+        <div class="list__item" style="border:none;"><span class="flex-1">Время группировки (сек)</span><input type="number" class="form-input" value="30" style="width:100px;">
+          <div class="form-hint">Уведомления от одного чата в течение указанного времени будут объединены</div>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <h3 class="card__title mb-4">Не беспокоить (DND)</h3>
+        <div class="list__item" style="border:none;"><span class="flex-1">Включить DND</span><label class="switch" onclick="toggleDNDOptions(this)"><input type="checkbox"><span class="switch__slider"></span></label></div>
+        <div class="dnd-options" style="display:none;margin-top:12px;">
+          <div class="list__item" style="border:none;"><span class="flex-1">По расписанию</span><div><input type="time" value="22:00" style="background:var(--bg-tertiary);border:1px solid var(--border-color);color:var(--text-primary);padding:4px 8px;"> — <input type="time" value="08:00" style="background:var(--bg-tertiary);border:1px solid var(--border-color);color:var(--text-primary);padding:4px 8px;"></div></div>
+          <div class="list__item" style="border:none;"><span class="flex-1">Исключения</span><select class="form-select" style="width:auto;"><option>Никто</option><option>Избранные</option><option>Все контакты</option></select></div>
+          <div class="list__item" style="border:none;"><span class="flex-1">Авто-ответ при DND</span><label class="switch"><input type="checkbox"><span class="switch__slider"></span></label></div>
+          <div class="form-group" style="margin-bottom:0;"><label class="form-label">Текст авто-ответа</label><textarea class="form-textarea" style="min-height:60px;" placeholder="Сейчас недоступен, отвечу позже...">Сейчас недоступен, отвечу позже.</textarea></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="card__title mb-4">Звонки</h3>
+        <div class="list__item" style="border:none;"><span class="flex-1">Прерывающий звонок (override DND)</span><label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label></div>
+        <div class="list__item" style="border:none;"><span class="flex-1">Видеозвонок — вибрация</span><select class="form-select" style="width:auto;"><option>Слабая</option><option selected>Сильная</option></select></div>
+        <div class="list__item" style="border:none;"><span class="flex-1">Звук входящего</span><select class="form-select" style="width:auto;"><option>Стандартный</option><option>Мягкий</option><option>Мелодия</option></select></div>
+      </div>
+    </div>
+
+    <!-- Tab 1: Чаты -->
+    <div class="notif-tab" style="display:none;">
+      <h1 class="page-title">💬 Уведомления чатов</h1>
+      <div class="card mb-4">
+        <h3 class="card__title mb-4">По умолчанию для всех чатов</h3>
+        <div class="list__item" style="border:none;"><span class="flex-1">Звук</span><select class="form-select" style="width:auto;"><option>Вкл</option><option>Выкл</option></select></div>
+        <div class="list__item" style="border:none;"><span class="flex-1">Вибрация</span><select class="form-select" style="width:auto;"><option>Вкл</option><option>Выкл</option></select></div>
+        <div class="list__item" style="border:none;"><span class="flex-1">Превью</span><select class="form-select" style="width:auto;"><option>20 символов</option><option>Скрыть текст</option></select></div>
+      </div>
+      <div class="card">
+        <h3 class="card__title mb-4">Индивидуальные настройки</h3>
+        <div class="list__item" style="border:none;">
+          <div class="flex items-center gap-3 flex-1">
+            <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>МА</span></div></div>
+            <div><div class="text-sm font-bold">Мария Андреева</div><div class="text-xs text-muted">Избранный</div></div>
+          </div>
+          <label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label>
+        </div>
+        <div class="list__item" style="border:none;">
+          <div class="flex items-center gap-3 flex-1">
+            <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-new"><div class="avatar__inner"><span>РД</span></div></div>
+            <div><div class="text-sm font-bold">Команда разработки</div><div class="text-xs text-muted">Группа</div></div>
+          </div>
+          <label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 2: Группы -->
+    <div class="notif-tab" style="display:none;">
+      <h1 class="page-title">👥 Уведомления групп</h1>
+      <div class="card mb-4">
+        <h3 class="card__title mb-4">Поведение по умолчанию</h3>
+        <div class="list__item" style="border:none;"><span class="flex-1">Тихие уведомления (без звука)</span><label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label></div>
+        <div class="list__item" style="border:none;"><span class="flex-1">Только @упоминания</span><label class="switch"><input type="checkbox"><span class="switch__slider"></span></label></div>
+        <div class="list__item" style="border:none;"><span class="flex-1">Все сообщения</span><label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label></div>
+      </div>
+      <div class="card">
+        <h3 class="card__title mb-4">Режим «Только важные»</h3>
+        <p class="text-sm text-secondary mb-3">Уведомления только от администраторов и при @упоминании</p>
+        <div class="list__item" style="border:none;"><span class="flex-1">Включить для всех групп</span><label class="switch"><input type="checkbox"><span class="switch__slider"></span></label></div>
+      </div>
+    </div>
+
+    <!-- Tab 3: Каналы -->
+    <div class="notif-tab" style="display:none;">
+      <h1 class="page-title">📢 Уведомления каналов</h1>
+      <div class="card">
+        <h3 class="card__title mb-4">По умолчанию</h3>
+        <div class="list__item" style="border:none;"><span class="flex-1">Звук при новом посте</span><label class="switch"><input type="checkbox"><span class="switch__slider"></span></label></div>
+        <div class="list__item" style="border:none;"><span class="flex-1">Push-уведомление</span><label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label></div>
+        <div class="list__item" style="border:none;"><span class="flex-1">Превью текста</span><select class="form-select" style="width:auto;"><option>50 символов</option><option>100 символов</option><option>Скрыть текст</option></select></div>
+      </div>
+    </div>
+
+    <!-- Tab 4: Звонки -->
+    <div class="notif-tab" style="display:none;">
+      <h1 class="page-title">📞 Уведомления звонков</h1>
+      <div class="card">
+        <h3 class="card__title mb-4">Настройки звонков</h3>
+        <div class="list__item" style="border:none;"><span class="flex-1">Звук входящего звонка</span><select class="form-select" style="width:auto;"><option>Стандартный</option><option>Мягкий</option><option>Мелодия</option></select></div>
+        <div class="list__item" style="border:none;"><span class="flex-1">Вибрация при звонке</span><label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label></div>
+        <div class="list__item" style="border:none;"><span class="flex-1">Автоответчик</span><label class="switch"><input type="checkbox"><span class="switch__slider"></span></label></div>
+        <div class="list__item" style="border:none;"><span class="flex-1">Звонки от незнакомых</span><select class="form-select" style="width:auto;"><option>Всегда</option><option>Только контакты</option><option>Никогда</option></select></div>
+      </div>
+    </div>
+
+    <!-- Tab 5: Отложенные уведомления -->
+    <div class="notif-tab" style="display:none;">
+      <h1 class="page-title">⏰ Отложенные уведомления</h1>
+      <div class="card mb-4">
+        <h3 class="card__title mb-4">Режим тишины</h3>
+        <div class="list__item" style="border:none;"><span class="flex-1">Включить</span><label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label></div>
+        <div class="list__item" style="border:none;"><span class="flex-1">С</span><input type="time" value="23:00" style="background:var(--bg-tertiary);border:1px solid var(--border-color);color:var(--text-primary);padding:4px 8px;"><span class="text-secondary">по</span><input type="time" value="07:00" style="background:var(--bg-tertiary);border:1px solid var(--border-color);color:var(--text-primary);padding:4px 8px;"></div>
+        <div class="list__item" style="border:none;"><span class="flex-1">Дни</span><div class="flex gap-1"><span class="chip chip--accent">Пн</span><span class="chip chip--accent">Вт</span><span class="chip chip--accent">Ср</span><span class="chip chip--accent">Чт</span><span class="chip chip--accent">Пт</span><span class="chip">Сб</span><span class="chip">Вс</span></div></div>
+      </div>
+      <div class="card">
+        <h3 class="card__title mb-4">Расписание уведомлений</h3>
+        <p class="text-sm text-secondary mb-3">Получать уведомления только в указанные часы</p>
+        <div class="list__item" style="border:none;"><span class="flex-1">Рабочие часы (Пн–Пт, 10:00–19:00)</span><label class="switch"><input type="checkbox"><span class="switch__slider"></span></label></div>
+      </div>
+    </div>
+
+    <!-- Tab 6: Mute-список -->
+    <div class="notif-tab" style="display:none;">
+      <h1 class="page-title">🔕 Mute-список</h1>
+      <div class="card mb-4">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="card__title mb-0">Заглушённые чаты</h3>
+          <button class="btn btn--primary btn--sm" onclick="showToast('Выберите чат для заглушки','info')">➕ Добавить</button>
+        </div>
+        <div class="list__item" style="border:none;">
+          <div class="flex items-center gap-3 flex-1">
+            <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-new"><div class="avatar__inner"><span>РД</span></div></div>
+            <div><div class="text-sm font-bold">Команда разработки</div><div class="text-xs text-muted">Заглушён до 20.07.2026</div></div>
+          </div>
+          <button class="btn btn--secondary btn--sm">Разглушить</button>
+        </div>
+        <div class="list__item" style="border:none;">
+          <div class="flex items-center gap-3 flex-1">
+            <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-new"><div class="avatar__inner"><span>РТ</span></div></div>
+            <div><div class="text-sm font-bold">Российская Газета</div><div class="text-xs text-muted">Навсегда</div></div>
+          </div>
+          <button class="btn btn--secondary btn--sm">Разглушить</button>
+        </div>
+      </div>
+    </div>
+
+  </div></div>
+</div>
+
+<script src="../assets/common.js"></script>
+<script>
+function switchNotifTab(index) {
+  document.querySelectorAll('.notif-tab').forEach((t, i) => {
+    t.style.display = (i === index) ? 'block' : 'none';
+  });
+  document.querySelectorAll('.sidebar .list__item').forEach((item, i) => {
+    item.classList.toggle('list__item--active', i === index);
+  });
+}
+
+function toggleDNDOptions(el) {
+  const checkbox = el.querySelector('input[type="checkbox"]');
+  const options = el.closest('.list__item').nextElementSibling;
+  if (options && options.classList.contains('dnd-options')) {
+    options.style.display = checkbox.checked ? 'block' : 'none';
+  }
+}
+</script>
+</body>
+</html>

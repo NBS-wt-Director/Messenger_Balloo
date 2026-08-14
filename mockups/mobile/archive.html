@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobile — Архив</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    html { overflow-y: auto; height: auto; }
+    body { overflow-y: auto; height: auto; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 40px 24px; }
+    .phone-frame { width:360px; height:760px; background:var(--bg-secondary); border:3px solid var(--border-strong); border-radius:36px; overflow:hidden; position:relative; display:flex; flex-direction:column; box-shadow:var(--shadow-glass); }
+    .phone-frame__notch { position:absolute; top:0; left:50%; transform:translateX(-50%); width:130px; height:26px; background:var(--bg-primary); border-bottom-left-radius:18px; border-bottom-right-radius:18px; z-index:10; }
+    .phone-frame__statusbar { height:30px; padding:4px 20px 0; display:flex; align-items:center; justify-content:space-between; font-size:12px; color:var(--text-secondary); background:var(--bg-secondary); }
+    .phone-frame__screen { flex:1; overflow:hidden; background:var(--bg-primary); display:flex; flex-direction:column; }
+    .phone-frame__home-bar { height:5px; width:120px; margin:0 auto 8px; background:var(--text-muted); border-radius:3px; }
+    .phone-tabbar { display:flex; height:52px; background:var(--bg-secondary); border-top:1px solid var(--border-color); }
+    .phone-tabbar__item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; font-size:10px; color:var(--text-secondary); cursor:pointer; transition:color 0.15s; }
+    .phone-tabbar__item:hover { color:var(--text-primary); }
+    .phone-tabbar__item--active { color:var(--accent); }
+    .phone-tabbar__icon { font-size:20px; line-height:1; }
+  </style>
+</head>
+<body>
+
+<div class="phone-frame">
+  <div class="phone-frame__notch"></div>
+  <div class="phone-frame__statusbar"><span>9:41</span><span>📶 🔋</span></div>
+  <div class="phone-frame__screen">
+    <!-- TOPBAR (обязательный) -->
+    <div class="topbar">
+      <div class="topbar__logo">
+        <div class="topbar__logo-icon">B</div>
+        <span>Balloo</span>
+        <div class="topbar__dropdown">
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/chats.html'">💬 Balloo</div>
+          <div class="topbar__dropdown-divider"></div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div>
+          <div class="topbar__dropdown-divider"></div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/contacts.html'">👤 Контакты</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/search.html'">🔍 Поиск</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/archive.html'">📦 Архив</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/calls.html'">📞 Звонки</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/invites.html'">📨 Приглашения</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/bots.html'">🤖 О ботах</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/about-balloo.html'">ℹ️ О Balloo</div>
+        </div>
+      </div>
+      <div class="topbar__title">Архив</div>
+      <div class="topbar__right">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact" onclick="window.location.href='../balloo-su/profile.html'">
+          <div class="avatar__inner"><span>ИИ</span></div>
+        </div>
+        <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+        <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+      </div>
+    </div>
+
+    <!-- Контент: Архив чатов -->
+    <div style="flex:1;overflow-y:auto;">
+      <div style="padding:16px;">
+        <h1 style="font-size:20px;font-weight:800;color:var(--text-primary);">Архив чатов</h1>
+        <p style="font-size:13px;color:var(--text-secondary);margin-top:4px;">2 архивированных чата</p>
+      </div>
+
+      <div style="padding:0 12px 12px;">
+        <input type="text" class="search-input" placeholder="🔍 Поиск в архиве..." style="width:100%;">
+      </div>
+
+      <div class="list">
+        <div class="list__item">
+          <div class="avatar avatar--md avatar--bordered avatar--status-offline avatar--ctx-new"><div class="avatar__inner"><span>СТ</span></div></div>
+          <div class="list__item-body"><div class="list__item-title">Старый проект</div><div class="list__item-subtitle">Архивирован 10.07.2026</div></div>
+          <button class="btn btn--secondary btn--sm" onclick="showToast('Чат восстановлен','success')">↩ Восстановить</button>
+          <button class="btn btn--tertiary btn--sm text-danger" onclick="showToast('Чат удалён','error')">🗑</button>
+        </div>
+        <div class="list__item">
+          <div class="avatar avatar--md avatar--bordered avatar--status-offline avatar--ctx-contact"><div class="avatar__inner"><span>ВП</span></div></div>
+          <div class="list__item-body"><div class="list__item-title">Виктор Петров</div><div class="list__item-subtitle">Архивирован 05.07.2026</div></div>
+          <button class="btn btn--secondary btn--sm" onclick="showToast('Чат восстановлен','success')">↩ Восстановить</button>
+          <button class="btn btn--tertiary btn--sm text-danger" onclick="showToast('Чат удалён','error')">🗑</button>
+        </div>
+      </div>
+
+      <div class="empty-state" style="display:none;">
+        <div class="empty-state__animation">📦</div>
+        <div class="empty-state__title">Нет архивированных чатов</div>
+        <div class="empty-state__subtitle">Архивируйте чат через меню ⋮ → «В архив»</div>
+      </div>
+    </div>
+
+    <!-- Tabbar (правило 3.2) — активен Чаты -->
+    <div class="phone-tabbar">
+      <div class="phone-tabbar__item phone-tabbar__item--active" onclick="window.location.href='chat.html'">
+        <span class="phone-tabbar__icon">💬</span>Чаты
+      </div>
+      <div class="phone-tabbar__item" onclick="window.location.href='contacts.html'">
+        <span class="phone-tabbar__icon">👥</span>Контакты
+      </div>
+      <div class="phone-tabbar__item" onclick="window.location.href='stories.html'">
+        <span class="phone-tabbar__icon">📷</span>Сторис
+      </div>
+      <div class="phone-tabbar__item" onclick="window.location.href='calls-history.html'">
+        <span class="phone-tabbar__icon">📞</span>Звонки
+      </div>
+      <div class="phone-tabbar__item" onclick="window.location.href='settings.html'">
+        <span class="phone-tabbar__icon">⚙</span>Настройки
+      </div>
+    </div>
+  </div>
+  <div class="phone-frame__home-bar"></div>
+</div>
+
+<script src="../assets/common.js"></script>
+</body>
+</html>

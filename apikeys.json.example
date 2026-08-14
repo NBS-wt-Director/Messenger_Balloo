@@ -1,0 +1,141 @@
+{
+  "_comment": "Balloo Messenger — API Keys Template",
+  "_instruction": "Заполни все пустые значения. После заполнения пришли мне этот файл целиком — я извлеку ключи и впишу в .env.dev и .env.production",
+  "_how_to_use": "DEV-ключи (localhost) | PRODUCTION-ключи (balloo.su)",
+  "dev": {
+    "_comment": "Для локальной разработки — localhost",
+    "database": {
+      "POSTGRES_PASSWORD": "PASSWORD",
+      "DATABASE_URL": "postgresql://balloo:PASSWORD@localhost:5432/balloo?schema=public"
+    },
+    "redis": {
+      "REDIS_PASSWORD": ""
+    },
+    "jwt": {
+      "JWT_ACCESS_SECRET": "CHANGE_ME_TO_SECURE_RANDOM_STRING",
+      "JWT_REFRESH_SECRET": "CHANGE_ME_TO_ANOTHER_SECURE_RANDOM_STRING"
+    },
+    "oauth": {
+      "yandex": {
+        "YANDEX_CLIENT_ID": "",
+        "YANDEX_CLIENT_SECRET": ""
+      },
+      "vk": {
+        "VK_CLIENT_ID": "",
+        "VK_CLIENT_SECRET": ""
+      },
+      "mail": {
+        "MAIL_CLIENT_ID": "",
+        "MAIL_CLIENT_SECRET": ""
+      },
+      "max": {
+        "MAX_CLIENT_ID": "",
+        "MAX_CLIENT_SECRET": ""
+      }
+    },
+    "smtp": {
+      "SMTP_HOST": "localhost",
+      "SMTP_PORT": "587",
+      "SMTP_USER": "",
+      "SMTP_PASSWORD": ""
+    },
+    "cdn": {
+      "MINIO_ACCESS_KEY": "minioadmin",
+      "MINIO_SECRET_KEY": "minioadmin"
+    },
+    "push": {
+      "VAPID_PRIVATE_KEY": "",
+      "VAPID_PUBLIC_KEY": ""
+    },
+    "payments": {
+      "YOOKASSA_SHOP_ID": "",
+      "YOOKASSA_API_KEY": ""
+    },
+    "setup": {
+      "SETUP_PASSWORD": "CHANGE_ME",
+      "ADMIN_INSTALL_PASSWORD": "CHANGE_ME"
+    }
+  },
+  "production": {
+    "_comment": "Для production — balloo.su. Замени все пустые значения.",
+    "database": {
+      "POSTGRES_PASSWORD": "",
+      "POSTGRES_DB": "balloo"
+    },
+    "redis": {
+      "REDIS_PASSWORD": ""
+    },
+    "jwt": {
+      "JWT_ACCESS_SECRET": "",
+      "JWT_REFRESH_SECRET": ""
+    },
+    "jwt_timeouts": {
+      "JWT_ACCESS_EXPIRES_IN": "900",
+      "JWT_REFRESH_EXPIRES_IN": "2592000"
+    },
+    "oauth": {
+      "yandex": {
+        "YANDEX_CLIENT_ID": "",
+        "YANDEX_CLIENT_SECRET": "",
+        "YANDEX_REDIRECT_URI": "https://app.balloo.su/api/auth/oauth/yandex/callback"
+      },
+      "vk": {
+        "VK_CLIENT_ID": "",
+        "VK_CLIENT_SECRET": "",
+        "VK_REDIRECT_URI": "https://app.balloo.su/api/auth/oauth/vk/callback"
+      },
+      "mail": {
+        "MAIL_CLIENT_ID": "",
+        "MAIL_CLIENT_SECRET": "",
+        "MAIL_REDIRECT_URI": "https://app.balloo.su/api/auth/oauth/mail/callback"
+      },
+      "max": {
+        "MAX_CLIENT_ID": "",
+        "MAX_CLIENT_SECRET": "",
+        "MAX_REDIRECT_URI": "https://app.balloo.su/api/auth/oauth/max/callback"
+      }
+    },
+    "smtp": {
+      "SMTP_HOST": "",
+      "SMTP_PORT": "587",
+      "SMTP_USER": "",
+      "SMTP_PASSWORD": "",
+      "SMTP_FROM": "noreply@balloo.su",
+      "SMTP_TLS": "true"
+    },
+    "cdn": {
+      "MINIO_ENDPOINT": "",
+      "MINIO_PORT": "9000",
+      "MINIO_ACCESS_KEY": "",
+      "MINIO_SECRET_KEY": "",
+      "MINIO_BUCKET": "balloo-media",
+      "MINIO_USE_SSL": "false"
+    },
+    "push": {
+      "VAPID_PRIVATE_KEY": "",
+      "VAPID_PUBLIC_KEY": "",
+      "VAPID_SUBJECT": "mailto:admin@balloo.su"
+    },
+    "payments": {
+      "YOOKASSA_SHOP_ID": "",
+      "YOOKASSA_API_KEY": "",
+      "YOOKASSA_WEBHOOK_URL": "https://api.balloo.su/api/payments/webhook/yookassa"
+    },
+    "monitoring": {
+      "PROMETHEUS_ENABLED": "false",
+      "PROMETHEUS_PORT": "9090"
+    },
+    "setup": {
+      "ADMIN_INSTALL_PASSWORD": "",
+      "SETUP_PASSWORD": ""
+    },
+    "cors": {
+      "CORS_ORIGIN": "https://app.balloo.su"
+    },
+    "report_issue": {
+      "REPORT_ISSUE_TELEGRAM": "https://t.me/balloo_support",
+      "REPORT_ISSUE_VK": "https://vk.com/balloo_support",
+      "REPORT_ISSUE_MAX": "https://max.balloo.su/support"
+    }
+  }
+}

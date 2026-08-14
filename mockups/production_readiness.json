@@ -1,0 +1,135 @@
+{
+  "meta": {
+    "document": "tickets/production-readiness-migration.md",
+    "title": "Production Readiness — статус миграции",
+    "created": "2025-08-14",
+    "total_tickets": 12,
+    "tickets_completed": 0,
+    "tickets_in_progress": 0,
+    "tickets_pending": 12,
+    "overall_progress_percent": 0
+  },
+  "components": {
+    "web": { "code_percent": 80, "tests_percent": 15, "docker": true, "ci_cd": true, "docs": true, "ready_percent": 70, "status": "staging" },
+    "api": { "code_percent": 90, "tests_percent": 15, "docker": true, "ci_cd": true, "docs": true, "ready_percent": 80, "status": "staging" },
+    "desktop": { "code_percent": 25, "tests_percent": 0, "docker": false, "ci_cd": true, "docs": true, "ready_percent": 20, "status": "not_ready" },
+    "android": { "code_percent": 30, "tests_percent": 0, "docker": false, "ci_cd": false, "docs": true, "ready_percent": 25, "status": "not_ready" },
+    "ios": { "code_percent": 0, "tests_percent": 0, "docker": false, "ci_cd": false, "docs": true, "ready_percent": 0, "status": "not_started" },
+    "git": { "code_percent": 0, "tests_percent": 0, "docker": false, "ci_cd": false, "docs": false, "ready_percent": 0, "status": "not_started" }
+  },
+  "tickets": [
+    {
+      "id": 1,
+      "title": "Git-репозиторий + .gitignore + CI/CD настройка",
+      "priority": "critical",
+      "status": "pending",
+      "progress_percent": 0,
+      "dependencies": [],
+      "files": ["/ (git init)", "/.gitignore", "/.github/workflows/ci.yml", "/.github/workflows/cd.yml", "/.github/workflows/release.yml"]
+    },
+    {
+      "id": 2,
+      "title": "Заполнение .env + apikeys.json → .env.dev + .env.production",
+      "priority": "critical",
+      "status": "pending",
+      "progress_percent": 0,
+      "dependencies": [1],
+      "files": ["/apikeys.json", "/.env.dev", "/.env.production", "/scripts/apply-keys.sh"]
+    },
+    {
+      "id": 3,
+      "title": "Prisma: миграции + seed + валидация",
+      "priority": "critical",
+      "status": "pending",
+      "progress_percent": 0,
+      "dependencies": [2],
+      "files": ["packages/shared/prisma/schema.prisma", "packages/shared/prisma/seed.ts"]
+    },
+    {
+      "id": 4,
+      "title": "Server API: доведение до 100%",
+      "priority": "critical",
+      "status": "pending",
+      "progress_percent": 0,
+      "dependencies": [2, 3],
+      "files": ["packages/server/src/**"]
+    },
+    {
+      "id": 5,
+      "title": "Web: доведение до 100%",
+      "priority": "critical",
+      "status": "pending",
+      "progress_percent": 0,
+      "dependencies": [2, 4],
+      "files": ["packages/web/src/**"]
+    },
+    {
+      "id": 6,
+      "title": "Desktop (Electron): реализация",
+      "priority": "high",
+      "status": "pending",
+      "progress_percent": 0,
+      "dependencies": [5],
+      "files": ["packages/desktop/src/**", "packages/desktop/electron-builder.yml"]
+    },
+    {
+      "id": 7,
+      "title": "Android: завершение реализации",
+      "priority": "high",
+      "status": "pending",
+      "progress_percent": 0,
+      "dependencies": [5],
+      "files": ["packages/mobile-android/src/**", "packages/mobile-android/android/**"]
+    },
+    {
+      "id": 8,
+      "title": "iOS: старт и базовая реализация",
+      "priority": "high",
+      "status": "pending",
+      "progress_percent": 0,
+      "dependencies": [7],
+      "files": ["packages/mobile-ios/**"]
+    },
+    {
+      "id": 9,
+      "title": "Тесты: покрытие 80%+",
+      "priority": "critical",
+      "status": "pending",
+      "progress_percent": 0,
+      "dependencies": [4, 5, 6, 7],
+      "files": ["packages/*/src/**/__tests__/**", "e2e/**", "packages/*/src/**/*.test.ts"]
+    },
+    {
+      "id": 10,
+      "title": "Docker & Production Infrastructure",
+      "priority": "critical",
+      "status": "pending",
+      "progress_percent": 0,
+      "dependencies": [2, 4],
+      "files": ["docker/**", "docker/prod/**", "scripts/backup.sh"]
+    },
+    {
+      "id": 11,
+      "title": "CI/CD Pipeline: полный пайплайн",
+      "priority": "high",
+      "status": "pending",
+      "progress_percent": 0,
+      "dependencies": [1, 9],
+      "files": [".github/workflows/**", "README.md"]
+    },
+    {
+      "id": 12,
+      "title": "Документация: финализация",
+      "priority": "high",
+      "status": "pending",
+      "progress_percent": 0,
+      "dependencies": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+      "files": ["README.md", "docs/07-operations-manual.md", "docs/08-release-process.md", "docs/09-security-audit.md", "CONTRIBUTING.md"]
+    }
+  ],
+  "commands": {
+    "run_ticket": "прочитай документ: tickets/production-readiness-migration.md и выполни тикет № X",
+    "confirm_ticket": "подтверди выполнение тикета № X",
+    "apply_keys": "прочитай документ: tickets/production-readiness-migration.md и выполни тикет №2 + вложи содержимое apikeys.json"
+  }
+}

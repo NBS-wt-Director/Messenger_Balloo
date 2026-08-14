@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobile — Профиль</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    html { overflow-y: auto; height: auto; }
+    body { overflow-y: auto; height: auto; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 40px 24px; }
+    .phone-frame { width:360px; height:760px; background:var(--bg-secondary); border:3px solid var(--border-strong); border-radius:36px; overflow:hidden; position:relative; display:flex; flex-direction:column; box-shadow:var(--shadow-glass); }
+    .phone-frame__notch { position:absolute; top:0; left:50%; transform:translateX(-50%); width:130px; height:26px; background:var(--bg-primary); border-bottom-left-radius:18px; border-bottom-right-radius:18px; z-index:10; }
+    .phone-frame__statusbar { height:30px; padding:4px 20px 0; display:flex; align-items:center; justify-content:space-between; font-size:12px; color:var(--text-secondary); background:var(--bg-secondary); }
+    .phone-frame__screen { flex:1; overflow:hidden; background:var(--bg-primary); display:flex; flex-direction:column; }
+    .phone-frame__home-bar { height:5px; width:120px; margin:0 auto 8px; background:var(--text-muted); border-radius:3px; }
+    .phone-tabbar { display:flex; height:52px; background:var(--bg-secondary); border-top:1px solid var(--border-color); }
+    .phone-tabbar__item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; font-size:10px; color:var(--text-secondary); cursor:pointer; transition:color 0.15s; }
+    .phone-tabbar__item--active { color:var(--accent); }
+    .phone-tabbar__icon { font-size:20px; line-height:1; }
+    .phone-scroll { flex:1; overflow-y:auto; }
+  </style>
+</head>
+<body>
+<div class="phone-frame">
+  <div class="phone-frame__notch"></div>
+  <div class="phone-frame__statusbar"><span>9:41</span><span>📶 🔋</span></div>
+  <div class="phone-frame__screen">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar__logo">
+        <div class="topbar__logo-icon">B</div><span>Balloo</span>
+        <div class="topbar__dropdown">
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/chats.html'">💬 Balloo</div>
+          <div class="topbar__dropdown-divider"></div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div>
+          <div class="topbar__dropdown-divider"></div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/contacts.html'">👤 Контакты</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/search.html'">🔍 Поиск</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/archive.html'">📦 Архив</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/calls.html'">📞 Звонки</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/invites.html'">📨 Приглашения</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/bots.html'">🤖 О ботах</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/about-balloo.html'">ℹ️ О Balloo</div>
+        </div>
+      </div>
+      <div class="topbar__title">Профиль</div>
+      <div class="topbar__right">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact" onclick="window.location.href='profile.html'"><div class="avatar__inner"><span>ИИ</span></div></div>
+        <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+        <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="phone-scroll">
+      <div style="padding:16px;">
+
+        <!-- Avatar -->
+        <div class="text-center mb-5">
+          <div class="avatar avatar--xl avatar--bordered avatar--status-online avatar--ctx-contact" style="margin:0 auto 12px;">
+            <div class="avatar__inner"><span>ИИ</span></div>
+          </div>
+          <button class="btn btn--secondary btn--sm" onclick="openAvatarPanel()">📷 Изменить аватар</button>
+        </div>
+
+        <!-- Multi-account switcher -->
+        <div class="card mb-4">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="card__title" style="font-size:14px;">👥 Аккаунты</h3>
+            <button class="btn btn--tertiary btn--sm" onclick="openAccountsPanel()">Управлять →</button>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+            <div style="display:flex;align-items:center;gap:6px;padding:6px 10px;cursor:pointer;background:var(--bg-tertiary);border:1px solid var(--accent);" onclick="openAccountsPanel()">
+              <div style="width:28px;height:28px;clip-path:var(--octagon-clip);background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">ИИ</div>
+              <span style="font-size:12px;font-weight:600;color:var(--text-primary);">Иван</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;padding:6px 10px;cursor:pointer;background:var(--bg-tertiary);border:1px solid var(--border-color);" onclick="openAccountsPanel()">
+              <div style="width:28px;height:28px;clip-path:var(--octagon-clip);background:var(--bg-active);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--text-primary);">МА</div>
+              <span style="font-size:12px;font-weight:600;color:var(--text-secondary);">Мария</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;padding:6px 10px;cursor:pointer;background:var(--bg-tertiary);border:1px solid var(--border-color);" onclick="openAccountsPanel()">
+              <div style="width:28px;height:28px;clip-path:var(--octagon-clip);background:var(--bg-active);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--text-primary);">РА</div>
+              <span style="font-size:12px;font-weight:600;color:var(--text-secondary);">Рабочий</span>
+            </div>
+            <div style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--accent);border:1px dashed var(--accent);cursor:pointer;" onclick="openAccountsPanel()">+</div>
+          </div>
+          <p class="text-xs text-muted mt-3">3 аккаунта · <a href="#" onclick="openAccountsPanel();return false;" style="color:var(--accent);">управление</a></p>
+        </div>
+
+        <!-- Basic info -->
+        <div class="card mb-4">
+          <h3 class="card__title mb-3" style="font-size:14px;">Основная информация</h3>
+          <div class="form-group"><label class="form-label">Имя</label><input type="text" class="form-input" value="Иван Иванов" style="font-size:13px;"></div>
+          <div class="form-group"><label class="form-label">Био</label><textarea class="form-textarea" style="font-size:13px;">Разработчик. Люблю геометрию и восьмигранники.</textarea></div>
+          <div class="form-group">
+            <label class="form-label">Статус</label>
+            <div class="flex gap-2">
+              <input type="text" class="form-input" value="На работе" maxlength="70" style="font-size:13px;flex:1;">
+            </div>
+          </div>
+          <div class="form-group"><label class="form-label">Дата рождения</label><input type="date" class="form-input" value="1990-05-20" style="font-size:13px;"></div>
+          <div class="form-group"><label class="form-label">Регистрация</label><input type="text" class="form-input" value="1 января 2026" disabled style="font-size:13px;"></div>
+        </div>
+
+        <!-- Appearance -->
+        <div class="card mb-4">
+          <h3 class="card__title mb-3" style="font-size:14px;">Оформление</h3>
+          <div class="form-group">
+            <label class="form-label">Тема</label>
+            <div class="flex gap-2 flex-wrap">
+              <button class="btn btn--secondary btn--sm" onclick="setTheme('dark')">🌙 Тёмная</button>
+              <button class="btn btn--secondary btn--sm" onclick="setTheme('light')">☀️ Светлая</button>
+              <button class="btn btn--secondary btn--sm" onclick="setTheme('russian')">🇷🇺 Наша</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Язык</label>
+            <select class="form-select" style="font-size:12px;">
+              <optgroup label="Русские"><option>Русский</option><option>Татарский</option><option>Чеченский</option><option>Бурятский</option></optgroup>
+              <optgroup label="Дружественные"><option>Китайский</option><option>Хинди</option><option>Белорусский</option></optgroup>
+              <optgroup label="Остальные"><option>Английский</option><option>Французский</option></optgroup>
+            </select>
+          </div>
+        </div>
+
+        <!-- Yandex Disk -->
+        <div class="card mb-4">
+          <h3 class="card__title mb-3" style="font-size:14px;">Yandex Disk</h3>
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm" style="color:var(--text-primary);">✅ Диск подключён</p>
+              <p class="text-xs text-muted mt-2">Файлы до 1 ГБ</p>
+            </div>
+            <button class="btn btn--danger btn--sm">Отключить</button>
+          </div>
+        </div>
+
+        <!-- Donate card -->
+        <div class="card mb-4" style="border-color:var(--accent);">
+          <h3 class="card__title mb-3" style="font-size:14px;">💰 Поддержка проекта</h3>
+          <p class="text-sm text-secondary mb-3">Помогите Balloo развиваться!</p>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn--primary btn--flex-1" onclick="window.location.href='donate.html'">💰 Поддержать</button>
+            <button class="btn btn--secondary btn--flex-1" onclick="window.location.href='my-donates.html'">📋 Мои донаты</button>
+          </div>
+        </div>
+
+        <!-- Help -->
+        <div class="card mb-4">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="card__title" style="font-size:14px;">🎧 Помощь</h3>
+            <button class="btn btn--primary btn--sm" onclick="showToast('Чат поддержки','info')">Написать →</button>
+          </div>
+          <div class="list__item" style="border:none;"><span class="flex-1">💬 Чат с поддержкой</span><span class="chip chip--accent">Онлайн</span></div>
+          <div class="list__item" style="border:none;cursor:pointer;" onclick="showToast('FAQ','info')"><span class="flex-1">❓ FAQ</span><span class="text-secondary">→</span></div>
+        </div>
+
+        <!-- Devices -->
+        <div class="card mb-4">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="card__title" style="font-size:14px;">📱 Устройства</h3>
+            <a href="../balloo-su/my-devices.html" class="btn btn--primary btn--sm">Мои устройства →</a>
+          </div>
+          <div class="list__item" style="border:none;">
+            <div style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:18px;">💻</div>
+            <div class="list__item-body"><div class="list__item-title">Windows Desktop</div><div class="list__item-subtitle">Москва • Сейчас</div></div>
+            <span class="chip chip--accent">Это устройство</span>
+          </div>
+          <div class="list__item" style="border:none;">
+            <div style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:18px;">📱</div>
+            <div class="list__item-body"><div class="list__item-title">iPhone 15 Pro</div><div class="list__item-subtitle">Москва • 2ч назад</div></div>
+            <button class="btn btn--tertiary btn--sm text-danger">Выйти</button>
+          </div>
+          <div class="list__item" style="border:none;">
+            <div style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:18px;">🌐</div>
+            <div class="list__item-body"><div class="list__item-title">Chrome (Web)</div><div class="list__item-subtitle">Москва • Вчера</div></div>
+            <button class="btn btn--tertiary btn--sm text-danger">Выйти</button>
+          </div>
+          <div class="divider"></div>
+          <a href="../balloo-su/add-device.html" class="btn btn--secondary btn--block btn--sm">➕ Добавить устройство</a>
+        </div>
+
+        <!-- Privacy -->
+        <div class="card mb-4">
+          <h3 class="card__title mb-3" style="font-size:14px;">Приватность</h3>
+          <div class="list__item" style="border:none;"><span class="flex-1">Видимость "В сети"</span><select class="form-select" style="width:auto;font-size:12px;"><option>Только контакты</option><option>Никто</option></select></div>
+          <div class="list__item" style="border:none;"><span class="flex-1">Превью уведомлений</span><span class="text-xs text-muted">20 символов</span></div>
+          <div class="list__item" style="border:none;"><span class="flex-1">Заблокированные</span><button class="btn btn--tertiary btn--sm" onclick="openBlockedPanel()">3 чел.</button></div>
+        </div>
+
+        <!-- Danger zone -->
+        <div class="card" style="border-color:var(--danger);">
+          <h3 class="card__title mb-3 text-danger" style="font-size:14px;">Опасная зона</h3>
+          <p class="text-sm text-secondary mb-3">Удаление аккаунта → анонимизация через 90 дней</p>
+          <button class="btn btn--danger btn--block">Удалить аккаунт</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABBAR -->
+    <div class="phone-tabbar">
+      <div class="phone-tabbar__item" onclick="window.location.href='chat.html'"><span class="phone-tabbar__icon">💬</span>Чаты</div>
+      <div class="phone-tabbar__item" onclick="window.location.href='contacts.html'"><span class="phone-tabbar__icon">👥</span>Контакты</div>
+      <div class="phone-tabbar__item" onclick="window.location.href='stories.html'"><span class="phone-tabbar__icon">📷</span>Сторис</div>
+      <div class="phone-tabbar__item" onclick="window.location.href='calls-history.html'"><span class="phone-tabbar__icon">📞</span>Звонки</div>
+      <div class="phone-tabbar__item phone-tabbar__item--active" onclick="window.location.href='settings.html'"><span class="phone-tabbar__icon">⚙</span>Настройки</div>
+    </div>
+
+  </div>
+  <div class="phone-frame__home-bar"></div>
+</div>
+
+<!-- Slide Panel: Avatar -->
+<div class="slide-panel" id="avatar-panel">
+  <div class="slide-panel__header">
+    <span class="slide-panel__title">📷 Изменить аватар</span>
+    <div class="slide-panel__close" onclick="closeAvatarPanel()">✕</div>
+  </div>
+  <div class="slide-panel__body">
+    <div class="text-center mb-4">
+      <div class="avatar avatar--xl avatar--bordered avatar--status-online avatar--ctx-contact" style="margin:0 auto 12px;"><div class="avatar__inner"><span>ИИ</span></div></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button class="btn btn--primary btn--block" onclick="showToast('Загрузка фото...','info');closeAvatarPanel();">📁 Загрузить фото</button>
+      <button class="btn btn--secondary btn--block" onclick="showToast('Камера...','info');closeAvatarPanel();">📸 Камера</button>
+      <button class="btn btn--secondary btn--block" onclick="showToast('Генерация...','info');closeAvatarPanel();">🤖 Сгенерировать AI</button>
+    </div>
+    <div class="divider"></div>
+    <button class="btn btn--danger btn--block btn--sm" onclick="showToast('Аватар удалён','error');closeAvatarPanel();">🗑 Удалить аватар</button>
+  </div>
+</div>
+
+<!-- Slide Panel: Accounts -->
+<div class="slide-panel" id="accounts-panel">
+  <div class="slide-panel__header">
+    <span class="slide-panel__title">👥 Управление аккаунтами</span>
+    <div class="slide-panel__close" onclick="closeAccountsPanel()">✕</div>
+  </div>
+  <div class="slide-panel__body">
+    <div class="account-detail-card account-detail-card--active">
+      <div style="width:40px;height:40px;clip-path:var(--octagon-clip);background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;">ИИ</div>
+      <div class="account-detail-card__info">
+        <div class="account-detail-card__name">Иван Иванов</div>
+        <div class="account-detail-card__status">Активный · @ivan</div>
+      </div>
+      <span class="chip chip--accent">Активен</span>
+    </div>
+    <div class="account-detail-card">
+      <div style="width:40px;height:40px;clip-path:var(--octagon-clip);background:var(--bg-active);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--text-secondary);">МА</div>
+      <div class="account-detail-card__info">
+        <div class="account-detail-card__name">Мария Андреева</div>
+        <div class="account-detail-card__status">@maria</div>
+      </div>
+      <button class="btn btn--tertiary btn--sm" onclick="showToast('Выход...','info')">Выйти</button>
+    </div>
+    <div class="account-detail-card">
+      <div style="width:40px;height:40px;clip-path:var(--octagon-clip);background:var(--bg-active);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--text-secondary);">РА</div>
+      <div class="account-detail-card__info">
+        <div class="account-detail-card__name">Рабочий аккаунт</div>
+        <div class="account-detail-card__status">@work</div>
+      </div>
+      <button class="btn btn--tertiary btn--sm" onclick="showToast('Выход...','info')">Выйти</button>
+    </div>
+    <div class="divider"></div>
+    <button class="btn btn--primary btn--block" onclick="showToast('Добавление аккаунта...','info');closeAccountsPanel();">➕ Добавить аккаунт</button>
+  </div>
+</div>
+
+<!-- Slide Panel: Blocked -->
+<div class="slide-panel" id="blocked-panel">
+  <div class="slide-panel__header">
+    <span class="slide-panel__title">🚫 Заблокированные пользователи</span>
+    <div class="slide-panel__close" onclick="closeBlockedPanel()">✕</div>
+  </div>
+  <div class="slide-panel__body">
+    <div class="blocked-list__item">
+      <div class="avatar avatar--sm avatar--bordered avatar--status-offline avatar--ctx-blocked"><div class="avatar__inner"><span>??</span></div></div>
+      <div class="blocked-list__info">
+        <div class="blocked-list__name" style="color:var(--text-muted);">Заблокированный</div>
+        <div class="blocked-list__reason">Причина: Спам</div>
+      </div>
+      <button class="btn btn--tertiary btn--sm" onclick="showToast('Пользователь разблокирован','success');this.closest('.blocked-list__item').remove()">Разблокировать</button>
+    </div>
+    <div class="blocked-list__item">
+      <div class="avatar avatar--sm avatar--bordered avatar--status-offline avatar--ctx-blocked"><div class="avatar__inner"><span>??</span></div></div>
+      <div class="blocked-list__info">
+        <div class="blocked-list__name" style="color:var(--text-muted);">Токсичный</div>
+        <div class="blocked-list__reason">Причина: Оскорбления</div>
+      </div>
+      <button class="btn btn--tertiary btn--sm" onclick="showToast('Пользователь разблокирован','success');this.closest('.blocked-list__item').remove()">Разблокировать</button>
+    </div>
+    <div class="blocked-list__item">
+      <div class="avatar avatar--sm avatar--bordered avatar--status-offline avatar--ctx-blocked"><div class="avatar__inner"><span>??</span></div></div>
+      <div class="blocked-list__info">
+        <div class="blocked-list__name" style="color:var(--text-muted);">Бот-скрипт</div>
+        <div class="blocked-list__reason">Причина: Автоматические сообщения</div>
+      </div>
+      <button class="btn btn--tertiary btn--sm" onclick="showToast('Пользователь разблокирован','success');this.closest('.blocked-list__item').remove()">Разблокировать</button>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+<script>
+function openAvatarPanel() { document.getElementById('avatar-panel').classList.add('slide-panel--visible'); }
+function closeAvatarPanel() { document.getElementById('avatar-panel').classList.remove('slide-panel--visible'); }
+function openAccountsPanel() { document.getElementById('accounts-panel').classList.add('slide-panel--visible'); }
+function closeAccountsPanel() { document.getElementById('accounts-panel').classList.remove('slide-panel--visible'); }
+function openBlockedPanel() { document.getElementById('blocked-panel').classList.add('slide-panel--visible'); }
+function closeBlockedPanel() { document.getElementById('blocked-panel').classList.remove('slide-panel--visible'); }
+document.querySelectorAll('.slide-panel').forEach(panel => {
+  panel.addEventListener('click', (e) => {
+    if (e.target === panel) panel.classList.remove('slide-panel--visible');
+  });
+});
+</script>
+</body>
+</html>

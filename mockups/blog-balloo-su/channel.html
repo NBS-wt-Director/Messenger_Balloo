@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog — Канал</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:#a855f7;">📝</div><span>Blog</span>
+    <div class="topbar__dropdown"></div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Канал</div>
+  <div class="topbar__right"></div>
+</div>
+<div class="main">
+  <div class="content overflow-y-auto">
+    <div class="page-container">
+
+      <!-- Back -->
+      <a href="feed.html" class="btn btn--tertiary btn--sm mb-4">← Все каналы</a>
+
+      <!-- Channel header -->
+      <div class="card mb-6">
+        <div style="width:100%;height:120px;background:linear-gradient(135deg,#a855f7,#6b21a8);display:flex;align-items:center;justify-content:center;font-size:48px;margin-bottom:16px;">📰</div>
+        <div class="flex items-center gap-4 mb-4">
+          <div style="width:72px;height:72px;clip-path:var(--octagon-clip);background:var(--bg-tertiary);display:flex;align-items:center;justify-content:center;font-size:36px;border:2px solid var(--accent);">📰</div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-2">
+              <h1 class="page-title" style="margin-bottom:0;">Новости</h1>
+              <span class="chip chip--accent">Корпоративный</span>
+            </div>
+            <p class="text-secondary text-sm">Официальные новости компании Balloo: релизы, обновления, анонсы</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-4" style="flex-wrap:wrap;">
+          <span class="chip">📄 24 статьи</span>
+          <span class="chip">👁 45.2K просмотров</span>
+          <span class="chip">😀 1.2K реакций</span>
+        </div>
+      </div>
+
+      <!-- In-channel search -->
+      <div class="form-group">
+        <input type="text" class="form-input" placeholder="🔍 Поиск по каналу «Новости»...">
+      </div>
+
+      <!-- Posts in channel -->
+      <div class="card mb-4 card--hover" onclick="window.location.href='post.html?slug=reliz-v1-beta'">
+        <div class="flex gap-4">
+          <div style="width:120px;height:120px;background:linear-gradient(135deg,#1a1d21,#2d3742);display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0;">🚀</div>
+          <div class="flex-1">
+            <h3 style="font-size:17px;font-weight:700;color:var(--text-primary);margin-bottom:6px;">Релиз v1.0.0-beta — первый публичный бета-релиз Balloo</h3>
+            <p class="text-xs text-secondary" style="margin-bottom:8px;">Сегодня мы запускаем первую бета-версию мессенджера Balloo для всех желающих…</p>
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-muted">Иван Воронов · 16 июля · 5 мин</span>
+              <div class="flex gap-2">
+                <span class="chip text-xs">👁 1.2K</span>
+                <span class="chip text-xs">😀 34</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-4 card--hover" onclick="window.location.href='post.html?slug=migraciya-k8s'">
+        <div class="flex gap-4">
+          <div style="width:120px;height:120px;background:linear-gradient(135deg,#3b9eff,#1565c0);display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0;">🐳</div>
+          <div class="flex-1">
+            <h3 style="font-size:17px;font-weight:700;color:var(--text-primary);margin-bottom:6px;">Миграция инфраструктуры на Kubernetes</h3>
+            <p class="text-xs text-secondary" style="margin-bottom:8px;">Инфраструктура Balloo полностью переведена на K8s. Деплой автоматизирован, масштабирование настроено…</p>
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-muted">Алексей Дрозд · 14 июля · 7 мин</span>
+              <div class="flex gap-2">
+                <span class="chip text-xs">👁 678</span>
+                <span class="chip text-xs">😀 15</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-4 card--hover" onclick="window.location.href='post.html?slug=novyy-dizayner'">
+        <div class="flex gap-4">
+          <div style="width:120px;height:120px;background:linear-gradient(135deg,#3b9eff,#1565c0);display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0;">👥</div>
+          <div class="flex-1">
+            <h3 style="font-size:17px;font-weight:700;color:var(--text-primary);margin-bottom:6px;">Новый дизайнер в команде — Мария Андреева</h3>
+            <p class="text-xs text-secondary" style="margin-bottom:8px;">Мария присоединилась к команде UI/UX. Рассказываем о её опыте и планах…</p>
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-muted">Алексей Дрозд · 10 июля · 3 мин</span>
+              <div class="flex gap-2">
+                <span class="chip text-xs">👁 432</span>
+                <span class="chip text-xs">😀 18</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Infinite scroll / Load more -->
+      <div class="text-center mt-6">
+        
+        
+        
+        
+        <button class="btn btn--secondary btn--sm" onclick="alert('Загрузка ещё статей...')">Загрузить ещё ↓</button><div class="text-xs text-muted mt-2">Бесконечная загрузка (IntersectionObserver)</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

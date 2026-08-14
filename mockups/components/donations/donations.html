@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Компонент: Donations — Донаты (админ)</title>
+  <link rel="stylesheet" href="../../assets/common.css">
+  <style>
+    .component-demo { padding: 24px; max-width: 640px; margin: 0 auto; }
+    .component-demo h1 { font-size: 20px; margin-bottom: 16px; }
+    .component-demo .demo-section { margin-bottom: 24px; }
+    .component-demo .demo-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+
+    .admin-donations { display: flex; flex-direction: column; gap: 16px; }
+    .admin-donations__stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .admin-donations__stat {
+      padding: 16px;
+      background: var(--bg-glass);
+      border: 1px solid var(--border-color);
+      text-align: center;
+    }
+    .admin-donations__stat__value { font-size: 24px; font-weight: 800; color: var(--accent); }
+    .admin-donations__stat__label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+    .admin-donations__table { width: 100%; border-collapse: collapse; }
+    .admin-donations__table th { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border-color); }
+    .admin-donations__table td { padding: 10px 12px; font-size: 14px; color: var(--text-primary); border-bottom: 1px solid var(--border-color); }
+    .admin-donations__table__row:hover td { background: var(--bg-hover); }
+    .admin-donations__table__amount { font-weight: 700; color: var(--accent); }
+    .admin-donations__table__status { font-size: 12px; padding: 3px 8px; font-weight: 600; }
+    .admin-donations__table__status--success { background: rgba(45,184,77,0.12); color: var(--accent); }
+    .admin-donations__table__status--pending { background: rgba(232,163,23,0.12); color: var(--warning); }
+  </style>
+</head>
+<body>
+  <div class="component-demo">
+    <h1>📦 Компонент: Donations (Донаты — админ)</h1>
+
+    <div class="demo-section">
+      <div class="demo-label">Статистика и таблица</div>
+      <div class="admin-donations">
+        <div class="admin-donations__stats">
+          <div class="admin-donations__stat">
+            <div class="admin-donations__stat__value">12 450 ₽</div>
+            <div class="admin-donations__stat__label">Всего собрано</div>
+          </div>
+          <div class="admin-donations__stat">
+            <div class="admin-donations__stat__value" style="color:var(--text-primary);">347</div>
+            <div class="admin-donations__stat__label">Транзакций</div>
+          </div>
+          <div class="admin-donations__stat">
+            <div class="admin-donations__stat__value" style="color:var(--warning);">12</div>
+            <div class="admin-donations__stat__label">Ожидание</div>
+          </div>
+        </div>
+        <table class="admin-donations__table">
+          <thead>
+            <tr><th>Пользователь</th><th>Сумма</th><th>Статус</th><th>Дата</th></tr>
+          </thead>
+          <tbody>
+            <tr class="admin-donations__table__row">
+              <td>Иван И.</td>
+              <td class="admin-donations__table__amount">500 ₽</td>
+              <td><span class="admin-donations__table__status admin-donations__table__status--success">Оплачено</span></td>
+              <td style="color:var(--text-muted);font-size:13px;">15.07.2026</td>
+            </tr>
+            <tr class="admin-donations__table__row">
+              <td>Алексей К.</td>
+              <td class="admin-donations__table__amount">1000 ₽</td>
+              <td><span class="admin-donations__table__status admin-donations__table__status--pending">Ожидание</span></td>
+              <td style="color:var(--text-muted);font-size:13px;">23.07.2026</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <script src="../../assets/common.js"></script>
+</body>
+</html>

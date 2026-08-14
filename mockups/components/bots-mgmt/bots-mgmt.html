@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Компонент: Bots Mgmt — Управление ботами</title>
+  <link rel="stylesheet" href="../../assets/common.css">
+  <style>
+    .component-demo { padding: 24px; max-width: 640px; margin: 0 auto; }
+    .component-demo h1 { font-size: 20px; margin-bottom: 16px; }
+    .component-demo .demo-section { margin-bottom: 24px; }
+    .component-demo .demo-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+
+    .bots-table { width: 100%; border-collapse: collapse; }
+    .bots-table th { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border-color); }
+    .bots-table td { padding: 12px; font-size: 14px; color: var(--text-primary); border-bottom: 1px solid var(--border-color); }
+    .bots-table__row:hover td { background: var(--bg-hover); }
+    .bots-table__name { font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    .bots-table__name .avatar { flex-shrink: 0; }
+    .bots-table__status { font-size: 12px; padding: 3px 8px; font-weight: 600; }
+    .bots-table__status--online { background: rgba(45,184,77,0.12); color: var(--accent); }
+    .bots-table__status--offline { background: rgba(107,119,133,0.12); color: #6b7785; }
+    .bots-table__actions { display: flex; gap: 8px; }
+    .bots-table__action-btn { padding: 4px 10px; font-size: 12px; cursor: pointer; border: 1px solid var(--border-color); color: var(--text-secondary); background: transparent; }
+    .bots-table__action-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+    .bots-table__action-btn--danger:hover { color: var(--danger); border-color: var(--danger); }
+    .bots-table__header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .bots-table__header__title { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+  </style>
+</head>
+<body>
+  <div class="component-demo">
+    <h1>📦 Компонент: Bots Mgmt (Управление ботами)</h1>
+
+    <div class="demo-section">
+      <div class="demo-label">Таблица ботов</div>
+      <div class="bots-table__header">
+        <div class="bots-table__header__title">Боты (3)</div>
+        <button class="btn btn--primary btn--sm">+ Добавить бота</button>
+      </div>
+      <table class="bots-table">
+        <thead>
+          <tr>
+            <th>Бот</th>
+            <th>Статус</th>
+            <th>Команды</th>
+            <th>Создан</th>
+            <th>Действия</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="bots-table__row">
+            <td>
+              <div class="bots-table__name">
+                <div class="avatar avatar--sm" style="background:var(--accent);color:#fff;clip-path:var(--octagon-clip);font-size:11px;display:inline-flex;align-items:center;justify-content:center;">🤖</div>
+                SupportBot
+              </div>
+            </td>
+            <td><span class="bots-table__status bots-table__status--online">Онлайн</span></td>
+            <td>24</td>
+            <td style="color:var(--text-muted);font-size:13px;">12.01.2026</td>
+            <td>
+              <div class="bots-table__actions">
+                <button class="bots-table__action-btn">Редактировать</button>
+                <button class="bots-table__action-btn bots-table__action-btn--danger">Удалить</button>
+              </div>
+            </td>
+          </tr>
+          <tr class="bots-table__row">
+            <td>
+              <div class="bots-table__name">
+                <div class="avatar avatar--sm" style="background:#3b9eff;color:#fff;clip-path:var(--octagon-clip);font-size:11px;display:inline-flex;align-items:center;justify-content:center;">🤖</div>
+                AnalyticsBot
+              </div>
+            </td>
+            <td><span class="bots-table__status bots-table__status--online">Онлайн</span></td>
+            <td>8</td>
+            <td style="color:var(--text-muted);font-size:13px;">20.02.2026</td>
+            <td>
+              <div class="bots-table__actions">
+                <button class="bots-table__action-btn">Редактировать</button>
+                <button class="bots-table__action-btn bots-table__action-btn--danger">Удалить</button>
+              </div>
+            </td>
+          </tr>
+          <tr class="bots-table__row">
+            <td>
+              <div class="bots-table__name">
+                <div class="avatar avatar--sm" style="background:#a855f7;color:#fff;clip-path:var(--octagon-clip);font-size:11px;display:inline-flex;align-items:center;justify-content:center;">🤖</div>
+                ModerationBot
+              </div>
+            </td>
+            <td><span class="bots-table__status bots-table__status--offline">Офлайн</span></td>
+            <td>15</td>
+            <td style="color:var(--text-muted);font-size:13px;">05.03.2026</td>
+            <td>
+              <div class="bots-table__actions">
+                <button class="bots-table__action-btn">Редактировать</button>
+                <button class="bots-table__action-btn bots-table__action-btn--danger">Удалить</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <script src="../../assets/common.js"></script>
+</body>
+</html>

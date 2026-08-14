@@ -1,0 +1,309 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "balloo.pre_filled_data",
+  "title": "Balloo Messenger — Предзаполненные данные (Seed)",
+  "description": "Единый источник правды по seed-данным монорепо. Содержит предзаполнение таблиц с fill_type=seed из mockups/data_schema.json. Эти данные вносятся при первом деплое (seed.sql / Prisma seed). Сгенерировано из mockups/index.html (секция «Данные»).",
+  "version": "1.0.0",
+  "last_updated": "2026-07-22",
+  "notes": [
+    "ID приведены в формате cuid-строк — это эталонные значения для seed; реальные id генерируются БД, ссылки внутри seed делаются по slug/порядку.",
+    "Переводы покрывают 6 языков: ru, en, zh, fr, be, hi.",
+    "Runtime-таблицы (заполняются в процессе работы) сюда НЕ входят — только seed-таблицы.",
+    "Корпоративные каналы блога создаются админом, личные выдаются сотрудникам — здесь только seed-категории."
+  ],
+  "languages": {
+    "total": 20,
+    "source": "docs/01-architecture-decisions.md, раздел 17 (i18n)",
+    "status": "✅ ПОДТВЕРЖДЁН пользователем (2026-07-18). Перечень 14 языков народов РФ зафиксирован.",
+    "groups": [
+      { "group": "Русские", "locales": [{ "code": "ru", "name": "Русский" }] },
+      {
+        "group": "Русские — языки народов РФ",
+        "count": 14,
+        "locales": [
+          { "code": "tt", "name": "Татарский" },
+          { "code": "ba", "name": "Башкирский" },
+          { "code": "ce", "name": "Чеченский" },
+          { "code": "cv", "name": "Чувашский" },
+          { "code": "av", "name": "Аварский" },
+          { "code": "dar", "name": "Даргинский" },
+          { "code": "udm", "name": "Удмуртский" },
+          { "code": "lez", "name": "Лезгинский" },
+          { "code": "kbd", "name": "Кабардино-черкесский" },
+          { "code": "chm", "name": "Марийский" },
+          { "code": "os", "name": "Осетинский" },
+          { "code": "sah", "name": "Якутский" },
+          { "code": "bua", "name": "Бурятский" },
+          { "code": "uk", "name": "Украинский" }
+        ]
+      },
+      {
+        "group": "Дружественные",
+        "locales": [
+          { "code": "zh", "name": "Китайский" },
+          { "code": "hi", "name": "Индийский (Хинди)" },
+          { "code": "be", "name": "Белорусский" }
+        ]
+      },
+      {
+        "group": "Остальные",
+        "locales": [
+          { "code": "en", "name": "Английский" },
+          { "code": "fr", "name": "Французский" }
+        ]
+      }
+    ],
+    "locale_codes_all": ["ru", "tt", "ba", "ce", "cv", "av", "dar", "udm", "lez", "kbd", "chm", "os", "sah", "bua", "uk", "zh", "hi", "be", "en", "fr"],
+    "base_translation_locales": ["ru", "en", "zh", "fr", "be", "hi"],
+    "base_locales_note": "Базовые локали, для которых seed-переводы уже подготовлены в этом файле. Переводы на 14 языков народов РФ подлежат генерации."
+  },
+  "seed_data": {
+    "donate_tiers": {
+      "table": "donate_tiers",
+      "model": "DonateTier",
+      "description": "Уровни поддержки: кофе/спонсор/VIP",
+      "rows": [
+        {
+          "slug": "coffee",
+          "name": "Кофе разработчику",
+          "minAmount": 100,
+          "perks": ["Спасибо в личном кабинете", "Бейдж «Спонсор»"],
+          "order": 1
+        },
+        {
+          "slug": "sponsor",
+          "name": "Спонсор",
+          "minAmount": 500,
+          "perks": ["Бейдж «Спонсор»", "Приоритет в фич-реквестах", "Доступ к beta-каналу"],
+          "order": 2
+        },
+        {
+          "slug": "vip",
+          "name": "VIP",
+          "minAmount": 2500,
+          "perks": ["Бейдж «VIP»", "Расширенные лимиты вложений", "Ранний доступ к функциям", "Прямой канал с командой"],
+          "order": 3
+        }
+      ]
+    },
+
+    "onboarding_steps": {
+      "table": "onboarding_steps",
+      "model": "OnboardingStep",
+      "description": "3–4 шага онбординга",
+      "rows": [
+        { "order": 1, "illustrationUrl": "/img/onboarding/welcome.svg", "isActive": true },
+        { "order": 2, "illustrationUrl": "/img/onboarding/chats.svg", "isActive": true },
+        { "order": 3, "illustrationUrl": "/img/onboarding/security.svg", "isActive": true },
+        { "order": 4, "illustrationUrl": "/img/onboarding/devices.svg", "isActive": true }
+      ],
+      "translations": {
+        "table": "onboarding_step_translations",
+        "model": "OnboardingStepTranslation",
+        "rows_by_step_order": {
+          "1": [
+            { "locale": "ru", "title": "Добро пожаловать в Balloo", "body": "Российский мессенджер с фокусом на приватность и безопасность." },
+            { "locale": "en", "title": "Welcome to Balloo", "body": "A Russian messenger focused on privacy and security." },
+            { "locale": "zh", "title": "欢迎来到 Balloo", "body": "一款注重隐私和安全的俄罗斯即时通讯应用。" },
+            { "locale": "fr", "title": "Bienvenue sur Balloo", "body": "Une messagerie russe axée sur la confidentialité et la sécurité." },
+            { "locale": "be", "title": "Сардэчна запрашаем у Balloo", "body": "Расійскі месенджар з акцэнтам на прыватнасць і бяспеку." },
+            { "locale": "hi", "title": "Balloo में आपकाना सवागत है", "body": "गोपनियता और सुरक्षा पर केंद्रित एक रूसी मैसेंजर।" }
+          ],
+          "2": [
+            { "locale": "ru", "title": "Чаты и группы", "body": "Общайтесь один на один или создавайте группы до 30 участников." },
+            { "locale": "en", "title": "Chats and Groups", "body": "Chat one-on-one or create groups of up to 30 participants." },
+            { "locale": "zh", "title": "聊天和群组", "body": "一对一聊天或创建最多30人的群组。" },
+            { "locale": "fr", "title": "Discussions et groupes", "body": "Discutez en privé ou créez des groupes jusqu'à 30 participants." },
+            { "locale": "be", "title": "Чаты і групы", "body": "Гутарце адзін на адзін або стварайце групы да 30 удзельнікаў." },
+            { "locale": "hi", "title": "चैट और समूह", "body": "एक-से-एक चैट करें या 30 सदस्यों तक के समूह बनाएं।" }
+          ],
+          "3": [
+            { "locale": "ru", "title": "Безопасность", "body": "Сквозное шифрование, 2FA и контроль устройств." },
+            { "locale": "en", "title": "Security", "body": "End-to-end encryption, 2FA and device control." },
+            { "locale": "zh", "title": "安全", "body": "端到端加密、双因素认证和设备控制。" },
+            { "locale": "fr", "title": "Sécurité", "body": "Chiffrement de bout en bout, 2FA et contrôle des appareils." },
+            { "locale": "be", "title": "Бяспека", "body": "Скразное шыфраванне, 2FA і кантроль прылад." },
+            { "locale": "hi", "title": "सुरक्षा", "body": "एंड-टू-एंड एन्क्रिप्शन, 2FA और डिवाइस नियंत्रण।" }
+          ],
+          "4": [
+            { "locale": "ru", "title": "Мультиаккаунт и устройства", "body": "Привязывайте любое число устройств и переключайтесь между аккаунтами." },
+            { "locale": "en", "title": "Multi-account and Devices", "body": "Link any number of devices and switch between accounts." },
+            { "locale": "zh", "title": "多账户和设备", "body": "绑定任意数量的设备并在账户之间切换。" },
+            { "locale": "fr", "title": "Multi-comptes et appareils", "body": "Liez autant d'appareils que souhaité et basculez entre les comptes." },
+            { "locale": "be", "title": "Мультыаккаунт і прылады", "body": "Прывязвайце любую колькасць прылад і пераключайцеся паміж акаўтамі." },
+            { "locale": "hi", "title": "बहु-खाता और डिवाइस", "body": "कितने भी डिवाइस जोड़ें और खातों के बीच स्विच करें।" }
+          ]
+        }
+      }
+    },
+
+    "text_pages": {
+      "table": "text_pages",
+      "model": "TextPage",
+      "description": "Информационные страницы: rules, about-company, about-balloo",
+      "rows": [
+        { "slug": "rules", "isPublished": true },
+        { "slug": "about-company", "isPublished": true },
+        { "slug": "about-balloo", "isPublished": true }
+      ],
+      "translations": {
+        "table": "text_page_translations",
+        "model": "TextPageTranslation",
+        "rows_by_slug": {
+          "rules": [
+            { "locale": "ru", "title": "Правила Balloo", "content": "# Правила Balloo\n\n1. Уважайте других пользователей.\n2. Запрещён спам и массовые рассылки.\n3. Запрещён контент, нарушающий законодательство РФ.\n4. Не используйте боты для накруток.\n5. Соблюдайте приватность третьих лиц." },
+            { "locale": "en", "title": "Balloo Rules", "content": "# Balloo Rules\n\n1. Respect other users.\n2. Spam and mass mailings are prohibited.\n3. Content violating Russian law is prohibited.\n4. Do not use bots for fraud.\n5. Respect the privacy of third parties." },
+            { "locale": "zh", "title": "Balloo 规则", "content": "# Balloo 规则\n\n1. 尊重其他用户。\n2. 禁止垃圾信息和群发。\n3. 禁止违反俄罗斯法律的内容。\n4. 不得使用机器人作弊。\n5. 尊重第三方隐私。" },
+            { "locale": "fr", "title": "Règles de Balloo", "content": "# Règles de Balloo\n\n1. Respectez les autres utilisateurs.\n2. Le spam et les envois massifs sont interdits.\n3. Le contenu contraire à la loi russe est interdit.\n4. N'utilisez pas de bots pour fraude.\n5. Respectez la vie privée des tiers." },
+            { "locale": "be", "title": "Правілы Balloo", "content": "# Правілы Balloo\n\n1. Паважайце іншых карыстальнікаў.\n2. Забаронены спам і масавыя рассылкі.\n3. Забаронены кантэнт, што парушае заканадаўства РФ.\n4. Не выкарыстоўвайце боты для накрутак.\n5. Захоўвайце прыватнасць трэціх асоб." },
+            { "locale": "hi", "title": "Balloo नियम", "content": "# Balloo नियम\n\n1. अन्य उपयोगकर्ताओं का सम्मान करें।\n2. स्पैम और बल्क मेलिंग प्रतिबंधित है।\n3. रूसी कानून का उल्लंघन करने वाली सामग्री प्रतिबंधित है।\n4. धोखाधड़ी के लिए बॉट का उपयोग न करें।\n5. तृतीय पक्ष की गोपनीयता का सम्मान करें।" }
+          ],
+          "about-company": [
+            { "locale": "ru", "title": "О компании", "content": "# О компании\n\nРазработчик мессенджера Balloo. Российская технологическая команда." },
+            { "locale": "en", "title": "About the Company", "content": "# About the Company\n\nDeveloper of the Balloo messenger. A Russian tech team." },
+            { "locale": "zh", "title": "关于公司", "content": "# 关于公司\n\nBalloo 即时通讯的开发者。一支俄罗斯技术团队。" },
+            { "locale": "fr", "title": "À propos de l'entreprise", "content": "# À propos de l'entreprise\n\nDéveloppeur de la messagerie Balloo. Une équipe technologique russe." },
+            { "locale": "be", "title": "Аб кампаніі", "content": "# Аб кампаніі\n\nРаспрацоўшчык месенджара Balloo. Расійская тэхналагічная каманда." },
+            { "locale": "hi", "title": "कंपनी के बारे में", "content": "# कंपनी के बारे में\n\nBalloo मैसेंजर का डेवलपर। एक रूसी तकनीकी टीम।" }
+          ],
+          "about-balloo": [
+            { "locale": "ru", "title": "О Balloo", "content": "# О Balloo\n\nВерсия приложения, лицензии сторонних компонентов, ссылки и история изменений." },
+            { "locale": "en", "title": "About Balloo", "content": "# About Balloo\n\nApplication version, third-party licenses, links and changelog." },
+            { "locale": "zh", "title": "关于 Balloo", "content": "# 关于 Balloo\n\n应用版本、第三方许可证、链接和更新日志。" },
+            { "locale": "fr", "title": "À propos de Balloo", "content": "# À propos de Balloo\n\nVersion de l'application, licences tierces, liens et journal des modifications." },
+            { "locale": "be", "title": "Аб Balloo", "content": "# Аб Balloo\n\nВерсія прыкладання, ліцэнзіі старонніх кампанентаў, спасылкі і гісторыя змен." },
+            { "locale": "hi", "title": "Balloo के बारे में", "content": "# Balloo के बारे में\n\nऐप संस्करण, तृतीय-पक्ष लाइसेंस, लिंक और चेंजलॉग।" }
+          ]
+        }
+      }
+    },
+
+    "blog_categories": {
+      "table": "blog_categories",
+      "model": "BlogCategory",
+      "description": "Категории блога: Новости, Технологии, Команда, Метрики",
+      "rows": [
+        { "slug": "news", "icon": "newspaper", "order": 1, "visible": true },
+        { "slug": "tech", "icon": "code", "order": 2, "visible": true },
+        { "slug": "team", "icon": "users", "order": 3, "visible": true },
+        { "slug": "metrics", "icon": "chart", "order": 4, "visible": true }
+      ],
+      "translations": {
+        "table": "blog_category_translations",
+        "model": "BlogCategoryTranslation",
+        "rows_by_slug": {
+          "news": [
+            { "locale": "ru", "name": "Новости" },
+            { "locale": "en", "name": "News" },
+            { "locale": "zh", "name": "新闻" },
+            { "locale": "fr", "name": "Actualités" },
+            { "locale": "be", "name": "Навіны" },
+            { "locale": "hi", "name": "समाचार" }
+          ],
+          "tech": [
+            { "locale": "ru", "name": "Технологии" },
+            { "locale": "en", "name": "Technology" },
+            { "locale": "zh", "name": "技术" },
+            { "locale": "fr", "name": "Technologie" },
+            { "locale": "be", "name": "Тэхналогіі" },
+            { "locale": "hi", "name": "तकनीक" }
+          ],
+          "team": [
+            { "locale": "ru", "name": "Команда" },
+            { "locale": "en", "name": "Team" },
+            { "locale": "zh", "name": "团队" },
+            { "locale": "fr", "name": "Équipe" },
+            { "locale": "be", "name": "Каманда" },
+            { "locale": "hi", "name": "टीम" }
+          ],
+          "metrics": [
+            { "locale": "ru", "name": "Метрики" },
+            { "locale": "en", "name": "Metrics" },
+            { "locale": "zh", "name": "指标" },
+            { "locale": "fr", "name": "Métriques" },
+            { "locale": "be", "name": "Метрыкі" },
+            { "locale": "hi", "name": "मेट्रिक्स" }
+          ]
+        }
+      }
+    },
+
+    "knowledge_categories": {
+      "table": "knowledge_categories",
+      "model": "KnowledgeCategory",
+      "description": "Категории базы знаний (дерево, порядок)",
+      "rows": [
+        { "slug": "getting-started", "name": "Начало работы", "order": 1, "parentId": null },
+        { "slug": "messaging", "name": "Сообщения", "order": 2, "parentId": null },
+        { "slug": "groups", "name": "Группы", "order": 3, "parentId": null },
+        { "slug": "security", "name": "Безопасность", "order": 4, "parentId": null },
+        { "slug": "bots-api", "name": "Боты и API", "order": 5, "parentId": null },
+        { "slug": "admin", "name": "Администрирование", "order": 6, "parentId": null }
+      ]
+    },
+
+    "application_stages": {
+      "table": "application_stages",
+      "model": "ApplicationStage",
+      "description": "Этапы воронки найма: Screening → Interview → Offer → Hired/Rejected",
+      "rows": [
+        { "slug": "screening", "name": "Скрининг", "order": 1, "isTerminal": false },
+        { "slug": "interview", "name": "Интервью", "order": 2, "isTerminal": false },
+        { "slug": "offer", "name": "Оффер", "order": 3, "isTerminal": false },
+        { "slug": "hired", "name": "Нанят", "order": 4, "isTerminal": true },
+        { "slug": "rejected", "name": "Отклонён", "order": 5, "isTerminal": true }
+      ]
+    },
+
+    "interview_criteria": {
+      "table": "interview_criteria",
+      "model": "InterviewCriterion",
+      "description": "Критерии оценки интервью: name, description, order, isActive",
+      "rows": [
+        { "name": "Технические навыки", "description": "Оценка профессиональных навыков: знание языков программирования, фреймворков, архитектурных паттернов", "order": 1, "isActive": true },
+        { "name": "Коммуникация", "description": "Способность ясно излагать мысли, слушать, задавать вопросы, работать в команде", "order": 2, "isActive": true },
+        { "name": "Решение задач", "description": "Анализ проблемы, генерация гипотез, структурированный подход к решению", "order": 3, "isActive": true },
+        { "name": "Командный дух", "description": "Готовность помогать коллегам, обмен знаниями, конструктивная обратная связь", "order": 4, "isActive": true },
+        { "name": "Опыт", "description": "Релевантный опыт работы, соответствие требованиям вакансии", "order": 5, "isActive": true },
+        { "name": "Качество кода", "description": "Читаемость, тестируемость, масштабируемость, соблюдение стандартов", "order": 6, "isActive": true }
+      ]
+    },
+
+    "feature_categories": {
+      "table": "feature_categories",
+      "model": "FeatureCategory",
+      "description": "Категории фич-реквестов (slug, иконка, порядок)",
+      "rows": [
+        { "slug": "messaging", "name": "Сообщения", "icon": "chat", "order": 1 },
+        { "slug": "calls", "name": "Звонки", "icon": "phone", "order": 2 },
+        { "slug": "groups", "name": "Группы", "icon": "users", "order": 3 },
+        { "slug": "privacy", "name": "Приватность", "icon": "shield", "order": 4 },
+        { "slug": "ui", "name": "Интерфейс", "icon": "layout", "order": 5 },
+        { "slug": "bots", "name": "Боты", "icon": "bot", "order": 6 },
+        { "slug": "other", "name": "Другое", "icon": "more", "order": 7 }
+      ]
+    }
+  },
+  "summary": {
+    "seed_tables_count": 11,
+    "seed_tables": [
+      "donate_tiers",
+      "onboarding_steps",
+      "onboarding_step_translations",
+      "text_pages",
+      "text_page_translations",
+      "blog_categories",
+      "blog_category_translations",
+      "knowledge_categories",
+      "application_stages",
+      "interview_criteria",
+      "feature_categories"
+    ],
+    "translation_locales": {
+      "total": 20,
+      "base_prepared": ["ru", "en", "zh", "fr", "be", "hi"],
+      "rf_languages_codes": ["tt", "ba", "ce", "cv", "av", "dar", "udm", "lez", "kbd", "chm", "os", "sah", "bua", "uk"],
+      "rf_languages_status": "✅ ПОДТВЕРЖДЁН пользователем (14 языков народов РФ, включая украинский). Seed-переводы на эти языки подлежат генерации."
+    }
+  }
+}

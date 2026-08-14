@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo — Онбординг</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="topbar">
+  <div class="topbar__logo">
+    <div class="topbar__logo-icon">B</div>
+    <span>Balloo</span>
+    <div class="topbar__dropdown">
+      <div class="topbar__dropdown-item" onclick="window.location.href='chats.html'">💬 Balloo (мессенджер)</div>
+      <div class="topbar__dropdown-divider"></div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div>
+    </div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Онбординг</div>
+  <div class="topbar__actions">
+    <div class="topbar__actions-btn">⋮</div>
+  </div>
+  <div class="topbar__right">
+    <div class="mascot">🦊</div>
+    <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+    <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+  </div>
+</div>
+
+<!-- Onboarding -->
+<div class="onboarding">
+  <!-- Step 1 -->
+  <div class="onboarding__step onboarding__step--active">
+    <div class="onboarding__illustration">💬</div>
+    <h2 class="onboarding__title">Добро пожаловать в Balloo!</h2>
+    <p class="onboarding__text">Кроссплатформенный мессенджер с уникальным дизайном, групповыми звонками и защитой ваших данных.</p>
+    <div class="onboarding__dots">
+      <span class="onboarding__dot onboarding__dot--active" onclick="onboardingStep=0;prevOnboarding()"></span>
+      <span class="onboarding__dot" onclick="onboardingStep=0;nextOnboarding()"></span>
+      <span class="onboarding__dot" onclick="onboardingStep=0;nextOnboarding();nextOnboarding()"></span>
+    </div>
+    <div class="onboarding__buttons">
+      <button class="btn btn--tertiary" onclick="skipOnboarding()">Пропустить</button>
+      <button class="btn btn--primary" onclick="nextOnboarding()">Далее →</button>
+    </div>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="onboarding__step">
+    <div class="onboarding__illustration">📞</div>
+    <h2 class="onboarding__title">Звонки и группы</h2>
+    <p class="onboarding__text">Аудио и видео звонки до 30 человек, групповые чаты с опросами, квизами и интерактивными списками.</p>
+    <div class="onboarding__dots">
+      <span class="onboarding__dot" onclick="onboardingStep=1;prevOnboarding()"></span>
+      <span class="onboarding__dot onboarding__dot--active" onclick="onboardingStep=1"></span>
+      <span class="onboarding__dot" onclick="onboardingStep=1;nextOnboarding()"></span>
+    </div>
+    <div class="onboarding__buttons">
+      <button class="btn btn--tertiary" onclick="prevOnboarding()">← Назад</button>
+      <button class="btn btn--primary" onclick="nextOnboarding()">Далее →</button>
+    </div>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="onboarding__step">
+    <div class="onboarding__illustration">🔐</div>
+    <h2 class="onboarding__title">Приватность и безопасность</h2>
+    <p class="onboarding__text">JWT-сессии, шифрование на сервере, 3 темы оформления, мультиязычность. Ваши файлы — на вашем Yandex Disk.</p>
+    <div class="onboarding__dots">
+      <span class="onboarding__dot" onclick="onboardingStep=2;prevOnboarding();prevOnboarding()"></span>
+      <span class="onboarding__dot" onclick="onboardingStep=2;prevOnboarding()"></span>
+      <span class="onboarding__dot onboarding__dot--active" onclick="onboardingStep=2"></span>
+    </div>
+    <div class="onboarding__buttons">
+      <button class="btn btn--tertiary" onclick="prevOnboarding()">← Назад</button>
+      <button class="btn btn--primary" onclick="skipOnboarding()">Начать →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Tooltip (Learning Mode) -->
+<div class="tooltip tooltip--bottom" style="top: 56px; left: 50%; transform: translateX(-50%); width: 300px;">
+  💡 Кликните по заголовку экрана, чтобы включить режим обучения. Подсказки появятся у каждой функции.
+</div>
+
+<script src="../assets/common.js"></script>
+</body>
+</html>

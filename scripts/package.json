@@ -1,0 +1,12 @@
+{
+  "name": "balloo-pdf-generator",
+  "version": "1.0.0",
+  "description": "Generate marketing and documentation PDFs for Balloo Messenger",
+  "type": "module",
+  "scripts": {
+    "generate": "node generate-pdfs.js"
+  },
+  "dependencies": {
+    "puppeteer": "^23.0.0"
+  }
+}

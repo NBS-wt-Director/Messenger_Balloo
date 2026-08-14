@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo — Офлайн</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    .error-page { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:calc(100vh - 56px); padding:40px 24px; text-align:center; }
+    .error-mascot { font-size:72px; margin-bottom:16px; }
+    .error-title { font-size:24px; font-weight:800; color:var(--text-primary); margin-bottom:8px; }
+    .error-desc { font-size:16px; color:var(--text-secondary); max-width:420px; line-height:1.6; margin-bottom:24px; }
+    .error-actions { display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-bottom:28px; }
+    .offline-cache { max-width:480px; width:100%; text-align:left; }
+    .offline-cache__title { font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-muted); margin-bottom:12px; text-align:center; }
+    .offline-cache__item { display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--bg-glass); backdrop-filter:blur(var(--blur)); border:1px solid var(--border-color); margin-bottom:8px; }
+    .offline-cache__avatar { width:40px; height:40px; clip-path:var(--octagon-clip); background:var(--bg-tertiary); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:20px; }
+    .offline-cache__info { flex:1; min-width:0; }
+    .offline-cache__name { font-size:14px; font-weight:600; color:var(--text-primary); }
+    .offline-cache__msg { font-size:12px; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .offline-cache__time { font-size:11px; color:var(--text-muted); flex-shrink:0; }
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon">B</div><span>Balloo</span></div>
+  <div class="topbar__title">Офлайн</div>
+  <div class="topbar__right"><div class="mascot">🦊</div><span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span><span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span></div>
+</div>
+<div class="main"><div class="content overflow-y-auto">
+  <div class="error-page">
+    <div class="error-mascot">🦊📡</div>
+    <h1 class="error-title">Нет соединения с интернетом</h1>
+    <p class="error-desc">Похоже, вы офлайн. Последние сообщения доступны для чтения из кэша. Новые сообщения будут отправлены автоматически при восстановлении соединения.</p>
+    <div class="error-actions">
+      <button class="btn btn--primary" onclick="location.reload()">Попробовать снова</button>
+    </div>
+    <div class="offline-cache">
+      <div class="offline-cache__title">Кэшированные чаты</div>
+      <div class="offline-cache__item">
+        <div class="offline-cache__avatar">💬</div>
+        <div class="offline-cache__info"><div class="offline-cache__name">Команда Balloo</div><div class="offline-cache__msg">Релиз v2.0 готов к тестированию</div></div>
+        <div class="offline-cache__time">2 мин</div>
+      </div>
+      <div class="offline-cache__item">
+        <div class="offline-cache__avatar">🦊</div>
+        <div class="offline-cache__info"><div class="offline-cache__name">Иван Петров</div><div class="offline-cache__msg">Привет! Видел новый дизайн?</div></div>
+        <div class="offline-cache__time">15 мин</div>
+      </div>
+      <div class="offline-cache__item">
+        <div class="offline-cache__avatar">📱</div>
+        <div class="offline-cache__info"><div class="offline-cache__name">Группа разработки</div><div class="offline-cache__msg">Аня: баг с аватаркой пофикшен</div></div>
+        <div class="offline-cache__time">1 ч</div>
+      </div>
+    </div>
+  </div>
+</div></div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

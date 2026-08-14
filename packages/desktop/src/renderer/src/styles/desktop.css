@@ -1,0 +1,176 @@
+/* ===== Desktop-specific styles ===== */
+/* Overrides and additions for the Electron desktop app */
+
+/* --- Window drag region --- */
+.desktop-drag-region {
+  -webkit-app-region: drag;
+  height: 32px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+}
+
+.desktop-drag-region.no-drag {
+  -webkit-app-region: no-drag;
+}
+
+/* --- Window controls (frameless) --- */
+.desktop-window-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: fixed;
+  top: 8px;
+  right: 12px;
+  z-index: 10000;
+  -webkit-app-region: no-drag;
+}
+
+.desktop-window-controls button {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.desktop-window-controls button:hover {
+  opacity: 0.8;
+}
+
+.desktop-window-controls .btn-close {
+  background: #ff5f57;
+}
+
+.desktop-window-controls .btn-minimize {
+  background: #febc2e;
+}
+
+.desktop-window-controls .btn-maximize {
+  background: #28c840;
+}
+
+/* --- System tray integration --- */
+.desktop-tray-menu {
+  display: none; /* Handled by native tray */
+}
+
+/* --- Native notification styling --- */
+.desktop-notification {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 99999;
+  background: var(--bg-card, #1e1e32);
+  border: 1px solid var(--border-color, #2a2a40);
+  padding: 16px;
+  max-width: 360px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  animation: slideInRight 0.3s ease;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* --- Keyboard shortcuts indicator --- */
+.desktop-shortcuts-hint {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-card, #1e1e32);
+  border: 1px solid var(--border-color, #2a2a40);
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--text-secondary, #8a8aa0);
+  z-index: 9998;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.desktop-shortcuts-hint.visible {
+  opacity: 1;
+}
+
+/* --- Prevent text selection on drag areas --- */
+.no-select {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* --- macOS traffic light inset fix --- */
+.platform-darwin .desktop-window-controls {
+  right: auto;
+  left: 12px;
+}
+
+.platform-darwin .desktop-drag-region {
+  height: 38px;
+}
+
+/* --- Desktop-specific layout adjustments --- */
+.desktop-frame {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.desktop-frame .desktop-titlebar {
+  height: 32px;
+  background: var(--bg-primary, #13132a);
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  -webkit-app-region: drag;
+}
+
+.desktop-frame .desktop-titlebar .app-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary, #8a8aa0);
+  margin-left: 8px;
+  -webkit-app-region: no-drag;
+}
+
+.desktop-frame .desktop-content {
+  flex: 1;
+  overflow: hidden;
+}
+
+/* --- Update notification badge --- */
+.desktop-update-badge {
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  background: var(--accent, #2db84d);
+  color: #fff;
+  padding: 8px 16px;
+  font-size: 13px;
+  border-radius: 4px;
+  cursor: pointer;
+  z-index: 9999;
+  box-shadow: 0 4px 16px rgba(45, 184, 77, 0.3);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 4px 16px rgba(45, 184, 77, 0.3); }
+  50% { box-shadow: 0 4px 24px rgba(45, 184, 77, 0.6); }
+}

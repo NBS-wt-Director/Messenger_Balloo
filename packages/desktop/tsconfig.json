@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "outDir": "./dist",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "types": ["vite/client"],
+    "jsx": "react-jsx",
+    "allowSyntheticDefaultImports": true,
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@balloo/shared": ["../shared/src"],
+      "@balloo/shared/*": ["../shared/src/*"],
+      "@balloo/web": ["../web/src"],
+      "@balloo/web/*": ["../web/src/*"],
+      "@/*": ["./src/renderer/src/*"],
+      "@/store/*": ["../web/src/store/*"],
+      "@/components/*": ["../web/src/components/*"],
+      "@/screens/*": ["../web/src/screens/*"],
+      "@/layouts/*": ["../web/src/layouts/*"],
+      "@/services/*": ["../web/src/services/*"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "dist-electron", "dist-renderer"]
+}

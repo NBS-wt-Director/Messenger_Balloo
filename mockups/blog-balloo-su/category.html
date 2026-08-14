@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog — Категория</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:#a855f7;">📝</div><span>Blog</span>
+    <div class="topbar__dropdown"></div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Категория</div>
+  <div class="topbar__right"></div>
+</div>
+<div class="main">
+  <div class="content overflow-y-auto">
+    <div class="page-container">
+
+      <!-- Back -->
+      <a href="feed.html" class="btn btn--tertiary btn--sm mb-4">← Лента</a>
+
+      <!-- Category header -->
+      <div class="card mb-6">
+        <div class="flex items-center gap-3 mb-2">
+          <span style="font-size:40px;">⚙️</span>
+          <div>
+            <h1 class="page-title" style="margin-bottom:4px;">Технологии</h1>
+            <p class="text-secondary text-sm">Статьи о технических решениях, архитектуре и разработке Balloo</p>
+          </div>
+        </div>
+        <div class="flex gap-2 mt-4">
+          <span class="chip">📄 18 статей</span>
+          <span class="chip">👁 32.1K просмотров</span>
+        </div>
+      </div>
+
+      <!-- Posts in category -->
+      <div class="card mb-4 card--hover" onclick="window.location.href='post.html?slug=dizain-sistema'">
+        <div class="flex gap-4">
+          <div style="width:120px;height:120px;background:linear-gradient(135deg,#a855f7,#6b21a8);display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0;">🎨</div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-2">
+              <a href="channel.html?slug=tehnologii" class="chip" style="cursor:pointer;">⚙️ Технологии</a>
+            </div>
+            <h3 style="font-size:17px;font-weight:700;color:var(--text-primary);margin-bottom:6px;">Дизайн-система Balloo: октагоны, пузыри и glassmorphism</h3>
+            <p class="text-xs text-secondary" style="margin-bottom:8px;">Как мы построили уникальную визуальную идентичность…</p>
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-muted">Мария Андреева · 14 июля · 8 мин</span>
+              <div class="flex gap-2">
+                <span class="chip text-xs">👁 856</span>
+                <span class="chip text-xs">😀 21</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-4 card--hover" onclick="window.location.href='post.html?slug=websocket-masshtab'">
+        <div class="flex gap-4">
+          <div style="width:120px;height:120px;background:linear-gradient(135deg,#2db84d,#166534);display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0;">⚡</div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-2">
+              <a href="channel.html?slug=tehnologii" class="chip" style="cursor:pointer;">⚙️ Технологии</a>
+            </div>
+            <h3 style="font-size:17px;font-weight:700;color:var(--text-primary);margin-bottom:6px;">WebSocket на Hono + uWebSockets.js: масштабирование realtime</h3>
+            <p class="text-xs text-secondary" style="margin-bottom:8px;">Почему мы выбрали uWebSockets.js вместо ws…</p>
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-muted">Иван Воронов · 12 июля · 12 мин</span>
+              <div class="flex gap-2">
+                <span class="chip text-xs">👁 2.1K</span>
+                <span class="chip text-xs">😀 45</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-4 card--hover" onclick="window.location.href='post.html?slug=prisma-migracii'">
+        <div class="flex gap-4">
+          <div style="width:120px;height:120px;background:linear-gradient(135deg,#e8a317,#b45309);display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0;">🗄️</div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-2">
+              <a href="channel.html?slug=tehnologii" class="chip" style="cursor:pointer;">⚙️ Технологии</a>
+            </div>
+            <h3 style="font-size:17px;font-weight:700;color:var(--text-primary);margin-bottom:6px;">Prisma + Flyway: схема БД и миграции Balloo</h3>
+            <p class="text-xs text-secondary" style="margin-bottom:8px;">Как мы управляем схемой PostgreSQL через Prisma и SQL-миграции…</p>
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-muted">Иван Воронов · 8 июля · 10 мин</span>
+              <div class="flex gap-2">
+                <span class="chip text-xs">👁 1.5K</span>
+                <span class="chip text-xs">😀 28</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Infinite scroll / Load more -->
+      <div class="text-center mt-6">
+        
+        
+        
+        <button class="btn btn--secondary btn--sm" onclick="alert('Загрузка ещё статей...')">Загрузить ещё ↓</button><div class="text-xs text-muted mt-2">Бесконечная загрузка (IntersectionObserver)</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

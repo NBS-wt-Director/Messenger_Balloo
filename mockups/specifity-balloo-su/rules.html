@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Specifity — Правила проектирования и разработки</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <link rel="stylesheet" href="spec.css">
+</head>
+<body class="app-flex">
+
+<div class="topbar">
+  <div class="topbar__logo">
+    <div class="topbar__logo-icon" style="background:var(--accent);">S</div>
+    <span>Specifity</span>
+    <div class="topbar__dropdown">
+      <div class="topbar__dropdown-item topbar__dropdown-item--node topbar__dropdown-item--node--current">📐 Specifity (текущий)</div>
+      <div class="topbar__dropdown-divider"></div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">💬 Balloo</div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">🛡️ Admin</div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">🏢 Command</div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">💡 Features</div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">📜 History</div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">⬇️ Download</div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">📚 API Docs</div>
+    </div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Правила проектирования и разработки</div>
+  <div class="topbar__right">
+    <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+    <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+  </div>
+</div>
+
+<div class="spec-app">
+  <div class="spec-sidebar">
+    <div class="spec-sidebar__search"><input type="text" class="search-input" placeholder="🔍 Поиск по спецификации..."></div>
+    <div class="spec-sidebar__group">Разделы</div>
+    <a class="spec-sidebar__item" href="home.html"><span class="spec-sidebar__item-icon">🏠</span> Главная</a>
+    <a class="spec-sidebar__item spec-sidebar__item--active" href="rules.html"><span class="spec-sidebar__item-icon">📋</span> Правила</a>
+    <a class="spec-sidebar__item" href="screens.html"><span class="spec-sidebar__item-icon">🖼️</span> Экраны <span class="spec-sidebar__item-num">110</span></a>
+    <a class="spec-sidebar__item" href="endpoints.html"><span class="spec-sidebar__item-icon">🔌</span> Эндпоинты</a>
+    <a class="spec-sidebar__item" href="data.html"><span class="spec-sidebar__item-icon">🗄️</span> Данные <span class="spec-sidebar__item-num">34</span></a>
+    <a class="spec-sidebar__item" href="components.html"><span class="spec-sidebar__item-icon">🧩</span> Компоненты <span class="spec-sidebar__item-num">241</span></a>
+    <div class="spec-sidebar__divider"></div>
+    <a class="spec-sidebar__item" href="specification.html"><span class="spec-sidebar__item-icon">📐</span> Спецификация экрана</a>
+  </div>
+
+  <div class="spec-content">
+    <div class="spec-pagehead">
+      <div class="spec-pagehead__id">ID: 1_10_03 · узел у_10 (specifity)</div>
+      <h1>Правила проектирования и разработки</h1>
+      <p>Единые правила для всего монорепо: порядок проектирования функциональности, система нумерации объектов, жизненный цикл, дизайн-система и статусы реализации. Источник — <code>AGENTS.md</code>.</p>
+    </div>
+
+    <!-- Порядок проектирования -->
+    <div class="spec-block">
+      <div class="spec-block__title">Порядок проектирования функциональности</div>
+      <div class="spec-block__intro">Применяется при добавлении любой новой функции. Никогда не начинать с сущностей данных или эндпоинтов — сначала «что и зачем», потом «как выглядит», потом «как устроено под капотом».</div>
+      <div class="spec-rules">
+        <div class="spec-rule"><div class="spec-rule__title">Функция (0_xx_yy)</div><div class="spec-rule__text">Что делает новый функционал, какая бизнес-задача решается.</div></div>
+        <div class="spec-rule"><div class="spec-rule__title">Узел (у_xx)</div><div class="spec-rule__text">Какому узлу (домену) принадлежит функция. Если затрагивает несколько узлов — описывается для каждого.</div></div>
+        <div class="spec-rule"><div class="spec-rule__title">Пользовательская ситуация</div><div class="spec-rule__text">Сценарий использования: кто, что делает, в какой последовательности, какой результат.</div></div>
+        <div class="spec-rule"><div class="spec-rule__title">Экраны (1_xx_yy)</div><div class="spec-rule__text">Какие UI-экраны нужны для функции по ситуациям.</div></div>
+        <div class="spec-rule"><div class="spec-rule__title">Эндпоинты + Компоненты (2_xx_yy + 4_xx_yy)</div><div class="spec-rule__text">API-эндпоинты и UI-компоненты, обслуживающие экраны.</div></div>
+        <div class="spec-rule"><div class="spec-rule__title">Сущности данных (3_xx_yy)</div><div class="spec-rule__text">Таблицы/модели БД для хранения данных функции.</div></div>
+      </div>
+    </div>
+
+    <!-- Нумерация -->
+    <div class="spec-block">
+      <div class="spec-block__title">Система нумерации объектов</div>
+      <div class="spec-block__intro">Все объекты имеют уникальный ID в формате <code>z_xx_yy</code>: <code>z</code> — префикс типа, <code>xx</code> — номер узла (01–99, 00 = shared), <code>yy</code> — порядковый номер внутри узла.</div>
+      <table class="spec-table">
+        <thead><tr><th>Префикс</th><th>Тип объекта</th><th>Пример</th></tr></thead>
+        <tbody>
+          <tr><td><code>у</code></td><td>Узел (node)</td><td><code>у_01</code> — balloo.su</td></tr>
+          <tr><td><code>0</code></td><td>Функция (function)</td><td><code>0_01_03</code> — функция №3 узла 01</td></tr>
+          <tr><td><code>1</code></td><td>Экран (screen)</td><td><code>1_01_04</code> — экран №4 узла 01</td></tr>
+          <tr><td><code>2</code></td><td>API-эндпоинт</td><td><code>2_01_05</code> — эндпоинт №5 узла 01</td></tr>
+          <tr><td><code>3</code></td><td>Сущность данных</td><td><code>3_01_02</code> — сущность №2 узла 01</td></tr>
+          <tr><td><code>4</code></td><td>Компонент</td><td><code>4_01_01</code> — компонент №1 узла 01</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;margin-top:10px;">Узел <code>00</code> — зарезервирован для общих экранов (<code>shared/</code>). Нумерация внутри узла независима. ID не меняются при правках и не переиспользуются при удалении.</p>
+    </div>
+
+    <!-- Жизненный цикл -->
+    <div class="spec-block">
+      <div class="spec-block__title">Жизненный цикл проекта</div>
+      <table class="spec-table">
+        <thead><tr><th>Фаза</th><th>Название</th><th>Что происходит</th></tr></thead>
+        <tbody>
+          <tr><td><span class="chip chip--accent">1</span></td><td>Проектирование макетов</td><td>Текущая фаза. Макеты — источник правды. Правки вносятся по замечаниям пользователя.</td></tr>
+          <tr><td><span class="chip">2</span></td><td>Фиксация документации</td><td>По команде «зафиксируй документацию». Макеты замораживаются, генерируется <code>docs/</code> + <code>README.md</code>.</td></tr>
+          <tr><td><span class="chip">3</span></td><td>Разработка</td><td>Макеты только для чтения. Код в <code>packages/</code> должен 100% совпадать с макетами.</td></tr>
+          <tr><td><span class="chip">4</span></td><td>v2</td><td>По команде пользователя. Макеты снова можно менять, новый цикл правок.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Порядок обработки замечаний -->
+    <div class="spec-block">
+      <div class="spec-block__title">Порядок обработки замечаний по макетам</div>
+      <div class="spec-rules">
+        <div class="spec-rule"><div class="spec-rule__title">1. Внести правку в макет</div><div class="spec-rule__text">HTML-файл макета в <code>mockups/&lt;узел&gt;/</code>. Соблюдать дизайн-систему <code>common.css</code>.</div></div>
+        <div class="spec-rule"><div class="spec-rule__title">2. Создать/обновить MD рядом с макетом</div><div class="spec-rule__text">Задание на создание работоспособной страницы: структура, компоненты, API, адаптивность.</div></div>
+        <div class="spec-rule"><div class="spec-rule__title">3. Обновить index.html</div><div class="spec-rule__text">Карточка экрана, счётчики, баннер готовности.</div></div>
+        <div class="spec-rule"><div class="spec-rule__title">4. Обновить index_ecrans.md</div><div class="spec-rule__text">Сводная таблица узлов, запись экрана, функции.</div></div>
+        <div class="spec-rule"><div class="spec-rule__title">5. Обновить index_ecrans.json</div><div class="spec-rule__text">Метаданные (JSON), счётчики, <code>last_updated</code>.</div></div>
+        <div class="spec-rule"><div class="spec-rule__title">6. Обновить docs/</div><div class="spec-rule__text">При новой функции — архитектура, требования, БД, API, фронтенд, devops.</div></div>
+      </div>
+    </div>
+
+    <!-- Дизайн-система -->
+    <div class="spec-block">
+      <div class="spec-block__title">Дизайн-система (краткая справка)</div>
+      <div class="spec-block__intro">Подробно — в <code>mockups/assets/common.css</code>. Эталон тем — <code>mockups/index.html</code>. Темы зафиксированы, замечания по ним игнорируются до Фазы 2.</div>
+      <table class="spec-table">
+        <thead><tr><th>Принцип</th><th>Описание</th></tr></thead>
+        <tbody>
+          <tr><td>Аватарки</td><td>Восьмигранные (октагон), двойная рамка (контекст + статус)</td></tr>
+          <tr><td>Пузыри сообщений</td><td>Без скруглений, угловые срезы (<code>--bubble-sender/receiver</code>)</td></tr>
+          <tr><td>Темы</td><td>3: dark (по умолчанию), light, russian (флаг РФ + драгметаллы)</td></tr>
+          <tr><td>Glassmorphism</td><td><code>backdrop-filter: blur()</code>, полупрозрачные карточки</td></tr>
+          <tr><td>Border-radius</td><td>Нет везде, кроме switch и аватарок — прямые углы</td></tr>
+          <tr><td>Шрифт</td><td>Inter / Manrope; код — JetBrains Mono / Fira Code</td></tr>
+          <tr><td>Акцент</td><td><code>--accent: #2db84d</code> (зелёный)</td></tr>
+          <tr><td>Языки</td><td>6: RU, EN, ZH, FR, BE, HI</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Статусы -->
+    <div class="spec-block">
+      <div class="spec-block__title">Статусы реализации</div>
+      <table class="spec-table">
+        <thead><tr><th>Статус</th><th>Описание</th></tr></thead>
+        <tbody>
+          <tr><td><code>запланирован</code></td><td>Узел/экран описан в планах</td></tr>
+          <tr><td><code>задокументирован</code></td><td>Написана документация</td></tr>
+          <tr><td><code>спроектирован</code></td><td>Макет готов, архитектура определена</td></tr>
+          <tr><td><code>написан</code></td><td>Код написан, не протестирован</td></tr>
+          <tr><td><code>протестирован</code></td><td>Код протестирован, готов к релизу</td></tr>
+          <tr><td><code>готов</code></td><td>Релизнут. Дополнительно: <code>открыт</code> / <code>закрыт</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+</body>
+</html>

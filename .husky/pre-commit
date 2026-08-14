@@ -1,0 +1,5 @@
+#!/bin/sh
+# husky pre-commit hook (root)
+# Запускает lint-staged для проверки изменённых файлов перед коммитом
+
+npx lint-staged

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobile — Сторис</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    html { overflow-y: auto; height: auto; }
+    body { overflow-y: auto; height: auto; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 40px 24px; }
+    .phone-frame { width:360px; height:760px; background:var(--bg-secondary); border:3px solid var(--border-strong); border-radius:36px; overflow:hidden; position:relative; display:flex; flex-direction:column; box-shadow:var(--shadow-glass); }
+    .phone-frame__notch { position:absolute; top:0; left:50%; transform:translateX(-50%); width:130px; height:26px; background:var(--bg-primary); border-bottom-left-radius:18px; border-bottom-right-radius:18px; z-index:10; }
+    .phone-frame__statusbar { height:30px; padding:4px 20px 0; display:flex; align-items:center; justify-content:space-between; font-size:12px; color:var(--text-secondary); background:var(--bg-secondary); }
+    .phone-frame__screen { flex:1; overflow:hidden; background:var(--bg-primary); display:flex; flex-direction:column; }
+    .phone-frame__home-bar { height:5px; width:120px; margin:0 auto 8px; background:var(--text-muted); border-radius:3px; }
+    .phone-tabbar { display:flex; height:52px; background:var(--bg-secondary); border-top:1px solid var(--border-color); }
+    .phone-tabbar__item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; font-size:10px; color:var(--text-secondary); cursor:pointer; transition:color 0.15s; }
+    .phone-tabbar__item:hover { color:var(--text-primary); }
+    .phone-tabbar__item--active { color:var(--accent); }
+    .phone-tabbar__icon { font-size:20px; line-height:1; }
+
+    .stories-tray { display:flex; gap:12px; padding:12px; overflow-x:auto; border-bottom:1px solid var(--border-color); }
+    .story-item { display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; min-width:64px; }
+    .story-avatar { width:56px; height:56px; clip-path:var(--octagon-clip-stories); display:flex; align-items:center; justify-content:center; position:relative; }
+    .story-avatar--add { background:var(--accent); }
+    .story-avatar--viewed { background:var(--bg-tertiary); opacity:0.6; }
+    .story-avatar__inner { width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:700; color:#fff; }
+    .story-name { font-size:10px; color:var(--text-secondary); text-align:center; max-width:64px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .story-viewer { position:fixed; inset:0; background:#000; z-index:1000; display:none; flex-direction:column; }
+    .story-viewer--visible { display:flex; }
+    .story-viewer__progress { display:flex; gap:4px; padding:12px 16px 8px; background:rgba(0,0,0,0.3); }
+    .story-viewer__progress-bar { flex:1; height:3px; background:rgba(255,255,255,0.3); border-radius:2px; overflow:hidden; }
+    .story-viewer__progress-fill { height:100%; background:#fff; width:0%; }
+    .story-viewer__header { display:flex; align-items:center; gap:12px; padding:12px 16px; background:rgba(0,0,0,0.3); }
+    .story-viewer__avatar { width:40px; height:40px; clip-path:var(--octagon-clip); background:var(--accent); display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; color:#fff; }
+    .story-viewer__user { flex:1; }
+    .story-viewer__user-name { font-size:14px; font-weight:600; color:#fff; }
+    .story-viewer__user-time { font-size:11px; color:rgba(255,255,255,0.6); }
+    .story-viewer__close { color:#fff; font-size:24px; cursor:pointer; }
+    .story-viewer__content { flex:1; display:flex; align-items:center; justify-content:center; position:relative; }
+    .story-viewer__nav-arrow { font-size:32px; color:rgba(255,255,255,0.7); cursor:pointer; position:absolute; top:50%; transform:translateY(-50%); padding:20px 10px; }
+    .story-viewer__nav-arrow--prev { left:0; }
+    .story-viewer__nav-arrow--next { right:0; }
+    .story-viewer__frame { max-width:100%; max-height:100%; object-fit:contain; }
+    .story-viewer__footer { display:flex; align-items:center; gap:12px; padding:16px; background:rgba(0,0,0,0.3); }
+    .story-viewer__reply-input { flex:1; padding:10px 16px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; font-size:14px; outline:none; border-radius:20px; }
+    .story-viewer__reply-input::placeholder { color:rgba(255,255,255,0.5); }
+  </style>
+</head>
+<body>
+
+<div class="phone-frame">
+  <div class="phone-frame__notch"></div>
+  <div class="phone-frame__statusbar"><span>9:41</span><span>📶 🔋</span></div>
+  <div class="phone-frame__screen">
+    <!-- TOPBAR (обязательный) -->
+    <div class="topbar">
+      <div class="topbar__logo">
+        <div class="topbar__logo-icon">B</div>
+        <span>Balloo</span>
+        <div class="topbar__dropdown">
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/chats.html'">💬 Balloo</div>
+          <div class="topbar__dropdown-divider"></div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div>
+          <div class="topbar__dropdown-divider"></div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/contacts.html'">👤 Контакты</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/search.html'">🔍 Поиск</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/archive.html'">📦 Архив</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/calls.html'">📞 Звонки</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/invites.html'">📨 Приглашения</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/bots.html'">🤖 О ботах</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/about-balloo.html'">ℹ️ О Balloo</div>
+        </div>
+      </div>
+      <div class="topbar__title">Сторис</div>
+      <div class="topbar__right">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact" onclick="window.location.href='../balloo-su/profile.html'">
+          <div class="avatar__inner"><span>ИИ</span></div>
+        </div>
+        <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+        <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+      </div>
+    </div>
+
+    <!-- Stories Tray (из web balloo-su/stories.html) -->
+    <div class="stories-tray">
+      <div class="story-item" onclick="openStoryCreate()">
+        <div class="story-avatar story-avatar--add"><div class="story-avatar__inner">+</div></div>
+        <span class="story-name">Моя сторис</span>
+      </div>
+      <div class="story-item" onclick="openStoryViewer()">
+        <div class="story-avatar"><div class="story-avatar__inner">МА</div></div>
+        <span class="story-name">Мария</span>
+      </div>
+      <div class="story-item" onclick="openStoryViewer()">
+        <div class="story-avatar"><div class="story-avatar__inner">АК</div></div>
+        <span class="story-name">Алексей</span>
+      </div>
+      <div class="story-item" onclick="openStoryViewer()">
+        <div class="story-avatar"><div class="story-avatar__inner">РГ</div></div>
+        <span class="story-name">Рос. Газета</span>
+      </div>
+      <div class="story-item" onclick="openStoryViewer()">
+        <div class="story-avatar story-avatar--viewed"><div class="story-avatar__inner">ДП</div></div>
+        <span class="story-name">Дмитрий</span>
+      </div>
+      <div class="story-item" onclick="openStoryViewer()">
+        <div class="story-avatar story-avatar--viewed"><div class="story-avatar__inner">СМ</div></div>
+        <span class="story-name">Семья</span>
+      </div>
+      <div class="story-item" onclick="openStoryViewer()">
+        <div class="story-avatar"><div class="story-avatar__inner">ТК</div></div>
+        <span class="story-name">Тех. буд.</span>
+      </div>
+    </div>
+
+    <!-- Чат-лист (как в web) -->
+    <div style="flex:1;overflow-y:auto;">
+      <div class="list">
+        <div class="list__item list__item--active">
+          <div class="avatar avatar--md avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>МА</span></div></div>
+          <div class="list__item-body"><div class="list__item-title">Мария Андреева</div><div class="list__item-subtitle">Добавила новую сторис ⭕</div></div>
+          <div class="list__item-meta"><span class="list__item-time">14:40</span></div>
+        </div>
+        <div class="list__item">
+          <div class="avatar avatar--md avatar--bordered avatar--status-online avatar--ctx-new"><div class="avatar__inner"><span>РД</span></div></div>
+          <div class="list__item-body"><div class="list__item-title">Команда разработки</div><div class="list__item-subtitle">Алексей: Макеты готовы</div></div>
+          <div class="list__item-meta"><span class="list__item-time">14:15</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabbar — активен Сторис -->
+    <div class="phone-tabbar">
+      <div class="phone-tabbar__item" onclick="window.location.href='chat.html'"><span class="phone-tabbar__icon">💬</span>Чаты</div>
+      <div class="phone-tabbar__item" onclick="window.location.href='contacts.html'"><span class="phone-tabbar__icon">👥</span>Контакты</div>
+      <div class="phone-tabbar__item phone-tabbar__item--active" onclick="window.location.href='stories.html'"><span class="phone-tabbar__icon">📷</span>Сторис</div>
+      <div class="phone-tabbar__item" onclick="window.location.href='calls-history.html'"><span class="phone-tabbar__icon">📞</span>Звонки</div>
+      <div class="phone-tabbar__item" onclick="window.location.href='settings.html'"><span class="phone-tabbar__icon">⚙</span>Настройки</div>
+    </div>
+  </div>
+  <div class="phone-frame__home-bar"></div>
+</div>
+
+<!-- Story Viewer (полноэкранный, из web) -->
+<div class="story-viewer" id="story-viewer">
+  <div class="story-viewer__progress">
+    <div class="story-viewer__progress-bar"><div class="story-viewer__progress-fill"></div></div>
+    <div class="story-viewer__progress-bar"><div class="story-viewer__progress-fill"></div></div>
+    <div class="story-viewer__progress-bar"><div class="story-viewer__progress-fill"></div></div>
+  </div>
+  <div class="story-viewer__header">
+    <div class="story-viewer__avatar"><div class="story-viewer__avatar-inner">МА</div></div>
+    <div class="story-viewer__user">
+      <div class="story-viewer__user-name">Мария Андреева</div>
+      <div class="story-viewer__user-time">2 часа назад</div>
+    </div>
+    <div class="story-viewer__close" onclick="closeStoryViewer()">✕</div>
+  </div>
+  <div class="story-viewer__content">
+    <span class="story-viewer__nav-arrow story-viewer__nav-arrow--prev" onclick="prevStory()">‹</span>
+    <div class="story-viewer__frame" style="background:linear-gradient(135deg,#2db84d,#1565c0,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:96px;min-height:400px;width:100%;">🌅</div>
+    <span class="story-viewer__nav-arrow story-viewer__nav-arrow--next" onclick="nextStory()">›</span>
+  </div>
+  <div class="story-viewer__footer">
+    <input type="text" class="story-viewer__reply-input" placeholder="Ответить на сторис...">
+    <button class="btn btn--primary btn--icon" onclick="showToast('Ответ отправлен','success')">➤</button>
+    <div class="story-viewer__views" style="color:rgba(255,255,255,0.7);font-size:13px;" title="Просмотры">👁 42</div>
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+<script>
+function openStoryViewer() { document.getElementById('story-viewer').classList.add('story-viewer--visible'); }
+function closeStoryViewer() { document.getElementById('story-viewer').classList.remove('story-viewer--visible'); }
+function openStoryCreate() { showToast('Создание сторис','info'); }
+function prevStory() { showToast('Предыдущая сторис','info'); }
+function nextStory() { showToast('Следующая сторис','info'); }
+</script>
+</body>
+</html>

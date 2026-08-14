@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Компонент: Group Create — Создание группы</title>
+  <link rel="stylesheet" href="../../assets/common.css">
+  <style>
+    .component-demo { padding: 24px; max-width: 480px; margin: 0 auto; }
+    .component-demo h1 { font-size: 20px; margin-bottom: 16px; }
+    .component-demo .demo-section { margin-bottom: 24px; }
+    .component-demo .demo-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+    .group-create-form { display: flex; flex-direction: column; gap: 16px; }
+    .group-create-form .form-input { background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary); padding: 10px 14px; font-size: 14px; outline: none; }
+    .group-create-form .form-input:focus { border-color: var(--accent); }
+    .group-create-form .form-input::placeholder { color: var(--text-muted); }
+    .group-create-form .avatar-upload { width: 72px; height: 72px; clip-path: var(--octagon-clip); background: var(--bg-tertiary); border: 2px dashed var(--border-strong); display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--text-muted); cursor: pointer; margin-bottom: 8px; }
+    .group-create-form .form-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; display: block; }
+    .group-create-form .member-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+    .group-create-form .member-chip { display: flex; align-items: center; gap: 6px; padding: 4px 8px; background: var(--bg-tertiary); border: 1px solid var(--border-color); font-size: 13px; color: var(--text-primary); }
+    .group-create-form .member-chip .remove { cursor: pointer; color: var(--text-muted); }
+    .group-create-form .member-chip .remove:hover { color: var(--danger); }
+    .group-create-form .member-list { display: flex; flex-direction: column; gap: 2px; max-height: 200px; overflow-y: auto; }
+    .group-create-form .member-row { display: flex; align-items: center; gap: 12px; padding: 10px 14px; cursor: pointer; transition: background 0.15s; }
+    .group-create-form .member-row:hover { background: var(--bg-hover); }
+    .group-create-form .member-row--selected { background: rgba(45,184,77,0.08); }
+    .group-create-form .member-row .check { margin-left: auto; color: var(--accent); }
+    .group-create-form .checkbox-row { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+    .group-create-form .checkbox-row input { accent-color: var(--accent); }
+    .group-create-form .checkbox-row label { font-size: 14px; color: var(--text-secondary); }
+  </style>
+</head>
+<body>
+  <div class="component-demo">
+    <h1>📦 Компонент: Group Create (Создание группы)</h1>
+
+    <div class="demo-section">
+      <div class="demo-label">Форма создания группы</div>
+      <div class="group-create-form">
+        <div class="avatar-upload" title="Загрузить аватар">📷</div>
+        <div>
+          <div class="form-label">Название группы</div>
+          <input class="form-input" type="text" placeholder="Введите название">
+        </div>
+        <div>
+          <div class="form-label">Описание</div>
+          <textarea class="form-input" placeholder="О чём ваша группа?" style="min-height:60px; resize:vertical;"></textarea>
+        </div>
+        <div>
+          <div class="form-label">Выбранные участники (2)</div>
+          <div class="member-chips">
+            <div class="member-chip">
+              <div class="avatar avatar--xs" style="clip-path:var(--octagon-clip);background:var(--accent);color:#fff;font-size:9px;display:inline-flex;">ИИ</div>
+              Иван Иванов
+              <span class="remove" onclick="this.parentElement.remove()">✕</span>
+            </div>
+            <div class="member-chip">
+              <div class="avatar avatar--xs" style="clip-path:var(--octagon-clip);background:#3b9eff;color:#fff;font-size:9px;display:inline-flex;">АК</div>
+              Алексей К.
+              <span class="remove" onclick="this.parentElement.remove()">✕</span>
+            </div>
+          </div>
+          <input class="form-input" type="text" placeholder="Добавить участников..." style="margin-top:8px;">
+        </div>
+        <div class="checkbox-row">
+          <input type="checkbox" id="admin-only" checked>
+          <label for="admin-only">Только администратор может отправлять сообщения</label>
+        </div>
+        <button class="btn btn--primary btn--block" style="margin-top: 8px;">Создать группу</button>
+      </div>
+    </div>
+  </div>
+  <script src="../../assets/common.js"></script>
+</body>
+</html>

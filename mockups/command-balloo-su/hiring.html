@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Command — Найм</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--info);">C</div><span>Command</span>
+    <div class="topbar__dropdown"><div class="topbar__dropdown-item">🏢 Command (текущий)</div><div class="topbar__dropdown-divider"></div><div class="topbar__dropdown-item">💬 Balloo</div><div class="topbar__dropdown-item">🛡️ Admin</div><div class="topbar__dropdown-item">💡 Features</div><div class="topbar__dropdown-item">📜 History</div><div class="topbar__dropdown-item">⬇️ Download</div><div class="topbar__dropdown-item">📚 API Docs</div></div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Найм</div>
+  <div class="topbar__actions"><div class="topbar__actions-btn" onclick="openModal('modal-new-vacancy')" title="Новая вакансия">✏</div></div>
+  <div class="topbar__right"><div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИВ</span></div></div><span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span><span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span></div>
+</div>
+<div class="main">
+  <div class="sidebar sidebar--narrow">
+    <div class="list">
+      <div class="list__item">🏠 Дашборд</div>
+      <div class="list__item">💬 Внутренний чат</div>
+      <div class="list__item">📅 Совещания</div>
+      <div class="list__item">📋 Задачи</div>
+      <div class="list__item">🏢 Мой отдел</div>
+      <div class="list__item">🏛️ Подразделения</div>
+      <div class="list__item">👥 HR</div>
+      <div class="list__item">📚 База знаний</div>
+      <div class="list__item list__item--active">🎯 Найм</div>
+      <div class="list__item">📊 Мониторинг</div>
+      <div class="list__item" style="border-top:1px solid var(--border-color);margin-top:8px;padding-top:12px;">💼 Вакансии</div>
+      <div class="list__item">⭐ Почему мы</div>
+    </div>
+  </div>
+  <div class="content overflow-y-auto"><div class="page-container">
+    <h1 class="page-title">Найм</h1>
+    <p class="page-subtitle">Вакансии • Кандидаты • Этапы собеседований</p>
+
+    <div class="card mb-4">
+      <h3 class="card__title mb-4">Воронка найма</h3>
+      <div class="flex gap-2" style="flex-wrap:wrap;">
+        <div class="card flex-1 text-center" style="min-width:120px;"><div style="font-size:24px;font-weight:800;color:var(--info);">45</div><div class="text-xs text-muted">Откликов</div></div>
+        <div class="card flex-1 text-center" style="min-width:120px;"><div style="font-size:24px;font-weight:800;color:var(--warning);">18</div><div class="text-xs text-muted">Скрининг</div></div>
+        <div class="card flex-1 text-center" style="min-width:120px;"><div style="font-size:24px;font-weight:800;color:var(--accent);">8</div><div class="text-xs text-muted">Собеседование</div></div>
+        <div class="card flex-1 text-center" style="min-width:120px;"><div style="font-size:24px;font-weight:800;color:var(--text-primary);">3</div><div class="text-xs text-muted">Оффер</div></div>
+        <div class="card flex-1 text-center" style="min-width:120px;"><div style="font-size:24px;font-weight:800;color:var(--accent);">2</div><div class="text-xs text-muted">Приняты</div></div>
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <h3 class="card__title mb-4">Открытые вакансии</h3>
+      <table class="table">
+        <thead><tr><th>Должность</th><th>Отдел</th><th>Кандидатов</th><th>Статус</th></tr></thead>
+        <tbody>
+          <tr><td>Senior Frontend Developer (React 19 / Next.js 15)</td><td>Разработка</td><td>12</td><td><span class="chip chip--accent">Активна</span></td></tr>
+          <tr><td>Backend Developer (Next.js API / WebSocket)</td><td>Разработка</td><td>8</td><td><span class="chip chip--accent">Активна</span></td></tr>
+          <tr><td>DevOps Engineer (K8s / Docker / CI/CD)</td><td>Инфраструктура</td><td>5</td><td><span class="chip chip--accent">Активна</span></td></tr>
+          <tr><td>UI/UX Designer</td><td>Дизайн</td><td>6</td><td><span class="chip chip--warning">Почти закрыта</span></td></tr>
+          <tr><td>QA Engineer (Playwright / Jest)</td><td>Разработка</td><td>4</td><td><span class="chip chip--accent">Активна</span></td></tr>
+          <tr><td>Technical Writer</td><td>Документация</td><td>2</td><td><span class="chip">Новая</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3 class="card__title mb-4">Кандидаты на собеседовании</h3>
+      <a href="candidate.html" class="list__item" style="border:none;text-decoration:none;color:inherit;cursor:pointer;">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-new"><div class="avatar__inner"><span>АМ</span></div></div>
+        <div class="flex-1"><div class="list__item-title">Алексей Морозов</div><div class="list__item-subtitle">Backend Developer • Этап: Техническое собеседование</div></div>
+        <span class="chip chip--warning">Назначено</span>
+      </a>
+      <div class="list__item" style="border:none;">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-new"><div class="avatar__inner"><span>ЕВ</span></div></div>
+        <div class="flex-1"><div class="list__item-title">Елена Волкова</div><div class="list__item-subtitle">UI/UX Designer • Этап: Тестовое задание</div></div>
+        <span class="chip chip--info">В работе</span>
+      </div>
+      <div class="list__item" style="border:none;">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-new"><div class="avatar__inner"><span>ДС</span></div></div>
+        <div class="flex-1"><div class="list__item-title">Дмитрий Соколов</div><div class="list__item-subtitle">DevOps Engineer • Этап: Оффер</div></div>
+        <span class="chip chip--accent">Оффер</span>
+      </div>
+    </div>
+  </div></div>
+</div>
+
+<div class="modal-overlay" id="modal-overlay"></div>
+<div class="modal modal--status-info" id="modal-new-vacancy">
+  <div class="modal__header"><span class="modal__title">Новая вакансия</span><div class="modal__close" onclick="closeModal('modal-new-vacancy')">✕</div></div>
+  <div class="modal__body">
+    <div class="form-group"><label class="form-label">Должность</label><input type="text" class="form-input" placeholder="Например: Frontend Developer"></div>
+    <div class="form-group"><label class="form-label">Отдел</label><select class="form-select"><option>Разработка</option><option>Дизайн</option><option>Инфраструктура</option><option>Документация</option></select></div>
+    <div class="form-group"><label class="form-label">Описание</label><textarea class="form-textarea" placeholder="Требования, обязанности..."></textarea></div>
+    <div class="form-group"><label class="form-label">Зарплатная вилка</label><div class="flex gap-2"><input type="text" class="form-input" placeholder="От"><input type="text" class="form-input" placeholder="До"></div></div>
+  </div>
+  <div class="modal__footer"><button class="btn btn--tertiary" onclick="closeModal('modal-new-vacancy')">Отмена</button><button class="btn btn--primary" onclick="closeModal('modal-new-vacancy')">Опубликовать</button></div>
+</div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

@@ -1,0 +1,2834 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "balloo.api_schema",
+  "title": "Balloo Messenger — Схема API (REST + WebSocket)",
+  "description": "Единый источник правды по API-эндпоинтам монорепо. Сгенерировано из HTML-макетов (151+ экран). Каждый UI-элемент (форма, кнопка, список, фильтр, модалка) обслуживается эндпоинтом или WS-событием.",
+  "version": "1.0.0",
+  "last_updated": "2026-07-22",
+  "conventions": {
+    "base_url": "https://api.balloo.su/v1",
+    "ws_url": "wss://ws.balloo.su/v1",
+    "auth_types": {
+      "JWT": "Bearer-токен авторизованного пользователя (Authorization: Bearer <token>)",
+      "Admin": "JWT с ролью admin/moderator (админ-панель)",
+      "Staff": "JWT с ролью staff (портал сотрудников command.balloo.su)",
+      "Bot": "Bot-токен (X-Bot-Token)",
+      "Public": "Без авторизации (гости)"
+    },
+    "error_format": {
+      "shape": {
+        "error": {
+          "code": "String",
+          "message": "String",
+          "details": "Json?"
+        }
+      },
+      "common_codes": [
+        "VALIDATION_ERROR",
+        "UNAUTHORIZED",
+        "FORBIDDEN",
+        "NOT_FOUND",
+        "RATE_LIMITED",
+        "CONFLICT",
+        "BANNED",
+        "INTERNAL"
+      ]
+    },
+    "http_errors": {
+      "400": "VALIDATION_ERROR — неверные данные запроса",
+      "401": "UNAUTHORIZED — нет/просрочен токен",
+      "403": "FORBIDDEN — нет прав",
+      "404": "NOT_FOUND — объект не найден",
+      "409": "CONFLICT — конфликт (дубликат, гонка)",
+      "429": "RATE_LIMITED — превышен лимит",
+      "500": "INTERNAL — внутренняя ошибка",
+      "555": "BANNED — аккаунт заблокирован (кастомный код, экран 1_00_07)"
+    },
+    "pagination": {
+      "query": {
+        "cursor": "String?",
+        "limit": "Int? (default 30, max 100)"
+      },
+      "response": {
+        "items": "[]",
+        "nextCursor": "String?",
+        "total": "Int?"
+      }
+    },
+    "timestamps": "Все даты — BigInt Unix seconds",
+    "ids": "Все id — String (cuid)",
+    "i18n": "Заголовок Accept-Language (20 локалей, см. data_schema.json → conventions.languages)"
+  },
+  "groups": [
+    {
+      "id": "api_auth",
+      "node": "у_01",
+      "name": "Аутентификация и аккаунт",
+      "screens": [
+        "1_01_01",
+        "1_01_02",
+        "1_01_03",
+        "1_01_29",
+        "1_01_30",
+        "1_01_22",
+        "1_00_07",
+        "1_00_08"
+      ],
+      "endpoints": [
+        {
+          "id": "2_01_01",
+          "method": "POST",
+          "path": "/auth/register",
+          "summary": "Регистрация по email",
+          "auth": "Public",
+          "body": {
+            "email": "String",
+            "password": "String",
+            "displayName": "String",
+            "acceptRules": "Boolean"
+          },
+          "response": {
+            "user": "User",
+            "accessToken": "String",
+            "refreshToken": "String"
+          },
+          "errors": [
+            "VALIDATION_ERROR",
+            "CONFLICT (email занят)",
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "id": "2_01_02",
+          "method": "POST",
+          "path": "/auth/login",
+          "summary": "Вход по email и паролю",
+          "auth": "Public",
+          "body": {
+            "email": "String",
+            "password": "String"
+          },
+          "response": {
+            "user": "User",
+            "accessToken": "String",
+            "refreshToken": "String",
+            "twoFactorRequired": "Boolean"
+          },
+          "errors": [
+            "UNAUTHORIZED (неверные данные)",
+            "BANNED",
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "id": "2_01_03",
+          "method": "POST",
+          "path": "/auth/oauth/{provider}",
+          "summary": "OAuth-вход (yandex | mailru | rambler)",
+          "auth": "Public",
+          "body": {
+            "code": "String",
+            "redirectUri": "String"
+          },
+          "response": {
+            "user": "User",
+            "accessToken": "String",
+            "refreshToken": "String",
+            "isNewUser": "Boolean"
+          },
+          "errors": [
+            "VALIDATION_ERROR",
+            "BANNED"
+          ]
+        },
+        {
+          "id": "2_01_04",
+          "method": "POST",
+          "path": "/auth/refresh",
+          "summary": "Обновление access-токена",
+          "auth": "Public",
+          "body": {
+            "refreshToken": "String"
+          },
+          "response": {
+            "accessToken": "String",
+            "refreshToken": "String"
+          },
+          "errors": [
+            "UNAUTHORIZED"
+          ]
+        },
+        {
+          "id": "2_01_05",
+          "method": "POST",
+          "path": "/auth/logout",
+          "summary": "Выход (текущее устройство)",
+          "auth": "JWT",
+          "body": {},
+          "response": {
+            "ok": "Boolean"
+          },
+          "errors": [
+            "UNAUTHORIZED"
+          ]
+        },
+        {
+          "id": "2_01_06",
+          "method": "POST",
+          "path": "/auth/password-reset/request",
+          "summary": "Запрос восстановления пароля (письмо)",
+          "auth": "Public",
+          "body": {
+            "email": "String"
+          },
+          "response": {
+            "ok": "Boolean"
+          },
+          "errors": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "id": "2_01_07",
+          "method": "POST",
+          "path": "/auth/password-reset/confirm",
+          "summary": "Установка нового пароля по коду",
+          "auth": "Public",
+          "body": {
+            "token": "String",
+            "newPassword": "String"
+          },
+          "response": {
+            "ok": "Boolean"
+          },
+          "errors": [
+            "VALIDATION_ERROR",
+            "NOT_FOUND (токен истёк)"
+          ]
+        },
+        {
+          "id": "2_01_08",
+          "method": "POST",
+          "path": "/auth/2fa/enable",
+          "summary": "Включение 2FA (TOTP), выдача секрета и QR",
+          "auth": "JWT",
+          "body": {},
+          "response": {
+            "secret": "String",
+            "qrDataUrl": "String"
+          },
+          "errors": [
+            "CONFLICT (уже включена)"
+          ]
+        },
+        {
+          "id": "2_01_09",
+          "method": "POST",
+          "path": "/auth/2fa/verify",
+          "summary": "Подтверждение кода 2FA (при входе или включении)",
+          "auth": "Public",
+          "body": {
+            "userId": "String",
+            "code": "String"
+          },
+          "response": {
+            "accessToken": "String",
+            "refreshToken": "String",
+            "backupCodes": "[String]?"
+          },
+          "errors": [
+            "UNAUTHORIZED (неверный код)",
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "id": "2_01_10",
+          "method": "DELETE",
+          "path": "/auth/2fa",
+          "summary": "Отключение 2FA",
+          "auth": "JWT",
+          "body": {
+            "code": "String"
+          },
+          "response": {
+            "ok": "Boolean"
+          },
+          "errors": [
+            "UNAUTHORIZED"
+          ]
+        },
+        {
+          "id": "2_01_11",
+          "method": "GET",
+          "path": "/auth/accounts",
+          "summary": "Список привязанных аккаунтов (мультиаккаунт)",
+          "auth": "JWT",
+          "response": {
+            "accounts": "[AccountBrief]"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_01_12",
+          "method": "POST",
+          "path": "/auth/accounts/switch",
+          "summary": "Переключение активного аккаунта",
+          "auth": "JWT",
+          "body": {
+            "accountId": "String"
+          },
+          "response": {
+            "accessToken": "String",
+            "refreshToken": "String"
+          },
+          "errors": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "id": "2_01_13",
+          "method": "POST",
+          "path": "/ban/appeal",
+          "summary": "Обжалование бана (экран 1_00_08)",
+          "auth": "Public",
+          "body": {
+            "email": "String",
+            "banId": "String?",
+            "message": "String"
+          },
+          "response": {
+            "appealId": "String"
+          },
+          "errors": [
+            "RATE_LIMITED",
+            "CONFLICT (уже подано)"
+          ]
+        },
+        {
+          "id": "2_01_14",
+          "method": "GET",
+          "path": "/onboarding/steps",
+          "summary": "Шаги онбординга (seed, локализованные)",
+          "auth": "Public",
+          "response": {
+            "steps": "[OnboardingStep]"
+          },
+          "errors": []
+        }
+      ]
+    },
+    {
+      "id": "api_devices",
+      "node": "у_01",
+      "name": "Устройства",
+      "screens": [
+        "1_01_21",
+        "1_01_23"
+      ],
+      "endpoints": [
+        {
+          "id": "2_01_15",
+          "method": "GET",
+          "path": "/devices",
+          "summary": "Список моих устройств",
+          "auth": "JWT",
+          "response": {
+            "devices": "[Device]"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_01_16",
+          "method": "DELETE",
+          "path": "/devices/{deviceId}",
+          "summary": "Завершить сессию устройства",
+          "auth": "JWT",
+          "response": {
+            "ok": "Boolean"
+          },
+          "errors": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "id": "2_01_17",
+          "method": "DELETE",
+          "path": "/devices",
+          "summary": "Завершить все сессии, кроме текущей",
+          "auth": "JWT",
+          "response": {
+            "ok": "Boolean",
+            "closed": "Int"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_01_18",
+          "method": "POST",
+          "path": "/devices/qr",
+          "summary": "Сгенерировать QR для входа нового устройства",
+          "auth": "JWT",
+          "response": {
+            "qrToken": "String",
+            "expiresAt": "BigInt"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_01_19",
+          "method": "POST",
+          "path": "/auth/qr-login",
+          "summary": "Вход по QR-токену с нового устройства",
+          "auth": "Public",
+          "body": {
+            "qrToken": "String",
+            "deviceInfo": "Json"
+          },
+          "response": {
+            "accessToken": "String",
+            "refreshToken": "String"
+          },
+          "errors": [
+            "NOT_FOUND (истёк)",
+            "UNAUTHORIZED"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "api_profile",
+      "node": "у_01",
+      "name": "Профиль и приватность",
+      "screens": [
+        "1_01_08",
+        "1_01_09",
+        "1_01_20",
+        "1_01_34",
+        "1_01_37",
+        "1_01_38"
+      ],
+      "endpoints": [
+        {
+          "id": "2_01_20",
+          "method": "GET",
+          "path": "/me",
+          "summary": "Мой профиль",
+          "auth": "JWT",
+          "response": {
+            "user": "User"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_01_21",
+          "method": "PATCH",
+          "path": "/me",
+          "summary": "Обновление профиля (имя, bio, username)",
+          "auth": "JWT",
+          "body": {
+            "displayName": "String?",
+            "username": "String?",
+            "bio": "String?",
+            "birthday": "BigInt?"
+          },
+          "response": {
+            "user": "User"
+          },
+          "errors": [
+            "VALIDATION_ERROR",
+            "CONFLICT (username занят)"
+          ]
+        },
+        {
+          "id": "2_01_22",
+          "method": "POST",
+          "path": "/me/avatar",
+          "summary": "Загрузка аватара (multipart)",
+          "auth": "JWT",
+          "body": {
+            "file": "File"
+          },
+          "response": {
+            "avatarUrl": "String"
+          },
+          "errors": [
+            "VALIDATION_ERROR (формат/размер)"
+          ]
+        },
+        {
+          "id": "2_01_23",
+          "method": "GET",
+          "path": "/users/{username}",
+          "summary": "Публичный профиль пользователя",
+          "auth": "JWT",
+          "response": {
+            "user": "PublicUser"
+          },
+          "errors": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "id": "2_01_24",
+          "method": "GET",
+          "path": "/me/settings",
+          "summary": "Настройки приложения (тема, язык, уведомления, приватность)",
+          "auth": "JWT",
+          "response": {
+            "settings": "UserSettings"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_01_25",
+          "method": "PATCH",
+          "path": "/me/settings",
+          "summary": "Обновление настроек (частичное)",
+          "auth": "JWT",
+          "body": {
+            "theme": "String?",
+            "locale": "String?",
+            "notifications": "Json?",
+            "privacy": "Json?"
+          },
+          "response": {
+            "settings": "UserSettings"
+          },
+          "errors": [
+            "VALIDATION_ERROR"
+          ]
+        },
+        {
+          "id": "2_01_26",
+          "method": "GET",
+          "path": "/me/blocked",
+          "summary": "Список заблокированных пользователей",
+          "auth": "JWT",
+          "response": {
+            "items": "[PublicUser]",
+            "nextCursor": "String?"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_01_27",
+          "method": "POST",
+          "path": "/users/{userId}/block",
+          "summary": "Заблокировать пользователя",
+          "auth": "JWT",
+          "response": {
+            "ok": "Boolean"
+          },
+          "errors": [
+            "NOT_FOUND",
+            "CONFLICT"
+          ]
+        },
+        {
+          "id": "2_01_28",
+          "method": "DELETE",
+          "path": "/users/{userId}/block",
+          "summary": "Разблокировать пользователя",
+          "auth": "JWT",
+          "response": {
+            "ok": "Boolean"
+          },
+          "errors": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "id": "2_01_29",
+          "method": "DELETE",
+          "path": "/me",
+          "summary": "Удаление аккаунта",
+          "auth": "JWT",
+          "body": {
+            "password": "String",
+            "reason": "String?"
+          },
+          "response": {
+            "ok": "Boolean"
+          },
+          "errors": [
+            "UNAUTHORIZED"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "api_chats",
+      "node": "у_01",
+      "name": "Чаты и сообщения",
+      "screens": [
+        "1_01_04",
+        "1_01_07",
+        "1_01_18",
+        "1_01_19",
+        "1_01_25",
+        "1_01_26",
+        "1_01_28",
+        "1_01_32",
+        "1_01_33",
+        "1_01_35",
+        "1_01_36",
+        "1_01_39",
+        "1_01_40"
+      ],
+      "endpoints": [
+        {
+          "id": "2_01_30",
+          "method": "GET",
+          "path": "/chats",
+          "summary": "Список чатов (с фильтром archived)",
+          "auth": "JWT",
+          "query": {
+            "archived": "Boolean?",
+            "cursor": "String?",
+            "limit": "Int?"
+          },
+          "response": {
+            "items": "[ChatBrief]",
+            "nextCursor": "String?"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_01_31",
+          "method": "POST",
+          "path": "/chats",
+          "summary": "Создать личный чат с пользователем",
+          "auth": "JWT",
+          "body": {
+            "userId": "String"
+          },
+          "response": {
+            "chat": "Chat"
+          },
+          "errors": [
+            "NOT_FOUND",
+            "FORBIDDEN (заблокирован)"
+          ]
+        },
+        {
+          "id": "2_01_32",
+          "method": "GET",
+          "path": "/chats/{chatId}",
+          "summary": "Данные чата",
+          "auth": "JWT",
+          "response": {
+            "chat": "Chat"
+          },
+          "errors": [
+            "NOT_FOUND",
+            "FORBIDDEN"
+          ]
+        },
+        {
+          "id": "2_01_33",
+          "method": "GET",
+          "path": "/chats/{chatId}/messages",
+          "summary": "История сообщений (cursor-пагинация назад)",
+          "auth": "JWT",
+          "query": {
+            "cursor": "String?",
+            "limit": "Int?"
+          },
+          "response": {
+            "items": "[Message]",
+            "nextCursor": "String?"
+          },
+          "errors": [
+            "FORBIDDEN"
+          ]
+        },
+        {
+          "id": "2_01_34",
+          "method": "POST",
+          "path": "/chats/{chatId}/messages",
+          "summary": "Отправить сообщение (текст/вложения/reply)",
+          "auth": "JWT",
+          "body": {
+            "text": "String?",
+            "attachmentIds": "[String]?",
+            "replyToId": "String?",
+            "clientId": "String"
+          },
+          "response": {
+            "message": "Message"
+          },
+          "errors": [
+            "VALIDATION_ERROR",
+            "FORBIDDEN",
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "id": "2_01_35",
+          "method": "PATCH",
+          "path": "/messages/{messageId}",
+          "summary": "Редактировать сообщение (модалка 1_01_32)",
+          "auth": "JWT",
+          "body": {
+            "text": "String"
+          },
+          "response": {
+            "message": "Message"
+          },
+          "errors": [
+            "FORBIDDEN (не автор)",
+            "NOT_FOUND",
+            "CONFLICT (время истекло)"
+          ]
+        },
+        {
+          "id": "2_01_36",
+          "method": "DELETE",
+          "path": "/messages/{messageId}",
+          "summary": "Удалить сообщение (для себя / для всех)",
+          "auth": "JWT",
+          "query": {
+            "forAll": "Boolean?"
+          },
+          "response": {
+            "ok": "Boolean"
+          },
+          "errors": [
+            "FORBIDDEN",
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "id": "2_01_37",
+          "method": "POST",
+          "path": "/messages/{messageId}/reactions",
+          "summary": "Поставить/сменить реакцию",
+          "auth": "JWT",
+          "body": {
+            "emoji": "String"
+          },
+          "response": {
+            "reactions": "Json"
+          },
+          "errors": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "id": "2_01_38",
+          "method": "DELETE",
+          "path": "/messages/{messageId}/reactions",
+          "summary": "Убрать реакцию",
+          "auth": "JWT",
+          "response": {
+            "reactions": "Json"
+          },
+          "errors": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "id": "2_01_39",
+          "method": "POST",
+          "path": "/chats/{chatId}/read",
+          "summary": "Отметить прочитанным до сообщения",
+          "auth": "JWT",
+          "body": {
+            "messageId": "String"
+          },
+          "response": {
+            "ok": "Boolean"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_01_40",
+          "method": "POST",
+          "path": "/chats/{chatId}/archive",
+          "summary": "Архивировать чат",
+          "auth": "JWT",
+          "response": {
+            "ok": "Boolean"
+          },
+          "errors": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "id": "2_01_41",
+          "method": "DELETE",
+          "path": "/chats/{chatId}/archive",
+          "summary": "Вернуть из архива",
+          "auth": "JWT",
+          "response": {
+            "ok": "Boolean"
+          },
+          "errors": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "id": "2_01_42",
+          "method": "POST",
+          "path": "/chats/{chatId}/mute",
+          "summary": "Отключить/настроить уведомления чата",
+          "auth": "JWT",
+          "body": {
+            "until": "BigInt?"
+          },
+          "response": {
+            "ok": "Boolean"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_01_43",
+          "method": "POST",
+          "path": "/chats/{chatId}/pin",
+          "summary": "Закрепить чат в списке",
+          "auth": "JWT",
+          "response": {
+            "ok": "Boolean"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_01_44",
+          "method": "GET",
+          "path": "/chats/{chatId}/attachments",
+          "summary": "Вложения чата по типам (медиа/файлы/ссылки/голосовые)",
+          "auth": "JWT",
+          "query": {
+            "type": "String (media|file|link|voice)",
+            "cursor": "String?"
+          },
+          "response": {
+            "items": "[Attachment]",
+            "nextCursor": "String?"
+          },
+          "errors": [
+            "FORBIDDEN"
+          ]
+        },
+        {
+          "id": "2_01_45",
+          "method": "POST",
+          "path": "/attachments",
+          "summary": "Загрузка вложения (multipart, панель 1_01_40)",
+          "auth": "JWT",
+          "body": {
+            "file": "File",
+            "kind": "String (image|video|file|voice)"
+          },
+          "response": {
+            "attachment": "Attachment"
+          },
+          "errors": [
+            "VALIDATION_ERROR (размер/формат)",
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "id": "2_01_46",
+          "method": "GET",
+          "path": "/attachments/{attachmentId}",
+          "summary": "Метаданные и ссылки вложения (viewer 1_01_33)",
+          "auth": "JWT",
+          "response": {
+            "attachment": "Attachment",
+            "downloadUrl": "String"
+          },
+          "errors": [
+            "NOT_FOUND",
+            "FORBIDDEN"
+          ]
+        },
+        {
+          "id": "2_01_47",
+          "method": "POST",
+          "path": "/messages/{messageId}/report",
+          "summary": "Жалоба на сообщение (1_01_26)",
+          "auth": "JWT",
+          "body": {
+            "reason": "String",
+            "comment": "String?"
+          },
+          "response": {
+            "reportId": "String"
+          },
+          "errors": [
+            "CONFLICT (уже подана)",
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "id": "2_01_48",
+          "method": "POST",
+          "path": "/chats/{chatId}/polls",
+          "summary": "Создать опрос/квиз (1_01_28)",
+          "auth": "JWT",
+          "body": {
+            "question": "String",
+            "options": "[String]",
+            "isQuiz": "Boolean",
+            "correctIndex": "Int?",
+            "isAnonymous": "Boolean",
+            "multipleChoice": "Boolean"
+          },
+          "response": {
+            "message": "Message"
+          },
+          "errors": [
+            "VALIDATION_ERROR",
+            "FORBIDDEN"
+          ]
+        },
+        {
+          "id": "2_01_49",
+          "method": "POST",
+          "path": "/polls/{pollId}/vote",
+          "summary": "Проголосовать в опросе",
+          "auth": "JWT",
+          "body": {
+            "optionIndexes": "[Int]"
+          },
+          "response": {
+            "poll": "Poll"
+          },
+          "errors": [
+            "CONFLICT (уже голосовал)",
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "id": "2_01_50",
+          "method": "POST",
+          "path": "/messages/forward",
+          "summary": "Переслать сообщения",
+          "auth": "JWT",
+          "body": {
+            "messageIds": "[String]",
+            "targetChatIds": "[String]"
+          },
+          "response": {
+            "ok": "Boolean"
+          },
+          "errors": [
+            "FORBIDDEN"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "api_groups",
+      "node": "у_01",
+      "name": "Группы и каналы",
+      "screens": [
+        "1_01_18",
+        "1_01_19",
+        "1_01_35"
+      ],
+      "endpoints": [
+        {
+          "id": "2_01_51",
+          "method": "POST",
+          "path": "/groups",
+          "summary": "Создать группу (1_01_18)",
+          "auth": "JWT",
+          "body": {
+            "title": "String",
+            "description": "String?",
+            "isPrivate": "Boolean",
+            "isCorporate": "Boolean",
+            "memberIds": "[String]"
+          },
+          "response": {
+            "chat": "Chat"
+          },
+          "errors": [
+            "VALIDATION_ERROR"
+          ]
+        },
+        {
+          "id": "2_01_52",
+          "method": "POST",
+          "path": "/channels",
+          "summary": "Создать канал (1_01_35)",
+          "auth": "JWT",
+          "body": {
+            "title": "String",
+            "description": "String?",
+            "username": "String?",
+            "isPrivate": "Boolean"
+          },
+          "response": {
+            "chat": "Chat"
+          },
+          "errors": [
+            "CONFLICT (username занят)"
+          ]
+        },
+        {
+          "id": "2_01_53",
+          "method": "PATCH",
+          "path": "/groups/{chatId}",
+          "summary": "Настройки группы/канала (1_01_19)",
+          "auth": "JWT",
+          "body": {
+            "title": "String?",
+            "description": "String?",
+            "avatar": "String?",
+            "permissions": "Json?",
+            "corporate": "Json?"
+          },
+          "response": {
+            "chat": "Chat"
+          },
+          "errors": [
+            "FORBIDDEN (не админ)"
+          ]
+        },
+        {
+          "id": "2_01_54",
+          "method": "GET",
+          "path": "/groups/{chatId}/members",
+          "summary": "Участники группы",
+          "auth": "JWT",
+          "query": {
+            "cursor": "String?",
+            "search": "String?"
+          },
+          "response": {
+            "items": "[Member]",
+            "nextCursor": "String?"
+          },
+          "errors": [
+            "FORBIDDEN"
+          ]
+        },
+        {
+          "id": "2_01_55",
+          "method": "POST",
+          "path": "/groups/{chatId}/members",
+          "summary": "Добавить участников",
+          "auth": "JWT",
+          "body": {
+            "userIds": "[String]"
+          },
+          "response": {
+            "added": "Int"
+          },
+          "errors": [
+            "FORBIDDEN"
+          ]
+        },
+        {
+          "id": "2_01_56",
+          "method": "DELETE",
+          "path": "/groups/{chatId}/members/{userId}",
+          "summary": "Удалить участника",
+          "auth": "JWT",
+          "response": {
+            "ok": "Boolean"
+          },
+          "errors": [
+            "FORBIDDEN"
+          ]
+        },
+        {
+          "id": "2_01_57",
+          "method": "PATCH",
+          "path": "/groups/{chatId}/members/{userId}/role",
+          "summary": "Изменить роль (admin/moderator/member)",
+          "auth": "JWT",
+          "body": {
+            "role": "String"
+          },
+          "response": {
+            "member": "Member"
+          },
+          "errors": [
+            "FORBIDDEN"
+          ]
+        },
+        {
+          "id": "2_01_58",
+          "method": "POST",
+          "path": "/groups/{chatId}/leave",
+          "summary": "Покинуть группу/канал",
+          "auth": "JWT",
+          "response": {
+            "ok": "Boolean"
+          },
+          "errors": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "id": "2_01_59",
+          "method": "POST",
+          "path": "/groups/{chatId}/invite-link",
+          "summary": "Сгенерировать инвайт-ссылку",
+          "auth": "JWT",
+          "body": {
+            "expiresAt": "BigInt?",
+            "maxUses": "Int?"
+          },
+          "response": {
+            "link": "String"
+          },
+          "errors": [
+            "FORBIDDEN"
+          ]
+        },
+        {
+          "id": "2_01_60",
+          "method": "POST",
+          "path": "/invite/{code}/join",
+          "summary": "Вступить по инвайт-ссылке",
+          "auth": "JWT",
+          "response": {
+            "chat": "Chat"
+          },
+          "errors": [
+            "NOT_FOUND (истёк)",
+            "CONFLICT (уже участник)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "api_contacts_search",
+      "node": "у_01",
+      "name": "Контакты и поиск",
+      "screens": [
+        "1_01_05",
+        "1_01_06"
+      ],
+      "endpoints": [
+        {
+          "id": "2_01_61",
+          "method": "GET",
+          "path": "/contacts",
+          "summary": "Список контактов",
+          "auth": "JWT",
+          "query": {
+            "search": "String?",
+            "cursor": "String?"
+          },
+          "response": {
+            "items": "[Contact]",
+            "nextCursor": "String?"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_01_62",
+          "method": "POST",
+          "path": "/contacts",
+          "summary": "Добавить контакт",
+          "auth": "JWT",
+          "body": {
+            "userId": "String",
+            "alias": "String?"
+          },
+          "response": {
+            "contact": "Contact"
+          },
+          "errors": [
+            "NOT_FOUND",
+            "CONFLICT"
+          ]
+        },
+        {
+          "id": "2_01_63",
+          "method": "DELETE",
+          "path": "/contacts/{contactId}",
+          "summary": "Удалить контакт",
+          "auth": "JWT",
+          "response": {
+            "ok": "Boolean"
+          },
+          "errors": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "id": "2_01_64",
+          "method": "GET",
+          "path": "/search",
+          "summary": "Глобальный поиск (люди, чаты, сообщения, каналы)",
+          "auth": "JWT",
+          "query": {
+            "q": "String",
+            "type": "String? (users|chats|messages|channels)",
+            "cursor": "String?"
+          },
+          "response": {
+            "users": "[PublicUser]",
+            "chats": "[ChatBrief]",
+            "messages": "[MessageHit]",
+            "nextCursor": "String?"
+          },
+          "errors": [
+            "VALIDATION_ERROR (q < 2)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "api_calls",
+      "node": "у_01",
+      "name": "Звонки",
+      "screens": [
+        "1_01_10",
+        "1_01_11"
+      ],
+      "endpoints": [
+        {
+          "id": "2_01_65",
+          "method": "GET",
+          "path": "/calls",
+          "summary": "История звонков",
+          "auth": "JWT",
+          "query": {
+            "cursor": "String?",
+            "missed": "Boolean?"
+          },
+          "response": {
+            "items": "[CallLog]",
+            "nextCursor": "String?"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_01_66",
+          "method": "POST",
+          "path": "/calls",
+          "summary": "Инициировать звонок (audio|video)",
+          "auth": "JWT",
+          "body": {
+            "chatId": "String",
+            "kind": "String (audio|video)"
+          },
+          "response": {
+            "callId": "String",
+            "iceServers": "Json",
+            "wsRoom": "String"
+          },
+          "errors": [
+            "FORBIDDEN",
+            "CONFLICT (уже в звонке)"
+          ]
+        },
+        {
+          "id": "2_01_67",
+          "method": "POST",
+          "path": "/calls/{callId}/answer",
+          "summary": "Принять звонок",
+          "auth": "JWT",
+          "response": {
+            "iceServers": "Json",
+            "wsRoom": "String"
+          },
+          "errors": [
+            "NOT_FOUND (завершён)"
+          ]
+        },
+        {
+          "id": "2_01_68",
+          "method": "POST",
+          "path": "/calls/{callId}/decline",
+          "summary": "Отклонить звонок",
+          "auth": "JWT",
+          "response": {
+            "ok": "Boolean"
+          },
+          "errors": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "id": "2_01_69",
+          "method": "POST",
+          "path": "/calls/{callId}/end",
+          "summary": "Завершить звонок",
+          "auth": "JWT",
+          "response": {
+            "ok": "Boolean",
+            "duration": "Int"
+          },
+          "errors": [
+            "NOT_FOUND"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "api_stories",
+      "node": "у_01",
+      "name": "Сторис",
+      "screens": [
+        "1_01_27"
+      ],
+      "endpoints": [
+        {
+          "id": "2_01_70",
+          "method": "GET",
+          "path": "/stories",
+          "summary": "Лента сторис контактов",
+          "auth": "JWT",
+          "response": {
+            "items": "[StoryGroup]"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_01_71",
+          "method": "POST",
+          "path": "/stories",
+          "summary": "Создать сторис (медиа + текст + стикеры)",
+          "auth": "JWT",
+          "body": {
+            "attachmentId": "String",
+            "caption": "String?",
+            "visibility": "String (all|contacts|close)",
+            "ttlHours": "Int (default 24)"
+          },
+          "response": {
+            "story": "Story"
+          },
+          "errors": [
+            "VALIDATION_ERROR",
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "id": "2_01_72",
+          "method": "POST",
+          "path": "/stories/{storyId}/view",
+          "summary": "Отметить просмотр",
+          "auth": "JWT",
+          "response": {
+            "ok": "Boolean"
+          },
+          "errors": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "id": "2_01_73",
+          "method": "POST",
+          "path": "/stories/{storyId}/reaction",
+          "summary": "Реакция на сторис",
+          "auth": "JWT",
+          "body": {
+            "emoji": "String"
+          },
+          "response": {
+            "ok": "Boolean"
+          },
+          "errors": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "id": "2_01_74",
+          "method": "DELETE",
+          "path": "/stories/{storyId}",
+          "summary": "Удалить свою сторис",
+          "auth": "JWT",
+          "response": {
+            "ok": "Boolean"
+          },
+          "errors": [
+            "FORBIDDEN",
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "id": "2_01_75",
+          "method": "GET",
+          "path": "/stories/{storyId}/viewers",
+          "summary": "Кто смотрел мою сторис",
+          "auth": "JWT",
+          "response": {
+            "items": "[PublicUser]",
+            "total": "Int"
+          },
+          "errors": [
+            "FORBIDDEN"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "api_misc_messenger",
+      "node": "у_01",
+      "name": "Приглашения, поддержка, боты, донаты, статика",
+      "screens": [
+        "1_01_13",
+        "1_01_14",
+        "1_01_15",
+        "1_01_24",
+        "1_01_31",
+        "1_01_12",
+        "1_01_16",
+        "1_01_17"
+      ],
+      "endpoints": [
+        {
+          "id": "2_01_76",
+          "method": "GET",
+          "path": "/invites",
+          "summary": "Мои приглашения (входящие/исходящие)",
+          "auth": "JWT",
+          "response": {
+            "incoming": "[Invite]",
+            "outgoing": "[Invite]"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_01_77",
+          "method": "POST",
+          "path": "/invites/{inviteId}/accept",
+          "summary": "Принять приглашение",
+          "auth": "JWT",
+          "response": {
+            "chat": "Chat"
+          },
+          "errors": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "id": "2_01_78",
+          "method": "POST",
+          "path": "/invites/{inviteId}/decline",
+          "summary": "Отклонить приглашение",
+          "auth": "JWT",
+          "response": {
+            "ok": "Boolean"
+          },
+          "errors": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "id": "2_01_79",
+          "method": "POST",
+          "path": "/support/tickets",
+          "summary": "Создать обращение в поддержку",
+          "auth": "JWT",
+          "body": {
+            "subject": "String",
+            "message": "String",
+            "attachmentIds": "[String]?"
+          },
+          "response": {
+            "ticket": "SupportTicket"
+          },
+          "errors": [
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "id": "2_01_80",
+          "method": "GET",
+          "path": "/support/tickets/{ticketId}/messages",
+          "summary": "Переписка с поддержкой",
+          "auth": "JWT",
+          "response": {
+            "items": "[Message]"
+          },
+          "errors": [
+            "FORBIDDEN"
+          ]
+        },
+        {
+          "id": "2_01_81",
+          "method": "GET",
+          "path": "/bots",
+          "summary": "Каталог ботов",
+          "auth": "JWT",
+          "query": {
+            "search": "String?"
+          },
+          "response": {
+            "items": "[Bot]"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_01_82",
+          "method": "POST",
+          "path": "/bots/{botId}/start",
+          "summary": "Начать диалог с ботом",
+          "auth": "JWT",
+          "response": {
+            "chat": "Chat"
+          },
+          "errors": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "id": "2_01_83",
+          "method": "GET",
+          "path": "/donate/tiers",
+          "summary": "Тарифы доната (seed)",
+          "auth": "Public",
+          "response": {
+            "items": "[DonateTier]"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_01_84",
+          "method": "POST",
+          "path": "/donate/checkout",
+          "summary": "Создать платёж/подписку доната",
+          "auth": "JWT",
+          "body": {
+            "tierId": "String",
+            "period": "String (month|year|once)"
+          },
+          "response": {
+            "paymentUrl": "String",
+            "donationId": "String"
+          },
+          "errors": [
+            "VALIDATION_ERROR"
+          ]
+        },
+        {
+          "id": "2_01_85",
+          "method": "GET",
+          "path": "/donate/my",
+          "summary": "Мои донаты и подписки (1_01_31)",
+          "auth": "JWT",
+          "response": {
+            "active": "[Donation]",
+            "history": "[Donation]"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_01_86",
+          "method": "DELETE",
+          "path": "/donate/subscriptions/{donationId}",
+          "summary": "Отменить донат-подписку",
+          "auth": "JWT",
+          "response": {
+            "ok": "Boolean"
+          },
+          "errors": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "id": "2_01_87",
+          "method": "GET",
+          "path": "/pages/{slug}",
+          "summary": "Текстовые страницы: rules, about-company, about-balloo (seed, локализ.)",
+          "auth": "Public",
+          "response": {
+            "page": "TextPage"
+          },
+          "errors": [
+            "NOT_FOUND"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "api_admin",
+      "node": "у_02",
+      "name": "Админ-панель (admin.balloo.su)",
+      "screens": [
+        "все экраны узла у_02 (26 шт.)"
+      ],
+      "endpoints": [
+        {
+          "id": "2_02_01",
+          "method": "POST",
+          "path": "/admin/auth/login",
+          "summary": "Вход в админ-панель (email+пароль+2FA)",
+          "auth": "Public",
+          "body": {
+            "email": "String",
+            "password": "String",
+            "totp": "String?"
+          },
+          "response": {
+            "accessToken": "String",
+            "admin": "AdminUser"
+          },
+          "errors": [
+            "UNAUTHORIZED",
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "id": "2_02_02",
+          "method": "GET",
+          "path": "/admin/dashboard",
+          "summary": "Метрики дашборда (DAU/MAU, сообщения, репорты)",
+          "auth": "Admin",
+          "query": {
+            "period": "String (day|week|month)"
+          },
+          "response": {
+            "metrics": "Json",
+            "charts": "Json"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_02_03",
+          "method": "GET",
+          "path": "/admin/users",
+          "summary": "Список пользователей (поиск, фильтры, пагинация)",
+          "auth": "Admin",
+          "query": {
+            "search": "String?",
+            "status": "String?",
+            "cursor": "String?"
+          },
+          "response": {
+            "items": "[AdminUserRow]",
+            "nextCursor": "String?",
+            "total": "Int"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_02_04",
+          "method": "GET",
+          "path": "/admin/users/{userId}",
+          "summary": "Карточка пользователя",
+          "auth": "Admin",
+          "response": {
+            "user": "AdminUserFull",
+            "sessions": "[Device]",
+            "bans": "[Ban]"
+          },
+          "errors": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "id": "2_02_05",
+          "method": "POST",
+          "path": "/admin/users/{userId}/ban",
+          "summary": "Забанить пользователя",
+          "auth": "Admin",
+          "body": {
+            "reason": "String",
+            "until": "BigInt?",
+            "comment": "String?"
+          },
+          "response": {
+            "ban": "Ban"
+          },
+          "errors": [
+            "CONFLICT (уже забанен)"
+          ]
+        },
+        {
+          "id": "2_02_06",
+          "method": "DELETE",
+          "path": "/admin/users/{userId}/ban",
+          "summary": "Разбанить",
+          "auth": "Admin",
+          "response": {
+            "ok": "Boolean"
+          },
+          "errors": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "id": "2_02_07",
+          "method": "GET",
+          "path": "/admin/reports",
+          "summary": "Очередь жалоб (фильтры по типу/статусу)",
+          "auth": "Admin",
+          "query": {
+            "status": "String?",
+            "type": "String?",
+            "cursor": "String?"
+          },
+          "response": {
+            "items": "[Report]",
+            "nextCursor": "String?"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_02_08",
+          "method": "POST",
+          "path": "/admin/reports/{reportId}/resolve",
+          "summary": "Решение по жалобе (approve/reject + действие)",
+          "auth": "Admin",
+          "body": {
+            "resolution": "String (approved|rejected)",
+            "action": "String? (delete_message|ban_user|warn)",
+            "comment": "String?"
+          },
+          "response": {
+            "report": "Report"
+          },
+          "errors": [
+            "CONFLICT (уже решена)"
+          ]
+        },
+        {
+          "id": "2_02_09",
+          "method": "GET",
+          "path": "/admin/appeals",
+          "summary": "Обжалования банов",
+          "auth": "Admin",
+          "query": {
+            "status": "String?",
+            "cursor": "String?"
+          },
+          "response": {
+            "items": "[BanAppeal]",
+            "nextCursor": "String?"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_02_10",
+          "method": "POST",
+          "path": "/admin/appeals/{appealId}/resolve",
+          "summary": "Решение по обжалованию",
+          "auth": "Admin",
+          "body": {
+            "resolution": "String (unban|keep)",
+            "comment": "String?"
+          },
+          "response": {
+            "appeal": "BanAppeal"
+          },
+          "errors": [
+            "CONFLICT"
+          ]
+        },
+        {
+          "id": "2_02_11",
+          "method": "GET",
+          "path": "/admin/support/tickets",
+          "summary": "Очередь тикетов поддержки",
+          "auth": "Admin",
+          "query": {
+            "status": "String?",
+            "assignee": "String?",
+            "cursor": "String?"
+          },
+          "response": {
+            "items": "[SupportTicket]",
+            "nextCursor": "String?"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_02_12",
+          "method": "POST",
+          "path": "/admin/support/tickets/{ticketId}/reply",
+          "summary": "Ответ в тикет",
+          "auth": "Admin",
+          "body": {
+            "message": "String",
+            "close": "Boolean?"
+          },
+          "response": {
+            "message": "Message"
+          },
+          "errors": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "id": "2_02_13",
+          "method": "GET",
+          "path": "/admin/groups",
+          "summary": "Модерация групп/каналов",
+          "auth": "Admin",
+          "query": {
+            "search": "String?",
+            "cursor": "String?"
+          },
+          "response": {
+            "items": "[AdminChatRow]",
+            "nextCursor": "String?"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_02_14",
+          "method": "DELETE",
+          "path": "/admin/groups/{chatId}",
+          "summary": "Удалить/заблокировать группу",
+          "auth": "Admin",
+          "body": {
+            "reason": "String"
+          },
+          "response": {
+            "ok": "Boolean"
+          },
+          "errors": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "id": "2_02_15",
+          "method": "GET",
+          "path": "/admin/bots",
+          "summary": "Управление ботами (список, статусы)",
+          "auth": "Admin",
+          "response": {
+            "items": "[Bot]"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_02_16",
+          "method": "PATCH",
+          "path": "/admin/bots/{botId}",
+          "summary": "Одобрить/заблокировать бота",
+          "auth": "Admin",
+          "body": {
+            "status": "String (approved|blocked)"
+          },
+          "response": {
+            "bot": "Bot"
+          },
+          "errors": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "id": "2_02_17",
+          "method": "GET",
+          "path": "/admin/donations",
+          "summary": "Донаты и подписки (сводка, список)",
+          "auth": "Admin",
+          "query": {
+            "period": "String?",
+            "cursor": "String?"
+          },
+          "response": {
+            "summary": "Json",
+            "items": "[Donation]"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_02_18",
+          "method": "GET",
+          "path": "/admin/audit-log",
+          "summary": "Журнал действий админов",
+          "auth": "Admin",
+          "query": {
+            "adminId": "String?",
+            "action": "String?",
+            "cursor": "String?"
+          },
+          "response": {
+            "items": "[AuditEntry]",
+            "nextCursor": "String?"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_02_19",
+          "method": "GET",
+          "path": "/admin/settings",
+          "summary": "Системные настройки платформы",
+          "auth": "Admin",
+          "response": {
+            "settings": "Json"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_02_20",
+          "method": "PATCH",
+          "path": "/admin/settings",
+          "summary": "Изменить системные настройки",
+          "auth": "Admin",
+          "body": {
+            "settings": "Json"
+          },
+          "response": {
+            "settings": "Json"
+          },
+          "errors": [
+            "VALIDATION_ERROR"
+          ]
+        },
+        {
+          "id": "2_02_21",
+          "method": "GET",
+          "path": "/admin/stories",
+          "summary": "Модерация сторис",
+          "auth": "Admin",
+          "query": {
+            "reported": "Boolean?",
+            "cursor": "String?"
+          },
+          "response": {
+            "items": "[Story]",
+            "nextCursor": "String?"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_02_22",
+          "method": "DELETE",
+          "path": "/admin/stories/{storyId}",
+          "summary": "Удалить сторис (модерация)",
+          "auth": "Admin",
+          "body": {
+            "reason": "String"
+          },
+          "response": {
+            "ok": "Boolean"
+          },
+          "errors": [
+            "NOT_FOUND"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "api_command",
+      "node": "у_03",
+      "name": "Портал сотрудников (command.balloo.su)",
+      "screens": [
+        "все экраны узла у_03 (26 шт.)"
+      ],
+      "endpoints": [
+        {
+          "id": "2_03_01",
+          "method": "POST",
+          "path": "/staff/auth/login",
+          "summary": "Вход сотрудника",
+          "auth": "Public",
+          "body": {
+            "email": "String",
+            "password": "String"
+          },
+          "response": {
+            "accessToken": "String",
+            "staff": "StaffUser"
+          },
+          "errors": [
+            "UNAUTHORIZED"
+          ]
+        },
+        {
+          "id": "2_03_02",
+          "method": "GET",
+          "path": "/staff/dashboard",
+          "summary": "Дашборд сотрудника (задачи, новости, встречи)",
+          "auth": "Staff",
+          "response": {
+            "tasks": "[Task]",
+            "news": "[NewsItem]",
+            "meetings": "[Meeting]"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_03_03",
+          "method": "GET",
+          "path": "/staff/tasks",
+          "summary": "Задачи (kanban, фильтры)",
+          "auth": "Staff",
+          "query": {
+            "status": "String?",
+            "assignee": "String?",
+            "sprint": "String?"
+          },
+          "response": {
+            "items": "[Task]"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_03_04",
+          "method": "POST",
+          "path": "/staff/tasks",
+          "summary": "Создать задачу",
+          "auth": "Staff",
+          "body": {
+            "title": "String",
+            "description": "String?",
+            "assigneeId": "String?",
+            "priority": "String",
+            "dueDate": "BigInt?"
+          },
+          "response": {
+            "task": "Task"
+          },
+          "errors": [
+            "VALIDATION_ERROR"
+          ]
+        },
+        {
+          "id": "2_03_05",
+          "method": "PATCH",
+          "path": "/staff/tasks/{taskId}",
+          "summary": "Обновить задачу (статус, исполнитель)",
+          "auth": "Staff",
+          "body": {
+            "status": "String?",
+            "assigneeId": "String?",
+            "priority": "String?"
+          },
+          "response": {
+            "task": "Task"
+          },
+          "errors": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "id": "2_03_06",
+          "method": "GET",
+          "path": "/staff/employees",
+          "summary": "Каталог сотрудников (оргструктура)",
+          "auth": "Staff",
+          "query": {
+            "department": "String?",
+            "search": "String?"
+          },
+          "response": {
+            "items": "[Employee]"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_03_07",
+          "method": "GET",
+          "path": "/staff/employees/{employeeId}",
+          "summary": "Карточка сотрудника",
+          "auth": "Staff",
+          "response": {
+            "employee": "Employee"
+          },
+          "errors": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "id": "2_03_08",
+          "method": "GET",
+          "path": "/staff/vacancies",
+          "summary": "Вакансии (HR)",
+          "auth": "Staff",
+          "query": {
+            "status": "String?"
+          },
+          "response": {
+            "items": "[Vacancy]"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_03_09",
+          "method": "GET",
+          "path": "/staff/candidates",
+          "summary": "Кандидаты по вакансиям (pipeline по стадиям)",
+          "auth": "Staff",
+          "query": {
+            "vacancyId": "String?",
+            "stage": "String?"
+          },
+          "response": {
+            "items": "[Candidate]"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_03_10",
+          "method": "GET",
+          "path": "/staff/candidates/{candidateId}",
+          "summary": "Карточка кандидата (интервью, 1_03_24)",
+          "auth": "Staff",
+          "response": {
+            "candidate": "Candidate",
+            "interviews": "[Interview]",
+            "notes": "[Note]"
+          },
+          "errors": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "id": "2_03_11",
+          "method": "POST",
+          "path": "/staff/candidates/{candidateId}/interview",
+          "summary": "Сохранить итог интервью (оценки, решение)",
+          "auth": "Staff",
+          "body": {
+            "scores": "Json",
+            "notes": "String",
+            "decision": "String (hire|reject|other_role)"
+          },
+          "response": {
+            "interview": "Interview"
+          },
+          "errors": [
+            "VALIDATION_ERROR"
+          ]
+        },
+        {
+          "id": "2_03_12",
+          "method": "PATCH",
+          "path": "/staff/candidates/{candidateId}/stage",
+          "summary": "Перевести кандидата на стадию",
+          "auth": "Staff",
+          "body": {
+            "stageId": "String"
+          },
+          "response": {
+            "candidate": "Candidate"
+          },
+          "errors": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "id": "2_03_13",
+          "method": "GET",
+          "path": "/staff/manager/dashboard",
+          "summary": "Дашборд руководителя (1_03_25): метрики команды, burn-down",
+          "auth": "Staff",
+          "query": {
+            "teamId": "String?",
+            "sprint": "String?"
+          },
+          "response": {
+            "metrics": "Json",
+            "burndown": "Json",
+            "tasks": "[Task]",
+            "deadlines": "[Task]"
+          },
+          "errors": [
+            "FORBIDDEN (не руководитель)"
+          ]
+        },
+        {
+          "id": "2_03_14",
+          "method": "GET",
+          "path": "/staff/time-off",
+          "summary": "Отпуска и отсутствия (1_03_26): мои заявки + календарь отдела",
+          "auth": "Staff",
+          "query": {
+            "department": "String?",
+            "from": "BigInt?",
+            "to": "BigInt?"
+          },
+          "response": {
+            "myRequests": "[TimeOffRequest]",
+            "calendar": "[TimeOffEntry]"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_03_15",
+          "method": "POST",
+          "path": "/staff/time-off",
+          "summary": "Подать заявку на отпуск/отсутствие",
+          "auth": "Staff",
+          "body": {
+            "type": "String (vacation|sick|remote|other)",
+            "from": "BigInt",
+            "to": "BigInt",
+            "comment": "String?"
+          },
+          "response": {
+            "request": "TimeOffRequest"
+          },
+          "errors": [
+            "VALIDATION_ERROR",
+            "CONFLICT (пересечение)"
+          ]
+        },
+        {
+          "id": "2_03_16",
+          "method": "POST",
+          "path": "/staff/time-off/{requestId}/approve",
+          "summary": "Утвердить/отклонить заявку (руководитель)",
+          "auth": "Staff",
+          "body": {
+            "approved": "Boolean",
+            "comment": "String?"
+          },
+          "response": {
+            "request": "TimeOffRequest"
+          },
+          "errors": [
+            "FORBIDDEN"
+          ]
+        },
+        {
+          "id": "2_03_17",
+          "method": "GET",
+          "path": "/staff/knowledge",
+          "summary": "База знаний (категории, статьи, поиск)",
+          "auth": "Staff",
+          "query": {
+            "categoryId": "String?",
+            "search": "String?"
+          },
+          "response": {
+            "categories": "[KnowledgeCategory]",
+            "articles": "[Article]"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_03_18",
+          "method": "GET",
+          "path": "/staff/news",
+          "summary": "Внутренние новости",
+          "auth": "Staff",
+          "query": {
+            "cursor": "String?"
+          },
+          "response": {
+            "items": "[NewsItem]",
+            "nextCursor": "String?"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_03_19",
+          "method": "GET",
+          "path": "/staff/meetings",
+          "summary": "Календарь встреч",
+          "auth": "Staff",
+          "query": {
+            "from": "BigInt",
+            "to": "BigInt"
+          },
+          "response": {
+            "items": "[Meeting]"
+          },
+          "errors": []
+        }
+      ]
+    },
+    {
+      "id": "api_features",
+      "node": "у_04",
+      "name": "Фич-реквесты (features.balloo.su)",
+      "screens": [
+        "все экраны узла у_04 (5 шт.)"
+      ],
+      "endpoints": [
+        {
+          "id": "2_04_01",
+          "method": "GET",
+          "path": "/features",
+          "summary": "Список фич-реквестов (фильтры, сортировка по голосам)",
+          "auth": "Public",
+          "query": {
+            "categoryId": "String?",
+            "status": "String?",
+            "sort": "String (votes|new)",
+            "cursor": "String?"
+          },
+          "response": {
+            "items": "[FeatureRequest]",
+            "nextCursor": "String?"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_04_02",
+          "method": "GET",
+          "path": "/features/{featureId}",
+          "summary": "Детали фич-реквеста + комментарии",
+          "auth": "Public",
+          "response": {
+            "feature": "FeatureRequest",
+            "comments": "[Comment]"
+          },
+          "errors": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "id": "2_04_03",
+          "method": "POST",
+          "path": "/features",
+          "summary": "Создать фич-реквест",
+          "auth": "JWT",
+          "body": {
+            "title": "String",
+            "description": "String",
+            "categoryId": "String"
+          },
+          "response": {
+            "feature": "FeatureRequest"
+          },
+          "errors": [
+            "VALIDATION_ERROR",
+            "RATE_LIMITED"
+          ]
+        },
+        {
+          "id": "2_04_04",
+          "method": "POST",
+          "path": "/features/{featureId}/vote",
+          "summary": "Голос за фичу (toggle)",
+          "auth": "JWT",
+          "response": {
+            "votes": "Int",
+            "voted": "Boolean"
+          },
+          "errors": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "id": "2_04_05",
+          "method": "POST",
+          "path": "/features/{featureId}/comments",
+          "summary": "Комментарий к фиче",
+          "auth": "JWT",
+          "body": {
+            "text": "String"
+          },
+          "response": {
+            "comment": "Comment"
+          },
+          "errors": [
+            "VALIDATION_ERROR"
+          ]
+        },
+        {
+          "id": "2_04_06",
+          "method": "GET",
+          "path": "/features/categories",
+          "summary": "Категории фич (seed)",
+          "auth": "Public",
+          "response": {
+            "items": "[FeatureCategory]"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_04_07",
+          "method": "PATCH",
+          "path": "/admin/features/{featureId}",
+          "summary": "Смена статуса фичи (админ: planned|in_progress|done|declined)",
+          "auth": "Admin",
+          "body": {
+            "status": "String",
+            "comment": "String?"
+          },
+          "response": {
+            "feature": "FeatureRequest"
+          },
+          "errors": [
+            "NOT_FOUND"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "api_history",
+      "node": "у_05",
+      "name": "История версий (history.balloo.su)",
+      "screens": [
+        "все экраны узла у_05 (4 шт.)"
+      ],
+      "endpoints": [
+        {
+          "id": "2_05_01",
+          "method": "GET",
+          "path": "/changelog",
+          "summary": "Список релизов (фильтр по платформе)",
+          "auth": "Public",
+          "query": {
+            "platform": "String? (web|desktop|android|ios)",
+            "cursor": "String?"
+          },
+          "response": {
+            "items": "[Release]",
+            "nextCursor": "String?"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_05_02",
+          "method": "GET",
+          "path": "/changelog/{version}",
+          "summary": "Детали релиза",
+          "auth": "Public",
+          "response": {
+            "release": "Release"
+          },
+          "errors": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "id": "2_05_03",
+          "method": "GET",
+          "path": "/roadmap",
+          "summary": "Роадмап (планируемые версии)",
+          "auth": "Public",
+          "response": {
+            "items": "[RoadmapItem]"
+          },
+          "errors": []
+        }
+      ]
+    },
+    {
+      "id": "api_download",
+      "node": "у_06",
+      "name": "Загрузки (download.balloo.su)",
+      "screens": [
+        "все экраны узла у_06 (2 шт.)"
+      ],
+      "endpoints": [
+        {
+          "id": "2_06_01",
+          "method": "GET",
+          "path": "/downloads",
+          "summary": "Актуальные сборки по платформам",
+          "auth": "Public",
+          "response": {
+            "builds": "[Build]"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_06_02",
+          "method": "GET",
+          "path": "/downloads/{buildId}/file",
+          "summary": "Скачивание сборки (redirect на CDN)",
+          "auth": "Public",
+          "response": {
+            "redirect": "302 → CDN URL"
+          },
+          "errors": [
+            "NOT_FOUND"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "api_blog",
+      "node": "у_11",
+      "name": "Блог (blog.balloo.su)",
+      "screens": [
+        "все экраны узла у_11 (6 шт.)"
+      ],
+      "endpoints": [
+        {
+          "id": "2_11_01",
+          "method": "GET",
+          "path": "/blog/posts",
+          "summary": "Лента постов (фильтры: категория, канал, поиск)",
+          "auth": "Public",
+          "query": {
+            "categoryId": "String?",
+            "channelId": "String?",
+            "q": "String?",
+            "cursor": "String?"
+          },
+          "response": {
+            "items": "[BlogPost]",
+            "nextCursor": "String?"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_11_02",
+          "method": "GET",
+          "path": "/blog/posts/{slug}",
+          "summary": "Пост (контент + похожие)",
+          "auth": "Public",
+          "response": {
+            "post": "BlogPost",
+            "related": "[BlogPost]"
+          },
+          "errors": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "id": "2_11_03",
+          "method": "GET",
+          "path": "/blog/categories",
+          "summary": "Категории блога (seed, локализ.)",
+          "auth": "Public",
+          "response": {
+            "items": "[BlogCategory]"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_11_04",
+          "method": "GET",
+          "path": "/blog/channels/{channelId}",
+          "summary": "Канал блога + его посты",
+          "auth": "Public",
+          "query": {
+            "cursor": "String?"
+          },
+          "response": {
+            "channel": "BlogChannel",
+            "items": "[BlogPost]"
+          },
+          "errors": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "id": "2_11_05",
+          "method": "POST",
+          "path": "/blog/channels/{channelId}/subscribe",
+          "summary": "Подписка на канал (персональная лента)",
+          "auth": "JWT",
+          "response": {
+            "subscribed": "Boolean"
+          },
+          "errors": [
+            "NOT_FOUND"
+          ]
+        },
+        {
+          "id": "2_11_06",
+          "method": "GET",
+          "path": "/blog/feed",
+          "summary": "Персональная лента (по подпискам)",
+          "auth": "JWT",
+          "query": {
+            "cursor": "String?"
+          },
+          "response": {
+            "items": "[BlogPost]",
+            "nextCursor": "String?"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_11_07",
+          "method": "POST",
+          "path": "/blog/posts/{postId}/reaction",
+          "summary": "Реакция на пост",
+          "auth": "JWT",
+          "body": {
+            "emoji": "String"
+          },
+          "response": {
+            "reactions": "Json"
+          },
+          "errors": [
+            "NOT_FOUND"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "api_platform",
+      "node": "у_08_у_09",
+      "name": "Платформенные (mobile/desktop): push, обновления",
+      "screens": [
+        "узлы у_08, у_09 переиспользуют API у_01; ниже — специфичные"
+      ],
+      "endpoints": [
+        {
+          "id": "2_08_01",
+          "method": "POST",
+          "path": "/push/register",
+          "summary": "Регистрация push-токена устройства (FCM/APNs/RuStore)",
+          "auth": "JWT",
+          "body": {
+            "token": "String",
+            "platform": "String (android|ios|web|desktop)",
+            "provider": "String"
+          },
+          "response": {
+            "ok": "Boolean"
+          },
+          "errors": [
+            "VALIDATION_ERROR"
+          ]
+        },
+        {
+          "id": "2_08_02",
+          "method": "DELETE",
+          "path": "/push/register",
+          "summary": "Отзыв push-токена (выход)",
+          "auth": "JWT",
+          "body": {
+            "token": "String"
+          },
+          "response": {
+            "ok": "Boolean"
+          },
+          "errors": []
+        },
+        {
+          "id": "2_09_01",
+          "method": "GET",
+          "path": "/app/update-check",
+          "summary": "Проверка обновления (desktop auto-update)",
+          "auth": "Public",
+          "query": {
+            "platform": "String",
+            "version": "String"
+          },
+          "response": {
+            "updateAvailable": "Boolean",
+            "latest": "Build?"
+          },
+          "errors": []
+        }
+      ]
+    }
+  ],
+  "websocket": {
+    "url": "wss://ws.balloo.su/v1",
+    "auth": "JWT в query (?token=) или первым фреймом { type: 'auth', token }",
+    "envelope": {
+      "type": "String",
+      "payload": "Json",
+      "ts": "BigInt"
+    },
+    "events": [
+      {
+        "event": "message.new",
+        "direction": "server→client",
+        "payload": {
+          "message": "Message"
+        },
+        "description": "Новое сообщение в любом чате пользователя"
+      },
+      {
+        "event": "message.edited",
+        "direction": "server→client",
+        "payload": {
+          "message": "Message"
+        },
+        "description": "Сообщение отредактировано"
+      },
+      {
+        "event": "message.deleted",
+        "direction": "server→client",
+        "payload": {
+          "chatId": "String",
+          "messageId": "String"
+        },
+        "description": "Сообщение удалено"
+      },
+      {
+        "event": "message.reaction",
+        "direction": "server→client",
+        "payload": {
+          "messageId": "String",
+          "reactions": "Json"
+        },
+        "description": "Изменение реакций"
+      },
+      {
+        "event": "chat.read",
+        "direction": "server→client",
+        "payload": {
+          "chatId": "String",
+          "userId": "String",
+          "messageId": "String"
+        },
+        "description": "Собеседник прочитал сообщения"
+      },
+      {
+        "event": "typing.start",
+        "direction": "bidirectional",
+        "payload": {
+          "chatId": "String",
+          "userId": "String?"
+        },
+        "description": "Индикатор «печатает» (клиент шлёт, сервер ретранслирует)"
+      },
+      {
+        "event": "typing.stop",
+        "direction": "bidirectional",
+        "payload": {
+          "chatId": "String",
+          "userId": "String?"
+        },
+        "description": "Окончание набора"
+      },
+      {
+        "event": "presence.update",
+        "direction": "server→client",
+        "payload": {
+          "userId": "String",
+          "status": "String (online|offline|away)",
+          "lastSeen": "BigInt?"
+        },
+        "description": "Изменение онлайн-статуса контакта"
+      },
+      {
+        "event": "call.incoming",
+        "direction": "server→client",
+        "payload": {
+          "callId": "String",
+          "from": "PublicUser",
+          "kind": "String (audio|video)"
+        },
+        "description": "Входящий звонок"
+      },
+      {
+        "event": "call.answered",
+        "direction": "server→client",
+        "payload": {
+          "callId": "String"
+        },
+        "description": "Звонок принят на другом устройстве/собеседником"
+      },
+      {
+        "event": "call.ended",
+        "direction": "server→client",
+        "payload": {
+          "callId": "String",
+          "reason": "String",
+          "duration": "Int?"
+        },
+        "description": "Звонок завершён/отклонён"
+      },
+      {
+        "event": "call.signal",
+        "direction": "bidirectional",
+        "payload": {
+          "callId": "String",
+          "sdp": "Json?",
+          "candidate": "Json?"
+        },
+        "description": "WebRTC-сигналинг (offer/answer/ICE)"
+      },
+      {
+        "event": "chat.updated",
+        "direction": "server→client",
+        "payload": {
+          "chat": "ChatBrief"
+        },
+        "description": "Изменение чата (название, аватар, участники)"
+      },
+      {
+        "event": "chat.member.joined",
+        "direction": "server→client",
+        "payload": {
+          "chatId": "String",
+          "member": "Member"
+        },
+        "description": "Участник вступил"
+      },
+      {
+        "event": "chat.member.left",
+        "direction": "server→client",
+        "payload": {
+          "chatId": "String",
+          "userId": "String"
+        },
+        "description": "Участник вышел/удалён"
+      },
+      {
+        "event": "story.new",
+        "direction": "server→client",
+        "payload": {
+          "story": "StoryBrief"
+        },
+        "description": "Новая сторис у контакта"
+      },
+      {
+        "event": "invite.new",
+        "direction": "server→client",
+        "payload": {
+          "invite": "Invite"
+        },
+        "description": "Новое приглашение"
+      },
+      {
+        "event": "poll.updated",
+        "direction": "server→client",
+        "payload": {
+          "pollId": "String",
+          "results": "Json"
+        },
+        "description": "Обновление результатов опроса"
+      },
+      {
+        "event": "device.new-login",
+        "direction": "server→client",
+        "payload": {
+          "device": "Device"
+        },
+        "description": "Вход с нового устройства (уведомление безопасности)"
+      },
+      {
+        "event": "device.qr-scanned",
+        "direction": "server→client",
+        "payload": {
+          "qrToken": "String",
+          "deviceInfo": "Json"
+        },
+        "description": "QR отсканирован — подтверждение входа (экран 1_01_23)"
+      },
+      {
+        "event": "notification.new",
+        "direction": "server→client",
+        "payload": {
+          "notification": "Json"
+        },
+        "description": "Прочие уведомления (донат, поддержка ответила, фича сменила статус)"
+      },
+      {
+        "event": "support.message",
+        "direction": "server→client",
+        "payload": {
+          "ticketId": "String",
+          "message": "Message"
+        },
+        "description": "Ответ поддержки в тикете"
+      },
+      {
+        "event": "admin.report.new",
+        "direction": "server→client",
+        "payload": {
+          "report": "Report"
+        },
+        "description": "Новая жалоба (реалтайм в админ-панели)",
+        "auth": "Admin"
+      },
+      {
+        "event": "staff.task.updated",
+        "direction": "server→client",
+        "payload": {
+          "task": "Task"
+        },
+        "description": "Обновление задачи на kanban (command.balloo.su)",
+        "auth": "Staff"
+      }
+    ]
+  },
+  "stats": {
+    "endpoint_groups": 16,
+    "endpoints_total": 150,
+    "websocket_events": 24,
+    "auth_types": 5
+  }
+}

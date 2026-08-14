@@ -1,0 +1,40 @@
+{
+  "name": "@balloo/web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Balloo Messenger — React + Vite + TypeScript web app",
+  "scripts": {
+    "build": "tsc && vite build",
+    "dev": "vite",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "cypress run",
+    "lint": "echo \"No linter configured yet\""
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.101.4",
+    "axios": "^1.7.0",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "react-router-dom": "^6.25.0",
+    "react-virtuoso": "^4.18.11",
+    "zustand": "^4.5.0"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.4.0",
+    "@testing-library/react": "^16.0.0",
+    "@testing-library/user-event": "^14.5.0",
+    "@types/node": "^20.11.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.0",
+    "cypress": "^15.19.0",
+    "jsdom": "^24.0.0",
+    "rollup-plugin-visualizer": "^7.0.1",
+    "terser": "^5.49.0",
+    "typescript": "^5.5.0",
+    "vite": "^5.4.0",
+    "vitest": "^2.0.0"
+  }
+}

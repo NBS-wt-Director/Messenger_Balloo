@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Компонент: Manager Dashboard — Дашборд руководителя</title>
+  <link rel="stylesheet" href="../../assets/common.css">
+  <style>
+    .component-demo { padding: 24px; max-width: 640px; margin: 0 auto; }
+    .component-demo h1 { font-size: 20px; margin-bottom: 16px; }
+    .component-demo .demo-section { margin-bottom: 24px; }
+    .component-demo .demo-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+
+    .dashboard-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+    .dashboard-stats__card { padding: 16px; background: var(--bg-glass); border: 1px solid var(--border-color); text-align: center; }
+    .dashboard-stats__card__value { font-size: 24px; font-weight: 800; color: var(--accent); }
+    .dashboard-stats__card__label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+    .dashboard-kanban { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .kanban-column { background: var(--bg-tertiary); border: 1px solid var(--border-color); padding: 12px; }
+    .kanban-column__title { font-size: 13px; font-weight: 700; color: var(--text-secondary); margin-bottom: 10px; text-transform: uppercase; }
+    .kanban-card { padding: 10px; background: var(--bg-secondary); border: 1px solid var(--border-color); margin-bottom: 8px; cursor: pointer; }
+    .kanban-card:hover { background: var(--bg-hover); }
+    .kanban-card__title { font-size: 13px; color: var(--text-primary); font-weight: 600; }
+    .kanban-card__meta { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+  </style>
+</head>
+<body>
+  <div class="component-demo">
+    <h1>📦 Компонент: Manager Dashboard (Дашборд руководителя)</h1>
+
+    <div class="demo-section">
+      <div class="demo-label">Метрики команды</div>
+      <div class="dashboard-stats">
+        <div class="dashboard-stats__card"><div class="dashboard-stats__card__value">8</div><div class="dashboard-stats__card__label">Сотрудников</div></div>
+        <div class="dashboard-stats__card"><div class="dashboard-stats__card__value" style="color:var(--text-primary);">12</div><div class="dashboard-stats__card__label">Задач в работе</div></div>
+        <div class="dashboard-stats__card"><div class="dashboard-stats__card__value" style="color:var(--warning);">3</div><div class="dashboard-stats__card__label">В ожидании</div></div>
+      </div>
+      <div class="demo-label">Канбан задач</div>
+      <div class="dashboard-kanban">
+        <div class="kanban-column">
+          <div class="kanban-column__title">К выполнению (5)</div>
+          <div class="kanban-card"><div class="kanban-card__title">Ред. профиля</div><div class="kanban-card__meta">Приоритет: средний</div></div>
+          <div class="kanban-card"><div class="kanban-card__title">API чатов</div><div class="kanban-card__meta">Приоритет: высокий</div></div>
+        </div>
+        <div class="kanban-column">
+          <div class="kanban-column__title">В работе (4)</div>
+          <div class="kanban-card"><div class="kanban-card__title">Stories v2</div><div class="kanban-card__meta">Приоритет: высокий</div></div>
+          <div class="kanban-card"><div class="kanban-card__title">Настройки</div><div class="kanban-card__meta">Приоритет: средний</div></div>
+        </div>
+        <div class="kanban-column">
+          <div class="kanban-column__title">Готово (3)</div>
+          <div class="kanban-card"><div class="kanban-card__title">Логин</div><div class="kanban-card__meta">Завершено 20.07</div></div>
+          <div class="kanban-card"><div class="kanban-card__title">Регистрация</div><div class="kanban-card__meta">Завершено 18.07</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="../../assets/common.js"></script>
+</body>
+</html>

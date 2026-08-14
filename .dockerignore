@@ -1,0 +1,17 @@
+node_modules
+**/node_modules
+dist
+**/dist
+.git
+*.log
+*.md
+mockups
+docs
+tickets
+scripts
+assets
+cypress
+coverage
+.env
+.env.*
+!.env.example

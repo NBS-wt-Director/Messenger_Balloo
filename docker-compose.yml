@@ -1,0 +1,77 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: balloo-postgres
+    restart: unless-stopped
+    env_file: .env.production
+    environment:
+      POSTGRES_USER: balloo
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-balloo}
+    expose:
+      - "5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U balloo"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: balloo-redis
+    restart: unless-stopped
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    expose:
+      - "6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  server:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.server
+    container_name: balloo-server
+    restart: unless-stopped
+    env_file: .env.production
+    ports:
+      - "3100:3000"
+    environment:
+      DATABASE_URL: postgresql://balloo:${POSTGRES_PASSWORD}@postgres:5432/balloo
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      NODE_ENV: production
+      SERVER_PORT: 3000
+      SERVER_HOST: 0.0.0.0
+      CORS_ORIGIN: ${CORS_ORIGIN:-https://app.balloo.su}
+      MAX_FILE_SIZE: ${MAX_FILE_SIZE:-52428800}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.web
+    container_name: balloo-web
+    restart: unless-stopped
+    depends_on:
+      server:
+        condition: service_healthy
+
+volumes:
+  postgres-data:
+  redis-data:

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Features — Предложить фичу</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--accent);">F</div><span>Features</span>
+    <div class="topbar__dropdown"><div class="topbar__dropdown-item">💡 Features (текущий)</div><div class="topbar__dropdown-divider"></div><div class="topbar__dropdown-item">💬 Balloo</div><div class="topbar__dropdown-item">🛡️ Admin</div><div class="topbar__dropdown-item">🏢 Command</div><div class="topbar__dropdown-item">📜 History</div><div class="topbar__dropdown-item">⬇️ Download</div><div class="topbar__dropdown-item">📚 API Docs</div></div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Предложить фичу</div>
+  <div class="topbar__actions">
+    <div class="topbar__actions-btn" onclick="window.location.href='list.html'" title="Назад">←</div>
+  </div>
+  <div class="topbar__right">
+    <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИИ</span></div></div>
+    <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+    <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+  </div>
+</div>
+<div class="main">
+  <div class="content overflow-y-auto">
+    <div class="page-container page-container--narrow">
+      <a href="list.html" class="text-sm text-secondary mb-4" style="display:inline-block;">← Назад к списку</a>
+      <h1 class="page-title">💡 Предложить новую фичу</h1>
+      <p class="page-subtitle">Опишите вашу идею. Сообщество проголосует, а команда рассмотрит.</p>
+
+      <div class="card">
+        <div class="form-group">
+          <label class="form-label">Название фичи *</label>
+           <input type="text" class="form-input" placeholder="Краткое и понятное название">
+           <div class="form-hint">Не более 80 символов</div>
+           <div class="form-hint" style="color:var(--info);">💡 Зачем это нужно: Короткое название помогает разработчикам быстро понять суть фичи и найти её в списке. Избегайте аббревиатур.</div>
+         </div>
+
+        <div class="form-group">
+          <label class="form-label">Категория *</label>
+          <select class="form-select">
+            <option value="">— Выберите категорию —</option>
+            <option>Мессенджер (чаты, сообщения)</option>
+            <option>Звонки (аудио/видео)</option>
+            <option>Группы (создание, управление)</option>
+            <option>UI/UX (интерфейс)</option>
+            <option>Боты и API</option>
+            <option>Файлы и медиа</option>
+            <option>Приватность и безопасность</option>
+            <option>Интеграции</option>
+            <option>Другое</option>
+          </select>
+          <div class="form-hint" style="color:var(--info);">💡 Зачем это нужно: Категория определяет, какой команде будет направлена ваша фича. Правильный выбор ускоряет обработку.</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Приоритет</label>
+          <select class="form-select">
+            <option value="">— Не указан —</option>
+            <option>Низкий (было бы неплохо)</option>
+            <option>Средний (полезно)</option>
+            <option>Высокий (очень нужно)</option>
+            <option>Критичный (без этого не работаю)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Описание *</label>
+          <textarea class="form-textarea" rows="5" placeholder="Подробно опишите, что вы хотите, как это должно работать и почему это важно"></textarea>
+          <div class="form-hint" style="color:var(--info);">💡 Зачем это нужно: Разработчики читают описание, чтобы понять, как фича должна работать. Чем подробнее — тем точнее реализация.</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Мотивация</label>
+          <textarea class="form-textarea" rows="3" placeholder="Какую проблему решает эта фича? Как вы справляетесь сейчас без неё?"></textarea>
+          <div class="form-hint" style="color:var(--info);">💡 Зачем это нужно: Мотивация помогает разработчикам понять реальную проблему пользователя и найти лучшее решение.</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Скриншоты / макеты (необязательно)</label>
+          <div class="card" style="border:2px dashed var(--border-strong);text-align:center;padding:32px;cursor:pointer;">
+            <div style="font-size:32px;">📎</div>
+            <div class="text-sm text-secondary mt-2">Перетащите файлы сюда или нажмите для выбора</div>
+            <div class="text-xs text-muted mt-1">PNG, JPG, GIF — до 5 МБ</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-checkbox">
+            <input type="checkbox" checked>
+            <span class="text-sm">Я проверил, что похожая фича ещё не предложена</span>
+          </label>
+        </div>
+        <div class="form-group">
+          <label class="form-checkbox">
+            <input type="checkbox">
+            <span class="text-sm">Подписаться на комментарии</span>
+          </label>
+        </div>
+
+        <div class="flex gap-2 mt-6">
+          <button class="btn btn--primary btn--lg btn--block" onclick="alert('Демо: фича отправлена на модерацию')">Отправить фичу</button>
+          <a href="list.html" class="btn btn--tertiary btn--lg">Отмена</a>
+        </div>
+
+        <!-- Donate banner -->
+        <div class="card mt-4" style="background:rgba(45,184,77,0.08);border-color:var(--accent);text-align:center;">
+          <div style="font-size:24px;margin-bottom:8px;">💚</div>
+          <div class="text-sm font-semibold" style="color:var(--accent);">Хотите ускорить реализацию?</div>
+          <div class="text-xs text-secondary mt-1">Отправьте донат на развитие фичи — это поможет команде быстрее справиться!</div>
+          <button class="btn btn--accent btn--sm mt-3" onclick="window.location.href='donate.html'">Поддержать донатом</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

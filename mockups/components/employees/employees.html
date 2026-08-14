@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Компонент: Employees — Сотрудники</title>
+  <link rel="stylesheet" href="../../assets/common.css">
+  <style>
+    .component-demo { padding: 24px; max-width: 640px; margin: 0 auto; }
+    .component-demo h1 { font-size: 20px; margin-bottom: 16px; }
+    .component-demo .demo-section { margin-bottom: 24px; }
+    .component-demo .demo-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+
+    .employees-table { width: 100%; border-collapse: collapse; }
+    .employees-table th { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border-color); }
+    .employees-table td { padding: 12px; font-size: 14px; color: var(--text-primary); border-bottom: 1px solid var(--border-color); }
+    .employees-table__row:hover td { background: var(--bg-hover); }
+    .employees-table__name { font-weight: 600; display: flex; align-items: center; gap: 10px; }
+    .employees-table__role { font-size: 12px; color: var(--text-secondary); }
+    .employees-table__status { font-size: 12px; padding: 3px 8px; font-weight: 600; }
+    .employees-table__status--active { background: rgba(45,184,77,0.12); color: var(--accent); }
+    .employees-table__status--inactive { background: rgba(107,119,133,0.12); color: #6b7785; }
+    .employees-table__header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .employees-table__header__title { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+    .employees-table__search { width: 240px; }
+  </style>
+</head>
+<body>
+  <div class="component-demo">
+    <h1>📦 Компонент: Employees (Сотрудники)</h1>
+
+    <div class="demo-section">
+      <div class="demo-label">Таблица сотрудников</div>
+      <div class="employees-table__header">
+        <div class="employees-table__header__title">Сотрудники (5)</div>
+        <input class="search-input employees-table__search" placeholder="Поиск...">
+      </div>
+      <table class="employees-table">
+        <thead><tr><th>Сотрудник</th><th>Роль</th><th>Статус</th><th>Действия</th></tr></thead>
+        <tbody>
+          <tr class="employees-table__row">
+            <td><div class="employees-table__name"><div class="avatar avatar--sm" style="background:var(--accent);color:#fff;clip-path:var(--octagon-clip);font-size:11px;display:inline-flex;align-items:center;justify-content:center;">ИИ</div>Иван Иванов</div></td>
+            <td><span class="employees-table__role">Администратор</span></td>
+            <td><span class="employees-table__status employees-table__status--active">Активен</span></td>
+            <td><button class="bots-table__action-btn">Редактировать</button></td>
+          </tr>
+          <tr class="employees-table__row">
+            <td><div class="employees-table__name"><div class="avatar avatar--sm" style="background:#3b9eff;color:#fff;clip-path:var(--octagon-clip);font-size:11px;display:inline-flex;align-items:center;justify-content:center;">МС</div>Мария С.</div></td>
+            <td><span class="employees-table__role">Модератор</span></td>
+            <td><span class="employees-table__status employees-table__status--active">Активен</span></td>
+            <td><button class="bots-table__action-btn">Редактировать</button></td>
+          </tr>
+          <tr class="employees-table__row">
+            <td><div class="employees-table__name"><div class="avatar avatar--sm" style="background:#6b7785;color:#fff;clip-path:var(--octagon-clip);font-size:11px;display:inline-flex;align-items:center;justify-content:center;">ДВ</div>Дмитрий В.</div></td>
+            <td><span class="employees-table__role">Сотрудник</span></td>
+            <td><span class="employees-table__status employees-table__status--inactive">Неактивен</span></td>
+            <td><button class="bots-table__action-btn">Редактировать</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <script src="../../assets/common.js"></script>
+</body>
+</html>

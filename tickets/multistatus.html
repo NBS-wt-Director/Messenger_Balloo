@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мультитикет: Восстановление проекта Balloo</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a2e;
+            color: #eee;
+        }
+        h1 {
+            color: #2db84d;
+            border-bottom: 2px solid #2db84d;
+            padding-bottom: 10px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .status-critical {
+            background: #ff4444;
+            color: white;
+        }
+        .status-medium {
+            background: #ffaa00;
+            color: black;
+        }
+        .ticket {
+            background: #16213e;
+            border: 1px solid #0f3460;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .ticket-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .ticket-number {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2db84d;
+        }
+        .ticket-status {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        .status-not-started {
+            background: #666;
+            color: white;
+        }
+        .facts {
+            background: #0f3460;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .facts h3 {
+            color: #2db84d;
+            margin-top: 0;
+        }
+        .facts ul {
+            list-style: none;
+            padding: 0;
+        }
+        .facts li {
+            padding: 5px 0;
+            border-bottom: 1px solid #1a1a2e;
+        }
+        .facts li:before {
+            content: "✓ ";
+            color: #2db84d;
+            font-weight: bold;
+        }
+        .commands {
+            background: #16213e;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .commands h3 {
+            color: #2db84d;
+            margin-top: 0;
+        }
+        .commands pre {
+            background: #0a0a1a;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        .progress {
+            background: #0a0a1a;
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        .progress-bar {
+            background: #2db84d;
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .summary-item {
+            background: #16213e;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .summary-item .number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2db84d;
+        }
+        .summary-item .label {
+            font-size: 12px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎫 Мультитикет: Восстановление проекта Balloo <span class="status-badge status-critical">КРИТИЧЕСКИЙ</span></h1>
+    
+    <div class="summary">
+        <div class="summary-item">
+            <div class="number">7</div>
+            <div class="label">Тикетов</div>
+        </div>
+        <div class="summary-item">
+            <div class="number">10ч</div>
+            <div class="label">Оценка</div>
+        </div>
+        <div class="summary-item">
+            <div class="number">0%</div>
+            <div class="label">Прогресс</div>
+        </div>
+    </div>
+
+    <div class="progress">
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <div class="facts">
+        <h3>📋 Факты (доказанные)</h3>
+        <ul>
+            <li>В начале сессии в packages/ было 736 TS/TSX файлов</li>
+            <li>Файл packages/server/src/routes/auth.ts существовал и содержал OAuth-маршруты</li>
+            <li>Файл packages/server/src/services/authService.ts существовал и редактировался</li>
+            <li>Файл packages/shared/prisma/schema.prisma существовал (1059 строк)</li>
+            <li>Файл docker-compose.yml существовал с полной конфигурацией</li>
+            <li>Сейчас: packages/ содержит только shared/ и web/</li>
+            <li>Сейчас: packages/shared/src/ содержит только config.ts</li>
+            <li>Сейчас: нет package.json нигде в проекте</li>
+            <li>Сейчас: нет Dockerfile.server, Dockerfile.web</li>
+            <li>Сейчас: нет .github/, .husky/, AGENTS.md, README.md</li>
+            <li>Сейчас: нет mockups (только general_docs/)</li>
+            <li>Git-репозиторий инициализирован, но пустой (только 18 файлов)</li>
+        </ul>
+    </div>
+
+    <h2>📝 Тикеты</h2>
+    
+    <div class="ticket">
+        <div class="ticket-header">
+            <span class="ticket-number">Тикет №1: Поиск файлов на компьютере</span>
+            <span class="ticket-status status-not-started">Не начат</span>
+        </div>
+        <p><strong>Приоритет:</strong> <span class="status-badge status-critical">Критический</span></p>
+        <p><strong>Время:</strong> 30 мин</p>
+        <p>Найти все package.json, Dockerfile.*, schema.prisma, каталоги server/src/, desktop/src/, mobile*/src/, mockups/</p>
+    </div>
+
+    <div class="ticket">
+        <div class="ticket-header">
+            <span class="ticket-number">Тикет №2: Проверка Git-истории</span>
+            <span class="ticket-status status-not-started">Не начат</span>
+        </div>
+        <p><strong>Приоритет:</strong> <span class="status-badge status-critical">Критический</span></p>
+        <p><strong>Время:</strong> 30 мин</p>
+        <p>Проверить git log, git reflog, восстановить файлы из истории</p>
+    </div>
+
+    <div class="ticket">
+        <div class="ticket-header">
+            <span class="ticket-number">Тикет №3: Восстановление структуры</span>
+            <span class="ticket-status status-not-started">Не начат</span>
+        </div>
+        <p><strong>Приоритет:</strong> <span class="status-badge status-critical">Критический</span></p>
+        <p><strong>Время:</strong> 2 часа</p>
+        <p>Переместить найденные файлы или создать структуру с нуля</p>
+    </div>
+
+    <div class="ticket">
+        <div class="ticket-header">
+            <span class="ticket-number">Тикет №4: Создание package.json</span>
+            <span class="ticket-status status-not-started">Не начат</span>
+        </div>
+        <p><strong>Приоритет:</strong> <span class="status-badge status-critical">Критический</span></p>
+        <p><strong>Время:</strong> 1 час</p>
+        <p>Создать корневой package.json, pnpm-workspace.yaml, package.json для всех пакетов</p>
+    </div>
+
+    <div class="ticket">
+        <div class="ticket-header">
+            <span class="ticket-number">Тикет №5: Восстановление документации</span>
+            <span class="ticket-status status-not-started">Не начат</span>
+        </div>
+        <p><strong>Приоритет:</strong> <span class="status-badge status-medium">Средний</span></p>
+        <p><strong>Время:</strong> 1 час</p>
+        <p>Восстановить AGENTS.md, README.md, docs/00-*.md</p>
+    </div>
+
+    <div class="ticket">
+        <div class="ticket-header">
+            <span class="ticket-number">Тикет №6: Проверка путей</span>
+            <span class="ticket-status status-not-started">Не начат</span>
+        </div>
+        <p><strong>Приоритет:</strong> <span class="status-badge status-medium">Средний</span></p>
+        <p><strong>Время:</strong> 1 час</p>
+        <p>Проверить и исправить пути в документации</p>
+    </div>
+
+    <div class="ticket">
+        <div class="ticket-header">
+            <span class="ticket-number">Тикет №7: Итоговая проверка</span>
+            <span class="ticket-status status-not-started">Не начат</span>
+        </div>
+        <p><strong>Приоритет:</strong> <span class="status-badge status-medium">Средний</span></p>
+        <p><strong>Время:</strong> 1 час</p>
+        <p>Проверить pnpm install, pnpm build, Docker</p>
+    </div>
+
+    <div class="commands">
+        <h3>🚀 Команды запуска</h3>
+        <pre>
+прочитай документ: tickets/multiticket_restore.md и выполни команду: выполнить тикет №1
+прочитай документ: tickets/multiticket_restore.md и выполни команду: выполнить тикет №2
+прочитай документ: tickets/multiticket_restore.md и выполни команду: выполнить тикет №3
+прочитай документ: tickets/multiticket_restore.md и выполни команду: выполнить тикет №4
+прочитай документ: tickets/multiticket_restore.md и выполни команду: выполнить тикет №5
+прочитай документ: tickets/multiticket_restore.md и выполни команду: выполнить тикет №6
+прочитай документ: tickets/multiticket_restore.md и выполни команду: выполнить тикет №7
+        </pre>
+    </div>
+
+    <script>
+        // Анимация прогресса
+        setTimeout(() => {
+            document.getElementById('progress-bar').style.width = '0%';
+        }, 100);
+    </script>
+</body>
+</html>

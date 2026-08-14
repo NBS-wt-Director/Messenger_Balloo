@@ -1,0 +1,5460 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "balloo.data_schema",
+  "title": "Balloo Messenger — Схема данных (PostgreSQL 16)",
+  "description": "Единый источник правды по сущностям данных монорепо. Сгенерировано из mockups/index.html (секция «Данные»). Все createdAt/updatedAt — BIGINT (Unix timestamp в секундах). ORM: Prisma. Миграции: Flyway (SQL). Инфраструктура: Supabase + PostgREST.",
+  "version": "1.0.0",
+  "last_updated": "2026-07-22",
+  "conventions": {
+    "primary_key": {
+      "type": "String",
+      "default": "cuid()",
+      "description": "Все PK — String @id @default(cuid())"
+    },
+    "timestamps": {
+      "createdAt": {
+        "type": "BigInt",
+        "default": 0,
+        "description": "Unix timestamp в секундах"
+      },
+      "updatedAt": {
+        "type": "BigInt",
+        "default": 0,
+        "description": "Unix timestamp в секундах"
+      }
+    },
+    "foreign_key": {
+      "type": "String",
+      "description": "Имя поля = <refTable_singular>Id, ссылается на id"
+    },
+    "data_types": {
+      "String": "Текстовые строки, slug, токены, enum-значения",
+      "BigInt": "Unix timestamp (секунды), счётчики больших значений",
+      "Boolean": "Флаги",
+      "Int": "Порядок, проценты, небольшие счётчики",
+      "Json": "JSON-структуры (матрицы прав, payload, before/after)",
+      "Float": "Денежные суммы, координаты"
+    },
+    "fill_types": {
+      "seed": "Требует предзаполнения при первом деплое (seed.sql)",
+      "runtime": "Заполняется в процессе работы приложения"
+    },
+    "languages": {
+      "total": 20,
+      "source": "docs/01-architecture-decisions.md, раздел 17 (i18n)",
+      "status": "✅ ПОДТВЕРЖДЁН пользователем (2026-07-18). Перечень 14 языков народов РФ зафиксирован.",
+      "groups": [
+        {
+          "group": "Русские",
+          "locales": [
+            "ru"
+          ],
+          "note": "Русский — основной язык группы"
+        },
+        {
+          "group": "Русские — языки народов РФ",
+          "count": 14,
+          "locales": [
+            {
+              "code": "tt",
+              "name": "Татарский"
+            },
+            {
+              "code": "ba",
+              "name": "Башкирский"
+            },
+            {
+              "code": "ce",
+              "name": "Чеченский"
+            },
+            {
+              "code": "cv",
+              "name": "Чувашский"
+            },
+            {
+              "code": "av",
+              "name": "Аварский"
+            },
+            {
+              "code": "dar",
+              "name": "Даргинский"
+            },
+            {
+              "code": "udm",
+              "name": "Удмуртский"
+            },
+            {
+              "code": "lez",
+              "name": "Лезгинский"
+            },
+            {
+              "code": "kbd",
+              "name": "Кабардино-черкесский"
+            },
+            {
+              "code": "chm",
+              "name": "Марийский"
+            },
+            {
+              "code": "os",
+              "name": "Осетинский"
+            },
+            {
+              "code": "sah",
+              "name": "Якутский"
+            },
+            {
+              "code": "bua",
+              "name": "Бурятский"
+            },
+            {
+              "code": "uk",
+              "name": "Украинский"
+            }
+          ]
+        },
+        {
+          "group": "Дружественные",
+          "locales": [
+            {
+              "code": "zh",
+              "name": "Китайский"
+            },
+            {
+              "code": "hi",
+              "name": "Индийский (Хинди)"
+            },
+            {
+              "code": "be",
+              "name": "Белорусский"
+            }
+          ]
+        },
+        {
+          "group": "Остальные",
+          "locales": [
+            {
+              "code": "en",
+              "name": "Английский"
+            },
+            {
+              "code": "fr",
+              "name": "Французский"
+            }
+          ]
+        }
+      ],
+      "locale_codes_all": [
+        "ru",
+        "tt",
+        "ba",
+        "ce",
+        "cv",
+        "av",
+        "dar",
+        "udm",
+        "lez",
+        "kbd",
+        "chm",
+        "os",
+        "sah",
+        "bua",
+        "uk",
+        "zh",
+        "hi",
+        "be",
+        "en",
+        "fr"
+      ],
+      "base_translation_locales": [
+        "ru",
+        "en",
+        "zh",
+        "fr",
+        "be",
+        "hi"
+      ],
+      "base_locales_note": "Базовые локали, для которых seed-переводы уже подготовлены в pre_filled_data.json. Переводы на 14 языков народов РФ подлежат генерации."
+    }
+  },
+  "groups": [
+    {
+      "id": "auth_users",
+      "title": "Auth & Users",
+      "table_count": 9,
+      "tables": [
+        {
+          "table": "users",
+          "model": "User",
+          "fill_type": "runtime",
+          "description": "Пользователи: email, профиль, настройки (тема, язык), роль, Yandex Disk",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "email",
+              "type": "String",
+              "unique": true
+            },
+            {
+              "name": "emailVerified",
+              "type": "BigInt",
+              "nullable": true
+            },
+            {
+              "name": "name",
+              "type": "String"
+            },
+            {
+              "name": "bio",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "statusText",
+              "type": "String",
+              "nullable": true,
+              "description": "до 70 символов"
+            },
+            {
+              "name": "statusPreset",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "avatarUrl",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "birthDate",
+              "type": "BigInt",
+              "nullable": true
+            },
+            {
+              "name": "registeredAt",
+              "type": "BigInt"
+            },
+            {
+              "name": "lastSeen",
+              "type": "BigInt",
+              "nullable": true
+            },
+            {
+              "name": "isOnline",
+              "type": "Boolean",
+              "default": false
+            },
+            {
+              "name": "showOnlineTo",
+              "type": "String",
+              "default": "contacts",
+              "description": "contacts | nobody"
+            },
+            {
+              "name": "language",
+              "type": "String",
+              "default": "ru"
+            },
+            {
+              "name": "theme",
+              "type": "String",
+              "default": "dark",
+              "description": "dark | light | russian"
+            },
+            {
+              "name": "yandexDiskToken",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "yandexDiskLinked",
+              "type": "Boolean",
+              "default": false
+            },
+            {
+              "name": "role",
+              "type": "String",
+              "default": "user",
+              "description": "super_admin | mod | developer | support | user"
+            },
+            {
+              "name": "isDeleted",
+              "type": "Boolean",
+              "default": false
+            },
+            {
+              "name": "deletedAt",
+              "type": "BigInt",
+              "nullable": true,
+              "description": "анонимизация через 90 дней"
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "accounts",
+          "model": "Account",
+          "fill_type": "runtime",
+          "description": "OAuth-провайдеры (email, Yandex, Mail.ru, Rambler, Gov v2)",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "userId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "provider",
+              "type": "String",
+              "description": "email | yandex | mailru | rambler | gov"
+            },
+            {
+              "name": "providerAccountId",
+              "type": "String"
+            },
+            {
+              "name": "refresh_token",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "access_token",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "expires_at",
+              "type": "BigInt",
+              "nullable": true
+            },
+            {
+              "name": "token_type",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "scope",
+              "type": "String",
+              "nullable": true
+            }
+          ]
+        },
+        {
+          "table": "sessions",
+          "model": "Session",
+          "fill_type": "runtime",
+          "description": "JWT-сессии: access + refresh token, IP, user-agent, device",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "userId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "deviceId",
+              "type": "String",
+              "references": {
+                "table": "devices",
+                "field": "id",
+                "relation": "Device"
+              }
+            },
+            {
+              "name": "sessionToken",
+              "type": "String",
+              "unique": true
+            },
+            {
+              "name": "accessToken",
+              "type": "String",
+              "nullable": true,
+              "description": "JWT access (короткий TTL)"
+            },
+            {
+              "name": "refreshToken",
+              "type": "String",
+              "nullable": true,
+              "description": "JWT refresh (длинный TTL)"
+            },
+            {
+              "name": "ipAddress",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "userAgent",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "expires",
+              "type": "BigInt"
+            },
+            {
+              "name": "isActive",
+              "type": "Boolean",
+              "default": true
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "devices",
+          "model": "Device",
+          "fill_type": "runtime",
+          "description": "Устройства: web/desktop/ios/android, платформа, push-токены, ноды",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "userId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "type",
+              "type": "String",
+              "description": "web | desktop | ios | android"
+            },
+            {
+              "name": "platform",
+              "type": "String"
+            },
+            {
+              "name": "name",
+              "type": "String",
+              "nullable": true,
+              "description": "пользовательское имя"
+            },
+            {
+              "name": "pushToken",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "pushPlatform",
+              "type": "String",
+              "nullable": true,
+              "description": "fcm | apns | web-push"
+            },
+            {
+              "name": "node",
+              "type": "String",
+              "nullable": true,
+              "description": "серверная нода"
+            },
+            {
+              "name": "lastActiveAt",
+              "type": "BigInt",
+              "nullable": true
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "pair_tokens",
+          "model": "PairToken",
+          "fill_type": "runtime",
+          "description": "QR-токены привязки устройств (TTL 60 сек)",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "token",
+              "type": "String",
+              "unique": true
+            },
+            {
+              "name": "userId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "deviceId",
+              "type": "String",
+              "nullable": true,
+              "references": {
+                "table": "devices",
+                "field": "id",
+                "relation": "Device"
+              }
+            },
+            {
+              "name": "expiresAt",
+              "type": "BigInt",
+              "description": "TTL 60 сек"
+            },
+            {
+              "name": "isUsed",
+              "type": "Boolean",
+              "default": false
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "account_device_links",
+          "model": "AccountDeviceLink",
+          "fill_type": "runtime",
+          "description": "Мультиаккаунт: связь аккаунт → устройство, активный статус, push",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "userId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "deviceId",
+              "type": "String",
+              "references": {
+                "table": "devices",
+                "field": "id",
+                "relation": "Device"
+              }
+            },
+            {
+              "name": "isActive",
+              "type": "Boolean",
+              "default": true,
+              "description": "текущий активный аккаунт на устройстве"
+            },
+            {
+              "name": "pushEnabled",
+              "type": "Boolean",
+              "default": true
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "password_reset_tokens",
+          "model": "PasswordResetToken",
+          "fill_type": "runtime",
+          "description": "Токены восстановления пароля (email → tokenHash, TTL 1 час)",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "userId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "tokenHash",
+              "type": "String",
+              "unique": true
+            },
+            {
+              "name": "expiresAt",
+              "type": "BigInt",
+              "description": "TTL 1 час"
+            },
+            {
+              "name": "isUsed",
+              "type": "Boolean",
+              "default": false
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "email_verification_tokens",
+          "model": "EmailVerificationToken",
+          "fill_type": "runtime",
+          "description": "Токены подтверждения email (tokenHash, TTL)",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "userId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "tokenHash",
+              "type": "String",
+              "unique": true
+            },
+            {
+              "name": "expiresAt",
+              "type": "BigInt"
+            },
+            {
+              "name": "isUsed",
+              "type": "Boolean",
+              "default": false
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "user_2fa_secrets",
+          "model": "User2FASecret",
+          "fill_type": "runtime",
+          "description": "TOTP-секреты и backup-коды пользователей (опциональный 2FA)",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "userId",
+              "type": "String",
+              "unique": true,
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "totpSecret",
+              "type": "String"
+            },
+            {
+              "name": "backupCodes",
+              "type": "Json"
+            },
+            {
+              "name": "isEnabled",
+              "type": "Boolean",
+              "default": false
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chats_messages",
+      "title": "Chats & Messages",
+      "table_count": 8,
+      "tables": [
+        {
+          "table": "chats",
+          "model": "Chat",
+          "fill_type": "runtime",
+          "description": "Чаты: direct (1:1) или group (связь с Group)",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "type",
+              "type": "String",
+              "description": "direct | group"
+            },
+            {
+              "name": "groupId",
+              "type": "String",
+              "nullable": true,
+              "references": {
+                "table": "groups",
+                "field": "id",
+                "relation": "Group"
+              }
+            },
+            {
+              "name": "title",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "avatarUrl",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "lastMessageId",
+              "type": "String",
+              "nullable": true,
+              "references": {
+                "table": "messages",
+                "field": "id",
+                "relation": "Message"
+              }
+            },
+            {
+              "name": "lastMessageAt",
+              "type": "BigInt",
+              "nullable": true
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "chat_members",
+          "model": "ChatMember",
+          "fill_type": "runtime",
+          "description": "Участники чата: joinedAt, mutedUntil, isArchived",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "chatId",
+              "type": "String",
+              "references": {
+                "table": "chats",
+                "field": "id",
+                "relation": "Chat"
+              }
+            },
+            {
+              "name": "userId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "joinedAt",
+              "type": "BigInt"
+            },
+            {
+              "name": "mutedUntil",
+              "type": "BigInt",
+              "nullable": true
+            },
+            {
+              "name": "isArchived",
+              "type": "Boolean",
+              "default": false
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "messages",
+          "model": "Message",
+          "fill_type": "runtime",
+          "description": "Сообщения: текст, reply, forward, флаги (edited/deleted/hidden/AI/ad), readAt",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "chatId",
+              "type": "String",
+              "references": {
+                "table": "chats",
+                "field": "id",
+                "relation": "Chat"
+              }
+            },
+            {
+              "name": "senderId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "text",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "replyToId",
+              "type": "String",
+              "nullable": true,
+              "references": {
+                "table": "messages",
+                "field": "id",
+                "relation": "Reply"
+              }
+            },
+            {
+              "name": "forwardFromId",
+              "type": "String",
+              "nullable": true,
+              "references": {
+                "table": "messages",
+                "field": "id",
+                "relation": "Forward"
+              }
+            },
+            {
+              "name": "isEdited",
+              "type": "Boolean",
+              "default": false
+            },
+            {
+              "name": "isDeleted",
+              "type": "Boolean",
+              "default": false
+            },
+            {
+              "name": "isHidden",
+              "type": "Boolean",
+              "default": false
+            },
+            {
+              "name": "isAI",
+              "type": "Boolean",
+              "default": false
+            },
+            {
+              "name": "isAd",
+              "type": "Boolean",
+              "default": false
+            },
+            {
+              "name": "readAt",
+              "type": "BigInt",
+              "nullable": true
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "message_edits",
+          "model": "MessageEdit",
+          "fill_type": "runtime",
+          "description": "История изменений сообщений (oldText, newText, editedAt)",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "messageId",
+              "type": "String",
+              "references": {
+                "table": "messages",
+                "field": "id",
+                "relation": "Message"
+              }
+            },
+            {
+              "name": "oldText",
+              "type": "String"
+            },
+            {
+              "name": "newText",
+              "type": "String"
+            },
+            {
+              "name": "editedAt",
+              "type": "BigInt"
+            }
+          ]
+        },
+        {
+          "table": "message_reads",
+          "model": "MessageRead",
+          "fill_type": "runtime",
+          "description": "Отметки прочтения сообщений",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "messageId",
+              "type": "String",
+              "references": {
+                "table": "messages",
+                "field": "id",
+                "relation": "Message"
+              }
+            },
+            {
+              "name": "userId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "readAt",
+              "type": "BigInt"
+            }
+          ]
+        },
+        {
+          "table": "attachments",
+          "model": "Attachment",
+          "fill_type": "runtime",
+          "description": "Вложения: photo/video/audio/voice/document/file/geo/contact, MinIO или Я.Диск",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "messageId",
+              "type": "String",
+              "references": {
+                "table": "messages",
+                "field": "id",
+                "relation": "Message"
+              }
+            },
+            {
+              "name": "type",
+              "type": "String",
+              "description": "photo | video | audio | voice | document | file | geo | contact"
+            },
+            {
+              "name": "url",
+              "type": "String"
+            },
+            {
+              "name": "storage",
+              "type": "String",
+              "description": "minio | yandex_disk"
+            },
+            {
+              "name": "meta",
+              "type": "Json",
+              "nullable": true,
+              "description": "размер, длительность, координаты и т.д."
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "reactions",
+          "model": "Reaction",
+          "fill_type": "runtime",
+          "description": "Реакции: до 5 эмодзи на сообщение",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "messageId",
+              "type": "String",
+              "references": {
+                "table": "messages",
+                "field": "id",
+                "relation": "Message"
+              }
+            },
+            {
+              "name": "userId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "emoji",
+              "type": "String",
+              "description": "до 5 на сообщение"
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "pinned_messages",
+          "model": "PinnedMessage",
+          "fill_type": "runtime",
+          "description": "Закреплённые сообщения в чате",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "chatId",
+              "type": "String",
+              "references": {
+                "table": "chats",
+                "field": "id",
+                "relation": "Chat"
+              }
+            },
+            {
+              "name": "messageId",
+              "type": "String",
+              "references": {
+                "table": "messages",
+                "field": "id",
+                "relation": "Message"
+              }
+            },
+            {
+              "name": "pinnedBy",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "groups",
+      "title": "Groups",
+      "table_count": 5,
+      "tables": [
+        {
+          "table": "groups",
+          "model": "Group",
+          "fill_type": "runtime",
+          "description": "Группы: private/public/topic/media/corporate, правила, лимиты, верификация",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "type",
+              "type": "String",
+              "description": "private | public | topic | media | corporate"
+            },
+            {
+              "name": "slug",
+              "type": "String",
+              "unique": true,
+              "nullable": true
+            },
+            {
+              "name": "title",
+              "type": "String"
+            },
+            {
+              "name": "description",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "avatarUrl",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "rules",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "memberLimit",
+              "type": "Int",
+              "nullable": true
+            },
+            {
+              "name": "isVerified",
+              "type": "Boolean",
+              "default": false
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "group_members",
+          "model": "GroupMember",
+          "fill_type": "runtime",
+          "description": "Участники группы",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "groupId",
+              "type": "String",
+              "references": {
+                "table": "groups",
+                "field": "id",
+                "relation": "Group"
+              }
+            },
+            {
+              "name": "userId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "joinedAt",
+              "type": "BigInt"
+            }
+          ]
+        },
+        {
+          "table": "group_roles",
+          "model": "GroupRole",
+          "fill_type": "runtime",
+          "description": "Роли в группе: super_admin/mod/author/user + права (delete, pin, invite, edit)",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "groupId",
+              "type": "String",
+              "references": {
+                "table": "groups",
+                "field": "id",
+                "relation": "Group"
+              }
+            },
+            {
+              "name": "userId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "role",
+              "type": "String",
+              "description": "super_admin | mod | author | user"
+            },
+            {
+              "name": "permissions",
+              "type": "Json",
+              "description": "delete, pin, invite, edit"
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "group_media_requests",
+          "model": "GroupMediaRequest",
+          "fill_type": "runtime",
+          "description": "Заявки на СМИ-группу: документы, статус (pending/approved/rejected), reviewedByAdminId",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "groupId",
+              "type": "String",
+              "references": {
+                "table": "groups",
+                "field": "id",
+                "relation": "Group"
+              }
+            },
+            {
+              "name": "requesterId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "documents",
+              "type": "Json",
+              "description": "массив ссылок на документы"
+            },
+            {
+              "name": "status",
+              "type": "String",
+              "default": "pending",
+              "description": "pending | approved | rejected"
+            },
+            {
+              "name": "reviewedByAdminId",
+              "type": "String",
+              "nullable": true,
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "channel_settings",
+          "model": "ChannelSettings",
+          "fill_type": "runtime",
+          "description": "Настройки каналов: кто может писать, редактирование постов, пересылка, скрытие счётчика, одобрение вступлений, botCommands",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "groupId",
+              "type": "String",
+              "unique": true,
+              "references": {
+                "table": "groups",
+                "field": "id",
+                "relation": "Group"
+              },
+              "description": "связь с группой типа media (канал)"
+            },
+            {
+              "name": "writeAccess",
+              "type": "String",
+              "default": "admin_only",
+              "description": "admin_only | admin_mods | all_subscribers"
+            },
+            {
+              "name": "editDuration",
+              "type": "String",
+              "default": "24h",
+              "description": "24h | forever | none"
+            },
+            {
+              "name": "allowForwarding",
+              "type": "Boolean",
+              "default": true
+            },
+            {
+              "name": "hideSubscriberCount",
+              "type": "Boolean",
+              "default": false
+            },
+            {
+              "name": "requireApproval",
+              "type": "Boolean",
+              "default": false
+            },
+            {
+              "name": "botCommands",
+              "type": "Json",
+              "nullable": true,
+              "description": "массив бот-команд [{botId, command, enabled}]"
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "polls",
+      "title": "Polls / Quizzes / Lists",
+      "table_count": 3,
+      "tables": [
+        {
+          "table": "polls",
+          "model": "Poll",
+          "fill_type": "runtime",
+          "description": "Опросы/квизы/активные списки/пассивные списки/персонали",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "chatId",
+              "type": "String",
+              "references": {
+                "table": "chats",
+                "field": "id",
+                "relation": "Chat"
+              }
+            },
+            {
+              "name": "messageId",
+              "type": "String",
+              "references": {
+                "table": "messages",
+                "field": "id",
+                "relation": "Message"
+              }
+            },
+            {
+              "name": "type",
+              "type": "String",
+              "description": "poll | quiz | active_list | passive_list | personal"
+            },
+            {
+              "name": "question",
+              "type": "String"
+            },
+            {
+              "name": "isAnonymous",
+              "type": "Boolean",
+              "default": true
+            },
+            {
+              "name": "isMultiple",
+              "type": "Boolean",
+              "default": false
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "poll_options",
+          "model": "PollOption",
+          "fill_type": "runtime",
+          "description": "Варианты ответов",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "pollId",
+              "type": "String",
+              "references": {
+                "table": "polls",
+                "field": "id",
+                "relation": "Poll"
+              }
+            },
+            {
+              "name": "text",
+              "type": "String"
+            },
+            {
+              "name": "order",
+              "type": "Int"
+            }
+          ]
+        },
+        {
+          "table": "poll_votes",
+          "model": "PollVote",
+          "fill_type": "runtime",
+          "description": "Голоса пользователей",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "pollId",
+              "type": "String",
+              "references": {
+                "table": "polls",
+                "field": "id",
+                "relation": "Poll"
+              }
+            },
+            {
+              "name": "optionId",
+              "type": "String",
+              "references": {
+                "table": "poll_options",
+                "field": "id",
+                "relation": "PollOption"
+              }
+            },
+            {
+              "name": "userId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "contacts_blocklist",
+      "title": "Contacts & Blocklist",
+      "table_count": 2,
+      "tables": [
+        {
+          "table": "contacts",
+          "model": "Contact",
+          "fill_type": "runtime",
+          "description": "Контакты пользователя (userId → contactId)",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "userId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "user_contacts"
+              }
+            },
+            {
+              "name": "contactId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "contact_user"
+              }
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "blocked_users",
+          "model": "BlockedUser",
+          "fill_type": "runtime",
+          "description": "Заблокированные пользователи",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "blockerId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "blocker"
+              }
+            },
+            {
+              "name": "blockedId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "blocked"
+              }
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "reports_bans",
+      "title": "Reports & Bans",
+      "table_count": 3,
+      "tables": [
+        {
+          "table": "reports",
+          "model": "Report",
+          "fill_type": "runtime",
+          "description": "Жалобы на сообщения: 7 причин, комментарий, pending/reviewing/resolved/rejected",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "messageId",
+              "type": "String",
+              "nullable": true,
+              "references": {
+                "table": "messages",
+                "field": "id",
+                "relation": "Message"
+              }
+            },
+            {
+              "name": "reporterId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "reporter"
+              }
+            },
+            {
+              "name": "reportedId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "reported"
+              }
+            },
+            {
+              "name": "reason",
+              "type": "String",
+              "description": "7 причин"
+            },
+            {
+              "name": "comment",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "status",
+              "type": "String",
+              "default": "pending",
+              "description": "pending | reviewing | resolved | rejected"
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "bans",
+          "model": "Ban",
+          "fill_type": "runtime",
+          "description": "Баны: temporary/permanent, 4 подтверждения, 5 жалоб, appealDeadline 72ч",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "userId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "type",
+              "type": "String",
+              "description": "temporary | permanent"
+            },
+            {
+              "name": "reason",
+              "type": "String"
+            },
+            {
+              "name": "confirmations",
+              "type": "Int",
+              "default": 0,
+              "description": "0/4 подтверждения админов"
+            },
+            {
+              "name": "reportCount",
+              "type": "Int",
+              "default": 0,
+              "description": "5 жалоб для авто-бана"
+            },
+            {
+              "name": "appealDeadline",
+              "type": "BigInt",
+              "description": "72ч на обжалование"
+            },
+            {
+              "name": "expiresAt",
+              "type": "BigInt",
+              "nullable": true
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "ban_appeals",
+          "model": "BanAppeal",
+          "fill_type": "runtime",
+          "description": "Обжалования: текст до 2000 символов, confirmations (0/4), decision",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "banId",
+              "type": "String",
+              "references": {
+                "table": "bans",
+                "field": "id",
+                "relation": "Ban"
+              }
+            },
+            {
+              "name": "userId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "text",
+              "type": "String",
+              "description": "до 2000 символов"
+            },
+            {
+              "name": "confirmations",
+              "type": "Int",
+              "default": 0,
+              "description": "0/4"
+            },
+            {
+              "name": "decision",
+              "type": "String",
+              "nullable": true,
+              "description": "approved | rejected | pending"
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calls",
+      "title": "Calls (WebRTC)",
+      "table_count": 2,
+      "tables": [
+        {
+          "table": "calls",
+          "model": "Call",
+          "fill_type": "runtime",
+          "description": "Звонки: audio/video, group до 30, ringing/active/ended/missed",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "chatId",
+              "type": "String",
+              "references": {
+                "table": "chats",
+                "field": "id",
+                "relation": "Chat"
+              }
+            },
+            {
+              "name": "type",
+              "type": "String",
+              "description": "audio | video"
+            },
+            {
+              "name": "status",
+              "type": "String",
+              "description": "ringing | active | ended | missed"
+            },
+            {
+              "name": "isGroup",
+              "type": "Boolean",
+              "default": false,
+              "description": "до 30 участников"
+            },
+            {
+              "name": "startedAt",
+              "type": "BigInt",
+              "nullable": true
+            },
+            {
+              "name": "endedAt",
+              "type": "BigInt",
+              "nullable": true
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "call_participants",
+          "model": "CallParticipant",
+          "fill_type": "runtime",
+          "description": "Участники звонка: muted, video, screen sharing",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "callId",
+              "type": "String",
+              "references": {
+                "table": "calls",
+                "field": "id",
+                "relation": "Call"
+              }
+            },
+            {
+              "name": "userId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "isMuted",
+              "type": "Boolean",
+              "default": false
+            },
+            {
+              "name": "videoOn",
+              "type": "Boolean",
+              "default": false
+            },
+            {
+              "name": "isScreenSharing",
+              "type": "Boolean",
+              "default": false
+            },
+            {
+              "name": "joinedAt",
+              "type": "BigInt"
+            },
+            {
+              "name": "leftAt",
+              "type": "BigInt",
+              "nullable": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drafts_notifications",
+      "title": "Drafts & Notifications",
+      "table_count": 2,
+      "tables": [
+        {
+          "table": "drafts",
+          "model": "Draft",
+          "fill_type": "runtime",
+          "description": "Черновики сообщений (один на чат)",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "chatId",
+              "type": "String",
+              "references": {
+                "table": "chats",
+                "field": "id",
+                "relation": "Chat"
+              }
+            },
+            {
+              "name": "userId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "text",
+              "type": "String"
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "notifications",
+          "model": "Notification",
+          "fill_type": "runtime",
+          "description": "Уведомления: message/call/mention/reaction/system, превью до 20 символов",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "userId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "type",
+              "type": "String",
+              "description": "message | call | mention | reaction | system"
+            },
+            {
+              "name": "preview",
+              "type": "String",
+              "description": "до 20 символов"
+            },
+            {
+              "name": "isRead",
+              "type": "Boolean",
+              "default": false
+            },
+            {
+              "name": "payload",
+              "type": "Json",
+              "nullable": true
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "stories",
+      "title": "Stories",
+      "table_count": 2,
+      "tables": [
+        {
+          "table": "stories",
+          "model": "Story",
+          "fill_type": "runtime",
+          "description": "Сторис: photo/video, Yandex Disk, expires 24ч",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "userId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "type",
+              "type": "String",
+              "description": "photo | video"
+            },
+            {
+              "name": "url",
+              "type": "String",
+              "description": "Yandex Disk"
+            },
+            {
+              "name": "expiresAt",
+              "type": "BigInt",
+              "description": "24ч"
+            },
+            {
+              "name": "replyToChatId",
+              "type": "String",
+              "nullable": true,
+              "references": {
+                "table": "chats",
+                "field": "id",
+                "relation": "Chat"
+              },
+              "description": "чат для ответа на сторис"
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "story_views",
+          "model": "StoryView",
+          "fill_type": "runtime",
+          "description": "Просмотры сторис",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "storyId",
+              "type": "String",
+              "references": {
+                "table": "stories",
+                "field": "id",
+                "relation": "Story"
+              }
+            },
+            {
+              "name": "userId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "viewedAt",
+              "type": "BigInt"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "invites",
+      "title": "Invites",
+      "table_count": 1,
+      "tables": [
+        {
+          "table": "invites",
+          "model": "Invite",
+          "fill_type": "runtime",
+          "description": "Приглашения: token, groupIds, pending/accepted/expired",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "token",
+              "type": "String",
+              "unique": true
+            },
+            {
+              "name": "creatorId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "groupIds",
+              "type": "Json",
+              "description": "массив id групп"
+            },
+            {
+              "name": "status",
+              "type": "String",
+              "default": "pending",
+              "description": "pending | accepted | expired"
+            },
+            {
+              "name": "ttlType",
+              "type": "String",
+              "description": "permanent | timed | onetime"
+            },
+            {
+              "name": "expiresAt",
+              "type": "BigInt",
+              "nullable": true
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bots",
+      "title": "Bots",
+      "table_count": 2,
+      "tables": [
+        {
+          "table": "bots",
+          "model": "Bot",
+          "fill_type": "runtime",
+          "description": "Боты: владелец, @username, аватар, описание, верификация",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "ownerId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "username",
+              "type": "String",
+              "unique": true
+            },
+            {
+              "name": "name",
+              "type": "String"
+            },
+            {
+              "name": "avatarUrl",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "description",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "isVerified",
+              "type": "Boolean",
+              "default": false
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "bot_tokens",
+          "model": "BotToken",
+          "fill_type": "runtime",
+          "description": "Токены ботов: хэш, scopes, последний usage, отзыв",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "botId",
+              "type": "String",
+              "references": {
+                "table": "bots",
+                "field": "id",
+                "relation": "Bot"
+              }
+            },
+            {
+              "name": "tokenHash",
+              "type": "String",
+              "unique": true
+            },
+            {
+              "name": "scopes",
+              "type": "Json"
+            },
+            {
+              "name": "lastUsedAt",
+              "type": "BigInt",
+              "nullable": true
+            },
+            {
+              "name": "isRevoked",
+              "type": "Boolean",
+              "default": false
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "donate",
+      "title": "Donate",
+      "table_count": 3,
+      "tables": [
+        {
+          "table": "donations",
+          "model": "Donation",
+          "fill_type": "runtime",
+          "description": "Пожертвования: сумма, метод, source (узел), type (one_time/subscription), статус, externalPaymentId",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "userId",
+              "type": "String",
+              "nullable": true,
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "amount",
+              "type": "Float"
+            },
+            {
+              "name": "currency",
+              "type": "String",
+              "default": "RUB"
+            },
+            {
+              "name": "method",
+              "type": "String"
+            },
+            {
+              "name": "source",
+              "type": "String",
+              "description": "узел-источник"
+            },
+            {
+              "name": "type",
+              "type": "String",
+              "description": "one_time | subscription"
+            },
+            {
+              "name": "status",
+              "type": "String"
+            },
+            {
+              "name": "externalPaymentId",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "donate_goals",
+          "model": "DonateGoal",
+          "fill_type": "runtime",
+          "description": "Цели сборов: targetAmount, collectedAmount, isActive. Управляется из админки",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "title",
+              "type": "String"
+            },
+            {
+              "name": "targetAmount",
+              "type": "Float"
+            },
+            {
+              "name": "collectedAmount",
+              "type": "Float",
+              "default": 0
+            },
+            {
+              "name": "isActive",
+              "type": "Boolean",
+              "default": true
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "donate_tiers",
+          "model": "DonateTier",
+          "fill_type": "seed",
+          "description": "Уровни поддержки (кофе/спонсор/VIP): minAmount, perks, order",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "slug",
+              "type": "String",
+              "unique": true
+            },
+            {
+              "name": "name",
+              "type": "String"
+            },
+            {
+              "name": "minAmount",
+              "type": "Float"
+            },
+            {
+              "name": "perks",
+              "type": "Json",
+              "description": "список бонусов"
+            },
+            {
+              "name": "order",
+              "type": "Int"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "support",
+      "title": "Support",
+      "table_count": 2,
+      "tables": [
+        {
+          "table": "support_tickets",
+          "model": "SupportTicket",
+          "fill_type": "runtime",
+          "description": "Тикеты поддержки: subject, статус, приоритет, assignedAdminId",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "userId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "subject",
+              "type": "String"
+            },
+            {
+              "name": "status",
+              "type": "String",
+              "default": "open"
+            },
+            {
+              "name": "priority",
+              "type": "String",
+              "default": "normal"
+            },
+            {
+              "name": "assignedAdminId",
+              "type": "String",
+              "nullable": true,
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "Admin"
+              }
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "support_messages",
+          "model": "SupportMessage",
+          "fill_type": "runtime",
+          "description": "Сообщения чата поддержки: authorId, isInternal (заметка админа), readAt",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "ticketId",
+              "type": "String",
+              "references": {
+                "table": "support_tickets",
+                "field": "id",
+                "relation": "SupportTicket"
+              }
+            },
+            {
+              "name": "authorId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "text",
+              "type": "String"
+            },
+            {
+              "name": "isInternal",
+              "type": "Boolean",
+              "default": false,
+              "description": "заметка админа"
+            },
+            {
+              "name": "readAt",
+              "type": "BigInt",
+              "nullable": true
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "feature_flags_admin",
+      "title": "Feature Flags & Admin",
+      "table_count": 5,
+      "tables": [
+        {
+          "table": "feature_flags",
+          "model": "FeatureFlag",
+          "fill_type": "runtime",
+          "description": "Флаги функций: key, isEnabled, rolloutPercent, targetSegment",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "key",
+              "type": "String",
+              "unique": true
+            },
+            {
+              "name": "isEnabled",
+              "type": "Boolean",
+              "default": false
+            },
+            {
+              "name": "rolloutPercent",
+              "type": "Int",
+              "default": 0
+            },
+            {
+              "name": "targetSegment",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "announcements",
+          "model": "Announcement",
+          "fill_type": "runtime",
+          "description": "Глобальные объявления: audience (all/employees/admins), период, isDismissible",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "title",
+              "type": "String"
+            },
+            {
+              "name": "body",
+              "type": "String"
+            },
+            {
+              "name": "audience",
+              "type": "String",
+              "description": "all | employees | admins"
+            },
+            {
+              "name": "isDismissible",
+              "type": "Boolean",
+              "default": true
+            },
+            {
+              "name": "createdByAdminId",
+              "type": "String",
+              "nullable": true,
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "startsAt",
+              "type": "BigInt"
+            },
+            {
+              "name": "endsAt",
+              "type": "BigInt",
+              "nullable": true
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "audit_logs",
+          "model": "AuditLog",
+          "fill_type": "runtime",
+          "description": "Журнал действий админов: action, target, before/after (JSON), ip",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "adminId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "action",
+              "type": "String"
+            },
+            {
+              "name": "target",
+              "type": "String"
+            },
+            {
+              "name": "before",
+              "type": "Json",
+              "nullable": true
+            },
+            {
+              "name": "after",
+              "type": "Json",
+              "nullable": true
+            },
+            {
+              "name": "ip",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "admin_2fa_secrets",
+          "model": "Admin2FASecret",
+          "fill_type": "runtime",
+          "description": "TOTP-секреты и backup-коды администраторов (обязательный 2FA)",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "adminId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "totpSecret",
+              "type": "String"
+            },
+            {
+              "name": "backupCodes",
+              "type": "Json"
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "file_storage_stats",
+          "model": "FileStorageStat",
+          "fill_type": "runtime",
+          "description": "Снимки статистики MinIO/Yandex Disk (time-series, без чтения файлов)",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "storage",
+              "type": "String",
+              "description": "minio | yandex_disk"
+            },
+            {
+              "name": "usedBytes",
+              "type": "BigInt"
+            },
+            {
+              "name": "fileCount",
+              "type": "BigInt"
+            },
+            {
+              "name": "snapshotAt",
+              "type": "BigInt"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "departments_employees",
+      "title": "Departments & Employees",
+      "table_count": 4,
+      "tables": [
+        {
+          "table": "departments",
+          "model": "Department",
+          "fill_type": "runtime",
+          "description": "Отделы: дерево (parentId), slug, руководитель (headId)",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "parentId",
+              "type": "String",
+              "nullable": true,
+              "references": {
+                "table": "departments",
+                "field": "id",
+                "relation": "Parent"
+              }
+            },
+            {
+              "name": "slug",
+              "type": "String",
+              "unique": true
+            },
+            {
+              "name": "name",
+              "type": "String"
+            },
+            {
+              "name": "headId",
+              "type": "String",
+              "nullable": true,
+              "references": {
+                "table": "employees",
+                "field": "id",
+                "relation": "Head"
+              }
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "department_members",
+          "model": "DepartmentMember",
+          "fill_type": "runtime",
+          "description": "Членство: role (head/member), permissions (JSON-матрица прав)",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "departmentId",
+              "type": "String",
+              "references": {
+                "table": "departments",
+                "field": "id",
+                "relation": "Department"
+              }
+            },
+            {
+              "name": "employeeId",
+              "type": "String",
+              "references": {
+                "table": "employees",
+                "field": "id",
+                "relation": "Employee"
+              }
+            },
+            {
+              "name": "role",
+              "type": "String",
+              "description": "head | member"
+            },
+            {
+              "name": "permissions",
+              "type": "Json",
+              "description": "матрица прав"
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "employees",
+          "model": "Employee",
+          "fill_type": "runtime",
+          "description": "Профиль сотрудника (расширение User): position, hiredAt, status, corporateEmail",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "userId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "position",
+              "type": "String"
+            },
+            {
+              "name": "hiredAt",
+              "type": "BigInt"
+            },
+            {
+              "name": "status",
+              "type": "String",
+              "description": "active | dismissed | leave"
+            },
+            {
+              "name": "corporateEmail",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "time_off_requests",
+          "model": "TimeOffRequest",
+          "fill_type": "runtime",
+          "description": "Запросы на отсутствие: employeeId, type, startDate, endDate, days, status, approverId, substituteEmployeeId, reason",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "employeeId",
+              "type": "String",
+              "references": {
+                "table": "employees",
+                "field": "id",
+                "relation": "Employee"
+              }
+            },
+            {
+              "name": "type",
+              "type": "String",
+              "description": "annual_leave | non_annual_leave | sick_leave | unpaid_leave | decree | training | remote_work"
+            },
+            {
+              "name": "startDate",
+              "type": "BigInt"
+            },
+            {
+              "name": "endDate",
+              "type": "BigInt"
+            },
+            {
+              "name": "days",
+              "type": "Float"
+            },
+            {
+              "name": "status",
+              "type": "String",
+              "default": "pending",
+              "description": "pending | approved | rejected | active | expired"
+            },
+            {
+              "name": "approverId",
+              "type": "String",
+              "nullable": true,
+              "references": {
+                "table": "employees",
+                "field": "id",
+                "relation": "Approver"
+              }
+            },
+            {
+              "name": "substituteEmployeeId",
+              "type": "String",
+              "nullable": true,
+              "references": {
+                "table": "employees",
+                "field": "id",
+                "relation": "Substitute"
+              }
+            },
+            {
+              "name": "reason",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "meetings",
+      "title": "Meetings",
+      "table_count": 2,
+      "tables": [
+        {
+          "table": "meetings",
+          "model": "Meeting",
+          "fill_type": "runtime",
+          "description": "Встречи: organizer, department, статус, meetingLink, связь с Call",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "organizerId",
+              "type": "String",
+              "references": {
+                "table": "employees",
+                "field": "id",
+                "relation": "Organizer"
+              }
+            },
+            {
+              "name": "departmentId",
+              "type": "String",
+              "nullable": true,
+              "references": {
+                "table": "departments",
+                "field": "id",
+                "relation": "Department"
+              }
+            },
+            {
+              "name": "status",
+              "type": "String"
+            },
+            {
+              "name": "meetingLink",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "callId",
+              "type": "String",
+              "nullable": true,
+              "references": {
+                "table": "calls",
+                "field": "id",
+                "relation": "Call"
+              }
+            },
+            {
+              "name": "scheduledAt",
+              "type": "BigInt"
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "meeting_protocols",
+          "model": "MeetingProtocol",
+          "fill_type": "runtime",
+          "description": "Протокол встречи (markdown), отдельно от записи",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "meetingId",
+              "type": "String",
+              "references": {
+                "table": "meetings",
+                "field": "id",
+                "relation": "Meeting"
+              }
+            },
+            {
+              "name": "body",
+              "type": "String",
+              "description": "markdown"
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tasks_sprints",
+      "title": "Tasks & Sprints",
+      "table_count": 3,
+      "tables": [
+        {
+          "table": "tasks",
+          "model": "Task",
+          "fill_type": "runtime",
+          "description": "Задачи: scope (personal при departmentId=null / department), статус, приоритет, sprintId",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "title",
+              "type": "String"
+            },
+            {
+              "name": "description",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "assigneeId",
+              "type": "String",
+              "nullable": true,
+              "references": {
+                "table": "employees",
+                "field": "id",
+                "relation": "Assignee"
+              }
+            },
+            {
+              "name": "departmentId",
+              "type": "String",
+              "nullable": true,
+              "references": {
+                "table": "departments",
+                "field": "id",
+                "relation": "Department"
+              },
+              "description": "null = personal scope"
+            },
+            {
+              "name": "sprintId",
+              "type": "String",
+              "nullable": true,
+              "references": {
+                "table": "sprints",
+                "field": "id",
+                "relation": "Sprint"
+              }
+            },
+            {
+              "name": "status",
+              "type": "String"
+            },
+            {
+              "name": "priority",
+              "type": "String"
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "sprints",
+          "model": "Sprint",
+          "fill_type": "runtime",
+          "description": "Спринты отдела: период, цель, статус",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "departmentId",
+              "type": "String",
+              "references": {
+                "table": "departments",
+                "field": "id",
+                "relation": "Department"
+              }
+            },
+            {
+              "name": "goal",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "status",
+              "type": "String"
+            },
+            {
+              "name": "startsAt",
+              "type": "BigInt"
+            },
+            {
+              "name": "endsAt",
+              "type": "BigInt"
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "sprint_metrics",
+          "model": "SprintMetric",
+          "fill_type": "runtime",
+          "description": "Метрики спринта: sprintId, activeTasks, completedTasks, overdueTasks, remainingStoryPoints, dailyData (JSON)",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "sprintId",
+              "type": "String",
+              "references": {
+                "table": "sprints",
+                "field": "id",
+                "relation": "Sprint"
+              }
+            },
+            {
+              "name": "totalTasks",
+              "type": "Int",
+              "default": 0
+            },
+            {
+              "name": "activeTasks",
+              "type": "Int",
+              "default": 0
+            },
+            {
+              "name": "completedTasks",
+              "type": "Int",
+              "default": 0
+            },
+            {
+              "name": "overdueTasks",
+              "type": "Int",
+              "default": 0
+            },
+            {
+              "name": "totalStoryPoints",
+              "type": "Int",
+              "default": 0
+            },
+            {
+              "name": "remainingStoryPoints",
+              "type": "Int",
+              "default": 0
+            },
+            {
+              "name": "dailyData",
+              "type": "Json",
+              "nullable": true,
+              "description": "[{day, ideal, actual, date}]"
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "knowledge_base",
+      "title": "Knowledge Base",
+      "table_count": 2,
+      "tables": [
+        {
+          "table": "knowledge_articles",
+          "model": "KnowledgeArticle",
+          "fill_type": "runtime",
+          "description": "Статьи базы знаний: slug, body (markdown), version, isPublished",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "categoryId",
+              "type": "String",
+              "nullable": true,
+              "references": {
+                "table": "knowledge_categories",
+                "field": "id",
+                "relation": "KnowledgeCategory"
+              }
+            },
+            {
+              "name": "slug",
+              "type": "String",
+              "unique": true
+            },
+            {
+              "name": "body",
+              "type": "String",
+              "description": "markdown"
+            },
+            {
+              "name": "version",
+              "type": "Int",
+              "default": 1
+            },
+            {
+              "name": "isPublished",
+              "type": "Boolean",
+              "default": false
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "knowledge_categories",
+          "model": "KnowledgeCategory",
+          "fill_type": "seed",
+          "description": "Категории базы знаний (дерево, порядок)",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "parentId",
+              "type": "String",
+              "nullable": true,
+              "references": {
+                "table": "knowledge_categories",
+                "field": "id",
+                "relation": "Parent"
+              }
+            },
+            {
+              "name": "slug",
+              "type": "String",
+              "unique": true
+            },
+            {
+              "name": "name",
+              "type": "String"
+            },
+            {
+              "name": "order",
+              "type": "Int"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "vacancies_applications",
+      "title": "Vacancies & Applications",
+      "table_count": 13,
+      "tables": [
+        {
+          "table": "vacancies",
+          "model": "Vacancy",
+          "fill_type": "runtime",
+          "description": "Вакансии: departmentId, зарплатная вилка, type (full/part/remote), статус",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "departmentId",
+              "type": "String",
+              "nullable": true,
+              "references": {
+                "table": "departments",
+                "field": "id",
+                "relation": "Department"
+              }
+            },
+            {
+              "name": "title",
+              "type": "String"
+            },
+            {
+              "name": "salaryMin",
+              "type": "Int",
+              "nullable": true
+            },
+            {
+              "name": "salaryMax",
+              "type": "Int",
+              "nullable": true
+            },
+            {
+              "name": "type",
+              "type": "String",
+              "description": "full | part | remote"
+            },
+            {
+              "name": "status",
+              "type": "String",
+              "default": "open"
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "vacancy_translations",
+          "model": "VacancyTranslation",
+          "fill_type": "runtime",
+          "description": "Переводы вакансий на 6 языков (SSR для SEO)",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "vacancyId",
+              "type": "String",
+              "references": {
+                "table": "vacancies",
+                "field": "id",
+                "relation": "Vacancy"
+              }
+            },
+            {
+              "name": "locale",
+              "type": "String",
+              "description": "ru | en | zh | fr | be | hi"
+            },
+            {
+              "name": "title",
+              "type": "String"
+            },
+            {
+              "name": "description",
+              "type": "String"
+            }
+          ]
+        },
+        {
+          "table": "applications",
+          "model": "Application",
+          "fill_type": "runtime",
+          "description": "Заявки кандидатов: данные, сопроводительное письмо, currentStage",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "vacancyId",
+              "type": "String",
+              "references": {
+                "table": "vacancies",
+                "field": "id",
+                "relation": "Vacancy"
+              }
+            },
+            {
+              "name": "candidateName",
+              "type": "String"
+            },
+            {
+              "name": "candidateEmail",
+              "type": "String"
+            },
+            {
+              "name": "coverLetter",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "currentStage",
+              "type": "String",
+              "references": {
+                "table": "application_stages",
+                "field": "slug",
+                "relation": "ApplicationStage"
+              }
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "application_stages",
+          "model": "ApplicationStage",
+          "fill_type": "seed",
+          "description": "Этапы воронки найма (Screening → Interview → Offer → Hired/Rejected)",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "slug",
+              "type": "String",
+              "unique": true
+            },
+            {
+              "name": "name",
+              "type": "String"
+            },
+            {
+              "name": "order",
+              "type": "Int"
+            },
+            {
+              "name": "isTerminal",
+              "type": "Boolean",
+              "default": false
+            }
+          ]
+        },
+        {
+          "table": "candidates",
+          "model": "Candidate",
+          "fill_type": "runtime",
+          "description": "Кандидаты: ФИО, email, телефон, город, резюме URL, GitHub/Portfolio, опыт, ожидаемая ЗП, статус",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "userId",
+              "type": "String",
+              "nullable": true,
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "name",
+              "type": "String"
+            },
+            {
+              "name": "email",
+              "type": "String"
+            },
+            {
+              "name": "phone",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "city",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "resumeUrl",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "githubUrl",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "portfolioUrl",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "experienceYears",
+              "type": "Int"
+            },
+            {
+              "name": "expectedSalary",
+              "type": "Int",
+              "nullable": true
+            },
+            {
+              "name": "status",
+              "type": "String",
+              "default": "new",
+              "description": "new | in_progress | hired | rejected | reserve"
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "interviews",
+          "model": "Interview",
+          "fill_type": "runtime",
+          "description": "Запланированные интервью: type, status, interviewerId, candidateId, applicationId, scheduledAt, duration, videoLink, timerSeconds",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "applicationId",
+              "type": "String",
+              "references": {
+                "table": "applications",
+                "field": "id",
+                "relation": "Application"
+              }
+            },
+            {
+              "name": "candidateId",
+              "type": "String",
+              "references": {
+                "table": "candidates",
+                "field": "id",
+                "relation": "Candidate"
+              }
+            },
+            {
+              "name": "interviewerId",
+              "type": "String",
+              "references": {
+                "table": "employees",
+                "field": "id",
+                "relation": "Interviewer"
+              }
+            },
+            {
+              "name": "type",
+              "type": "String",
+              "description": "screening | technical | final | culture"
+            },
+            {
+              "name": "status",
+              "type": "String",
+              "default": "scheduled",
+              "description": "scheduled | in_progress | completed | cancelled"
+            },
+            {
+              "name": "scheduledAt",
+              "type": "BigInt"
+            },
+            {
+              "name": "duration",
+              "type": "Int",
+              "default": 60
+            },
+            {
+              "name": "videoLink",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "timerSeconds",
+              "type": "Int",
+              "default": 0
+            },
+            {
+              "name": "result",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "interview_criteria",
+          "model": "InterviewCriterion",
+          "fill_type": "seed",
+          "description": "Критерии оценки интервью: name, description, order, isActive",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "name",
+              "type": "String"
+            },
+            {
+              "name": "description",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "order",
+              "type": "Int",
+              "default": 0
+            },
+            {
+              "name": "isActive",
+              "type": "Boolean",
+              "default": true
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "interview_ratings",
+          "model": "InterviewRating",
+          "fill_type": "runtime",
+          "description": "Оценки по критериям: interviewId, criterionId, score (1-5), comment",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "interviewId",
+              "type": "String",
+              "references": {
+                "table": "interviews",
+                "field": "id",
+                "relation": "Interview"
+              }
+            },
+            {
+              "name": "criterionId",
+              "type": "String",
+              "references": {
+                "table": "interview_criteria",
+                "field": "id",
+                "relation": "Criterion"
+              }
+            },
+            {
+              "name": "score",
+              "type": "Int",
+              "description": "1-5"
+            },
+            {
+              "name": "comment",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "interview_notes",
+          "model": "InterviewNote",
+          "fill_type": "runtime",
+          "description": "Заметки интервьюера: interviewId, body (markdown)",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "interviewId",
+              "type": "String",
+              "references": {
+                "table": "interviews",
+                "field": "id",
+                "relation": "Interview"
+              }
+            },
+            {
+              "name": "body",
+              "type": "String"
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "interview_decisions",
+          "model": "InterviewDecision",
+          "fill_type": "runtime",
+          "description": "Решения по кандидатам: interviewId, decision, comment, otherRoleVacancyId",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "interviewId",
+              "type": "String",
+              "references": {
+                "table": "interviews",
+                "field": "id",
+                "relation": "Interview"
+              }
+            },
+            {
+              "name": "decision",
+              "type": "String",
+              "description": "accept | reject | other_role"
+            },
+            {
+              "name": "comment",
+              "type": "String"
+            },
+            {
+              "name": "otherRoleVacancyId",
+              "type": "String",
+              "nullable": true,
+              "references": {
+                "table": "vacancies",
+                "field": "id",
+                "relation": "Vacancy"
+              }
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "candidate_match_scores",
+          "model": "CandidateMatchScore",
+          "fill_type": "runtime",
+          "description": "Процент совпадения кандидата с вакансией: candidateId, vacancyId, matchPercent, avgScore",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "candidateId",
+              "type": "String",
+              "references": {
+                "table": "candidates",
+                "field": "id",
+                "relation": "Candidate"
+              }
+            },
+            {
+              "name": "vacancyId",
+              "type": "String",
+              "references": {
+                "table": "vacancies",
+                "field": "id",
+                "relation": "Vacancy"
+              }
+            },
+            {
+              "name": "matchPercent",
+              "type": "Int",
+              "description": "0-100"
+            },
+            {
+              "name": "avgScore",
+              "type": "Float",
+              "nullable": true
+            },
+            {
+              "name": "calculatedAt",
+              "type": "BigInt",
+              "nullable": true
+            }
+          ]
+        },
+        {
+          "table": "application_documents",
+          "model": "ApplicationDocument",
+          "fill_type": "runtime",
+          "description": "Документы к заявке: applicationId, type, url, fileName",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "applicationId",
+              "type": "String",
+              "references": {
+                "table": "applications",
+                "field": "id",
+                "relation": "Application"
+              }
+            },
+            {
+              "name": "type",
+              "type": "String",
+              "description": "cv | portfolio | certificate | other"
+            },
+            {
+              "name": "url",
+              "type": "String"
+            },
+            {
+              "name": "fileName",
+              "type": "String"
+            },
+            {
+              "name": "uploadedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "vacancy_views",
+          "model": "VacancyView",
+          "fill_type": "runtime",
+          "description": "Просмотры вакансий: vacancyId, userId, viewedAt",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "vacancyId",
+              "type": "String",
+              "references": {
+                "table": "vacancies",
+                "field": "id",
+                "relation": "Vacancy"
+              }
+            },
+            {
+              "name": "userId",
+              "type": "String",
+              "nullable": true,
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "viewedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hr",
+      "title": "HR",
+      "table_count": 1,
+      "tables": [
+        {
+          "table": "hr_requests",
+          "model": "HrRequest",
+          "fill_type": "runtime",
+          "description": "HR-заявки (онбординг, рассылки, кадровые процессы): type, payload (JSON)",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "type",
+              "type": "String",
+              "description": "onboarding | mailing | hr_process"
+            },
+            {
+              "name": "payload",
+              "type": "Json"
+            },
+            {
+              "name": "status",
+              "type": "String"
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "features_requests",
+      "title": "Features (фич-реквесты)",
+      "table_count": 5,
+      "tables": [
+        {
+          "table": "features",
+          "model": "Feature",
+          "fill_type": "runtime",
+          "description": "Фич-реквесты: title, description, статус, votesCount",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "categoryId",
+              "type": "String",
+              "nullable": true,
+              "references": {
+                "table": "feature_categories",
+                "field": "id",
+                "relation": "FeatureCategory"
+              }
+            },
+            {
+              "name": "title",
+              "type": "String"
+            },
+            {
+              "name": "description",
+              "type": "String"
+            },
+            {
+              "name": "status",
+              "type": "String"
+            },
+            {
+              "name": "votesCount",
+              "type": "Int",
+              "default": 0
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "feature_categories",
+          "model": "FeatureCategory",
+          "fill_type": "seed",
+          "description": "Категории фич-реквестов (slug, иконка, порядок)",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "slug",
+              "type": "String",
+              "unique": true
+            },
+            {
+              "name": "name",
+              "type": "String"
+            },
+            {
+              "name": "icon",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "order",
+              "type": "Int"
+            }
+          ]
+        },
+        {
+          "table": "feature_votes",
+          "model": "FeatureVote",
+          "fill_type": "runtime",
+          "description": "Голоса: userId (null для гостя), voterFingerprint для дедупликации",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "featureId",
+              "type": "String",
+              "references": {
+                "table": "features",
+                "field": "id",
+                "relation": "Feature"
+              }
+            },
+            {
+              "name": "userId",
+              "type": "String",
+              "nullable": true,
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "voterFingerprint",
+              "type": "String",
+              "nullable": true,
+              "description": "дедупликация гостей"
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "feature_comments",
+          "model": "FeatureComment",
+          "fill_type": "runtime",
+          "description": "Комментарии к фичам (дерево через parentId)",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "featureId",
+              "type": "String",
+              "references": {
+                "table": "features",
+                "field": "id",
+                "relation": "Feature"
+              }
+            },
+            {
+              "name": "userId",
+              "type": "String",
+              "nullable": true,
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "parentId",
+              "type": "String",
+              "nullable": true,
+              "references": {
+                "table": "feature_comments",
+                "field": "id",
+                "relation": "Parent"
+              }
+            },
+            {
+              "name": "text",
+              "type": "String"
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "feature_changelogs",
+          "model": "FeatureChangeLog",
+          "fill_type": "runtime",
+          "description": "История изменений статуса фичи (fromStatus → toStatus)",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "featureId",
+              "type": "String",
+              "references": {
+                "table": "features",
+                "field": "id",
+                "relation": "Feature"
+              }
+            },
+            {
+              "name": "fromStatus",
+              "type": "String"
+            },
+            {
+              "name": "toStatus",
+              "type": "String"
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "versions",
+      "title": "Versions (history.balloo.su)",
+      "table_count": 3,
+      "tables": [
+        {
+          "table": "versions",
+          "model": "Version",
+          "fill_type": "runtime",
+          "description": "Версии: semver, codename, releaseDate, статус (released/planned), isMajor",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "semver",
+              "type": "String",
+              "unique": true
+            },
+            {
+              "name": "codename",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "releaseDate",
+              "type": "BigInt",
+              "nullable": true
+            },
+            {
+              "name": "status",
+              "type": "String",
+              "description": "released | planned"
+            },
+            {
+              "name": "isMajor",
+              "type": "Boolean",
+              "default": false
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "version_changes",
+          "model": "VersionChange",
+          "fill_type": "runtime",
+          "description": "Пункты changelog: category (feature/fix/security/breaking), title, order",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "versionId",
+              "type": "String",
+              "references": {
+                "table": "versions",
+                "field": "id",
+                "relation": "Version"
+              }
+            },
+            {
+              "name": "category",
+              "type": "String",
+              "description": "feature | fix | security | breaking"
+            },
+            {
+              "name": "title",
+              "type": "String"
+            },
+            {
+              "name": "order",
+              "type": "Int"
+            }
+          ]
+        },
+        {
+          "table": "version_translations",
+          "model": "VersionTranslation",
+          "fill_type": "runtime",
+          "description": "Переводы пунктов changelog на 6 языков (SSR для SEO)",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "changeId",
+              "type": "String",
+              "references": {
+                "table": "version_changes",
+                "field": "id",
+                "relation": "VersionChange"
+              }
+            },
+            {
+              "name": "locale",
+              "type": "String",
+              "description": "ru | en | zh | fr | be | hi"
+            },
+            {
+              "name": "title",
+              "type": "String"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "content_seed",
+      "title": "Контент (требует предзаполнения)",
+      "table_count": 4,
+      "tables": [
+        {
+          "table": "onboarding_steps",
+          "model": "OnboardingStep",
+          "fill_type": "seed",
+          "description": "Шаги онбординга: 3–4 шага, порядок, иллюстрация, активен. Управляется из админки",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "order",
+              "type": "Int"
+            },
+            {
+              "name": "illustrationUrl",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "isActive",
+              "type": "Boolean",
+              "default": true
+            }
+          ]
+        },
+        {
+          "table": "onboarding_step_translations",
+          "model": "OnboardingStepTranslation",
+          "fill_type": "seed",
+          "description": "Переводы шагов на 6 языков (ru, en, zh, fr, be, hi)",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "stepId",
+              "type": "String",
+              "references": {
+                "table": "onboarding_steps",
+                "field": "id",
+                "relation": "OnboardingStep"
+              }
+            },
+            {
+              "name": "locale",
+              "type": "String",
+              "description": "ru | en | zh | fr | be | hi"
+            },
+            {
+              "name": "title",
+              "type": "String"
+            },
+            {
+              "name": "body",
+              "type": "String"
+            }
+          ]
+        },
+        {
+          "table": "text_pages",
+          "model": "TextPage",
+          "fill_type": "seed",
+          "description": "Информационные страницы: rules, about-company, about-balloo",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "slug",
+              "type": "String",
+              "unique": true,
+              "description": "rules | about-company | about-balloo"
+            },
+            {
+              "name": "isPublished",
+              "type": "Boolean",
+              "default": true
+            }
+          ]
+        },
+        {
+          "table": "text_page_translations",
+          "model": "TextPageTranslation",
+          "fill_type": "seed",
+          "description": "Переводы страниц на 6 языков (title + content в markdown)",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "pageId",
+              "type": "String",
+              "references": {
+                "table": "text_pages",
+                "field": "id",
+                "relation": "TextPage"
+              }
+            },
+            {
+              "name": "locale",
+              "type": "String",
+              "description": "ru | en | zh | fr | be | hi"
+            },
+            {
+              "name": "title",
+              "type": "String"
+            },
+            {
+              "name": "content",
+              "type": "String",
+              "description": "markdown"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "blog",
+      "title": "Blog (blog.balloo.su)",
+      "table_count": 13,
+      "tables": [
+        {
+          "table": "blog_channels",
+          "model": "BlogChannel",
+          "fill_type": "runtime",
+          "description": "Каналы: corporate/personal, slug, владелец, аватар, баннер, accentColor, видимость, archived",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "type",
+              "type": "String",
+              "description": "corporate | personal"
+            },
+            {
+              "name": "slug",
+              "type": "String",
+              "unique": true
+            },
+            {
+              "name": "ownerId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "name",
+              "type": "String"
+            },
+            {
+              "name": "avatarUrl",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "bannerUrl",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "accentColor",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "visibility",
+              "type": "String",
+              "default": "public"
+            },
+            {
+              "name": "isArchived",
+              "type": "Boolean",
+              "default": false
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "blog_channel_members",
+          "model": "BlogChannelMember",
+          "fill_type": "runtime",
+          "description": "Авторы/модераторы каналов: role (owner/author/moderator)",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "channelId",
+              "type": "String",
+              "references": {
+                "table": "blog_channels",
+                "field": "id",
+                "relation": "BlogChannel"
+              }
+            },
+            {
+              "name": "userId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "role",
+              "type": "String",
+              "description": "owner | author | moderator"
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "blog_posts",
+          "model": "BlogPost",
+          "fill_type": "runtime",
+          "description": "Статьи: slug, channelId, authorId, title, excerpt, body (markdown), cover, categoryId, status (draft/pending_review/published/changes_requested/rejected), publishedAt, reviewComment, reviewerId, readingTime, views, locale",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "slug",
+              "type": "String",
+              "unique": true
+            },
+            {
+              "name": "channelId",
+              "type": "String",
+              "references": {
+                "table": "blog_channels",
+                "field": "id",
+                "relation": "BlogChannel"
+              }
+            },
+            {
+              "name": "authorId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "title",
+              "type": "String"
+            },
+            {
+              "name": "excerpt",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "body",
+              "type": "String",
+              "description": "markdown"
+            },
+            {
+              "name": "coverUrl",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "categoryId",
+              "type": "String",
+              "nullable": true,
+              "references": {
+                "table": "blog_categories",
+                "field": "id",
+                "relation": "BlogCategory"
+              }
+            },
+            {
+              "name": "status",
+              "type": "String",
+              "description": "draft | pending_review | published | changes_requested | rejected"
+            },
+            {
+              "name": "publishedAt",
+              "type": "BigInt",
+              "nullable": true
+            },
+            {
+              "name": "reviewComment",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "reviewerId",
+              "type": "String",
+              "nullable": true,
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "Reviewer"
+              }
+            },
+            {
+              "name": "readingTime",
+              "type": "Int",
+              "nullable": true
+            },
+            {
+              "name": "views",
+              "type": "Int",
+              "default": 0
+            },
+            {
+              "name": "locale",
+              "type": "String",
+              "default": "ru"
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "blog_post_translations",
+          "model": "BlogPostTranslation",
+          "fill_type": "runtime",
+          "description": "Переводы статей на 6 языков (title, excerpt, body)",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "postId",
+              "type": "String",
+              "references": {
+                "table": "blog_posts",
+                "field": "id",
+                "relation": "BlogPost"
+              }
+            },
+            {
+              "name": "locale",
+              "type": "String",
+              "description": "ru | en | zh | fr | be | hi"
+            },
+            {
+              "name": "title",
+              "type": "String"
+            },
+            {
+              "name": "excerpt",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "body",
+              "type": "String"
+            }
+          ]
+        },
+        {
+          "table": "blog_categories",
+          "model": "BlogCategory",
+          "fill_type": "seed",
+          "description": "Категории: slug, icon, order, visible",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "slug",
+              "type": "String",
+              "unique": true
+            },
+            {
+              "name": "icon",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "order",
+              "type": "Int"
+            },
+            {
+              "name": "visible",
+              "type": "Boolean",
+              "default": true
+            }
+          ]
+        },
+        {
+          "table": "blog_category_translations",
+          "model": "BlogCategoryTranslation",
+          "fill_type": "seed",
+          "description": "Переводы категорий на 6 языков",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "categoryId",
+              "type": "String",
+              "references": {
+                "table": "blog_categories",
+                "field": "id",
+                "relation": "BlogCategory"
+              }
+            },
+            {
+              "name": "locale",
+              "type": "String",
+              "description": "ru | en | zh | fr | be | hi"
+            },
+            {
+              "name": "name",
+              "type": "String"
+            }
+          ]
+        },
+        {
+          "table": "blog_tags",
+          "model": "BlogTag",
+          "fill_type": "runtime",
+          "description": "Теги (управляются из админки)",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "slug",
+              "type": "String",
+              "unique": true
+            },
+            {
+              "name": "name",
+              "type": "String"
+            }
+          ]
+        },
+        {
+          "table": "blog_post_tags",
+          "model": "BlogPostTag",
+          "fill_type": "runtime",
+          "description": "Связь пост ↔ теги (many-to-many)",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "postId",
+              "type": "String",
+              "references": {
+                "table": "blog_posts",
+                "field": "id",
+                "relation": "BlogPost"
+              }
+            },
+            {
+              "name": "tagId",
+              "type": "String",
+              "references": {
+                "table": "blog_tags",
+                "field": "id",
+                "relation": "BlogTag"
+              }
+            }
+          ]
+        },
+        {
+          "table": "blog_reactions",
+          "model": "BlogReaction",
+          "fill_type": "runtime",
+          "description": "Реакции на статьи: emoji, до 5 на пользователя",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "postId",
+              "type": "String",
+              "references": {
+                "table": "blog_posts",
+                "field": "id",
+                "relation": "BlogPost"
+              }
+            },
+            {
+              "name": "userId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "emoji",
+              "type": "String",
+              "description": "до 5 на пользователя"
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "blog_comments",
+          "model": "BlogComment",
+          "fill_type": "runtime",
+          "description": "Комментарии: дерево (parentId), hidden (модерация), authorId",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "postId",
+              "type": "String",
+              "references": {
+                "table": "blog_posts",
+                "field": "id",
+                "relation": "BlogPost"
+              }
+            },
+            {
+              "name": "authorId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "parentId",
+              "type": "String",
+              "nullable": true,
+              "references": {
+                "table": "blog_comments",
+                "field": "id",
+                "relation": "Parent"
+              }
+            },
+            {
+              "name": "text",
+              "type": "String"
+            },
+            {
+              "name": "isHidden",
+              "type": "Boolean",
+              "default": false,
+              "description": "модерация"
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "blog_post_views",
+          "model": "BlogPostView",
+          "fill_type": "runtime",
+          "description": "Просмотры статей (для статистики и time-series графиков)",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "postId",
+              "type": "String",
+              "references": {
+                "table": "blog_posts",
+                "field": "id",
+                "relation": "BlogPost"
+              }
+            },
+            {
+              "name": "userId",
+              "type": "String",
+              "nullable": true,
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "viewedAt",
+              "type": "BigInt"
+            }
+          ]
+        },
+        {
+          "table": "blog_subscriptions",
+          "model": "BlogSubscription",
+          "fill_type": "runtime",
+          "description": "Подписки пользователей на каналы (для ленты «Мои подписки»)",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "userId",
+              "type": "String",
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "channelId",
+              "type": "String",
+              "references": {
+                "table": "blog_channels",
+                "field": "id",
+                "relation": "BlogChannel"
+              }
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ],
+          "unique": [
+            [
+              "userId",
+              "channelId"
+            ]
+          ]
+        },
+        {
+          "table": "blog_personal_channels",
+          "model": "BlogPersonalChannel",
+          "fill_type": "runtime",
+          "description": "Персональные каналы сотрудников: employeeId, slug, avatarUrl, bio, isActive",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "employeeId",
+              "type": "String",
+              "unique": true,
+              "references": {
+                "table": "employees",
+                "field": "id",
+                "relation": "Employee"
+              }
+            },
+            {
+              "name": "slug",
+              "type": "String",
+              "unique": true
+            },
+            {
+              "name": "avatarUrl",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "bio",
+              "type": "String",
+              "nullable": true
+            },
+            {
+              "name": "isActive",
+              "type": "Boolean",
+              "default": true
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "service_status",
+      "title": "Service Status",
+      "table_count": 2,
+      "tables": [
+        {
+          "table": "service_status_incidents",
+          "model": "ServiceStatusIncident",
+          "fill_type": "runtime",
+          "description": "Инциденты сервиса: severity, affectedNodes, период, status, createdByAdminId",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "title",
+              "type": "String"
+            },
+            {
+              "name": "body",
+              "type": "String"
+            },
+            {
+              "name": "severity",
+              "type": "String",
+              "description": "minor | major | critical"
+            },
+            {
+              "name": "affectedNodes",
+              "type": "Json",
+              "description": "массив узлов (balloo, admin, ...)"
+            },
+            {
+              "name": "startsAt",
+              "type": "BigInt"
+            },
+            {
+              "name": "endsAt",
+              "type": "BigInt",
+              "nullable": true
+            },
+            {
+              "name": "status",
+              "type": "String",
+              "default": "investigating",
+              "description": "investigating | identified | monitoring | resolved"
+            },
+            {
+              "name": "createdByAdminId",
+              "type": "String",
+              "nullable": true,
+              "references": {
+                "table": "users",
+                "field": "id",
+                "relation": "User"
+              }
+            },
+            {
+              "name": "createdAt",
+              "type": "BigInt",
+              "default": 0
+            },
+            {
+              "name": "updatedAt",
+              "type": "BigInt",
+              "default": 0
+            }
+          ]
+        },
+        {
+          "table": "service_status_snapshots",
+          "model": "ServiceStatusSnapshot",
+          "fill_type": "runtime",
+          "description": "Time-series снимки статуса узлов (up/degraded/down, latency) для real-time дашборда",
+          "fields": [
+            {
+              "name": "id",
+              "type": "String",
+              "primary": true,
+              "default": "cuid()"
+            },
+            {
+              "name": "nodeId",
+              "type": "String",
+              "description": "balloo | admin | command | features | history | download | docs | blog"
+            },
+            {
+              "name": "status",
+              "type": "String",
+              "description": "up | degraded | down"
+            },
+            {
+              "name": "latencyMs",
+              "type": "Int",
+              "nullable": true
+            },
+            {
+              "name": "checkedAt",
+              "type": "BigInt"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "total_tables": 101,
+    "total_tables_note": "Обновлено: добавлены 13 новые таблицы (каналы, кандидаты/интервью, отпуска, метрики спринта, документы заявок, персональные каналы). Ранее 88.",
+    "total_groups": 25,
+    "seed_tables": [
+      "donate_tiers",
+      "knowledge_categories",
+      "application_stages",
+      "interview_criteria",
+      "feature_categories",
+      "onboarding_steps",
+      "onboarding_step_translations",
+      "text_pages",
+      "text_page_translations",
+      "blog_categories",
+      "blog_category_translations"
+    ],
+    "seed_table_count": 11,
+    "runtime_table_count": 90,
+    "translation_locales": {
+      "total": 20,
+      "base_prepared": [
+        "ru",
+        "en",
+        "zh",
+        "fr",
+        "be",
+        "hi"
+      ],
+      "rf_languages_codes": [
+        "tt",
+        "ba",
+        "ce",
+        "cv",
+        "av",
+        "dar",
+        "udm",
+        "lez",
+        "kbd",
+        "chm",
+        "os",
+        "sah",
+        "bua",
+        "uk"
+      ],
+      "rf_languages_status": "✅ ПОДТВЕРЖДЁН пользователем (14 языков народов РФ, включая украинский)"
+    },
+    "stack": {
+      "db": "PostgreSQL 16",
+      "orm": "Prisma",
+      "migrations": "Flyway",
+      "infra": "Supabase + PostgREST"
+    }
+  }
+}

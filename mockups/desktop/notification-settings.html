@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo — Настройки уведомлений (Desktop)</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    html { overflow-y: auto; height: auto; }
+    body { overflow-y: auto; height: auto; min-height: 100vh; background: var(--bg-primary); }
+    body.app-flex { display: flex; flex-direction: column; }
+    .window-frame { max-width: 1100px; margin: 24px auto; background: var(--bg-secondary); border: 1px solid var(--border-strong); box-shadow: var(--shadow-glass); display: flex; flex-direction: column; overflow: hidden; }
+    .titlebar { height: 40px; display: flex; align-items: center; background: var(--bg-tertiary); border-bottom: 1px solid var(--border-color); padding: 0 12px; gap: 16px; }
+    .titlebar__left { display: flex; align-items: center; gap: 8px; }
+    .titlebar__icon { width: 20px; height: 20px; clip-path: var(--octagon-clip); background: var(--accent); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 11px; font-weight: 900; }
+    .titlebar__title { font-size: 13px; color: var(--text-secondary); }
+    .titlebar__menu { display: flex; gap: 12px; flex: 1; }
+    .titlebar__menu-item { font-size: 13px; color: var(--text-secondary); cursor: pointer; padding: 4px 8px; }
+    .titlebar__menu-item:hover { color: var(--text-primary); background: var(--bg-hover); }
+    .titlebar__controls { display: flex; gap: 0; }
+    .titlebar__btn { width: 46px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--text-secondary); cursor: pointer; }
+    .titlebar__btn:hover { background: var(--bg-hover); }
+    .titlebar__btn--close:hover { background: var(--danger); color: #fff; }
+    .window-body { height: 650px; display: flex; overflow: hidden; }
+    .window-sidebar { width: 260px; min-width: 260px; border-right: 1px solid var(--border-color); overflow-y: auto; background: var(--bg-tertiary); display: flex; flex-direction: column; }
+    .window-content { flex: 1; overflow-y: auto; padding: 20px; }
+    .statusbar { height: 28px; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; background: var(--bg-tertiary); border-top: 1px solid var(--border-color); font-size: 11px; color: var(--text-secondary); }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; }
+    .status-dot--online { background: var(--accent); }
+    .statusbar__sep { margin-left: 16px; }
+    .settings-section { margin-bottom: 24px; }
+    .settings-section__title { font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .settings-section__desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.5; }
+    .setting-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--bg-glass); border: 1px solid var(--border-color); margin-bottom: 4px; }
+    .setting-row__left { flex: 1; }
+    .setting-row__label { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+    .setting-row__desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .system-integration { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
+    .system-integration__card { flex: 1; min-width: 200px; background: var(--bg-glass); border: 1px solid var(--border-color); padding: 16px; }
+    .system-integration__card-title { font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .system-integration__card-body { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+    .channel-list { margin-top: 12px; }
+    .channel-item { display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: var(--bg-glass); border: 1px solid var(--border-color); margin-bottom: 4px; }
+    .channel-item__name { flex: 1; font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .channel-item__type { font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+    .channel-item__type--dm { background: rgba(59,158,255,0.12); color: var(--info); }
+    .channel-item__type--group { background: rgba(168,85,247,0.12); color: #a855f7; }
+    .channel-item__type--broadcast { background: rgba(45,184,77,0.12); color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar__logo">
+    <div class="topbar__logo-icon">B</div>
+    <span>Balloo</span>
+    <div class="topbar__dropdown">
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/index.html'">💬 Balloo</div>
+      <div class="topbar__dropdown-divider"></div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div>
+    </div>
+  </div>
+  <div class="topbar__title">Настройки уведомлений</div>
+  <div class="topbar__right">
+    <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact" onclick="window.location.href='../balloo-su/profile.html'">
+      <div class="avatar__inner"><span>ИИ</span></div>
+    </div>
+    <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+    <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+  </div>
+</div>
+
+<!-- Desktop Window Frame -->
+<div class="window-frame">
+  <!-- Titlebar -->
+  <div class="titlebar">
+    <div class="titlebar__left">
+      <div class="titlebar__icon">B</div>
+      <span class="titlebar__title">Balloo Messenger — Настройки уведомлений</span>
+    </div>
+    <div class="titlebar__menu">
+      <div class="titlebar__menu-item" onclick="window.location.href='chat.html'">Чаты</div>
+      <div class="titlebar__menu-item" onclick="window.location.href='stories.html'">Сторис</div>
+      <div class="titlebar__menu-item" onclick="window.location.href='contacts.html'">Контакты</div>
+      <div class="titlebar__menu-item" onclick="window.location.href='settings.html'">Настройки</div>
+      <div class="titlebar__menu-item" onclick="window.location.href='profile.html'">Профиль</div>
+      <div class="titlebar__menu-item" style="color:var(--accent);">Уведомления</div>
+      <div class="titlebar__menu-item" onclick="window.location.href='archive.html'">Архив</div>
+    </div>
+    <div class="titlebar__controls">
+      <div class="titlebar__btn" title="Свернуть">─</div>
+      <div class="titlebar__btn" title="Развернуть">▢</div>
+      <div class="titlebar__btn titlebar__btn--close" title="Закрыть">✕</div>
+    </div>
+  </div>
+
+  <div class="window-body">
+    <!-- Sidebar: навигация по разделам уведомлений -->
+    <div class="window-sidebar">
+      <div style="padding:12px 16px 8px;font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">Уведомления</div>
+      <div class="sidebar-nav-item sidebar-nav-item--active" onclick="showSection('global')" style="display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;color:var(--accent);font-size:13px;border-bottom:1px solid var(--border-color);">
+        <span>🔔</span> Общие
+      </div>
+      <div class="sidebar-nav-item" onclick="showSection('channels')" style="display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;color:var(--text-secondary);font-size:13px;border-bottom:1px solid var(--border-color);">
+        <span>📢</span> Каналы
+      </div>
+      <div class="sidebar-nav-item" onclick="showSection('chats')" style="display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;color:var(--text-secondary);font-size:13px;border-bottom:1px solid var(--border-color);">
+        <span>💬</span> Чаты
+      </div>
+      <div class="sidebar-nav-item" onclick="showSection('dnd')" style="display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;color:var(--text-secondary);font-size:13px;border-bottom:1px solid var(--border-color);">
+        <span>🔇</span> Не беспокоить
+      </div>
+      <div class="sidebar-nav-item" onclick="showSection('sound')" style="display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;color:var(--text-secondary);font-size:13px;border-bottom:1px solid var(--border-color);">
+        <span>🔊</span> Звуки
+      </div>
+      <div class="sidebar-nav-item" onclick="showSection('preview')" style="display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;color:var(--text-secondary);font-size:13px;border-bottom:1px solid var(--border-color);">
+        <span>👁</span> Превью
+      </div>
+      <div class="sidebar-nav-item" onclick="showSection('desktop')" style="display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;color:var(--text-secondary);font-size:13px;border-bottom:1px solid var(--border-color);">
+        <span>🖥</span> Системная интеграция
+      </div>
+      <div class="sidebar-nav-item" onclick="showSection('scheduled')" style="display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;color:var(--text-secondary);font-size:13px;">
+        <span>⏰</span> Отложенные
+      </div>
+
+      <div style="flex:1;"></div>
+      <div style="padding:12px 16px;">
+        <button class="btn btn--secondary btn--block btn--sm" onclick="window.location.href='settings.html'">← Все настройки</button>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="window-content">
+      <!-- Section: Global -->
+      <div class="settings-section" id="section-global">
+        <div class="settings-section__title">🔔 Общие уведомления</div>
+        <div class="settings-section__desc">Базовые настройки push-уведомлений для всех чатов, каналов и групп.</div>
+
+        <div class="setting-row">
+          <div class="setting-row__left">
+            <div class="setting-row__label">Включить уведомления</div>
+            <div class="setting-row__desc">Push-уведомления на рабочем столе и мобильных устройствах</div>
+          </div>
+          <label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-row__left">
+            <div class="setting-row__label">Звук уведомлений</div>
+            <div class="setting-row__desc">Воспроизведение звука при получении нового сообщения</div>
+          </div>
+          <label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-row__left">
+            <div class="setting-row__label">Вибрация (мобильные)</div>
+            <div class="setting-row__desc">Виброоповещение при получении сообщений на мобильных устройствах</div>
+          </div>
+          <label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-row__left">
+            <div class="setting-row__label">Группировка уведомлений</div>
+            <div class="setting-row__desc">Объединять до 5 сообщений в одно уведомление</div>
+          </div>
+          <label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-row__left">
+            <div class="setting-row__label">Уведомления о новых подключениях</div>
+            <div class="setting-row__desc">Оповещать при входе на новое устройство</div>
+          </div>
+          <label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-row__left">
+            <div class="setting-row__label">Закреплённые сообщения</div>
+            <div class="setting-row__desc">Уведомлять о новых закреплённых сообщениях в чатах</div>
+          </div>
+          <label class="switch"><input type="checkbox"><span class="switch__slider"></span></label>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-row__left">
+            <div class="setting-row__label">Упоминания и ответы</div>
+            <div class="setting-row__desc">Особый звук при @упоминаниях и ответах на ваше сообщение</div>
+          </div>
+          <label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label>
+        </div>
+      </div>
+
+      <!-- Section: Channels (hidden by default) -->
+      <div class="settings-section" id="section-channels" style="display:none;">
+        <div class="settings-section__title">📢 Уведомления каналов</div>
+        <div class="settings-section__desc">Настройка уведомлений для каналов и broadcast-групп.</div>
+
+        <div class="setting-row">
+          <div class="setting-row__left">
+            <div class="setting-row__label">Звук для каналов</div>
+            <div class="setting-row__desc">Отдельный звук уведомлений для каналов</div>
+          </div>
+          <select class="form-select" style="width:auto;">
+            <option>Стандартный канал</option>
+            <option>Тихий</option>
+            <option>Без звука</option>
+          </select>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-row__left">
+            <div class="setting-row__label">Группировка каналов</div>
+            <div class="setting-row__desc">Не более 1 уведомления от канала в час</div>
+          </div>
+          <label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label>
+        </div>
+
+        <div class="divider"></div>
+        <div style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:8px;">Мои каналы</div>
+
+        <div class="channel-list">
+          <div class="channel-item">
+            <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-new"><div class="avatar__inner"><span>РГ</span></div></div>
+            <div class="channel-item__name">Российская Газета <span class="chip chip--info" style="font-size:8px;">СМИ</span></div>
+            <span class="channel-item__type channel-item__type--broadcast">broadcast</span>
+            <label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label>
+          </div>
+          <div class="channel-item">
+            <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-new"><div class="avatar__inner"><span>ТБ</span></div></div>
+            <div class="channel-item__name">Технологии будущего <span class="chip chip--warning" style="font-size:8px;">КОРП</span></div>
+            <span class="channel-item__type channel-item__type--broadcast">broadcast</span>
+            <label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label>
+          </div>
+          <div class="channel-item">
+            <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-new"><div class="avatar__inner"><span>НН</span></div></div>
+            <div class="channel-item__name">Новости IT</div>
+            <span class="channel-item__type channel-item__type--broadcast">broadcast</span>
+            <label class="switch"><input type="checkbox"><span class="switch__slider"></span></label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Chats (hidden by default) -->
+      <div class="settings-section" id="section-chats" style="display:none;">
+        <div class="settings-section__title">💬 Уведомления чатов</div>
+        <div class="settings-section__desc">Настройка уведомлений для личных чатов и групп.</div>
+
+        <div class="setting-row">
+          <div class="setting-row__left">
+            <div class="setting-row__label">Звук для личных чатов</div>
+            <div class="setting-row__desc">Отдельный звук уведомлений для личных сообщений</div>
+          </div>
+          <select class="form-select" style="width:auto;">
+            <option>Стандартный</option>
+            <option>Стандартный 2</option>
+            <option>Стандартный 3</option>
+            <option>Без звука</option>
+          </select>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-row__left">
+            <div class="setting-row__label">Звук для групп</div>
+            <div class="setting-row__desc">Отдельный звук уведомлений для групповых чатов</div>
+          </div>
+          <select class="form-select" style="width:auto;">
+            <option>Стандартный</option>
+            <option>Тихий</option>
+            <option>Без звука</option>
+          </select>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-row__left">
+            <div class="setting-row__label">Только упоминания</div>
+            <div class="setting-row__desc">Уведомлять только при @упоминании (для групп)</div>
+          </div>
+          <label class="switch"><input type="checkbox"><span class="switch__slider"></span></label>
+        </div>
+
+        <div class="divider"></div>
+        <div style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:8px;">Уведомления для чатов</div>
+
+        <div class="channel-list">
+          <div class="channel-item">
+            <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>МА</span></div></div>
+            <div class="channel-item__name">Мария Андреева</div>
+            <span class="channel-item__type channel-item__type--dm">DM</span>
+            <label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label>
+          </div>
+          <div class="channel-item">
+            <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-new"><div class="avatar__inner"><span>РД</span></div></div>
+            <div class="channel-item__name">Команда разработки</div>
+            <span class="channel-item__type channel-item__type--group">группа</span>
+            <label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label>
+          </div>
+          <div class="channel-item">
+            <div class="avatar avatar--sm avatar--bordered avatar--status-busy avatar--ctx-family"><div class="avatar__inner"><span>СМ</span></div></div>
+            <div class="channel-item__name">Семья ❤️</div>
+            <span class="channel-item__type channel-item__type--group">группа</span>
+            <label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: DND (hidden by default) -->
+      <div class="settings-section" id="section-dnd" style="display:none;">
+        <div class="settings-section__title">🔇 Не беспокоить</div>
+        <div class="settings-section__desc">Настройка режима тишины и исключений.</div>
+
+        <div class="setting-row">
+          <div class="setting-row__left">
+            <div class="setting-row__label">Включить режим DND</div>
+            <div class="setting-row__desc">Полностью отключить все уведомления</div>
+          </div>
+          <label class="switch"><input type="checkbox"><span class="switch__slider"></span></label>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-row__left">
+            <div class="setting-row__label">По расписанию</div>
+            <div class="setting-row__desc">Автоматически включать DND в указанное время</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <input type="time" value="22:00" style="background:var(--bg-tertiary);border:1px solid var(--border-color);color:var(--text-primary);padding:6px 10px;font-size:13px;">
+            <span class="text-muted">—</span>
+            <input type="time" value="08:00" style="background:var(--bg-tertiary);border:1px solid var(--border-color);color:var(--text-primary);padding:6px 10px;font-size:13px;">
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-row__left">
+            <div class="setting-row__label">Повторный вызов</div>
+            <div class="setting-row__desc">Разрешить повторный звонок от того же контакта (DND-исключение)</div>
+          </div>
+          <label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-row__left">
+            <div class="setting-row__label">Звёздочные контакты</div>
+            <div class="setting-row__desc">Уведомления от избранных контактов всегда проходят</div>
+          </div>
+          <label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label>
+        </div>
+
+        <div class="divider"></div>
+        <div class="setting-row">
+          <div class="setting-row__left">
+            <div class="setting-row__label">⏱ Авто-DND при бездействии</div>
+            <div class="setting-row__desc">Включать DND через N минут неактивности</div>
+          </div>
+          <select class="form-select" style="width:auto;">
+            <option>Не включать</option>
+            <option>15 минут</option>
+            <option>30 минут</option>
+            <option>1 час</option>
+            <option>2 часа</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Section: Sound (hidden by default) -->
+      <div class="settings-section" id="section-sound" style="display:none;">
+        <div class="settings-section__title">🔊 Настройка звуков</div>
+        <div class="settings-section__desc">Выбор звуковых тем для разных типов уведомлений.</div>
+
+        <div class="setting-row">
+          <div class="setting-row__left">
+            <div class="setting-row__label">Звуковая тема</div>
+            <div class="setting-row__desc">Общая звуковая тема для всех уведомлений</div>
+          </div>
+          <select class="form-select" style="width:auto;">
+            <option>Стандартная</option>
+            <option>Мягкая</option>
+            <option>Минимализм</option>
+            <option>Ретро</option>
+          </select>
+        </div>
+
+        <div class="divider"></div>
+        <div style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:8px;">Громкость</div>
+
+        <div class="setting-row">
+          <div class="setting-row__left">
+            <div class="setting-row__label">Общая громкость</div>
+            <div class="setting-row__desc" id="volume-value">70%</div>
+          </div>
+          <input type="range" min="0" max="100" value="70" style="width:160px;accent-color:var(--accent);" oninput="document.getElementById('volume-value').textContent=this.value+'%'">
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-row__left">
+            <div class="setting-row__label">Громкость уведомлений</div>
+            <div class="setting-row__desc" id="notif-volume-value">100%</div>
+          </div>
+          <input type="range" min="0" max="100" value="100" style="width:160px;accent-color:var(--accent);" oninput="document.getElementById('notif-volume-value').textContent=this.value+'%'">
+        </div>
+
+        <div class="divider"></div>
+        <div style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:8px;">Предпрослушка</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn--secondary btn--sm" onclick="showToast('Предпрослушка: Стандартная','info')">🔔 Стандарт</button>
+          <button class="btn btn--secondary btn--sm" onclick="showToast('Предпрослушка: Мягкая','info')">🔔 Мягкая</button>
+          <button class="btn btn--secondary btn--sm" onclick="showToast('Предпрослушка: Минимализм','info')">🔔 Минимализм</button>
+          <button class="btn btn--secondary btn--sm" onclick="showToast('Предпрослушка: Ретро','info')">🔔 Ретро</button>
+        </div>
+      </div>
+
+      <!-- Section: Preview (hidden by default) -->
+      <div class="settings-section" id="section-preview" style="display:none;">
+        <div class="settings-section__title">👁 Превью сообщений</div>
+        <div class="settings-section__desc">Что показывать в уведомлении на заблокированном экране.</div>
+
+        <div class="setting-row">
+          <div class="setting-row__left">
+            <div class="setting-row__label">Показывать текст сообщения</div>
+            <div class="setting-row__desc">Отображать содержимое сообщения в push-уведомлении</div>
+          </div>
+          <label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-row__left">
+            <div class="setting-row__label">Показывать имя отправителя</div>
+            <div class="setting-row__desc">Имя и аватар отправителя в уведомлении</div>
+          </div>
+          <label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-row__left">
+            <div class="setting-row__label">Лимит символов превью</div>
+            <div class="setting-row__desc">Максимальная длина текста в push-уведомлении</div>
+          </div>
+          <select class="form-select" style="width:auto;">
+            <option>20 символов</option>
+            <option selected>40 символов</option>
+            <option>80 символов</option>
+            <option>Без ограничений</option>
+          </select>
+        </div>
+
+        <div class="divider"></div>
+        <div class="setting-row">
+          <div class="setting-row__left">
+            <div class="setting-row__label">📱 На заблокированном экране</div>
+            <div class="setting-row__desc">Управление видимостью уведомлений при блокировке экрана</div>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-row__left">
+            <div class="setting-row__label">Показывать уведомления</div>
+            <div class="setting-row__desc">Уровень видимости на экране блокировки</div>
+          </div>
+          <select class="form-select" style="width:auto;">
+            <option>Все уведомления</option>
+            <option>Скрыть содержимое</option>
+            <option>Не показывать</option>
+          </select>
+        </div>
+
+        <div class="divider"></div>
+        <div style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:12px;">Пример превью</div>
+        <div style="background:var(--bg-tertiary);border:1px solid var(--border-color);border-radius:8px;padding:16px;max-width:320px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            <div class="avatar avatar--xs" style="background:var(--accent);"><div class="avatar__inner"><span>МА</span></div></div>
+            <span class="text-sm font-bold">Мария Андреева</span>
+            <span class="text-xs text-muted" style="margin-left:auto;">14:32</span>
+          </div>
+          <div class="text-sm text-secondary">Да, посмотрела. Отличная работа! Особенно понравился дизайн...</div>
+        </div>
+      </div>
+
+      <!-- Section: Desktop Integration (hidden by default) -->
+      <div class="settings-section" id="section-desktop" style="display:none;">
+        <div class="settings-section__title">🖥 Системная интеграция</div>
+        <div class="settings-section__desc">Нативные уведомления ОС, tray-иконка, глобальные хоткеи.</div>
+
+        <div class="setting-row">
+          <div class="setting-row__left">
+            <div class="setting-row__label">Нативные уведомления ОС</div>
+            <div class="setting-row__desc">Использовать системные уведомления (macOS / Windows / Linux)</div>
+          </div>
+          <label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-row__left">
+            <div class="setting-row__label">Tray-иконка</div>
+            <div class="setting-row__desc">Сворачивать в системный трей вместо закрытия</div>
+          </div>
+          <label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-row__left">
+            <div class="setting-row__label">Badge на иконке (dock/taskbar)</div>
+            <div class="setting-row__desc">Показывать счётчик непрочитанных на иконке приложения</div>
+          </div>
+          <label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-row__left">
+            <div class="setting-row__label">Auto-launch при старте ОС</div>
+            <div class="setting-row__desc">Автоматически запускать Balloo при входе в систему</div>
+          </div>
+          <label class="switch"><input type="checkbox"><span class="switch__slider"></span></label>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-row__left">
+            <div class="setting-row__label">Глобальный хоткей открытия</div>
+            <div class="setting-row__desc">Горячая клавиша для показа/скрытия окна</div>
+          </div>
+          <input type="text" class="form-input" value="Ctrl+Shift+B" style="width:140px;text-align:center;font-size:13px;">
+        </div>
+
+        <div class="divider"></div>
+        <div style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:12px;">Глобальные хоткеи</div>
+        <div class="system-integration">
+          <div class="system-integration__card">
+            <div class="system-integration__card-title">🔍 Поиск</div>
+            <div class="system-integration__card-body">
+              <div class="flex justify-between items-center">
+                <span>Быстрый поиск</span>
+                <code style="background:var(--bg-tertiary);padding:2px 8px;font-size:12px;">Ctrl+K</code>
+              </div>
+            </div>
+          </div>
+          <div class="system-integration__card">
+            <div class="system-integration__card-title">💬 Новый чат</div>
+            <div class="system-integration__card-body">
+              <div class="flex justify-between items-center">
+                <span>Создать чат</span>
+                <code style="background:var(--bg-tertiary);padding:2px 8px;font-size:12px;">Ctrl+N</code>
+              </div>
+            </div>
+          </div>
+          <div class="system-integration__card">
+            <div class="system-integration__card-title">📞 Звонок</div>
+            <div class="system-integration__card-body">
+              <div class="flex justify-between items-center">
+                <span>Новый звонок</span>
+                <code style="background:var(--bg-tertiary);padding:2px 8px;font-size:12px;">Ctrl+Shift+V</code>
+              </div>
+            </div>
+          </div>
+          <div class="system-integration__card">
+            <div class="system-integration__card-title">🎨 Тема</div>
+            <div class="system-integration__card-body">
+              <div class="flex justify-between items-center">
+                <span>Переключить тему</span>
+                <code style="background:var(--bg-tertiary);padding:2px 8px;font-size:12px;">Ctrl+Shift+T</code>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Scheduled (hidden by default) -->
+      <div class="settings-section" id="section-scheduled" style="display:none;">
+        <div class="settings-section__title">⏰ Отложенные уведомления</div>
+        <div class="settings-section__desc">Управление отложенными и повторяющимися уведомлениями.</div>
+
+        <div class="setting-row">
+          <div class="setting-row__left">
+            <div class="setting-row__label">Умные уведомления</div>
+            <div class="setting-row__desc">ИИ-группировка: не отправлять уведомления каждые 2 секунды, а собрать в пакет</div>
+          </div>
+          <label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-row__left">
+            <div class="setting-row__label">Задержка пакетной отправки</div>
+            <div class="setting-row__desc">Время ожидания для сбора сообщений в пакет</div>
+          </div>
+          <select class="form-select" style="width:auto;">
+            <option>Мгновенно</option>
+            <option selected>30 секунд</option>
+            <option>1 минута</option>
+            <option>5 минут</option>
+          </select>
+        </div>
+
+        <div class="divider"></div>
+        <div style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:12px;">Активные отложенные</div>
+        <div class="channel-list">
+          <div class="channel-item">
+            <div style="font-size:18px;">⏰</div>
+            <div class="channel-item__name" style="flex:1;">Напоминание: встреча с Марией</div>
+            <span class="text-xs text-muted">Сегодня 15:00</span>
+            <label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label>
+          </div>
+          <div class="channel-item">
+            <div style="font-size:18px;">⏰</div>
+            <div class="channel-item__name" style="flex:1;">Напоминание: дедлайн проекта</div>
+            <span class="text-xs text-muted">Завтра 09:00</span>
+            <label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Statusbar -->
+  <div class="statusbar">
+    <div><span class="status-dot status-dot--online"></span> Подключено · WebSocket</div>
+    <div class="statusbar__sep">💾 Кэш: 124 МБ · v1.0.0-beta</div>
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+<script>
+function showSection(sectionId) {
+  // Hide all sections
+  document.querySelectorAll('.settings-section').forEach(s => s.style.display = 'none');
+  // Show target
+  const target = document.getElementById('section-' + sectionId);
+  if (target) target.style.display = 'block';
+
+  // Update sidebar active state
+  document.querySelectorAll('.window-sidebar .sidebar-nav-item').forEach(item => {
+    item.classList.remove('sidebar-nav-item--active');
+    item.style.color = 'var(--text-secondary)';
+  });
+  event.target.closest('.sidebar-nav-item').classList.add('sidebar-nav-item--active');
+  event.target.closest('.sidebar-nav-item').style.color = 'var(--accent)';
+}
+
+function showToast(message, type) {
+  const container = document.getElementById('toast-container') || createToastContainer();
+  const toast = document.createElement('div');
+  toast.className = 'toast toast--' + (type || 'info');
+  toast.textContent = message;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+function createToastContainer() {
+  const container = document.createElement('div');
+  container.id = 'toast-container';
+  container.className = 'toast-container';
+  container.style.cssText = 'position:fixed;top:70px;right:16px;z-index:600;display:flex;flex-direction:column;gap:8px;';
+  document.body.appendChild(container);
+  return container;
+}
+</script>
+</body>
+</html>

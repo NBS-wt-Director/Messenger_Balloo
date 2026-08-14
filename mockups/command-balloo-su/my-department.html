@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Command — Мой отдел</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--info);">C</div><span>Command</span>
+    <div class="topbar__dropdown"></div>
+  </div>
+  <div class="topbar__title">Мой отдел</div>
+  <div class="topbar__right"><div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИВ</span></div></div></div>
+</div>
+<div class="main">
+  <div class="sidebar sidebar--narrow">
+    <div class="list">
+      <div class="list__item">🏠 Дашборд</div>
+      <div class="list__item">💬 Чат</div>
+      <div class="list__item">📅 Совещания</div>
+      <div class="list__item">📋 Задачи</div>
+      <div class="list__item list__item--active">🏢 Мой отдел</div>
+      <div class="list__item">🏛️ Подразделения</div>
+      <div class="list__item">👥 HR</div>
+      <div class="list__item">📚 База знаний</div>
+      <div class="list__item">🎯 Найм</div>
+      <div class="list__item">📊 Мониторинг</div>
+    </div>
+  </div>
+  <div class="content overflow-y-auto"><div class="page-container">
+    <h1 class="page-title">🏢 Мой отдел — Разработка</h1>
+    <p class="page-subtitle">Команда и метрики отдела</p>
+
+    <div class="flex gap-4 mb-6" style="flex-wrap:wrap;">
+      <div class="card flex-1" style="min-width:140px;"><div class="text-xs text-muted">Сотрудников</div><div style="font-size:28px;font-weight:800;color:var(--accent);">8</div></div>
+      <div class="card flex-1" style="min-width:140px;"><div class="text-xs text-muted">Активных задач</div><div style="font-size:28px;font-weight:800;color:var(--info);">15</div></div>
+      <div class="card flex-1" style="min-width:140px;"><div class="text-xs text-muted">PR в ревью</div><div style="font-size:28px;font-weight:800;color:var(--warning);">4</div></div>
+      <div class="card flex-1" style="min-width:140px;"><div class="text-xs text-muted">Спринт</div><div style="font-size:28px;font-weight:800;color:var(--accent);">8/12</div></div>
+    </div>
+
+    <div class="card mb-6">
+      <h3 class="card__title mb-4">👥 Участники отдела</h3>
+      <div class="list__item" style="border:none;">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИВ</span></div></div>
+        <div class="flex-1"><div class="list__item-title">Иван Воронцов <span class="chip chip--accent" style="margin-left:8px;">Lead</span></div><div class="list__item-subtitle">Lead Developer · 5 задач</div></div>
+        <button class="btn btn--secondary btn--sm" title="Написать чат">💬 Написать</button>
+      </div>
+      <div class="list__item" style="border:none;">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ЕК</span></div></div>
+        <div class="flex-1"><div class="list__item-title">Елена Киселева</div><div class="list__item-subtitle">Senior Backend · 3 задачи</div></div>
+        <button class="btn btn--secondary btn--sm" title="Написать чат">💬 Написать</button>
+      </div>
+      <div class="list__item" style="border:none;">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>АП</span></div></div>
+        <div class="flex-1"><div class="list__item-title">Антон Петров</div><div class="list__item-subtitle">Middle Frontend · 4 задачи</div></div>
+        <button class="btn btn--secondary btn--sm" title="Написать чат">💬 Написать</button>
+      </div>
+      <div class="list__item" style="border:none;">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-busy avatar--ctx-contact"><div class="avatar__inner"><span>СМ</span></div></div>
+        <div class="flex-1"><div class="list__item-title">Сергей Морозов</div><div class="list__item-subtitle">Middle Backend · 3 задачи</div></div>
+        <button class="btn btn--secondary btn--sm" title="Написать чат">💬 Написать</button>
+      </div>
+      <div class="list__item" style="border:none;">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-offline avatar--ctx-contact"><div class="avatar__inner"><span>ОЗ</span></div></div>
+        <div class="flex-1"><div class="list__item-title">Ольга Зайцева</div><div class="list__item-subtitle">QA Engineer · 2 задачи</div></div>
+        <button class="btn btn--secondary btn--sm" title="Написать чат" style="opacity:0.5;">💬 Написать</button>
+      </div>
+    </div>
+
+    <div class="card mb-6">
+      <h3 class="card__title mb-4">📊 Прогресс спринта #12</h3>
+      <div style="height:20px;background:var(--bg-tertiary);border:1px solid var(--border-color);margin-bottom:8px;">
+        <div style="height:100%;width:67%;background:var(--accent);"></div>
+      </div>
+      <div class="flex justify-between text-sm">
+        <span class="text-secondary">8 из 12 задач завершено</span>
+        <span class="text-muted">Осталось 3 дня</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="card__title mb-4">📌 Текущие задачи отдела</h3>
+      <table class="table">
+        <thead><tr><th>Задача</th><th>Исполнитель</th><th>Статус</th><th>Дедлайн</th></tr></thead>
+        <tbody>
+          <tr><td>WebSocket重构</td><td>Елена К.</td><td><span class="chip chip--accent">Готово</span></td><td>Сегодня</td></tr>
+          <tr><td>Мобильные макеты</td><td>Иван В.</td><td><span class="chip chip--danger">Срочно</span></td><td>Сегодня</td></tr>
+          <tr><td>CI/CD admin</td><td>Антон П.</td><td><span class="chip chip--warning">В работе</span></td><td>Завтра</td></tr>
+          <tr><td>API документация</td><td>Сергей М.</td><td><span class="chip chip--warning">В работе</span></td><td>Пт</td></tr>
+          <tr><td>E2E тесты</td><td>Ольга З.</td><td><span class="chip chip--info">Бэклог</span></td><td>След. неделя</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div></div>
+</div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

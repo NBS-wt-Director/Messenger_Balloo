@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Balloo — Production Readiness | Статус миграции</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --bg-2: #161a24;
+    --card: #1c2230;
+    --border: #2a3245;
+    --text: #e6e9f2;
+    --text-dim: #8b93a7;
+    --accent: #2db84d;
+    --accent-dim: rgba(45, 184, 77, 0.15);
+    --warn: #e8a33d;
+    --warn-dim: rgba(232, 163, 61, 0.15);
+    --danger: #e5534b;
+    --danger-dim: rgba(229, 83, 75, 0.15);
+    --info: #4aa8e0;
+    --info-dim: rgba(74, 168, 224, 0.15);
+    --radius: 4px;
+    --font: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    padding: 24px;
+    min-height: 100vh;
+  }
+  .container { max-width: 1200px; margin: 0 auto; }
+
+  /* Header */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px 24px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 20px;
+  }
+  .header h1 { font-size: 22px; font-weight: 700; }
+  .header .sub { color: var(--text-dim); font-size: 13px; margin-top: 4px; }
+  .overall-badge {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 18px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+  .overall-num {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--accent);
+  }
+  .overall-label { font-size: 12px; color: var(--text-dim); }
+  .overall-label strong { display: block; color: var(--text); font-size: 14px; margin-bottom: 2px; }
+
+  /* Progress bar */
+  .progress-track {
+    height: 8px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+    margin: 8px 0 4px;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.4s ease;
+    background: var(--accent);
+  }
+  .progress-fill.warn { background: var(--warn); }
+  .progress-fill.danger { background: var(--danger); }
+
+  /* Cards grid */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+  }
+  .card h3 { font-size: 14px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+  .card .chip {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 99px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .chip.green { background: var(--accent-dim); color: var(--accent); }
+  .chip.yellow { background: var(--warn-dim); color: var(--warn); }
+  .chip.red { background: var(--danger-dim); color: var(--danger); }
+  .chip.blue { background: var(--info-dim); color: var(--info); }
+  .card .stat { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-dim); padding: 4px 0; }
+  .card .stat b { color: var(--text); font-weight: 600; }
+  .card .percent { font-size: 24px; font-weight: 800; margin-bottom: 8px; }
+  .card .percent .of { font-size: 13px; color: var(--text-dim); font-weight: 500; }
+
+  /* Section title */
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 28px 0 14px;
+  }
+  .section-title h2 { font-size: 17px; }
+  .section-title .count { font-size: 12px; color: var(--text-dim); background: var(--bg-2); border: 1px solid var(--border); padding: 2px 10px; border-radius: 99px; }
+
+  /* Tickets table */
+  .ticket-table { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .ticket-table th {
+    text-align: left;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text-dim);
+    padding: 12px 14px;
+    background: var(--bg-2);
+    border-bottom: 1px solid var(--border);
+  }
+  .ticket-table td { padding: 12px 14px; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: middle; }
+  .ticket-table tr:last-child td { border-bottom: none; }
+  .ticket-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .ticket-id { font-weight: 700; color: var(--text-dim); width: 52px; }
+  .ticket-title { font-weight: 600; }
+  .ticket-deps { color: var(--text-dim); font-size: 12px; }
+
+  /* Status badge */
+  .status-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 99px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .st-done { background: var(--accent-dim); color: var(--accent); }
+  .st-progress { background: var(--info-dim); color: var(--info); }
+  .st-pending { background: var(--bg); color: var(--text-dim); border: 1px solid var(--border); }
+
+  /* Legend */
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 16px; font-size: 12px; color: var(--text-dim); }
+  .legend span { display: flex; align-items: center; gap: 6px; }
+  .legend .dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+
+  /* Footer */
+  .footer { margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-dim); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+  .footer code { background: var(--bg-2); border: 1px solid var(--border); padding: 2px 8px; border-radius: 3px; font-size: 11px; }
+
+  /* Responsive */
+  @media (max-width: 720px) {
+    .header { flex-direction: column; align-items: flex-start; }
+    .ticket-table { font-size: 12px; }
+    .ticket-deps { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div>
+      <h1>Production Readiness</h1>
+      <div class="sub">Мультитикет: tickets/production-readiness-migration.md · Обновлено: <span id="updated-at">—</span></div>
+    </div>
+    <div class="overall-badge">
+      <div>
+        <div class="overall-label">ОБЩАЯ ГОТОВНОСТЬ</div>
+        <div class="overall-num" id="overall-percent">0%</div>
+      </div>
+      <div>
+        <div class="overall-label">ТИКЕТЫ</div>
+        <strong id="overall-tickets">0/12</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overall progress -->
+  <div class="progress-track"><div class="progress-fill danger" id="overall-bar" style="width:0%"></div></div>
+
+  <!-- Components -->
+  <div class="section-title">
+    <h2>Компоненты</h2>
+    <span class="count" id="components-count">6</span>
+  </div>
+  <div class="grid" id="components-grid"></div>
+
+  <!-- Tickets -->
+  <div class="section-title">
+    <h2>Тикеты</h2>
+    <span class="count" id="tickets-count">12</span>
+  </div>
+  <table class="ticket-table">
+    <thead>
+      <tr>
+        <th>№</th>
+        <th>Тикет</th>
+        <th>Приоритет</th>
+        <th>Зависимости</th>
+        <th>Статус</th>
+        <th style="width:160px">Прогресс</th>
+      </tr>
+    </thead>
+    <tbody id="tickets-body"></tbody>
+  </table>
+
+  <!-- Legend -->
+  <div class="legend">
+    <span><span class="dot" style="background:var(--accent)"></span> готов</span>
+    <span><span class="dot" style="background:var(--info)"></span> в работе</span>
+    <span><span class="dot" style="background:var(--text-dim)"></span> не начат</span>
+    <span><span class="dot" style="background:var(--danger)"></span> критичный приоритет</span>
+    <span><span class="dot" style="background:var(--warn)"></span> важный приоритет</span>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <div>Команда запуска тикета: <code>прочитай документ: tickets/production-readiness-migration.md и выполни тикет № X</code></div>
+    <div>Данные: <code>mockups/production_readiness.json</code></div>
+  </div>
+
+</div>
+
+<script>
+// ============================================
+// Balloo — Production Readiness Dashboard
+// Загружает данные из mockups/production_readiness.json
+// ============================================
+
+const STATUS_MAP = {
+  pending:   { label: 'Не начат',  cls: 'st-pending' },
+  progress:  { label: 'В работе',  cls: 'st-progress' },
+  done:      { label: 'Готов',     cls: 'st-done' },
+  blocked:   { label: 'Заблокирован', cls: 'st-pending' }
+};
+
+const PRIORITY_MAP = {
+  critical: { label: 'Критичный', cls: 'chip red' },
+  high:     { label: 'Важный',    cls: 'chip yellow' },
+  normal:   { label: 'Обычный',   cls: 'chip blue' }
+};
+
+function esc(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+
+function renderComponents(data) {
+  const grid = document.getElementById('components-grid');
+  const comps = data.components || {};
+  const names = { web: 'Web', api: 'API (Server)', desktop: 'Desktop', android: 'Android', ios: 'iOS', git: 'Git + CI/CD' };
+  document.getElementById('components-count').textContent = Object.keys(comps).length;
+
+  grid.innerHTML = Object.entries(comps).map(([key, c]) => {
+    const ready = c.ready_percent ?? 0;
+    const barCls = ready >= 80 ? '' : ready >= 40 ? 'warn' : 'danger';
+    const statusChip = c.status === 'staging' ? '<span class="chip yellow">staging</span>'
+      : c.status === 'ready' ? '<span class="chip green">ready</span>'
+      : c.status === 'not_ready' ? '<span class="chip red">not ready</span>'
+      : '<span class="chip blue">not started</span>';
+    return `
+      <div class="card">
+        <h3>${esc(names[key] || key)} ${statusChip}</h3>
+        <div class="percent">${ready}%<span class="of"> готовность</span></div>
+        <div class="progress-track"><div class="progress-fill ${barCls}" style="width:${ready}%"></div></div>
+        <div class="stat"><span>Код</span><b>${c.code_percent ?? 0}%</b></div>
+        <div class="stat"><span>Тесты</span><b>${c.tests_percent ?? 0}%</b></div>
+        <div class="stat"><span>Docker</span><b>${c.docker ? '✅' : '❌'}</b></div>
+        <div class="stat"><span>CI/CD</span><b>${c.ci_cd ? '✅' : '❌'}</b></div>
+        <div class="stat"><span>Документация</span><b>${c.docs ? '✅' : '❌'}</b></div>
+      </div>`;
+  }).join('');
+}
+
+function renderTickets(data) {
+  const body = document.getElementById('tickets-body');
+  const tickets = data.tickets || [];
+  document.getElementById('tickets-count').textContent = tickets.length;
+
+  body.innerHTML = tickets.map(t => {
+    const st = STATUS_MAP[t.status] || STATUS_MAP.pending;
+    const pr = PRIORITY_MAP[t.priority] || PRIORITY_MAP.normal;
+    const deps = (t.dependencies || []).length ? t.dependencies.map(d => '№' + d).join(', ') : '—';
+    const barCls = t.status === 'done' ? '' : t.status === 'progress' ? 'warn' : 'danger';
+    return `
+      <tr>
+        <td class="ticket-id">№${t.id}</td>
+        <td class="ticket-title">${esc(t.title)}</td>
+        <td><span class="${pr.cls}">${pr.label}</span></td>
+        <td class="ticket-deps">${deps}</td>
+        <td><span class="status-badge ${st.cls}">${st.label}</span></td>
+        <td>
+          <div class="progress-track"><div class="progress-fill ${barCls}" style="width:${t.progress_percent ?? 0}%"></div></div>
+        </td>
+      </tr>`;
+  }).join('');
+}
+
+function renderOverall(data) {
+  const meta = data.meta || {};
+  const tickets = data.tickets || [];
+  const done = tickets.filter(t => t.status === 'done').length;
+  const inProgress = tickets.filter(t => t.status === 'progress').length;
+  const pending = tickets.filter(t => t.status !== 'done').length;
+
+  const overall = meta.overall_progress_percent ?? 0;
+  document.getElementById('overall-percent').textContent = overall + '%';
+  document.getElementById('overall-tickets').textContent = `${done}/${tickets.length}`;
+  const bar = document.getElementById('overall-bar');
+  bar.style.width = overall + '%';
+  bar.className = 'progress-fill ' + (overall >= 80 ? '' : overall >= 40 ? 'warn' : 'danger');
+  document.getElementById('updated-at').textContent = meta.updated || meta.created || '—';
+}
+
+async function load() {
+  try {
+    const res = await fetch('production_readiness.json');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    renderOverall(data);
+    renderComponents(data);
+    renderTickets(data);
+  } catch (e) {
+    // Fallback: если файл не доступен (открыт локально) — показать заглушку
+    document.getElementById('tickets-body').innerHTML =
+      '<tr><td colspan="6" style="color:var(--warn)">⚠ Не удалось загрузить production_readiness.json (' + esc(e.message) + ').<br>Откройте через HTTP-сервер: <code>npx serve mockups</code></td></tr>';
+  }
+}
+
+load();
+</script>
+</body>
+</html>

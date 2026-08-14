@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Download — Загрузки</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--info);">D</div><span>Download</span>
+    <div class="topbar__dropdown"><div class="topbar__dropdown-item">⬇️ Download (текущий)</div><div class="topbar__dropdown-divider"></div><div class="topbar__dropdown-item">💬 Balloo</div><div class="topbar__dropdown-item">🛡️ Admin</div><div class="topbar__dropdown-item">🏢 Command</div><div class="topbar__dropdown-item">💡 Features</div><div class="topbar__dropdown-item">📜 History</div><div class="topbar__dropdown-item">📚 API Docs</div></div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Загрузки</div>
+  <div class="topbar__right">
+    <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+    <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+  </div>
+</div>
+<div class="main">
+  <div class="content overflow-y-auto">
+    <div class="page-container">
+      <h1 class="page-title">⬇️ Скачать Balloo</h1>
+      <p class="page-subtitle">Версия 1.0.0-beta · 16 июля 2026</p>
+
+      <!-- Desktop -->
+      <div class="section-title">💻 Для компьютера</div>
+      <div class="flex gap-4 mb-6" style="flex-wrap:wrap;">
+        <div class="card flex-1 card--hover" style="min-width:240px;text-align:center;">
+          <div style="font-size:48px;">🪟</div>
+          <h3 class="card__title mt-2">Windows</h3>
+          <div class="card__body text-sm">Windows 10/11 (x64)<br>MSI-установщик · 82 МБ</div>
+          <button class="btn btn--primary btn--block mt-4">Скачать .msi</button>
+          <div class="text-xs text-muted mt-2">SHA256: a3f8...e91c</div>
+        </div>
+        <div class="card flex-1 card--hover" style="min-width:240px;text-align:center;">
+          <div style="font-size:48px;">🐧</div>
+          <h3 class="card__title mt-2">Linux</h3>
+          <div class="card__body text-sm">AppImage / Deb / RPM<br>Universal · 76 МБ</div>
+          <div class="flex gap-2 mt-4">
+            <button class="btn btn--primary flex-1">AppImage</button>
+            <button class="btn btn--secondary flex-1">.deb</button>
+            <button class="btn btn--secondary flex-1">.rpm</button>
+          </div>
+        </div>
+        <div class="card flex-1 card--hover" style="min-width:240px;text-align:center;">
+          <div style="font-size:48px;">🍎</div>
+          <h3 class="card__title mt-2">macOS</h3>
+          <div class="card__body text-sm">macOS 12+ (Universal)<br>.dmg · 85 МБ</div>
+          <button class="btn btn--primary btn--block mt-4">Скачать .dmg</button>
+          <div class="text-xs text-muted mt-2">Поддержка Apple Silicon</div>
+        </div>
+      </div>
+
+      <!-- Mobile -->
+      <div class="section-title">📱 Для телефона</div>
+      <div class="flex gap-4 mb-6" style="flex-wrap:wrap;">
+        <div class="card flex-1 card--hover" style="min-width:240px;text-align:center;">
+          <div style="font-size:48px;">🤖</div>
+          <h3 class="card__title mt-2">Android</h3>
+          <div class="card__body text-sm">Android 8.0+<br>APK · 48 МБ</div>
+          <button class="btn btn--primary btn--block mt-4">Скачать APK</button>
+          <a href="#" class="text-xs text-accent mt-2" style="display:block;">Google Play →</a>
+          <a href="#" class="text-xs text-accent" style="display:block;">RuStore →</a>
+        </div>
+        <div class="card flex-1 card--hover" style="min-width:240px;text-align:center;">
+          <div style="font-size:48px;">🍎</div>
+          <h3 class="card__title mt-2">iOS</h3>
+          <div class="card__body text-sm">iOS 14+<br>App Store</div>
+          <a href="#" class="btn btn--primary btn--block mt-4">App Store →</a>
+          <div class="text-xs text-muted mt-2">TestFlight доступен</div>
+        </div>
+        <div class="card flex-1 card--hover" style="min-width:240px;text-align:center;">
+          <div style="font-size:48px;">🌐</div>
+          <h3 class="card__title mt-2">PWA</h3>
+          <div class="card__body text-sm">Progressive Web App<br>Установка из браузера</div>
+          <a href="https://balloo.su" class="btn btn--primary btn--block mt-4">Открыть PWA</a>
+          <div class="text-xs text-muted mt-2">Офлайн-режим поддерживается</div>
+        </div>
+      </div>
+
+      <!-- QR -->
+      <div class="section-title">📷 QR-код для телефона</div>
+      <div class="card mb-6 text-center">
+        <div style="display:inline-block;padding:24px;background:#fff;">
+          <div style="width:180px;height:180px;background:
+            repeating-conic-gradient(#000 0% 25%, #fff 0% 50%) 50% / 12px 12px;
+            position:relative;">
+            <div style="position:absolute;inset:0;background:
+              linear-gradient(45deg,transparent 40%,#fff 41%,#fff 44%,transparent 45%),
+              linear-gradient(-45deg,transparent 40%,#fff 41%,#fff 44%,transparent 45%);"></div>
+            <div style="position:absolute;top:8px;left:8px;width:40px;height:40px;background:#fff;border:8px solid #000;"></div>
+            <div style="position:absolute;top:8px;right:8px;width:40px;height:40px;background:#fff;border:8px solid #000;"></div>
+            <div style="position:absolute;bottom:8px;left:8px;width:40px;height:40px;background:#fff;border:8px solid #000;"></div>
+            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:32px;height:32px;clip-path:polygon(30% 0%,70% 0%,100% 30%,100% 70%,70% 100%,30% 100%,0% 70%,0% 30%);background:var(--accent);"></div>
+          </div>
+        </div>
+        <p class="text-sm text-secondary mt-4">Наведите камеру телефона для перехода на download.balloo.su</p>
+      </div>
+
+      <!-- System requirements -->
+      <div class="section-title">⚙️ Системные требования</div>
+      <div class="card mb-6">
+        <table class="table">
+          <thead><tr><th>Платформа</th><th>ОС</th><th>ОЗУ</th><th>Диск</th></tr></thead>
+          <tbody>
+            <tr><td>Windows</td><td>Windows 10/11 (x64)</td><td>4 ГБ</td><td>200 МБ</td></tr>
+            <tr><td>Linux</td><td>Ubuntu 20.04+, Fedora 35+</td><td>4 ГБ</td><td>200 МБ</td></tr>
+            <tr><td>macOS</td><td>macOS 12 Monterey+</td><td>4 ГБ</td><td>200 МБ</td></tr>
+            <tr><td>Android</td><td>Android 8.0 (Oreo)+</td><td>2 ГБ</td><td>100 МБ</td></tr>
+            <tr><td>iOS</td><td>iOS 14+</td><td>2 ГБ</td><td>100 МБ</td></tr>
+            <tr><td>PWA</td><td>Chrome 90+, Edge 90+, Safari 14+</td><td>—</td><td>50 МБ (кэш)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card text-center">
+        <div class="text-sm text-secondary mb-2">Предыдущие версии</div>
+        <a href="https://history.balloo.su" class="btn btn--tertiary">📜 Смотреть историю версий →</a>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

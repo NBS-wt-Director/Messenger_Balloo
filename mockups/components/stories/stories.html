@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Компонент: Stories — Сторис</title>
+  <link rel="stylesheet" href="../../assets/common.css">
+  <style>
+    .component-demo { padding: 24px; max-width: 560px; margin: 0 auto; }
+    .component-demo h1 { font-size: 20px; margin-bottom: 16px; }
+    .component-demo .demo-section { margin-bottom: 24px; }
+    .component-demo .demo-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+
+    .stories-bar {
+      display: flex;
+      gap: 16px;
+      padding: 16px;
+      overflow-x: auto;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .story-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .story-item__ring {
+      width: 64px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      clip-path: var(--octagon-clip-stories);
+      padding: 3px;
+    }
+    .story-item__ring--seen { opacity: 0.5; }
+    .story-item__ring--border { border: 2px solid var(--accent); }
+    .story-item__ring--no-border { border: 2px solid var(--border-strong); }
+    .story-item__avatar {
+      width: 100%;
+      height: 100%;
+      clip-path: var(--octagon-clip-stories);
+      background: var(--bg-tertiary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    .story-item__name {
+      font-size: 11px;
+      color: var(--text-secondary);
+      max-width: 64px;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .story-item__add {
+      width: 64px;
+      height: 64px;
+      clip-path: var(--octagon-clip-stories);
+      background: var(--bg-tertiary);
+      border: 2px dashed var(--border-strong);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: var(--accent);
+      cursor: pointer;
+    }
+    .stories-viewer {
+      position: fixed;
+      inset: 0;
+      background: var(--bg-primary);
+      z-index: 1000;
+      display: none;
+      flex-direction: column;
+    }
+    .stories-viewer--visible { display: flex; }
+    .stories-viewer__progress {
+      display: flex;
+      gap: 4px;
+      padding: 12px 16px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
+    }
+    .stories-viewer__progress-bar {
+      flex: 1;
+      height: 2px;
+      background: rgba(255,255,255,0.3);
+      overflow: hidden;
+    }
+    .stories-viewer__progress-bar__fill {
+      height: 100%;
+      background: #fff;
+      width: 0%;
+      transition: width 5s linear;
+    }
+    .stories-viewer__progress-bar__fill--done { width: 100%; }
+    .stories-viewer__progress-bar__fill--active { width: 60%; }
+    .stories-viewer__header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 20px 16px 10px;
+    }
+    .stories-viewer__header .avatar { flex-shrink: 0; }
+    .stories-viewer__header__name { font-size: 14px; font-weight: 600; color: #fff; }
+    .stories-viewer__header__time { font-size: 12px; color: rgba(255,255,255,0.6); }
+    .stories-viewer__close {
+      margin-left: auto;
+      width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; cursor: pointer;
+      font-size: 20px;
+    }
+    .stories-viewer__content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-tertiary);
+      color: var(--text-muted);
+      font-size: 48px;
+    }
+    .stories-viewer__footer {
+      padding: 12px 16px;
+      display: flex;
+      gap: 8px;
+    }
+    .stories-viewer__footer .input-area__field { flex: 1; }
+  </style>
+</head>
+<body>
+  <div class="component-demo">
+    <h1>📦 Компонент: Stories (Сторис)</h1>
+
+    <div class="demo-section">
+      <div class="demo-label">Панель сторис в topbar</div>
+      <div class="stories-bar">
+        <div class="story-item" onclick="alert('Создать сторис')">
+          <div class="story-item__add">+</div>
+          <div class="story-item__name">Ваша история</div>
+        </div>
+        <div class="story-item">
+          <div class="story-item__ring story-item__ring--border">
+            <div class="story-item__avatar" style="background:var(--accent);color:#fff;">ИИ</div>
+          </div>
+          <div class="story-item__name">Иван</div>
+        </div>
+        <div class="story-item">
+          <div class="story-item__ring story-item__ring--border">
+            <div class="story-item__avatar" style="background:#3b9eff;color:#fff;">АК</div>
+          </div>
+          <div class="story-item__name">Алексей</div>
+        </div>
+        <div class="story-item">
+          <div class="story-item__ring story-item__ring--border story-item__ring--seen">
+            <div class="story-item__avatar" style="background:#a855f7;color:#fff;">МС</div>
+          </div>
+          <div class="story-item__name">Мария</div>
+        </div>
+        <div class="story-item">
+          <div class="story-item__ring story-item__ring--border story-item__ring--seen">
+            <div class="story-item__avatar" style="background:#e8a317;color:#fff;">ДВ</div>
+          </div>
+          <div class="story-item__name">Дмитрий</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="demo-section">
+      <div class="demo-label">Просмотр сторис</div>
+      <div class="stories-viewer stories-viewer--visible">
+        <div class="stories-viewer__progress">
+          <div class="stories-viewer__progress-bar"><div class="stories-viewer__progress-bar__fill--done"></div></div>
+          <div class="stories-viewer__progress-bar"><div class="stories-viewer__progress-bar__fill--active"></div></div>
+          <div class="stories-viewer__progress-bar"><div></div></div>
+        </div>
+        <div class="stories-viewer__header">
+          <div class="avatar avatar--sm avatar--bordered" style="background:var(--accent);clip-path:var(--octagon-clip-stories);">
+            <div class="avatar__inner" style="clip-path:var(--octagon-clip-stories);background:var(--accent);color:#fff;font-size:12px;">ИИ</div>
+          </div>
+          <span class="stories-viewer__header__name">Иван Иванов</span>
+          <span class="stories-viewer__header__time">2 ч назад</span>
+          <div class="stories-viewer__close">✕</div>
+        </div>
+        <div class="stories-viewer__content">🖼</div>
+        <div class="stories-viewer__footer">
+          <input class="input-area__field" placeholder="Отправить сообщение...">
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="../../assets/common.js"></script>
+</body>
+</html>

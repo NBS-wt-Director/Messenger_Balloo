@@ -1,0 +1,5 @@
+#!/bin/sh
+# husky pre-push hook
+# Запускает все тесты перед push
+
+pnpm test:all

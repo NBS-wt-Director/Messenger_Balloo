@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo — Офлайн</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    .error-page { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:calc(100vh - 56px); padding:40px 24px; text-align:center; }
+    .error-mascot { font-size:72px; margin-bottom:16px; }
+    .error-title { font-size:24px; font-weight:800; color:var(--text-primary); margin-bottom:8px; }
+    .error-desc { font-size:16px; color:var(--text-secondary); max-width:420px; line-height:1.6; margin-bottom:28px; }
+    .error-actions { display:flex; gap:12px; flex-wrap:wrap; justify-content:center; }
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon">B</div><span>Balloo</span></div>
+  <div class="topbar__title">Офлайн</div>
+  <div class="topbar__right"><div class="mascot">🦊</div><span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span><span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span></div>
+</div>
+<div class="main"><div class="content overflow-y-auto">
+  <div class="error-page">
+    <div class="error-mascot">🦊📡</div>
+    <h1 class="error-title">Нет соединения с интернетом</h1>
+    <p class="error-desc">Похоже, вы офлайн. Balloo требует подключения к интернету. Проверьте сетевое соединение и попробуйте снова.</p>
+    <div class="error-actions">
+      <button class="btn btn--primary" onclick="location.reload()">Попробовать снова</button>
+      <a class="btn btn--secondary" href="/login">Войти в Balloo</a>
+    </div>
+  </div>
+</div></div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

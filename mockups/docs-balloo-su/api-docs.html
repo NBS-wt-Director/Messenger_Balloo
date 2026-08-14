@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Docs — API Documentation</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--info);">D</div><span>API Docs</span>
+    <div class="topbar__dropdown"><div class="topbar__dropdown-item">📚 API Docs (текущий)</div><div class="topbar__dropdown-divider"></div><div class="topbar__dropdown-item">💬 Balloo</div><div class="topbar__dropdown-item">🛡️ Admin</div><div class="topbar__dropdown-item">🏢 Command</div><div class="topbar__dropdown-item">💡 Features</div><div class="topbar__dropdown-item">📜 History</div><div class="topbar__dropdown-item">⬇️ Download</div></div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">API Documentation</div>
+  <div class="topbar__right">
+    <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+    <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+  </div>
+</div>
+<div class="main">
+  <!-- Sidebar: API navigation -->
+  <div class="sidebar sidebar--narrow">
+    <div class="sidebar__search">
+      <input type="text" class="search-input" placeholder="🔍 Поиск endpoint...">
+    </div>
+    <div class="list">
+      <div class="list__item list__item--active" style="font-weight:700;">📖 Обзор</div>
+      <div class="list__item" style="font-weight:700;color:var(--accent);">🔐 Auth</div>
+      <div class="list__item" style="padding-left:32px;">POST /auth/login</div>
+      <div class="list__item" style="padding-left:32px;">POST /auth/register</div>
+      <div class="list__item" style="padding-left:32px;">POST /auth/oauth</div>
+      <div class="list__item" style="padding-left:32px;">POST /auth/refresh</div>
+      <div class="list__item" style="padding-left:32px;">POST /auth/logout</div>
+      <div class="list__item" style="font-weight:700;color:var(--accent);">💬 Messages</div>
+      <div class="list__item" style="padding-left:32px;">GET /messages</div>
+      <div class="list__item" style="padding-left:32px;">POST /messages</div>
+      <div class="list__item" style="padding-left:32px;">PUT /messages/:id</div>
+      <div class="list__item" style="padding-left:32px;">DELETE /messages/:id</div>
+      <div class="list__item" style="font-weight:700;color:var(--accent);">👥 Chats</div>
+      <div class="list__item" style="padding-left:32px;">GET /chats</div>
+      <div class="list__item" style="padding-left:32px;">POST /chats</div>
+      <div class="list__item" style="padding-left:32px;">GET /chats/:id</div>
+      <div class="list__item" style="font-weight:700;color:var(--accent);">📞 Calls</div>
+      <div class="list__item" style="padding-left:32px;">POST /calls/initiate</div>
+      <div class="list__item" style="padding-left:32px;">POST /calls/:id/accept</div>
+      <div class="list__item" style="padding-left:32px;">POST /calls/:id/end</div>
+      <div class="list__item" style="font-weight:700;color:var(--accent);">🔌 WebSocket</div>
+      <div class="list__item" style="padding-left:32px;">wss://balloo.su/ws</div>
+      <div class="list__item" style="padding-left:32px;">Events: message</div>
+      <div class="list__item" style="padding-left:32px;">Events: typing</div>
+      <div class="list__item" style="padding-left:32px;">Events: presence</div>
+      <div class="list__item" style="font-weight:700;color:var(--accent);">🤖 Bots</div>
+      <div class="list__item" style="padding-left:32px;">POST /bots</div>
+      <div class="list__item" style="padding-left:32px;">GET /bots/:id/webhook</div>
+    </div>
+  </div>
+
+  <div class="content overflow-y-auto">
+    <div class="page-container">
+      <div class="flex items-center justify-between mb-6">
+        <h1 class="page-title">📖 API Documentation</h1>
+        <div class="flex gap-2">
+          <span class="chip chip--accent">OpenAPI 3.0</span>
+          <span class="chip chip--info">v1.0.0-beta</span>
+        </div>
+      </div>
+
+      <div class="card mb-6">
+        <h3 class="card__title">Базовый URL</h3>
+        <div class="flex items-center gap-2 mt-2">
+          <code style="background:var(--bg-tertiary);padding:4px 12px;font-family:'Fira Code',monospace;color:var(--accent);font-size:14px;">https://api.balloo.su/v1</code>
+          <span class="chip chip--accent">Production</span>
+        </div>
+        <div class="flex items-center gap-2 mt-2">
+          <code style="background:var(--bg-tertiary);padding:4px 12px;font-family:'Fira Code',monospace;color:var(--warning);font-size:14px;">wss://balloo.su/ws</code>
+          <span class="chip chip--info">WebSocket</span>
+        </div>
+      </div>
+
+      <!-- Auth section -->
+      <div class="section-title">🔐 Аутентификация</div>
+      <div class="card mb-4">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="chip" style="background:var(--accent);color:#fff;">POST</span>
+          <code style="font-family:'Fira Code',monospace;font-size:14px;color:var(--text-primary);">/auth/login</code>
+        </div>
+        <p class="card__body mb-4">Аутентификация пользователя по email и паролю. Возвращает access и refresh токены.</p>
+
+        <div class="text-xs font-bold text-muted mb-2">REQUEST BODY</div>
+        <div style="background:var(--bg-tertiary);padding:16px;font-family:'Fira Code',monospace;font-size:13px;line-height:1.6;overflow-x:auto;">
+<span style="color:var(--text-muted);">{</span><br>
+&nbsp;&nbsp;<span style="color:var(--info);">"email"</span><span style="color:var(--text-muted);">:</span> <span style="color:var(--accent);">"user@example.com"</span><span style="color:var(--text-muted);">,</span><br>
+&nbsp;&nbsp;<span style="color:var(--info);">"password"</span><span style="color:var(--text-muted);">:</span> <span style="color:var(--accent);">"secret123"</span><br>
+<span style="color:var(--text-muted);">}</span>
+        </div>
+
+        <div class="text-xs font-bold text-muted mb-2 mt-4">RESPONSE 200</div>
+        <div style="background:var(--bg-tertiary);padding:16px;font-family:'Fira Code',monospace;font-size:13px;line-height:1.6;overflow-x:auto;">
+<span style="color:var(--text-muted);">{</span><br>
+&nbsp;&nbsp;<span style="color:var(--info);">"accessToken"</span><span style="color:var(--text-muted);">:</span> <span style="color:var(--accent);">"eyJhbG..."</span><span style="color:var(--text-muted);">,</span><br>
+&nbsp;&nbsp;<span style="color:var(--info);">"refreshToken"</span><span style="color:var(--text-muted);">:</span> <span style="color:var(--accent);">"dGhpcyB..."</span><span style="color:var(--text-muted);">,</span><br>
+&nbsp;&nbsp;<span style="color:var(--info);">"user"</span><span style="color:var(--text-muted);">: {</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--info);">"id"</span><span style="color:var(--text-muted);">:</span> <span style="color:var(--warning);">"usr_abc123"</span><span style="color:var(--text-muted);">,</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--info);">"email"</span><span style="color:var(--text-muted);">:</span> <span style="color:var(--accent);">"user@example.com"</span><span style="color:var(--text-muted);">,</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--info);">"name"</span><span style="color:var(--text-muted);">:</span> <span style="color:var(--accent);">"Иван Иванов"</span><br>
+&nbsp;&nbsp;<span style="color:var(--text-muted);">}</span><br>
+<span style="color:var(--text-muted);">}</span>
+        </div>
+
+        <div class="flex gap-2 mt-4">
+          <button class="btn btn--sm btn--primary">Попробовать</button>
+          <button class="btn btn--sm btn--secondary">Копировать curl</button>
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div class="section-title">💬 Сообщения</div>
+      <div class="card mb-4">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="chip" style="background:var(--info);color:#fff;">GET</span>
+          <code style="font-family:'Fira Code',monospace;font-size:14px;color:var(--text-primary);">/messages?chatId=:id&limit=50&before=:msgId</code>
+        </div>
+        <p class="card__body mb-4">Получить сообщения чата с пагинацией. Поддерживает cursor-based pagination через параметр <code style="color:var(--accent);">before</code>.</p>
+
+        <div class="text-xs font-bold text-muted mb-2">QUERY PARAMETERS</div>
+        <table class="table mb-4">
+          <thead><tr><th>Параметр</th><th>Тип</th><th>Обяз.</th><th>Описание</th></tr></thead>
+          <tbody>
+            <tr><td><code>chatId</code></td><td>string</td><td>✅</td><td>ID чата</td></tr>
+            <tr><td><code>limit</code></td><td>number</td><td>❌</td><td>Лимит (по умолч. 50, макс. 200)</td></tr>
+            <tr><td><code>before</code></td><td>string</td><td>❌</td><td>ID сообщения для пагинации</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- WebSocket -->
+      <div class="section-title">🔌 WebSocket Events</div>
+      <div class="card mb-4">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="chip chip--info">WS</span>
+          <code style="font-family:'Fira Code',monospace;font-size:14px;color:var(--text-primary);">wss://balloo.su/ws</code>
+        </div>
+        <p class="card__body mb-4">Постоянное соединение для realtime-обновлений. Авторизация через query-параметр <code style="color:var(--accent);">?token=</code>.</p>
+
+        <div class="text-xs font-bold text-muted mb-2">CLIENT → SERVER</div>
+        <table class="table mb-4">
+          <thead><tr><th>Event</th><th>Payload</th><th>Описание</th></tr></thead>
+          <tbody>
+            <tr><td><code>message:send</code></td><td>{ chatId, text, attachments? }</td><td>Отправить сообщение</td></tr>
+            <tr><td><code>typing:start</code></td><td>{ chatId }</td><td>Начал печатать</td></tr>
+            <tr><td><code>typing:stop</code></td><td>{ chatId }</td><td>Перестал печатать</td></tr>
+            <tr><td><code>presence:update</code></td><td>{ status }</td><td>Обновить статус</td></tr>
+            <tr><td><code>reaction:add</code></td><td>{ msgId, emoji }</td><td>Добавить реакцию</td></tr>
+          </tbody>
+        </table>
+
+        <div class="text-xs font-bold text-muted mb-2">SERVER → CLIENT</div>
+        <table class="table">
+          <thead><tr><th>Event</th><th>Payload</th><th>Описание</th></tr></thead>
+          <tbody>
+            <tr><td><code>message:new</code></td><td>{ id, chatId, author, text, ... }</td><td>Новое сообщение</td></tr>
+            <tr><td><code>message:edit</code></td><td>{ id, text, editedAt }</td><td>Сообщение изменено</td></tr>
+            <tr><td><code>message:delete</code></td><td>{ id }</td><td>Сообщение удалено</td></tr>
+            <tr><td><code>presence:update</code></td><td>{ userId, status }</td><td>Статус пользователя</td></tr>
+            <tr><td><code>call:incoming</code></td><td>{ callId, caller, type }</td><td>Входящий звонок</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Error codes -->
+      <div class="section-title">⚠️ Коды ошибок</div>
+      <div class="card">
+        <table class="table">
+          <thead><tr><th>Код</th><th>Описание</th></tr></thead>
+          <tbody>
+            <tr><td><span class="chip chip--danger">400</span></td><td>Bad Request — невалидные данные</td></tr>
+            <tr><td><span class="chip chip--danger">401</span></td><td>Unauthorized — нет/невалидный токен</td></tr>
+            <tr><td><span class="chip chip--danger">403</span></td><td>Forbidden — нет прав</td></tr>
+            <tr><td><span class="chip chip--danger">404</span></td><td>Not Found — ресурс не найден</td></tr>
+            <tr><td><span class="chip chip--warning">429</span></td><td>Too Many Requests — rate limit</td></tr>
+            <tr><td><span class="chip chip--danger">500</span></td><td>Internal Server Error</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

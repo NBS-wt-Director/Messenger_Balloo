@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo — Вход</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+
+<div class="window-frame">
+  <div class="titlebar">
+    <div class="titlebar__left">
+      <div class="titlebar__icon">B</div>
+      <span class="titlebar__title">Balloo Messenger — Вход</span>
+    </div>
+    <div class="titlebar__menu">
+      <div class="titlebar__menu-item">Файл</div>
+      <div class="titlebar__menu-item">Правка</div>
+      <div class="titlebar__menu-item">Вид</div>
+      <div class="titlebar__menu-item">Окно</div>
+      <div class="titlebar__menu-item">Справка</div>
+    </div>
+    <div class="titlebar__controls">
+      <div class="titlebar__btn" title="Свернуть">─</div>
+      <div class="titlebar__btn" title="Развернуть">▢</div>
+      <div class="titlebar__btn titlebar__btn--close" title="Закрыть">✕</div>
+    </div>
+  </div>
+
+  <div class="window-body" style="display:flex;align-items:center;justify-content:center;">
+    <div class="auth-card" style="width:100%;max-width:420px;">
+      <div class="text-center mb-6">
+        <div style="font-size:48px;">🦊</div>
+        <h1 class="auth-title">С возвращением!</h1>
+        <p class="auth-subtitle">Войдите в свой аккаунт Balloo</p>
+      </div>
+
+      <!-- OAuth -->
+      <div class="auth-oauth">
+        <button class="auth-oauth-btn">
+          <span style="color:#fc3f1d;">Y</span> Войти через Яндекс
+        </button>
+        <button class="auth-oauth-btn">
+          <span style="color:#005ff9;">@</span> Войти через Mail.ru
+        </button>
+        <button class="auth-oauth-btn">
+          <span style="color:#ffcc00;">R</span> Войти через Rambler
+        </button>
+      </div>
+
+      <div class="auth-divider">или</div>
+
+      <!-- Email form -->
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-input" placeholder="ivan@example.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Пароль</label>
+        <input type="password" class="form-input" placeholder="••••••••">
+        <div style="text-align:right;margin-top:4px;"><a href="password-reset.html" style="color:var(--accent);font-size:13px;">Забыли пароль?</a></div>
+      </div>
+
+      <button class="btn btn--primary btn--block mb-4">Войти</button>
+
+      <div class="divider"></div>
+
+      <!-- Login via QR -->
+      <div class="text-center mb-4">
+        <p class="text-sm text-secondary mb-3">Уже вошли на другом устройстве?</p>
+        <button class="btn btn--secondary btn--block" onclick="window.location.href='add-device.html'">
+          📱 Войти через другое устройство (QR)
+        </button>
+        <p class="text-xs text-muted mt-2">Отсканируйте QR-код с экрана авторизованного устройства</p>
+      </div>
+
+      <div class="divider"></div>
+
+      <p class="text-center text-sm text-secondary">
+        Нет аккаунта? <a href="register.html" class="text-accent">Зарегистрироваться</a>
+      </p>
+
+      <div class="divider"></div>
+      <p class="text-center text-xs text-muted">
+        v2: Вход через Госуслуги и SMS-код (3 цифры)
+      </p>
+    </div>
+  </div>
+
+  <div class="statusbar">
+    <div><span class="status-dot status-dot--online"></span> Подключено · WebSocket</div>
+    <div class="statusbar__sep">🔒 E2E · 💾 Кэш: 124 МБ · v1.0.0-beta</div>
+  </div>
+</div>
+
+<!-- Modal: reCAPTCHA -->
+<div class="modal-overlay" id="modal-overlay"></div>
+<div class="modal modal--status-info" id="modal-recaptcha">
+  <div class="modal__header">
+    <span class="modal__title">Проверка reCAPTCHA</span>
+    <div class="modal__close" onclick="closeModal('modal-recaptcha')">✕</div>
+  </div>
+  <div class="modal__body">
+    <div class="card">
+      <p class="text-center mb-4">🤖 Подтвердите, что вы не робот</p>
+      <div class="flex items-center gap-3 justify-center">
+        <input type="checkbox" id="recaptcha-check" class="form-checkbox" style="width:24px;height:24px;">
+        <label for="recaptcha-check">Я не робот</label>
+      </div>
+    </div>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--primary" onclick="closeModal('modal-recaptcha')">Подтвердить</button>
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+
+</body>
+</html>

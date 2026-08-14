@@ -1,0 +1,197 @@
+/* ===== Balloo Themes ===== */
+/* Эталон: ticket-68-themes-demo.html / mockups/assets/common.css */
+/* Тикет #68 — фиксация тем оформления v2 */
+
+/* --- Dark Theme (default) --- */
+/* Чистый чёрный фон, высокий контраст текста */
+[data-theme='dark'] {
+  --bg-primary: #000000;
+  --bg-secondary: #0a0d11;
+  --bg-tertiary: #14191f;
+  --bg-glass: rgba(30, 36, 44, 0.65);
+  --bg-glass-hover: rgba(40, 48, 58, 0.75);
+  --bg-hover: #252d36;
+  --bg-active: #2d3742;
+  --border-color: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.15);
+  --text-primary: #f2f5f8;
+  --text-secondary: #aeb8c4;
+  --text-muted: #727f8d;
+  --accent: #2db84d;
+  --accent-hover: #34d05f;
+  --accent-text: #ffffff;
+  --danger: #e3422d;
+  --danger-bg: rgba(227, 66, 45, 0.12);
+  --warning: #e8a317;
+  --info: #3b9eff;
+  --shadow: 0 4px 24px rgba(0, 0, 0, 0.55);
+  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.35);
+  --blur: 16px;
+
+  /* Legacy (для обратной совместимости) */
+  --bg-overlay: rgba(0, 0, 0, 0.6);
+  --bubble-sender: #2db84d;
+  --bubble-sender-text: #ffffff;
+  --bubble-receiver: #14191f;
+  --bubble-receiver-text: #f2f5f8;
+  --success: #2db84d;
+  --glass-bg: rgba(30, 36, 44, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.55);
+  --sidebar-width: 280px;
+  --topbar-height: 56px;
+  --input-bg: #14191f;
+  --scrollbar-thumb: rgba(255, 255, 255, 0.15);
+  --scrollbar-track: transparent;
+  --status-online: #2db84d;
+  --status-offline: #727f8d;
+  --status-busy: #e3422d;
+  --status-away: #e8a317;
+  --octagon-clip: polygon(
+    30% 0%, 70% 0%,
+    100% 30%, 100% 70%,
+    70% 100%, 30% 100%,
+    0% 70%, 0% 30%
+  );
+  --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-secondary: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* --- Light Theme --- */
+/* Светлый, минималистичный */
+[data-theme='light'] {
+  --bg-primary: #f5f7fa;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #eef1f5;
+  --bg-glass: rgba(255, 255, 255, 0.72);
+  --bg-glass-hover: rgba(255, 255, 255, 0.85);
+  --bg-hover: #e8edf2;
+  --bg-active: #dde4ec;
+  --border-color: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.15);
+  --text-primary: #1a1d21;
+  --text-secondary: #5a6573;
+  --text-muted: #939eab;
+  --accent: #1e9e3e;
+  --accent-hover: #25b350;
+  --accent-text: #ffffff;
+  --danger: #d32f2f;
+  --danger-bg: rgba(211, 47, 47, 0.08);
+  --warning: #f57c00;
+  --info: #1976d2;
+  --shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.08);
+  --blur: 16px;
+
+  /* Legacy */
+  --bg-overlay: rgba(0, 0, 0, 0.4);
+  --bubble-sender: #1e9e3e;
+  --bubble-sender-text: #ffffff;
+  --bubble-receiver: #eef1f5;
+  --bubble-receiver-text: #1a1d21;
+  --success: #1e9e3e;
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --sidebar-width: 280px;
+  --topbar-height: 56px;
+  --input-bg: #eef1f5;
+  --scrollbar-thumb: rgba(0, 0, 0, 0.2);
+  --scrollbar-track: transparent;
+  --status-online: #1e9e3e;
+  --status-offline: #939eab;
+  --status-busy: #d32f2f;
+  --status-away: #f57c00;
+  --octagon-clip: polygon(
+    30% 0%, 70% 0%,
+    100% 30%, 100% 70%,
+    70% 100%, 30% 100%,
+    0% 70%, 0% 30%
+  );
+  --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-secondary: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* --- Russian Theme --- */
+/* Тёмная тема с флагом РФ (градиент 45°) + драгметаллы (золото, серебро, платина) */
+[data-theme='russian'] {
+  --bg-primary: #0a0c10;
+  --bg-secondary: #141821;
+  --bg-tertiary: #1c2230;
+  --bg-glass: rgba(28, 34, 48, 0.72);
+  --bg-glass-hover: rgba(38, 46, 64, 0.82);
+  --bg-hover: #283042;
+  --bg-active: #323c52;
+  --border-color: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 215, 0, 0.30);
+  --text-primary: #f4f0e8;
+  --text-secondary: #b0b8c8;
+  --text-muted: #727c90;
+  --accent: #c9a227;
+  --accent-hover: #e0b830;
+  --accent-text: #1a1d21;
+  --danger: #c62828;
+  --danger-bg: rgba(198, 40, 40, 0.15);
+  --warning: #ffb300;
+  --info: #1565c0;
+  --shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.45);
+  --blur: 18px;
+
+  /* Цвета флага РФ */
+  --russian-white: #ffffff;
+  --russian-blue: #0039a6;
+  --russian-red: #d52b1e;
+
+  /* Драгметаллы */
+  --gold: #d4af37;
+  --silver: #c0c0c0;
+  --platinum: #e5e4e2;
+
+  /* Legacy */
+  --bg-overlay: rgba(0, 0, 0, 0.6);
+  --bubble-sender: #c9a227;
+  --bubble-sender-text: #1a1d21;
+  --bubble-receiver: #1c2230;
+  --bubble-receiver-text: #f4f0e8;
+  --success: #c9a227;
+  --glass-bg: rgba(28, 34, 48, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --sidebar-width: 280px;
+  --topbar-height: 56px;
+  --input-bg: #1c2230;
+  --scrollbar-thumb: rgba(255, 255, 255, 0.15);
+  --scrollbar-track: transparent;
+  --status-online: #c9a227;
+  --status-offline: #727c90;
+  --status-busy: #c62828;
+  --status-away: #ffb300;
+  --octagon-clip: polygon(
+    30% 0%, 70% 0%,
+    100% 30%, 100% 70%,
+    70% 100%, 30% 100%,
+    0% 70%, 0% 30%
+  );
+  --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-secondary: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Russian theme: 45° flag-colour gradient as page backdrop (darkened for readability) */
+[data-theme='russian'] body {
+  background:
+    linear-gradient(45deg,
+      rgba(255, 255, 255, 0.22) 0%,
+      rgba(0, 57, 166, 0.38) 50%,
+      rgba(213, 43, 30, 0.42) 100%),
+    var(--bg-primary);
+}

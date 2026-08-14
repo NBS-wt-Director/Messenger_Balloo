@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Command — Мониторинг</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    .chart-placeholder { height: 200px; background: var(--bg-tertiary); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 13px; }
+    .metric-card { background: var(--bg-glass); backdrop-filter: blur(var(--blur)); border: 1px solid var(--border-color); padding: 16px; }
+    .metric-card__value { font-size: 24px; font-weight: 800; color: var(--text-primary); }
+    .metric-card__label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--info);">C</div><span>Command</span>
+    <div class="topbar__dropdown"><div class="topbar__dropdown-item">🏢 Command (текущий)</div><div class="topbar__dropdown-divider"></div><div class="topbar__dropdown-item">💬 Balloo</div><div class="topbar__dropdown-item">🛡️ Admin</div><div class="topbar__dropdown-item">💡 Features</div><div class="topbar__dropdown-item">📜 History</div><div class="topbar__dropdown-item">⬇️ Download</div><div class="topbar__dropdown-item">📚 API Docs</div></div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Мониторинг продукта</div>
+  <div class="topbar__actions"><div class="topbar__actions-btn" title="Обновить" onclick="window.location.reload()">↻</div></div>
+  <div class="topbar__right"><div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИВ</span></div></div><span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span><span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span></div>
+</div>
+<div class="main">
+  <div class="sidebar sidebar--narrow">
+    <div class="list">
+      <div class="list__item">🏠 Дашборд</div>
+      <div class="list__item">💬 Внутренний чат</div>
+      <div class="list__item">📅 Совещания</div>
+      <div class="list__item">📋 Задачи</div>
+      <div class="list__item">🏢 Мой отдел</div>
+      <div class="list__item">🏛️ Подразделения</div>
+      <div class="list__item">👥 HR</div>
+      <div class="list__item">📚 База знаний</div>
+      <div class="list__item">🎯 Найм</div>
+      <div class="list__item list__item--active">📊 Мониторинг</div>
+      <div class="list__item" style="border-top:1px solid var(--border-color);margin-top:8px;padding-top:12px;">💼 Вакансии</div>
+      <div class="list__item">⭐ Почему мы</div>
+    </div>
+  </div>
+  <div class="content overflow-y-auto"><div class="page-container">
+    <h1 class="page-title">Мониторинг продукта</h1>
+    <p class="page-subtitle">Дашборды в реальном времени • Prometheus • Grafana</p>
+
+    <div class="flex gap-4 mb-6" style="flex-wrap:wrap;">
+      <div class="metric-card flex-1" style="min-width:150px;">
+        <div class="metric-card__value text-accent">●</div>
+        <div class="metric-card__label">Статус системы</div>
+        <div class="text-xs mt-2" style="color:var(--accent);">Все сервисы активны</div>
+      </div>
+      <div class="metric-card flex-1" style="min-width:150px;"><div class="metric-card__value">99.7%</div><div class="metric-card__label">Uptime</div></div>
+      <div class="metric-card flex-1" style="min-width:150px;"><div class="metric-card__value">45ms</div><div class="metric-card__label">Avg Latency</div></div>
+      <div class="metric-card flex-1" style="min-width:150px;"><div class="metric-card__value">2.4k</div><div class="metric-card__label">RPS</div></div>
+    </div>
+
+    <div class="card mb-4">
+      <h3 class="card__title mb-4">Активные пользователи (Realtime)</h3>
+      <div class="chart-placeholder">📊 DAU/MAU график • WebSocket: 1,023 подключений</div>
+    </div>
+
+    <div class="flex gap-4 mb-4" style="flex-wrap:wrap;">
+      <!-- Total resources -->
+      <div class="card flex-1" style="min-width:200px;">
+        <h3 class="card__title mb-4">📊 Суммарные ресурсы</h3>
+        <div class="mb-2"><div class="flex justify-between text-xs mb-2"><span>CPU (все серверы)</span><span>58%</span></div><div style="height:8px;background:var(--bg-tertiary);"><div style="width:58%;height:100%;background:var(--accent);"></div></div></div>
+        <div class="mb-2"><div class="flex justify-between text-xs mb-2"><span>RAM (все серверы)</span><span>71%</span></div><div style="height:8px;background:var(--bg-tertiary);"><div style="width:71%;height:100%;background:var(--warning);"></div></div></div>
+        <div class="mb-2"><div class="flex justify-between text-xs mb-2"><span>DISK (все серверы)</span><span>52%</span></div><div style="height:8px;background:var(--bg-tertiary);"><div style="width:52%;height:100%;background:var(--accent);"></div></div></div>
+        <div class="text-xs text-muted mt-2">4 сервера · 2 серверные</div>
+      </div>
+      <div class="card flex-1" style="min-width:200px;">
+        <h3 class="card__title mb-4">Сервисы</h3>
+        <div class="list__item" style="border:none;"><span class="status-dot status-dot--online"></span><span class="flex-1 text-sm">api.balloo.su</span><span class="chip chip--accent">OK</span></div>
+        <div class="list__item" style="border:none;"><span class="status-dot status-dot--online"></span><span class="flex-1 text-sm">ws.balloo.su</span><span class="chip chip--accent">OK</span></div>
+        <div class="list__item" style="border:none;"><span class="status-dot status-dot--online"></span><span class="flex-1 text-sm">postgres:9187</span><span class="chip chip--accent">OK</span></div>
+        <div class="list__item" style="border:none;"><span class="status-dot status-dot--online"></span><span class="flex-1 text-sm">redis:6379</span><span class="chip chip--accent">OK</span></div>
+        <div class="list__item" style="border:none;"><span class="status-dot status-dot--busy"></span><span class="flex-1 text-sm">minio:9000</span><span class="chip chip--danger">HIGH</span></div>
+      </div>
+    </div>
+
+    <!-- Server resources detail -->
+    <div class="card mb-4">
+      <h3 class="card__title mb-4">🖥️ Ресурсы серверов</h3>
+      <table class="table">
+        <thead><tr><th>Сервер</th><th>Серверная</th><th>CPU</th><th>RAM</th><th>Disk</th><th>Статус</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>api-server-01</strong></td>
+            <td class="text-sm text-secondary">МСК-1 · Корпус А</td>
+            <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:60px;height:6px;background:var(--bg-tertiary);"><div style="width:45%;height:100%;background:var(--accent);"></div></div><span class="text-xs">45%</span></div></td>
+            <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:60px;height:6px;background:var(--bg-tertiary);"><div style="width:60%;height:100%;background:var(--accent);"></div></div><span class="text-xs">60%</span></div></td>
+            <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:60px;height:6px;background:var(--bg-tertiary);"><div style="width:35%;height:100%;background:var(--accent);"></div></div><span class="text-xs">35%</span></div></td>
+            <td><span class="chip chip--accent">OK</span></td>
+          </tr>
+          <tr>
+            <td><strong>ws-server-01</strong></td>
+            <td class="text-sm text-secondary">МСК-1 · Корпус А</td>
+            <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:60px;height:6px;background:var(--bg-tertiary);"><div style="width:82%;height:100%;background:var(--warning);"></div></div><span class="text-xs">82%</span></div></td>
+            <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:60px;height:6px;background:var(--bg-tertiary);"><div style="width:85%;height:100%;background:var(--warning);"></div></div><span class="text-xs">85%</span></div></td>
+            <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:60px;height:6px;background:var(--bg-tertiary);"><div style="width:40%;height:100%;background:var(--accent);"></div></div><span class="text-xs">40%</span></div></td>
+            <td><span class="chip chip--warning">Нагрузка</span></td>
+          </tr>
+          <tr>
+            <td><strong>db-server-01</strong></td>
+            <td class="text-sm text-secondary">МСК-2 · Корпус Б</td>
+            <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:60px;height:6px;background:var(--bg-tertiary);"><div style="width:30%;height:100%;background:var(--accent);"></div></div><span class="text-xs">30%</span></div></td>
+            <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:60px;height:6px;background:var(--bg-tertiary);"><div style="width:75%;height:100%;background:var(--warning);"></div></div><span class="text-xs">75%</span></div></td>
+            <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:60px;height:6px;background:var(--bg-tertiary);"><div style="width:68%;height:100%;background:var(--accent);"></div></div><span class="text-xs">68%</span></div></td>
+            <td><span class="chip chip--accent">OK</span></td>
+          </tr>
+          <tr>
+            <td><strong>storage-01</strong></td>
+            <td class="text-sm text-secondary">МСК-2 · Корпус Б</td>
+            <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:60px;height:6px;background:var(--bg-tertiary);"><div style="width:20%;height:100%;background:var(--accent);"></div></div><span class="text-xs">20%</span></div></td>
+            <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:60px;height:6px;background:var(--bg-tertiary);"><div style="width:40%;height:100%;background:var(--accent);"></div></div><span class="text-xs">40%</span></div></td>
+            <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:60px;height:6px;background:var(--bg-tertiary);"><div style="width:78%;height:100%;background:var(--danger);"></div></div><span class="text-xs">78%</span></div></td>
+            <td><span class="chip chip--danger">Почти полон</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Active gateways -->
+    <div class="card mb-4">
+      <h3 class="card__title mb-4">🔗 Активные ворота в сеть</h3>
+      <table class="table">
+        <thead><tr><th>Тип</th><th>Назначение</th><th>IP</th><th>Время подключения</th><th>Статус</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="chip">VPN</span></td>
+            <td class="text-sm text-secondary">SSH туннель к db-server</td>
+            <td class="text-xs" style="font-family:monospace;">10.0.1.42 → 10.0.2.10</td>
+            <td class="text-xs">2ч 15м</td>
+            <td><span class="chip chip--accent">Активен</span></td>
+          </tr>
+          <tr>
+            <td><span class="chip">VPN</span></td>
+            <td class="text-sm text-secondary">Связь МСК-1 ↔ МСК-2</td>
+            <td class="text-xs" style="font-family:monospace;">10.0.1.1 → 10.0.2.1</td>
+            <td class="text-xs">5д 12ч</td>
+            <td><span class="chip chip--accent">Активен</span></td>
+          </tr>
+          <tr>
+            <td><span class="chip chip--info">Proxy</span></td>
+            <td class="text-sm text-secondary">Reverse proxy (Nginx)</td>
+            <td class="text-xs" style="font-family:monospace;">0.0.0.0:443</td>
+            <td class="text-xs">12д 8ч</td>
+            <td><span class="chip chip--accent">Активен</span></td>
+          </tr>
+          <tr>
+            <td><span class="chip">VPN</span></td>
+            <td class="text-sm text-secondary">Администратор — удалённый доступ</td>
+            <td class="text-xs" style="font-family:monospace;">192.168.1.100 → 10.0.1.1</td>
+            <td class="text-xs">45м</td>
+            <td><span class="chip chip--accent">Активен</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3 class="card__title mb-4">Алерты (последние 24ч)</h3>
+      <div class="list__item" style="border:none;"><span class="status-dot status-dot--busy"></span><span class="flex-1"><strong style="color:var(--danger);">High CPU load</strong> — ws.balloo.su exceeded 90%</span><span class="text-xs text-muted">14:32</span><button class="btn btn--tertiary btn--sm">Ack</button></div>
+      <div class="list__item" style="border:none;"><span class="status-dot status-dot--busy"></span><span class="flex-1"><strong style="color:var(--danger);">MinIO high usage</strong> — 78% of 2TB bucket</span><span class="text-xs text-muted">13:15</span><button class="btn btn--tertiary btn--sm">Ack</button></div>
+      <div class="list__item" style="border:none;"><span class="status-dot status-dot--dnd"></span><span class="flex-1"><strong style="color:var(--warning);">Slow query</strong> — DB query > 500ms</span><span class="text-xs text-muted">12:00</span><button class="btn btn--tertiary btn--sm">Ack</button></div>
+      <div class="list__item" style="border:none;"><span class="status-dot status-dot--online"></span><span class="flex-1"><strong style="color:var(--accent);">Backup completed</strong> — 2.4GB to MinIO</span><span class="text-xs text-muted">00:00</span><button class="btn btn--tertiary btn--sm">Ack</button></div>
+    </div>
+  </div></div>
+</div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

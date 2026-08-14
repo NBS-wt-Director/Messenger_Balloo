@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo — Создать интерактив</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    html { overflow-y: auto; height: auto; }
+    body { overflow-y: auto; height: auto; min-height: 100vh; background: var(--bg-primary); padding: 0; }
+    .window-frame { max-width: 900px; margin: 24px auto; background: var(--bg-secondary); border: 1px solid var(--border-strong); box-shadow: var(--shadow-glass); display: flex; flex-direction: column; overflow: hidden; }
+    .window-body { height: 600px; display: flex; flex-direction: column; overflow: hidden; }
+    .window-sidebar { width: 240px; min-width: 240px; border-right: 1px solid var(--border-color); overflow-y: auto; background: var(--bg-tertiary); display: flex; flex-direction: column; }
+    .window-content { flex: 1; overflow-y: auto; padding: 20px; }
+    .statusbar { height: 28px; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; background: var(--bg-tertiary); border-top: 1px solid var(--border-color); font-size: 11px; color: var(--text-secondary); }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; vertical-align: middle; }
+    .status-dot--online { background: var(--accent); }
+    .statusbar__sep { margin-left: 16px; }
+    .poll-tabs { display:flex; gap:4px; border-bottom:2px solid var(--border-color); padding-bottom:0; margin-bottom:16px; overflow-x:auto; }
+    .poll-tab { padding:8px 14px; font-size:12px; font-weight:600; color:var(--text-secondary); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-2px; white-space:nowrap; transition:all 0.15s; }
+    .poll-tab:hover { color:var(--text-primary); }
+    .poll-tab--active { color:var(--accent); border-bottom-color:var(--accent); }
+    .sidebar-section { padding: 10px 12px; border-bottom: 1px solid var(--border-color); }
+    .sidebar-section-title { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; padding: 4px 0 8px; }
+    .sidebar-nav-item { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 6px; cursor: pointer; color: var(--text-secondary); font-size: 13px; text-decoration: none; transition: all 0.15s; }
+    .sidebar-nav-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+    .sidebar-nav-item--active { background: rgba(45,184,77,0.1); color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar__logo">
+    <div class="topbar__logo-icon">B</div>
+    <span>Balloo</span>
+    <div class="topbar__dropdown">
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/index.html'">💬 Balloo</div>
+      <div class="topbar__dropdown-divider"></div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div>
+      <div class="topbar__dropdown-divider"></div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/contacts.html'">👤 Контакты</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/search.html'">🔍 Поиск</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/archive.html'">📦 Архив</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/calls.html'">📞 Звонки</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/invites.html'">📨 Приглашения</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/bots.html'">🤖 О ботах</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/about-balloo.html'">ℹ️ О Balloo</div>
+    </div>
+  </div>
+  <div class="topbar__title">Создать опрос</div>
+  <div class="topbar__right">
+    <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact" onclick="window.location.href='../balloo-su/profile.html'">
+      <div class="avatar__inner"><span>ИИ</span></div>
+    </div>
+    <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+    <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+  </div>
+</div>
+
+<div class="window-frame">
+  <div class="titlebar">
+    <div class="titlebar__left">
+      <div class="titlebar__icon">B</div>
+      <span class="titlebar__title">Balloo Messenger — Создать опрос</span>
+    </div>
+    <div class="titlebar__menu">
+      <div class="titlebar__menu-item" onclick="window.location.href='chat.html'">Чаты</div>
+      <div class="titlebar__menu-item" onclick="window.location.href='stories.html'">Сторис</div>
+      <div class="titlebar__menu-item" onclick="window.location.href='contacts.html'">Контакты</div>
+      <div class="titlebar__menu-item" onclick="window.location.href='poll-editor.html'" style="color:var(--accent);">Опросы</div>
+      <div class="titlebar__menu-item" onclick="window.location.href='archive.html'">Архив</div>
+      <div class="titlebar__menu-item" onclick="window.location.href='calls-history.html'">Звонки</div>
+    </div>
+    <div class="titlebar__controls">
+      <div class="titlebar__btn" title="Свернуть">─</div>
+      <div class="titlebar__btn" title="Развернуть">▢</div>
+      <div class="titlebar__btn titlebar__btn--close" title="Закрыть">✕</div>
+    </div>
+  </div>
+
+  <div class="window-body">
+    <div class="window-sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">Типы интерактивов</div>
+        <div class="sidebar-nav-item sidebar-nav-item--active" data-type="poll" onclick="selectPollType(this,'poll')">📊 Опрос</div>
+        <div class="sidebar-nav-item" data-type="quiz" onclick="selectPollType(this,'quiz')">🎯 Квиз</div>
+        <div class="sidebar-nav-item" data-type="active_list" onclick="selectPollType(this,'active_list')">✅ Актив. список</div>
+        <div class="sidebar-nav-item" data-type="passive_list" onclick="selectPollType(this,'passive_list')">📋 Пассив. список</div>
+        <div class="sidebar-nav-item" data-type="personali" onclick="selectPollType(this,'personali')">👤 Персонали</div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">Быстрые ссылки</div>
+        <div class="sidebar-nav-item" onclick="window.location.href='chat.html'">💬 Вернуться в чат</div>
+        <div class="sidebar-nav-item" onclick="window.location.href='group-create.html'">👥 Создать группу</div>
+      </div>
+    </div>
+
+    <div class="window-content">
+      <div style="max-width:520px;margin:0 auto;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <span class="font-bold" style="font-size:18px;color:var(--text-primary);">📊 Создать интерактив</span>
+          <div class="topbar__actions-btn" onclick="window.location.href='chat.html'">✕</div>
+        </div>
+
+        <div class="poll-tabs">
+          <div class="poll-tab poll-tab--active" data-type="poll" onclick="selectPollType(this,'poll')">📊 Опрос</div>
+          <div class="poll-tab" data-type="quiz" onclick="selectPollType(this,'quiz')">🎯 Квиз</div>
+          <div class="poll-tab" data-type="active_list" onclick="selectPollType(this,'active_list')">✅ Актив. список</div>
+          <div class="poll-tab" data-type="passive_list" onclick="selectPollType(this,'passive_list')">📋 Пассив. список</div>
+          <div class="poll-tab" data-type="personali" onclick="selectPollType(this,'personali')">👤 Персонали</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Вопрос / заголовок</label>
+          <input type="text" class="form-input" placeholder="Введите вопрос..." value="Какой цвет для акцента?">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Варианты ответа</label>
+          <div id="options-list">
+            <div style="display:flex;gap:8px;margin-bottom:8px;">
+              <input type="text" class="form-input" placeholder="Вариант 1" value="Зелёный" style="flex:1;">
+              <button class="btn btn--tertiary btn--sm" title="Удалить" onclick="this.closest('div[style]').remove()">🗑</button>
+            </div>
+            <div style="display:flex;gap:8px;margin-bottom:8px;">
+              <input type="text" class="form-input" placeholder="Вариант 2" value="Мятный" style="flex:1;">
+              <button class="btn btn--tertiary btn--sm" title="Удалить" onclick="this.closest('div[style]').remove()">🗑</button>
+            </div>
+            <div style="display:flex;gap:8px;margin-bottom:8px;">
+              <input type="text" class="form-input" placeholder="Вариант 3" value="Бирюзовый" style="flex:1;">
+              <button class="btn btn--tertiary btn--sm" title="Удалить" onclick="this.closest('div[style]').remove()">🗑</button>
+            </div>
+          </div>
+          <button class="btn btn--tertiary btn--sm mt-2" onclick="addOption()">+ Добавить вариант</button>
+        </div>
+
+        <div class="form-group" id="quiz-correct" style="display:none;">
+          <label class="form-label">Правильный ответ (квиз)</label>
+          <select class="form-select">
+            <option>Зелёный</option><option>Мятный</option><option>Бирюзовый</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-checkbox"><input type="checkbox" checked><span>Анонимное голосование</span></label>
+        </div>
+        <div class="form-group">
+          <label class="form-checkbox"><input type="checkbox"><span>Множественный выбор</span></label>
+        </div>
+        <div class="form-group">
+          <label class="form-checkbox"><input type="checkbox" checked><span>Можно переслать</span></label>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Срок действия</label>
+          <select class="form-select">
+            <option>24 часа</option><option>12 часов</option><option>1 час</option><option>Без ограничений</option>
+          </select>
+        </div>
+
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px;">
+          <button class="btn btn--tertiary" onclick="window.location.href='chat.html'">Отмена</button>
+          <button class="btn btn--primary" onclick="window.location.href='chat.html'">Создать</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="statusbar">
+    <div><span class="status-dot status-dot--online"></span> Подключено · WebSocket</div>
+    <div class="statusbar__sep">💾 Кэш: 124 МБ · v1.0.0-beta</div>
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+<script>
+function selectPollType(el, type) {
+  document.querySelectorAll('.poll-tab[data-type]').forEach(t => t.classList.remove('poll-tab--active'));
+  el.classList.add('poll-tab--active');
+  document.querySelectorAll('.sidebar-nav-item[data-type]').forEach(t => {
+    t.classList.toggle('sidebar-nav-item--active', t.dataset.type === type);
+  });
+  document.getElementById('quiz-correct').style.display = (type === 'quiz') ? 'block' : 'none';
+}
+
+function addOption() {
+  const list = document.getElementById('options-list');
+  const count = list.children.length + 1;
+  const div = document.createElement('div');
+  div.style.cssText = 'display:flex;gap:8px;margin-bottom:8px;';
+  div.innerHTML = `<input type="text" class="form-input" placeholder="Вариант ${count}" style="flex:1;"><button class="btn btn--tertiary btn--sm" title="Удалить" onclick="this.closest('div[style]').remove()">🗑</button>`;
+  list.appendChild(div);
+}
+</script>
+</body>
+</html>

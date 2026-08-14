@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobile — Мои устройства</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    html { overflow-y: auto; height: auto; }
+    body { overflow-y: auto; height: auto; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 40px 24px; }
+    .phone-frame { width:360px; height:760px; background:var(--bg-secondary); border:3px solid var(--border-strong); border-radius:36px; overflow:hidden; position:relative; display:flex; flex-direction:column; box-shadow:var(--shadow-glass); }
+    .phone-frame__notch { position:absolute; top:0; left:50%; transform:translateX(-50%); width:130px; height:26px; background:var(--bg-primary); border-bottom-left-radius:18px; border-bottom-right-radius:18px; z-index:10; }
+    .phone-frame__statusbar { height:30px; padding:4px 20px 0; display:flex; align-items:center; justify-content:space-between; font-size:12px; color:var(--text-secondary); background:var(--bg-secondary); }
+    .phone-frame__screen { flex:1; overflow:hidden; background:var(--bg-primary); display:flex; flex-direction:column; }
+    .phone-frame__home-bar { height:5px; width:120px; margin:0 auto 8px; background:var(--text-muted); border-radius:3px; }
+    .annotation { max-width:360px; margin:0 auto 8px; padding:0 8px; font-size:12px; color:var(--text-muted); }
+    .annotation strong { color:var(--accent); }
+    .device-details { display:none;padding-top:12px;border-top:1px solid var(--border-color); }
+    .device-details.show { display:block; }
+    .meta-grid { display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px; }
+    .meta-grid div { font-size:12px; }
+    .meta-grid .text-muted { font-size:10px; }
+  </style>
+</head>
+<body>
+<div class="annotation" style="margin-top:24px;"><strong>Mobile — Мои устройства</strong> КОПИЯ WEB: balloo-su/my-devices.html</div>
+<div class="phone-frame">
+  <div class="phone-frame__notch"></div>
+  <div class="phone-frame__statusbar"><span>9:41</span><span>📶 🔋</span></div>
+  <div class="phone-frame__screen">
+    <!-- TOPBAR (обязательный) -->
+    <div class="topbar">
+      <div class="topbar__logo">
+        <div class="topbar__logo-icon">B</div><span>Balloo</span>
+        <div class="topbar__dropdown">
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/chats.html'">💬 Balloo</div>
+          <div class="topbar__dropdown-divider"></div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div>
+        </div>
+      </div>
+      <div class="topbar__title">Мои устройства</div>
+      <div class="topbar__right">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact" onclick="window.location.href='profile.html'"><div class="avatar__inner"><span>ИИ</span></div></div>
+        <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+        <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+      </div>
+    </div>
+    <!-- MY DEVICES -->
+    <div style="flex:1;overflow-y:auto;padding:16px;">
+      <h1 style="font-size:20px;font-weight:800;color:var(--text-primary);margin-bottom:16px;">📱 Мои устройства</h1>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;">Активные сессии на ваших устройствах</p>
+
+      <!-- Stats -->
+      <div class="flex gap-2 mb-4" style="flex-wrap:wrap;">
+        <div class="card flex-1" style="min-width:100px;padding:10px;"><div class="text-xs text-muted">Всего устройств</div><div style="font-size:22px;font-weight:800;color:var(--accent);">4</div></div>
+        <div class="card flex-1" style="min-width:100px;padding:10px;"><div class="text-xs text-muted">Активных сейчас</div><div style="font-size:22px;font-weight:800;color:var(--info);">2</div></div>
+        <div class="card flex-1" style="min-width:100px;padding:10px;"><div class="text-xs text-muted">Узлов</div><div style="font-size:22px;font-weight:800;color:var(--warning);">3</div></div>
+      </div>
+
+      <!-- Current device (highlighted) -->
+      <div class="card mb-3" style="border-color:var(--accent);">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="chip chip--accent">Это устройство</span>
+          <span class="chip">Сейчас активно</span>
+        </div>
+        <div class="list__item" style="border:none;padding:0;">
+          <div style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:24px;">💻</div>
+          <div class="list__item-body">
+            <div class="list__item-title">Windows Desktop</div>
+            <div class="list__item-subtitle">Москва · 192.168.1.42 · Balloo Desktop v1.0.0-beta</div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="meta-grid">
+          <div><div class="text-xs text-muted">Узлы</div><div class="text-sm">💬 balloo.su · 🖥️ desktop</div></div>
+          <div><div class="text-xs text-muted">Браузер / ОС</div><div class="text-sm">Windows 11 · Chrome 125</div></div>
+          <div><div class="text-xs text-muted">Последняя активность</div><div class="text-sm">Сейчас</div></div>
+          <div><div class="text-xs text-muted">IP-адрес</div><div class="text-sm">192.168.1.42</div></div>
+        </div>
+        <div class="flex gap-2 mt-3">
+          <button class="btn btn--secondary btn--sm" onclick="renameDevice(this)">✏ Переименовать</button>
+          <button class="btn btn--tertiary btn--sm" onclick="toggleDetails(this)">📋 Подробнее</button>
+        </div>
+        <div class="device-details" style="display:none;">
+          <div class="text-xs text-muted mb-2">Полная информация сессии</div>
+          <table class="table" style="font-size:12px;">
+            <tr><td style="width:40%;">Session ID</td><td><code>sess_a3f8e91c</code></td></tr>
+            <tr><td>Создана</td><td>16 июля 2026, 09:12</td></tr>
+            <tr><td>Истекает</td><td>17 июля 2026, 09:12</td></tr>
+            <tr><td>Access token</td><td><code>eyJhbG...xJ9</code></td></tr>
+            <tr><td>Refresh token</td><td><code>dGhpcyB...k3Q</code></td></tr>
+            <tr><td>WebSocket</td><td><code>wss://balloo.su/ws</code> · подключен</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- Other device 1 -->
+      <div class="card mb-3">
+        <div class="list__item" style="border:none;">
+          <div style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:24px;">📱</div>
+          <div class="list__item-body">
+            <div class="list__item-title">iPhone 15 Pro</div>
+            <div class="list__item-subtitle">Москва · 2 часа назад · Balloo Mobile v1.0.0-beta</div>
+          </div>
+          <div class="flex gap-1">
+            <button class="btn btn--secondary btn--sm" onclick="renameDevice(this)">✏</button>
+            <button class="btn btn--tertiary btn--sm" onclick="toggleDetails(this)">📋</button>
+            <button class="btn btn--danger btn--sm" onclick="if(confirm('Завершить сессию на iPhone 15 Pro?'))alert('Сессия завершена')">Остановить</button>
+          </div>
+        </div>
+        <div class="device-details" style="display:none;">
+          <div class="meta-grid">
+            <div><div class="text-xs text-muted">Узлы</div><div class="text-sm">💬 balloo.su · 📱 mobile</div></div>
+            <div><div class="text-xs text-muted">ОС</div><div class="text-sm">iOS 17.4 · Expo SDK 51</div></div>
+            <div><div class="text-xs text-muted">Последняя активность</div><div class="text-sm">2 часа назад</div></div>
+            <div><div class="text-xs text-muted">IP-адрес</div><div class="text-sm">85.143.x.x</div></div>
+          </div>
+          <table class="table mt-3" style="font-size:12px;">
+            <tr><td style="width:40%;">Session ID</td><td><code>sess_b7d2f04a</code></td></tr>
+            <tr><td>Создана</td><td>14 июля 2026, 18:30</td></tr>
+            <tr><td>Истекает</td><td>17 июля 2026, 18:30</td></tr>
+            <tr><td>Push token</td><td><code>ExponentPushToken[...xyz]</code></td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- Other device 2 -->
+      <div class="card mb-3">
+        <div class="list__item" style="border:none;">
+          <div style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:24px;">🌐</div>
+          <div class="list__item-body">
+            <div class="list__item-title">Chrome (Web PWA)</div>
+            <div class="list__item-subtitle">Москва · Вчера · balloo.su (PWA)</div>
+          </div>
+          <div class="flex gap-1">
+            <button class="btn btn--secondary btn--sm" onclick="renameDevice(this)">✏</button>
+            <button class="btn btn--tertiary btn--sm" onclick="toggleDetails(this)">📋</button>
+            <button class="btn btn--danger btn--sm" onclick="if(confirm('Завершить сессию Chrome?'))alert('Сессия завершена')">Остановить</button>
+          </div>
+        </div>
+        <div class="device-details" style="display:none;">
+          <div class="meta-grid">
+            <div><div class="text-xs text-muted">Узлы</div><div class="text-sm">💬 balloo.su</div></div>
+            <div><div class="text-xs text-muted">Браузер</div><div class="text-sm">Chrome 125 · macOS 14</div></div>
+            <div><div class="text-xs text-muted">Последняя активность</div><div class="text-sm">Вчера, 22:15</div></div>
+            <div><div class="text-xs text-muted">IP-адрес</div><div class="text-sm">85.143.x.x</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Other device 3 -->
+      <div class="card mb-3">
+        <div class="list__item" style="border:none;">
+          <div style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:24px;">🤖</div>
+          <div class="list__item-body">
+            <div class="list__item-title">Android (Samsung S24)</div>
+            <div class="list__item-subtitle">Санкт-Петербург · 3 дня назад · Balloo Mobile v1.0.0-beta</div>
+          </div>
+          <div class="flex gap-1">
+            <button class="btn btn--secondary btn--sm" onclick="renameDevice(this)">✏</button>
+            <button class="btn btn--tertiary btn--sm" onclick="toggleDetails(this)">📋</button>
+            <button class="btn btn--danger btn--sm" onclick="if(confirm('Завершить сессию Samsung S24?'))alert('Сессия завершена')">Остановить</button>
+          </div>
+        </div>
+        <div class="device-details" style="display:none;">
+          <div class="meta-grid">
+            <div><div class="text-xs text-muted">Узлы</div><div class="text-sm">💬 balloo.su · 📱 mobile</div></div>
+            <div><div class="text-xs text-muted">ОС</div><div class="text-sm">Android 14 · One UI 6.1</div></div>
+            <div><div class="text-xs text-muted">Последняя активность</div><div class="text-sm">13 июля, 14:20</div></div>
+            <div><div class="text-xs text-muted">IP-адрес</div><div class="text-sm">95.161.x.x</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add device -->
+      <div class="text-center mb-4">
+        <button class="btn btn--primary btn--block" onclick="window.location.href='add-device.html'">➕ Добавить устройство</button>
+      </div>
+
+      <!-- Terminate all other sessions -->
+      <div class="card" style="border-color:var(--danger);">
+        <h3 class="card__title mb-3 text-danger">Завершить все другие сессии</h3>
+        <p class="text-sm text-secondary mb-3">Выйти из всех устройств, кроме текущего. Потребуется повторный вход на каждом.</p>
+        <button class="btn btn--danger btn--block" onclick="if(confirm('Завершить все другие сессии?'))alert('Все сессии завершены')">Завершить все другие сессии</button>
+      </div>
+    </div>
+  </div>
+  <div class="phone-frame__home-bar"></div>
+</div>
+
+<script src="../assets/common.js"></script>
+<script>
+// API: GET /devices — список всех устройств/сессий
+// API: GET /devices/:id — информация об устройстве
+// API: PATCH /devices/:id — переименовать устройство
+// API: DELETE /devices/:id — завершить сессию
+// API: GET /sessions/:id — информация о сессии
+// API: DELETE /sessions/:id — завершить сессию
+// API: DELETE /sessions — завершить все другие сессии
+
+function toggleDetails(btn) {
+  var card = btn.closest('.card');
+  var details = card.querySelector('.device-details');
+  if (details) {
+    details.style.display = details.style.display === 'none' ? 'block' : 'none';
+    btn.textContent = details.style.display === 'block' ? '📋 Скрыть' : '📋 Подробнее';
+  }
+}
+
+function renameDevice(btn) {
+  var card = btn.closest('.card');
+  var title = card.querySelector('.list__item-title');
+  if (title) {
+    var newName = prompt('Новое название устройства:', title.textContent);
+    if (newName) {
+      title.textContent = newName;
+      // API: PATCH /devices/:id { name: newName }
+      alert('Устройство переименовано: ' + newName);
+    }
+  }
+}
+</script>
+</body>
+</html>

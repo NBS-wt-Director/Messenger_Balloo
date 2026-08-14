@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobile — Запись голосового</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    html { overflow-y: auto; height: auto; }
+    body { overflow-y: auto; height: auto; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 40px 24px; }
+    .phone-frame { width:360px; height:760px; background:var(--bg-secondary); border:3px solid var(--border-strong); border-radius:36px; overflow:hidden; position:relative; display:flex; flex-direction:column; box-shadow:var(--shadow-glass); }
+    .phone-frame__notch { position:absolute; top:0; left:50%; transform:translateX(-50%); width:130px; height:26px; background:var(--bg-primary); border-bottom-left-radius:18px; border-bottom-right-radius:18px; z-index:10; }
+    .phone-frame__statusbar { height:30px; padding:4px 20px 0; display:flex; align-items:center; justify-content:space-between; font-size:12px; color:var(--text-secondary); background:var(--bg-secondary); }
+    .phone-frame__screen { flex:1; overflow:hidden; background:var(--bg-primary); display:flex; flex-direction:column; }
+    .phone-frame__home-bar { height:5px; width:120px; margin:0 auto 8px; background:var(--text-muted); border-radius:3px; }
+    .phone-tabbar { display:flex; height:52px; background:var(--bg-secondary); border-top:1px solid var(--border-color); }
+    .phone-tabbar__item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; font-size:10px; color:var(--text-secondary); cursor:pointer; transition:color 0.15s; }
+    .phone-tabbar__item:hover { color:var(--text-primary); }
+    .phone-tabbar__item--active { color:var(--accent); }
+    .phone-tabbar__icon { font-size:20px; line-height:1; }
+
+    /* Voice Record Screen */
+    .voice-record-screen { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px; gap:20px; }
+    .voice-record-screen__timer { font-size:32px; font-weight:700; color:var(--text-primary); font-variant-numeric:tabular-nums; }
+    .voice-record-screen__waveform { width:100%; max-width:280px; height:80px; display:flex; align-items:center; justify-content:center; gap:3px; }
+    .voice-record-screen__bar { width:4px; background:var(--accent); border-radius:2px; transition:height 0.05s; }
+    .voice-record-screen__controls { display:flex; align-items:center; gap:32px; }
+    .voice-record-screen__btn { width:56px; height:56px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:24px; cursor:pointer; transition:all 0.15s; }
+    .voice-record-screen__btn--send { background:var(--accent); color:#fff; }
+    .voice-record-screen__btn--cancel { background:var(--bg-tertiary); color:var(--text-secondary); }
+    .voice-record-screen__btn--pause { background:var(--bg-tertiary); color:var(--text-primary); }
+    .voice-record-screen__btn--delete { background:var(--danger-bg); color:var(--danger); }
+
+    /* Hold to record state */
+    .voice-hold-state { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px; gap:24px; }
+    .voice-hold-state__icon { width:100px; height:100px; border-radius:50%; background:var(--bg-glass); backdrop-filter:blur(var(--blur)); border:2px solid var(--accent); display:flex; align-items:center; justify-content:center; font-size:48px; }
+    .voice-hold-state__text { font-size:16px; color:var(--text-secondary); text-align:center; }
+    .voice-hold-state__hint { font-size:12px; color:var(--text-muted); text-align:center; }
+
+    /* Preview state */
+    .voice-preview { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px; gap:16px; width:100%; }
+    .voice-preview__waveform { width:100%; max-width:280px; height:80px; display:flex; align-items:center; justify-content:center; gap:3px; }
+    .voice-preview__waveform .voice-record-screen__bar { background:var(--accent); }
+    .voice-preview__controls { display:flex; align-items:center; gap:16px; margin-top:16px; }
+
+    /* Cancel to delete animation */
+    .voice-record-screen__cancel-zone { position:absolute; bottom:0; left:0; right:0; height:0; background:var(--danger-bg); display:flex; align-items:center; justify-content:center; font-size:14px; color:var(--danger); font-weight:600; transition:height 0.2s; overflow:hidden; }
+    .voice-record-screen__cancel-zone--visible { height:80px; }
+
+    .phone-chat-header { padding:8px 12px; border-bottom:1px solid var(--border-color); display:flex; align-items:center; gap:8px; background:var(--bg-secondary); }
+    .phone-chat-header__btn { font-size:16px; color:var(--text-secondary); cursor:pointer; padding:4px; }
+    .phone-chat-header__info { flex:1; min-width:0; }
+    .phone-chat-header__name { font-size:14px; font-weight:700; color:var(--text-primary); }
+    .phone-chat-header__status { font-size:10px; color:var(--accent); }
+
+    .phone-input-area { padding:6px 10px; border-top:1px solid var(--border-color); display:flex; gap:6px; align-items:center; background:var(--bg-secondary); }
+    .phone-input-area__btn { width:30px; height:30px; display:flex; align-items:center; justify-content:center; color:var(--text-secondary); cursor:pointer; font-size:16px; }
+  </style>
+</head>
+<body>
+
+<div class="phone-frame">
+  <div class="phone-frame__notch"></div>
+  <div class="phone-frame__statusbar"><span>9:41</span><span>📶 🔋</span></div>
+  <div class="phone-frame__screen">
+    <!-- TOPBAR (обязательный) -->
+    <div class="topbar">
+      <div class="topbar__logo">
+        <div class="topbar__logo-icon">B</div>
+        <span>Balloo</span>
+        <div class="topbar__dropdown">
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/chats.html'">💬 Balloo</div>
+          <div class="topbar__dropdown-divider"></div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div>
+          <div class="topbar__dropdown-divider"></div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/contacts.html'">👤 Контакты</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/search.html'">🔍 Поиск</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/archive.html'">📦 Архив</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/calls.html'">📞 Звонки</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/invites.html'">📨 Приглашения</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/bots.html'">🤖 О ботах</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/about-balloo.html'">ℹ️ О Balloo</div>
+        </div>
+      </div>
+      <div class="topbar__title">Запись голосового</div>
+      <div class="topbar__right">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact" onclick="window.location.href='profile.html'">
+          <div class="avatar__inner"><span>ИИ</span></div>
+        </div>
+        <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+        <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+      </div>
+    </div>
+
+    <!-- Chat header (context) -->
+    <div class="phone-chat-header">
+      <span class="phone-chat-header__btn" onclick="window.location.href='chat.html'">←</span>
+      <div class="phone-chat-header__info">
+        <div class="phone-chat-header__name">Мария Андреева</div>
+        <div class="phone-chat-header__status">в сети</div>
+      </div>
+    </div>
+
+    <!-- Voice Record Screen (recording state) -->
+    <div class="voice-record-screen" id="voice-record-screen">
+      <div class="voice-record-screen__timer" id="voice-timer">0:00</div>
+
+      <!-- Waveform visualization -->
+      <div class="voice-record-screen__waveform" id="waveform">
+        <!-- Bars generated by JS -->
+      </div>
+
+      <div class="voice-record-screen__controls">
+        <button class="voice-record-screen__btn voice-record-screen__btn--cancel" onclick="showToast('Отмена записи','info');window.location.href='chat.html'" title="Отмена">✕</button>
+        <button class="voice-record-screen__btn voice-record-screen__btn--pause" id="btn-pause" onclick="togglePause()" title="Пауза">⏸</button>
+        <button class="voice-record-screen__btn voice-record-screen__btn--send" id="btn-send" onclick="showToast('Отправка голосового...','success');window.location.href='chat.html'" title="Отправить">➤</button>
+      </div>
+    </div>
+
+    <!-- Tabbar -->
+    <div class="phone-tabbar">
+      <div class="phone-tabbar__item" onclick="window.location.href='chat.html'"><span class="phone-tabbar__icon">💬</span>Чаты</div>
+      <div class="phone-tabbar__item" onclick="window.location.href='contacts.html'"><span class="phone-tabbar__icon">👥</span>Контакты</div>
+      <div class="phone-tabbar__item" onclick="window.location.href='stories.html'"><span class="phone-tabbar__icon">📷</span>Сторис</div>
+      <div class="phone-tabbar__item" onclick="window.location.href='calls-history.html'"><span class="phone-tabbar__icon">📞</span>Звонки</div>
+      <div class="phone-tabbar__item" onclick="window.location.href='settings.html'"><span class="phone-tabbar__icon">⚙</span>Настройки</div>
+    </div>
+  </div>
+  <div class="phone-frame__home-bar"></div>
+</div>
+
+<script src="../assets/common.js"></script>
+<script>
+// Generate waveform bars
+const waveform = document.getElementById('waveform');
+const barCount = 40;
+for (let i = 0; i < barCount; i++) {
+  const bar = document.createElement('div');
+  bar.className = 'voice-record-screen__bar';
+  bar.style.height = '4px';
+  waveform.appendChild(bar);
+}
+
+// Animate waveform during recording
+let recording = true;
+let timerInterval = null;
+let seconds = 0;
+let paused = false;
+
+function animateWaveform() {
+  if (!recording) return;
+  const bars = waveform.querySelectorAll('.voice-record-screen__bar');
+  bars.forEach(bar => {
+    const h = Math.random() * 60 + 4;
+    bar.style.height = h + 'px';
+  });
+  requestAnimationFrame(() => setTimeout(animateWaveform, 50));
+}
+
+function startTimer() {
+  timerInterval = setInterval(() => {
+    if (!paused) {
+      seconds++;
+      const m = Math.floor(seconds / 60);
+      const s = (seconds % 60).toString().padStart(2, '0');
+      document.getElementById('voice-timer').textContent = `${m}:${s}`;
+    }
+  }, 1000);
+}
+
+function togglePause() {
+  paused = !paused;
+  const btn = document.getElementById('btn-pause');
+  btn.textContent = paused ? '▶' : '⏸';
+  btn.title = paused ? 'Продолжить' : 'Пауза';
+}
+
+// Init
+animateWaveform();
+startTimer();
+</script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo — Пустой чат</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon">B</div><span>Balloo</span>
+    <div class="topbar__dropdown">
+      <div class="topbar__dropdown-item" onclick="window.location.href='chats.html'">💬 Balloo</div>
+      <div class="topbar__dropdown-divider"></div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div>
+    </div>
+  </div>
+  <div class="topbar__title">Новый чат</div>
+  <div class="topbar__right">
+    <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИИ</span></div></div>
+    <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+    <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar__search"><input type="text" class="search-input" placeholder="🔍 Поиск чатов..."></div>
+    <div class="list">
+      <div class="list__item">
+        <div class="avatar avatar--md avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>МА</span></div></div>
+        <div class="list__item-body"><div class="list__item-title">Мария Андреева</div><div class="list__item-subtitle">привет!</div></div>
+        <div class="list__item-meta"><span class="list__item-time">Вчера</span></div>
+      </div>
+      <div class="list__item">
+        <div class="avatar avatar--md avatar--bordered avatar--status-online avatar--ctx-new"><div class="avatar__inner"><span>РД</span></div></div>
+        <div class="list__item-body"><div class="list__item-title">Команда разработки</div><div class="list__item-subtitle">Нет сообщений</div></div>
+        <div class="list__item-meta"><span class="list__item-time">—</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content: Empty state -->
+  <div class="content" style="display:flex;align-items:center;justify-content:center;">
+    <div class="empty-state">
+      <!-- Mascot animation -->
+      <div class="empty-state__animation">
+        <div style="width:120px;height:120px;clip-path:var(--octagon-clip);background:linear-gradient(135deg,var(--accent),var(--accent-hover));display:flex;align-items:center;justify-content:center;">
+          <span style="font-size:56px;">🎈</span>
+        </div>
+      </div>
+      
+      <h2 class="empty-state__title">Balloo Messenger</h2>
+      <p class="empty-state__subtitle" style="max-width:400px;margin-bottom:32px;">
+        Выберите чат из списка слева или начните новый разговор. Общайтесь, делитесь файлами и создавайте группы.
+      </p>
+
+      <!-- Quick actions -->
+      <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
+        <button class="btn btn--primary" onclick="openModal('modal-new-chat')">
+          ✏️ Новый чат
+        </button>
+        <button class="btn btn--secondary" onclick="window.location.href='group-create.html'">
+          👥 Создать группу
+        </button>
+        <button class="btn btn--secondary" onclick="window.location.href='channel-create.html'">
+          📢 Создать канал
+        </button>
+      </div>
+
+      <!-- Features grid -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px;max-width:500px;width:100%;">
+        <div class="card card--hover" style="text-align:center;padding:16px;" onclick="openModal('modal-new-chat')">
+          <div style="font-size:28px;margin-bottom:8px;">💬</div>
+          <div class="text-sm font-bold" style="color:var(--text-primary);">Личные</div>
+          <div class="text-xs text-muted mt-2">Один на один</div>
+        </div>
+        <div class="card card--hover" style="text-align:center;padding:16px;" onclick="window.location.href='group-create.html'">
+          <div style="font-size:28px;margin-bottom:8px;">👥</div>
+          <div class="text-sm font-bold" style="color:var(--text-primary);">Группы</div>
+          <div class="text-xs text-muted mt-2">До 200 000 участников</div>
+        </div>
+        <div class="card card--hover" style="text-align:center;padding:16px;" onclick="window.location.href='channel-create.html'">
+          <div style="font-size:28px;margin-bottom:8px;">📢</div>
+          <div class="text-sm font-bold" style="color:var(--text-primary);">Каналы</div>
+          <div class="text-xs text-muted mt-2">Неограниченные подписчики</div>
+        </div>
+      </div>
+
+      <!-- Tips -->
+      <div style="margin-top:40px;max-width:400px;width:100%;">
+        <div class="text-xs text-muted mb-2">Полезные действия:</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div class="list__item" style="border:none;padding:8px 12px;cursor:pointer;" onclick="openModal('modal-new-chat')">
+            <span class="text-secondary">🔍 Найти человека по номеру или @username</span>
+          </div>
+          <div class="list__item" style="border:none;padding:8px 12px;cursor:pointer;" onclick="window.location.href='stories.html'">
+            <span class="text-secondary">📷 Посмотреть сторис</span>
+          </div>
+          <div class="list__item" style="border:none;padding:8px 12px;cursor:pointer;">
+            <span class="text-secondary">📞 Посмотреть звонки</span>
+          </div>
+          <div class="list__item" style="border:none;padding:8px 12px;cursor:pointer;">
+            <span class="text-secondary">📨 Приглашения</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: New Chat -->
+<div class="modal-overlay" id="modal-overlay"></div>
+<div class="modal" id="modal-new-chat">
+  <div class="modal__header">
+    <span class="modal__title">Новый чат</span>
+    <div class="modal__close" onclick="closeModal('modal-new-chat')">✕</div>
+  </div>
+  <div class="modal__body">
+    <div class="form-group">
+      <input type="text" class="form-input" placeholder="🔍 Поиск человека...">
+    </div>
+    <div class="list" style="max-height:300px;">
+      <div class="list__item">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>АК</span></div></div>
+        <div class="list__item-body"><div class="list__item-title">Алексей Козлов</div><div class="list__item-subtitle">в сети</div></div>
+      </div>
+      <div class="list__item">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-offline avatar--ctx-contact"><div class="avatar__inner"><span>ДП</span></div></div>
+        <div class="list__item-body"><div class="list__item-title">Дмитрий Петров</div><div class="list__item-subtitle">был 2 часа назад</div></div>
+      </div>
+      <div class="list__item">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ОС</span></div></div>
+        <div class="list__item-body"><div class="list__item-title">Ольга Смирнова</div><div class="list__item-subtitle">в сети</div></div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <button class="btn btn--secondary btn--block" onclick="window.location.href='group-create.html'">👥 Создать группу</button>
+    <button class="btn btn--secondary btn--block" onclick="window.location.href='channel-create.html'">📢 Создать канал</button>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--tertiary" onclick="closeModal('modal-new-chat')">Отмена</button>
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+</body>
+</html>

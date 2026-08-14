@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Компонент: Feature Flags — Флаги фич</title>
+  <link rel="stylesheet" href="../../assets/common.css">
+  <style>
+    .component-demo { padding: 24px; max-width: 640px; margin: 0 auto; }
+    .component-demo h1 { font-size: 20px; margin-bottom: 16px; }
+    .component-demo .demo-section { margin-bottom: 24px; }
+    .component-demo .demo-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+
+    .feature-flags { display: flex; flex-direction: column; gap: 2px; }
+    .feature-flag-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+    }
+    .feature-flag-row + .feature-flag-row { border-top: none; }
+    .feature-flag-row__info { flex: 1; }
+    .feature-flag-row__name { font-weight: 600; color: var(--text-primary); font-size: 14px; }
+    .feature-flag-row__desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .feature-flag-row__env { font-size: 11px; padding: 3px 8px; font-weight: 600; margin-top: 4px; display: inline-block; }
+    .feature-flag-row__env--prod { background: rgba(45,184,77,0.12); color: var(--accent); }
+    .feature-flag-row__env--staging { background: rgba(232,163,23,0.12); color: var(--warning); }
+    .feature-flag-row__env--dev { background: rgba(59,158,255,0.12); color: var(--info); }
+  </style>
+</head>
+<body>
+  <div class="component-demo">
+    <h1>📦 Компонент: Feature Flags (Флаги фич)</h1>
+
+    <div class="demo-section">
+      <div class="demo-label">Feature Flags</div>
+      <div class="feature-flags">
+        <div class="feature-flag-row">
+          <div class="feature-flag-row__info">
+            <div class="feature-flag-row__name">📷 Stories v2</div>
+            <div class="feature-flag-row__desc">Новый интерфейс сторис</div>
+            <div class="feature-flag-row__env feature-flag-row__env--prod">Production: ВКЛ</div>
+          </div>
+          <label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label>
+        </div>
+        <div class="feature-flag-row">
+          <div class="feature-flag-row__info">
+            <div class="feature-flag-row__name">🎨 Dark Theme</div>
+            <div class="feature-flag-row__desc">Тёмная тема оформления</div>
+            <div class="feature-flag-row__env feature-flag-row__env--prod">Production: ВКЛ</div>
+          </div>
+          <label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label>
+        </div>
+        <div class="feature-flag-row">
+          <div class="feature-flag-row__info">
+            <div class="feature-flag-row__name">🤖 AI Chat</div>
+            <div class="feature-flag-row__desc">AI-ассистент в чате</div>
+            <div class="feature-flag-row__env feature-flag-row__env--staging">Staging: ВКЛ</div>
+          </div>
+          <label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label>
+        </div>
+        <div class="feature-flag-row">
+          <div class="feature-flag-row__info">
+            <div class="feature-flag-row__name">📱 Video Calls</div>
+            <div class="feature-flag-row__desc">Видеозвонки</div>
+            <div class="feature-flag-row__env feature-flag-row__env--dev">Dev: ВЫКЛ</div>
+          </div>
+          <label class="switch"><input type="checkbox"><span class="switch__slider"></span></label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="../../assets/common.js"></script>
+</body>
+</html>

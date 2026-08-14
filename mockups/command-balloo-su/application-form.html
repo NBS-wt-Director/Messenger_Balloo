@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Command — Анкета заявки</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--info);">C</div><span>Command</span>
+    <div class="topbar__dropdown"></div>
+  </div>
+  <div class="topbar__title">Стать членом команды</div>
+  <div class="topbar__right"></div>
+</div>
+<div class="main">
+  <div class="content overflow-y-auto">
+    <div class="page-container page-container--narrow">
+      <a href="vacancies.html" class="btn btn--tertiary btn--sm mb-4">← К вакансиям</a>
+
+      <h1 class="page-title">📝 Анкета заявки</h1>
+      <p class="page-subtitle">«Стать членом нашей команды»</p>
+
+      <div class="card mb-4" style="background:rgba(59,158,255,0.08);border-color:var(--info);">
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="form-label">Вакансия *</label>
+          <input type="text" class="form-input" placeholder="Начните вводить название вакансии..." id="vacancy-combobox" oninput="filterVacancies(this.value)" onfocus="showSuggestions()" autocomplete="off">
+          <div class="form-hint">Выберите из списка или введите название. При выборе — автоподстановка имени вакансии.</div>
+          <!-- Suggestions dropdown -->
+          <div id="vacancy-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:8px;max-height:200px;overflow-y:auto;z-index:50;box-shadow:var(--shadow-glass);">
+            <div style="padding:8px 12px;font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--border-color);">Рекомендуемые</div>
+            <div class="suggestion-item" style="padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border-color);" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background=''" onclick="selectVacancy('Senior Frontend Developer (React 19 / Next.js 15)')">
+              <span style="font-size:16px;">⚛️</span>
+              <div><div class="text-sm font-bold">Senior Frontend Developer</div><div class="text-xs text-muted">React 19 / Next.js 15 · 12 откликов</div></div>
+            </div>
+            <div class="suggestion-item" style="padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border-color);" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background=''" onclick="selectVacancy('Backend Developer (Next.js API / WebSocket)')">
+              <span style="font-size:16px;">🔧</span>
+              <div><div class="text-sm font-bold">Backend Developer</div><div class="text-xs text-muted">Next.js API / WebSocket · 8 откликов</div></div>
+            </div>
+            <div style="padding:8px 12px;font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--border-color);border-top:1px solid var(--border-color);">Все вакансии</div>
+            <div class="suggestion-item" style="padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border-color);" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background=''" onclick="selectVacancy('DevOps Engineer (K8s / Docker / CI/CD)')">
+              <span style="font-size:16px;">🐳</span>
+              <div><div class="text-sm font-bold">DevOps Engineer</div><div class="text-xs text-muted">K8s / Docker / CI/CD · 5 откликов</div></div>
+            </div>
+            <div class="suggestion-item" style="padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border-color);" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background=''" onclick="selectVacancy('UI/UX Designer')">
+              <span style="font-size:16px;">🎨</span>
+              <div><div class="text-sm font-bold">UI/UX Designer</div><div class="text-xs text-muted">Дизайн · 6 откликов</div></div>
+            </div>
+            <div class="suggestion-item" style="padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border-color);" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background=''" onclick="selectVacancy('QA Engineer (Playwright / Jest)')">
+              <span style="font-size:16px;">🧪</span>
+              <div><div class="text-sm font-bold">QA Engineer</div><div class="text-xs text-muted">Playwright / Jest · 4 отклика</div></div>
+            </div>
+            <div class="suggestion-item" style="padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background=''" onclick="selectVacancy('Technical Writer')">
+              <span style="font-size:16px;">📝</span>
+              <div><div class="text-sm font-bold">Technical Writer</div><div class="text-xs text-muted">Документация · 2 отклика</div></div>
+            </div>
+          </div>
+        </div>
+        <div id="vacancy-selected" style="display:none;margin-top:8px;">
+          <div class="flex items-center gap-3">
+            <span style="font-size:24px;" id="selected-vacancy-icon">⚛️</span>
+            <div class="flex-1">
+              <div class="font-semibold" style="color:var(--text-primary);" id="selected-vacancy-name">Senior Frontend Developer</div>
+              <div class="text-xs text-muted" id="selected-vacancy-meta">Вакансия #1 · ID подгружен автоматически</div>
+            </div>
+            <a href="vacancy-detail.html?id=1" class="text-xs text-accent">Описание →</a>
+            <button class="btn btn--tertiary btn--sm" onclick="clearVacancy()">✕</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="form-group">
+          <label class="form-label">Имя и фамилия *</label>
+          <input type="text" class="form-input" placeholder="Иван Иванов">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email *</label>
+          <input type="email" class="form-input" placeholder="ivan@example.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Телефон</label>
+          <input type="tel" class="form-input" placeholder="+7 (999) 123-45-67">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Город / Часовой пояс</label>
+          <input type="text" class="form-input" placeholder="Москва, UTC+3">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Ссылка на резюме *</label>
+          <input type="url" class="form-input" placeholder="https://...">
+          <span class="form-hint">Или прикрепите файл (PDF, DOCX)</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">GitHub / GitLab / Portfolio</label>
+          <input type="url" class="form-input" placeholder="https://github.com/username">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Опыт работы (лет) *</label>
+          <select class="form-select">
+            <option>Менее 1 года</option>
+            <option>1–3 года</option>
+            <option>3–5 лет</option>
+            <option>5+ лет</option>
+            <option>10+ лет</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Расскажите о себе *</label>
+          <textarea class="form-textarea" rows="5" placeholder="Почему вы хотите_join Balloo? Какой опыт релевантен?"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Ожидания по зарплате</label>
+          <input type="text" class="form-input" placeholder="250 000 ₽">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Как скоро готовы начать?</label>
+          <select class="form-select">
+            <option>Немедленно</option>
+            <option>Через 2 недели</option>
+            <option>Через месяц</option>
+            <option>Более месяца</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-checkbox">
+            <input type="checkbox" checked> Я согласен на обработку персональных данных
+          </label>
+        </div>
+
+        <button class="btn btn--primary btn--block btn--lg" onclick="alert('Заявка отправлена! Мы свяжемся с вами в течение 3 рабочих дней.')">Отправить заявку</button>
+        <p class="text-xs text-muted text-center mt-4">Заявка отправляется в HR-модуль. Ответ — в течение 3 рабочих дней.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../assets/common.js"></script>
+<script>
+const vacancies = [
+  { id: 1, name: 'Senior Frontend Developer (React 19 / Next.js 15)', icon: '⚛️', meta: 'React 19 / Next.js 15 · 12 откликов' },
+  { id: 2, name: 'Backend Developer (Next.js API / WebSocket)', icon: '🔧', meta: 'Next.js API / WebSocket · 8 откликов' },
+  { id: 3, name: 'DevOps Engineer (K8s / Docker / CI/CD)', icon: '🐳', meta: 'K8s / Docker / CI/CD · 5 откликов' },
+  { id: 4, name: 'UI/UX Designer', icon: '🎨', meta: 'Дизайн · 6 откликов' },
+  { id: 5, name: 'QA Engineer (Playwright / Jest)', icon: '🧪', meta: 'Playwright / Jest · 4 отклика' },
+  { id: 6, name: 'Technical Writer', icon: '📝', meta: 'Документация · 2 отклика' }
+];
+
+function filterVacancies(query) {
+  const suggestions = document.getElementById('vacancy-suggestions');
+  const items = suggestions.querySelectorAll('.suggestion-item');
+  let visible = 0;
+  
+  items.forEach(item => {
+    const text = item.textContent.toLowerCase();
+    if (!query || text.includes(query.toLowerCase())) {
+      item.style.display = 'flex';
+      visible++;
+    } else {
+      item.style.display = 'none';
+    }
+  });
+  
+  if (query) suggestions.style.display = 'block';
+}
+
+function showSuggestions() {
+  document.getElementById('vacancy-suggestions').style.display = 'block';
+}
+
+function selectVacancy(name) {
+  const input = document.getElementById('vacancy-combobox');
+  input.value = name;
+  
+  const v = vacancies.find(v => v.name === name);
+  if (v) {
+    document.getElementById('selected-vacancy-icon').textContent = v.icon;
+    document.getElementById('selected-vacancy-name').textContent = v.name;
+    document.getElementById('selected-vacancy-meta').textContent = `Вакансия #${v.id} · ID подгружен автоматически`;
+    document.getElementById('vacancy-selected').style.display = 'block';
+  }
+  
+  document.getElementById('vacancy-suggestions').style.display = 'none';
+}
+
+function clearVacancy() {
+  document.getElementById('vacancy-combobox').value = '';
+  document.getElementById('vacancy-selected').style.display = 'none';
+}
+
+// Close suggestions on outside click
+document.addEventListener('click', function(e) {
+  const combobox = document.getElementById('vacancy-combobox');
+  const suggestions = document.getElementById('vacancy-suggestions');
+  if (!combobox.contains(e.target) && !suggestions.contains(e.target)) {
+    suggestions.style.display = 'none';
+  }
+});
+</script>
+</body>
+</html>

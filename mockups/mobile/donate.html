@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobile — Донат</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    html { overflow-y: auto; height: auto; }
+    body { overflow-y: auto; height: auto; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 40px 24px; }
+    .phone-frame { width:360px; height:760px; background:var(--bg-secondary); border:3px solid var(--border-strong); border-radius:36px; overflow:hidden; position:relative; display:flex; flex-direction:column; box-shadow:var(--shadow-glass); }
+    .phone-frame__notch { position:absolute; top:0; left:50%; transform:translateX(-50%); width:130px; height:26px; background:var(--bg-primary); border-bottom-left-radius:18px; border-bottom-right-radius:18px; z-index:10; }
+    .phone-frame__statusbar { height:30px; padding:4px 20px 0; display:flex; align-items:center; justify-content:space-between; font-size:12px; color:var(--text-secondary); background:var(--bg-secondary); }
+    .phone-frame__screen { flex:1; overflow:hidden; background:var(--bg-primary); display:flex; flex-direction:column; }
+    .phone-frame__home-bar { height:5px; width:120px; margin:0 auto 8px; background:var(--text-muted); border-radius:3px; }
+    .phone-tabbar { display:flex; height:52px; background:var(--bg-secondary); border-top:1px solid var(--border-color); }
+    .phone-tabbar__item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; font-size:10px; color:var(--text-secondary); cursor:pointer; transition:color 0.15s; }
+    .phone-tabbar__item--active { color:var(--accent); }
+    .phone-tabbar__icon { font-size:20px; line-height:1; }
+    .phone-scroll { flex:1; overflow-y:auto; padding:12px; }
+    .tier-card { background:var(--bg-tertiary); border:1px solid var(--border-color); padding:12px; margin-bottom:10px; }
+    .tier-card--accent { border-color:var(--accent); }
+    .tier-card--gold { border-color:var(--gold); }
+    .tier-icon { font-size:28px; margin-bottom:6px; }
+    .tier-title { font-size:14px; font-weight:700; color:var(--text-primary); }
+    .tier-price { font-size:20px; font-weight:800; color:var(--accent); margin:4px 0; }
+    .tier-desc { font-size:12px; color:var(--text-secondary); margin-bottom:8px; }
+    .pay-method { display:flex; align-items:center; gap:6px; padding:8px 10px; background:var(--bg-tertiary); border:1px solid var(--border-color); font-size:12px; }
+    .donor-row { display:flex; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid var(--border-color); }
+    .donor-row:last-child { border-bottom:none; }
+  </style>
+</head>
+<body>
+<div class="phone-frame">
+  <div class="phone-frame__notch"></div>
+  <div class="phone-frame__statusbar"><span>9:41</span><span>📶 🔋</span></div>
+  <div class="phone-frame__screen">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar__logo">
+        <div class="topbar__logo-icon">B</div><span>Balloo</span>
+        <div class="topbar__dropdown">
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/chats.html'">💬 Balloo</div>
+          <div class="topbar__dropdown-divider"></div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div>
+          <div class="topbar__dropdown-divider"></div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/contacts.html'">👤 Контакты</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/search.html'">🔍 Поиск</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/archive.html'">📦 Архив</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/calls.html'">📞 Звонки</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/invites.html'">📨 Приглашения</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/bots.html'">🤖 О ботах</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/about-balloo.html'">ℹ️ О Balloo</div>
+        </div>
+      </div>
+      <div class="topbar__title">Поддержать</div>
+      <div class="topbar__right">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact" onclick="window.location.href='profile.html'"><div class="avatar__inner"><span>ИИ</span></div></div>
+        <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+        <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="phone-scroll">
+
+      <!-- Header -->
+      <div style="text-align:center;margin-bottom:14px;">
+        <div style="font-size:48px;margin-bottom:6px;">💚</div>
+        <h1 style="font-size:20px;font-weight:800;color:var(--text-primary);">Поддержите Balloo</h1>
+        <p style="font-size:12px;color:var(--text-secondary);">Независимый мессенджер без рекламы. Ваша поддержка помогает развиваться.</p>
+      </div>
+
+      <!-- Progress -->
+      <div class="card" style="margin-bottom:12px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <h3 class="card__title" style="font-size:13px;">Цель месяца: серверы + разработка</h3>
+          <span class="chip chip--accent">67%</span>
+        </div>
+        <div style="height:10px;background:var(--bg-tertiary);border:1px solid var(--border-color);margin-bottom:6px;">
+          <div style="height:100%;width:67%;background:var(--accent);"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;">
+          <span class="text-secondary">Собрано: <strong style="color:var(--accent);">134 000 ₽</strong></span>
+          <span class="text-muted">Цель: 200 000 ₽</span>
+        </div>
+      </div>
+
+      <!-- Tiers -->
+      <div class="section-title" style="font-size:14px;">Уровни поддержки</div>
+
+      <div class="tier-card">
+        <div class="tier-icon">☕</div>
+        <div class="tier-title">Кофе разработчику</div>
+        <div class="tier-price">100 ₽</div>
+        <div class="tier-desc">Разовая поддержка. Спасибо за кофе!</div>
+        <button class="btn btn--primary btn--block btn--sm">Поддержать</button>
+      </div>
+
+      <div class="tier-card tier-card--accent">
+        <span class="chip chip--accent" style="margin-bottom:4px;">Популярный</span>
+        <div class="tier-icon">⭐</div>
+        <div class="tier-title">Спонсор</div>
+        <div class="tier-price">500 ₽/мес</div>
+        <div class="tier-desc">Ежемесячная подписка. Звание «Спонсор» в профиле.</div>
+        <button class="btn btn--primary btn--block btn--sm">Стать спонсором</button>
+      </div>
+
+      <div class="tier-card tier-card--gold">
+        <span class="chip chip--warning" style="margin-bottom:4px;">VIP</span>
+        <div class="tier-icon">👑</div>
+        <div class="tier-title">Платиновый донор</div>
+        <div class="tier-price">5 000 ₽/мес</div>
+        <div class="tier-desc">VIP-знак, приоритетная поддержка, ранний доступ к фичам.</div>
+        <button class="btn btn--primary btn--block btn--sm">Стать VIP</button>
+      </div>
+
+      <div class="tier-card">
+        <div class="tier-icon">💎</div>
+        <div class="tier-title">Своя сумма</div>
+        <div class="tier-desc">Любая сумма разово или ежемесячно.</div>
+        <div style="display:flex;gap:6px;">
+          <input type="number" class="form-input" placeholder="Сумма ₽" style="flex:1;font-size:13px;">
+          <button class="btn btn--primary btn--sm">OK</button>
+        </div>
+      </div>
+
+      <!-- Payment methods -->
+      <div class="section-title" style="font-size:14px;margin-top:12px;">Способы оплаты</div>
+      <div class="card" style="margin-bottom:12px;">
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          <div class="pay-method"><span style="font-size:18px;">💳</span>Карта</div>
+          <div class="pay-method"><span style="font-size:18px;">📱</span>СБП</div>
+          <div class="pay-method"><span style="font-size:18px;">₿</span>Crypto</div>
+          <div class="pay-method"><span style="font-size:18px;">💰</span>ЮMoney</div>
+        </div>
+        <p style="font-size:10px;color:var(--text-muted);margin-top:8px;">Все платежи защищены. Balloo не хранит данные карт.</p>
+      </div>
+
+      <!-- Why donate -->
+      <div class="section-title" style="font-size:14px;">Почему ваша поддержка важна</div>
+      <div class="card" style="margin-bottom:12px;">
+        <ul style="list-style:disc;padding-left:16px;line-height:1.8;font-size:12px;">
+          <li><strong>Нет рекламы</strong> — Balloo не продаёт данные</li>
+          <li><strong>Серверы</strong> — аренда инфраструктуры</li>
+          <li><strong>Разработка</strong> — оплата команды</li>
+          <li><strong>Open source</strong> — часть модулей открыта</li>
+        </ul>
+      </div>
+
+      <!-- Top donors -->
+      <div class="section-title" style="font-size:14px;">Топ доноров месяца</div>
+      <div class="card" style="margin-bottom:12px;">
+        <div class="donor-row">
+          <span style="font-size:18px;">🥇</span>
+          <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>АК</span></div></div>
+          <div style="flex:1;"><div style="font-size:13px;font-weight:600;">Анонимный донор</div><div style="font-size:11px;color:var(--text-muted);">Платиновый · 5 000 ₽/мес</div></div>
+        </div>
+        <div class="donor-row">
+          <span style="font-size:18px;">🥈</span>
+          <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>МП</span></div></div>
+          <div style="flex:1;"><div style="font-size:13px;font-weight:600;">Михаил П.</div><div style="font-size:11px;color:var(--text-muted);">Спонсор · 500 ₽/мес</div></div>
+        </div>
+        <div class="donor-row">
+          <span style="font-size:18px;">🥉</span>
+          <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ЕС</span></div></div>
+          <div style="flex:1;"><div style="font-size:13px;font-weight:600;">Елена С.</div><div style="font-size:11px;color:var(--text-muted);">Спонсор · 500 ₽/мес</div></div>
+        </div>
+      </div>
+
+      <button class="btn btn--secondary btn--block" onclick="window.location.href='my-donates.html'" style="margin-bottom:8px;">📋 Мои донаты</button>
+      <p style="text-align:center;font-size:11px;color:var(--text-muted);">Спасибо каждому, кто поддерживает Balloo! 💚</p>
+    </div>
+
+    <!-- TABBAR -->
+    <div class="phone-tabbar">
+      <div class="phone-tabbar__item" onclick="window.location.href='chat.html'"><span class="phone-tabbar__icon">💬</span>Чаты</div>
+      <div class="phone-tabbar__item" onclick="window.location.href='contacts.html'"><span class="phone-tabbar__icon">👥</span>Контакты</div>
+      <div class="phone-tabbar__item" onclick="window.location.href='stories.html'"><span class="phone-tabbar__icon">📷</span>Сторис</div>
+      <div class="phone-tabbar__item" onclick="window.location.href='calls-history.html'"><span class="phone-tabbar__icon">📞</span>Звонки</div>
+      <div class="phone-tabbar__item phone-tabbar__item--active" onclick="window.location.href='settings.html'"><span class="phone-tabbar__icon">⚙</span>Настройки</div>
+    </div>
+
+  </div>
+  <div class="phone-frame__home-bar"></div>
+</div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

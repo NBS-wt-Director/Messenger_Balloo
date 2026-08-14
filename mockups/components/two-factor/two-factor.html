@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Компонент: Two Factor — Двухфакторная аутентификация</title>
+  <link rel="stylesheet" href="../../assets/common.css">
+  <style>
+    .component-demo { padding: 24px; max-width: 480px; margin: 0 auto; }
+    .component-demo h1 { font-size: 20px; margin-bottom: 16px; }
+    .component-demo .demo-section { margin-bottom: 24px; }
+    .component-demo .demo-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+
+    .two-factor { display: flex; flex-direction: column; gap: 20px; }
+    .two-factor__icon {
+      width: 64px; height: 64px;
+      clip-path: var(--octagon-clip);
+      background: var(--accent);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px;
+      margin: 0 auto 8px;
+    }
+    .two-factor__title { font-size: 18px; font-weight: 700; color: var(--text-primary); text-align: center; }
+    .two-factor__desc { font-size: 14px; color: var(--text-secondary); text-align: center; line-height: 1.6; }
+    .two-factor__code-inputs { display: flex; gap: 8px; justify-content: center; }
+    .two-factor__code-input {
+      width: 48px; height: 56px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      font-size: 24px;
+      font-weight: 700;
+      text-align: center;
+      outline: none;
+    }
+    .two-factor__code-input:focus { border-color: var(--accent); }
+    .two-factor__resend { font-size: 13px; color: var(--text-muted); text-align: center; }
+    .two-factor__resend a { color: var(--accent); cursor: pointer; }
+    .two-factor__backup {
+      padding: 12px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .two-factor__backup code {
+      display: block;
+      font-family: 'Fira Code', monospace;
+      font-size: 14px;
+      color: var(--text-primary);
+      margin-top: 4px;
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+  <div class="component-demo">
+    <h1>📦 Компонент: Two Factor (Двухфакторная аутентификация)</h1>
+
+    <div class="demo-section">
+      <div class="demo-label">Ввод кода 2FA</div>
+      <div class="two-factor">
+        <div class="two-factor__icon">🔐</div>
+        <div class="two-factor__title">Двухфакторная аутентификация</div>
+        <div class="two-factor__desc">Введите 6-значный код из приложения-аутентификатора</div>
+        <div class="two-factor__code-inputs">
+          <input class="two-factor__code-input" maxlength="1" value="1">
+          <input class="two-factor__code-input" maxlength="1" value="2">
+          <input class="two-factor__code-input" maxlength="1" value="3">
+          <input class="two-factor__code-input" maxlength="1" value="4">
+          <input class="two-factor__code-input" maxlength="1">
+          <input class="two-factor__code-input" maxlength="1">
+        </div>
+        <div class="two-factor__resend">
+          Отправить код повторно через <strong style="color:var(--accent)">30</strong> сек
+        </div>
+        <button class="btn btn--primary btn--block">Подтвердить</button>
+        <div class="two-factor__backup">
+          Резервные коды (сохраните их в безопасном месте):
+          <code>XXXX-XXXX-XXXX</code>
+          <code>XXXX-XXXX-XXXX</code>
+          <code>XXXX-XXXX-XXXX</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="demo-section">
+      <div class="demo-label">Настройка 2FA</div>
+      <div class="two-factor">
+        <div class="two-factor__icon">📱</div>
+        <div class="two-factor__title">Настройте 2FA</div>
+        <div class="two-factor__desc">
+          1. Установите приложение-аутентификатор (Google Authenticator, Authy)<br>
+          2. Отсканируйте QR-код<br>
+          3. Введите полученный код
+        </div>
+        <div style="width:160px;height:160px;background:var(--bg-tertiary);border:1px solid var(--border-color);margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:48px;">
+          📱
+        </div>
+        <button class="btn btn--primary btn--block">Далее</button>
+      </div>
+    </div>
+  </div>
+  <script src="../../assets/common.js"></script>
+</body>
+</html>

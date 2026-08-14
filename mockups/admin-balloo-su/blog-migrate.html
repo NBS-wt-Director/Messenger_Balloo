@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Миграция постов</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--warning);">A</div><span>Admin</span>
+    <div class="topbar__dropdown"></div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Миграция постов</div>
+  <div class="topbar__right"></div>
+</div>
+<div class="main">
+  <div class="sidebar sidebar--narrow">
+    <div class="list">
+      <div class="list__item">📊 Дашборд</div>
+      <div class="list__item">👤 Пользователи</div>
+      <div class="list__item">🚩 Жалобы <span class="badge" style="margin-left:auto;">12</span></div>
+      <div class="list__item">🔨 Баны</div>
+      <div class="list__item">📈 Метрики</div>
+      <div class="list__item">🎛️ Feature Flags</div>
+      <div class="list__item">📁 Файлы</div>
+      <div class="list__item">📝 Тексты</div>
+      <div class="list__item" style="border-top:1px solid var(--border-color);margin-top:8px;padding-top:12px;">🏢 Отделы</div>
+      <div class="list__item">👤 Сотрудники</div>
+      <div class="list__item">💼 Вакансии</div>
+      <div class="list__item">📜 Версии</div>
+      <div class="list__item">💡 Фичи (модерация)</div>
+      <div class="list__item">💚 Донаты</div>
+      <div class="list__item" style="border-top:1px solid var(--border-color);margin-top:8px;padding-top:12px;">📝 Блог: Очередь</div>
+      <div class="list__item">📡 Блог: Каналы</div>
+      <div class="list__item">🏷️ Блог: Категории</div>
+      <div class="list__item">📊 Блог: Статистика</div>
+    </div>
+  </div>
+  <div class="content overflow-y-auto"><div class="page-container">
+    <a href="blog-channels.html" class="btn btn--tertiary btn--sm mb-4">← Каналы</a>
+
+    <h1 class="page-title">🔄 Миграция постов</h1>
+    <div class="card mb-6" style="border-left:3px solid var(--danger);">
+      <div class="flex items-center gap-4">
+        <div style="width:64px;height:64px;clip-path:var(--octagon-clip);background:linear-gradient(135deg,#3b9eff,#1565c0);display:flex;align-items:center;justify-content:center;font-size:28px;border:2px solid var(--danger);">🐳</div>
+        <div class="flex-1">
+          <h3 style="font-size:18px;font-weight:700;color:var(--text-primary);">DevOps заметки Алексея</h3>
+          <p class="text-xs text-secondary">Личный канал · 6 статей · владелец: Алексей Дрозд <span class="chip chip--danger">уволен</span></p>
+        </div>
+      </div>
+    </div>
+
+    <p class="text-secondary text-sm mb-6">Сотрудник уволен. Компания решает судьбу постов в его личном канале. Выберите действие:</p>
+
+    <!-- Action options -->
+    <div class="card mb-4" style="border:2px solid var(--accent);">
+      <div class="flex items-start gap-3">
+        <input type="radio" name="action" checked style="margin-top:4px;accent-color:var(--accent);">
+        <div class="flex-1">
+          <h4 class="font-bold" style="color:var(--text-primary);">📦 Перенести посты в другой канал</h4>
+          <p class="text-xs text-secondary mt-2">Все посты будут перемещены в выбранный корпоративный или личный канал. Авторство сохранится за Алексеем Дрозд.</p>
+          <div class="form-group mt-4">
+            <label class="form-label">Целевой канал</label>
+            <select class="form-select">
+              <option>⚙️ Технологии (корпоративный)</option>
+              <option>📰 Новости (корпоративный)</option>
+              <option>🦊 Блог Ивана Воронова (личный)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="flex items-start gap-3">
+        <input type="radio" name="action" style="margin-top:4px;accent-color:var(--accent);">
+        <div class="flex-1">
+          <h4 class="font-bold" style="color:var(--text-primary);">👤 Передать канал другому сотруднику</h4>
+          <p class="text-xs text-secondary mt-2">Канал будет передан другому сотруднику. Он станет новым владельцем, автором и модератором.</p>
+          <div class="form-group mt-4">
+            <label class="form-label">Новый владелец</label>
+            <select class="form-select">
+              <option>Иван Воронов (Lead Developer)</option>
+              <option>Мария Андреева (UI/UX Designer)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-6">
+      <div class="flex items-start gap-3">
+        <input type="radio" name="action" style="margin-top:4px;accent-color:var(--accent);">
+        <div class="flex-1">
+          <h4 class="font-bold" style="color:var(--text-primary);">🗄️ Архивировать канал целиком</h4>
+          <p class="text-xs text-secondary mt-2">Канал и все посты будут скрыты из публичной ленты. Доступны только в архиве.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Posts preview -->
+    <div class="card mb-6">
+      <h3 class="card__title mb-4">Посты в канале (6)</h3>
+      <table class="table">
+        <thead><tr><th>Заголовок</th><th>Дата</th><th>Просмотры</th><th>Реакции</th></tr></thead>
+        <tbody>
+          <tr class="table__row"><td><strong>5 лет с DevOps</strong></td><td class="text-xs text-muted">9 июля</td><td>1 100</td><td>45</td></tr>
+          <tr class="table__row"><td>Docker для новичков</td><td class="text-xs text-muted">11 июля</td><td>—</td><td>—</td></tr>
+          <tr class="table__row"><td>K8s для разработчиков</td><td class="text-xs text-muted">5 июля</td><td>890</td><td>22</td></tr>
+          <tr class="table__row"><td>CI/CD пайплайны</td><td class="text-xs text-muted">2 июля</td><td>1 200</td><td>31</td></tr>
+          <tr class="table__row"><td>Мониторинг с Grafana</td><td class="text-xs text-muted">28 июня</td><td>670</td><td>14</td></tr>
+          <tr class="table__row"><td>Ansible: автоматизация</td><td class="text-xs text-muted">20 июня</td><td>540</td><td>9</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="flex gap-2">
+      <button class="btn btn--primary">✓ Применить миграцию</button>
+      <a href="blog-channels.html" class="btn btn--tertiary">Отмена</a>
+    </div>
+  </div></div>
+</div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

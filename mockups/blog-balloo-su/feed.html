@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog — Лента</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:#a855f7;">📝</div><span>Blog</span>
+    <div class="topbar__dropdown"></div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Корпоративный блог</div>
+  <div class="topbar__right"></div>
+</div>
+<div class="main">
+  <div class="content overflow-y-auto">
+    <div class="page-container">
+      <h1 class="page-title">📝 Корпоративный блог</h1>
+      <p class="page-subtitle">Новости • Технологии • Команда Balloo</p>
+
+      <!-- Channel filter chips -->
+      <div class="flex gap-2 mb-6" style="flex-wrap:wrap;">
+        <span class="chip chip--accent" style="cursor:pointer;">Все каналы</span>
+        <span class="chip" style="cursor:pointer;">📰 Новости</span>
+        <span class="chip" style="cursor:pointer;">⚙️ Технологии</span>
+        <span class="chip" style="cursor:pointer;">👥 Команда</span>
+        <span class="chip" style="cursor:pointer;">📊 Метрики</span>
+      </div>
+
+      <!-- Featured post -->
+      <div class="card mb-6 card--hover" style="border-left:3px solid var(--accent);" onclick="window.location.href='post.html?slug=reliz-v1-beta'">
+        <div style="width:100%;height:200px;background:linear-gradient(135deg,#1a1d21,#2d3742);display:flex;align-items:center;justify-content:center;font-size:64px;margin-bottom:16px;">🚀</div>
+        <div class="flex items-center gap-3 mb-2">
+          <span class="chip chip--accent">📰 Новости</span>
+          <span class="chip">Закреплено</span>
+        </div>
+        <h2 style="font-size:22px;font-weight:800;color:var(--text-primary);margin-bottom:8px;">Релиз v1.0.0-beta — первый публичный бета-релиз Balloo</h2>
+        <p class="text-secondary text-sm" style="margin-bottom:12px;">Сегодня мы запускаем первую бета-версию мессенджера Balloo. Онбординг, чаты, звонки, группы, 3 темы оформления и 6 языков — всё готово для первых пользователей…</p>
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="avatar avatar--xs avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИВ</span></div></div>
+            <span class="text-xs text-secondary">Иван Воронов · 16 июля 2026 · 5 мин чтения</span>
+          </div>
+          <div class="flex gap-2">
+            <span class="chip">👁 1.2K</span>
+            <span class="chip">😀 34</span>
+            <span class="chip">💬 12</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Regular posts -->
+      <div class="card mb-4 card--hover" onclick="window.location.href='post.html?slug=dizain-sistema'">
+        <div class="flex gap-4">
+          <div style="width:120px;height:120px;background:linear-gradient(135deg,#a855f7,#6b21a8);display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0;">🎨</div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="chip">⚙️ Технологии</span>
+            </div>
+            <h3 style="font-size:17px;font-weight:700;color:var(--text-primary);margin-bottom:6px;">Дизайн-система Balloo: октагоны, пузыри и glassmorphism</h3>
+            <p class="text-xs text-secondary" style="margin-bottom:8px;">Как мы построили уникальную визуальную идентичность: восьмигранные аватарки, пузыри без скруглений, три темы оформления…</p>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <div class="avatar avatar--xs avatar--bordered avatar--status-offline avatar--ctx-contact"><div class="avatar__inner"><span>МА</span></div></div>
+                <span class="text-xs text-muted">Мария Андреева · 14 июля · 8 мин</span>
+              </div>
+              <div class="flex gap-2">
+                <span class="chip text-xs">👁 856</span>
+                <span class="chip text-xs">😀 21</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-4 card--hover" onclick="window.location.href='post.html?slug=websocket-masshtab'">
+        <div class="flex gap-4">
+          <div style="width:120px;height:120px;background:linear-gradient(135deg,#2db84d,#166534);display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0;">⚡</div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="chip">⚙️ Технологии</span>
+            </div>
+            <h3 style="font-size:17px;font-weight:700;color:var(--text-primary);margin-bottom:6px;">WebSocket на Hono + uWebSockets.js: масштабирование realtime</h3>
+            <p class="text-xs text-secondary" style="margin-bottom:8px;">Почему мы выбрали uWebSockets.js вместо ws, как масштабируем соединения и обрабатываем миллионы сообщений…</p>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <div class="avatar avatar--xs avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИВ</span></div></div>
+                <span class="text-xs text-muted">Иван Воронов · 12 июля · 12 мин</span>
+              </div>
+              <div class="flex gap-2">
+                <span class="chip text-xs">👁 2.1K</span>
+                <span class="chip text-xs">😀 45</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-4 card--hover" onclick="window.location.href='post.html?slug=novyy-dizayner'">
+        <div class="flex gap-4">
+          <div style="width:120px;height:120px;background:linear-gradient(135deg,#3b9eff,#1565c0);display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0;">👥</div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="chip">👥 Команда</span>
+            </div>
+            <h3 style="font-size:17px;font-weight:700;color:var(--text-primary);margin-bottom:6px;">Новый дизайнер в команде — Мария Андреева</h3>
+            <p class="text-xs text-secondary" style="margin-bottom:8px;">Мария присоединилась к команде UI/UX. Рассказываем о её опыте и планах по развитию дизайн-системы Balloo…</p>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <div class="avatar avatar--xs avatar--bordered avatar--status-offline avatar--ctx-contact"><div class="avatar__inner"><span>АД</span></div></div>
+                <span class="text-xs text-muted">Алексей Дрозд · 10 июля · 3 мин</span>
+              </div>
+              <div class="flex gap-2">
+                <span class="chip text-xs">👁 432</span>
+                <span class="chip text-xs">😀 18</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Infinite scroll / Load more -->
+      <div class="text-center mt-6">
+        <button class="btn btn--secondary btn--sm" onclick="alert('Загрузка ещё статей...')">Загрузить ещё ↓</button>
+        <div class="text-xs text-muted mt-2">Бесконечная загрузка (IntersectionObserver)</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

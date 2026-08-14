@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo — О Balloo</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon">B</div><span>Balloo</span>
+    <div class="topbar__dropdown"><div class="topbar__dropdown-item" onclick="window.location.href='chats.html'">💬 Balloo</div><div class="topbar__dropdown-divider"></div><div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div><div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div><div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div><div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div><div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div><div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div></div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">О Balloo</div>
+  <div class="topbar__right"><div class="mascot">🦊</div><span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span><span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span></div>
+</div>
+<div class="main"><div class="content overflow-y-auto"><div class="page-container page-container--narrow">
+  <h1 class="page-title">О Balloo Messenger</h1>
+  <div class="card mb-4">
+    <div class="flex items-center justify-between mb-4">
+      <div><span class="text-secondary">Версия:</span> <strong style="color:var(--text-primary);">1.0.0 (v1)</strong></div>
+      <span class="chip chip--accent">Актуальная</span>
+    </div>
+    <p class="card__body">Кроссплатформенный мессенджер: Web, Desktop (Windows/Linux), iOS, Android.</p>
+  </div>
+  <div class="card mb-4"><h3 class="section-title" style="margin-top:0;">Технологии</h3><p class="card__body">Next.js 15 • PostgreSQL 16 • Prisma • WebSocket (Hono + uWebSockets) • Expo • Electron • Docker • Kubernetes</p></div>
+  <div class="card mb-4"><h3 class="section-title" style="margin-top:0;">Лицензии</h3><p class="card__body text-sm">MIT License • Google Fonts (Open Font License) • React (MIT) • Next.js (MIT) • Expo (MIT)</p></div>
+  <div class="card mb-4"><h3 class="section-title" style="margin-top:0;">Ссылки</h3>
+    <div class="list__item" style="border:none;" onclick="window.location.href='../download-balloo-su/downloads.html'">⬇️ Скачать приложение</div>
+    <div class="list__item" style="border:none;" onclick="window.location.href='../history-balloo-su/changelog.html'">📜 История версий</div>
+    <div class="list__item" style="border:none;" onclick="window.location.href='../docs-balloo-su/api-docs.html'">📚 API документация</div>
+    <div class="list__item" style="border:none;" onclick="window.location.href='../features-balloo-su/list.html'">💡 Предложить функцию</div>
+    <div class="list__item" style="border:none;" onclick="window.location.href='rules.html'">📋 Правила</div>
+    <div class="list__item" style="border:none;" onclick="window.location.href='about-company.html'">🏢 О компании</div>
+  </div>
+  <div class="card"><h3 class="section-title" style="margin-top:0;">Дорожная карта</h3>
+    <p class="card__body mb-2"><strong>v1 (текущая):</strong> Чаты, группы, звонки, OAuth, мультиязычность</p>
+    <p class="card__body"><strong>v2 (план):</strong> Госуслуги, SMS, E2EE, подразделы чатов, Premium</p>
+  </div>
+</div></div></div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Компонент: Groups Mgmt — Управление группами</title>
+  <link rel="stylesheet" href="../../assets/common.css">
+  <style>
+    .component-demo { padding: 24px; max-width: 640px; margin: 0 auto; }
+    .component-demo h1 { font-size: 20px; margin-bottom: 16px; }
+    .component-demo .demo-section { margin-bottom: 24px; }
+    .component-demo .demo-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+
+    .admin-groups__table { width: 100%; border-collapse: collapse; }
+    .admin-groups__table th { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border-color); }
+    .admin-groups__table td { padding: 12px; font-size: 14px; color: var(--text-primary); border-bottom: 1px solid var(--border-color); }
+    .admin-groups__table__row:hover td { background: var(--bg-hover); }
+    .admin-groups__table__name { font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    .admin-groups__table__members { color: var(--text-secondary); }
+    .admin-groups__table__status { font-size: 12px; padding: 3px 8px; font-weight: 600; }
+    .admin-groups__table__status--public { background: rgba(45,184,77,0.12); color: var(--accent); }
+    .admin-groups__table__status--private { background: rgba(59,158,255,0.12); color: var(--info); }
+    .admin-groups__table__actions { display: flex; gap: 8px; }
+    .admin-groups__header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .admin-groups__header__title { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+  </style>
+</head>
+<body>
+  <div class="component-demo">
+    <h1>📦 Компонент: Groups Mgmt (Управление группами)</h1>
+
+    <div class="demo-section">
+      <div class="demo-label">Таблица групп</div>
+      <div class="admin-groups__header">
+        <div class="admin-groups__header__title">Группы (8)</div>
+        <button class="btn btn--primary btn--sm">+ Добавить</button>
+      </div>
+      <table class="admin-groups__table">
+        <thead><tr><th>Группа</th><th>Участники</th><th>Тип</th><th>Действия</th></tr></thead>
+        <tbody>
+          <tr class="admin-groups__table__row">
+            <td><div class="admin-groups__table__name">👥 Команда</div></td>
+            <td class="admin-groups__table__members">15</td>
+            <td><span class="admin-groups__table__status admin-groups__table__status--public">Публичная</span></td>
+            <td><div class="admin-groups__table__actions"><button class="bots-table__action-btn">Ред.</button></div></td>
+          </tr>
+          <tr class="admin-groups__table__row">
+            <td><div class="admin-groups__table__name">👥 Проект Alpha</div></td>
+            <td class="admin-groups__table__members">7</td>
+            <td><span class="admin-groups__table__status admin-groups__table__status--private">Приватная</span></td>
+            <td><div class="admin-groups__table__actions"><button class="bots-table__action-btn">Ред.</button></div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <script src="../../assets/common.js"></script>
+</body>
+</html>

@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo — Полноэкранный просмотрщик медиа (Desktop)</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    html { overflow: hidden; }
+    body { overflow: hidden; height: 100vh; background: #000; display: flex; flex-direction: column; }
+    .viewer-topbar {
+      height: 48px; display: flex; align-items: center; justify-content: space-between;
+      padding: 0 16px; background: rgba(0,0,0,0.85); backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.08); z-index: 10;
+    }
+    .viewer-topbar__left { display: flex; align-items: center; gap: 12px; }
+    .viewer-topbar__back {
+      width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 18px; cursor: pointer; border-radius: 4px; transition: background 0.15s;
+    }
+    .viewer-topbar__back:hover { background: rgba(255,255,255,0.1); }
+    .viewer-topbar__info { display: flex; align-items: center; gap: 10px; }
+    .viewer-topbar__filename { color: #fff; font-size: 14px; font-weight: 600; }
+    .viewer-topbar__meta { color: rgba(255,255,255,0.5); font-size: 12px; }
+    .viewer-topbar__right { display: flex; align-items: center; gap: 4px; }
+    .viewer-topbar__btn {
+      width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 16px; cursor: pointer; border-radius: 4px; transition: background 0.15s;
+    }
+    .viewer-topbar__btn:hover { background: rgba(255,255,255,0.1); }
+    .viewer-body { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+    .viewer-slide {
+      display: none; width: 100%; height: 100%; align-items: center; justify-content: center;
+    }
+    .viewer-slide--active { display: flex; }
+    .viewer-slide img {
+      max-width: 100%; max-height: 100%; object-fit: contain; user-select: none;
+      transition: transform 0.2s ease;
+    }
+    .viewer-slide video {
+      max-width: 100%; max-height: 100%; background: #000;
+    }
+    .viewer-slide--audio {
+      flex-direction: column; gap: 24px;
+    }
+    .viewer-slide--audio .audio-icon {
+      width: 120px; height: 120px; display: flex; align-items: center; justify-content: center;
+      background: var(--bg-glass); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1);
+      font-size: 48px; border-radius: 0;
+    }
+    .viewer-slide--audio .audio-info { text-align: center; color: #fff; }
+    .viewer-slide--audio .audio-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+    .viewer-slide--audio .audio-artist { font-size: 14px; color: rgba(255,255,255,0.6); }
+    .viewer-audio-controls {
+      display: flex; align-items: center; gap: 16px; margin-top: 16px;
+    }
+    .viewer-audio-controls button {
+      width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+      background: rgba(255,255,255,0.1); border: none; color: #fff; font-size: 18px;
+      cursor: pointer; border-radius: 4px; transition: background 0.15s;
+    }
+    .viewer-audio-controls button:hover { background: rgba(255,255,255,0.2); }
+    .viewer-audio-controls button--play { width: 56px; height: 56px; font-size: 24px; background: var(--accent); }
+    .viewer-audio-controls button--play:hover { background: var(--accent-hover); }
+    .viewer-progress {
+      width: 300px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px;
+      cursor: pointer; position: relative; margin-top: 12px;
+    }
+    .viewer-progress__bar {
+      height: 100%; background: var(--accent); border-radius: 2px; width: 35%;
+    }
+    .viewer-progress__time {
+      display: flex; justify-content: space-between; color: rgba(255,255,255,0.5);
+      font-size: 11px; margin-top: 4px;
+    }
+    .viewer-nav {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.5); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.1);
+      color: #fff; font-size: 20px; cursor: pointer; z-index: 5; transition: background 0.15s;
+    }
+    .viewer-nav:hover { background: rgba(0,0,0,0.7); }
+    .viewer-nav--prev { left: 16px; }
+    .viewer-nav--next { right: 16px; }
+    .viewer-counter {
+      position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+      background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); padding: 6px 16px;
+      color: #fff; font-size: 13px; font-weight: 600; z-index: 5;
+    }
+    .viewer-dots {
+      position: absolute; bottom: 48px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 6px; z-index: 5;
+    }
+    .viewer-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.3);
+      cursor: pointer; transition: background 0.15s;
+    }
+    .viewer-dot--active { background: #fff; }
+    .viewer-sidebar {
+      width: 280px; background: rgba(0,0,0,0.85); backdrop-filter: blur(12px);
+      border-left: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column;
+      z-index: 10;
+    }
+    .viewer-sidebar__header {
+      padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.08);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .viewer-sidebar__title { color: #fff; font-size: 14px; font-weight: 700; }
+    .viewer-sidebar__close { color: rgba(255,255,255,0.5); cursor: pointer; font-size: 16px; }
+    .viewer-sidebar__list { flex: 1; overflow-y: auto; padding: 8px; }
+    .viewer-thumb {
+      width: 100%; aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+      margin-bottom: 8px; cursor: pointer; border: 2px solid transparent; transition: border-color 0.15s;
+      font-size: 24px;
+    }
+    .viewer-thumb:hover { border-color: rgba(255,255,255,0.3); }
+    .viewer-thumb--active { border-color: var(--accent); }
+    .viewer-sidebar__footer {
+      padding: 12px 16px; border-top: 1px solid rgba(255,255,255,0.08);
+      display: flex; gap: 8px;
+    }
+    .viewer-sidebar__footer button {
+      flex: 1; padding: 8px; font-size: 12px; font-weight: 600;
+      color: #fff; cursor: pointer; border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.05); border-radius: 4px; transition: background 0.15s;
+    }
+    .viewer-sidebar__footer button:hover { background: rgba(255,255,255,0.1); }
+    .viewer-info-panel {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: rgba(0,0,0,0.85); backdrop-filter: blur(12px);
+      border-top: 1px solid rgba(255,255,255,0.08); padding: 16px;
+      z-index: 10; display: none;
+    }
+    .viewer-info-panel--visible { display: block; }
+    .viewer-info-panel__row {
+      display: flex; justify-content: space-between; padding: 6px 0;
+      font-size: 13px; color: rgba(255,255,255,0.7);
+    }
+    .viewer-info-panel__label { color: rgba(255,255,255,0.4); }
+    .viewer-info-panel__value { color: #fff; font-weight: 600; }
+    .viewer-zoom-controls {
+      position: absolute; bottom: 16px; right: 16px; display: flex; gap: 4px; z-index: 5;
+    }
+    .viewer-zoom-controls button {
+      width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.5); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.1);
+      color: #fff; font-size: 14px; cursor: pointer; transition: background 0.15s;
+    }
+    .viewer-zoom-controls button:hover { background: rgba(0,0,0,0.7); }
+    .viewer-zoom-level {
+      display: flex; align-items: center; color: #fff; font-size: 12px; padding: 0 8px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOPBAR (overlay on viewer) -->
+<div class="viewer-topbar">
+  <div class="viewer-topbar__left">
+    <div class="viewer-topbar__back" onclick="closeViewer()" title="Назад (Esc)">←</div>
+    <div class="viewer-topbar__info">
+      <span class="viewer-topbar__filename">macos.png</span>
+      <span class="viewer-topbar__meta">• 240 КБ · 1920×1080</span>
+    </div>
+  </div>
+  <div class="viewer-topbar__right">
+    <div class="viewer-topbar__btn" onclick="toggleSidebar()" title="Галерея (G)">🖼</div>
+    <div class="viewer-topbar__btn" onclick="toggleInfo()" title="Информация (I)">ℹ️</div>
+    <div class="viewer-topbar__btn" onclick="toggleFullscreen()" title="Полный экран (F)">⛶</div>
+    <div class="viewer-topbar__btn" onclick="downloadMedia()" title="Скачать (S)">⬇️</div>
+    <div class="viewer-topbar__btn" onclick="shareMedia()" title="Поделиться">📤</div>
+    <div class="viewer-topbar__btn" onclick="closeViewer()" title="Закрыть (Esc)">✕</div>
+  </div>
+</div>
+
+<!-- MAIN VIEWER BODY -->
+<div class="viewer-body" id="viewer-body">
+  <!-- Image 1 -->
+  <div class="viewer-slide viewer-slide--active" data-index="0">
+    <div style="width:80%;height:70%;background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;font-weight:600;border:1px solid rgba(255,255,255,0.1);">
+      🖼 macOS Screenshot<br><span style="font-size:12px;font-weight:400;color:rgba(255,255,255,0.5);margin-top:8px;">1920×1080 · 240 КБ</span>
+    </div>
+  </div>
+
+  <!-- Image 2 -->
+  <div class="viewer-slide" data-index="1">
+    <div style="width:80%;height:70%;background:linear-gradient(135deg,#2d1b69,#11998e);display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;font-weight:600;border:1px solid rgba(255,255,255,0.1);">
+      🖼 design.png<br><span style="font-size:12px;font-weight:400;color:rgba(255,255,255,0.5);margin-top:8px;">3840×2160 · 1.2 МБ</span>
+    </div>
+  </div>
+
+  <!-- Video -->
+  <div class="viewer-slide" data-index="2">
+    <div style="width:80%;height:70%;background:#000;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.1);flex-direction:column;gap:16px;">
+      <div style="font-size:48px;">🎥</div>
+      <div style="color:#fff;font-size:16px;font-weight:600;">demo.mp4</div>
+      <div style="color:rgba(255,255,255,0.5);font-size:13px;">15 МБ · 1920×1080 · 2:34</div>
+      <div style="display:flex;gap:12px;margin-top:8px;">
+        <button style="padding:8px 20px;background:var(--accent);color:#fff;border:none;cursor:pointer;font-size:14px;font-weight:600;">▶ Воспроизвести</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Document -->
+  <div class="viewer-slide" data-index="3">
+    <div style="width:60%;height:70%;background:linear-gradient(135deg,#e8a317,#c97d00);display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;font-weight:600;border:1px solid rgba(255,255,255,0.1);flex-direction:column;gap:12px;">
+      <div style="font-size:48px;">📄</div>
+      <div>spec.pdf</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.6);">340 КБ · PDF-документ</div>
+      <div style="display:flex;gap:8px;">
+        <button style="padding:6px 16px;background:rgba(255,255,255,0.2);color:#fff;border:none;cursor:pointer;font-size:13px;">👁 Просмотр</button>
+        <button style="padding:6px 16px;background:var(--accent);color:#fff;border:none;cursor:pointer;font-size:13px;">⬇ Скачать</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Audio -->
+  <div class="viewer-slide viewer-slide--audio" data-index="4">
+    <div class="audio-icon">🎵</div>
+    <div class="audio-info">
+      <div class="audio-title">voice.ogg</div>
+      <div class="audio-artist">Голосовое сообщение · 88 КБ</div>
+    </div>
+    <div class="viewer-audio-controls">
+      <button title="Назад 10с">⏪</button>
+      <button class="viewer-audio-controls button--play" title="Пауза/Воспроизведение">▶</button>
+      <button title="Вперёд 10с">⏩</button>
+    </div>
+    <div>
+      <div class="viewer-progress">
+        <div class="viewer-progress__bar"></div>
+      </div>
+      <div class="viewer-progress__time">
+        <span>0:05</span>
+        <span>0:14</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation arrows -->
+  <div class="viewer-nav viewer-nav--prev" onclick="prevSlide()" title="Предыдущий (←)">❮</div>
+  <div class="viewer-nav viewer-nav--next" onclick="nextSlide()" title="Следующий (→)">❯</div>
+
+  <!-- Dots -->
+  <div class="viewer-dots" id="viewer-dots">
+    <div class="viewer-dot viewer-dot--active" onclick="goToSlide(0)"></div>
+    <div class="viewer-dot" onclick="goToSlide(1)"></div>
+    <div class="viewer-dot" onclick="goToSlide(2)"></div>
+    <div class="viewer-dot" onclick="goToSlide(3)"></div>
+    <div class="viewer-dot" onclick="goToSlide(4)"></div>
+  </div>
+
+  <!-- Counter -->
+  <div class="viewer-counter" id="viewer-counter">1 / 5</div>
+
+  <!-- Zoom controls -->
+  <div class="viewer-zoom-controls">
+    <button onclick="zoomOut()" title="Уменьшить">−</button>
+    <div class="viewer-zoom-level" id="zoom-level">100%</div>
+    <button onclick="zoomIn()" title="Увеличить">+</button>
+    <button onclick="zoomReset()" title="Сбросить">⊡</button>
+  </div>
+
+  <!-- Info panel -->
+  <div class="viewer-info-panel" id="viewer-info">
+    <div class="viewer-info-panel__row">
+      <span class="viewer-info-panel__label">Файл</span>
+      <span class="viewer-info-panel__value">macos.png</span>
+    </div>
+    <div class="viewer-info-panel__row">
+      <span class="viewer-info-panel__label">Тип</span>
+      <span class="viewer-info-panel__value">Изображение PNG</span>
+    </div>
+    <div class="viewer-info-panel__row">
+      <span class="viewer-info-panel__label">Размер</span>
+      <span class="viewer-info-panel__value">240 КБ</span>
+    </div>
+    <div class="viewer-info-panel__row">
+      <span class="viewer-info-panel__label">Разрешение</span>
+      <span class="viewer-info-panel__value">1920×1080</span>
+    </div>
+    <div class="viewer-info-panel__row">
+      <span class="viewer-info-panel__label">Отправитель</span>
+      <span class="viewer-info-panel__value">Мария Андреева</span>
+    </div>
+    <div class="viewer-info-panel__row">
+      <span class="viewer-info-panel__label">Дата</span>
+      <span class="viewer-info-panel__value">16.07.2026, 14:20</span>
+    </div>
+  </div>
+</div>
+
+<!-- Sidebar: Gallery -->
+<div class="viewer-sidebar" id="viewer-sidebar" style="display:none;">
+  <div class="viewer-sidebar__header">
+    <span class="viewer-sidebar__title">🖼 Галерея (5)</span>
+    <span class="viewer-sidebar__close" onclick="toggleSidebar()">✕</span>
+  </div>
+  <div class="viewer-sidebar__list">
+    <div class="viewer-thumb viewer-thumb--active" style="background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);" onclick="goToSlide(0)">🖼</div>
+    <div class="viewer-thumb" style="background:linear-gradient(135deg,#2d1b69,#11998e);" onclick="goToSlide(1)">🖼</div>
+    <div class="viewer-thumb" style="background:#000;" onclick="goToSlide(2)">🎥</div>
+    <div class="viewer-thumb" style="background:linear-gradient(135deg,#e8a317,#c97d00);" onclick="goToSlide(3)">📄</div>
+    <div class="viewer-thumb" style="background:linear-gradient(135deg,#6b7785,#4a5568);" onclick="goToSlide(4)">🎵</div>
+  </div>
+  <div class="viewer-sidebar__footer">
+    <button onclick="downloadMedia()">⬇️ Скачать всё</button>
+    <button onclick="shareMedia()">📤 Поделиться</button>
+    <button style="border-color:rgba(227,66,45,0.3);color:var(--danger);" onclick="showToast('Удалено','error')">🗑 Удалить</button>
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+<script>
+let currentSlide = 0;
+const totalSlides = 5;
+let zoom = 100;
+
+function updateViewer() {
+  document.querySelectorAll('.viewer-slide').forEach((s, i) => {
+    s.classList.toggle('viewer-slide--active', i === currentSlide);
+  });
+  document.querySelectorAll('.viewer-dot').forEach((d, i) => {
+    d.classList.toggle('viewer-dot--active', i === currentSlide);
+  });
+  document.querySelectorAll('.viewer-thumb').forEach((t, i) => {
+    t.classList.toggle('viewer-thumb--active', i === currentSlide);
+  });
+  document.getElementById('viewer-counter').textContent = (currentSlide + 1) + ' / ' + totalSlides;
+}
+
+function nextSlide() {
+  currentSlide = (currentSlide + 1) % totalSlides;
+  updateViewer();
+}
+
+function prevSlide() {
+  currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+  updateViewer();
+}
+
+function goToSlide(index) {
+  currentSlide = index;
+  updateViewer();
+}
+
+function closeViewer() {
+  if (confirm('Закрыть просмотрщик?')) {
+    showToast('Просмотрщик закрыт', 'info');
+  }
+}
+
+function toggleSidebar() {
+  const sidebar = document.getElementById('viewer-sidebar');
+  sidebar.style.display = sidebar.style.display === 'none' ? 'flex' : 'none';
+}
+
+function toggleInfo() {
+  const panel = document.getElementById('viewer-info');
+  panel.classList.toggle('viewer-info-panel--visible');
+}
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen?.();
+  } else {
+    document.exitFullscreen?.();
+  }
+}
+
+function downloadMedia() {
+  showToast('Загрузка начата', 'success');
+}
+
+function shareMedia() {
+  showToast('Ссылка скопирована', 'success');
+}
+
+function zoomIn() {
+  zoom = Math.min(zoom + 25, 300);
+  applyZoom();
+}
+
+function zoomOut() {
+  zoom = Math.max(zoom - 25, 25);
+  applyZoom();
+}
+
+function zoomReset() {
+  zoom = 100;
+  applyZoom();
+}
+
+function applyZoom() {
+  document.getElementById('zoom-level').textContent = zoom + '%';
+  document.querySelectorAll('.viewer-slide--active > div').forEach(el => {
+    el.style.transform = 'scale(' + (zoom / 100) + ')';
+  });
+}
+
+// Keyboard navigation
+document.addEventListener('keydown', (e) => {
+  switch(e.key) {
+    case 'ArrowLeft': prevSlide(); break;
+    case 'ArrowRight': nextSlide(); break;
+    case 'Escape': closeViewer(); break;
+    case 'g': case 'G': toggleSidebar(); break;
+    case 'i': case 'I': toggleInfo(); break;
+    case 'f': case 'F': toggleFullscreen(); break;
+    case 's': case 'S': downloadMedia(); break;
+    case '+': case '=': zoomIn(); break;
+    case '-': zoomOut(); break;
+    case '0': zoomReset(); break;
+  }
+});
+
+// Touch/swipe support (basic)
+let touchStartX = 0;
+document.getElementById('viewer-body').addEventListener('touchstart', (e) => {
+  touchStartX = e.changedTouches[0].screenX;
+});
+document.getElementById('viewer-body').addEventListener('touchend', (e) => {
+  const diff = e.changedTouches[0].screenX - touchStartX;
+  if (Math.abs(diff) > 50) {
+    if (diff > 0) prevSlide();
+    else nextSlide();
+  }
+});
+</script>
+</body>
+</html>

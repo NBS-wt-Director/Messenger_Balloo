@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobile — Обзор (сториборд)</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    html { overflow-y: auto; height: auto; }
+    body { overflow-y: auto; height: auto; min-height: 100vh; }
+    .storyboard { display: flex; flex-wrap: wrap; gap: 32px; justify-content: center; padding: 40px 24px 80px; }
+    .phone-frame {
+      width: 320px; height: 640px;
+      background: var(--bg-secondary);
+      border: 3px solid var(--border-strong);
+      border-radius: 32px;
+      overflow: hidden;
+      position: relative;
+      display: flex; flex-direction: column;
+      box-shadow: var(--shadow-glass);
+    }
+    .phone-frame__notch {
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 120px; height: 24px;
+      background: var(--bg-primary);
+      border-bottom-left-radius: 16px; border-bottom-right-radius: 16px;
+      z-index: 10;
+    }
+    .phone-frame__statusbar {
+      height: 28px; padding: 0 16px;
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 11px; color: var(--text-secondary);
+      background: var(--bg-secondary);
+      padding-top: 4px;
+    }
+    .phone-frame__screen {
+      flex: 1; overflow: hidden;
+      background: var(--bg-primary);
+      display: flex; flex-direction: column;
+    }
+    .phone-frame__label {
+      text-align: center; margin-top: 12px;
+      font-size: 13px; font-weight: 600; color: var(--text-secondary);
+    }
+    .phone-frame__home-bar {
+      height: 4px; width: 100px; margin: 0 auto 8px;
+      background: var(--text-muted); border-radius: 2px;
+    }
+    /* Mini topbar for phone */
+    .phone-topbar {
+      height: 44px; padding: 0 12px;
+      display: flex; align-items: center; gap: 8px;
+      background: var(--bg-glass); backdrop-filter: blur(var(--blur));
+      border-bottom: 1px solid var(--border-color);
+      font-size: 13px;
+    }
+    .phone-topbar__title { flex: 1; font-weight: 700; color: var(--text-primary); }
+    .phone-topbar__back { color: var(--accent); font-size: 18px; }
+    /* Tab bar */
+    .phone-tabbar {
+      height: 56px; display: flex;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border-color);
+    }
+    .phone-tabbar__item {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 2px; font-size: 10px; color: var(--text-muted);
+      cursor: pointer;
+    }
+    .phone-tabbar__item--active { color: var(--accent); }
+    .phone-tabbar__icon { font-size: 18px; }
+    /* Mini chat list */
+    .phone-chat-list { flex: 1; overflow: hidden; }
+    .phone-chat-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 12px; border-bottom: 1px solid var(--border-color);
+    }
+    .phone-chat-item__name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .phone-chat-item__msg { font-size: 11px; color: var(--text-secondary); }
+    /* Mini message */
+    .phone-msg {
+      max-width: 75%; padding: 6px 10px; margin: 2px 8px;
+      font-size: 12px; line-height: 1.4;
+    }
+    .phone-msg--sent {
+      align-self: flex-end; background: var(--accent); color: var(--accent-text);
+      clip-path: var(--bubble-sender);
+    }
+    .phone-msg--recv {
+      align-self: flex-start; background: var(--bg-tertiary); color: var(--text-primary);
+      clip-path: var(--bubble-receiver);
+    }
+    .phone-messages { flex: 1; overflow: hidden; padding: 8px 0; display: flex; flex-direction: column; }
+    /* Call screen */
+    .phone-call {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 16px;
+      background: var(--bg-primary);
+    }
+    .phone-call__avatar { width: 80px; height: 80px; clip-path: var(--octagon-clip); background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 32px; color: #fff; }
+    .phone-call__name { font-size: 18px; font-weight: 700; color: var(--text-primary); }
+    .phone-call__status { font-size: 13px; color: var(--text-secondary); }
+    .phone-call__controls { display: flex; gap: 16px; margin-top: 24px; }
+    .phone-call__btn { width: 48px; height: 48px; clip-path: var(--octagon-clip); display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; }
+    .phone-call__btn--mute { background: var(--bg-tertiary); color: var(--text-primary); }
+    .phone-call__btn--video { background: var(--bg-tertiary); color: var(--text-primary); }
+    .phone-call__btn--hangup { background: var(--danger); color: #fff; }
+    /* Settings mini */
+    .phone-settings-list { flex: 1; overflow: hidden; }
+    .phone-settings-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 12px; border-bottom: 1px solid var(--border-color);
+      font-size: 13px; color: var(--text-primary);
+    }
+    .phone-settings-item span:last-child { margin-left: auto; color: var(--text-muted); font-size: 11px; }
+    /* Onboarding mini */
+    .phone-onboarding {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 16px;
+      text-align: center; padding: 24px;
+    }
+    .phone-onboarding__icon { width: 80px; height: 80px; clip-path: var(--octagon-clip); background: var(--bg-glass); display: flex; align-items: center; justify-content: center; font-size: 40px; }
+    .phone-onboarding__title { font-size: 18px; font-weight: 800; color: var(--text-primary); }
+    .phone-onboarding__text { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+    .phone-onboarding__dots { display: flex; gap: 6px; }
+    .phone-onboarding__dot { width: 20px; height: 3px; background: var(--border-strong); }
+    .phone-onboarding__dot--active { background: var(--accent); }
+  </style>
+</head>
+<body>
+<div class="topbar topbar-mini">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--accent);">B</div><span>Balloo</span></div>
+  <div class="topbar__title">📱 Mobile — Сборный сториборд</div>
+  <div class="topbar__right"><a href="../index.html" class="btn btn--sm btn--tertiary">← Назад</a><span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span></div>
+</div>
+
+<div class="storyboard">
+  <!-- Onboarding -->
+  <div>
+    <div class="phone-frame">
+      <div class="phone-frame__notch"></div>
+      <div class="phone-frame__statusbar"><span>9:41</span><span>📶 🔋</span></div>
+      <div class="phone-frame__screen">
+        <div class="phone-onboarding">
+          <div class="phone-onboarding__icon">💬</div>
+          <div class="phone-onboarding__title">Добро пожаловать в Balloo</div>
+          <div class="phone-onboarding__text">Российский мессенджер с восьмигранными аватарками и тремя темами оформления</div>
+          <div class="phone-onboarding__dots">
+            <div class="phone-onboarding__dot phone-onboarding__dot--active"></div>
+            <div class="phone-onboarding__dot"></div>
+            <div class="phone-onboarding__dot"></div>
+          </div>
+          <button class="btn btn--primary btn--block">Далее</button>
+        </div>
+      </div>
+      <div class="phone-frame__home-bar"></div>
+    </div>
+    <div class="phone-frame__label">01 — Онбординг</div>
+  </div>
+
+  <!-- Chat List -->
+  <div>
+    <div class="phone-frame">
+      <div class="phone-frame__notch"></div>
+      <div class="phone-frame__statusbar"><span>9:41</span><span>📶 🔋</span></div>
+      <div class="phone-frame__screen">
+        <div class="phone-topbar">
+          <span class="phone-topbar__title">Чаты</span>
+          <span style="color:var(--accent);">✏</span>
+        </div>
+        <div class="phone-chat-list">
+          <div class="phone-chat-item">
+            <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>МА</span></div></div>
+            <div class="flex-1"><div class="phone-chat-item__name">Мария</div><div class="phone-chat-item__msg">Привет! Как дела?</div></div>
+            <span class="badge" style="font-size:9px;">3</span>
+          </div>
+          <div class="phone-chat-item">
+            <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-new"><div class="avatar__inner"><span>РД</span></div></div>
+            <div class="flex-1"><div class="phone-chat-item__name">Рабочий чат</div><div class="phone-chat-item__msg">Иван: готово</div></div>
+          </div>
+          <div class="phone-chat-item">
+            <div class="avatar avatar--sm avatar--bordered avatar--status-offline"><div class="avatar__inner"><span>АС</span></div></div>
+            <div class="flex-1"><div class="phone-chat-item__name">Алексей</div><div class="phone-chat-item__msg">🎵 Голосовое</div></div>
+          </div>
+          <div class="phone-chat-item">
+            <div class="avatar avatar--sm avatar--bordered avatar--status-busy avatar--ctx-family"><div class="avatar__inner"><span>СМ</span></div></div>
+            <div class="flex-1"><div class="phone-chat-item__name">Семья</div><div class="phone-chat-item__msg">Мама: фото</div></div>
+          </div>
+        </div>
+        <div class="phone-tabbar">
+          <div class="phone-tabbar__item phone-tabbar__item--active"><span class="phone-tabbar__icon">💬</span>Чаты</div>
+          <div class="phone-tabbar__item"><span class="phone-tabbar__icon">👥</span>Контакты</div>
+          <div class="phone-tabbar__item"><span class="phone-tabbar__icon">📞</span>Звонки</div>
+          <div class="phone-tabbar__item"><span class="phone-tabbar__icon">⚙</span>Настройки</div>
+        </div>
+      </div>
+      <div class="phone-frame__home-bar"></div>
+    </div>
+    <div class="phone-frame__label">02 — Список чатов</div>
+  </div>
+
+  <!-- Chat Detail -->
+  <div>
+    <div class="phone-frame">
+      <div class="phone-frame__notch"></div>
+      <div class="phone-frame__statusbar"><span>9:41</span><span>📶 🔋</span></div>
+      <div class="phone-frame__screen">
+        <div class="phone-topbar">
+          <span class="phone-topbar__back">←</span>
+          <div class="avatar avatar--xs avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>МА</span></div></div>
+          <span class="phone-topbar__title">Мария</span>
+          <span style="color:var(--accent);">📞</span>
+        </div>
+        <div class="phone-messages">
+          <div class="phone-msg phone-msg--recv">Привет! Ты видел новый макет?</div>
+          <div class="phone-msg phone-msg--sent">Да, выглядит отлично! 🔥</div>
+          <div class="phone-msg phone-msg--recv">Особенно аватарки-октагоны</div>
+          <div class="phone-msg phone-msg--sent">Согласен. Когда старт?</div>
+          <div class="phone-msg phone-msg--recv">Завтра в 10:00</div>
+        </div>
+        <div style="padding:8px 12px;border-top:1px solid var(--border-color);display:flex;gap:8px;align-items:center;">
+          <input type="text" placeholder="Сообщение..." style="flex:1;padding:8px;background:var(--bg-tertiary);border:1px solid var(--border-color);color:var(--text-primary);font-size:12px;outline:none;">
+          <span style="color:var(--accent);font-size:18px;">➤</span>
+        </div>
+      </div>
+      <div class="phone-frame__home-bar"></div>
+    </div>
+    <div class="phone-frame__label">03 — Чат</div>
+  </div>
+
+  <!-- Call -->
+  <div>
+    <div class="phone-frame">
+      <div class="phone-frame__notch"></div>
+      <div class="phone-frame__statusbar"><span>9:41</span><span>📶 🔋</span></div>
+      <div class="phone-frame__screen">
+        <div class="phone-call">
+          <div class="phone-call__avatar">МА</div>
+          <div class="phone-call__name">Мария Андреева</div>
+          <div class="phone-call__status">00:42 · 📶 HD</div>
+          <div style="width:240px;height:180px;background:var(--bg-tertiary);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:48px;">📹</div>
+          <div class="phone-call__controls">
+            <div class="phone-call__btn phone-call__btn--mute">🎤</div>
+            <div class="phone-call__btn phone-call__btn--video">📷</div>
+            <div class="phone-call__btn phone-call__btn--hangup">📞</div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-frame__home-bar"></div>
+    </div>
+    <div class="phone-frame__label">04 — Звонок</div>
+  </div>
+
+  <!-- Settings -->
+  <div>
+    <div class="phone-frame">
+      <div class="phone-frame__notch"></div>
+      <div class="phone-frame__statusbar"><span>9:41</span><span>📶 🔋</span></div>
+      <div class="phone-frame__screen">
+        <div class="phone-topbar"><span class="phone-topbar__title">Настройки</span></div>
+        <div style="padding:16px;text-align:center;border-bottom:1px solid var(--border-color);">
+          <div class="avatar avatar--lg avatar--bordered avatar--status-online avatar--ctx-contact" style="margin:0 auto;"><div class="avatar__inner"><span>ИИ</span></div></div>
+          <div style="font-size:15px;font-weight:700;color:var(--text-primary);margin-top:8px;">Иван Иванов</div>
+          <div style="font-size:11px;color:var(--text-muted);">@ivan · balloo.su/ivan</div>
+        </div>
+        <div class="phone-settings-list">
+          <div class="phone-settings-item">🌙 <span>Тема</span><span>Тёмная</span></div>
+          <div class="phone-settings-item">🔔 <span>Уведомления</span><span>Вкл</span></div>
+          <div class="phone-settings-item">🔒 <span>Приватность</span><span></span></div>
+          <div class="phone-settings-item">🌐 <span>Язык</span><span>RU</span></div>
+          <div class="phone-settings-item">💾 <span>Хранилище</span><span>Yandex</span></div>
+          <div class="phone-settings-item">ℹ️ <span>О Balloo</span><span>v1.0</span></div>
+        </div>
+        <div class="phone-tabbar">
+          <div class="phone-tabbar__item"><span class="phone-tabbar__icon">💬</span>Чаты</div>
+          <div class="phone-tabbar__item"><span class="phone-tabbar__icon">👥</span>Контакты</div>
+          <div class="phone-tabbar__item"><span class="phone-tabbar__icon">📞</span>Звонки</div>
+          <div class="phone-tabbar__item phone-tabbar__item--active"><span class="phone-tabbar__icon">⚙</span>Настройки</div>
+        </div>
+      </div>
+      <div class="phone-frame__home-bar"></div>
+    </div>
+    <div class="phone-frame__label">05 — Настройки</div>
+  </div>
+
+  <!-- Login -->
+  <div>
+    <div class="phone-frame">
+      <div class="phone-frame__notch"></div>
+      <div class="phone-frame__statusbar"><span>9:41</span><span>📶 🔋</span></div>
+      <div class="phone-frame__screen" style="display:flex;align-items:center;justify-content:center;padding:24px;">
+        <div style="text-align:center;width:100%;">
+          <div style="font-size:40px;">🦊</div>
+          <div style="font-size:18px;font-weight:800;color:var(--text-primary);margin:8px 0;">С возвращением!</div>
+          <div style="font-size:11px;color:var(--text-secondary);margin-bottom:16px;">Войдите в аккаунт</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <button style="padding:10px;background:#fc3f1d;color:#fff;border:none;border-radius:4px;font-size:12px;cursor:pointer;">Y Яндекс</button>
+            <button style="padding:10px;background:#005ff9;color:#fff;border:none;border-radius:4px;font-size:12px;cursor:pointer;">@ Mail.ru</button>
+          </div>
+          <div style="font-size:10px;color:var(--text-muted);margin:8px 0;">или</div>
+          <input type="email" placeholder="ivan@example.com" style="width:100%;padding:8px;background:var(--bg-tertiary);border:1px solid var(--border-color);color:var(--text-primary);font-size:12px;border-radius:4px;margin-bottom:8px;">
+          <input type="password" placeholder="••••••••" style="width:100%;padding:8px;background:var(--bg-tertiary);border:1px solid var(--border-color);color:var(--text-primary);font-size:12px;border-radius:4px;margin-bottom:12px;">
+          <button style="padding:10px;background:var(--accent);color:#fff;border:none;border-radius:4px;font-size:13px;font-weight:600;cursor:pointer;width:100%;">Войти</button>
+          <div style="font-size:10px;color:var(--text-secondary);margin-top:12px;">Нет аккаунта? <a href="#" style="color:var(--accent);">Регистрация</a></div>
+        </div>
+      </div>
+      <div class="phone-frame__home-bar"></div>
+    </div>
+    <div class="phone-frame__label">06 — Вход</div>
+  </div>
+
+  <!-- Register -->
+  <div>
+    <div class="phone-frame">
+      <div class="phone-frame__notch"></div>
+      <div class="phone-frame__statusbar"><span>9:41</span><span>📶 🔋</span></div>
+      <div class="phone-frame__screen" style="display:flex;align-items:center;justify-content:center;padding:24px;">
+        <div style="text-align:center;width:100%;">
+          <div style="font-size:18px;font-weight:800;color:var(--text-primary);margin-bottom:4px;">Создать аккаунт</div>
+          <div style="font-size:11px;color:var(--text-secondary);margin-bottom:16px;">Зарегистрируйтесь</div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;">
+            <button style="padding:10px;background:#fc3f1d;color:#fff;border:none;border-radius:4px;font-size:12px;cursor:pointer;">Y Яндекс</button>
+            <button style="padding:10px;background:#005ff9;color:#fff;border:none;border-radius:4px;font-size:12px;cursor:pointer;">@ Mail.ru</button>
+          </div>
+          <div style="font-size:10px;color:var(--text-muted);margin-bottom:12px;">или email</div>
+          <input type="text" placeholder="Иван Иванов" style="width:100%;padding:8px;background:var(--bg-tertiary);border:1px solid var(--border-color);color:var(--text-primary);font-size:12px;border-radius:4px;margin-bottom:8px;">
+          <input type="email" placeholder="ivan@example.com" style="width:100%;padding:8px;background:var(--bg-tertiary);border:1px solid var(--border-color);color:var(--text-primary);font-size:12px;border-radius:4px;margin-bottom:8px;">
+          <input type="password" placeholder="Минимум 8 символов" style="width:100%;padding:8px;background:var(--bg-tertiary);border:1px solid var(--border-color);color:var(--text-primary);font-size:12px;border-radius:4px;margin-bottom:12px;">
+          <button style="padding:10px;background:var(--accent);color:#fff;border:none;border-radius:4px;font-size:13px;font-weight:600;cursor:pointer;width:100%;">Зарегистрироваться</button>
+          <div style="font-size:10px;color:var(--text-secondary);margin-top:12px;">Уже есть аккаунт? <a href="#" style="color:var(--accent);">Войти</a></div>
+        </div>
+      </div>
+      <div class="phone-frame__home-bar"></div>
+    </div>
+    <div class="phone-frame__label">07 — Регистрация</div>
+  </div>
+
+  <!-- Profile -->
+  <div>
+    <div class="phone-frame">
+      <div class="phone-frame__notch"></div>
+      <div class="phone-frame__statusbar"><span>9:41</span><span>📶 🔋</span></div>
+      <div class="phone-frame__screen">
+        <div class="phone-topbar"><span class="phone-topbar__title">Профиль</span><span style="color:var(--accent);">✏</span></div>
+        <div style="padding:16px;text-align:center;border-bottom:1px solid var(--border-color);">
+          <div class="avatar avatar--xl avatar--bordered avatar--status-online avatar--ctx-contact" style="margin:0 auto 8px;"><div class="avatar__inner"><span>ИИ</span></div></div>
+          <div style="font-size:15px;font-weight:700;color:var(--text-primary);">Иван Иванов</div>
+          <div style="font-size:11px;color:var(--text-muted);">На работе</div>
+          <button style="margin-top:8px;padding:6px 12px;background:var(--bg-tertiary);border:1px solid var(--border-color);color:var(--text-primary);font-size:11px;border-radius:4px;cursor:pointer;">📷 Изменить аватар</button>
+        </div>
+        <div style="padding:12px;">
+          <div style="font-size:12px;font-weight:700;color:var(--text-primary);margin-bottom:8px;">Аккаунты</div>
+          <div style="display:flex;gap:8px;margin-bottom:12px;">
+            <div style="flex:1;padding:8px;background:var(--bg-tertiary);border:1px solid var(--accent);border-radius:4px;text-align:center;">
+              <div style="width:24px;height:24px;clip-path:var(--octagon-clip);background:var(--accent);display:inline-flex;align-items:center;justify-content:center;font-size:9px;color:#fff;font-weight:700;">ИИ</div>
+              <div style="font-size:10px;color:var(--text-primary);margin-top:4px;">Иван</div>
+            </div>
+            <div style="flex:1;padding:8px;background:var(--bg-tertiary);border:1px solid var(--border-color);border-radius:4px;text-align:center;">
+              <div style="width:24px;height:24px;clip-path:var(--octagon-clip);background:var(--bg-active);display:inline-flex;align-items:center;justify-content:center;font-size:9px;color:var(--text-primary);font-weight:700;">МА</div>
+              <div style="font-size:10px;color:var(--text-secondary);margin-top:4px;">Мария</div>
+            </div>
+          </div>
+          <div style="font-size:12px;font-weight:700;color:var(--text-primary);margin-bottom:8px;">Настройки</div>
+          <div class="phone-settings-item">🌙 <span>Тема</span><span>Тёмная</span></div>
+          <div class="phone-settings-item">🔒 <span>Приватность</span><span></span></div>
+          <div class="phone-settings-item">📱 <span>Устройства</span><span>3</span></div>
+          <div class="phone-settings-item">💰 <span>Донат</span><span></span></div>
+        </div>
+        <div class="phone-tabbar">
+          <div class="phone-tabbar__item"><span class="phone-tabbar__icon">💬</span>Чаты</div>
+          <div class="phone-tabbar__item"><span class="phone-tabbar__icon">👥</span>Контакты</div>
+          <div class="phone-tabbar__item"><span class="phone-tabbar__icon">📷</span>Сторис</div>
+          <div class="phone-tabbar__item"><span class="phone-tabbar__icon">📞</span>Звонки</div>
+          <div class="phone-tabbar__item phone-tabbar__item--active"><span class="phone-tabbar__icon">⚙</span>Настройки</div>
+        </div>
+      </div>
+      <div class="phone-frame__home-bar"></div>
+    </div>
+    <div class="phone-frame__label">08 — Профиль</div>
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+</body>
+</html>

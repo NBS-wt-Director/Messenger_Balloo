@@ -1,0 +1,46 @@
+{
+  "name": "balloo-messenger",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Balloon Messenger — мессенджер + админ + портал сотрудников + блог",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "dev:web": "pnpm --filter @balloo/web dev",
+    "dev:server": "pnpm --filter @balloo/server dev",
+    "dev:desktop": "pnpm --filter @balloo/desktop dev",
+    "dev:mobile-android": "pnpm --filter @balloo/mobile-android start",
+    "build": "pnpm -r build",
+    "build:all": "pnpm -r --parallel build",
+    "build:shared": "pnpm --filter @balloo/shared build",
+    "build:server": "pnpm --filter @balloo/server build",
+    "build:web": "pnpm --filter @balloo/web build",
+    "test": "pnpm -r test",
+    "test:all": "pnpm -r --parallel test",
+    "test:shared": "pnpm --filter @balloo/shared test",
+    "test:server": "pnpm --filter @balloo/server test",
+    "test:web": "pnpm --filter @balloo/web test",
+    "test:e2e": "pnpm --filter @balloo/web test:e2e",
+    "lint": "pnpm -r lint",
+    "lint:all": "pnpm -r --parallel lint",
+    "lint:shared": "pnpm --filter @balloo/shared lint",
+    "lint:server": "pnpm --filter @balloo/server lint",
+    "lint:web": "pnpm --filter @balloo/web lint",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:build": "docker compose build",
+    "docker:logs": "docker compose logs -f",
+    "db:generate": "pnpm --filter @balloo/shared prisma generate",
+    "db:migrate": "pnpm --filter @balloo/shared prisma migrate deploy",
+    "db:seed": "pnpm --filter @balloo/shared prisma db seed",
+    "db:push": "pnpm --filter @balloo/shared prisma db push",
+    "db:studio": "pnpm --filter @balloo/shared prisma studio"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@11.17.0"
+}

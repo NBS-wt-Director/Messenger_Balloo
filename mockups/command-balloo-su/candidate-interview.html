@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Command — Карточка кандидата (интервью)</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--info);">C</div><span>Command</span>
+    <div class="topbar__dropdown"><div class="topbar__dropdown-item">🏢 Command (текущий)</div><div class="topbar__dropdown-divider"></div><div class="topbar__dropdown-item">💬 Balloo</div><div class="topbar__dropdown-item">🛡️ Admin</div><div class="topbar__dropdown-item">💡 Features</div><div class="topbar__dropdown-item">📜 History</div><div class="topbar__dropdown-item">⬇️ Download</div><div class="topbar__dropdown-item">📚 API Docs</div></div>
+  </div>
+  <div class="topbar__title">Интервью — Алексей Морозов</div>
+  <div class="topbar__actions">
+    <div class="flex gap-2 items-center" style="color:var(--text-secondary);font-size:13px;">
+      <span>⏱</span>
+      <span id="interview-timer" class="font-semibold" style="color:var(--warning);font-variant-numeric:tabular-nums;">24:17</span>
+    </div>
+    <button class="btn btn--secondary btn--sm" onclick="toggleNotes()">📝 Заметки</button>
+  </div>
+  <div class="topbar__right"><div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИИ</span></div></div><span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span><span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span></div>
+</div>
+<div class="main">
+  <!-- Sidebar: Candidate info -->
+  <div class="sidebar">
+    <div style="padding:20px 16px;border-bottom:1px solid var(--border-color);">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="avatar avatar--lg avatar--bordered avatar--status-online avatar--ctx-new"><div class="avatar__inner"><span>АМ</span></div></div>
+        <div>
+          <div class="font-bold" style="font-size:16px;color:var(--text-primary);">Алексей Морозов</div>
+          <div class="text-sm text-secondary">Backend Developer</div>
+        </div>
+      </div>
+      <div class="flex flex-col gap-2 text-sm">
+        <div class="flex justify-between"><span class="text-muted">Откликнулся:</span><span>12.07.2026</span></div>
+        <div class="flex justify-between"><span class="text-muted">Вакансия:</span><span>Senior Backend (Next.js)</span></div>
+        <div class="flex justify-between"><span class="text-muted">Этап:</span><span class="chip chip--info">Техническое интервью</span></div>
+        <div class="flex justify-between"><span class="text-muted">Интервьюер:</span><span>Иван Иванов</span></div>
+        <div class="flex justify-between"><span class="text-muted">Дата:</span><span>22.07.2026, 14:00</span></div>
+        <div class="flex justify-between"><span class="text-muted">Длительность:</span><span>60 мин</span></div>
+      </div>
+    </div>
+    <!-- Previous stages -->
+    <div style="padding:16px;">
+      <div class="text-xs text-muted mb-2" style="font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Этапы найма</div>
+      <div class="flex flex-col gap-1">
+        <div class="flex items-center gap-2"><span style="color:var(--accent);">✓</span><span class="text-sm">Резюме / Скрининг</span><span class="text-xs text-muted ml-auto">14.07</span></div>
+        <div class="flex items-center gap-2"><span style="color:var(--accent);">✓</span><span class="text-sm">Тестовое задание</span><span class="text-xs text-muted ml-auto">17.07</span></div>
+        <div class="flex items-center gap-2"><span style="color:var(--info);">●</span><span class="text-sm font-semibold">Техническое интервью</span><span class="text-xs text-muted ml-auto">22.07</span></div>
+        <div class="flex items-center gap-2"><span class="text-muted">○</span><span class="text-sm text-muted">Финальное интервью</span></div>
+        <div class="flex items-center gap-2"><span class="text-muted">○</span><span class="text-sm text-muted">Оффер</span></div>
+      </div>
+    </div>
+    <!-- Quick stats -->
+    <div style="padding:16px;border-top:1px solid var(--border-color);">
+      <div class="text-xs text-muted mb-2" style="font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Статистика</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <div class="card text-center" style="padding:12px;"><div class="font-bold" style="font-size:18px;color:var(--text-primary);">3.2</div><div class="text-xs text-muted">Средний балл</div></div>
+        <div class="card text-center" style="padding:12px;"><div class="font-bold" style="font-size:18px;color:var(--accent);">85%</div><div class="text-xs text-muted">Совпадение</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content: Interview area -->
+  <div class="content overflow-y-auto">
+    <div style="display:flex;flex-direction:column;height:100%;">
+      <!-- Interview header -->
+      <div style="padding:20px 24px;border-bottom:1px solid var(--border-color);display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <h2 style="font-size:18px;font-weight:700;color:var(--text-primary);">Техническое интервью</h2>
+          <div class="text-sm text-secondary">Backend Developer · Senior Level · 60 мин</div>
+        </div>
+        <div class="flex gap-2">
+          <button class="btn btn--secondary btn--sm">📹 Видеозвонок</button>
+          <button class="btn btn--primary btn--sm" onclick="openModal('modal-decision')">Решение</button>
+        </div>
+      </div>
+
+      <!-- Evaluation criteria -->
+      <div style="padding:20px 24px;border-bottom:1px solid var(--border-color);">
+        <h3 class="card__title mb-4" style="font-size:14px;">Критерии оценки</h3>
+        <div class="flex flex-col gap-3">
+          <!-- Criterion 1 -->
+          <div class="flex items-center gap-3">
+            <div style="flex:1;">
+              <div class="text-sm font-semibold" style="color:var(--text-primary);">Архитектура и дизайн систем</div>
+              <div class="text-xs text-muted">Масштабируемость, паттерны проектирования, балансировка нагрузки</div>
+            </div>
+            <div class="flex gap-1">
+              <button class="btn btn--secondary btn--sm eval-btn" onclick="rateCriteria(this, 1)">1</button>
+              <button class="btn btn--secondary btn--sm eval-btn" onclick="rateCriteria(this, 2)">2</button>
+              <button class="btn btn--secondary btn--sm eval-btn" onclick="rateCriteria(this, 3)">3</button>
+              <button class="btn btn--secondary btn--sm eval-btn" onclick="rateCriteria(this, 4)">4</button>
+              <button class="btn btn--secondary btn--sm eval-btn" onclick="rateCriteria(this, 5)">5</button>
+            </div>
+            <span class="eval-score text-xs font-bold" style="color:var(--text-muted);width:20px;">—</span>
+          </div>
+          <!-- Criterion 2 -->
+          <div class="flex items-center gap-3">
+            <div style="flex:1;">
+              <div class="text-sm font-semibold" style="color:var(--text-primary);">Базы данных и ORM</div>
+              <div class="text-xs text-muted">PostgreSQL, Prisma, оптимизация запросов, миграции</div>
+            </div>
+            <div class="flex gap-1">
+              <button class="btn btn--secondary btn--sm eval-btn" onclick="rateCriteria(this, 1)">1</button>
+              <button class="btn btn--secondary btn--sm eval-btn" onclick="rateCriteria(this, 2)">2</button>
+              <button class="btn btn--secondary btn--sm eval-btn" onclick="rateCriteria(this, 3)">3</button>
+              <button class="btn btn--secondary btn--sm eval-btn" onclick="rateCriteria(this, 4)">4</button>
+              <button class="btn btn--secondary btn--sm eval-btn" onclick="rateCriteria(this, 5)">5</button>
+            </div>
+            <span class="eval-score text-xs font-bold" style="color:var(--text-muted);width:20px;">—</span>
+          </div>
+          <!-- Criterion 3 -->
+          <div class="flex items-center gap-3">
+            <div style="flex:1;">
+              <div class="text-sm font-semibold" style="color:var(--text-primary);">WebSocket / Real-time</div>
+              <div class="text-xs text-muted">Реальный опыт работы с WebSocket, pub/sub, масштабируемость</div>
+            </div>
+            <div class="flex gap-1">
+              <button class="btn btn--secondary btn--sm eval-btn" onclick="rateCriteria(this, 1)">1</button>
+              <button class="btn btn--secondary btn--sm eval-btn" onclick="rateCriteria(this, 2)">2</button>
+              <button class="btn btn--secondary btn--sm eval-btn" onclick="rateCriteria(this, 3)">3</button>
+              <button class="btn btn--secondary btn--sm eval-btn" onclick="rateCriteria(this, 4)">4</button>
+              <button class="btn btn--secondary btn--sm eval-btn" onclick="rateCriteria(this, 5)">5</button>
+            </div>
+            <span class="eval-score text-xs font-bold" style="color:var(--text-muted);width:20px;">—</span>
+          </div>
+          <!-- Criterion 4 -->
+          <div class="flex items-center gap-3">
+            <div style="flex:1;">
+              <div class="text-sm font-semibold" style="color:var(--text-primary);">Тестирование и качество кода</div>
+              <div class="text-xs text-muted">Unit / Integration тесты, CI/CD, code review</div>
+            </div>
+            <div class="flex gap-1">
+              <button class="btn btn--secondary btn--sm eval-btn" onclick="rateCriteria(this, 1)">1</button>
+              <button class="btn btn--secondary btn--sm eval-btn" onclick="rateCriteria(this, 2)">2</button>
+              <button class="btn btn--secondary btn--sm eval-btn" onclick="rateCriteria(this, 3)">3</button>
+              <button class="btn btn--secondary btn--sm eval-btn" onclick="rateCriteria(this, 4)">4</button>
+              <button class="btn btn--secondary btn--sm eval-btn" onclick="rateCriteria(this, 5)">5</button>
+            </div>
+            <span class="eval-score text-xs font-bold" style="color:var(--text-muted);width:20px;">—</span>
+          </div>
+          <!-- Criterion 5 -->
+          <div class="flex items-center gap-3">
+            <div style="flex:1;">
+              <div class="text-sm font-semibold" style="color:var(--text-primary);">Коммуникация и культура</div>
+              <div class="text-xs text-muted">Командная работа, объяснение решений, soft skills</div>
+            </div>
+            <div class="flex gap-1">
+              <button class="btn btn--secondary btn--sm eval-btn" onclick="rateCriteria(this, 1)">1</button>
+              <button class="btn btn--secondary btn--sm eval-btn" onclick="rateCriteria(this, 2)">2</button>
+              <button class="btn btn--secondary btn--sm eval-btn" onclick="rateCriteria(this, 3)">3</button>
+              <button class="btn btn--secondary btn--sm eval-btn" onclick="rateCriteria(this, 4)">4</button>
+              <button class="btn btn--secondary btn--sm eval-btn" onclick="rateCriteria(this, 5)">5</button>
+            </div>
+            <span class="eval-score text-xs font-bold" style="color:var(--text-muted);width:20px;">—</span>
+          </div>
+        </div>
+        <div class="flex justify-between items-center mt-4 pt-3" style="border-top:1px solid var(--border-color);">
+          <span class="text-sm font-semibold" style="color:var(--text-secondary);">Итого:</span>
+          <div class="flex items-center gap-2">
+            <span id="total-score" class="font-bold" style="font-size:20px;color:var(--text-muted);">0 / 25</span>
+            <span id="total-percent" class="chip" style="display:none;">0%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes area -->
+      <div id="notes-area" style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+        <div style="padding:16px 24px;border-bottom:1px solid var(--border-color);display:flex;justify-content:space-between;align-items:center;">
+          <h3 class="card__title" style="font-size:14px;margin:0;">📝 Заметки интервьюера</h3>
+          <div class="flex gap-2">
+            <button class="btn btn--tertiary btn--sm" onclick="toggleNotes()">Свернуть</button>
+          </div>
+        </div>
+        <textarea class="form-textarea" style="flex:1;padding:16px 24px;resize:none;border:none;" placeholder="Записывайте наблюдения во время интервью...
+
+Примеры:
+• Сильные стороны кандидата
+• Слабые стороны / зоны роста
+• Вопросы, которые вызвали затруднения
+• Рекомендации"></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Decision Modal -->
+<div class="modal-overlay" id="modal-overlay"></div>
+<div class="modal modal--status-success" id="modal-decision" style="width:480px;">
+  <div class="modal__header"><span class="modal__title">Решение по кандидату</span><div class="modal__close" onclick="closeModal('modal-decision')">✕</div></div>
+  <div class="modal__body">
+    <div class="text-center mb-4">
+      <div class="avatar avatar--md avatar--bordered avatar--ctx-new mx-auto" style="margin:0 auto 12px;"><div class="avatar__inner"><span>АМ</span></div></div>
+      <div class="font-bold" style="font-size:16px;color:var(--text-primary);">Алексей Морозов</div>
+      <div class="text-sm text-secondary">Backend Developer · Senior</div>
+      <div class="mt-2">
+        <span id="decision-score-display" class="chip chip--info" style="display:none;">Средний балл: 0/5</span>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="text-sm mb-4" style="color:var(--text-secondary);">Выберите решение по итогам интервью:</div>
+
+    <!-- Decision buttons -->
+    <div class="flex flex-col gap-3">
+      <button class="btn btn--primary btn--block" onclick="submitDecision('accept')">
+        <span style="font-size:18px;">✓</span> Принять — далее оффер
+      </button>
+      <button class="btn btn--secondary btn--block" onclick="openModal('modal-other-role')">
+        <span style="font-size:18px;">↻</span> На другую роль
+      </button>
+      <button class="btn btn--danger btn--block" onclick="openModal('modal-reject')">
+        <span style="font-size:18px;">✕</span> Отклонить
+      </button>
+    </div>
+
+    <div class="form-group mt-4">
+      <label class="form-label">Комментарий (обязательно)</label>
+      <textarea class="form-textarea" placeholder="Обоснуйте решение..." style="min-height:80px;"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- Other role modal -->
+<div class="modal modal--status-info" id="modal-other-role" style="width:480px;">
+  <div class="modal__header"><span class="modal__title">🔄 Предложить другую роль</span><div class="modal__close" onclick="closeModal('modal-other-role')">✕</div></div>
+  <div class="modal__body">
+    <div class="text-sm mb-4" style="color:var(--text-secondary);">Кандидат подходит для другой позиции. Выберите роль:</div>
+    <div class="form-group">
+      <label class="form-label">Предлагаемая вакансия</label>
+      <select class="form-select">
+        <option>— Выберите —</option>
+        <option>Junior Backend Developer</option>
+        <option>Middle Backend Developer</option>
+        <option>Tech Lead (Next.js)</option>
+        <option>System Architect</option>
+        <option>CTO Office — Advisor</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Комментарий кандидату</label>
+      <textarea class="form-textarea" placeholder="Почему предлагаем эту роль..." style="min-height:80px;"></textarea>
+    </div>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--tertiary" onclick="closeModal('modal-other-role')">Отмена</button>
+    <button class="btn btn--primary" onclick="closeModal('modal-other-role');closeModal('modal-decision')">Отправить</button>
+  </div>
+</div>
+
+<!-- Reject modal -->
+<div class="modal modal--status-danger" id="modal-reject" style="width:480px;">
+  <div class="modal__header"><span class="modal__title">✕ Отклонение кандидата</span><div class="modal__close" onclick="closeModal('modal-reject')">✕</div></div>
+  <div class="modal__body">
+    <div class="text-sm mb-4" style="color:var(--text-secondary);">Подтвердите отклонение. Укажите причину:</div>
+    <div class="form-group">
+      <label class="form-label">Причина отклонения</label>
+      <select class="form-select">
+        <option>— Выберите —</option>
+        <option>Недостаточный уровень навыков</option>
+        <option>Не подходит по культуре</option>
+        <option>Нет опыта с ключевыми технологиями</option>
+        <option>Есть более подходящий кандидат</option>
+        <option>Другая причина</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Детали</label>
+      <textarea class="form-textarea" placeholder="Подробное обоснование..." style="min-height:100px;"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-checkbox"><input type="checkbox"> Добавить в резервную базу кандидатов</label>
+    </div>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--tertiary" onclick="closeModal('modal-reject')">Отмена</button>
+    <button class="btn btn--danger" onclick="closeAllModals()">Подтвердить отклонение</button>
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+<script>
+// Interview timer
+let interviewSeconds = 24 * 60 + 17;
+function updateTimer() {
+  const m = Math.floor(interviewSeconds / 60).toString().padStart(2, '0');
+  const s = (interviewSeconds % 60).toString().padStart(2, '0');
+  document.getElementById('interview-timer').textContent = m + ':' + s;
+  if (interviewSeconds > 0) interviewSeconds--;
+  else {
+    document.getElementById('interview-timer').style.color = 'var(--danger)';
+    document.getElementById('interview-timer').textContent = '00:00';
+  }
+}
+setInterval(updateTimer, 1000);
+
+// Evaluation criteria rating
+const scores = {};
+function rateCriteria(btn, value) {
+  const row = btn.closest('.flex.items-center.gap-3');
+  const buttons = row.querySelectorAll('.eval-btn');
+  const scoreEl = row.querySelector('.eval-score');
+
+  buttons.forEach(b => {
+    b.classList.remove('btn--primary');
+    b.classList.add('btn--secondary');
+  });
+  btn.classList.remove('btn--secondary');
+  btn.classList.add('btn--primary');
+
+  const color = value <= 2 ? 'var(--danger)' : value <= 3 ? 'var(--warning)' : 'var(--accent)';
+  scoreEl.textContent = value;
+  scoreEl.style.color = color;
+
+  // Get criterion index
+  const allRows = document.querySelectorAll('.flex.items-center.gap-3');
+  let idx = 0;
+  allRows.forEach((r, i) => { if (r === row) idx = i; });
+  scores[idx] = value;
+
+  updateTotalScore();
+}
+
+function updateTotalScore() {
+  const values = Object.values(scores);
+  const total = values.reduce((a, b) => a + b, 0);
+  const max = values.length * 5 || 25;
+  const percent = values.length > 0 ? Math.round((total / max) * 100) : 0;
+
+  document.getElementById('total-score').textContent = total + ' / ' + max;
+  document.getElementById('total-score').style.color = values.length > 0 ? 'var(--text-primary)' : 'var(--text-muted)';
+
+  const pctEl = document.getElementById('total-percent');
+  if (values.length > 0) {
+    pctEl.style.display = '';
+    pctEl.textContent = percent + '%';
+    pctEl.className = 'chip ' + (percent >= 70 ? 'chip--accent' : percent >= 50 ? 'chip--warning' : 'chip--danger');
+  }
+
+  // Update decision modal score display
+  const avg = values.length > 0 ? (total / values.length).toFixed(1) : 0;
+  const scoreDisplay = document.getElementById('decision-score-display');
+  scoreDisplay.textContent = 'Средний балл: ' + avg + '/5';
+  scoreDisplay.style.display = values.length > 0 ? '' : 'none';
+}
+
+// Notes toggle
+function toggleNotes() {
+  const area = document.getElementById('notes-area');
+  area.style.display = area.style.display === 'none' ? 'flex' : 'none';
+}
+
+// Submit decision
+function submitDecision(type) {
+  const labels = { accept: 'Кандидат принят! Далее — оффер.', reject: 'Кандидат отклонён.', other: 'Предложение отправлено.' };
+  alert(labels[type] || 'Решение сохранено.');
+  closeAllModals();
+}
+</script>
+</body>
+</html>

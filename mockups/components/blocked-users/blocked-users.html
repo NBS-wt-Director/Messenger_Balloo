@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Компонент: Blocked Users — Заблокированные пользователи</title>
+  <link rel="stylesheet" href="../../assets/common.css">
+  <style>
+    .component-demo { padding: 24px; max-width: 480px; margin: 0 auto; }
+    .component-demo h1 { font-size: 20px; margin-bottom: 16px; }
+    .component-demo .demo-section { margin-bottom: 24px; }
+    .component-demo .demo-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+
+    .blocked-list { display: flex; flex-direction: column; gap: 2px; }
+    .blocked-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+    }
+    .blocked-item + .blocked-item { border-top: none; }
+    .blocked-item .avatar { background: #000; }
+    .blocked-item .avatar .avatar__inner { background: #6b7785; }
+    .blocked-item__info { flex: 1; min-width: 0; }
+    .blocked-item__name { font-weight: 600; color: var(--text-primary); font-size: 14px; }
+    .blocked-item__id { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .blocked-item__action {
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      cursor: pointer;
+      border: 1px solid var(--accent);
+      transition: background 0.15s;
+    }
+    .blocked-item__action:hover { background: rgba(45,184,77,0.1); }
+    .blocked-empty {
+      text-align: center;
+      padding: 40px 24px;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="component-demo">
+    <h1>📦 Компонент: Blocked Users (Заблокированные пользователи)</h1>
+
+    <div class="demo-section">
+      <div class="demo-label">Список заблокированных</div>
+      <div class="blocked-list">
+        <div class="blocked-item">
+          <div class="avatar avatar--md avatar--bordered avatar--status-offline avatar--ctx-blocked">
+            <div class="avatar__inner"><span>МП</span></div>
+          </div>
+          <div class="blocked-item__info">
+            <div class="blocked-item__name">Михаил П.</div>
+            <div class="blocked-item__id">ID: clxxx123</div>
+          </div>
+          <div class="blocked-item__action" onclick="this.textContent='Разблокировать';this.style.color='var(--text-muted)';this.style.borderColor='var(--border-color)'">Разблокировать</div>
+        </div>
+        <div class="blocked-item">
+          <div class="avatar avatar--md avatar--bordered avatar--status-offline avatar--ctx-blocked">
+            <div class="avatar__inner"><span>ОС</span></div>
+          </div>
+          <div class="blocked-item__info">
+            <div class="blocked-item__name">Ольга С.</div>
+            <div class="blocked-item__id">ID: clxxx456</div>
+          </div>
+          <div class="blocked-item__action" onclick="this.textContent='Разблокировать';this.style.color='var(--text-muted)';this.style.borderColor='var(--border-color)'">Разблокировать</div>
+        </div>
+        <div class="blocked-item">
+          <div class="avatar avatar--md avatar--bordered avatar--status-offline avatar--ctx-blocked">
+            <div class="avatar__inner"><span>ДВ</span></div>
+          </div>
+          <div class="blocked-item__info">
+            <div class="blocked-item__name">Дмитрий В.</div>
+            <div class="blocked-item__id">ID: clxxx789</div>
+          </div>
+          <div class="blocked-item__action" onclick="this.textContent='Разблокировать';this.style.color='var(--text-muted)';this.style.borderColor='var(--border-color)'">Разблокировать</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="demo-section">
+      <div class="demo-label">Пустой список</div>
+      <div class="blocked-empty">
+        Нет заблокированных пользователей
+      </div>
+    </div>
+  </div>
+  <script src="../../assets/common.js"></script>
+</body>
+</html>

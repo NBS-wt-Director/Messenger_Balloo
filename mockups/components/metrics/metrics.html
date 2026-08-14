@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Компонент: Metrics — Метрики</title>
+  <link rel="stylesheet" href="../../assets/common.css">
+  <style>
+    .component-demo { padding: 24px; max-width: 640px; margin: 0 auto; }
+    .component-demo h1 { font-size: 20px; margin-bottom: 16px; }
+    .component-demo .demo-section { margin-bottom: 24px; }
+    .component-demo .demo-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+
+    .metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+    .metrics-grid__card { padding: 16px; background: var(--bg-glass); border: 1px solid var(--border-color); text-align: center; }
+    .metrics-grid__card__value { font-size: 24px; font-weight: 800; color: var(--accent); }
+    .metrics-grid__card__label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+    .metrics-grid__card__change { font-size: 11px; margin-top: 4px; }
+    .metrics-grid__card__change--up { color: var(--accent); }
+    .metrics-grid__card__change--down { color: var(--danger); }
+    .metrics-chart {
+      height: 200px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-around;
+      padding: 16px 12px 0;
+      gap: 4px;
+    }
+    .metrics-chart__bar {
+      flex: 1;
+      background: var(--accent);
+      opacity: 0.7;
+      min-height: 4px;
+      transition: opacity 0.15s;
+    }
+    .metrics-chart__bar:hover { opacity: 1; }
+  </style>
+</head>
+<body>
+  <div class="component-demo">
+    <h1>📦 Компонент: Metrics (Метрики)</h1>
+
+    <div class="demo-section">
+      <div class="demo-label">Основные метрики</div>
+      <div class="metrics-grid">
+        <div class="metrics-grid__card">
+          <div class="metrics-grid__card__value">12 450</div>
+          <div class="metrics-grid__card__label">Пользователей</div>
+          <div class="metrics-grid__card__change metrics-grid__card__change--up">↑ 12%</div>
+        </div>
+        <div class="metrics-grid__card">
+          <div class="metrics-grid__card__value" style="color:var(--text-primary);">3 280</div>
+          <div class="metrics-grid__card__label">Онлайн сейчас</div>
+          <div class="metrics-grid__card__change metrics-grid__card__change--up">↑ 5%</div>
+        </div>
+        <div class="metrics-grid__card">
+          <div class="metrics-grid__card__value" style="color:var(--text-primary);">45 600</div>
+          <div class="metrics-grid__card__label">Сообщений/день</div>
+          <div class="metrics-grid__card__change metrics-grid__card__change--down">↓ 2%</div>
+        </div>
+        <div class="metrics-grid__card">
+          <div class="metrics-grid__card__value" style="color:var(--text-primary);">99.8%</div>
+          <div class="metrics-grid__card__label">Аптайм</div>
+          <div class="metrics-grid__card__change metrics-grid__card__change--up">↑ 0.1%</div>
+        </div>
+      </div>
+      <div class="demo-label" style="margin-top:16px;">Активность за неделю</div>
+      <div class="metrics-chart">
+        <div class="metrics-chart__bar" style="height:60%"></div>
+        <div class="metrics-chart__bar" style="height:75%"></div>
+        <div class="metrics-chart__bar" style="height:50%"></div>
+        <div class="metrics-chart__bar" style="height:85%"></div>
+        <div class="metrics-chart__bar" style="height:70%"></div>
+        <div class="metrics-chart__bar" style="height:90%"></div>
+        <div class="metrics-chart__bar" style="height:95%"></div>
+      </div>
+    </div>
+  </div>
+  <script src="../../assets/common.js"></script>
+</body>
+</html>

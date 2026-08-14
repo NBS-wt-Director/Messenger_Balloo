@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Specifity — Компоненты</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <link rel="stylesheet" href="spec.css">
+  <style>
+    .comp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+    .comp-card { background: var(--bg-glass); backdrop-filter: blur(var(--blur)); border: 1px solid var(--border-color); padding: 16px; }
+    .comp-card__header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color); }
+    .comp-card__node { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+    .comp-card__count { font-size: 12px; font-weight: 700; color: var(--accent); background: rgba(45,184,77,0.12); padding: 2px 8px; border: 1px solid var(--accent); }
+    .comp-card__list { display: flex; flex-wrap: wrap; gap: 5px; }
+  </style>
+</head>
+<body class="app-flex">
+
+<div class="topbar">
+  <div class="topbar__logo">
+    <div class="topbar__logo-icon" style="background:var(--accent);">S</div>
+    <span>Specifity</span>
+    <div class="topbar__dropdown">
+      <div class="topbar__dropdown-item topbar__dropdown-item--node topbar__dropdown-item--node--current">📐 Specifity (текущий)</div>
+      <div class="topbar__dropdown-divider"></div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">💬 Balloo</div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">🛡️ Admin</div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">🏢 Command</div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">💡 Features</div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">📜 History</div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">⬇️ Download</div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">📚 API Docs</div>
+    </div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Компоненты · каталог</div>
+  <div class="topbar__right">
+    <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+    <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+  </div>
+</div>
+
+<div class="spec-app">
+  <div class="spec-sidebar">
+    <div class="spec-sidebar__search"><input type="text" class="search-input" placeholder="🔍 Поиск компонента..."></div>
+    <div class="spec-sidebar__group">Разделы</div>
+    <a class="spec-sidebar__item" href="home.html"><span class="spec-sidebar__item-icon">🏠</span> Главная</a>
+    <a class="spec-sidebar__item" href="rules.html"><span class="spec-sidebar__item-icon">📋</span> Правила</a>
+    <a class="spec-sidebar__item" href="screens.html"><span class="spec-sidebar__item-icon">🖼️</span> Экраны <span class="spec-sidebar__item-num">110</span></a>
+    <a class="spec-sidebar__item" href="endpoints.html"><span class="spec-sidebar__item-icon">🔌</span> Эндпоинты</a>
+    <a class="spec-sidebar__item" href="data.html"><span class="spec-sidebar__item-icon">🗄️</span> Данные <span class="spec-sidebar__item-num">34</span></a>
+    <a class="spec-sidebar__item spec-sidebar__item--active" href="components.html"><span class="spec-sidebar__item-icon">🧩</span> Компоненты <span class="spec-sidebar__item-num">241</span></a>
+    <div class="spec-sidebar__divider"></div>
+    <a class="spec-sidebar__item" href="specification.html"><span class="spec-sidebar__item-icon">📐</span> Спецификация экрана</a>
+  </div>
+
+  <div class="spec-content">
+    <div class="spec-pagehead">
+      <div class="spec-pagehead__id">ID: 1_10_07 · узел у_10 (specifity)</div>
+      <h1>Компоненты · каталог</h1>
+      <p>Каталог UI-компонентов монорепо (React / React Native): ~241 компонент (183 частных + 58 глобальных). Глобальные (<span class="comp-chip comp-chip--global">shared</span>) — в <code>packages/shared/src/components/</code>, частные — в фич-фолдерах узлов.</p>
+    </div>
+
+    <div class="spec-filters">
+      <span class="spec-filter spec-filter--active">Все (241)</span>
+      <span class="spec-filter">Shared (58)</span>
+      <span class="spec-filter">balloo.su</span>
+      <span class="spec-filter">admin</span>
+      <span class="spec-filter">command</span>
+      <span class="spec-filter">specifity</span>
+      <span class="spec-filter">blog</span>
+    </div>
+
+    <div class="comp-grid">
+      <!-- Shared -->
+      <div class="comp-card">
+        <div class="comp-card__header"><span class="comp-card__node">🔗 shared — глобальные</span><span class="comp-card__count">7</span></div>
+        <div class="comp-card__list">
+          <span class="comp-chip comp-chip--global">ErrorScreen</span>
+          <span class="comp-chip comp-chip--global">OfflineScreen</span>
+          <span class="comp-chip comp-chip--global">CachedChatItem</span>
+          <span class="comp-chip comp-chip--global">InstructionCard</span>
+          <span class="comp-chip comp-chip--global">BanAppealOverlay</span>
+          <span class="comp-chip comp-chip--global">MarkdownRenderer</span>
+          <span class="comp-chip comp-chip--global">Pagination</span>
+        </div>
+      </div>
+
+      <!-- balloo.su -->
+      <div class="comp-card">
+        <div class="comp-card__header"><span class="comp-card__node">💬 balloo.su — частные</span><span class="comp-card__count">33</span></div>
+        <div class="comp-card__list">
+          <span class="comp-chip">OnboardingCarousel</span><span class="comp-chip">LoginForm</span><span class="comp-chip">RegisterForm</span><span class="comp-chip">OAuthButtons</span>
+          <span class="comp-chip">ChatList</span><span class="comp-chip">ChatWindow</span><span class="comp-chip">MessageBubble</span><span class="comp-chip">TypingIndicator</span>
+          <span class="comp-chip">ReactionPicker</span><span class="comp-chip">AttachmentPanel</span><span class="comp-chip">ContactList</span><span class="comp-chip">SearchBar</span>
+          <span class="comp-chip">ProfileEditor</span><span class="comp-chip">AvatarUploader</span><span class="comp-chip">StatusPicker</span><span class="comp-chip">CallHistory</span>
+          <span class="comp-chip">ActiveCallOverlay</span><span class="comp-chip">CallControls</span><span class="comp-chip">ParticipantGrid</span><span class="comp-chip">GroupCreateForm</span>
+          <span class="comp-chip">SettingsPage</span><span class="comp-chip">DeviceList</span><span class="comp-chip">AccountSwitcher</span><span class="comp-chip">QRPairDisplay</span>
+          <span class="comp-chip">DonatePage</span><span class="comp-chip">ReportMessagePanel</span>
+        </div>
+      </div>
+
+      <!-- admin -->
+      <div class="comp-card">
+        <div class="comp-card__header"><span class="comp-card__node">🛡️ admin — частные</span><span class="comp-card__count">44</span></div>
+        <div class="comp-card__list">
+          <span class="comp-chip">AdminLoginForm</span><span class="comp-chip">TOTPInput</span><span class="comp-chip">DashboardStats</span><span class="comp-chip">UserTable</span>
+          <span class="comp-chip">UserBanDialog</span><span class="comp-chip">ReportQueue</span><span class="comp-chip">ReportCard</span><span class="comp-chip">BanList</span>
+          <span class="comp-chip">AppealQueue</span><span class="comp-chip">MetricsGraph</span><span class="comp-chip">FeatureFlagToggle</span><span class="comp-chip">DepartmentManager</span>
+          <span class="comp-chip">VacancyManager</span><span class="comp-chip">VersionManager</span><span class="comp-chip">DonationManager</span><span class="comp-chip">TextEditor</span>
+          <span class="comp-chip">BlogQueuePage</span><span class="comp-chip">BlogReviewPage</span><span class="comp-chip">BlogChannelsPage</span><span class="comp-chip">BlogCategoriesPage</span>
+          <span class="comp-chip">BlogStatsPage</span><span class="comp-chip">LocalizationTable</span>
+        </div>
+      </div>
+
+      <!-- command -->
+      <div class="comp-card">
+        <div class="comp-card__header"><span class="comp-card__node">🏢 command — частные</span><span class="comp-card__count">30</span></div>
+        <div class="comp-card__list">
+          <span class="comp-chip">SSOLogin</span><span class="comp-chip">EmployeeDashboard</span><span class="comp-chip">HRModule</span><span class="comp-chip">KnowledgeBase</span>
+          <span class="comp-chip">HiringPipeline</span><span class="comp-chip">ProductMonitor</span><span class="comp-chip">VacancyList</span><span class="comp-chip">VacancyDetail</span>
+          <span class="comp-chip">ApplicationForm</span><span class="comp-chip">InternalChat</span><span class="comp-chip">MeetingScheduler</span><span class="comp-chip">TodoList</span>
+          <span class="comp-chip">OrgStructure</span><span class="comp-chip">BlogEditorPage</span><span class="comp-chip">MarkdownEditor</span><span class="comp-chip">CoverUploader</span>
+          <span class="comp-chip">TranslationTable</span><span class="comp-chip">CommentModerationList</span><span class="comp-chip">ChannelStats</span>
+        </div>
+      </div>
+
+      <!-- features -->
+      <div class="comp-card">
+        <div class="comp-card__header"><span class="comp-card__node">💡 features — частные</span><span class="comp-card__count">8</span></div>
+        <div class="comp-card__list">
+          <span class="comp-chip">FeatureLogin</span><span class="comp-chip">FeatureList</span><span class="comp-chip">FeatureCard</span><span class="comp-chip">FeatureDetail</span>
+          <span class="comp-chip">VoteButton</span><span class="comp-chip">FeatureSubmitForm</span><span class="comp-chip">CommentSection</span><span class="comp-chip">FeatureDonate</span>
+        </div>
+      </div>
+
+      <!-- history -->
+      <div class="comp-card">
+        <div class="comp-card__header"><span class="comp-card__node">📜 history — частные</span><span class="comp-card__count">6</span></div>
+        <div class="comp-card__list">
+          <span class="comp-chip">ChangelogRedirect</span><span class="comp-chip">VersionList</span><span class="comp-chip">VersionCard</span><span class="comp-chip">VersionDetail</span>
+          <span class="comp-chip">VersionNav</span><span class="comp-chip">HistoryDonate</span>
+        </div>
+      </div>
+
+      <!-- download -->
+      <div class="comp-card">
+        <div class="comp-card__header"><span class="comp-card__node">⬇️ download — частные</span><span class="comp-card__count">5</span></div>
+        <div class="comp-card__list">
+          <span class="comp-chip">DownloadGrid</span><span class="comp-chip">PlatformCard</span><span class="comp-chip">QRCodeDisplay</span><span class="comp-chip">PWAInstallBtn</span><span class="comp-chip">DownloadDonate</span>
+        </div>
+      </div>
+
+      <!-- docs -->
+      <div class="comp-card">
+        <div class="comp-card__header"><span class="comp-card__node">📚 docs — частные</span><span class="comp-card__count">5</span></div>
+        <div class="comp-card__list">
+          <span class="comp-chip">SwaggerUI</span><span class="comp-chip">ApiMethodBadge</span><span class="comp-chip">EndpointTable</span><span class="comp-chip">WebSocketEventList</span><span class="comp-chip">ApiSearch</span>
+        </div>
+      </div>
+
+      <!-- mobile -->
+      <div class="comp-card">
+        <div class="comp-card__header"><span class="comp-card__node">📱 mobile — частные</span><span class="comp-card__count">15</span></div>
+        <div class="comp-card__list">
+          <span class="comp-chip">MobileChat</span><span class="comp-chip">SwipeableMessage</span><span class="comp-chip">MobileCallOverlay</span><span class="comp-chip">MobileSettings</span>
+          <span class="comp-chip">QRScanner</span><span class="comp-chip">MobileAttachments</span><span class="comp-chip">TabBar</span><span class="comp-chip">DrawerNav</span>
+          <span class="comp-chip">MobileOnboarding</span><span class="comp-chip">MobileNotification</span><span class="comp-chip">MobileSearch</span>
+        </div>
+      </div>
+
+      <!-- desktop -->
+      <div class="comp-card">
+        <div class="comp-card__header"><span class="comp-card__node">🖥️ desktop — частные</span><span class="comp-card__count">10</span></div>
+        <div class="comp-card__list">
+          <span class="comp-chip">DesktopWindow</span><span class="comp-chip">TitleBar</span><span class="comp-chip">TrayIcon</span><span class="comp-chip">WindowModeToggle</span>
+          <span class="comp-chip">MultiWindowChat</span><span class="comp-chip">DesktopDeviceList</span><span class="comp-chip">GlobalHotkeyHandler</span>
+        </div>
+      </div>
+
+      <!-- specifity -->
+      <div class="comp-card">
+        <div class="comp-card__header"><span class="comp-card__node">📐 specifity — частные</span><span class="comp-card__count">24</span></div>
+        <div class="comp-card__list">
+          <span class="comp-chip">SpecSidebar</span><span class="comp-chip">SpecPageHead</span><span class="comp-chip">SpecStatRow</span><span class="comp-chip">SpecNodeCard</span>
+          <span class="comp-chip">SpecCodeTree</span><span class="comp-chip">SpecRuleList</span><span class="comp-chip">SpecTable</span><span class="comp-chip">SpecFilterBar</span>
+          <span class="comp-chip">SpecScreensGroup</span><span class="comp-chip">SpecScreenRow</span><span class="comp-chip">SpecEndpointGroup</span><span class="comp-chip">SpecEndpointRow</span>
+          <span class="comp-chip">ApiMethodBadge</span><span class="comp-chip">ApiAccessBadge</span><span class="comp-chip">SpecWsEventTable</span><span class="comp-chip">SpecDataGroup</span>
+          <span class="comp-chip">SpecDataRow</span><span class="comp-chip">DataTypeBadge</span><span class="comp-chip">SpecCompCard</span><span class="comp-chip">SpecCompChip</span>
+          <span class="comp-chip">SpecSplitView</span><span class="comp-chip">SpecLeftPanel</span><span class="comp-chip">SpecLinkedItem</span><span class="comp-chip">SpecToolbar</span>
+          <span class="comp-chip">SpecFramePreview</span><span class="comp-chip">SpecResizeHandle</span>
+        </div>
+        <p style="margin-top:8px;font-size:11px;color:var(--text-muted);line-height:1.5;">📐 Включает компоненты split-view (6) + общие компоненты разделов (18). <code>SpecSidebar</code>, <code>SpecPageHead</code>, <code>SpecTable</code>, <code>SpecFilterBar</code> — переиспользуются на нескольких экранах узла.</p>
+      </div>
+
+      <!-- blog -->
+      <div class="comp-card">
+        <div class="comp-card__header"><span class="comp-card__node">📝 blog — частные</span><span class="comp-card__count">17</span></div>
+        <div class="comp-card__list">
+          <span class="comp-chip">BlogFeedPage</span><span class="comp-chip">BlogPostCard</span><span class="comp-chip">BlogPostCardFeatured</span><span class="comp-chip">ChannelFilter</span>
+          <span class="comp-chip">BlogPostPage</span><span class="comp-chip">ReactionBar</span><span class="comp-chip">CommentTree</span><span class="comp-chip">CommentInput</span>
+          <span class="comp-chip">RelatedPosts</span><span class="comp-chip">ChannelPage</span><span class="comp-chip">ChannelHeader</span><span class="comp-chip">CategoryPage</span>
+          <span class="comp-chip">BlogSearchPage</span><span class="comp-chip">SearchResultCard</span><span class="comp-chip">ChannelScopeSelector</span><span class="comp-chip">PersonalFeedPage</span>
+          <span class="comp-chip">PersonalChannelCard</span>
+        </div>
+      </div>
+    </div>
+
+    <p style="font-size:12px;color:var(--text-muted);margin-top:20px;line-height:1.6;">📋 Полный каталог компонентов — в <code>mockups/index.html</code> (раздел «Компоненты»). Каталог компонентов компании — в <code>/general_files/components/</code>.</p>
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Features — Вход</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--accent);">F</div><span>Features</span>
+    <div class="topbar__dropdown"><div class="topbar__dropdown-item">💡 Features</div><div class="topbar__dropdown-divider"></div><div class="topbar__dropdown-item">💬 Balloo</div><div class="topbar__dropdown-item">🛡️ Admin</div><div class="topbar__dropdown-item">🏢 Command</div><div class="topbar__dropdown-item">📜 History</div><div class="topbar__dropdown-item">⬇️ Download</div><div class="topbar__dropdown-item">📚 API Docs</div></div>
+  </div>
+  <div class="topbar__title">Вход</div>
+  <div class="topbar__right"><span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span><span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span></div>
+</div>
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="text-center mb-4">
+      <div class="topbar__logo-icon" style="background:var(--accent);width:48px;height:48px;font-size:24px;margin:0 auto;">F</div>
+    </div>
+    <h1 class="auth-title">Портал фич-реквестов</h1>
+    <p class="auth-subtitle">Войдите, чтобы голосовать и предлагать функции</p>
+
+    <div class="auth-oauth">
+      <button class="auth-oauth-btn">
+        <span style="color:#fc3f1d;">Y</span> Войти через Яндекс
+      </button>
+      <button class="auth-oauth-btn">
+        <span style="color:#005ff9;">@</span> Войти через Mail.ru
+      </button>
+      <button class="auth-oauth-btn">
+        <span style="color:#ffcc00;">R</span> Войти через Rambler
+      </button>
+    </div>
+
+    <div class="auth-divider">или</div>
+
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input type="email" class="form-input" placeholder="ivan@example.com">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Пароль</label>
+      <input type="password" class="form-input" placeholder="••••••••">
+    </div>
+
+    <button class="btn btn--primary btn--block mb-4">Войти</button>
+
+    <div class="divider"></div>
+
+    <div class="text-center">
+      <p class="text-sm text-secondary mb-3">Уже вошли на другом устройстве?</p>
+      <button class="btn btn--secondary btn--block" onclick="alert('QR-код для привязки устройства. Отсканируйте камерой мобильного.')">📱 Войти через другое устройство (QR)</button>
+      <p class="text-xs text-muted mt-2">Единый аккаунт Balloo для всех узлов</p>
+    </div>
+
+    <div class="divider"></div>
+    <p class="text-center text-sm text-secondary">
+      Нет аккаунта? <a href="#" class="text-accent">Зарегистрироваться</a>
+    </p>
+    <p class="text-center text-xs text-muted mt-2">
+      Можно голосовать без входа, но ваши голоса не сохранятся
+    </p>
+  </div>
+</div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

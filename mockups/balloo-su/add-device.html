@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo — Добавить устройство</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon">B</div><span>Balloo</span>
+    <div class="topbar__dropdown"><div class="topbar__dropdown-item" onclick="window.location.href='chats.html'">💬 Balloo</div><div class="topbar__dropdown-divider"></div><div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div><div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div><div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div><div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div><div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div><div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div></div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Добавить устройство</div>
+  <div class="topbar__actions">
+    <div class="topbar__actions-btn" onclick="window.location.href='my-devices.html'" title="Назад">←</div>
+  </div>
+  <div class="topbar__right">
+    <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИИ</span></div></div>
+    <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+    <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+  </div>
+</div>
+<div class="main">
+  <div class="content overflow-y-auto">
+    <div class="page-container page-container--narrow">
+      <a href="my-devices.html" class="text-sm text-secondary mb-4" style="display:inline-block;">← Назад к устройствам</a>
+      <h1 class="page-title">➕ Добавить устройство</h1>
+      <p class="page-subtitle">Отсканируйте QR-код камерой мобильного устройства</p>
+
+      <div class="card mb-6 text-center">
+        <div class="text-sm text-secondary mb-4">QR-код действует <strong id="qr-timer" style="color:var(--accent);">60</strong> сек.</div>
+
+        <!-- QR Code -->
+        <div style="display:inline-block;padding:24px;background:#fff;">
+          <div style="width:220px;height:220px;background:
+            repeating-conic-gradient(#000 0% 25%, #fff 0% 50%) 50% / 14px 14px;
+            position:relative;">
+            <div style="position:absolute;top:10px;left:10px;width:48px;height:48px;background:#fff;border:10px solid #000;"></div>
+            <div style="position:absolute;top:10px;right:10px;width:48px;height:48px;background:#fff;border:10px solid #000;"></div>
+            <div style="position:absolute;bottom:10px;left:10px;width:48px;height:48px;background:#fff;border:10px solid #000;"></div>
+            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:40px;height:40px;clip-path:polygon(30% 0%,70% 0%,100% 30%,100% 70%,70% 100%,30% 100%,0% 70%,0% 30%);background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;font-weight:900;">B</div>
+          </div>
+        </div>
+
+        <div class="text-xs text-muted mt-4">Код: <code>balloo://pair/a3f8e91c7d2b</code></div>
+
+        <div class="flex gap-2 justify-center mt-6">
+          <button class="btn btn--primary" id="refresh-qr">🔄 Обновить код</button>
+          <button class="btn btn--secondary" onclick="window.location.href='my-devices.html'">Отмена</button>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <h3 class="card__title mb-4">📋 Инструкция</h3>
+        <ol style="padding-left:20px;line-height:2;color:var(--text-primary);">
+          <li>Откройте Balloo на новом устройстве</li>
+          <li>На экране входа нажмите <strong>«Войти через другое устройство»</strong></li>
+          <li>Наведите камеру мобильного устройства на этот QR-код</li>
+          <li>Подтвердите вход на обоих устройствах</li>
+          <li>Готово! Новое устройство появится в списке</li>
+        </ol>
+      </div>
+
+      <div class="card mb-4">
+        <h3 class="card__title mb-4">🔄 Как это работает</h3>
+        <div class="card__body" style="font-size:14px;line-height:1.7;">
+          <p class="mb-4">QR-код содержит временный токен привязки устройства. Код работает <strong>в обе стороны</strong>:</p>
+          <ul style="list-style:disc;padding-left:20px;line-height:1.8;">
+            <li><strong>Это устройство → мобильное:</strong> покажите этот QR-код, мобильное устройство сканирует камерой</li>
+            <li><strong>Мобильное → это устройство:</strong> на мобильном откройте «Мои устройства → Добавить», отсканируйте QR с экрана мобильного другим устройством (или покажите QR с мобильного и отсканируйте здесь)</li>
+          </ul>
+          <p class="mt-4">Код истекает через 60 секунд. После сканирования на обоих устройствах появляется подтверждение привязки.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="card__title mb-4">🔒 Безопасность</h3>
+        <div class="card__body" style="font-size:14px;line-height:1.7;">
+          <ul style="list-style:disc;padding-left:20px;line-height:1.8;">
+            <li>Токен привязки одноразовый, истекает через 60 секунд</li>
+            <li>Требуется подтверждение на обоих устройствах</li>
+            <li>Новое устройство наследует права аккаунта, но не пароль</li>
+            <li>Сессия на новом устройстве можно отозвать в любой момент из «Мои устройства»</li>
+            <li>При подозрительной активности — повторная аутентификация</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../assets/common.js"></script>
+<script>
+var qrSeconds = 60;
+var qrInterval = setInterval(function() {
+  qrSeconds--;
+  var el = document.getElementById('qr-timer');
+  if (el) {
+    el.textContent = qrSeconds;
+    if (qrSeconds <= 10) el.style.color = 'var(--danger)';
+  }
+  if (qrSeconds <= 0) {
+    clearInterval(qrInterval);
+    if (el) { el.textContent = 'истёк'; el.style.color = 'var(--danger)'; }
+  }
+}, 1000);
+document.getElementById('refresh-qr').addEventListener('click', function() {
+  qrSeconds = 60;
+  var el = document.getElementById('qr-timer');
+  if (el) el.style.color = 'var(--accent)';
+  clearInterval(qrInterval);
+  qrInterval = setInterval(function() {
+    qrSeconds--;
+    if (el) {
+      el.textContent = qrSeconds;
+      if (qrSeconds <= 10) el.style.color = 'var(--danger)';
+    }
+    if (qrSeconds <= 0) {
+      clearInterval(qrInterval);
+      if (el) { el.textContent = 'истёк'; el.style.color = 'var(--danger)'; }
+    }
+  }, 1000);
+});
+</script>
+</body>
+</html>

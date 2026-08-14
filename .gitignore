@@ -1,0 +1,68 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+dist/
+build/
+.next
+.nuxt
+output/
+
+# Environment — секретные файлы (НЕ коммитить)
+.env
+.env.local
+.env.dev
+.env.production
+.env.staging
+.env.development.local
+.env.test.local
+.env.production.local
+# .env.example и .env.production.example — коммитятся (шаблоны)
+
+# API Keys (секретный файл с реальными ключами)
+apikeys.json
+
+# Internal / temp
+.context_pre/
+.old/
+tmp/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# TypeScript
+*.tsbuildinfo
+
+# Prisma
+# ВАЖНО: prisma/migrations/ коммитится в git (миграции — часть кода). НЕ исключать!
+
+# Docker
+docker/data/
+
+# Coverage
+coverage/
+*.lcov
+
+# Test
+.jest/
+.cache/

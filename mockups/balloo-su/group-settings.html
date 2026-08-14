@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo — Настройки группы</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    .member-row:hover { background: var(--bg-tertiary); }
+    .role-card { border-left: 3px solid var(--accent); }
+    .export-progress { height: 8px; background: var(--bg-tertiary); border-radius: 4px; overflow: hidden; }
+    .export-progress__bar { height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.3s; }
+    .delete-zone { border: 2px dashed var(--danger); background: rgba(239,68,68,0.04); }
+    .stat-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 4px; font-size: 11px; }
+    .stat-badge--active { background: rgba(45,184,77,0.12); color: var(--accent); }
+    .stat-badge--total { background: rgba(148,163,184,0.12); color: var(--text-secondary); }
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon">B</div><span>Balloo</span>
+    <div class="topbar__dropdown"><div class="topbar__dropdown-item" onclick="window.location.href='chats.html'">💬 Balloo</div><div class="topbar__dropdown-divider"></div><div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div><div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div><div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div><div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div><div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div><div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div></div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Настройки группы</div>
+  <div class="topbar__right"><div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИИ</span></div></div><span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span><span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span></div>
+</div>
+<div class="main">
+  <div class="sidebar sidebar--narrow">
+    <div class="list">
+      <div class="list__item list__item--active" onclick="switchGroupTab(0)">📋 Основное</div>
+      <div class="list__item" onclick="switchGroupTab(1)">👥 Участники</div>
+      <div class="list__item" onclick="switchGroupTab(2)">🔐 Роли</div>
+      <div class="list__item" onclick="switchGroupTab(3)">💬 Шаблоны</div>
+      <div class="list__item" onclick="switchGroupTab(4)">📰 СМИ</div>
+      <div class="list__item" onclick="switchGroupTab(5)">🏢 Корпоративные</div>
+      <div class="list__item" onclick="switchGroupTab(6)">📤 Экспорт</div>
+      <div class="list__item" onclick="switchGroupTab(7)">🗑 Удалить</div>
+    </div>
+  </div>
+  <div class="content overflow-y-auto"><div class="page-container">
+    <div class="flex items-center gap-3 mb-6">
+      <div class="avatar avatar--lg"><div class="avatar__inner"><span>КТ</span></div></div>
+      <div>
+        <h1 class="page-title mb-1">Команда разработки</h1>
+        <p class="text-sm text-secondary">Группа · 234 участника · Создана 01.01.2026 14:30</p>
+      </div>
+    </div>
+
+    <!-- Tab 0: Основное -->
+    <div class="tab-panel" style="display:block;" id="group-tab-0">
+      <div class="card mb-6">
+        <h3 class="card__title mb-4">📋 Основное</h3>
+        <div class="form-group"><label class="form-label">Название группы</label><input type="text" class="form-input" value="Команда разработки"></div>
+        <div class="form-group"><label class="form-label">Описание</label><textarea class="form-textarea" style="min-height:80px;">Рабочая группа для разработки проекта Balloo</textarea></div>
+        <div class="form-group"><label class="form-label">Тип группы</label>
+          <select class="form-select"><option selected>Открытая</option><option>Закрытая</option></select></div>
+        <div class="form-group"><label class="form-label">Ссылка-приглашение</label>
+          <div class="flex gap-2"><input type="text" class="form-input flex-1" value="https://balloo.su/join/devteam" readonly><button class="btn btn--tertiary btn--sm">Копировать</button></div></div>
+        <div class="form-group"><label class="form-label">Приватность</label>
+          <select class="form-select"><option>Публичная</option><option selected>Закрытая</option></select></div>
+        <div class="form-group"><label class="form-label">Правила группы</label><textarea class="form-textarea" style="min-height:80px;">1. Уважайте участников<br>2. Без спама<br>3. Тема — разработка</textarea></div>
+        <button class="btn btn--primary">Сохранить</button>
+      </div>
+      <div class="card">
+        <h3 class="card__title mb-4">📊 Статистика</h3>
+        <div class="list__item" style="border:none;"><span class="flex-1">Участников</span><span class="chip">234</span></div>
+        <div class="list__item" style="border:none;"><span class="flex-1">Сообщений сегодня</span><span class="chip">1,247</span></div>
+        <div class="list__item" style="border:none;"><span class="flex-1">Активных (7д)</span><span class="chip">189</span></div>
+        <div class="list__item" style="border:none;"><span class="flex-1">Файлов</span><span class="chip">56</span></div>
+      </div>
+    </div>
+
+    <!-- Tab 1: Участники -->
+    <div class="tab-panel" style="display:none;" id="group-tab-1">
+      <div class="card mb-4">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="card__title mb-0">👥 Участники (234)</h3>
+          <div class="flex gap-2">
+            <button class="btn btn--primary btn--sm">➕ Добавить</button>
+            <button class="btn btn--tertiary btn--sm">📋 Массовое приглашение</button>
+          </div>
+        </div>
+        <!-- Stats row -->
+        <div class="flex gap-3 mb-4" style="flex-wrap:wrap;">
+          <div class="card flex-1" style="min-width:120px;"><div class="text-xs text-muted">Всего</div><div style="font-size:20px;font-weight:800;">234</div></div>
+          <div class="card flex-1" style="min-width:120px;"><div class="text-xs text-muted">Активных</div><div style="font-size:20px;font-weight:800;color:var(--accent);">189</div></div>
+          <div class="card flex-1" style="min-width:120px;"><div class="text-xs text-muted">Неактивных</div><div style="font-size:20px;font-weight:800;color:var(--text-muted);">45</div></div>
+        </div>
+        <!-- Search -->
+        <div class="form-group mb-4"><input type="text" class="form-input" placeholder="🔍 Поиск по участникам..." oninput="filterMembers(this.value)"></div>
+        <!-- Filters -->
+        <div class="flex gap-2 mb-4" style="flex-wrap:wrap;">
+          <select class="form-select form-select--sm" style="width:auto;" onchange="filterByRole(this.value)">
+            <option value="all">Все роли</option>
+            <option value="creator">Создатель</option>
+            <option value="admin">Админ</option>
+            <option value="moderator">Модератор</option>
+            <option value="author">Автор</option>
+            <option value="member">Участник</option>
+            <option value="reader">Читатель</option>
+          </select>
+        </div>
+        <!-- Infinite scroll table -->
+        <div id="members-list" style="max-height:500px;overflow-y:auto;">
+          <div class="member-row flex items-center gap-3 p-3 rounded" style="cursor:pointer;border-bottom:1px solid var(--border-color);">
+            <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИВ</span></div></div>
+            <div class="flex-1">
+              <div class="text-sm font-bold" style="color:var(--text-primary);">Иван Воронцов</div>
+              <div class="text-xs text-muted">Присоединился: 01.01.2026</div>
+            </div>
+            <span class="chip chip--danger">Создатель</span>
+            <span class="stat-badge stat-badge--active">🟢 активен</span>
+            <span class="text-xs text-muted">1,247 сообщ.</span>
+            <div class="flex gap-1">
+              <button class="btn btn--tertiary btn--xs" onclick="kickMember('Иван Воронцов')" title="Выгнать">🚪</button>
+              <button class="btn btn--tertiary btn--xs" title="Написать">✉️</button>
+            </div>
+          </div>
+          <div class="member-row flex items-center gap-3 p-3 rounded" style="cursor:pointer;border-bottom:1px solid var(--border-color);">
+            <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ЕК</span></div></div>
+            <div class="flex-1">
+              <div class="text-sm font-bold" style="color:var(--text-primary);">Елена Киселёва</div>
+              <div class="text-xs text-muted">Присоединилась: 02.01.2026</div>
+            </div>
+            <span class="chip chip--warning">Админ</span>
+            <span class="stat-badge stat-badge--active">🟢 активна</span>
+            <span class="text-xs text-muted">892 сообщ.</span>
+            <div class="flex gap-1">
+              <button class="btn btn--tertiary btn--xs" onclick="kickMember('Елена Киселёва')" title="Выгнать">🚪</button>
+              <button class="btn btn--tertiary btn--xs" title="Написать">✉️</button>
+            </div>
+          </div>
+          <div class="member-row flex items-center gap-3 p-3 rounded" style="cursor:pointer;border-bottom:1px solid var(--border-color);">
+            <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>МА</span></div></div>
+            <div class="flex-1">
+              <div class="text-sm font-bold" style="color:var(--text-primary);">Мария Андреева</div>
+              <div class="text-xs text-muted">Присоединилась: 03.01.2026</div>
+            </div>
+            <span class="chip chip--accent">Модератор</span>
+            <span class="stat-badge stat-badge--active">🟢 активна</span>
+            <span class="text-xs text-muted">534 сообщ.</span>
+            <div class="flex gap-1">
+              <button class="btn btn--tertiary btn--xs" onclick="kickMember('Мария Андреева')" title="Выгнать">🚪</button>
+              <button class="btn btn--tertiary btn--xs" title="Написать">✉️</button>
+            </div>
+          </div>
+          <div class="member-row flex items-center gap-3 p-3 rounded" style="cursor:pointer;border-bottom:1px solid var(--border-color);">
+            <div class="avatar avatar--sm avatar--bordered avatar--status-offline avatar--ctx-contact"><div class="avatar__inner"><span>ДС</span></div></div>
+            <div class="flex-1">
+              <div class="text-sm font-bold" style="color:var(--text-primary);">Дмитрий Соколов</div>
+              <div class="text-xs text-muted">Присоединился: 05.01.2026</div>
+            </div>
+            <span class="chip">Автор</span>
+            <span class="stat-badge stat-badge--total">⚫ оффлайн</span>
+            <span class="text-xs text-muted">321 сообщ.</span>
+            <div class="flex gap-1">
+              <button class="btn btn--tertiary btn--xs" onclick="kickMember('Дмитрий Соколов')" title="Выгнать">🚪</button>
+              <button class="btn btn--tertiary btn--xs" title="Написать">✉️</button>
+            </div>
+          </div>
+          <div class="member-row flex items-center gap-3 p-3 rounded" style="cursor:pointer;border-bottom:1px solid var(--border-color);">
+            <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>АП</span></div></div>
+            <div class="flex-1">
+              <div class="text-sm font-bold" style="color:var(--text-primary);">Антон Петров</div>
+              <div class="text-xs text-muted">Присоединился: 10.01.2026</div>
+            </div>
+            <span class="chip chip--info">Участник</span>
+            <span class="stat-badge stat-badge--active">🟢 активен</span>
+            <span class="text-xs text-muted">156 сообщ.</span>
+            <div class="flex gap-1">
+              <button class="btn btn--tertiary btn--xs" onclick="kickMember('Антон Петров')" title="Выгнать">🚪</button>
+              <button class="btn btn--tertiary btn--xs" title="Написать">✉️</button>
+            </div>
+          </div>
+          <div class="member-row flex items-center gap-3 p-3 rounded" style="cursor:pointer;border-bottom:1px solid var(--border-color);">
+            <div class="avatar avatar--sm avatar--bordered avatar--status-offline avatar--ctx-contact"><div class="avatar__inner"><span>ОС</span></div></div>
+            <div class="flex-1">
+              <div class="text-sm font-bold" style="color:var(--text-primary);">Ольга Смирнова</div>
+              <div class="text-xs text-muted">Присоединилась: 15.01.2026</div>
+            </div>
+            <span class="chip chip--info">Читатель</span>
+            <span class="stat-badge stat-badge--total">⚫ оффлайн</span>
+            <span class="text-xs text-muted">23 сообщ.</span>
+            <div class="flex gap-1">
+              <button class="btn btn--tertiary btn--xs" onclick="kickMember('Ольга Смирнова')" title="Выгнать">🚪</button>
+              <button class="btn btn--tertiary btn--xs" title="Написать">✉️</button>
+            </div>
+          </div>
+        </div>
+        <div class="text-center text-xs text-muted mt-3" id="members-loading">Загрузка ещё...</div>
+      </div>
+    </div>
+
+    <!-- Tab 2: Роли -->
+    <div class="tab-panel" style="display:none;" id="group-tab-2">
+      <div class="card mb-4">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="card__title mb-0">🔐 Роли и права</h3>
+          <button class="btn btn--primary btn--sm" onclick="openModal('modal-new-role')">➕ Создать роль</button>
+        </div>
+        <p class="text-sm text-secondary mb-4">Настраиваемая матрица прав. Корпоративные и СМИ группы могут создавать собственные роли.</p>
+        <!-- Role: Создатель (default, locked) -->
+        <div class="card role-card mb-3" style="border-left-color:var(--danger);">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+              <span class="chip chip--danger">Создатель</span>
+              <span class="text-xs text-muted">По умолчанию — нельзя изменить</span>
+            </div>
+            <span class="text-xs text-muted">1 чел.</span>
+          </div>
+          <div class="grid grid-cols-5 gap-2 text-center text-sm">
+            <div class="p-2" style="background:var(--bg-tertiary);border-radius:4px;">✅ Удаление</div>
+            <div class="p-2" style="background:var(--bg-tertiary);border-radius:4px;">✅ Закреп</div>
+            <div class="p-2" style="background:var(--bg-tertiary);border-radius:4px;">✅ Приглашение</div>
+            <div class="p-2" style="background:var(--bg-tertiary);border-radius:4px;">✅ Редактирование</div>
+            <div class="p-2" style="background:var(--bg-tertiary);border-radius:4px;">✅ Назначение</div>
+          </div>
+        </div>
+        <!-- Role: Админ -->
+        <div class="card role-card mb-3">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+              <span class="chip chip--warning">Админ</span>
+              <button class="btn btn--tertiary btn--xs">✎ Редактировать</button>
+            </div>
+            <span class="text-xs text-muted">5 чел.</span>
+          </div>
+          <div class="grid grid-cols-5 gap-2 text-center text-sm">
+            <div class="p-2" style="background:var(--bg-tertiary);border-radius:4px;">✅</div>
+            <div class="p-2" style="background:var(--bg-tertiary);border-radius:4px;">✅</div>
+            <div class="p-2" style="background:var(--bg-tertiary);border-radius:4px;">✅</div>
+            <div class="p-2" style="background:var(--bg-tertiary);border-radius:4px;">✅</div>
+            <div class="p-2" style="background:var(--bg-tertiary);border-radius:4px;">❌</div>
+          </div>
+        </div>
+        <!-- Role: Модератор -->
+        <div class="card role-card mb-3">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+              <span class="chip chip--accent">Модератор</span>
+              <button class="btn btn--tertiary btn--xs">✎ Редактировать</button>
+            </div>
+            <span class="text-xs text-muted">12 чел.</span>
+          </div>
+          <div class="grid grid-cols-5 gap-2 text-center text-sm">
+            <div class="p-2" style="background:var(--bg-tertiary);border-radius:4px;">✅</div>
+            <div class="p-2" style="background:var(--bg-tertiary);border-radius:4px;">✅</div>
+            <div class="p-2" style="background:var(--bg-tertiary);border-radius:4px;">❌</div>
+            <div class="p-2" style="background:var(--bg-tertiary);border-radius:4px;">✅</div>
+            <div class="p-2" style="background:var(--bg-tertiary);border-radius:4px;">❌</div>
+          </div>
+        </div>
+        <!-- Role: Участник (default for new members) -->
+        <div class="card role-card mb-3" style="border-left-color:var(--accent);">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+              <span class="chip chip--info">Участник</span>
+              <span class="text-xs text-secondary">— Роль по умолчанию для новых участников</span>
+              <select class="form-select form-select--sm" style="width:auto;" onchange="setDefaultRole(this.value)">
+                <option value="member" selected>Участник</option>
+                <option value="reader">Читатель</option>
+                <option value="author">Автор</option>
+              </select>
+              <span class="text-xs text-muted">(кроме Создателя)</span>
+            </div>
+            <span class="text-xs text-muted">198 чел.</span>
+          </div>
+          <div class="grid grid-cols-5 gap-2 text-center text-sm">
+            <div class="p-2" style="background:var(--bg-tertiary);border-radius:4px;">❌</div>
+            <div class="p-2" style="background:var(--bg-tertiary);border-radius:4px;">❌</div>
+            <div class="p-2" style="background:var(--bg-tertiary);border-radius:4px;">❌</div>
+            <div class="p-2" style="background:var(--bg-tertiary);border-radius:4px;">✅</div>
+            <div class="p-2" style="background:var(--bg-tertiary);border-radius:4px;">❌</div>
+          </div>
+        </div>
+        <!-- Role: Читатель -->
+        <div class="card role-card">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+              <span class="chip chip--info">Читатель</span>
+              <button class="btn btn--tertiary btn--xs">✎ Редактировать</button>
+            </div>
+            <span class="text-xs text-muted">18 чел.</span>
+          </div>
+          <div class="grid grid-cols-5 gap-2 text-center text-sm">
+            <div class="p-2" style="background:var(--bg-tertiary);border-radius:4px;">❌</div>
+            <div class="p-2" style="background:var(--bg-tertiary);border-radius:4px;">❌</div>
+            <div class="p-2" style="background:var(--bg-tertiary);border-radius:4px;">❌</div>
+            <div class="p-2" style="background:var(--bg-tertiary);border-radius:4px;">❌</div>
+            <div class="p-2" style="background:var(--bg-tertiary);border-radius:4px;">❌</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 3: Шаблоны сообщений -->
+    <div class="tab-panel" style="display:none;" id="group-tab-3">
+      <div class="card mb-4">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="card__title mb-0">💬 Шаблоны сообщений</h3>
+          <button class="btn btn--primary btn--sm" onclick="openModal('modal-new-template')">➕ Создать шаблон</button>
+        </div>
+        <!-- Stats -->
+        <div class="flex gap-3 mb-4" style="flex-wrap:wrap;">
+          <div class="card flex-1" style="min-width:100px;"><div class="text-xs text-muted">Всего</div><div style="font-size:20px;font-weight:800;">12</div></div>
+          <div class="card flex-1" style="min-width:100px;"><div class="text-xs text-muted">Использовано (7д)</div><div style="font-size:20px;font-weight:800;color:var(--accent);">47</div></div>
+          <div class="card flex-1" style="min-width:100px;"><div class="text-xs text-muted">Категории</div><div style="font-size:20px;font-weight:800;color:var(--info);">3</div></div>
+        </div>
+        <!-- Template list -->
+        <div class="mb-3">
+          <div class="card mb-2" style="cursor:pointer;" onclick="openModal('modal-edit-template')">
+            <div class="flex items-center justify-between mb-1">
+              <strong style="color:var(--text-primary);">👋 Приветствие нового участника</strong>
+              <span class="chip chip--info">Приветствие</span>
+            </div>
+            <p class="text-sm text-secondary">Добро пожаловать в группу! Пожалуйста, ознакомьтесь с правилами и представьтесь.</p>
+            <div class="flex gap-2 mt-2"><span class="text-xs text-muted">Использовано: 23 раза</span><span class="text-xs text-muted">Создан: 01.01.2026</span></div>
+          </div>
+          <div class="card mb-2" style="cursor:pointer;">
+            <div class="flex items-center justify-between mb-1">
+              <strong style="color:var(--text-primary);">📜 Правила группы</strong>
+              <span class="chip chip--warning">Правила</span>
+            </div>
+            <p class="text-sm text-secondary">1. Уважайте участников 2. Без спама 3. Тема группы — разработка</p>
+            <div class="flex gap-2 mt-2"><span class="text-xs text-muted">Использовано: 15 раз</span><span class="text-xs text-muted">Создан: 01.01.2026</span></div>
+          </div>
+          <div class="card" style="cursor:pointer;">
+            <div class="flex items-center justify-between mb-1">
+              <strong style="color:var(--text-primary);">ℹ️ Статус работы</strong>
+              <span class="chip">Инфо</span>
+            </div>
+            <p class="text-sm text-secondary">Работаем по графику Пн–Пт, 10:00–19:00 (МСК). Дедлайны — в задачах.</p>
+            <div class="flex gap-2 mt-2"><span class="text-xs text-muted">Использовано: 9 раз</span><span class="text-xs text-muted">Создан: 05.01.2026</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 4: СМИ -->
+    <div class="tab-panel" style="display:none;" id="group-tab-4">
+      <div class="card mb-4">
+        <h3 class="card__title mb-4">📰 Настройки СМИ</h3>
+        <div class="list__item" style="border:none;"><span class="flex-1">Статус СМИ</span><label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label></div>
+        <div class="form-group"><label class="form-label">Медиа-контакт (email)</label><input type="email" class="form-input" value="press@balloo.su"></div>
+        <div class="form-group"><label class="form-label">Медиа-контакт (телефон)</label><input type="tel" class="form-input" value="+7 (999) 123-45-67"></div>
+      </div>
+      <div class="card mb-4">
+        <h3 class="card__title mb-4">📨 PR-заявки (входящие)</h3>
+        <div class="card mb-2" style="border-left:3px solid var(--warning);">
+          <div class="flex items-center justify-between mb-1">
+            <strong style="color:var(--text-primary);">Интервью о запуске Balloo</strong>
+            <span class="chip chip--warning">Ожидает</span>
+          </div>
+          <p class="text-sm text-secondary">От: journalist@example.com · 18.07.2026</p>
+          <div class="flex gap-2 mt-2">
+            <button class="btn btn--primary btn--sm">Ответить</button>
+            <button class="btn btn--tertiary btn--sm">Отклонить</button>
+          </div>
+        </div>
+        <div class="card" style="border-left:3px solid var(--accent);">
+          <div class="flex items-center justify-between mb-1">
+            <strong style="color:var(--text-primary);">Статья про корпоративный мессенджер</strong>
+            <span class="chip chip--accent">Принята</span>
+          </div>
+          <p class="text-sm text-secondary">От: editor@techmedia.ru · 15.07.2026</p>
+        </div>
+      </div>
+      <div class="card mb-4">
+        <h3 class="card__title mb-4">📄 Документы СМИ</h3>
+        <div class="list__item" style="border:none;"><span class="flex-1">Брендбук Balloo</span><a href="#" style="color:var(--accent);">📥 Скачать</a></div>
+        <div class="list__item" style="border:none;"><span class="flex-1">Пресс-релиз v1.0</span><a href="#" style="color:var(--accent);">📥 Скачать</a></div>
+      </div>
+      <div class="card">
+        <h3 class="card__title mb-4">🌍 Локализация — Инагент</h3>
+        <p class="text-sm text-secondary mb-3">Отметьте страны, где группа зарегистрирована как иноагент:</p>
+        <div class="flex gap-2 flex-wrap">
+          <label class="form-checkbox"><input type="checkbox"> 🇷🇺 Россия</label>
+          <label class="form-checkbox"><input type="checkbox"> 🇺🇦 Украина</label>
+          <label class="form-checkbox"><input type="checkbox"> 🇱🇹 Литва</label>
+          <label class="form-checkbox"><input type="checkbox"> 🇵🇱 Польша</label>
+          <label class="form-checkbox"><input type="checkbox"> 🇱🇻 Латвия</label>
+          <label class="form-checkbox"><input type="checkbox"> 🇪🇪 Эстония</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 5: Корпоративные -->
+    <div class="tab-panel" style="display:none;" id="group-tab-5">
+      <div class="card mb-4">
+        <h3 class="card__title mb-4">🏢 Настройки корпоративной группы</h3>
+        <div class="form-group"><label class="form-label">Привязка к отделу</label>
+          <select class="form-select"><option>Разработка</option><option>Дизайн</option><option selected>Инфраструктура</option></select></div>
+        <div class="form-group"><label class="form-label">Корпоративные правила</label><textarea class="form-textarea" style="min-height:80px;">Правила корпоративной группы</textarea></div>
+      </div>
+      <div class="card mb-4">
+        <h3 class="card__title mb-4">📍 Адреса и расписание</h3>
+        <div class="card mb-2">
+          <div class="flex items-center justify-between">
+            <div>
+              <strong style="color:var(--text-primary);">🏢 Офис главный — Москва, ул. Ленина 10</strong>
+              <div class="text-xs text-secondary mt-1">Пн–Пт: 09:00–18:00 · Сб–Вс: выходной</div>
+            </div>
+            <div class="flex gap-1">
+              <button class="btn btn--tertiary btn--xs">✎</button>
+              <button class="btn btn--danger btn--xs">🗑</button>
+            </div>
+          </div>
+        </div>
+        <div class="card mb-2">
+          <div class="flex items-center justify-between">
+            <div>
+              <strong style="color:var(--text-primary);">🏢 Офис второй — Москва, пр. Мира 25</strong>
+              <div class="text-xs text-secondary mt-1">Пн–Пт: 10:00–19:00 · Сб: 10:00–14:00</div>
+            </div>
+            <div class="flex gap-1">
+              <button class="btn btn--tertiary btn--xs">✎</button>
+              <button class="btn btn--danger btn--xs">🗑</button>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn--secondary btn--sm">➕ Добавить адрес</button>
+      </div>
+      <div class="card mb-4">
+        <h3 class="card__title mb-4">🛒 Каталог товаров / услуг витрины</h3>
+        <div class="card mb-2">
+          <div class="flex items-center justify-between">
+            <div>
+              <strong style="color:var(--text-primary);">Брендбук Balloo (PDF)</strong>
+              <div class="text-xs text-secondary">Документ · 2.4 МБ</div>
+            </div>
+            <span class="chip chip--accent">Активен</span>
+          </div>
+        </div>
+        <button class="btn btn--primary btn--sm">➕ Добавить товар</button>
+      </div>
+      <div class="card mb-4">
+        <h3 class="card__title mb-4">💬 Настройка чатов</h3>
+        <div class="list__item" style="border:none;"><span class="flex-1">Чат клиентов — админ</span><select class="form-select" style="width:auto;"><option>Иван Воронцов</option><option>Елена Киселёва</option></select></div>
+        <div class="list__item" style="border:none;"><span class="flex-1">Чат сотрудников — админ</span><select class="form-select" style="width:auto;"><option>Мария Андреева</option><option>Дмитрий Соколов</option></select></div>
+      </div>
+      <div class="card">
+        <h3 class="card__title mb-4">📜 Корпоративные правила</h3>
+        <div class="form-group"><label class="form-label">Правила</label><textarea class="form-textarea" style="min-height:80px;">1. Соблюдайте график<br>2. Используйте корпоративные каналы связи<br>3. Конфиденциальность</textarea></div>
+        <button class="btn btn--primary">Сохранить</button>
+      </div>
+    </div>
+
+    <!-- Tab 6: Экспорт/Импорт -->
+    <div class="tab-panel" style="display:none;" id="group-tab-6">
+      <div class="card mb-4">
+        <h3 class="card__title mb-4">📤 Экспорт данных</h3>
+        <div class="form-group mb-4"><label class="form-label">Формат экспорта</label>
+          <select class="form-select"><option>JSON (полный)</option><option>CSV (таблица)</option><option>TXT (текст)</option></select></div>
+        <div class="flex gap-2 mb-4">
+          <button class="btn btn--primary" onclick="startExport('chat')">📄 Экспорт чата (JSON)</button>
+          <button class="btn btn--secondary" onclick="startExport('members')">👥 Экспорт участников</button>
+        </div>
+        <div id="export-progress-area" style="display:none;">
+          <div class="text-sm text-secondary mb-2">Прогресс экспорта:</div>
+          <div class="export-progress mb-2"><div class="export-progress__bar" style="width:45%;"></div></div>
+          <div class="text-xs text-muted">45% · Примерно 2 мин осталось</div>
+        </div>
+      </div>
+      <div class="card">
+        <h3 class="card__title mb-4">📥 Импорт участников</h3>
+        <div class="form-group mb-4"><label class="form-label">Файл (CSV/JSON)</label><input type="file" class="form-input"></div>
+        <div class="form-group mb-4"><label class="form-label">Роль по умолчанию для импортированных</label>
+          <select class="form-select"><option>Участник</option><option>Читатель</option><option>Автор</option></select></div>
+        <button class="btn btn--primary">📥 Импортировать</button>
+      </div>
+    </div>
+
+    <!-- Tab 7: Удалить группу -->
+    <div class="tab-panel" style="display:none;" id="group-tab-7">
+      <div class="card delete-zone">
+        <h3 class="card__title mb-4" style="color:var(--danger);">🗑 Удалить группу</h3>
+        <div class="text-sm text-secondary mb-4">Это действие необратимо! Все сообщения, файлы и настройки будут удалены.</div>
+        <div class="form-group mb-3">
+          <label class="form-label">Введите название группы для подтверждения</label>
+          <input type="text" class="form-input" placeholder="Команда разработки">
+        </div>
+        <div class="form-group mb-3">
+          <label class="form-label">Дата и время создания (без секунд)</label>
+          <input type="text" class="form-input" value="01.01.2026 14:30" readonly style="opacity:0.6;">
+        </div>
+        <div class="form-group mb-4">
+          <label class="form-label">Выберите действие</label>
+          <div class="flex gap-3">
+            <label class="form-radio"><input type="radio" name="delete-action" value="delete" checked><span>🗑 Удалить навсегда</span></label>
+            <label class="form-radio"><input type="radio" name="delete-action" value="archive"><span>📦 Архивировать (скрыть)</span></label>
+          </div>
+        </div>
+        <div class="card mb-4" style="background:var(--bg-tertiary);border-color:var(--info);">
+          <div class="text-sm" style="font-weight:700;color:var(--info);">💾 Экспорт перед удалением</div>
+          <p class="text-xs text-secondary">Рекомендуем экспортировать данные перед удалением.</p>
+          <label class="form-checkbox mt-2"><input type="checkbox" checked><span>Экспортировать чат (JSON) перед удалением</span></label>
+        </div>
+        <button class="btn btn--danger btn--block" onclick="confirmDelete()">🗑 Удалить группу</button>
+      </div>
+    </div>
+
+  </div></div>
+</div>
+<script src="../assets/common.js"></script>
+<script>
+function switchGroupTab(index) {
+  document.querySelectorAll('.tab-panel').forEach((p, i) => {
+    p.style.display = (i === index) ? 'block' : 'none';
+  });
+  document.querySelectorAll('.sidebar .list__item').forEach((item, i) => {
+    if (i < 8) item.classList.toggle('list__item--active', i === index);
+  });
+}
+
+function filterMembers(query) {
+  const rows = document.querySelectorAll('.member-row');
+  rows.forEach(row => {
+    const text = row.textContent.toLowerCase();
+    row.style.display = text.includes(query.toLowerCase()) ? '' : 'none';
+  });
+}
+
+function filterByRole(role) {
+  // In real app: filter by role data attribute
+}
+
+function kickMember(name) {
+  openModal('modal-kick-confirm');
+}
+
+function setDefaultRole(role) {
+  // In real app: update default role for new members
+}
+
+function startExport(type) {
+  document.getElementById('export-progress-area').style.display = 'block';
+  // Simulate progress
+  let progress = 0;
+  const bar = document.querySelector('.export-progress__bar');
+  const interval = setInterval(() => {
+    progress += 5;
+    if (progress >= 100) { clearInterval(interval); return; }
+    bar.style.width = progress + '%';
+  }, 500);
+}
+
+function confirmDelete() {
+  if (confirm('Вы уверены? Это действие необратимо!')) {
+    alert('Группа удалена.');
+  }
+}
+</script>
+
+<!-- Modal: Kick Confirm -->
+<div class="modal-overlay" id="modal-overlay"></div>
+<div class="modal" id="modal-kick-confirm">
+  <div class="modal__header"><span class="modal__title">🚪 Выгнать участника</span><div class="modal__close" onclick="closeModal('modal-kick-confirm')">✕</div></div>
+  <div class="modal__body">
+    <p class="text-sm text-secondary mb-4">Вы действительно хотите выгнать участника?</p>
+    <div class="form-group"><label class="form-label">Причина</label><textarea class="form-textarea" style="min-height:60px;" placeholder="Укажите причину..."></textarea></div>
+    <div class="form-group"><label class="form-checkbox"><input type="checkbox"><span>Заблокировать и предотвратить повторное вступление</span></label></div>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--tertiary" onclick="closeModal('modal-kick-confirm')">Отмена</button>
+    <button class="btn btn--danger" onclick="closeModal('modal-kick-confirm')">Выгнать</button>
+  </div>
+</div>
+
+<!-- Modal: New Role -->
+<div class="modal" id="modal-new-role">
+  <div class="modal__header"><span class="modal__title">🔐 Создать роль</span><div class="modal__close" onclick="closeModal('modal-new-role')">✕</div></div>
+  <div class="modal__body">
+    <div class="form-group"><label class="form-label">Название роли</label><input type="text" class="form-input" placeholder="Например: Старший модератор"></div>
+    <div class="form-group"><label class="form-label">Цвет роли</label><input type="color" class="form-input" value="#2db84d"></div>
+    <p class="text-sm text-secondary mb-2">Матрица прав:</p>
+    <div class="grid grid-cols-5 gap-2">
+      <label class="form-checkbox"><input type="checkbox"><span>Удаление</span></label>
+      <label class="form-checkbox"><input type="checkbox"><span>Закреп</span></label>
+      <label class="form-checkbox"><input type="checkbox"><span>Приглашение</span></label>
+      <label class="form-checkbox"><input type="checkbox" checked><span>Редактирование</span></label>
+      <label class="form-checkbox"><input type="checkbox"><span>Назначение</span></label>
+    </div>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--tertiary" onclick="closeModal('modal-new-role')">Отмена</button>
+    <button class="btn btn--primary" onclick="closeModal('modal-new-role')">Создать</button>
+  </div>
+</div>
+
+<!-- Modal: New Template -->
+<div class="modal" id="modal-new-template">
+  <div class="modal__header"><span class="modal__title">💬 Новый шаблон</span><div class="modal__close" onclick="closeModal('modal-new-template')">✕</div></div>
+  <div class="modal__body">
+    <div class="form-group"><label class="form-label">Название</label><input type="text" class="form-input" placeholder="Например: Приветствие"></div>
+    <div class="form-group"><label class="form-label">Категория</label>
+      <select class="form-select"><option>Приветствие</option><option>Правила</option><option>Инфо</option><option>Другое</option></select></div>
+    <div class="form-group"><label class="form-label">Текст шаблона</label><textarea class="form-textarea" style="min-height:100px;" placeholder="Текст шаблона..."></textarea></div>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--tertiary" onclick="closeModal('modal-new-template')">Отмена</button>
+    <button class="btn btn--primary" onclick="closeModal('modal-new-template')">Создать</button>
+  </div>
+</div>
+
+<!-- Modal: Edit Template -->
+<div class="modal" id="modal-edit-template">
+  <div class="modal__header"><span class="modal__title">✏️ Редактировать шаблон</span><div class="modal__close" onclick="closeModal('modal-edit-template')">✕</div></div>
+  <div class="modal__body">
+    <div class="form-group"><label class="form-label">Название</label><input type="text" class="form-input" value="👋 Приветствие нового участника"></div>
+    <div class="form-group"><label class="form-label">Категория</label>
+      <select class="form-select"><option selected>Приветствие</option><option>Правила</option><option>Инфо</option></select></div>
+    <div class="form-group"><label class="form-label">Текст шаблона</label><textarea class="form-textarea" style="min-height:100px;">Добро пожаловать в группу! Пожалуйста, ознакомьтесь с правилами и представьтесь.</textarea></div>
+    <div class="card" style="background:var(--bg-tertiary);margin-top:12px;">
+      <div class="text-sm font-bold">📊 Статистика</div>
+      <div class="text-xs text-secondary mt-1">Использовано: 23 раза · Последнее: 18.07.2026</div>
+    </div>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--tertiary" onclick="closeModal('modal-edit-template')">Отмена</button>
+    <button class="btn btn--primary" onclick="closeModal('modal-edit-template')">Сохранить</button>
+  </div>
+</div>
+
+<!-- Modal: Corporate Settings (НОВАЯ) -->
+<div class="modal" id="modal-corporate-settings">
+  <div class="modal__header"><span class="modal__title">🏢 Настройки корпоративной группы</span><div class="modal__close" onclick="closeModal('modal-corporate-settings')">✕</div></div>
+  <div class="modal__body">
+    <div class="form-group"><label class="form-label">Название корпоративной группы</label><input type="text" class="form-input" value="Команда разработки · Инфраструктура"></div>
+    <div class="form-group"><label class="form-label">Привязка к отделу</label>
+      <select class="form-select"><option>Разработка</option><option>Дизайн</option><option selected>Инфраструктура</option><option>Маркетинг</option><option>HR</option><option>Финансы</option></select></div>
+    <div class="form-group"><label class="form-label">Корпоративные правила</label><textarea class="form-textarea" style="min-height:80px;" placeholder="Введите корпоративные правила...">1. Соблюдайте график<br>2. Используйте корпоративные каналы связи<br>3. Конфиденциальность</textarea></div>
+    
+    <div class="divider"></div>
+    
+    <div class="form-group"><label class="form-label">📍 Адреса офисов</label>
+      <div class="card mb-2" style="background:var(--bg-tertiary);">
+        <div class="flex items-center justify-between">
+          <div>
+            <strong style="color:var(--text-primary);">🏢 Офис главный</strong>
+            <div class="text-xs text-secondary mt-1">Москва, ул. Ленина 10 · Пн–Пт: 09:00–18:00</div>
+          </div>
+          <div class="flex gap-1">
+            <button class="btn btn--tertiary btn--xs">✎</button>
+            <button class="btn btn--danger btn--xs">🗑</button>
+          </div>
+        </div>
+      </div>
+      <div class="card mb-2" style="background:var(--bg-tertiary);">
+        <div class="flex items-center justify-between">
+          <div>
+            <strong style="color:var(--text-primary);">🏢 Офис второй</strong>
+            <div class="text-xs text-secondary mt-1">Москва, пр. Мира 25 · Пн–Пт: 10:00–19:00 · Сб: 10:00–14:00</div>
+          </div>
+          <div class="flex gap-1">
+            <button class="btn btn--tertiary btn--xs">✎</button>
+            <button class="btn btn--danger btn--xs">🗑</button>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn--secondary btn--sm" onclick="openModal('modal-add-office')">➕ Добавить адрес</button>
+    </div>
+    
+    <div class="divider"></div>
+    
+    <div class="form-group"><label class="form-label">🛒 Витрина товаров / услуг</label>
+      <div class="card mb-2" style="background:var(--bg-tertiary);">
+        <div class="flex items-center justify-between">
+          <div>
+            <strong style="color:var(--text-primary);">Брендбук Balloo (PDF)</strong>
+            <div class="text-xs text-secondary">Документ · 2.4 МБ</div>
+          </div>
+          <span class="chip chip--accent">Активен</span>
+        </div>
+      </div>
+      <button class="btn btn--primary btn--sm" onclick="openModal('modal-add-product')">➕ Добавить товар</button>
+    </div>
+    
+    <div class="divider"></div>
+    
+    <div class="form-group"><label class="form-label">💬 Настройка чатов</label>
+      <div class="list__item" style="border:none;"><span class="flex-1">Чат клиентов — админ</span><select class="form-select" style="width:auto;"><option>Иван Воронцов</option><option>Елена Киселёва</option></select></div>
+      <div class="list__item" style="border:none;"><span class="flex-1">Чат сотрудников — админ</span><select class="form-select" style="width:auto;"><option>Мария Андреева</option><option>Дмитрий Соколов</option></select></div>
+      <button class="btn btn--secondary btn--sm mt-2" onclick="openModal('modal-add-chat')">➕ Добавить чат</button>
+    </div>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--tertiary" onclick="closeModal('modal-corporate-settings')">Отмена</button>
+    <button class="btn btn--primary" onclick="closeModal('modal-corporate-settings')">Сохранить</button>
+  </div>
+</div>
+
+<!-- Modal: Add Office -->
+<div class="modal" id="modal-add-office">
+  <div class="modal__header"><span class="modal__title">📍 Добавить адрес офиса</span><div class="modal__close" onclick="closeModal('modal-add-office')">✕</div></div>
+  <div class="modal__body">
+    <div class="form-group"><label class="form-label">Название офиса</label><input type="text" class="form-input" placeholder="Например: Офис третий"></div>
+    <div class="form-group"><label class="form-label">Адрес</label><input type="text" class="form-input" placeholder="Город, улица, дом"></div>
+    <div class="form-group"><label class="form-label">Расписание (Пн–Пт)</label>
+      <div class="flex gap-2">
+        <input type="time" class="form-input" value="09:00">
+        <span class="text-secondary">—</span>
+        <input type="time" class="form-input" value="18:00">
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">Расписание (Сб)</label>
+      <div class="flex gap-2">
+        <input type="time" class="form-input" value="10:00">
+        <span class="text-secondary">—</span>
+        <input type="time" class="form-input" value="14:00">
+      </div>
+    </div>
+    <div class="form-group"><label class="form-checkbox"><input type="checkbox" checked><span>Работаем в субботу</span></label></div>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--tertiary" onclick="closeModal('modal-add-office')">Отмена</button>
+    <button class="btn btn--primary" onclick="closeModal('modal-add-office')">Добавить</button>
+  </div>
+</div>
+
+<!-- Modal: Add Product -->
+<div class="modal" id="modal-add-product">
+  <div class="modal__header"><span class="modal__title">🛒 Добавить товар / услугу</span><div class="modal__close" onclick="closeModal('modal-add-product')">✕</div></div>
+  <div class="modal__body">
+    <div class="form-group"><label class="form-label">Название</label><input type="text" class="form-input" placeholder="Название товара или услуги"></div>
+    <div class="form-group"><label class="form-label">Описание</label><textarea class="form-textarea" style="min-height:60px;" placeholder="Краткое описание..."></textarea></div>
+    <div class="form-group"><label class="form-label">Тип</label>
+      <select class="form-select"><option>Документ</option><option>Товар</option><option>Услуга</option><option>Пресс-кит</option></select></div>
+    <div class="form-group"><label class="form-label">Файл (опционально)</label><input type="file" class="form-input"></div>
+    <div class="form-group"><label class="form-checkbox"><input type="checkbox" checked><span>Активен (виден в витрине)</span></label></div>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--tertiary" onclick="closeModal('modal-add-product')">Отмена</button>
+    <button class="btn btn--primary" onclick="closeModal('modal-add-product')">Добавить</button>
+  </div>
+</div>
+
+<!-- Modal: Add Chat -->
+<div class="modal" id="modal-add-chat">
+  <div class="modal__header"><span class="modal__title">💬 Добавить чат</span><div class="modal__close" onclick="closeModal('modal-add-chat')">✕</div></div>
+  <div class="modal__body">
+    <div class="form-group"><label class="form-label">Название чата</label><input type="text" class="form-input" placeholder="Например: Чат поддержки"></div>
+    <div class="form-group"><label class="form-label">Тип чата</label>
+      <select class="form-select"><option>Чат клиентов</option><option>Чат сотрудников</option><option>Техподдержка</option><option>HR-чат</option></select></div>
+    <div class="form-group"><label class="form-label">Админ чата</label>
+      <select class="form-select"><option>Иван Воронцов</option><option>Елена Киселёва</option><option>Мария Андреева</option><option>Дмитрий Соколов</option></select></div>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--tertiary" onclick="closeModal('modal-add-chat')">Отмена</button>
+    <button class="btn btn--primary" onclick="closeModal('modal-add-chat')">Добавить</button>
+  </div>
+</div>
+
+</body>
+</html>

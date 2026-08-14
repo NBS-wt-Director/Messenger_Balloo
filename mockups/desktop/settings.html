@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo — Настройки</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    html { overflow-y: auto; height: auto; }
+    body { overflow-y: auto; height: auto; min-height: 100vh; background: var(--bg-primary); padding: 0; }
+    .window-frame { max-width: 1000px; margin: 24px auto; background: var(--bg-secondary); border: 1px solid var(--border-strong); box-shadow: var(--shadow-glass); display: flex; flex-direction: column; overflow: hidden; }
+    .window-body { height: 600px; display: flex; overflow: hidden; }
+    .window-sidebar { width: 240px; min-width: 240px; border-right: 1px solid var(--border-color); overflow-y: auto; background: var(--bg-tertiary); display: flex; flex-direction: column; }
+    .window-content { flex: 1; overflow-y: auto; padding: 20px; }
+    .statusbar { height: 28px; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; background: var(--bg-tertiary); border-top: 1px solid var(--border-color); font-size: 11px; color: var(--text-secondary); }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; vertical-align: middle; }
+    .status-dot--online { background: var(--accent); }
+    .statusbar__sep { margin-left: 16px; }
+    .settings-tabs { display:flex; gap:4px; border-bottom:2px solid var(--border-color); padding-bottom:0; margin-bottom:20px; overflow-x:auto; }
+    .settings-tab { padding:10px 16px; font-size:13px; font-weight:600; color:var(--text-secondary); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-2px; white-space:nowrap; transition:all 0.15s; }
+    .settings-tab:hover { color:var(--text-primary); }
+    .settings-tab--active { color:var(--accent); border-bottom-color:var(--accent); }
+    .settings-content { display:none; }
+    .settings-content--active { display:block; }
+    .sidebar-section { padding: 10px 12px; border-bottom: 1px solid var(--border-color); }
+    .sidebar-section-title { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; padding: 4px 0 8px; }
+    .sidebar-nav-item { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 6px; cursor: pointer; color: var(--text-secondary); font-size: 13px; text-decoration: none; transition: all 0.15s; }
+    .sidebar-nav-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+    .sidebar-nav-item--active { background: rgba(45,184,77,0.1); color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar__logo">
+    <div class="topbar__logo-icon">B</div>
+    <span>Balloo</span>
+    <div class="topbar__dropdown">
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/index.html'">💬 Balloo</div>
+      <div class="topbar__dropdown-divider"></div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div>
+      <div class="topbar__dropdown-divider"></div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/contacts.html'">👤 Контакты</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/search.html'">🔍 Поиск</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/archive.html'">📦 Архив</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/calls.html'">📞 Звонки</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/invites.html'">📨 Приглашения</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/bots.html'">🤖 О ботах</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/about-balloo.html'">ℹ️ О Balloo</div>
+    </div>
+  </div>
+  <div class="topbar__title">Настройки</div>
+  <div class="topbar__right">
+    <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact" onclick="window.location.href='../balloo-su/profile.html'">
+      <div class="avatar__inner"><span>ИИ</span></div>
+    </div>
+    <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+    <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+  </div>
+</div>
+
+<div class="window-frame">
+  <div class="titlebar">
+    <div class="titlebar__left">
+      <div class="titlebar__icon">B</div>
+      <span class="titlebar__title">Balloo Messenger — Настройки</span>
+    </div>
+    <div class="titlebar__menu">
+      <div class="titlebar__menu-item" onclick="window.location.href='chat.html'">Чаты</div>
+      <div class="titlebar__menu-item" onclick="window.location.href='stories.html'">Сторис</div>
+      <div class="titlebar__menu-item" onclick="window.location.href='contacts.html'">Контакты</div>
+      <div class="titlebar__menu-item" onclick="window.location.href='settings.html'" style="color:var(--accent);">Настройки</div>
+      <div class="titlebar__menu-item" onclick="window.location.href='profile.html'">Профиль</div>
+      <div class="titlebar__menu-item" onclick="window.location.href='archive.html'">Архив</div>
+    </div>
+    <div class="titlebar__controls">
+      <div class="titlebar__btn" title="Свернуть">─</div>
+      <div class="titlebar__btn" title="Развернуть">▢</div>
+      <div class="titlebar__btn titlebar__btn--close" title="Закрыть">✕</div>
+    </div>
+  </div>
+
+  <div class="window-body">
+    <div class="window-sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">Настройки</div>
+        <div class="sidebar-nav-item sidebar-nav-item--active" data-tab="notifications" onclick="switchTab('notifications')">🔔 Уведомления</div>
+        <div class="sidebar-nav-item" data-tab="appearance" onclick="switchTab('appearance')">🎨 Оформление</div>
+        <div class="sidebar-nav-item" data-tab="language" onclick="switchTab('language')">🌍 Язык</div>
+        <div class="sidebar-nav-item" data-tab="privacy" onclick="switchTab('privacy')">🔒 Приватность</div>
+        <div class="sidebar-nav-item" data-tab="storage" onclick="switchTab('storage')">💾 Хранилище</div>
+        <div class="sidebar-nav-item" data-tab="devices" onclick="switchTab('devices')">📱 Устройства</div>
+        <div class="sidebar-nav-item" data-tab="accounts" onclick="switchTab('accounts')">👤 Аккаунты</div>
+        <div class="sidebar-nav-item" data-tab="security" onclick="switchTab('security')">🔐 Безопасность</div>
+        <div class="sidebar-nav-item" data-tab="cache" onclick="switchTab('cache')">💾 Оффлайн-кэш</div>
+        <div class="sidebar-nav-item" data-tab="disk" onclick="switchTab('disk')">☁️ Облако</div>
+        <div class="sidebar-nav-item" data-tab="donate" onclick="switchTab('donate')">💰 Донаты</div>
+        <div class="sidebar-nav-item" data-tab="support" onclick="switchTab('support')">🎧 Поддержка</div>
+        <div class="sidebar-nav-item" data-tab="about" onclick="switchTab('about')">ℹ️ О Balloo</div>
+      </div>
+    </div>
+
+    <div class="window-content">
+      <div class="settings-tabs">
+        <div class="settings-tab settings-tab--active" data-tab="notifications" onclick="switchTab('notifications')">🔔 Уведомления</div>
+        <div class="settings-tab" data-tab="appearance" onclick="switchTab('appearance')">🎨 Оформление</div>
+        <div class="settings-tab" data-tab="language" onclick="switchTab('language')">🌍 Язык</div>
+        <div class="settings-tab" data-tab="privacy" onclick="switchTab('privacy')">🔒 Приватность</div>
+        <div class="settings-tab" data-tab="storage" onclick="switchTab('storage')">💾 Хранилище</div>
+        <div class="settings-tab" data-tab="devices" onclick="switchTab('devices')">📱 Устройства</div>
+        <div class="settings-tab" data-tab="accounts" onclick="switchTab('accounts')">👤 Аккаунты</div>
+        <div class="settings-tab" data-tab="security" onclick="switchTab('security')">🔐 Безопасность</div>
+        <div class="settings-tab" data-tab="cache" onclick="switchTab('cache')">💾 Кэш</div>
+        <div class="settings-tab" data-tab="disk" onclick="switchTab('disk')">☁️ Облако</div>
+        <div class="settings-tab" data-tab="donate" onclick="switchTab('donate')">💰 Донаты</div>
+        <div class="settings-tab" data-tab="support" onclick="switchTab('support')">🎧 Поддержка</div>
+        <div class="settings-tab" data-tab="about" onclick="switchTab('about')">ℹ️ О Balloo</div>
+      </div>
+
+      <!-- Tab: Notifications -->
+      <div class="settings-content settings-content--active" id="tab-notifications">
+        <h1 class="page-title">Уведомления</h1>
+        <div class="card mb-4">
+          <h3 class="card__title mb-4">Push-уведомления</h3>
+          <div class="list__item" style="border:none;"><span class="flex-1">Превью текста</span><span class="chip">20 символов</span></div>
+          <div class="list__item" style="border:none;"><span class="flex-1">Группировка (до 5 сообщений)</span><label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label></div>
+          <div class="list__item" style="border:none;"><span class="flex-1">Звук уведомлений</span><select class="form-select" style="width:auto;"><option>Стандартный 1</option><option>Стандартный 2</option><option>Стандартный 3</option><option>Без звука</option></select></div>
+        </div>
+        <div class="card mb-4">
+          <h3 class="card__title mb-4">Не беспокоить (DND)</h3>
+          <div class="list__item" style="border:none;"><span class="flex-1">Включить DND</span><label class="switch"><input type="checkbox"><span class="switch__slider"></span></label></div>
+          <div class="list__item" style="border:none;"><span class="flex-1">По расписанию</span><div><input type="time" value="22:00" style="background:var(--bg-tertiary);border:1px solid var(--border-color);color:var(--text-primary);padding:4px 8px;"> — <input type="time" value="08:00" style="background:var(--bg-tertiary);border:1px solid var(--border-color);color:var(--text-primary);padding:4px 8px;"></div></div>
+        </div>
+        <div class="card mb-4">
+          <h3 class="card__title mb-4">Звонки</h3>
+          <div class="list__item" style="border:none;"><span class="flex-1">Прерывающий звонок</span><label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label></div>
+          <div class="list__item" style="border:none;"><span class="flex-1">Вибрация при звонке</span><label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label></div>
+        </div>
+        <div class="card">
+          <h3 class="card__title mb-4">Оффлайн-кэш (SQLite)</h3>
+          <div class="list__item" style="border:none;"><span class="flex-1">Кэшировать сообщения</span><label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label></div>
+          <div class="list__item" style="border:none;"><span class="flex-1">Авто-очистка при >2GB</span><label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label></div>
+          <div class="list__item" style="border:none;"><span class="flex-1">Очередь отправки (офлайн)</span><label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label></div>
+          <p class="text-xs text-muted mt-2">Используется: 847 МБ из 2 ГБ</p>
+        </div>
+      </div>
+
+      <!-- Tab: Appearance -->
+      <div class="settings-content" id="tab-appearance">
+        <h1 class="page-title">Оформление</h1>
+        <div class="card mb-4">
+          <h3 class="card__title mb-4">Тема</h3>
+          <div class="list__item" style="border:none;cursor:pointer;background:var(--bg-active);"><span class="flex-1">🌙 Тёмная</span><span class="chip chip--accent">Активна</span></div>
+          <div class="list__item" style="border:none;cursor:pointer;"><span class="flex-1">☀️ Светлая</span></div>
+          <div class="list__item" style="border:none;cursor:pointer;"><span class="flex-1">🇷🇺 Российская</span><span class="text-xs text-muted">(флаг + драгметаллы)</span></div>
+        </div>
+      </div>
+
+      <!-- Tab: Language -->
+      <div class="settings-content" id="tab-language">
+        <h1 class="page-title">Язык</h1>
+        <div class="card mb-4">
+          <h3 class="card__title mb-4">Интерфейс</h3>
+          <div class="text-sm text-secondary mb-3">20 языков: 3 группы</div>
+          <div class="form-group"><select class="form-select form-select--lg">
+            <option selected>🇷🇺 Русский</option><option>🇬🇧 English</option><option>🇫🇷 Français</option>
+            <option>🇨🇳 中文</option><option>🇮🇳 हिन्दী</option><option>🇧🇾 Беларуская</option>
+            <option>🇹🇷 Татарский</option><option>🇧🇦 Башкирский</option><option>🇨🇪 Чеченский</option>
+            <option>🇨🇻 Чувашский</option><option>🇦🇻 Аварский</option><option>🇩🇦 Даргинский</option>
+            <option>🇺🇩 Удмуртский</option><option>🇱🇪 Лезгинский</option><option>🇰🇩 Кабардино-черкесский</option>
+            <option>🇨🇭 Марийский</option><option>🇴🇸 Осетинский</option><option>🇾🇦 Якутский</option>
+            <option>🇧🇺 Бурятский</option><option>🇺🇦 Українська</option>
+          </select></div>
+        </div>
+      </div>
+
+      <!-- Tab: Privacy -->
+      <div class="settings-content" id="tab-privacy">
+        <h1 class="page-title">Приватность</h1>
+        <div class="card mb-4">
+          <h3 class="card__title mb-4">👁 Видимость профиля</h3>
+          <div class="form-group mb-3">
+            <label class="form-label">Кто видит профиль</label>
+            <select class="form-select" onchange="togglePrivacyComboBox(this, 'profile-combo')">
+              <option value="all">Все</option><option value="except">Все кроме...</option><option value="specific">Конкретный...</option>
+            </select>
+            <div id="profile-combo" style="display:none;margin-top:8px;">
+              <input type="text" class="form-input" placeholder="Поиск контактов..." style="margin-bottom:4px;">
+              <div style="max-height:120px;overflow-y:auto;border:1px solid var(--border-color);border-radius:4px;">
+                <label class="form-checkbox" style="padding:4px 8px;"><input type="checkbox"> Анна Иванова</label>
+                <label class="form-checkbox" style="padding:4px 8px;"><input type="checkbox"> Сергей Морозов</label>
+              </div>
+            </div>
+          </div>
+          <div class="form-group mb-3">
+            <label class="form-label">Кто видит статус «в сети»</label>
+            <select class="form-select" onchange="togglePrivacyComboBox(this, 'online-combo')">
+              <option value="all">Все</option><option value="except">Все кроме...</option><option value="specific">Конкретный...</option>
+            </select>
+            <div id="online-combo" style="display:none;margin-top:8px;">
+              <input type="text" class="form-input" placeholder="Поиск контактов..." style="margin-bottom:4px;">
+              <div style="max-height:120px;overflow-y:auto;border:1px solid var(--border-color);border-radius:4px;">
+                <label class="form-checkbox" style="padding:4px 8px;"><input type="checkbox"> Анна Иванова</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="card__title mb-0">🚫 Чёрный список</h3>
+            <button class="btn btn--danger btn--sm" onclick="openModal('modal-block-user')">➕ Заблокировать</button>
+          </div>
+          <div class="list__item" style="border:none;padding:12px;">
+            <div class="flex items-center gap-3">
+              <div class="avatar avatar--sm"><div class="avatar__inner"><span>ББ</span></div></div>
+              <div class="flex-1"><div class="text-sm font-bold">Блокированный 1</div><div class="text-xs text-muted">Заблокирован: 10.07.2026</div></div>
+              <button class="btn btn--secondary btn--sm" onclick="unblockUser('Блокированный 1')">Разблокировать</button>
+            </div>
+          </div>
+          <div class="list__item" style="border:none;padding:12px;">
+            <div class="flex items-center gap-3">
+              <div class="avatar avatar--sm"><div class="avatar__inner"><span>СС</span></div></div>
+              <div class="flex-1"><div class="text-sm font-bold">Блокированный 2</div><div class="text-xs text-muted">Заблокирован: 05.07.2026</div></div>
+              <button class="btn btn--secondary btn--sm" onclick="unblockUser('Блокированный 2')">Разблокировать</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Storage -->
+      <div class="settings-content" id="tab-storage">
+        <h1 class="page-title">Хранилище</h1>
+        <div class="card mb-4">
+          <h3 class="card__title mb-4">Автозагрузка медиа</h3>
+          <div class="list__item" style="border:none;"><span class="flex-1">WiFi</span><label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label></div>
+          <div class="list__item" style="border:none;"><span class="flex-1">Мобильные данные</span><label class="switch"><input type="checkbox"><span class="switch__slider"></span></label></div>
+        </div>
+        <div class="card">
+          <h3 class="card__title mb-4">Управление кэшем</h3>
+          <div class="list__item" style="border:none;"><span class="flex-1">Очистить кэш медиа</span><span class="chip">340 МБ</span></div>
+          <div class="list__item" style="border:none;"><span class="flex-1">Очистить кэш файлов</span><span class="chip">507 МБ</span></div>
+          <button class="btn btn--danger btn--sm mt-3">Очистить всё</button>
+        </div>
+      </div>
+
+      <!-- Tab: Devices -->
+      <div class="settings-content" id="tab-devices">
+        <h1 class="page-title">Мои устройства</h1>
+        <div class="card mb-4">
+          <h3 class="card__title mb-4">Активные сессии</h3>
+          <div class="card" style="background:rgba(45,184,77,0.06);border-color:var(--accent);margin-bottom:12px;">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div style="font-size:28px;">💻</div>
+              <div class="flex-1"><div class="text-sm" style="font-weight:700;">Windows PC (текущее)</div><div class="text-xs text-secondary">IP: 192.168.1.42 • Chrome 120 • Москва</div></div>
+              <span class="chip chip--accent">Текущее</span>
+            </div>
+          </div>
+          <div class="list__item" style="border:none;padding:12px;">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div style="font-size:24px;">📱</div>
+              <div class="flex-1"><div class="text-sm" style="font-weight:600;">iPhone 15 Pro</div><div class="text-xs text-secondary">iOS 17 • IP: 10.0.0.15 • Москва • 2ч назад</div></div>
+              <div class="flex gap-1">
+                <button class="btn btn--secondary btn--sm" onclick="soundCall('iPhone 15 Pro')">🔔 Вызвать</button>
+                <button class="btn btn--danger btn--sm">Завершить</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <button class="btn btn--secondary btn--block mb-2" onclick="window.location.href='add-device.html'">📷 Добавить устройство (QR)</button>
+          <button class="btn btn--danger btn--block">Завершить все сессии</button>
+        </div>
+      </div>
+
+      <!-- Tab: Accounts -->
+      <div class="settings-content" id="tab-accounts">
+        <h1 class="page-title">Аккаунты</h1>
+        <div class="card mb-4">
+          <h3 class="card__title mb-4">Мультиаккаунт</h3>
+          <div class="text-sm text-secondary mb-3">Неограниченное количество аккаунтов. Уведомления для всех.</div>
+          <div class="card" style="background:rgba(45,184,77,0.06);border-color:var(--accent);margin-bottom:12px;">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div class="avatar avatar--md"><div class="avatar__inner"><span>ИИ</span></div></div>
+              <div class="flex-1"><div class="text-sm" style="font-weight:700;">Иван Иванов</div><div class="text-xs text-secondary">+7 (999) 123-45-67 • @ivanov</div></div>
+              <span class="chip chip--accent">Активный</span>
+            </div>
+          </div>
+          <div class="list__item" style="border:none;padding:12px;cursor:pointer;">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div class="avatar avatar--md"><div class="avatar__inner"><span>ББ</span></div></div>
+              <div class="flex-1"><div class="text-sm" style="font-weight:600;">Баллоо Блог</div><div class="text-xs text-secondary">@ballooblog • Корпоративный</div></div>
+              <button class="btn btn--secondary btn--sm">Переключить</button>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn--primary btn--block">+ Добавить аккаунт</button>
+      </div>
+
+      <!-- Tab: Security / 2FA (email-код, не TOTP) -->
+      <div class="settings-content" id="tab-security">
+        <h1 class="page-title">Безопасность</h1>
+        <div class="card mb-4">
+          <h3 class="card__title mb-4">Двухфакторная аутентификация</h3>
+          <div class="list__item" style="border:none;">
+            <div class="flex-1"><div class="text-sm" style="font-weight:700;">2FA через email-код</div><div class="text-xs text-secondary">Код подтверждения отправляется на email</div></div>
+            <label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label>
+          </div>
+        </div>
+        <div class="card mb-4">
+          <h3 class="card__title mb-4">Подтверждение</h3>
+          <div class="form-group">
+            <label class="form-label">Код из email</label>
+            <input type="text" class="form-input" placeholder="Введите 6-значный код">
+          </div>
+          <button class="btn btn--primary btn--block" onclick="showToast('Код подтверждён', 'success')">Подтвердить</button>
+        </div>
+        <div class="card">
+          <h3 class="card__title mb-4">Отключение 2FA</h3>
+          <div class="text-sm text-secondary mb-3">Для отключения нужно подтвердить email-код.</div>
+          <button class="btn btn--danger btn--block">Отключить 2FA</button>
+        </div>
+      </div>
+
+      <!-- Tab: Cache -->
+      <div class="settings-content" id="tab-cache">
+        <h1 class="page-title">Оффлайн-кэш</h1>
+        <div class="card mb-4">
+          <h3 class="card__title mb-4">💾 Настройки кэширования</h3>
+          <div class="list__item" style="border:none;"><span class="flex-1">Кэшировать сообщения</span><label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label></div>
+          <div class="list__item" style="border:none;"><span class="flex-1">Кэшировать файлы</span><label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label></div>
+          <div class="list__item" style="border:none;"><span class="flex-1">Авто-очистка при превышении лимита</span><label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label></div>
+        </div>
+        <div class="card">
+          <h3 class="card__title mb-4">📊 Использование</h3>
+          <div class="flex gap-3 mb-4" style="flex-wrap:wrap;">
+            <div class="card flex-1" style="min-width:100px;"><div class="text-xs text-muted">Использовано</div><div style="font-size:20px;font-weight:800;">847 МБ</div></div>
+            <div class="card flex-1" style="min-width:100px;"><div class="text-xs text-muted">Лимит</div><div style="font-size:20px;font-weight:800;">2 ГБ</div></div>
+            <div class="card flex-1" style="min-width:100px;"><div class="text-xs text-muted">Свободно</div><div style="font-size:20px;font-weight:800;color:var(--accent);">1.2 ГБ</div></div>
+          </div>
+          <div style="background:var(--bg-tertiary);height:12px;border-radius:6px;overflow:hidden;margin-bottom:8px;">
+            <div style="width:42%;height:100%;background:var(--accent);border-radius:6px;"></div>
+          </div>
+          <p class="text-xs text-muted">42% заполнено</p>
+        </div>
+      </div>
+
+      <!-- Tab: Disk -->
+      <div class="settings-content" id="tab-disk">
+        <h1 class="page-title">Облачное хранилище</h1>
+        <div class="card mb-4">
+          <h3 class="card__title mb-4">Подключение</h3>
+          <div class="list__item" style="border:none;"><span class="flex-1">Yandex Disk</span><span class="chip chip--accent">✅ Подключено</span></div>
+          <div class="list__item" style="border:none;"><span class="flex-1">Mail.ru Cloud</span><span class="chip">Не подключено</span></div>
+          <div class="list__item" style="border:none;"><span class="flex-1">Использовано (Yandex)</span><span class="text-sm">2.4 ГБ из 10 ГБ</span></div>
+          <button class="btn btn--secondary btn--block mt-3">🔄 Переключить аккаунт</button>
+        </div>
+      </div>
+
+      <!-- Tab: Donate -->
+      <div class="settings-content" id="tab-donate">
+        <h1 class="page-title">💰 Донаты</h1>
+        <div class="card mb-4">
+          <h3 class="card__title mb-4">Мои донаты</h3>
+          <div class="list__item" style="border:none;padding:12px;">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div style="font-size:24px;">🎈</div>
+              <div class="flex-1"><div class="text-sm" style="font-weight:700;">Balloo — развитие мессенджера</div><div class="text-xs text-secondary">Тир: 🥇 Золотой — с 01.07.2026</div></div>
+              <div class="text-right"><div class="text-sm font-bold">500 ₽/мес</div><span class="chip chip--accent">Активен</span></div>
+            </div>
+          </div>
+          <button class="btn btn--primary btn--block mt-3" onclick="window.location.href='donate.html'">💰 Поддержать проект</button>
+          <button class="btn btn--secondary btn--block mt-2" onclick="window.location.href='my-donates.html'">📋 Вся история</button>
+        </div>
+      </div>
+
+      <!-- Tab: Support -->
+      <div class="settings-content" id="tab-support">
+        <h1 class="page-title">🎧 Поддержка</h1>
+        <div class="card mb-4">
+          <h3 class="card__title mb-4">Чат с поддержкой</h3>
+          <div class="text-sm text-secondary mb-3">Среднее время ответа: 15 минут</div>
+          <div style="background:var(--bg-tertiary);border-radius:8px;padding:12px;margin-bottom:12px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+              <div class="avatar avatar--sm" style="background:var(--accent);"><div class="avatar__inner"><span>П</span></div></div>
+              <span class="text-sm font-bold">Поддержка Balloo</span>
+              <span class="chip chip--accent">Онлайн</span>
+            </div>
+            <div style="background:var(--bg-secondary);border-radius:4px;padding:8px;">
+              <div class="text-sm">Здравствуйте! Чем можем помочь?</div>
+              <div class="text-xs text-muted" style="text-align:right;">14:30</div>
+            </div>
+          </div>
+          <div class="form-group"><input type="text" class="form-input" placeholder="Напишите сообщение..."></div>
+          <button class="btn btn--primary btn--block">📤 Отправить</button>
+        </div>
+        <div class="card">
+          <h3 class="card__title mb-4">📚 Самопомощь</h3>
+          <div class="list__item" style="border:none;cursor:pointer;"><span class="flex-1">❓ Частые вопросы (FAQ)</span><span class="text-secondary">→</span></div>
+          <div class="list__item" style="border:none;cursor:pointer;"><span class="flex-1">📖 База знаний</span><span class="text-secondary">→</span></div>
+          <div class="list__item" style="border:none;cursor:pointer;"><span class="flex-1">📜 Правила сообщества</span><span class="text-secondary">→</span></div>
+        </div>
+      </div>
+
+      <!-- Tab: About -->
+      <div class="settings-content" id="tab-about">
+        <h1 class="page-title">О Balloo</h1>
+        <div class="card mb-4">
+          <div class="text-center mb-4">
+            <div style="font-size:48px;">🎈</div>
+            <div class="text-lg font-bold mt-2">Balloo Messenger</div>
+            <div class="text-sm text-secondary">Версия 1.0.0 (сборка 2026.07.18)</div>
+          </div>
+          <div class="list__item" style="border:none;"><span class="flex-1">Ссылка на поддержку</span><a href="#" style="color:var(--accent);">help@balloo.su</a></div>
+          <div class="list__item" style="border:none;"><span class="flex-1">Лицензия</span><a href="#" style="color:var(--accent);">Открыть лицензию</a></div>
+          <div class="list__item" style="border:none;"><span class="flex-1">История изменений</span><a href="https://history.balloo.su" style="color:var(--accent);">История версий</a></div>
+        </div>
+        <div class="card">
+          <h3 class="card__title mb-4">🙏 Благодарности</h3>
+          <div class="text-sm text-secondary">Спасибо всем участникам сообщества Balloo за тестирование и обратную связь.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="statusbar">
+    <div><span class="status-dot status-dot--online"></span> Подключено · WebSocket</div>
+    <div class="statusbar__sep">💾 Кэш: 124 МБ · v1.0.0-beta</div>
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+<script>
+function switchTab(tabName) {
+  document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('settings-tab--active'));
+  document.querySelectorAll('.settings-content').forEach(c => c.classList.remove('settings-content--active'));
+  document.querySelectorAll(`.settings-tab[data-tab="${tabName}"]`).forEach(t => t.classList.add('settings-tab--active'));
+  const target = document.getElementById('tab-' + tabName);
+  if (target) target.classList.add('settings-content--active');
+  document.querySelectorAll('.sidebar-nav-item[data-tab]').forEach(item => {
+    item.classList.toggle('sidebar-nav-item--active', item.dataset.tab === tabName);
+  });
+}
+
+function togglePrivacyComboBox(select, comboId) {
+  const combo = document.getElementById(comboId);
+  if (!combo) return;
+  combo.style.display = (select.value === 'except' || select.value === 'specific') ? 'block' : 'none';
+}
+
+function unblockUser(name) {
+  if (confirm('Разблокировать ' + name + '?')) {
+    showToast(name + ' разблокирован(а)', 'success');
+  }
+}
+
+function soundCall(deviceName) {
+  if (confirm('Отправить push-вызов на ' + deviceName + '?')) {
+    showToast('Push-вызов отправлен!', 'info');
+  }
+}
+</script>
+</body>
+</html>

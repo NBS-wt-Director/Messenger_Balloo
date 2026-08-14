@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Command — Подразделения</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--info);">C</div><span>Command</span>
+    <div class="topbar__dropdown"></div>
+  </div>
+  <div class="topbar__title">Подразделения</div>
+  <div class="topbar__right"><div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИВ</span></div></div></div>
+</div>
+<div class="main">
+  <div class="sidebar sidebar--narrow">
+    <div class="list">
+      <div class="list__item">🏠 Дашборд</div>
+      <div class="list__item">💬 Чат</div>
+      <div class="list__item">📅 Совещания</div>
+      <div class="list__item">📋 Задачи</div>
+      <div class="list__item">🏢 Мой отдел</div>
+      <div class="list__item list__item--active">🏛️ Подразделения</div>
+      <div class="list__item">👥 HR</div>
+      <div class="list__item">📚 База знаний</div>
+      <div class="list__item">🎯 Найм</div>
+      <div class="list__item">📊 Мониторинг</div>
+    </div>
+  </div>
+  <div class="content overflow-y-auto"><div class="page-container">
+    <h1 class="page-title">🏛️ Подразделения</h1>
+    <div class="flex items-center gap-4 mb-2">
+      <p class="page-subtitle" style="margin:0;">Структура компании Balloo</p>
+      <button class="btn btn--primary btn--sm" onclick="openModal('modal-new-dept')">+ Создать подразделение</button>
+    </div>
+
+    <div class="flex gap-4 mb-6" style="flex-wrap:wrap;">
+      <div class="card flex-1" style="min-width:140px;"><div class="text-xs text-muted">Отделов</div><div style="font-size:28px;font-weight:800;color:var(--accent);">4</div></div>
+      <div class="card flex-1" style="min-width:140px;"><div class="text-xs text-muted">Сотрудников</div><div style="font-size:28px;font-weight:800;color:var(--info);">18</div></div>
+      <div class="card flex-1" style="min-width:140px;"><div class="text-xs text-muted">Вакансий</div><div style="font-size:28px;font-weight:800;color:var(--warning);">6</div></div>
+    </div>
+
+    <!-- Development -->
+    <div class="card mb-4 card--hover" onclick="window.location.href='my-department.html'">
+      <div class="flex items-center gap-4">
+        <span style="font-size:40px;">⚛️</span>
+        <div class="flex-1">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="chip chip--accent">Мой отдел</span>
+          </div>
+          <div class="card__title">Разработка</div>
+          <div class="card__body text-sm">Frontend, Backend, Mobile · 8 сотрудников · 3 вакансии</div>
+        </div>
+        <div class="flex gap-2">
+          <div class="avatar avatar--xs avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИВ</span></div></div>
+          <div class="avatar avatar--xs avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ЕК</span></div></div>
+          <div class="avatar avatar--xs avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>АП</span></div></div>
+          <div class="avatar avatar--xs avatar--bordered avatar--status-online avatar--ctx-contact" style="background:var(--bg-tertiary);"><div class="avatar__inner"><span>+5</span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Design -->
+    <div class="card mb-4 card--hover">
+      <div class="flex items-center gap-4">
+        <span style="font-size:40px;">🎨</span>
+        <div class="flex-1">
+          <div class="card__title">Дизайн</div>
+          <div class="card__body text-sm">UI/UX, Графика · 3 сотрудника · 1 вакансия</div>
+        </div>
+        <div class="flex gap-2">
+          <div class="avatar avatar--xs avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>МА</span></div></div>
+          <div class="avatar avatar--xs avatar--bordered avatar--status-busy avatar--ctx-contact"><div class="avatar__inner"><span>ДЗ</span></div></div>
+          <div class="avatar avatar--xs avatar--bordered avatar--status-offline avatar--ctx-contact"><div class="avatar__inner"><span>КЛ</span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Infrastructure -->
+    <div class="card mb-4 card--hover">
+      <div class="flex items-center gap-4">
+        <span style="font-size:40px;">🚀</span>
+        <div class="flex-1">
+          <div class="card__title">Инфраструктура</div>
+          <div class="card__body text-sm">DevOps, SRE · 4 сотрудника · 1 вакансия</div>
+        </div>
+        <div class="flex gap-2">
+          <div class="avatar avatar--xs avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ДС</span></div></div>
+          <div class="avatar avatar--xs avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ПН</span></div></div>
+          <div class="avatar avatar--xs avatar--bordered avatar--status-offline avatar--ctx-contact"><div class="avatar__inner"><span>РБ</span></div></div>
+          <div class="avatar avatar--xs avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>АК</span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Documentation -->
+    <div class="card mb-4 card--hover">
+      <div class="flex items-center gap-4">
+        <span style="font-size:40px;">📝</span>
+        <div class="flex-1">
+          <div class="card__title">Документация</div>
+          <div class="card__body text-sm">Technical Writing · 3 сотрудника · 1 вакансия</div>
+        </div>
+        <div class="flex gap-2">
+          <div class="avatar avatar--xs avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>НС</span></div></div>
+          <div class="avatar avatar--xs avatar--bordered avatar--status-offline avatar--ctx-contact"><div class="avatar__inner"><span>ВЯ</span></div></div>
+          <div class="avatar avatar--xs avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ТМ</span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card text-center">
+      <p class="text-sm text-secondary">Хотите перейти в другой отдел?</p>
+      <a href="vacancies.html" class="btn btn--secondary mt-2">💼 Смотреть вакансии других отделов</a>
+    </div>
+  </div></div>
+</div>
+<script src="../assets/common.js"></script>
+
+<!-- Modal: New Department -->
+<div class="modal-overlay" id="modal-overlay"></div>
+<div class="modal modal--status-info" id="modal-new-dept">
+  <div class="modal__header"><span class="modal__title">🏛️ Создать подразделение</span><div class="modal__close" onclick="closeModal('modal-new-dept')">✕</div></div>
+  <div class="modal__body">
+    <div class="form-group"><label class="form-label">Название подразделения *</label><input type="text" class="form-input" placeholder="Например: Маркетинг"></div>
+    <div class="form-group">
+      <label class="form-label">Родительское подразделение</label>
+      <select class="form-select">
+        <option>— Нет (корневое) —</option>
+        <option>Разработка</option>
+        <option>Дизайн</option>
+        <option>Маркетинг</option>
+        <option>HR</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Руководитель</label>
+      <select class="form-select">
+        <option>— Не назначен —</option>
+        <option>Иван Воронцов</option>
+        <option>Елена Киселева</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Описание</label><textarea class="form-textarea" placeholder="Цели и задачи подразделения..." style="min-height:80px;"></textarea></div>
+    <div class="form-group"><label class="form-label">Порядок отображения</label><input type="number" class="form-input" value="1" min="1"></div>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--tertiary" onclick="closeModal('modal-new-dept')">Отмена</button>
+    <button class="btn btn--primary" onclick="closeModal('modal-new-dept')">Создать</button>
+  </div>
+</div>
+</script>
+</body>
+</html>

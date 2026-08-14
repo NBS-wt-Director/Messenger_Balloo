@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <title>Command — Отпуска и отсутствие</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--info);">C</div><span>Command</span>
+    <div class="topbar__dropdown"><div class="topbar__dropdown-item">🏢 Command (текущий)</div><div class="topbar__dropdown-divider"></div><div class="topbar__dropdown-item">💬 Balloo</div><div class="topbar__dropdown-item">🛡️ Admin</div><div class="topbar__dropdown-item">💡 Features</div><div class="topbar__dropdown-item">📜 History</div><div class="topbar__dropdown-item">⬇️ Download</div><div class="topbar__dropdown-item">📚 API Docs</div></div>
+  </div>
+  <div class="topbar__title">Отпуска и отсутствие</div>
+  <div class="topbar__actions">
+    <button class="btn btn--primary btn--sm" onclick="openModal('modal-new-request')">+ Запрос</button>
+    <div class="tabs" style="border:none;">
+      <div class="tab tab--active">Мои</div>
+      <div class="tab">Отдел</div>
+      <div class="tab">Все</div>
+    </div>
+  </div>
+  <div class="topbar__right"><div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИИ</span></div></div><span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span><span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span></div>
+</div>
+<div class="main">
+  <!-- Sidebar -->
+  <div class="sidebar sidebar--narrow">
+    <div class="list">
+      <div class="list__item">📊 Дашборд</div>
+      <div class="list__item">👤 Профиль</div>
+      <div class="list__item">📝 Задачи</div>
+      <div class="list__item">📅 Календарь</div>
+      <div class="list__item">💬 Внутренний чат</div>
+      <div class="list__item">📞 Совещания</div>
+      <div class="list__item list__item--active">🏢 Мой отдел</div>
+      <div class="list__item">👥 HR</div>
+      <div class="list__item">🎯 Найм</div>
+      <div class="list__item">📚 База знаний</div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="content overflow-y-auto">
+    <div class="page-container" style="padding-bottom:40px;">
+      <!-- Summary cards -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
+        <div class="card">
+          <div class="text-xs text-muted mb-2">Остаток отпуска</div>
+          <div class="flex items-end gap-2">
+            <span class="font-bold" style="font-size:28px;color:var(--accent);">14</span>
+            <span class="text-xs text-secondary mb-1">дней</span>
+          </div>
+          <div class="text-xs text-muted mt-1">Из 28 годовых</div>
+        </div>
+        <div class="card">
+          <div class="text-xs text-muted mb-2">Использовано</div>
+          <div class="flex items-end gap-2">
+            <span class="font-bold" style="font-size:28px;color:var(--text-primary);">14</span>
+            <span class="text-xs text-secondary mb-1">дней</span>
+          </div>
+          <div class="text-xs text-muted mt-1">50% годового</div>
+        </div>
+        <div class="card">
+          <div class="text-xs text-muted mb-2">Активные запросы</div>
+          <div class="flex items-end gap-2">
+            <span class="font-bold" style="font-size:28px;color:var(--warning);">2</span>
+            <span class="text-xs text-secondary mb-1">на рассмотрении</span>
+          </div>
+          <div class="text-xs text-muted mt-1">1 требует решения</div>
+        </div>
+        <div class="card">
+          <div class="text-xs text-muted mb-2">Сейчас в отпуске</div>
+          <div class="flex items-end gap-2">
+            <span class="font-bold" style="font-size:28px;color:var(--info);">1</span>
+            <span class="text-xs text-secondary mb-1">человек</span>
+          </div>
+          <div class="text-xs text-muted mt-1">Ольга Зайцева</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;">
+        <!-- Absence calendar -->
+        <div class="card">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="card__title" style="font-size:14px;margin:0;">📅 Календарь отсутствий отдела</h3>
+            <div class="flex gap-2">
+              <button class="btn btn--secondary btn--sm">‹</button>
+              <span class="text-sm font-semibold" style="color:var(--text-primary);align-self:center;">Июль 2026</span>
+              <button class="btn btn--secondary btn--sm">›</button>
+            </div>
+          </div>
+          <!-- Mini calendar -->
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--border-color);text-align:center;">
+            <div style="padding:6px;background:var(--bg-secondary);font-size:10px;color:var(--text-muted);font-weight:700;">ПН</div>
+            <div style="padding:6px;background:var(--bg-secondary);font-size:10px;color:var(--text-muted);font-weight:700;">ВТ</div>
+            <div style="padding:6px;background:var(--bg-secondary);font-size:10px;color:var(--text-muted);font-weight:700;">СР</div>
+            <div style="padding:6px;background:var(--bg-secondary);font-size:10px;color:var(--text-muted);font-weight:700;">ЧТ</div>
+            <div style="padding:6px;background:var(--bg-secondary);font-size:10px;color:var(--text-muted);font-weight:700;">ПТ</div>
+            <div style="padding:6px;background:var(--bg-secondary);font-size:10px;color:var(--text-muted);font-weight:700;">СБ</div>
+            <div style="padding:6px;background:var(--bg-secondary);font-size:10px;color:var(--text-muted);font-weight:700;">ВС</div>
+            <!-- Week 1 -->
+            <div style="background:var(--bg-secondary);padding:6px;font-size:12px;color:var(--text-muted);">29</div>
+            <div style="background:var(--bg-secondary);padding:6px;font-size:12px;color:var(--text-muted);">30</div>
+            <div style="background:var(--bg-secondary);padding:6px;font-size:12px;">1</div>
+            <div style="background:var(--bg-secondary);padding:6px;font-size:12px;">2</div>
+            <div style="background:var(--bg-secondary);padding:6px;font-size:12px;">3</div>
+            <div style="background:var(--bg-secondary);padding:6px;font-size:12px;color:var(--text-muted);">4</div>
+            <div style="background:var(--bg-secondary);padding:6px;font-size:12px;color:var(--text-muted);">5</div>
+            <!-- Week 2 -->
+            <div style="background:var(--bg-secondary);padding:6px;font-size:12px;">6</div>
+            <div style="background:var(--bg-secondary);padding:6px;font-size:12px;">7</div>
+            <div style="background:var(--bg-secondary);padding:6px;font-size:12px;">8</div>
+            <div style="background:var(--bg-secondary);padding:6px;font-size:12px;">9</div>
+            <div style="background:var(--bg-secondary);padding:6px;font-size:12px;">10</div>
+            <div style="background:var(--bg-secondary);padding:6px;font-size:12px;color:var(--text-muted);">11</div>
+            <div style="background:var(--bg-secondary);padding:6px;font-size:12px;color:var(--text-muted);">12</div>
+            <!-- Week 3 -->
+            <div style="background:var(--bg-secondary);padding:6px;font-size:12px;">13</div>
+            <div style="background:var(--bg-secondary);padding:6px;font-size:12px;">14</div>
+            <div style="background:var(--bg-secondary);padding:6px;font-size:12px;">15</div>
+            <div style="background:var(--bg-secondary);padding:6px;font-size:12px;">16</div>
+            <div style="background:var(--bg-secondary);padding:6px;font-size:12px;">17</div>
+            <div style="background:var(--bg-secondary);padding:6px;font-size:12px;color:var(--text-muted);">18</div>
+            <div style="background:var(--bg-secondary);padding:6px;font-size:12px;color:var(--text-muted);">19</div>
+            <!-- Week 4 -->
+            <div style="background:var(--bg-secondary);padding:6px;font-size:12px;">20</div>
+            <div style="background:var(--bg-secondary);padding:6px;font-size:12px;">21</div>
+            <!-- Today -->
+            <div style="background:var(--bg-active);padding:6px;font-size:12px;border:2px solid var(--accent);position:relative;">
+              22
+              <span style="position:absolute;bottom:2px;right:4px;width:4px;height:4px;background:var(--accent);border-radius:50%;"></span>
+            </div>
+            <!-- OZ vacation: 23-30 -->
+            <div style="background:rgba(59,158,255,0.1);padding:6px;font-size:12px;position:relative;" title="Ольга Зайцева — отпуск">
+              23
+              <span style="position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:16px;height:3px;background:var(--info);border-radius:2px;"></span>
+            </div>
+            <div style="background:rgba(59,158,255,0.1);padding:6px;font-size:12px;position:relative;" title="Ольга Зайцева — отпуск">24<span style="position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:16px;height:3px;background:var(--info);border-radius:2px;"></span></div>
+            <div style="background:rgba(59,158,255,0.1);padding:6px;font-size:12px;position:relative;" title="Ольга Зайцева — отпуск">25<span style="position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:16px;height:3px;background:var(--info);border-radius:2px;"></span></div>
+            <div style="background:rgba(59,158,255,0.1);padding:6px;font-size:12px;position:relative;" title="Ольга Зайцева — отпуск">26<span style="position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:16px;height:3px;background:var(--info);border-radius:2px;"></span></div>
+            <div style="background:rgba(59,158,255,0.1);padding:6px;font-size:12px;color:var(--text-muted);position:relative;" title="Ольга Зайцева — отпуск">27<span style="position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:16px;height:3px;background:var(--info);border-radius:2px;"></span></div>
+            <div style="background:rgba(59,158,255,0.1);padding:6px;font-size:12px;color:var(--text-muted);position:relative;" title="Ольга Зайцева — отпуск">28<span style="position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:16px;height:3px;background:var(--info);border-radius:2px;"></span></div>
+            <!-- Week 5 -->
+            <div style="background:rgba(59,158,255,0.1);padding:6px;font-size:12px;position:relative;" title="Ольга Зайцева — отпуск">29<span style="position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:16px;height:3px;background:var(--info);border-radius:2px;"></span></div>
+            <div style="background:rgba(59,158,255,0.1);padding:6px;font-size:12px;position:relative;" title="Ольга Зайцева — отпуск">30<span style="position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:16px;height:3px;background:var(--info);border-radius:2px;"></span></div>
+            <div style="background:var(--bg-secondary);padding:6px;font-size:12px;">31</div>
+            <div style="background:var(--bg-secondary);padding:6px;font-size:12px;color:var(--text-muted);">1</div>
+            <div style="background:var(--bg-secondary);padding:6px;font-size:12px;color:var(--text-muted);">2</div>
+            <div style="background:var(--bg-secondary);padding:6px;font-size:12px;color:var(--text-muted);">3</div>
+            <div style="background:var(--bg-secondary);padding:6px;font-size:12px;color:var(--text-muted);">4</div>
+          </div>
+          <div class="flex gap-4 mt-3 text-xs">
+            <div class="flex items-center gap-1"><span style="display:inline-block;width:16px;height:3px;background:var(--info);border-radius:2px;"></span> Отпуск</div>
+            <div class="flex items-center gap-1"><span style="display:inline-block;width:4px;height:4px;background:var(--accent);border-radius:50%;"></span> Сегодня</div>
+            <div class="flex items-center gap-1"><span style="display:inline-block;width:16px;height:3px;background:var(--warning);border-radius:2px;"></span> Больничный</div>
+          </div>
+        </div>
+
+        <!-- Leave requests -->
+        <div class="card">
+          <h3 class="card__title mb-4" style="font-size:14px;">📋 Запросы на отсутствие</h3>
+          <div class="flex flex-col gap-3">
+            <!-- Request 1: Pending (requires approval) -->
+            <div class="card" style="border-left:3px solid var(--warning);background:rgba(232,163,23,0.05);">
+              <div class="flex items-center gap-3 mb-2">
+                <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИИ</span></div></div>
+                <div class="flex-1">
+                  <div class="text-sm font-semibold" style="color:var(--text-primary);">Иван Иванов</div>
+                  <div class="text-xs text-secondary">Годовой отпуск · 14 дней</div>
+                </div>
+                <span class="chip chip--warning">На рассмотрении</span>
+              </div>
+              <div class="text-xs text-muted mb-3">25.07 — 07.08.2026</div>
+              <div class="flex gap-2">
+                <button class="btn btn--primary btn--sm" onclick="approveRequest(this)">✓ Утвердить</button>
+                <button class="btn btn--danger btn--sm" onclick="rejectRequest(this)">✕ Отклонить</button>
+                <button class="btn btn--tertiary btn--sm" style="margin-left:auto;">💬 Обсудить</button>
+              </div>
+            </div>
+
+            <!-- Request 2: Pending -->
+            <div class="card" style="border-left:3px solid var(--info);">
+              <div class="flex items-center gap-3 mb-2">
+                <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>СМ</span></div></div>
+                <div class="flex-1">
+                  <div class="text-sm font-semibold" style="color:var(--text-primary);">Сергей Морозов</div>
+                  <div class="text-xs text-secondary">Больничный · 3 дня</div>
+                </div>
+                <span class="chip chip--info">На рассмотрении</span>
+              </div>
+              <div class="text-xs text-muted mb-3">20.07 — 22.07.2026</div>
+              <div class="flex gap-2">
+                <button class="btn btn--primary btn--sm" onclick="approveRequest(this)">✓ Утвердить</button>
+                <button class="btn btn--danger btn--sm" onclick="rejectRequest(this)">✕ Отклонить</button>
+                <button class="btn btn--tertiary btn--sm" style="margin-left:auto;">💬 Обсудить</button>
+              </div>
+            </div>
+
+            <!-- Request 3: Approved -->
+            <div class="card" style="border-left:3px solid var(--accent);opacity:0.7;">
+              <div class="flex items-center gap-3">
+                <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ОЗ</span></div></div>
+                <div class="flex-1">
+                  <div class="text-sm font-semibold" style="color:var(--text-primary);">Ольга Зайцева</div>
+                  <div class="text-xs text-secondary">Годовой отпуск · 14 дней</div>
+                </div>
+                <span class="chip chip--accent">✓ Утверждён</span>
+              </div>
+              <div class="text-xs text-muted mt-1">23.07 — 05.08.2026 (сейчас в отпуске)</div>
+            </div>
+
+            <!-- Request 4: Rejected -->
+            <div class="card" style="border-left:3px solid var(--danger);opacity:0.5;">
+              <div class="flex items-center gap-3">
+                <div class="avatar avatar--sm avatar--bordered avatar--status-offline avatar--ctx-contact"><div class="avatar__inner"><span>ДВ</span></div></div>
+                <div class="flex-1">
+                  <div class="text-sm font-semibold" style="color:var(--text-primary);">Дмитрий Волков</div>
+                  <div class="text-xs text-secondary">Уволен без содержания · 5 дней</div>
+                </div>
+                <span class="chip chip--danger">✕ Отклонён</span>
+              </div>
+              <div class="text-xs text-muted mt-1">10.08 — 14.08.2026 · Причина: Конфликт с релизом</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Team absence overview -->
+      <div class="card">
+        <h3 class="card__title mb-4" style="font-size:14px;">👥 Отсутствие команды — Ближайшие 30 дней</h3>
+        <table class="table">
+          <thead><tr><th>Сотрудник</th><th>Тип</th><th>Период</th><th>Дней</th><th>Статус</th><th>Замещающий</th></tr></thead>
+          <tbody>
+            <tr class="table__row"><td><div class="flex items-center gap-2"><div class="avatar avatar--xs avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИИ</span></div></div>Иван Иванов</div></td><td><span class="chip chip--warning">Отпуск</span></td><td>25.07 — 07.08</td><td>14</td><td><span class="chip chip--warning">На рассмотрении</span></td><td>—</td></tr>
+            <tr class="table__row"><td><div class="flex items-center gap-2"><div class="avatar avatar--xs avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ОЗ</span></div></div>Ольга Зайцева</div></td><td><span class="chip chip--accent">Отпуск</span></td><td>23.07 — 05.08</td><td>14</td><td><span class="chip chip--accent">Активен</span></td><td>ЕК</td></tr>
+            <tr class="table__row"><td><div class="flex items-center gap-2"><div class="avatar avatar--xs avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>СМ</span></div></div>Сергей Морозов</div></td><td><span class="chip chip--info">Больничный</span></td><td>20.07 — 22.07</td><td>3</td><td><span class="chip chip--info">На рассмотрении</span></td><td>АП</td></tr>
+            <tr class="table__row"><td><div class="flex items-center gap-2"><div class="avatar avatar--xs avatar--bordered avatar--status-offline avatar--ctx-contact"><div class="avatar__inner"><span>ЕК</span></div></div>Елена Киселёва</div></td><td><span class="chip">Полу-день</span></td><td>28.07</td><td>0.5</td><td><span class="chip">Запланировано</span></td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- New request modal -->
+<div class="modal-overlay" id="modal-overlay"></div>
+<div class="modal modal--status-info" id="modal-new-request" style="width:480px;">
+  <div class="modal__header"><span class="modal__title">📝 Новый запрос на отсутствие</span><div class="modal__close" onclick="closeModal('modal-new-request')">✕</div></div>
+  <div class="modal__body">
+    <div class="form-group">
+      <label class="form-label">Тип отсутствия *</label>
+      <select class="form-select">
+        <option>— Выберите —</option>
+        <option>🏖 Годовой отпуск</option>
+        <option>🏖 Негодовой отпуск</option>
+        <option>🤒 Больничный</option>
+        <option>📋 Уволен без содержания</option>
+        <option>👶 Декретный отпуск</option>
+        <option>🎓 Обучение / Курс</option>
+        <option>🏠 Удалённая работа</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Дата начала *</label>
+      <input type="date" class="form-input">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Дата окончания *</label>
+      <input type="date" class="form-input">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Замещающий сотрудник</label>
+      <select class="form-select">
+        <option>— Не требуется —</option>
+        <option>Елена Киселёва</option>
+        <option>Антон Петров</option>
+        <option>Сергей Морозов</option>
+        <option>Дмитрий Волков</option>
+      </select>
+      <div class="form-hint">Укажите, кто возьмёт ваши задачи на время отсутствия</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Причина / Комментарий</label>
+      <textarea class="form-textarea" placeholder="Кратко опишите причину..." style="min-height:80px;"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Ожидаемый остаток после запроса</label>
+      <div class="font-bold" style="font-size:18px;color:var(--accent);">0 дней</div>
+      <div class="form-hint">После этого запроса весь ваш отпуск будет использован</div>
+    </div>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--tertiary" onclick="closeModal('modal-new-request')">Отмена</button>
+    <button class="btn btn--primary" onclick="closeModal('modal-new-request')">Отправить запрос</button>
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+<script>
+function approveRequest(btn) {
+  const card = btn.closest('.card');
+  card.style.borderLeftColor = 'var(--accent)';
+  card.style.opacity = '0.7';
+  const chips = card.querySelectorAll('.chip');
+  if (chips[0]) {
+    chips[0].className = 'chip chip--accent';
+    chips[0].textContent = '✓ Утверждён';
+  }
+  // Hide approve/reject buttons
+  const buttons = card.querySelectorAll('.btn');
+  buttons.forEach(b => { if (b.onclick) b.style.display = 'none'; });
+  const discussBtn = card.querySelector('.btn--tertiary');
+  if (discussBtn) discussBtn.style.marginLeft = 'auto';
+  alert('Запрос утверждён ✓');
+}
+
+function rejectRequest(btn) {
+  const card = btn.closest('.card');
+  card.style.borderLeftColor = 'var(--danger)';
+  card.style.opacity = '0.5';
+  const chips = card.querySelectorAll('.chip');
+  if (chips[0]) {
+    chips[0].className = 'chip chip--danger';
+    chips[0].textContent = '✕ Отклонён';
+  }
+  const buttons = card.querySelectorAll('.btn');
+  buttons.forEach(b => { if (b.onclick) b.style.display = 'none'; });
+  alert('Запрос отклонён ✕');
+}
+</script>
+</body>
+</html>

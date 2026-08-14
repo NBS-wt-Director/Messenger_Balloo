@@ -1,0 +1,1059 @@
+// ============================================================
+// Balloo Messenger — Prisma Schema
+// Тикеты №6 (Users + Auth) + №7 (Chats + Messages)
+// ============================================================
+
+generator client {
+  provider        = "prisma-client-js"
+  binaryTargets   = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// Enums
+// ============================================================
+
+enum UserStatus {
+  active
+  banned
+  suspended
+  deleted
+}
+
+enum TwoFAMethod {
+  totp
+  sms
+  email
+}
+
+enum DeviceType {
+  web
+  desktop
+  android
+  ios
+}
+
+enum ChatType {
+  direct
+  group
+  channel
+}
+
+enum MessageStatus {
+  sent
+  delivered
+  read
+}
+
+enum BlogPostStatus {
+  draft
+  published
+  rejected
+}
+
+enum VacancyStatus {
+  open
+  closed
+  on_hold
+}
+
+enum ApplicationStatus {
+  new
+  review
+  interview
+  rejected
+  hired
+}
+
+enum InterviewType {
+  phone
+  video
+  in_person
+  take_home
+}
+
+enum InterviewResult {
+  pass
+  fail
+  pending
+}
+
+enum MessageType {
+  text
+  image
+  file
+  voice
+  video
+  poll
+  system
+}
+
+enum DonationStatus {
+  pending
+  manual_pending
+  yookassa_pending
+  completed
+  failed
+  refunded
+}
+
+enum DonationProvider {
+  sbp_manual
+  yookassa
+}
+
+enum ReportStatus {
+  open
+  reviewing
+  resolved
+  dismissed
+}
+
+// ============================================================
+// Models — Тикет #6: Users + Auth
+// ============================================================
+
+model User {
+  id           String       @id @default(cuid()) @db.VarChar(25)
+  email        String?      @unique @db.VarChar(255)
+  username     String?      @unique @db.VarChar(50)
+  passwordHash String?      @db.VarChar(255)
+  phone        String?      @unique @db.VarChar(20)
+  avatarUrl    String?  @db.VarChar(500)
+  displayName  String?  @db.VarChar(100)
+  role         String   @default("user") // user, admin, moderator
+  status       UserStatus   @default(active)
+  language     String       @default("ru")
+  createdAt    BigInt       @default(0)
+  updatedAt    BigInt       @default(0)
+
+  // Relations
+  twoFASecrets       TwoFASecret[]
+  oAuthAccounts      OAuthAccount[]
+  devices            Device[]
+  bansGiven          UserBan[]    @relation("UserBanAdmin")
+  bansReceived       UserBan[]    @relation("UserBanUser")
+  userChats          UserChat[]
+  messages           Message[]    @relation("MessageSender")
+  inviteLinks        InviteLink[]
+  profile            Profile?
+  publicProfile      PublicProfile?
+  stories            Story[]
+  polls              Poll[]
+  pollVotes          PollVote[]
+  storyViews         StoryView[]
+  storyReactions     StoryReaction[]
+  chatBansReceived   ChatBan[]    @relation("ChatBanUser")
+  chatBansGiven      ChatBan[]    @relation("ChatBanAdmin")
+  blockedBy          BlockedUser[] @relation("BlockedUserBlocked")
+  blockedUsers       BlockedUser[] @relation("BlockedUserBlocker")
+  blogPosts          BlogPost[]         @relation("BlogPostAuthor")
+  blogComments       BlogComment[]      @relation("BlogPostComments")
+  knowledgePagesEdited KnowledgePage[]  @relation("KnowledgePageEditor")
+  departmentsHead    Department[]    @relation("DepartmentHead")
+  interviewsConducted Interview[]    @relation("InterviewInterviewer")
+  applicationsSubmitted Application[] @relation("ApplicationApplicant")
+  donations           Donation[]
+  featureRequests     FeatureRequest[]   @relation("FeatureAuthor")
+  featureVotes        FeatureVote[]
+  featureComments     FeatureComment[]
+  reportsGiven        Report[]         @relation("ReportReporter")
+  reportsTargeted     Report[]         @relation("ReportTarget")
+  resolvedReports     Report[]         @relation("ReportResolver")
+  bots                Bot[]            @relation("BotCreator")
+  auditLogs           AuditLog[]
+  messageReactions    MessageReaction[]
+  messageReadCounts   MessageReadCount[]
+
+  @@map("users")
+}
+
+model TwoFASecret {
+  id            String      @id @default(cuid()) @db.VarChar(25)
+  userId        String
+  secret        String      @db.VarChar(255)
+  backupCodes   String      @db.Text // JSON array of backup codes
+  method        TwoFAMethod @default(totp)
+  enabled       Boolean     @default(true)
+  createdAt     BigInt      @default(0)
+  updatedAt     BigInt      @default(0)
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId])
+  @@map("two_fa_secrets")
+}
+
+model OAuthAccount {
+  id           String   @id @default(cuid()) @db.VarChar(25)
+  userId       String
+  provider     String   @db.VarChar(50) // yandex, vk, mailru
+  providerId   String   @db.VarChar(255)
+  accessToken  String?  @db.Text
+  refreshToken String?  @db.Text
+  expiresAt    BigInt?  // Unix seconds
+  createdAt    BigInt   @default(0)
+  updatedAt    BigInt   @default(0)
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerId])
+  @@index([userId])
+  @@map("oauth_accounts")
+}
+
+model Device {
+  id         String   @id @default(cuid()) @db.VarChar(25)
+  userId     String
+  type       DeviceType
+  name       String?  @db.VarChar(100)
+  platform   String?  @db.VarChar(50) // e.g. "Windows 11", "iOS 17"
+  pushToken  String?  @db.VarChar(255) // WebSocket session ID или push token
+  lastIp     String?  @db.VarChar(45) // IPv4 or IPv6
+  lastActive BigInt   @default(0)
+  createdAt  BigInt   @default(0)
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("devices")
+}
+
+model UserBan {
+  id          String   @id @default(cuid()) @db.VarChar(25)
+  userId      String
+  adminId     String
+  reason      String   @db.Text
+  global      Boolean  @default(false)
+  expiresAt   BigInt?  // Unix seconds, null = permanent
+  createdAt   BigInt   @default(0)
+
+  // Relations
+  user  User  @relation("UserBanUser", fields: [userId], references: [id], onDelete: Cascade)
+  admin User  @relation("UserBanAdmin", fields: [adminId], references: [id])
+
+  @@index([userId])
+  @@map("user_bans")
+}
+
+// ============================================================
+// Models — Тикет #7: Chats + Messages
+// ============================================================
+
+model Chat {
+  id           String      @id @default(cuid()) @db.VarChar(25)
+  type         ChatType    @default(direct)
+  name         String?     @db.VarChar(255)
+  avatarUrl    String?     @db.VarChar(500)
+  inviteCode   String?     @unique @db.VarChar(20)
+  createdAt    BigInt      @default(0)
+  updatedAt    BigInt      @default(0)
+
+  // Relations
+  members      UserChat[]
+  settings     ChatSettings?
+  messages     Message[]
+  inviteLinks  InviteLink[]
+  polls        Poll[]
+  chatBans     ChatBan[]    @relation("ChatBanChat")
+
+  @@index([createdAt])
+  @@map("chats")
+}
+
+model UserChat {
+  id        String       @id @default(cuid()) @db.VarChar(25)
+  userId    String
+  chatId    String
+  role      String       @default("member") // owner, admin, moderator, member
+  joinedAt  BigInt       @default(0)
+  lastRead  BigInt       @default(0)
+  pinned    Boolean      @default(false)
+  muted     Boolean      @default(false)
+  unread    Int          @default(0)
+
+  // Relations
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chat  Chat  @relation(fields: [chatId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, chatId])
+  @@index([chatId])
+  // Оптимизация: сортировка чатов по lastRead (тикет №64)
+  @@index([userId, lastRead])
+  @@map("user_chats")
+}
+
+model ChatSettings {
+  id                String  @id @default(cuid()) @db.VarChar(25)
+  chatId            String  @unique
+  allowMessages     Boolean @default(true)
+  allowMedia        Boolean @default(true)
+  allowPolls        Boolean @default(true)
+  allowStories      Boolean @default(false)
+  requiredApprove   Boolean @default(false)
+
+  // Relations
+  chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+
+  @@map("chat_settings")
+}
+
+model Message {
+  id              String       @id @default(cuid()) @db.VarChar(25)
+  chatId          String
+  senderId        String
+  type            MessageType  @default(text)
+  content         String?      @db.Text
+  replyToId       String?      @db.VarChar(25) // messageId
+  editCount       Int          @default(0)
+  deleted         Boolean      @default(false)
+  pinned          Boolean      @default(false)
+  status          MessageStatus @default(sent)
+  createdAt       BigInt       @default(0)
+  updatedAt       BigInt       @default(0)
+
+  // Relations
+  chat       Chat        @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  sender     User       @relation("MessageSender", fields: [senderId], references: [id])
+  replyTo    Message?   @relation("MessageReplies", fields: [replyToId], references: [id], onDelete: Cascade)
+  replies    Message[]  @relation("MessageReplies")
+  attachments MessageAttachment[]
+  reactions  MessageReaction[]
+  readCounts MessageReadCount[]
+
+  @@index([chatId, createdAt])
+  @@index([senderId])
+  // Оптимизация: профиль пользователя — сообщения по дате (тикет №64)
+  @@index([senderId, createdAt])
+  @@map("messages")
+}
+
+model MessageAttachment {
+  id        String   @id @default(cuid()) @db.VarChar(25)
+  messageId String
+  type      String   @db.VarChar(20) // image, file, voice, video
+  url       String   @db.VarChar(500)
+  thumbnail String?  @db.VarChar(500)
+  size      BigInt   @default(0) // bytes
+  name      String?  @db.VarChar(255)
+  width     Int?
+  height    Int?
+  duration  Int?     // seconds
+
+  // Relations
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@index([messageId])
+  @@map("message_attachments")
+}
+
+model MessageReaction {
+  id        String   @id @default(cuid()) @db.VarChar(25)
+  messageId String
+  userId    String
+  emoji     String   @db.VarChar(20)
+  createdAt BigInt   @default(0)
+  updatedAt BigInt   @default(0)
+
+  // Relations
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@unique([messageId, userId])
+  @@index([messageId])
+  @@map("message_reactions")
+}
+
+model MessageReadCount {
+  id        String   @id @default(cuid()) @db.VarChar(25)
+  messageId String
+  userId    String
+  readAt    BigInt   @default(0)
+
+  // Relations
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@unique([messageId, userId])
+  @@index([messageId])
+  @@map("message_read_counts")
+}
+
+model InviteLink {
+  id         String   @id @default(cuid()) @db.VarChar(25)
+  chatId     String
+  creatorId  String
+  code       String   @db.VarChar(20)
+  maxUses    Int?     // null = unlimited
+  usedCount  Int      @default(0)
+  expiresAt  BigInt?  // Unix seconds, null = never expires
+  createdAt  BigInt   @default(0)
+
+  // Relations
+  chat    Chat    @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  creator User   @relation(fields: [creatorId], references: [id])
+
+  @@unique([chatId, code])
+  @@index([chatId])
+  @@map("invite_links")
+}
+
+// ============================================================
+// Placeholder'ы для будущих тикетов (не активны — закомментированы)
+// ============================================================
+
+// ============================================================
+// Models — Тикет #8: Profiles + Stories + Polls
+// ============================================================
+
+model Profile {
+  id          String   @id @default(cuid()) @db.VarChar(25)
+  userId      String   @unique
+  bio         String?  @db.Text
+  website     String?  @db.VarChar(500)
+  socialLinks String?  @db.Text // JSON: { twitter: "...", github: "...", ... }
+  createdAt   BigInt   @default(0)
+  updatedAt   BigInt   @default(0)
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("profiles")
+}
+
+model PublicProfile {
+  id          String   @id @default(cuid()) @db.VarChar(25)
+  userId      String   @unique
+  username    String   @unique @db.VarChar(50)
+  displayName String?  @db.VarChar(100)
+  avatarUrl   String?  @db.VarChar(500)
+  bio         String?  @db.Text
+  isPrivate   Boolean  @default(false)
+  createdAt   BigInt   @default(0)
+  updatedAt   BigInt   @default(0)
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([username])
+  @@map("public_profiles")
+}
+
+model Story {
+  id         String   @id @default(cuid()) @db.VarChar(25)
+  userId     String
+  type       String   @db.VarChar(20) // image, video
+  mediaUrl   String   @db.VarChar(500)
+  thumbnail  String?  @db.VarChar(500)
+  expiresAt  BigInt           // Unix seconds — when story expires
+  viewCount  Int      @default(0)
+  createdAt  BigInt   @default(0)
+
+  // Relations
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  views     StoryView[]
+  reactions StoryReaction[]
+
+  @@index([userId, expiresAt])
+  @@index([expiresAt])
+  @@map("stories")
+}
+
+model StoryView {
+  id        String   @id @default(cuid()) @db.VarChar(25)
+  storyId   String
+  viewerId  String
+  viewedAt  BigInt   @default(0)
+
+  // Relations
+  story Story @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  viewer User @relation(fields: [viewerId], references: [id], onDelete: Cascade)
+
+  @@unique([storyId, viewerId])
+  @@index([storyId])
+  @@index([viewerId])
+  @@map("story_views")
+}
+
+model StoryReaction {
+  id        String   @id @default(cuid()) @db.VarChar(25)
+  storyId   String
+  userId    String
+  emoji     String   @db.VarChar(20)
+  createdAt BigInt   @default(0)
+
+  // Relations
+  story Story @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([storyId, userId, emoji])
+  @@index([storyId])
+  @@index([userId])
+  @@map("story_reactions")
+}
+
+model Poll {
+  id                String   @id @default(cuid()) @db.VarChar(25)
+  chatId            String
+  creatorId         String
+  question          String   @db.Text
+  options           String   @db.Text // JSON array of option strings
+  allowsMultiple    Boolean  @default(false)
+  expiresAt         BigInt?  // Unix seconds, null = never expires
+  createdAt         BigInt   @default(0)
+  updatedAt         BigInt   @default(0)
+
+  // Relations
+  chat       Chat        @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  creator    User        @relation(fields: [creatorId], references: [id])
+  votes      PollVote[]
+
+  @@index([chatId])
+  @@index([creatorId])
+  @@map("polls")
+}
+
+model PollVote {
+  id           String   @id @default(cuid()) @db.VarChar(25)
+  pollId       String
+  userId       String
+  optionIndex  Int
+  createdAt    BigInt   @default(0)
+
+  // Relations
+  poll Poll @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([pollId, userId])
+  @@index([pollId])
+  @@index([userId])
+  @@map("poll_votes")
+}
+
+model ChatBan {
+  id         String   @id @default(cuid()) @db.VarChar(25)
+  chatId     String
+  userId     String
+  adminId    String
+  reason     String?  @db.Text
+  expiresAt  BigInt?  // Unix seconds, null = permanent
+  createdAt  BigInt   @default(0)
+
+  // Relations
+  chat   Chat   @relation("ChatBanChat", fields: [chatId], references: [id], onDelete: Cascade)
+  user   User   @relation("ChatBanUser", fields: [userId], references: [id], onDelete: Cascade)
+  admin  User   @relation("ChatBanAdmin", fields: [adminId], references: [id])
+
+  @@unique([chatId, userId])
+  @@index([chatId])
+  @@index([userId])
+  @@map("chat_bans")
+}
+
+model BlockedUser {
+  blockerId String
+  blockedId String
+  createdAt BigInt @default(0)
+
+  // Relations
+  blocker User @relation("BlockedUserBlocker", fields: [blockerId], references: [id], onDelete: Cascade)
+  blocked User @relation("BlockedUserBlocked", fields: [blockedId], references: [id], onDelete: Cascade)
+
+  @@id([blockerId, blockedId])
+  @@index([blockerId])
+  @@index([blockedId])
+  @@map("blocked_users")
+}
+
+// --- Тикет #9: Blog + Knowledge + Hiring ---
+
+model BlogPost {
+  id          String         @id @default(cuid()) @db.VarChar(25)
+  authorId    String
+  channelId   String?
+  title       String         @db.VarChar(255)
+  content     String         @db.Text
+  status      BlogPostStatus @default(draft)
+  views       Int            @default(0)
+  createdAt   BigInt         @default(0)
+  updatedAt   BigInt         @default(0)
+
+  // Relations
+  author       User             @relation("BlogPostAuthor", fields: [authorId], references: [id])
+  channel      BlogChannel?     @relation("BlogChannelPosts", fields: [channelId], references: [id])
+  comments     BlogComment[]    @relation("BlogPostComments")
+  postCategories BlogPostCategory[]
+
+  @@index([authorId])
+  @@index([channelId])
+  // Оптимизация: лента блога по каналу (тикет №64)
+  @@index([channelId, status, createdAt])
+  @@index([status])
+  @@index([createdAt])
+  @@map("blog_posts")
+}
+
+model BlogComment {
+  id         String   @id @default(cuid()) @db.VarChar(25)
+  postId     String
+  authorId   String
+  content    String   @db.Text
+  createdAt  BigInt   @default(0)
+  updatedAt  BigInt   @default(0)
+
+  // Relations
+  post     BlogPost @relation("BlogPostComments", fields: [postId], references: [id], onDelete: Cascade)
+  author   User     @relation("BlogPostComments", fields: [authorId], references: [id])
+
+  @@index([postId])
+  @@index([authorId])
+  @@map("blog_comments")
+}
+
+model BlogChannel {
+  id          String   @id @default(cuid()) @db.VarChar(25)
+  name        String   @db.VarChar(255)
+  description String?  @db.Text
+  avatarUrl   String?  @db.VarChar(500)
+  postCount   Int      @default(0)
+  followers   Int      @default(0)
+  createdAt   BigInt   @default(0)
+  updatedAt   BigInt   @default(0)
+
+  // Relations
+  posts BlogPost[] @relation("BlogChannelPosts")
+
+  @@index([name])
+  @@map("blog_channels")
+}
+
+model BlogCategory {
+  id           String   @id @default(cuid()) @db.VarChar(25)
+  name         String   @db.VarChar(100) // i18n key, e.g. "tech", "news"
+  slug         String   @unique @db.VarChar(100)
+  createdAt    BigInt   @default(0)
+
+  // Relations
+  postCategories BlogPostCategory[] @relation("BlogCategoryCategories")
+  knowledgePages KnowledgePage[]
+
+  @@index([slug])
+  @@map("blog_categories")
+}
+
+model BlogPostCategory {
+  id           String   @id @default(cuid()) @db.VarChar(25)
+  postId       String
+  categoryId   String
+  createdAt    BigInt   @default(0)
+
+  // Relations
+  post     BlogPost     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  category BlogCategory @relation("BlogCategoryCategories", fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, categoryId])
+  @@index([postId])
+  @@index([categoryId])
+  @@map("blog_post_categories")
+}
+
+model KnowledgePage {
+  id           String   @id @default(cuid()) @db.VarChar(25)
+  categoryId   String
+  title        String   @db.VarChar(255) // i18n key
+  content      String?  @db.Text
+  version      Int      @default(1)
+  lastEditorId String?
+  createdAt    BigInt   @default(0)
+  updatedAt    BigInt   @default(0)
+
+  // Relations
+  category   BlogCategory @relation(fields: [categoryId], references: [id])
+  lastEditor User?        @relation("KnowledgePageEditor", fields: [lastEditorId], references: [id])
+
+  @@index([categoryId])
+  @@index([createdAt])
+  @@map("knowledge_pages")
+}
+
+model Department {
+  id          String   @id @default(cuid()) @db.VarChar(25)
+  name        String   @db.VarChar(255)
+  description String?  @db.Text
+  parentId    String?
+  headId      String?
+  createdAt   BigInt   @default(0)
+  updatedAt   BigInt   @default(0)
+
+  // Relations
+  parent     Department?  @relation("DepartmentHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children   Department[] @relation("DepartmentHierarchy")
+  head       User?        @relation("DepartmentHead", fields: [headId], references: [id])
+  vacancies  Vacancy[]
+
+  @@index([parentId])
+  @@map("departments")
+}
+
+model Vacancy {
+  id          String          @id @default(cuid()) @db.VarChar(25)
+  title       String          @db.VarChar(255) // i18n key
+  departmentId String
+  description String?         @db.Text
+  requirements String?         @db.Text
+  salary      String?         @db.VarChar(50)
+  status      VacancyStatus   @default(open)
+  createdAt   BigInt          @default(0)
+  updatedAt   BigInt          @default(0)
+
+  // Relations
+  department Department    @relation(fields: [departmentId], references: [id])
+  applications Application[]
+
+  @@index([departmentId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("vacancies")
+}
+
+model Application {
+  id           String        @id @default(cuid()) @db.VarChar(25)
+  vacancyId    String
+  applicantId  String
+  status       ApplicationStatus @default(new)
+  coverLetter  String?       @db.Text
+  resumeUrl    String?       @db.VarChar(500)
+  createdAt    BigInt        @default(0)
+  updatedAt    BigInt        @default(0)
+
+  // Relations
+  vacancy      Vacancy     @relation(fields: [vacancyId], references: [id], onDelete: Cascade)
+  applicant    User        @relation("ApplicationApplicant", fields: [applicantId], references: [id])
+  interviews   Interview[] @relation("ApplicationInterviews")
+
+  @@index([vacancyId])
+  @@index([applicantId])
+  @@index([status])
+  @@map("applications")
+}
+
+model Interview {
+  id            String        @id @default(cuid()) @db.VarChar(25)
+  applicationId String
+  interviewerId String
+  date          BigInt                // Unix seconds
+  type          InterviewType
+  notes         String?       @db.Text
+  result        InterviewResult?
+  createdAt     BigInt        @default(0)
+  updatedAt     BigInt        @default(0)
+
+  // Relations
+  application  Application  @relation("ApplicationInterviews", fields: [applicationId], references: [id], onDelete: Cascade)
+  interviewer  User         @relation("InterviewInterviewer", fields: [interviewerId], references: [id])
+
+  @@index([applicationId])
+  @@index([interviewerId])
+  @@index([date])
+  @@map("interviews")
+}
+
+// --- Тикет #10: Donations + Features + Reports + Bots ---
+
+model DonationTier {
+  id        String   @id @default(cuid()) @db.VarChar(25)
+  name      String   @db.VarChar(100)
+  amount    Int      // в минимальных единицах валюты (копейки, центы)
+  features  String?  @db.Text // JSON: список привилегий уровня
+  createdAt BigInt   @default(0)
+  updatedAt BigInt   @default(0)
+
+  // Relations
+  donations Donation[]
+
+  @@index([amount])
+  @@map("donation_tiers")
+}
+
+model Donation {
+  id              String           @id @default(cuid()) @db.VarChar(25)
+  userId          String
+  tierId          String?
+  amount          Int              // в минимальных единицах валюты
+  currency        String           @default("RUB") @db.VarChar(10)
+  status          DonationStatus   @default(pending)
+  provider        DonationProvider @default(sbp_manual)
+  paymentMethod   String?          @db.VarChar(50) // sbp_qr, sbp_phone, bank_card, yookassa_card
+  paymentIntentId String?          @db.VarChar(255) // ID платежа в платёжной системе
+  createdAt       BigInt           @default(0)
+  updatedAt       BigInt           @default(0)
+
+  // Relations
+  user   User        @relation(fields: [userId], references: [id])
+  tier   DonationTier? @relation(fields: [tierId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([provider])
+  @@map("donations")
+}
+
+/// Конфигурация платёжного модуля (двухрежимный: анонимный / полноценный ЮKassa)
+model PaymentConfig {
+  id              String   @id @default(cuid()) @db.VarChar(25)
+  mode            String   @default("anonymous") @db.VarChar(20) // "anonymous" | "yookassa"
+  shopId          String?  @db.VarChar(255) // YooKassa shopId
+  secretKey       String?  @db.Text // YooKassa secret API key (зашифровано на уровне приложения)
+  sbpQrUrl        String   @default("/assets/logos/qr_helpus.jpg") @db.VarChar(500)
+  sbpPhoneNumber  String   @default("89122023035") @db.VarChar(20)
+  sbpPhoneName    String   @default("Оберюхттин Иван, Сбербанк") @db.VarChar(255)
+  forKassaUrl     String   @default("/for_kassa") @db.VarChar(500)
+  webhookActive   Boolean  @default(false)
+  createdAt       BigInt   @default(0)
+  updatedAt       BigInt   @default(0)
+
+  @@map("payment_config")
+}
+
+model FeatureRequest {
+  id          String            @id @default(cuid()) @db.VarChar(25)
+  userId      String
+  title       String            @db.VarChar(255)
+  description String?           @db.Text
+  category    String?           @db.VarChar(100)
+  priority    String?           @db.VarChar(50)
+  motivation  String?           @db.Text
+  status      String            @default("idea")
+  votesCount  Int               @default(0)
+  createdAt   BigInt            @default(0)
+  updatedAt   BigInt            @default(0)
+
+  // Relations
+  author   User            @relation("FeatureAuthor", fields: [userId], references: [id], onDelete: Cascade)
+  votes    FeatureVote[]
+  comments FeatureComment[]
+
+  @@index([userId])
+  @@index([status])
+  // Оптимизация: сортировка фич-реквестов по статусу и голосам (тикет №64)
+  @@index([status, votesCount])
+  @@index([createdAt])
+  @@index([votesCount])
+  @@map("feature_requests")
+}
+
+model FeatureVote {
+  id         String   @id @default(cuid()) @db.VarChar(25)
+  featureId  String
+  userId     String
+  createdAt  BigInt   @default(0)
+
+  // Relations
+  feature FeatureRequest @relation(fields: [featureId], references: [id], onDelete: Cascade)
+  user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([featureId, userId])
+  @@index([featureId])
+  @@index([userId])
+  @@map("feature_votes")
+}
+
+model FeatureComment {
+  id         String   @id @default(cuid()) @db.VarChar(25)
+  featureId  String
+  userId     String?
+  parentId   String?
+  text       String   @db.Text
+  createdAt  BigInt   @default(0)
+
+  // Relations
+  feature FeatureRequest    @relation(fields: [featureId], references: [id], onDelete: Cascade)
+  author  User?              @relation(fields: [userId], references: [id], onDelete: SetNull)
+  parent  FeatureComment?    @relation("FeatureCommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies FeatureComment[]   @relation("FeatureCommentReplies")
+
+  @@index([featureId])
+  @@index([userId])
+  @@index([parentId])
+  @@map("feature_comments")
+}
+
+model Report {
+  id          String        @id @default(cuid()) @db.VarChar(25)
+  reporterId  String
+  targetId    String         // ID цели (user, message, chat, post и т.д.)
+  targetType  String         @db.VarChar(50) // user, message, chat, post, story
+  reason      String         @db.VarChar(255)
+  content     String?        @db.Text
+  status      ReportStatus  @default(open)
+  resolvedBy  String?       // admin who resolved
+  resolvedAt  BigInt?       // Unix seconds
+  action      String?       @db.VarChar(50) // dismiss, warn, ban, delete_content
+  comment     String?       @db.Text
+  createdAt   BigInt        @default(0)
+  updatedAt   BigInt        @default(0)
+
+  // Relations
+  reporter User @relation("ReportReporter", fields: [reporterId], references: [id])
+  target   User? @relation("ReportTarget", fields: [targetId], references: [id])
+  resolver User? @relation("ReportResolver", fields: [resolvedBy], references: [id])
+
+  @@index([reporterId])
+  @@index([targetId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("reports")
+}
+
+model Bot {
+  id          String   @id @default(cuid()) @db.VarChar(25)
+  name        String   @db.VarChar(100)
+  description String?  @db.Text
+  avatarUrl   String?  @db.VarChar(500)
+  commands    String?  @db.Text // JSON: список команд бота
+  isPublic    Boolean  @default(true)
+  creatorId   String
+  createdAt   BigInt   @default(0)
+  updatedAt   BigInt   @default(0)
+
+  // Relations
+  creator    User         @relation("BotCreator", fields: [creatorId], references: [id])
+  botCommands BotCommand[]
+
+  @@index([isPublic])
+  @@index([creatorId])
+  @@index([createdAt])
+  @@map("bots")
+}
+
+model BotCommand {
+  id          String   @id @default(cuid()) @db.VarChar(25)
+  botId       String
+  name        String   @db.VarChar(50)
+  description String?  @db.Text
+  handler     String   @db.VarChar(255) // обработчик команды
+  createdAt   BigInt   @default(0)
+  updatedAt   BigInt   @default(0)
+
+  // Relations
+  bot Bot @relation(fields: [botId], references: [id], onDelete: Cascade)
+
+  @@index([botId])
+  @@map("bot_commands")
+}
+
+// --- Тикет #11: Admin + Analytics + Versions ---
+
+model AuditLog {
+  id        String   @id @default(cuid()) @db.VarChar(25)
+  adminId   String
+  action    String   @db.VarChar(100) // ban_user, unban_user, create_announcement, etc.
+  target    String   @db.VarChar(255) // ID цели или описание цели
+  details   String?  @db.Text // JSON: дополнительные детали действия
+  ip        String?  @db.VarChar(45) // IPv4 or IPv6
+  createdAt BigInt   @default(0)
+
+  // Relations
+  admin User @relation(fields: [adminId], references: [id])
+
+  @@index([adminId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+model FeatureFlag {
+  id            String   @id @default(cuid()) @db.VarChar(25)
+  name          String   @unique @db.VarChar(100) // e.g. "enable_stories", "enable_polls"
+  enabled       Boolean  @default(false)
+  targetVersion String?  @db.VarChar(20) // e.g. "2.1.0", null = all versions
+  description   String?  @db.Text
+  createdAt     BigInt   @default(0)
+  updatedAt     BigInt   @default(0)
+
+  @@index([enabled])
+  @@index([targetVersion])
+  @@map("feature_flags")
+}
+
+model ServiceVersion {
+  id          String   @id @default(cuid()) @db.VarChar(25)
+  version     String   @db.VarChar(20) // semantic version: "1.0.0"
+  changelog   String?  @db.Text
+  publishedAt BigInt   @default(0) // Unix seconds
+  isLatest    Boolean  @default(false)
+  createdAt   BigInt   @default(0)
+
+  @@unique([version])
+  @@index([publishedAt])
+  @@index([isLatest])
+  @@map("service_versions")
+}
+
+model ServiceMetric {
+  id        String   @id @default(cuid()) @db.VarChar(25)
+  name      String   @db.VarChar(100) // e.g. "active_users", "messages_sent", "storage_used"
+  value     Float            // numeric value
+  timestamp BigInt   @default(0) // Unix seconds
+
+  @@index([name])
+  @@index([timestamp])
+  @@map("service_metrics")
+}
+
+model Announcement {
+  id             String   @id @default(cuid()) @db.VarChar(25)
+  title          String   @db.VarChar(255)
+  content        String   @db.Text
+  targetAudience String   @db.VarChar(50) // all, users, admin, moderators
+  activeFrom     BigInt           // Unix seconds
+  activeUntil    BigInt?          // Unix seconds, null = permanent
+  createdAt      BigInt   @default(0)
+  updatedAt      BigInt   @default(0)
+
+  @@index([targetAudience])
+  @@index([activeFrom])
+  @@index([activeUntil])
+  @@map("announcements")
+}
+
+model DownloadFile {
+  id        String   @id @default(cuid()) @db.VarChar(25)
+  platform  String   @db.VarChar(20) // windows, macos, linux, android, ios, web
+  version   String   @db.VarChar(20)
+  url       String   @db.VarChar(500)
+  size      BigInt   @default(0) // bytes
+  checksum  String?  @db.VarChar(64) // SHA-256
+  createdAt BigInt   @default(0)
+
+  @@index([platform])
+  @@index([version])
+  @@index([createdAt])
+  @@map("download_files")
+}
+
+model DevelopmentStatus {
+  id             String   @id @default(cuid()) @db.VarChar(25)
+  ticketNumber   Int              // номер тикета
+  blockName      String   @db.VarChar(100) // имя блока: "Подготовка", "База данных", "Бэкенд"
+  status         String   @db.VarChar(20) // todo, in_progress, done, blocked, skipped
+  screensDone    Int      @default(0)
+  screensTotal   Int      @default(0)
+  testsPassed    Int      @default(0)
+  testsTotal     Int      @default(0)
+  errors         String?  @db.Text // описание ошибок
+  updatedAt      BigInt   @default(0)
+
+  @@index([ticketNumber])
+  @@index([blockName])
+  @@index([status])
+  @@map("development_statuses")
+}

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Жалобы</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--warning);">A</div><span>Admin</span>
+    <div class="topbar__dropdown"><div class="topbar__dropdown-item">🛡️ Admin (текущий)</div><div class="topbar__dropdown-divider"></div><div class="topbar__dropdown-item">💬 Balloo</div><div class="topbar__dropdown-item">🏢 Command</div><div class="topbar__dropdown-item">💡 Features</div><div class="topbar__dropdown-item">📜 History</div><div class="topbar__dropdown-item">⬇️ Download</div><div class="topbar__dropdown-item">📚 API Docs</div></div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Жалобы</div>
+  <div class="topbar__right"><div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>АД</span></div></div><span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span><span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span></div>
+</div>
+<div class="main">
+  <div class="sidebar sidebar--narrow">
+    <div class="list"><div class="list__item">📊 Дашборд</div><div class="list__item">👤 Пользователи</div><div class="list__item list__item--active">🚩 Жалобы <span class="badge" style="margin-left:auto;">12</span></div><div class="list__item">🔨 Баны</div><div class="list__item">📈 Метрики</div><div class="list__item">🎛️ Feature Flags</div><div class="list__item">📁 Файлы</div><div class="list__item">📝 Тексты</div><div class="list__item" style="border-top:1px solid var(--border-color);margin-top:8px;padding-top:12px;">🏢 Отделы</div><div class="list__item">👤 Сотрудники</div><div class="list__item">💼 Вакансии</div><div class="list__item">📜 Версии</div><div class="list__item">💡 Фичи (модерация)</div><div class="list__item">💚 Донаты</div></div>
+  </div>
+  <div class="content overflow-y-auto"><div class="page-container">
+    <h1 class="page-title">Жалобы</h1>
+    <div data-tab-group="reports" class="mb-4">
+      <div class="tabs"><div class="tab tab--active" onclick="switchTab('reports',0)">Ожидают (12)</div><div class="tab" onclick="switchTab('reports',1)">В работе (3)</div><div class="tab" onclick="switchTab('reports',2)">Решённые (45)</div></div>
+      <div class="tab-panel" style="display:block;">
+        <div class="card mb-4">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2"><div class="avatar avatar--xs avatar--bordered avatar--status-offline avatar--ctx-new"><div class="avatar__inner"><span>СП</span></div></div><strong style="color:var(--text-primary);">user_spam</strong></div>
+            <span class="chip chip--danger">Спам</span>
+          </div>
+          <p class="text-sm text-secondary mb-2">Жалоб: 7 от 5 разных пользователей</p>
+          <p class="text-xs text-muted mb-4">ID сообщения: msg_abc123 • 15.07.2026 14:30</p>
+          <div class="card" style="background:var(--bg-tertiary);padding:12px;margin-bottom:12px;"><p class="text-sm">⚠ Содержимое жалобы доступно только как метаданные (без текста сообщения)</p></div>
+          <div class="flex gap-2"><button class="btn btn--danger btn--sm">Запросить бан</button><button class="btn btn--secondary btn--sm">Отклонить</button><button class="btn btn--tertiary btn--sm">Подробнее</button></div>
+        </div>
+        <div class="card mb-4">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2"><div class="avatar avatar--xs avatar--bordered avatar--status-offline avatar--ctx-new"><div class="avatar__inner"><span>??</span></div></div><strong style="color:var(--text-primary);">user_toxic</strong></div>
+            <span class="chip chip--warning">Ненормативная лексика</span>
+          </div>
+          <p class="text-sm text-secondary mb-2">Жалоб: 5 от 5 разных пользователей</p>
+          <div class="flex gap-2"><button class="btn btn--danger btn--sm">Запросить бан</button><button class="btn btn--secondary btn--sm">Отклонить</button></div>
+        </div>
+      </div>
+      <div class="tab-panel" style="display:none;"><div class="empty-state"><div class="empty-state__animation">📋</div><div class="empty-state__title">Нет жалоб в работе</div></div></div>
+      <div class="tab-panel" style="display:none;"><div class="empty-state"><div class="empty-state__animation">✅</div><div class="empty-state__title">Нет решённых жалоб</div></div></div>
+    </div>
+  </div></div>
+</div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

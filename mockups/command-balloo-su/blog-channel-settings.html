@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Command — Настройки канала</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--info);">C</div><span>Command</span>
+    <div class="topbar__dropdown"></div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Настройки канала</div>
+  <div class="topbar__right"></div>
+</div>
+<div class="main">
+  <div class="sidebar sidebar--narrow">
+    <div class="list">
+      <div class="list__item">🏠 Дашборд</div>
+      <div class="list__item">💬 Внутренний чат</div>
+      <div class="list__item">📅 Совещания</div>
+      <div class="list__item">📋 Задачи</div>
+      <div class="list__item">🏢 Мой отдел</div>
+      <div class="list__item">🏛️ Подразделения</div>
+      <div class="list__item">👥 HR</div>
+      <div class="list__item">📚 База знаний</div>
+      <div class="list__item">🎯 Найм</div>
+      <div class="list__item">📊 Мониторинг</div>
+      <div class="list__item" style="border-top:1px solid var(--border-color);margin-top:8px;padding-top:12px;">📝 Мои статьи</div>
+      <div class="list__item">✍️ Мой канал</div>
+      <div class="list__item list__item--active">⚙️ Настройки канала</div>
+      <div class="list__item" style="border-top:1px solid var(--border-color);margin-top:8px;padding-top:12px;">💼 Вакансии</div>
+      <div class="list__item">⭐ Почему мы</div>
+    </div>
+  </div>
+  <div class="content overflow-y-auto"><div class="page-container">
+    <h1 class="page-title">⚙️ Настройки личного канала</h1>
+    <p class="page-subtitle">Оформление и описание вашего личного канала в блоге</p>
+
+    <!-- Channel name -->
+    <div class="form-group">
+      <label class="form-label">Название канала</label>
+      <input type="text" class="form-input" value="Блог Ивана Воронова">
+    </div>
+
+    <!-- Channel description -->
+    <div class="form-group">
+      <label class="form-label">Описание</label>
+      <textarea class="form-textarea" style="min-height:60px;">Lead Developer. Пишу про архитектуру, WebSocket, DevOps и разработку.</textarea>
+    </div>
+
+    <!-- Avatar -->
+    <div class="form-group">
+      <label class="form-label">Аватар канала</label>
+      <div class="flex items-center gap-4">
+        <div style="width:72px;height:72px;clip-path:var(--octagon-clip);background:linear-gradient(135deg,#2db84d,#166534);display:flex;align-items:center;justify-content:center;font-size:36px;border:2px solid var(--accent);">🦊</div>
+        <button class="btn btn--secondary btn--sm">📷 Загрузить</button>
+        <button class="btn btn--tertiary btn--sm">🗑 Удалить</button>
+      </div>
+    </div>
+
+    <!-- Cover banner -->
+    <div class="form-group">
+      <label class="form-label">Баннер канала</label>
+      <div style="width:100%;height:100px;background:linear-gradient(135deg,#2db84d,#166534);display:flex;align-items:center;justify-content:center;font-size:32px;border:2px dashed var(--border-strong);cursor:pointer;">
+        🦊 <span class="text-muted text-sm" style="margin-left:12px;">Нажмите чтобы изменить баннер</span>
+      </div>
+    </div>
+
+    <!-- Accent color -->
+    <div class="form-group">
+      <label class="form-label">Акцентный цвет канала</label>
+      <div class="flex gap-2" style="flex-wrap:wrap;">
+        <div style="width:36px;height:36px;background:#2db84d;border:2px solid var(--text-primary);cursor:pointer;"></div>
+        <div style="width:36px;height:36px;background:#3b9eff;border:2px solid transparent;cursor:pointer;"></div>
+        <div style="width:36px;height:36px;background:#a855f7;border:2px solid transparent;cursor:pointer;"></div>
+        <div style="width:36px;height:36px;background:#e8a317;border:2px solid transparent;cursor:pointer;"></div>
+        <div style="width:36px;height:36px;background:#e3422d;border:2px solid transparent;cursor:pointer;"></div>
+        <div style="width:36px;height:36px;background:#6b21a8;border:2px solid transparent;cursor:pointer;"></div>
+      </div>
+      <div class="form-hint">Цвет применяется к аватару, баннеру и акцентным элементам канала</div>
+    </div>
+
+    <!-- Channel slug -->
+    <div class="form-group">
+      <label class="form-label">URL канала</label>
+      <div class="flex items-center gap-2">
+        <span class="text-secondary text-sm">blog.balloo.su/</span>
+        <input type="text" class="form-input" value="ivan-voronov" style="flex:1;">
+      </div>
+    </div>
+
+    <!-- Visibility -->
+    <div class="form-group">
+      <label class="form-label">Видимость канала</label>
+      <label class="form-checkbox">
+        <input type="checkbox" checked>
+        <span>Канал виден в ленте личных каналов</span>
+      </label>
+      <label class="form-checkbox mt-2">
+        <input type="checkbox" checked>
+        <span>Разрешить комментарии от гостей</span>
+      </label>
+      <label class="form-checkbox mt-2">
+        <input type="checkbox" checked>
+        <span>Разрешить реакции от гостей</span>
+      </label>
+    </div>
+
+    <!-- Translations -->
+    <div class="card mb-4">
+      <h3 class="card__title mb-4">🌐 Локализация описания</h3>
+      <table class="table">
+        <thead><tr><th>Язык</th><th>Название</th><th>Описание</th><th>Действие</th></tr></thead>
+        <tbody>
+          <tr><td>🇷🇺 RU</td><td>Блог Ивана Воронова</td><td class="text-xs text-secondary">Lead Developer. Пишу про…</td><td><span class="chip chip--accent">✓</span></td></tr>
+          <tr><td>🇬🇧 EN</td><td>Ivan Voronov's Blog</td><td class="text-xs text-secondary">Lead Developer. Writing about…</td><td><span class="chip chip--accent">✓</span></td></tr>
+          <tr><td>🇨🇳 ZH</td><td>—</td><td>—</td><td><button class="btn btn--tertiary btn--sm">➕</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Save -->
+    <div class="flex gap-2">
+      <button class="btn btn--primary">💾 Сохранить</button>
+      <a href="blog-my-channel.html" class="btn btn--tertiary">← Назад</a>
+    </div>
+  </div></div>
+</div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

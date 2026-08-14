@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo — Активный звонок</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body style="height:100vh;display:flex;flex-direction:column;overflow:hidden;margin:0;">
+<div class="topbar" style="flex-shrink:0;">
+  <div class="topbar__logo"><div class="topbar__logo-icon">B</div><span>Balloo</span></div>
+  <div class="topbar__title">Групповой звонок — Команда разработки</div>
+  <div class="topbar__actions">
+    <button class="topbar__actions-btn">⏺ Запись</button>
+    <button class="topbar__actions-btn">🖥 Демо экрана</button>
+    <button class="topbar__actions-btn">📹 Камера</button>
+    <button class="topbar__actions-btn">🎤 Микрофон</button>
+  </div>
+  <div class="topbar__right">
+    <div class="avatar avatar--sm avatar--bordered avatar--status-busy avatar--ctx-contact"><div class="avatar__inner"><span>ИИ</span></div></div>
+    <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span><span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+  </div>
+</div>
+
+<div class="call-overlay call-overlay--visible" id="call-overlay" style="position:relative;z-index:1;flex:1;min-height:0;">
+  <div class="call-overlay__header" style="flex-shrink:0;">
+    <div class="flex items-center gap-3">
+      <div class="avatar avatar--sm avatar--bordered avatar--status-busy avatar--ctx-new"><div class="avatar__inner"><span>РД</span></div></div>
+      <div>
+        <div class="font-semibold" style="color:var(--text-primary);">Команда разработки</div>
+        <div class="call-overlay__timer" id="call-timer">00:00</div>
+      </div>
+    </div>
+    <div class="flex gap-2 items-center">
+      <span class="chip chip--warning">⚠ Низкая скорость</span>
+      <span class="chip">5 участников</span>
+      <button class="btn btn--tertiary" onclick="window.location.href='calls.html'">Завершить</button>
+    </div>
+  </div>
+
+  <!-- Главный говорящий — занимает основную область -->
+  <div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:24px;">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+      <div class="call-participant__video call-participant__video--speaking" style="width:min(480px,60vw);height:min(360px,55vh);">
+        <div class="avatar avatar--lg avatar--bordered avatar--status-busy avatar--ctx-contact" style="width:120px;height:120px;font-size:42px;"><div class="avatar__inner"><span>МА</span></div></div>
+      </div>
+      <span class="call-participant__name" style="font-size:16px;color:var(--text-primary);font-weight:600;">Мария (говорит) 🎤</span>
+    </div>
+  </div>
+
+  <!-- Полоска остальных участников -->
+  <div style="display:flex;gap:8px;padding:10px 24px;overflow-x:auto;border-top:1px solid var(--border-color);flex-shrink:0;background:var(--bg-secondary);">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">
+      <div class="call-participant__video" style="width:120px;height:90px;">
+        <div class="avatar avatar--bordered avatar--status-busy avatar--ctx-contact" style="width:48px;height:48px;font-size:18px;"><div class="avatar__inner"><span>ИИ</span></div></div>
+      </div>
+      <span style="font-size:11px;color:var(--text-muted);">Вы</span>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">
+      <div class="call-participant__video" style="width:120px;height:90px;position:relative;">
+        <div class="avatar avatar--bordered avatar--status-busy avatar--ctx-contact" style="width:48px;height:48px;font-size:18px;"><div class="avatar__inner"><span>АК</span></div></div>
+        <span class="chip chip--info" style="position:absolute;bottom:3px;right:3px;font-size:8px;padding:1px 4px;">🖥</span>
+      </div>
+      <span style="font-size:11px;color:var(--text-muted);">Алексей 🖥</span>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">
+      <div class="call-participant__video" style="width:120px;height:90px;position:relative;">
+        <div class="avatar avatar--bordered avatar--status-busy avatar--ctx-contact" style="width:48px;height:48px;font-size:18px;"><div class="avatar__inner"><span>ДП</span></div></div>
+        <span class="chip" style="position:absolute;bottom:3px;right:3px;font-size:8px;padding:1px 4px;">🔇</span>
+      </div>
+      <span style="font-size:11px;color:var(--text-muted);">Дмитрий 🔇</span>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">
+      <div class="call-participant__video" style="width:120px;height:90px;">
+        <div class="avatar avatar--bordered avatar--status-busy avatar--ctx-contact" style="width:48px;height:48px;font-size:18px;"><div class="avatar__inner"><span>ОС</span></div></div>
+      </div>
+      <span style="font-size:11px;color:var(--text-muted);">Ольга</span>
+    </div>
+  </div>
+
+  <div class="call-overlay__controls" style="flex-shrink:0;">
+    <div class="call-control call-control--mute" id="call-mute" onclick="toggleMute()" title="Микрофон">🎤</div>
+    <div class="call-control call-control--video" id="call-video" onclick="toggleVideo()" title="Камера">📹</div>
+    <div class="call-control call-control--screen" id="call-screen" onclick="toggleScreen()" title="Демонстрация">🖥</div>
+    <div class="call-control call-control--hangup" onclick="window.location.href='calls.html'" title="Завершить">📞</div>
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+<script>startCallTimer();</script>
+</body>
+</html>

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo — Обжалование бана</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    /* Overlay — перекрывает все остальные экраны */
+    html, body { overflow:hidden; }
+    .appeal-overlay {
+      position:fixed; inset:0; z-index:9999;
+      display:flex; align-items:center; justify-content:center;
+      background:rgba(0,0,0,0.85); backdrop-filter:blur(8px);
+      padding:24px; overflow-y:auto;
+    }
+
+    /* Appeal window */
+    .appeal-window {
+      width:100%; max-width:520px;
+      background:var(--bg-secondary); border:1px solid var(--border-color);
+      box-shadow:var(--shadow);
+      display:flex; flex-direction:column;
+    }
+
+    /* Header */
+    .appeal-header {
+      padding:16px 24px; border-bottom:1px solid var(--border-color);
+      display:flex; align-items:center; gap:12px;
+      background:var(--bg-glass); backdrop-filter:blur(var(--blur));
+    }
+    .appeal-header__icon { font-size:28px; }
+    .appeal-header__title { font-size:18px; font-weight:800; color:var(--text-primary); flex:1; }
+    .appeal-header__status {
+      font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;
+      padding:3px 10px; border:1px solid var(--warning); color:var(--warning);
+      background:rgba(232,163,23,0.12);
+    }
+    .appeal-header__status--approved { color:var(--accent); border-color:var(--accent); background:rgba(45,184,77,0.12); }
+    .appeal-header__status--rejected { color:var(--danger); border-color:var(--danger); background:var(--danger-bg); }
+
+    /* Body */
+    .appeal-body { padding:24px; overflow-y:auto; }
+
+    /* Countdown timer */
+    .countdown {
+      text-align:center; margin-bottom:24px;
+      padding:16px; background:var(--bg-tertiary); border:1px solid var(--border-color);
+    }
+    .countdown__label {
+      font-size:12px; text-transform:uppercase; letter-spacing:0.5px;
+      color:var(--text-muted); font-weight:700; margin-bottom:6px;
+    }
+    .countdown__value {
+      font-size:32px; font-weight:900; color:var(--warning); line-height:1;
+      font-variant-numeric: tabular-nums;
+    }
+    .countdown__hint {
+      font-size:13px; color:var(--text-secondary); margin-top:6px;
+    }
+    .countdown--expired .countdown__value { color:var(--danger); }
+    .countdown--approved .countdown__value { color:var(--accent); }
+
+    /* Ban info block */
+    .ban-info {
+      margin-bottom:24px; padding:16px;
+      background:var(--danger-bg); border:1px solid var(--danger);
+    }
+    .ban-info__title {
+      font-size:13px; font-weight:700; color:var(--danger);
+      text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px;
+    }
+    .ban-info__row {
+      display:flex; gap:8px; padding:6px 0;
+      border-bottom:1px solid var(--border-color);
+    }
+    .ban-info__row:last-child { border-bottom:none; }
+    .ban-info__row-label {
+      font-size:13px; color:var(--text-muted); min-width:100px; flex-shrink:0;
+    }
+    .ban-info__row-value {
+      font-size:13px; color:var(--text-primary); font-weight:600;
+    }
+
+    /* Appeal form */
+    .appeal-form { margin-bottom:24px; }
+    .appeal-form__label {
+      display:block; font-size:13px; font-weight:700; color:var(--text-primary);
+      margin-bottom:8px;
+    }
+    .appeal-form__textarea {
+      width:100%; min-height:120px; resize:vertical;
+      padding:12px; font-size:14px; color:var(--text-primary);
+      background:var(--bg-tertiary); border:1px solid var(--border-color);
+      font-family:inherit;
+    }
+    .appeal-form__textarea:focus {
+      outline:none; border-color:var(--accent);
+    }
+    .appeal-form__counter {
+      font-size:12px; color:var(--text-muted); text-align:right; margin-top:4px;
+    }
+    .appeal-form__hint {
+      font-size:12px; color:var(--text-muted); margin-top:8px; line-height:1.5;
+    }
+
+    /* Decision result (when closed) */
+    .appeal-result {
+      margin-bottom:24px; padding:20px; text-align:center;
+      border:1px solid var(--border-color);
+    }
+    .appeal-result--approved { background:rgba(45,184,77,0.08); border-color:var(--accent); }
+    .appeal-result--rejected { background:var(--danger-bg); border-color:var(--danger); }
+    .appeal-result__icon { font-size:48px; margin-bottom:12px; }
+    .appeal-result__title {
+      font-size:20px; font-weight:800; margin-bottom:8px;
+    }
+    .appeal-result--approved .appeal-result__title { color:var(--accent); }
+    .appeal-result--rejected .appeal-result__title { color:var(--danger); }
+    .appeal-result__desc {
+      font-size:14px; color:var(--text-secondary); line-height:1.6; max-width:380px; margin:0 auto;
+    }
+
+    /* Admin review status */
+    .review-status {
+      margin-bottom:24px; padding:16px;
+      background:var(--bg-tertiary); border:1px solid var(--border-color);
+    }
+    .review-status__title {
+      font-size:13px; font-weight:700; color:var(--text-muted);
+      text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px;
+    }
+    .review-status__step {
+      display:flex; align-items:center; gap:10px; padding:6px 0;
+    }
+    .review-status__dot {
+      width:10px; height:10px; flex-shrink:0;
+      background:var(--bg-active); border:1px solid var(--border-color);
+    }
+    .review-status__dot--done { background:var(--accent); border-color:var(--accent); }
+    .review-status__dot--current { background:var(--warning); border-color:var(--warning); }
+    .review-status__text {
+      font-size:13px; color:var(--text-secondary);
+    }
+    .review-status__text--done { color:var(--text-primary); }
+
+    /* Footer */
+    .appeal-footer {
+      padding:16px 24px; border-top:1px solid var(--border-color);
+      display:flex; gap:12px; justify-content:flex-end;
+      background:var(--bg-glass); backdrop-filter:blur(var(--blur));
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============ OVERLAY: Обжалование бана ============ -->
+<!-- Открывается когда инициализируется отсчёт для обжалования -->
+<!-- Закрывается когда решение принято -->
+<div class="appeal-overlay" id="appeal-overlay">
+
+  <div class="appeal-window">
+
+    <!-- Header -->
+    <div class="appeal-header">
+      <span class="appeal-header__icon">⚖️</span>
+      <span class="appeal-header__title">Обжалование бана</span>
+      <span class="appeal-header__status" id="appeal-status-badge">На рассмотрении</span>
+    </div>
+
+    <!-- Body -->
+    <div class="appeal-body">
+
+      <!-- Countdown timer -->
+      <div class="countdown" id="countdown-block">
+        <div class="countdown__label">До истечения срока обжалования</div>
+        <div class="countdown__value" id="countdown-value">71:59:42</div>
+        <div class="countdown__hint">После истечения срока подать обжалование будет невозможно</div>
+      </div>
+
+      <!-- Ban info -->
+      <div class="ban-info">
+        <div class="ban-info__title">Информация о бане</div>
+        <div class="ban-info__row">
+          <span class="ban-info__row-label">Причина:</span>
+          <span class="ban-info__row-value">Спам (массовая рассылка)</span>
+        </div>
+        <div class="ban-info__row">
+          <span class="ban-info__row-label">Дата бана:</span>
+          <span class="ban-info__row-value">17.07.2026, 14:32</span>
+        </div>
+        <div class="ban-info__row">
+          <span class="ban-info__row-label">Тип:</span>
+          <span class="ban-info__row-value">Временный (7 дней)</span>
+        </div>
+        <div class="ban-info__row">
+          <span class="ban-info__row-label">ID бана:</span>
+          <span class="ban-info__row-value">#BAN-2026-0717-0042</span>
+        </div>
+      </div>
+
+      <!-- Appeal form -->
+      <div class="appeal-form" id="appeal-form-block">
+        <label class="appeal-form__label" for="appeal-text">Опишите вашу ситуацию</label>
+        <textarea
+          class="appeal-form__textarea"
+          id="appeal-text"
+          placeholder="Объясните, почему вы считаете бан ошибочным, или опишите обстоятельства нарушения..."
+          maxlength="2000"
+          oninput="document.getElementById('appeal-counter').textContent = this.value.length + ' / 2000'"
+        ></textarea>
+        <div class="appeal-form__counter" id="appeal-counter">0 / 2000</div>
+        <div class="appeal-form__hint">
+          💡 Будьте честны и конкретны. Укажите, какие действия привели к нарушению и почему оно больше не повторится. Приложите скриншоты, если это поможет делу.
+        </div>
+      </div>
+
+      <!-- Admin review status (after submission) -->
+      <div class="review-status" id="review-status-block" style="display:none;">
+        <div class="review-status__title">Статус рассмотрения</div>
+        <div class="review-status__step">
+          <span class="review-status__dot review-status__dot--done"></span>
+          <span class="review-status__text review-status__text--done">Заявка подана</span>
+        </div>
+        <div class="review-status__step">
+          <span class="review-status__dot review-status__dot--current"></span>
+          <span class="review-status__text">Ожидание подтверждения администраторами (0 / 4)</span>
+        </div>
+        <div class="review-status__step">
+          <span class="review-status__dot"></span>
+          <span class="review-status__text">Решение принято</span>
+        </div>
+      </div>
+
+      <!-- Decision result (when closed) — hidden by default -->
+      <div class="appeal-result appeal-result--approved" id="appeal-result-approved" style="display:none;">
+        <div class="appeal-result__icon">✅</div>
+        <div class="appeal-result__title">Бан снят</div>
+        <div class="appeal-result__desc">Администрация рассмотрела ваше обжалование и приняла решение снять блокировку. Вы можете продолжить пользоваться Balloo.</div>
+      </div>
+
+      <div class="appeal-result appeal-result--rejected" id="appeal-result-rejected" style="display:none;">
+        <div class="appeal-result__icon">❌</div>
+        <div class="appeal-result__title">Обжалование отклонено</div>
+        <div class="appeal-result__desc">Администрация отклонила ваше обжалование. Бан остаётся в силе. Вы сможете подать повторное обжалование через 30 дней.</div>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="appeal-footer">
+      <button class="btn btn--secondary" onclick="closeAppeal()">Закрыть</button>
+      <button class="btn btn--primary" id="submit-appeal-btn" onclick="submitAppeal()">Подать обжалование</button>
+    </div>
+
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+<script>
+  // Mock interactivity for the ban appeal overlay
+  var submitted = false;
+
+  function submitAppeal() {
+    if (submitted) return;
+    var text = document.getElementById('appeal-text').value.trim();
+    if (!text) { alert('Пожалуйста, опишите вашу ситуацию'); return; }
+
+    submitted = true;
+    // Hide form, show review status
+    document.getElementById('appeal-form-block').style.display = 'none';
+    document.getElementById('review-status-block').style.display = 'block';
+    document.getElementById('submit-appeal-btn').style.display = 'none';
+    // Update status badge
+    document.getElementById('appeal-status-badge').textContent = 'На рассмотрении';
+  }
+
+  function closeAppeal() {
+    // В реальном приложении оверлей закрывается только когда решение принято
+    // Здесь — демо-закрытие
+    document.getElementById('appeal-overlay').style.display = 'none';
+  }
+
+  // Demo countdown
+  (function() {
+    var total = 72 * 3600 - 18; // ~71:59:42
+    var el = document.getElementById('countdown-value');
+    setInterval(function() {
+      if (total <= 0) return;
+      total--;
+      var h = Math.floor(total / 3600);
+      var m = Math.floor((total % 3600) / 60);
+      var s = total % 60;
+      el.textContent = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+      if (total === 0) {
+        document.getElementById('countdown-block').classList.add('countdown--expired');
+        document.querySelector('.countdown__hint').textContent = 'Срок обжалования истёк';
+      }
+    }, 1000);
+  })();
+</script>
+
+</body>
+</html>

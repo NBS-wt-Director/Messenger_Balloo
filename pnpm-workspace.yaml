@@ -1,0 +1,14 @@
+packages:
+  - 'packages/*'
+allowBuilds:
+  '@prisma/client': true
+  '@prisma/engines': true
+  cypress: false
+  dtrace-provider: false
+  electron: false
+  electron-winstaller: false
+  esbuild: true
+  prisma: true
+  react-native-screens: true
+  sharp: true
+  unrs-resolver: false

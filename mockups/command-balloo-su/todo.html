@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Command — Задачи (TODO)</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--info);">C</div><span>Command</span>
+    <div class="topbar__dropdown"></div>
+  </div>
+  <div class="topbar__title">Задачи</div>
+  <div class="topbar__actions">
+    <div class="topbar__actions-btn" onclick="openModal('modal-new-task')" title="Новая задача">✏</div>
+  </div>
+  <div class="topbar__right"><div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИВ</span></div></div></div>
+</div>
+<div class="main">
+  <div class="sidebar sidebar--narrow">
+    <div class="list">
+      <div class="list__item list__item--active">📋 Мои задачи <span class="badge" style="margin-left:auto;">5</span></div>
+      <div class="list__item">👥 Задачи отдела <span class="badge" style="margin-left:auto;">12</span></div>
+      <div class="list__item">🔥 Срочные</div>
+      <div class="list__item">✅ Завершённые</div>
+      <div class="list__item" style="border-top:1px solid var(--border-color);margin-top:8px;padding-top:12px;">📊 Спринт #12</div>
+      <div class="list__item">📥 Бэклог</div>
+    </div>
+  </div>
+  <div class="content overflow-y-auto"><div class="page-container">
+    <h1 class="page-title">Задачи</h1>
+    <p class="page-subtitle">Личные задачи и задачи отдела</p>
+
+    <div class="tabs mb-6" data-tab-group="todo">
+      <div class="tab tab--active" onclick="switchTab('todo',0)">Личные</div>
+      <div class="tab" onclick="switchTab('todo',1)">Отдел</div>
+    </div>
+
+    <div class="flex gap-4 mb-6" style="flex-wrap:wrap;">
+      <div class="card flex-1" style="min-width:140px;"><div class="text-xs text-muted">Активных</div><div style="font-size:28px;font-weight:800;color:var(--accent);">5</div></div>
+      <div class="card flex-1" style="min-width:140px;"><div class="text-xs text-muted">Сегодня</div><div style="font-size:28px;font-weight:800;color:var(--danger);">2</div></div>
+      <div class="card flex-1" style="min-width:140px;"><div class="text-xs text-muted">Спринт</div><div style="font-size:28px;font-weight:800;color:var(--warning);">8/12</div></div>
+      <div class="card flex-1" style="min-width:140px;"><div class="text-xs text-muted">Завершено</div><div style="font-size:28px;font-weight:800;color:var(--info);">23</div></div>
+    </div>
+
+    <div class="section-title">🔥 Срочные</div>
+    <div class="card mb-4">
+      <div class="list__item" style="border:none;">
+        <input type="checkbox" style="width:18px;height:18px;accent-color:var(--accent);">
+        <span class="chip chip--danger">Срочно</span>
+        <div class="flex-1">
+          <div class="list__item-title">Завершить макеты мобильного приложения</div>
+          <div class="text-xs text-muted">Дедлайн: сегодня · Приоритет: P0</div>
+        </div>
+        <span class="text-xs text-muted">Сегодня</span>
+      </div>
+      <div class="list__item" style="border:none;">
+        <input type="checkbox" style="width:18px;height:18px;accent-color:var(--accent);">
+        <span class="chip chip--danger">Срочно</span>
+        <div class="flex-1">
+          <div class="list__item-title">Ревью PR #234 — WebSocket重构</div>
+          <div class="text-xs text-muted">Дедлайн: сегодня · Приоритет: P0</div>
+        </div>
+        <span class="text-xs text-muted">Сегодня</span>
+      </div>
+    </div>
+
+    <div class="section-title">🔄 В работе</div>
+    <div class="card mb-4">
+      <div class="list__item" style="border:none;">
+        <input type="checkbox" style="width:18px;height:18px;accent-color:var(--accent);">
+        <span class="chip chip--warning">В работе</span>
+        <div class="flex-1">
+          <div class="list__item-title">Настроить CI/CD pipeline для admin.balloo.su</div>
+          <div class="text-xs text-muted">Дедлайн: завтра · Приоритет: P1</div>
+        </div>
+        <span class="text-xs text-muted">Завтра</span>
+      </div>
+      <div class="list__item" style="border:none;">
+        <input type="checkbox" style="width:18px;height:18px;accent-color:var(--accent);">
+        <span class="chip chip--warning">В работе</span>
+        <div class="flex-1">
+          <div class="list__item-title">Документация API для разработчиков ботов</div>
+          <div class="text-xs text-muted">Дедлайн: пятница · Приоритет: P1</div>
+        </div>
+        <span class="text-xs text-muted">Пт</span>
+      </div>
+    </div>
+
+    <div class="section-title">📥 Бэклог</div>
+    <div class="card mb-4">
+      <div class="list__item" style="border:none;">
+        <input type="checkbox" style="width:18px;height:18px;accent-color:var(--accent);">
+        <span class="chip chip--info">Бэклог</span>
+        <div class="flex-1">
+          <div class="list__item-title">Миграция БД — добавить таблицу stories</div>
+          <div class="text-xs text-muted">Приоритет: P2</div>
+        </div>
+        <span class="text-xs text-muted">След. неделя</span>
+      </div>
+      <div class="list__item" style="border:none;">
+        <input type="checkbox" style="width:18px;height:18px;accent-color:var(--accent);">
+        <span class="chip chip--info">Бэклог</span>
+        <div class="flex-1">
+          <div class="list__item-title">Исследовать Tauri как альтернативу Electron</div>
+          <div class="text-xs text-muted">Приоритет: P3</div>
+        </div>
+        <span class="text-xs text-muted">Бэклог</span>
+      </div>
+    </div>
+
+    <!-- Tab: Отдел -->
+    <div class="tab-panel" style="display:none;">
+      <!-- Filters -->
+      <div class="flex gap-3 mb-4" style="flex-wrap:wrap;">
+        <select class="form-select" style="width:auto;"><option value="">Все исполнители</option><option>Иван Воронцов</option><option>Елена Киселёва</option><option>Антон Петров</option></select>
+        <select class="form-select" style="width:auto;"><option value="">Все статусы</option><option>Срочные</option><option>В работе</option><option>Бэклог</option><option>Завершённые</option></select>
+        <button class="btn btn--secondary btn--sm" onclick="openModal('modal-assign-task')">👥 Назначить задачу</button>
+      </div>
+      <!-- Visual load overview -->
+      <div class="card mb-4">
+        <h3 class="card__title mb-3">💼 Загрузка отдела</h3>
+        <div class="mb-2"><div class="flex justify-between text-xs mb-1"><span>Иван В.</span><span>65%</span></div><div style="height:6px;background:var(--bg-tertiary);"><div style="width:65%;height:100%;background:var(--warning);"></div></div></div>
+        <div class="mb-2"><div class="flex justify-between text-xs mb-1"><span>Елена К.</span><span>90%</span></div><div style="height:6px;background:var(--bg-tertiary);"><div style="width:90%;height:100%;background:var(--danger);"></div></div></div>
+        <div class="mb-2"><div class="flex justify-between text-xs mb-1"><span>Антон П.</span><span>75%</span></div><div style="height:6px;background:var(--bg-tertiary);"><div style="width:75%;height:100%;background:var(--warning);"></div></div></div>
+        <div><div class="flex justify-between text-xs mb-1"><span>Сергей М.</span><span>40%</span></div><div style="height:6px;background:var(--bg-tertiary);"><div style="width:40%;height:100%;background:var(--info);"></div></div></div>
+      </div>
+      <div class="section-title">🔥 Срочные</div>
+      <div class="card mb-4">
+        <div class="list__item" style="border:none;">
+          <input type="checkbox" style="width:18px;height:18px;accent-color:var(--accent);">
+          <span class="chip chip--danger">Срочно</span>
+          <div class="flex-1"><div class="list__item-title">Ревью PR #234 — WebSocket</div><div class="text-xs text-muted">Дедлайн: сегодня · Приоритет: P0</div></div>
+          <div class="avatar avatar--xs" style="margin-left:auto;"><div class="avatar__inner"><span>ЕК</span></div></div>
+        </div>
+      </div>
+      <div class="section-title">🔄 В работе</div>
+      <div class="card mb-4">
+        <div class="list__item" style="border:none;">
+          <input type="checkbox" style="width:18px;height:18px;accent-color:var(--accent);">
+          <span class="chip chip--warning">В работе</span>
+          <div class="flex-1"><div class="list__item-title">Настроить CI/CD для admin</div><div class="text-xs text-muted">Дедлайн: завтра · Приоритет: P1</div></div>
+          <div class="avatar avatar--xs" style="margin-left:auto;"><div class="avatar__inner"><span>ИВ</span></div></div>
+        </div>
+        <div class="list__item" style="border:none;">
+          <input type="checkbox" style="width:18px;height:18px;accent-color:var(--accent);">
+          <span class="chip chip--warning">В работе</span>
+          <div class="flex-1"><div class="list__item-title">API для ботов</div><div class="text-xs text-muted">Дедлайн: пятница · Приоритет: P1</div></div>
+          <div class="avatar avatar--xs" style="margin-left:auto;"><div class="avatar__inner"><span>СМ</span></div></div>
+        </div>
+      </div>
+      <div class="section-title">📥 Бэклог</div>
+      <div class="card mb-4">
+        <div class="list__item" style="border:none;">
+          <input type="checkbox" style="width:18px;height:18px;accent-color:var(--accent);">
+          <span class="chip chip--info">Бэклог</span>
+          <div class="flex-1"><div class="list__item-title">Миграция БД — stories</div><div class="text-xs text-muted">Приоритет: P2</div></div>
+          <div class="avatar avatar--xs" style="margin-left:auto;"><div class="avatar__inner"><span>АП</span></div></div>
+        </div>
+      </div>
+      <div class="section-title">✅ Завершённые</div>
+      <div class="card">
+        <div class="list__item" style="border:none;opacity:0.5;">
+          <input type="checkbox" checked style="width:18px;height:18px;accent-color:var(--accent);">
+          <span class="chip chip--accent">Готово</span>
+          <div class="flex-1"><div class="list__item-title" style="text-decoration:line-through;">Дизайн-система</div></div>
+          <span class="text-xs text-muted">Вчера</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Assign Task -->
+<div class="modal" id="modal-assign-task">
+  <div class="modal__header"><span class="modal__title">👥 Назначить задачу</span><div class="modal__close" onclick="closeModal('modal-assign-task')">✕</div></div>
+  <div class="modal__body">
+    <div class="form-group"><label class="form-label">Задача</label><input type="text" class="form-input" placeholder="Название задачи..."></div>
+    <div class="form-group"><label class="form-label">Исполнитель</label>
+      <select class="form-select"><option>Иван Воронцов</option><option>Елена Киселёва</option><option>Антон Петров</option><option>Сергей Морозов</option></select></div>
+    <div class="form-group"><label class="form-label">Приоритет</label>
+      <select class="form-select"><option>P1 — Высокий</option><option>P2 — Средний</option><option>P3 — Низкий</option></select></div>
+    <div class="form-group"><label class="form-label">Дедлайн</label><input type="datetime-local" class="form-input"></div>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--tertiary" onclick="closeModal('modal-assign-task')">Отмена</button>
+    <button class="btn btn--primary" onclick="closeModal('modal-assign-task')">Назначить</button>
+  </div>
+</div>
+<script src="../assets/common.js"></script>
+
+<!-- Modal: New Task -->
+<div class="modal-overlay" id="modal-overlay"></div>
+<div class="modal modal--status-info" id="modal-new-task">
+  <div class="modal__header"><span class="modal__title">📋 Новая задача</span><div class="modal__close" onclick="closeModal('modal-new-task')">✕</div></div>
+  <div class="modal__body">
+    <div class="form-group"><label class="form-label">Название задачи *</label><input type="text" class="form-input" placeholder="Например: Исправить баг авторизации"></div>
+    <div class="form-group"><label class="form-label">Описание</label><textarea class="form-textarea" placeholder="Подробности задачи..." style="min-height:80px;"></textarea></div>
+    <div class="form-group">
+      <label class="form-label">Дедлайн (дата + время) *</label>
+      <input type="datetime-local" class="form-input">
+      <div class="form-hint">Когда задача должна быть выполнена</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Исполнитель</label>
+      <select class="form-select">
+        <option>👤 Я (себе)</option>
+        <option>👥 Мой отдел</option>
+        <option>🏢 Все отделы (руководитель)</option>
+      </select>
+      <div class="form-hint">Руководитель может ставить задачи себе и отделам. Директор и его помощники = руководители всех отделов.</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Приоритет</label>
+      <select class="form-select">
+        <option>P1 — Высокий</option>
+        <option>P2 — Средний</option>
+        <option>P3 — Низкий</option>
+      </select>
+    </div>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--tertiary" onclick="closeModal('modal-new-task')">Отмена</button>
+    <button class="btn btn--primary" onclick="closeModal('modal-new-task')">Создать задачу</button>
+  </div>
+</div>
+</script>
+</body>
+</html>

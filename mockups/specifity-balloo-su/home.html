@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Specifity — Главная</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <link rel="stylesheet" href="spec.css">
+</head>
+<body class="app-flex">
+
+<!-- Topbar -->
+<div class="topbar">
+  <div class="topbar__logo">
+    <div class="topbar__logo-icon" style="background:var(--accent);">S</div>
+    <span>Specifity</span>
+    <div class="topbar__dropdown">
+      <div class="topbar__dropdown-item topbar__dropdown-item--node topbar__dropdown-item--node--current">📐 Specifity (текущий)</div>
+      <div class="topbar__dropdown-divider"></div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">💬 Balloo</div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">🛡️ Admin</div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">🏢 Command</div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">💡 Features</div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">📜 History</div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">⬇️ Download</div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">📚 API Docs</div>
+    </div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Главная · обзор монорепо</div>
+  <div class="topbar__right">
+    <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+    <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+  </div>
+</div>
+
+<div class="spec-app">
+  <!-- Sidebar navigation -->
+  <div class="spec-sidebar">
+    <div class="spec-sidebar__search">
+      <input type="text" class="search-input" placeholder="🔍 Поиск по спецификации...">
+    </div>
+    <div class="spec-sidebar__group">Разделы</div>
+    <a class="spec-sidebar__item spec-sidebar__item--active" href="home.html"><span class="spec-sidebar__item-icon">🏠</span> Главная</a>
+    <a class="spec-sidebar__item" href="rules.html"><span class="spec-sidebar__item-icon">📋</span> Правила</a>
+    <a class="spec-sidebar__item" href="screens.html"><span class="spec-sidebar__item-icon">🖼️</span> Экраны <span class="spec-sidebar__item-num">110</span></a>
+    <a class="spec-sidebar__item" href="endpoints.html"><span class="spec-sidebar__item-icon">🔌</span> Эндпоинты</a>
+    <a class="spec-sidebar__item" href="data.html"><span class="spec-sidebar__item-icon">🗄️</span> Данные <span class="spec-sidebar__item-num">34</span></a>
+    <a class="spec-sidebar__item" href="components.html"><span class="spec-sidebar__item-icon">🧩</span> Компоненты <span class="spec-sidebar__item-num">241</span></a>
+    <div class="spec-sidebar__divider"></div>
+    <a class="spec-sidebar__item" href="specification.html"><span class="spec-sidebar__item-icon">📐</span> Спецификация экрана</a>
+  </div>
+
+  <!-- Content -->
+  <div class="spec-content">
+    <div class="spec-pagehead">
+      <div class="spec-pagehead__id">ID: 1_10_02 · узел у_10 (specifity)</div>
+      <h1>Главная · обзор монорепо Balloo</h1>
+      <p>Входной экран инструмента Specifity. Обзор структуры монорепо: категории, узлы экосистемы, ключевые метрики и единая система нумерации объектов. Отсюда — навигация во все разделы спецификации.</p>
+    </div>
+
+    <div class="spec-stats">
+      <div class="spec-stat"><strong>12</strong><span>узлов (11 доменов + shared)</span></div>
+      <div class="spec-stat"><strong>110</strong><span>экранов</span></div>
+      <div class="spec-stat"><strong>34</strong><span>таблицы БД</span></div>
+      <div class="spec-stat"><strong>241</strong><span>компонент</span></div>
+      <div class="spec-stat"><strong>3</strong><span>темы оформления</span></div>
+      <div class="spec-stat"><strong>6</strong><span>языков интерфейса</span></div>
+    </div>
+
+    <!-- Categories -->
+    <div class="spec-block">
+      <div class="spec-block__title">Категории объектов</div>
+      <div class="spec-block__intro">Все объекты проекта нумеруются по системе <code>z_xx_yy</code>: префикс определяет тип, <code>xx</code> — номер узла, <code>yy</code> — порядковый номер внутри узла.</div>
+      <div class="spec-grid">
+        <div class="spec-nodecard">
+          <div class="spec-nodecard__head"><div class="spec-nodecard__icon">у</div><div><div class="spec-nodecard__title">Узлы</div><div class="spec-nodecard__id">префикс у</div></div></div>
+          <div class="spec-nodecard__desc">Домены экосистемы: balloo.su, admin, command, docs и др. Узел 00 = shared.</div>
+        </div>
+        <div class="spec-nodecard">
+          <div class="spec-nodecard__head"><div class="spec-nodecard__icon">0</div><div><div class="spec-nodecard__title">Функции</div><div class="spec-nodecard__id">префикс 0</div></div></div>
+          <div class="spec-nodecard__desc">Бизнес-функционал: что делает узел, какая задача решается.</div>
+        </div>
+        <div class="spec-nodecard">
+          <div class="spec-nodecard__head"><div class="spec-nodecard__icon">1</div><div><div class="spec-nodecard__title">Экраны</div><div class="spec-nodecard__id">префикс 1</div></div></div>
+          <div class="spec-nodecard__desc">UI-экраны по пользовательским ситуациям.</div>
+        </div>
+        <div class="spec-nodecard">
+          <div class="spec-nodecard__head"><div class="spec-nodecard__icon">2</div><div><div class="spec-nodecard__title">Эндпоинты</div><div class="spec-nodecard__id">префикс 2</div></div></div>
+          <div class="spec-nodecard__desc">REST API + WebSocket events, обслуживающие экраны.</div>
+        </div>
+        <div class="spec-nodecard">
+          <div class="spec-nodecard__head"><div class="spec-nodecard__icon">3</div><div><div class="spec-nodecard__title">Данные</div><div class="spec-nodecard__id">префикс 3</div></div></div>
+          <div class="spec-nodecard__desc">Таблицы/модели БД для хранения данных функции.</div>
+        </div>
+        <div class="spec-nodecard">
+          <div class="spec-nodecard__head"><div class="spec-nodecard__icon">4</div><div><div class="spec-nodecard__title">Компоненты</div><div class="spec-nodecard__id">префикс 4</div></div></div>
+          <div class="spec-nodecard__desc">React / React Native UI-компоненты экранов.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Nodes -->
+    <div class="spec-block">
+      <div class="spec-block__title">Узлы экосистемы</div>
+      <div class="spec-block__intro">12 узлов: 11 доменов + 1 каталог общих экранов (shared). Подробно — в разделе <a href="screens.html" style="color:var(--accent);">Экраны</a>.</div>
+      <div class="spec-grid">
+        <div class="spec-nodecard"><div class="spec-nodecard__head"><div class="spec-nodecard__icon">🔗</div><div><div class="spec-nodecard__title">shared</div><div class="spec-nodecard__id">у_00 · 8 экранов</div></div></div><div class="spec-nodecard__desc">Общие экраны: ошибки 404/403/500/503, офлайн, бан, обжалование.</div><div class="spec-nodecard__foot"><span class="chip">общие</span></div></div>
+        <div class="spec-nodecard"><div class="spec-nodecard__head"><div class="spec-nodecard__icon">💬</div><div><div class="spec-nodecard__title">balloo.su</div><div class="spec-nodecard__id">у_01 · 26 экранов</div></div></div><div class="spec-nodecard__desc">Основной мессенджер: чаты, звонки, группы, профиль, настройки.</div><div class="spec-nodecard__foot"><span class="chip chip--accent">основной</span></div></div>
+        <div class="spec-nodecard"><div class="spec-nodecard__head"><div class="spec-nodecard__icon">🛡️</div><div><div class="spec-nodecard__title">admin</div><div class="spec-nodecard__id">у_02 · 21 экран</div></div></div><div class="spec-nodecard__desc">Админ-панель: дашборд, модерация, баны, аналитика, 2FA.</div><div class="spec-nodecard__foot"><span class="chip">admin</span></div></div>
+        <div class="spec-nodecard"><div class="spec-nodecard__head"><div class="spec-nodecard__icon">🏢</div><div><div class="spec-nodecard__title">command</div><div class="spec-nodecard__id">у_03 · 20 экранов</div></div></div><div class="spec-nodecard__desc">Портал сотрудников: вакансии, отделы, внутренние инструменты.</div><div class="spec-nodecard__foot"><span class="chip">staff</span></div></div>
+        <div class="spec-nodecard"><div class="spec-nodecard__head"><div class="spec-nodecard__icon">💡</div><div><div class="spec-nodecard__title">features</div><div class="spec-nodecard__id">у_04 · 5 экранов</div></div></div><div class="spec-nodecard__desc">Фич-реквесты: голосования, статусы, дорожная карта.</div><div class="spec-nodecard__foot"><span class="chip">public</span></div></div>
+        <div class="spec-nodecard"><div class="spec-nodecard__head"><div class="spec-nodecard__icon">📜</div><div><div class="spec-nodecard__title">history</div><div class="spec-nodecard__id">у_05 · 4 экрана</div></div></div><div class="spec-nodecard__desc">История версий: changelog, релизы, сравнение.</div><div class="spec-nodecard__foot"><span class="chip">public</span></div></div>
+        <div class="spec-nodecard"><div class="spec-nodecard__head"><div class="spec-nodecard__icon">⬇️</div><div><div class="spec-nodecard__title">download</div><div class="spec-nodecard__id">у_06 · 2 экрана</div></div></div><div class="spec-nodecard__desc">Загрузки клиентов: web, desktop, Android, iOS.</div><div class="spec-nodecard__foot"><span class="chip">public</span></div></div>
+        <div class="spec-nodecard"><div class="spec-nodecard__head"><div class="spec-nodecard__icon">📚</div><div><div class="spec-nodecard__title">docs</div><div class="spec-nodecard__id">у_07 · 1 экран</div></div></div><div class="spec-nodecard__desc">API-документация (OpenAPI 3.0).</div><div class="spec-nodecard__foot"><span class="chip">dev</span></div></div>
+        <div class="spec-nodecard"><div class="spec-nodecard__head"><div class="spec-nodecard__icon">📱</div><div><div class="spec-nodecard__title">mobile</div><div class="spec-nodecard__id">у_08 · 9 экранов</div></div></div><div class="spec-nodecard__desc">Сборные мобильные макеты: жесты, long-press, swipe.</div><div class="spec-nodecard__foot"><span class="chip">mobile</span></div></div>
+        <div class="spec-nodecard"><div class="spec-nodecard__head"><div class="spec-nodecard__icon">🖥️</div><div><div class="spec-nodecard__title">desktop</div><div class="spec-nodecard__id">у_09 · 7 экранов</div></div></div><div class="spec-nodecard__desc">Обёртки окна ПК: titlebar, tray, системные кнопки.</div><div class="spec-nodecard__foot"><span class="chip">desktop</span></div></div>
+        <div class="spec-nodecard"><div class="spec-nodecard__head"><div class="spec-nodecard__icon">📐</div><div><div class="spec-nodecard__title">specifity</div><div class="spec-nodecard__id">у_10 · 7 экранов</div></div></div><div class="spec-nodecard__desc">Этот инструмент: спецификация монорепо (текущий узел).</div><div class="spec-nodecard__foot"><span class="chip chip--accent">текущий</span></div></div>
+        <div class="spec-nodecard"><div class="spec-nodecard__head"><div class="spec-nodecard__icon">📝</div><div><div class="spec-nodecard__title">blog</div><div class="spec-nodecard__id">у_11 · 6 экранов</div></div></div><div class="spec-nodecard__desc">Корпоративный блог: лента, статьи, каналы, комментарии.</div><div class="spec-nodecard__foot"><span class="chip">public</span></div></div>
+      </div>
+    </div>
+
+    <!-- Monorepo structure -->
+    <div class="spec-block">
+      <div class="spec-block__title">Структура монорепо</div>
+      <div class="spec-block__intro">pnpm workspaces: макеты (источник правды) → документация → код в <code>packages/</code>.</div>
+      <div class="spec-tree">
+<span class="t-dir">balloo/</span>
+├── <span class="t-file">AGENTS.md</span>                    <span class="t-comment"># инструкция для AI-ассистента</span>
+├── <span class="t-dir">docs/</span>                        <span class="t-comment"># глобальная документация (под капотом)</span>
+│   ├── <span class="t-file">01-architecture-decisions.md</span>
+│   ├── <span class="t-file">02-requirements-checklist.md</span>
+│   ├── <span class="t-file">03-database-schema.md</span>
+│   ├── <span class="t-file">04-api-websocket-spec.md</span>
+│   ├── <span class="t-file">05-frontend-spec.md</span>
+│   └── <span class="t-file">06-devops-infrastructure.md</span>
+├── <span class="t-dir">mockups/</span>                     <span class="t-comment"># ИСТОЧНИК ПРАВДЫ — макеты экранов</span>
+│   ├── <span class="t-file">index.html</span>              <span class="t-comment"># каталог всех макетов</span>
+│   ├── <span class="t-file">index_ecrans.md</span>         <span class="t-comment"># метаданные (Markdown)</span>
+│   ├── <span class="t-dir">assets/</span>                  <span class="t-comment"># common.css + common.js</span>
+│   ├── <span class="t-dir">shared/</span>                  <span class="t-comment"># узел 00 — общие экраны</span>
+│   ├── <span class="t-dir">balloo-su/</span>               <span class="t-comment"># узел 01 — мессенджер</span>
+│   ├── <span class="t-dir">admin-balloo-su/</span>         <span class="t-comment"># узел 02 — админка</span>
+│   └── <span class="t-comment">... остальные узлы</span>
+├── <span class="t-dir">packages/</span>                    <span class="t-comment"># код монорепо</span>
+│   ├── <span class="t-dir">web/</span>  <span class="t-dir">desktop/</span>  <span class="t-dir">mobile-android/</span>  <span class="t-dir">mobile-ios/</span>
+│   ├── <span class="t-dir">server/</span>
+│   └── <span class="t-dir">shared/</span>                   <span class="t-comment"># общие компоненты + типы</span>
+└── <span class="t-dir">docker/</span>                      <span class="t-comment"># Docker-инфраструктура</span>
+      </div>
+    </div>
+
+    <!-- Lifecycle -->
+    <div class="spec-block">
+      <div class="spec-block__title">Жизненный цикл проекта</div>
+      <div class="spec-stats" style="margin-top:0;">
+        <div class="spec-stat"><strong>1</strong><span>Проектирование макетов</span></div>
+        <div class="spec-stat"><strong>2</strong><span>Фиксация документации</span></div>
+        <div class="spec-stat"><strong>3</strong><span>Разработка</span></div>
+        <div class="spec-stat"><strong>4</strong><span>v2 (новый цикл)</span></div>
+      </div>
+      <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;max-width:820px;">Текущая фаза — <strong style="color:var(--accent);">Фаза 1: проектирование макетов</strong>. Макеты — единственный источник правды. Готовность <code>??</code> пока не подтверждена. Подробно — в разделе <a href="rules.html" style="color:var(--accent);">Правила</a>.</p>
+    </div>
+
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+</body>
+</html>

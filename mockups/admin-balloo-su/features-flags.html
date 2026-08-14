@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Feature Flags</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--warning);">A</div><span>Admin</span>
+    <div class="topbar__dropdown"><div class="topbar__dropdown-item">🛡️ Admin (текущий)</div><div class="topbar__dropdown-divider"></div><div class="topbar__dropdown-item">💬 Balloo</div><div class="topbar__dropdown-item">🏢 Command</div><div class="topbar__dropdown-item">💡 Features</div><div class="topbar__dropdown-item">📜 History</div><div class="topbar__dropdown-item">⬇️ Download</div><div class="topbar__dropdown-item">📚 API Docs</div></div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Feature Flags</div>
+  <div class="topbar__actions"><div class="topbar__actions-btn" onclick="openModal('modal-new-flag')" title="Новый флаг">✏</div></div>
+  <div class="topbar__right"><div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>АД</span></div></div><span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span><span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span></div>
+</div>
+<div class="main">
+  <div class="sidebar sidebar--narrow">
+    <div class="list">
+      <div class="list__item">📊 Дашборд</div>
+      <div class="list__item">👤 Пользователи</div>
+      <div class="list__item">🚩 Жалобы</div>
+      <div class="list__item">🔨 Баны</div>
+      <div class="list__item">📈 Метрики</div>
+      <div class="list__item list__item--active">🎛️ Feature Flags</div>
+      <div class="list__item">📁 Файлы</div>
+      <div class="list__item">📝 Тексты</div>
+      <div class="list__item" style="border-top:1px solid var(--border-color);margin-top:8px;padding-top:12px;">🏢 Отделы</div>
+      <div class="list__item">👤 Сотрудники</div>
+      <div class="list__item">💼 Вакансии</div>
+      <div class="list__item">📜 Версии</div>
+      <div class="list__item">💡 Фичи (модерация)</div>
+      <div class="list__item">💚 Донаты</div>
+    </div>
+  </div>
+  <div class="content overflow-y-auto"><div class="page-container">
+    <h1 class="page-title">Feature Flags</h1>
+    <p class="page-subtitle">Управление функциями • Группировка • Глобальные уведомления</p>
+
+    <!-- Global notification -->
+    <div class="card mb-4">
+      <h3 class="card__title mb-4">📢 Глобальное уведомление</h3>
+      <div class="form-group">
+        <label class="form-label">Текст уведомления (всем пользователям)</label>
+        <input type="text" class="form-input" placeholder="Например: Технические работы с 22:00 до 23:00">
+      </div>
+      <div class="text-xs text-muted mb-4">Уведомление будет показано баннером на всех экранах + push-уведомление авторизованным пользователям</div>
+      <div class="flex gap-2">
+        <button class="btn btn--primary btn--sm">📤 Отправить</button>
+        <button class="btn btn--tertiary btn--sm">Очистить</button>
+      </div>
+    </div>
+
+    <!-- Feature flags grouped by category -->
+    <div class="card">
+      <h3 class="card__title mb-4">🎛️ Флаги функций</h3>
+
+      <!-- Auth group -->
+      <div class="feature-group mb-4">
+        <div class="feature-group__header" onclick="toggleGroup('auth')">
+          <span class="feature-group__icon">🔐</span>
+          <span class="feature-group__title">Auth</span>
+          <span class="feature-group__count">2</span>
+          <span class="feature-group__chevron">▼</span>
+        </div>
+        <div class="feature-group__body" id="group-auth">
+          <table class="table">
+            <thead><tr><th>Флаг</th><th>Описание</th><th>Статус</th><th>Переключатель</th></tr></thead>
+            <tbody>
+              <tr><td><code>gosuslugi_auth</code></td><td>Авторизация через Госуслуги (v2)</td><td><span class="chip chip--warning">v2</span></td><td><label class="switch"><input type="checkbox"><span class="switch__slider"></span></label></td></tr>
+              <tr><td><code>e2e_encryption</code></td><td>End-to-end шифрование (v2)</td><td><span class="chip chip--warning">v2</span></td><td><label class="switch"><input type="checkbox"><span class="switch__slider"></span></label></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Messaging group -->
+      <div class="feature-group mb-4">
+        <div class="feature-group__header" onclick="toggleGroup('messaging')">
+          <span class="feature-group__icon">💬</span>
+          <span class="feature-group__title">Messaging</span>
+          <span class="feature-group__count">3</span>
+          <span class="feature-group__chevron">▼</span>
+        </div>
+        <div class="feature-group__body" id="group-messaging">
+          <table class="table">
+            <thead><tr><th>Флаг</th><th>Описание</th><th>Статус</th><th>Переключатель</th></tr></thead>
+            <tbody>
+              <tr><td><code>voice_to_text</code></td><td>Голосовые в текст (v2)</td><td><span class="chip chip--warning">v2</span></td><td><label class="switch"><input type="checkbox"><span class="switch__slider"></span></label></td></tr>
+              <tr><td><code>link_preview</code></td><td>Предпросмотр ссылок (v2)</td><td><span class="chip chip--warning">v2</span></td><td><label class="switch"><input type="checkbox"><span class="switch__slider"></span></label></td></tr>
+              <tr><td><code>animated_stickers</code></td><td>Анимированные стикеры (v2)</td><td><span class="chip chip--warning">v2</span></td><td><label class="switch"><input type="checkbox"><span class="switch__slider"></span></label></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Groups group -->
+      <div class="feature-group mb-4">
+        <div class="feature-group__header" onclick="toggleGroup('groups')">
+          <span class="feature-group__icon">👥</span>
+          <span class="feature-group__title">Groups</span>
+          <span class="feature-group__count">1</span>
+          <span class="feature-group__chevron">▼</span>
+        </div>
+        <div class="feature-group__body" id="group-groups">
+          <table class="table">
+            <thead><tr><th>Флаг</th><th>Описание</th><th>Статус</th><th>Переключатель</th></tr></thead>
+            <tbody>
+              <tr><td><code>groups_threading</code></td><td>Подразделы в чатах (v2)</td><td><span class="chip chip--warning">v2</span></td><td><label class="switch"><input type="checkbox"><span class="switch__slider"></span></label></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Polls group -->
+      <div class="feature-group mb-4">
+        <div class="feature-group__header" onclick="toggleGroup('polls')">
+          <span class="feature-group__icon">📊</span>
+          <span class="feature-group__title">Polls</span>
+          <span class="feature-group__count">1</span>
+          <span class="feature-group__chevron">▼</span>
+        </div>
+        <div class="feature-group__body" id="group-polls">
+          <table class="table">
+            <thead><tr><th>Флаг</th><th>Описание</th><th>Статус</th><th>Переключатель</th></tr></thead>
+            <tbody>
+              <tr><td><code>disable_read_receipts</code></td><td>Отключение «прочитано» за плату (v2)</td><td><span class="chip chip--warning">v2</span></td><td><label class="switch"><input type="checkbox"><span class="switch__slider"></span></label></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Stories group -->
+      <div class="feature-group mb-4">
+        <div class="feature-group__header" onclick="toggleGroup('stories')">
+          <span class="feature-group__icon">📸</span>
+          <span class="feature-group__title">Stories</span>
+          <span class="feature-group__count">0</span>
+          <span class="feature-group__chevron">▼</span>
+        </div>
+        <div class="feature-group__body" id="group-stories">
+          <div class="text-sm text-muted" style="padding:12px;">Нет флагов</div>
+        </div>
+      </div>
+
+      <!-- Donate group -->
+      <div class="feature-group mb-4">
+        <div class="feature-group__header" onclick="toggleGroup('donate')">
+          <span class="feature-group__icon">💚</span>
+          <span class="feature-group__title">Donate</span>
+          <span class="feature-group__count">1</span>
+          <span class="feature-group__chevron">▼</span>
+        </div>
+        <div class="feature-group__body" id="group-donate">
+          <table class="table">
+            <thead><tr><th>Флаг</th><th>Описание</th><th>Статус</th><th>Переключатель</th></tr></thead>
+            <tbody>
+              <tr><td><code>premium_subscription</code></td><td>Платная подписка (v2)</td><td><span class="chip chip--warning">v2</span></td><td><label class="switch"><input type="checkbox"><span class="switch__slider"></span></label></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Blog group -->
+      <div class="feature-group mb-4">
+        <div class="feature-group__header" onclick="toggleGroup('blog')">
+          <span class="feature-group__icon">📝</span>
+          <span class="feature-group__title">Blog</span>
+          <span class="feature-group__count">0</span>
+          <span class="feature-group__chevron">▼</span>
+        </div>
+        <div class="feature-group__body" id="group-blog">
+          <div class="text-sm text-muted" style="padding:12px;">Нет флагов</div>
+        </div>
+      </div>
+
+      <!-- HR group -->
+      <div class="feature-group mb-4">
+        <div class="feature-group__header" onclick="toggleGroup('hr')">
+          <span class="feature-group__icon">🏢</span>
+          <span class="feature-group__title">HR</span>
+          <span class="feature-group__count">0</span>
+          <span class="feature-group__chevron">▼</span>
+        </div>
+        <div class="feature-group__body" id="group-hr">
+          <div class="text-sm text-muted" style="padding:12px;">Нет флагов</div>
+        </div>
+      </div>
+
+      <!-- Admin group -->
+      <div class="feature-group">
+        <div class="feature-group__header" onclick="toggleGroup('admin')">
+          <span class="feature-group__icon">🛡️</span>
+          <span class="feature-group__title">Admin</span>
+          <span class="feature-group__count">0</span>
+          <span class="feature-group__chevron">▼</span>
+        </div>
+        <div class="feature-group__body" id="group-admin">
+          <div class="text-sm text-muted" style="padding:12px;">Нет флагов</div>
+        </div>
+      </div>
+    </div>
+  </div></div>
+</div>
+
+<!-- Modal: disable flag -->
+<div class="modal-overlay" id="modal-overlay"></div>
+<div class="modal modal--status-warning" id="modal-disable-flag">
+  <div class="modal__header"><span class="modal__title">⚠️ Выключить флаг</span><div class="modal__close" onclick="closeModal('modal-disable-flag')">✕</div></div>
+  <div class="modal__body">
+    <p class="text-sm text-secondary mb-4">При выключении флага все пользователи будут уведомлены.</p>
+    <div class="form-group">
+      <label class="form-label">Причина выключения *</label>
+      <textarea class="form-textarea" placeholder="Почему выключаете этот флаг?" required></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Дата повторного включения (планируемая)</label>
+      <input type="date" class="form-input">
+      <div class="form-hint">Когда можно снова включить этот флаг</div>
+    </div>
+    <div class="card" style="background:rgba(45,184,77,0.08);border-color:var(--accent);padding:12px;">
+      <div class="text-sm" style="color:var(--accent);">📢 Уведомление будет показано:</div>
+      <div class="text-xs text-secondary mt-1">• Баннер на всех экранах</div>
+      <div class="text-xs text-secondary">• Push-уведомление авторизованным</div>
+    </div>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--tertiary" onclick="closeModal('modal-disable-flag')">Отмена</button>
+    <button class="btn btn--warning" onclick="closeModal('modal-disable-flag')">Выключить + Уведомить</button>
+  </div>
+</div>
+
+<!-- Modal: new flag -->
+<div class="modal modal--status-info" id="modal-new-flag">
+  <div class="modal__header"><span class="modal__title">Новый Feature Flag</span><div class="modal__close" onclick="closeModal('modal-new-flag')">✕</div></div>
+  <div class="modal__body">
+    <div class="form-group"><label class="form-label">Ключ</label><input type="text" class="form-input" placeholder="new_feature_name"></div>
+    <div class="form-group"><label class="form-label">Описание</label><textarea class="form-textarea" placeholder="Что делает эта функция?"></textarea></div>
+    <div class="form-group"><label class="form-label">Группа</label><select class="form-select"><option>Auth</option><option>Messaging</option><option>Groups</option><option>Polls</option><option>Stories</option><option>Donate</option><option>Blog</option><option>HR</option><option>Admin</option></select></div>
+    <div class="form-group"><label class="form-label">Версия</label><select class="form-select"><option>v1</option><option>v2</option></select></div>
+  </div>
+  <div class="modal__footer"><button class="btn btn--tertiary" onclick="closeModal('modal-new-flag')">Отмена</button><button class="btn btn--primary" onclick="closeModal('modal-new-flag')">Создать</button></div>
+</div>
+
+<style>
+  .feature-group__header {
+    display: flex; align-items: center; gap: 8px; padding: 10px 12px;
+    cursor: pointer; border-bottom: 1px solid var(--border-color);
+    transition: background 0.15s;
+  }
+  .feature-group__header:hover { background: var(--bg-hover); }
+  .feature-group__icon { font-size: 16px; }
+  .feature-group__title { font-size: 14px; font-weight: 700; color: var(--text-primary); flex: 1; }
+  .feature-group__count { font-size: 12px; color: var(--text-muted); }
+  .feature-group__chevron { font-size: 10px; color: var(--text-muted); transition: transform 0.2s; }
+  .feature-group__header--collapsed .feature-group__chevron { transform: rotate(-90deg); }
+  .feature-group__body { overflow: hidden; transition: max-height 0.3s; }
+  .feature-group__body--collapsed { max-height: 0 !important; }
+  .feature-group__body table { border-top: none; }
+</style>
+
+<script src="../assets/common.js"></script>
+<script>
+function toggleGroup(name) {
+  const body = document.getElementById('group-' + name);
+  const header = body.previousElementSibling;
+  body.classList.toggle('feature-group__body--collapsed');
+  header.classList.toggle('feature-group__header--collapsed');
+}
+</script>
+</body>
+</html>

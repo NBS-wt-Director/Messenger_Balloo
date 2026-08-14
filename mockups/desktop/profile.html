@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo — Профиль</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    html { overflow-y: auto; height: auto; }
+    body { overflow-y: auto; height: auto; min-height: 100vh; background: var(--bg-primary); padding: 0; }
+    .window-frame { max-width: 1000px; margin: 24px auto; background: var(--bg-secondary); border: 1px solid var(--border-strong); box-shadow: var(--shadow-glass); display: flex; flex-direction: column; overflow: hidden; }
+    .window-body { height: 600px; display: flex; overflow: hidden; }
+    .window-sidebar { width: 240px; min-width: 240px; border-right: 1px solid var(--border-color); overflow-y: auto; background: var(--bg-tertiary); display: flex; flex-direction: column; }
+    .window-content { flex: 1; overflow-y: auto; padding: 20px; }
+    .statusbar { height: 28px; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; background: var(--bg-tertiary); border-top: 1px solid var(--border-color); font-size: 11px; color: var(--text-secondary); }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; vertical-align: middle; }
+    .status-dot--online { background: var(--accent); }
+    .statusbar__sep { margin-left: 16px; }
+    .sidebar-section { padding: 10px 12px; border-bottom: 1px solid var(--border-color); }
+    .sidebar-section-title { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; padding: 4px 0 8px; }
+    .sidebar-nav-item { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 6px; cursor: pointer; color: var(--text-secondary); font-size: 13px; text-decoration: none; transition: all 0.15s; }
+    .sidebar-nav-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+    .sidebar-nav-item--active { background: rgba(45,184,77,0.1); color: var(--accent); }
+    .account-detail-card { display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg-tertiary);border:1px solid var(--border-color);border-radius:8px;margin-bottom:8px; }
+    .account-detail-card--active { border-color:var(--accent); background:rgba(45,184,77,0.06); }
+    .account-detail-card__info { flex:1; }
+    .account-detail-card__name { font-size:13px;font-weight:600;color:var(--text-primary); }
+    .account-detail-card__status { font-size:11px;color:var(--text-secondary); }
+    .blocked-list__item { display:flex;align-items:center;gap:10px;padding:10px;border-bottom:1px solid var(--border-color); }
+    .blocked-list__info { flex:1; }
+    .blocked-list__name { font-size:13px;font-weight:600; }
+    .blocked-list__reason { font-size:11px;color:var(--text-muted); }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar__logo">
+    <div class="topbar__logo-icon">B</div>
+    <span>Balloo</span>
+    <div class="topbar__dropdown">
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/index.html'">💬 Balloo</div>
+      <div class="topbar__dropdown-divider"></div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div>
+      <div class="topbar__dropdown-divider"></div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/contacts.html'">👤 Контакты</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/search.html'">🔍 Поиск</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/archive.html'">📦 Архив</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/calls.html'">📞 Звонки</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/invites.html'">📨 Приглашения</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/bots.html'">🤖 О ботах</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/about-balloo.html'">ℹ️ О Balloo</div>
+    </div>
+  </div>
+  <div class="topbar__title">Профиль</div>
+  <div class="topbar__right">
+    <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact" onclick="window.location.href='../balloo-su/profile.html'">
+      <div class="avatar__inner"><span>ИИ</span></div>
+    </div>
+    <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+    <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+  </div>
+</div>
+
+<div class="window-frame">
+  <div class="titlebar">
+    <div class="titlebar__left">
+      <div class="titlebar__icon">B</div>
+      <span class="titlebar__title">Balloo Messenger — Профиль</span>
+    </div>
+    <div class="titlebar__menu">
+      <div class="titlebar__menu-item" onclick="window.location.href='chat.html'">Чаты</div>
+      <div class="titlebar__menu-item" onclick="window.location.href='stories.html'">Сторис</div>
+      <div class="titlebar__menu-item" onclick="window.location.href='contacts.html'">Контакты</div>
+      <div class="titlebar__menu-item" onclick="window.location.href='settings.html'">Настройки</div>
+      <div class="titlebar__menu-item" onclick="window.location.href='profile.html'" style="color:var(--accent);">Профиль</div>
+      <div class="titlebar__menu-item" onclick="window.location.href='archive.html'">Архив</div>
+    </div>
+    <div class="titlebar__controls">
+      <div class="titlebar__btn" title="Свернуть">─</div>
+      <div class="titlebar__btn" title="Развернуть">▢</div>
+      <div class="titlebar__btn titlebar__btn--close" title="Закрыть">✕</div>
+    </div>
+  </div>
+
+  <div class="window-body">
+    <div class="window-sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">Профиль</div>
+        <div class="sidebar-nav-item sidebar-nav-item--active" data-section="main" onclick="showSection('main')">👤 Основная информация</div>
+        <div class="sidebar-nav-item" data-section="accounts" onclick="showSection('accounts')">👥 Аккаунты</div>
+        <div class="sidebar-nav-item" data-section="appearance" onclick="showSection('appearance')">🎨 Оформление</div>
+        <div class="sidebar-nav-item" data-section="devices" onclick="showSection('devices')">📱 Устройства</div>
+        <div class="sidebar-nav-item" data-section="donate" onclick="showSection('donate')">💰 Поддержка</div>
+        <div class="sidebar-nav-item" data-section="privacy" onclick="showSection('privacy')">🔒 Приватность</div>
+        <div class="sidebar-nav-item" data-section="danger" onclick="showSection('danger')">⚠️ Опасная зона</div>
+      </div>
+    </div>
+
+    <div class="window-content">
+      <div class="text-center mb-4">
+        <div class="avatar avatar--xl avatar--bordered avatar--status-online avatar--ctx-contact" style="margin:0 auto 12px;" onclick="window.location.href='../balloo-su/public-profile.html'">
+          <div class="avatar__inner"><span>ИИ</span></div>
+        </div>
+        <button class="btn btn--secondary btn--sm" onclick="openAvatarPanel()">📷 Изменить аватар</button>
+      </div>
+
+      <!-- Section: Main -->
+      <div id="section-main">
+        <div class="card mb-4">
+          <h3 class="card__title mb-4">Основная информация</h3>
+          <div class="form-group"><label class="form-label">Имя</label><input type="text" class="form-input" value="Иван Иванов"></div>
+          <div class="form-group"><label class="form-label">Био</label><textarea class="form-textarea">Разработчик. Люблю геометрию и восьмигранники.</textarea></div>
+          <div class="form-group"><label class="form-label">Статус</label>
+            <div class="flex gap-2">
+              <input type="text" class="form-input" value="На работе" maxlength="70">
+              <select class="form-select" style="width:auto;"><option>На работе</option><option>Свободен</option><option>Занят</option><option>В отпуске</option></select>
+            </div>
+          </div>
+          <div class="form-group"><label class="form-label">Дата рождения</label><input type="date" class="form-input" value="1990-05-20"></div>
+          <div class="form-group"><label class="form-label">Дата регистрации</label><input type="text" class="form-input" value="1 января 2026" disabled></div>
+        </div>
+      </div>
+
+      <!-- Section: Accounts -->
+      <div id="section-accounts" style="display:none;">
+        <div class="card mb-4">
+          <h3 class="card__title mb-4">👥 Мультиаккаунт</h3>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+            <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;background:var(--bg-tertiary);border:1px solid var(--accent);">
+              <div style="width:32px;height:32px;clip-path:var(--octagon-clip);background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;">ИИ</div>
+              <span style="font-size:13px;font-weight:600;color:var(--text-primary);">Иван (активный)</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;background:var(--bg-tertiary);border:1px solid var(--border-color);">
+              <div style="width:32px;height:32px;clip-path:var(--octagon-clip);background:var(--bg-active);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--text-primary);">МА</div>
+              <span style="font-size:13px;font-weight:600;color:var(--text-secondary);">Мария</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;background:var(--bg-tertiary);border:1px solid var(--border-color);">
+              <div style="width:32px;height:32px;clip-path:var(--octagon-clip);background:var(--bg-active);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--text-primary);">РА</div>
+              <span style="font-size:13px;font-weight:600;color:var(--text-secondary);">Рабочий</span>
+            </div>
+            <div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--accent);border:1px dashed var(--accent);cursor:pointer;" onclick="openAccountsPanel()" title="Добавить аккаунт">+</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Appearance -->
+      <div id="section-appearance" style="display:none;">
+        <div class="card mb-4">
+          <h3 class="card__title mb-4">Оформление</h3>
+          <div class="form-group"><label class="form-label">Тема</label>
+            <div class="flex gap-2">
+              <button class="btn btn--secondary" onclick="setTheme('dark')">🌙 Тёмная</button>
+              <button class="btn btn--secondary" onclick="setTheme('light')">☀️ Светлая</button>
+              <button class="btn btn--secondary" onclick="setTheme('russian')">🇷🇺 Наша</button>
+            </div>
+          </div>
+          <div class="form-group"><label class="form-label">Язык</label>
+            <select class="form-select">
+              <optgroup label="Русские"><option>Русский</option><option>Татарский</option><option>Чеченский</option><option>Бурятский</option></optgroup>
+              <optgroup label="Дружественные"><option>Китайский</option><option>Хинди</option><option>Белорусский</option></optgroup>
+              <optgroup label="Остальные"><option>Английский</option><option>Французский</option></optgroup>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Devices -->
+      <div id="section-devices" style="display:none;">
+        <div class="card mb-4">
+          <h3 class="card__title mb-4">Устройства</h3>
+          <div class="list__item" style="border:none;">
+            <div style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;">💻</div>
+            <div class="list__item-body"><div class="list__item-title">Windows Desktop</div><div class="list__item-subtitle">Москва • Сейчас активно</div></div>
+            <span class="chip chip--accent">Это устройство</span>
+          </div>
+          <div class="list__item" style="border:none;">
+            <div style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;">📱</div>
+            <div class="list__item-body"><div class="list__item-title">iPhone 15 Pro</div><div class="list__item-subtitle">Москва • 2 часа назад</div></div>
+            <button class="btn btn--tertiary btn--sm text-danger">Выйти</button>
+          </div>
+          <div class="list__item" style="border:none;">
+            <div style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;">🌐</div>
+            <div class="list__item-body"><div class="list__item-title">Chrome (Web)</div><div class="list__item-subtitle">Москва • Вчера</div></div>
+            <button class="btn btn--tertiary btn--sm text-danger">Выйти</button>
+          </div>
+          <div class="divider"></div>
+          <a href="add-device.html" class="btn btn--secondary btn--block btn--sm">➕ Добавить устройство</a>
+        </div>
+      </div>
+
+      <!-- Section: Donate -->
+      <div id="section-donate" style="display:none;">
+        <div class="card mb-4" style="border-color:var(--accent);">
+          <h3 class="card__title mb-4">💰 Поддержка проекта</h3>
+          <p class="text-sm text-secondary mb-3">Помогите Balloo развиваться! Ваши донаты идут на развитие мессенджера.</p>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn--primary btn--flex-1" onclick="window.location.href='donate.html'">💰 Поддержать</button>
+            <button class="btn btn--secondary btn--flex-1" onclick="window.location.href='my-donates.html'">📋 Мои донаты</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Privacy -->
+      <div id="section-privacy" style="display:none;">
+        <div class="card mb-4">
+          <h3 class="card__title mb-4">Приватность</h3>
+          <div class="list__item" style="border:none;"><span class="flex-1">Видимость "В сети"</span><select class="form-select" style="width:auto;"><option>Только контакты</option><option>Никто</option></select></div>
+          <div class="list__item" style="border:none;"><span class="flex-1">Превью уведомлений</span><span class="text-xs text-muted">20 символов</span></div>
+          <div class="list__item" style="border:none;"><span class="flex-1">Заблокированные пользователи</span><button class="btn btn--tertiary btn--sm" onclick="openBlockedPanel()">3 чел.</button></div>
+        </div>
+      </div>
+
+      <!-- Section: Danger -->
+      <div id="section-danger" style="display:none;">
+        <div class="card" style="border-color:var(--danger);">
+          <h3 class="card__title mb-4 text-danger">Опасная зона</h3>
+          <p class="text-sm text-secondary mb-4">Удаление аккаунта → анонимизация через 90 дней.</p>
+          <button class="btn btn--danger btn--block">Удалить аккаунт</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="statusbar">
+    <div><span class="status-dot status-dot--online"></span> Подключено · WebSocket</div>
+    <div class="statusbar__sep">💾 Кэш: 124 МБ · v1.0.0-beta</div>
+  </div>
+</div>
+
+<!-- Slide panels -->
+<div class="slide-panel" id="avatar-panel">
+  <div class="slide-panel__header"><span class="slide-panel__title">📷 Изменить аватар</span><div class="slide-panel__close" onclick="closeAvatarPanel()">✕</div></div>
+  <div class="slide-panel__body">
+    <div class="text-center mb-4"><div class="avatar avatar--xl avatar--bordered avatar--status-online avatar--ctx-contact" style="margin:0 auto 16px;"><div class="avatar__inner"><span>ИИ</span></div></div></div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button class="btn btn--primary btn--block" onclick="showToast('Загрузка фото...','info');closeAvatarPanel();">📁 Загрузить фото</button>
+      <button class="btn btn--secondary btn--block" onclick="showToast('Камера...','info');closeAvatarPanel();">📸 Камера</button>
+      <button class="btn btn--secondary btn--block" onclick="showToast('Генерация...','info');closeAvatarPanel();">🤖 Сгенерировать AI</button>
+    </div>
+    <div class="divider"></div>
+    <button class="btn btn--danger btn--block btn--sm" onclick="showToast('Аватар удалён','error');closeAvatarPanel();">🗑 Удалить аватар</button>
+  </div>
+</div>
+
+<div class="slide-panel" id="accounts-panel">
+  <div class="slide-panel__header"><span class="slide-panel__title">👥 Управление аккаунтами</span><div class="slide-panel__close" onclick="closeAccountsPanel()">✕</div></div>
+  <div class="slide-panel__body">
+    <div class="account-detail-card account-detail-card--active">
+      <div style="width:40px;height:40px;clip-path:var(--octagon-clip);background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;">ИИ</div>
+      <div class="account-detail-card__info"><div class="account-detail-card__name">Иван Иванов</div><div class="account-detail-card__status">Активный · @ivan</div></div>
+      <span class="chip chip--accent">Активен</span>
+    </div>
+    <div class="account-detail-card">
+      <div style="width:40px;height:40px;clip-path:var(--octagon-clip);background:var(--bg-active);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--text-secondary);">МА</div>
+      <div class="account-detail-card__info"><div class="account-detail-card__name">Мария Андреева</div><div class="account-detail-card__status">@maria</div></div>
+      <button class="btn btn--tertiary btn--sm" onclick="showToast('Выход...','info')">Выйти</button>
+    </div>
+    <div class="account-detail-card">
+      <div style="width:40px;height:40px;clip-path:var(--octagon-clip);background:var(--bg-active);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--text-secondary);">РА</div>
+      <div class="account-detail-card__info"><div class="account-detail-card__name">Рабочий аккаунт</div><div class="account-detail-card__status">@work</div></div>
+      <button class="btn btn--tertiary btn--sm" onclick="showToast('Выход...','info')">Выйти</button>
+    </div>
+    <div class="divider"></div>
+    <button class="btn btn--primary btn--block" onclick="showToast('Добавление...','info');closeAccountsPanel();">➕ Добавить аккаунт</button>
+  </div>
+</div>
+
+<div class="slide-panel" id="blocked-panel">
+  <div class="slide-panel__header"><span class="slide-panel__title">🚫 Заблокированные</span><div class="slide-panel__close" onclick="closeBlockedPanel()">✕</div></div>
+  <div class="slide-panel__body">
+    <div class="blocked-list__item">
+      <div class="avatar avatar--sm avatar--bordered avatar--status-offline avatar--ctx-blocked"><div class="avatar__inner"><span>??</span></div></div>
+      <div class="blocked-list__info"><div class="blocked-list__name" style="color:var(--text-muted);">Заблокированный</div><div class="blocked-list__reason">Причина: Спам</div></div>
+      <button class="btn btn--tertiary btn--sm" onclick="showToast('Разблокирован','success');this.closest('.blocked-list__item').remove()">Разблокировать</button>
+    </div>
+    <div class="blocked-list__item">
+      <div class="avatar avatar--sm avatar--bordered avatar--status-offline avatar--ctx-blocked"><div class="avatar__inner"><span>??</span></div></div>
+      <div class="blocked-list__info"><div class="blocked-list__name" style="color:var(--text-muted);">Токсичный</div><div class="blocked-list__reason">Причина: Оскорбления</div></div>
+      <button class="btn btn--tertiary btn--sm" onclick="showToast('Разблокирован','success');this.closest('.blocked-list__item').remove()">Разблокировать</button>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+<script>
+function showSection(name) {
+  ['main','accounts','appearance','devices','donate','privacy','danger'].forEach(s => {
+    document.getElementById('section-' + s).style.display = s === name ? 'block' : 'none';
+  });
+  document.querySelectorAll('.sidebar-nav-item[data-section]').forEach(el => {
+    el.classList.toggle('sidebar-nav-item--active', el.dataset.section === name);
+  });
+}
+
+function openAvatarPanel() { document.getElementById('avatar-panel').classList.add('slide-panel--visible'); }
+function closeAvatarPanel() { document.getElementById('avatar-panel').classList.remove('slide-panel--visible'); }
+function openAccountsPanel() { document.getElementById('accounts-panel').classList.add('slide-panel--visible'); }
+function closeAccountsPanel() { document.getElementById('accounts-panel').classList.remove('slide-panel--visible'); }
+function openBlockedPanel() { document.getElementById('blocked-panel').classList.add('slide-panel--visible'); }
+function closeBlockedPanel() { document.getElementById('blocked-panel').classList.remove('slide-panel--visible'); }
+
+document.querySelectorAll('.slide-panel').forEach(panel => {
+  panel.addEventListener('click', (e) => { if (e.target === panel) panel.classList.remove('slide-panel--visible'); });
+});
+</script>
+</body>
+</html>

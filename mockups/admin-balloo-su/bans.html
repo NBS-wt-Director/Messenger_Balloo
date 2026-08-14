@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Баны</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--warning);">A</div><span>Admin</span>
+    <div class="topbar__dropdown"><div class="topbar__dropdown-item">🛡️ Admin (текущий)</div><div class="topbar__dropdown-divider"></div><div class="topbar__dropdown-item">💬 Balloo</div><div class="topbar__dropdown-item">🏢 Command</div><div class="topbar__dropdown-item">💡 Features</div><div class="topbar__dropdown-item">📜 History</div><div class="topbar__dropdown-item">⬇️ Download</div><div class="topbar__dropdown-item">📚 API Docs</div></div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Баны и обжалования</div>
+  <div class="topbar__right"><div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>АД</span></div></div><span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span><span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span></div>
+</div>
+<div class="main">
+  <div class="sidebar sidebar--narrow">
+    <div class="list"><div class="list__item">📊 Дашборд</div><div class="list__item">👤 Пользователи</div><div class="list__item">🚩 Жалобы <span class="badge" style="margin-left:auto;">12</span></div><div class="list__item list__item--active">🔨 Баны</div><div class="list__item">📈 Метрики</div><div class="list__item">🎛️ Feature Flags</div><div class="list__item">📁 Файлы</div><div class="list__item">📝 Тексты</div><div class="list__item" style="border-top:1px solid var(--border-color);margin-top:8px;padding-top:12px;">🏢 Отделы</div><div class="list__item">👤 Сотрудники</div><div class="list__item">💼 Вакансии</div><div class="list__item">📜 Версии</div><div class="list__item">💡 Фичи (модерация)</div><div class="list__item">💚 Донаты</div></div>
+  </div>
+  <div class="content overflow-y-auto"><div class="page-container">
+    <h1 class="page-title">Баны и обжалования</h1>
+    <div data-tab-group="bans" class="mb-4">
+      <div class="tabs"><div class="tab tab--active" onclick="switchTab('bans',0)">Активные баны (3)</div><div class="tab" onclick="switchTab('bans',1)">Обжалования (1)</div><div class="tab" onclick="switchTab('bans',2)">Запросы на бан (2)</div></div>
+      <div class="tab-panel" style="display:block;">
+        <!-- Search and filters -->
+        <div class="flex gap-3 mb-4" style="flex-wrap:wrap;">
+          <div class="form-group flex-1 mb-0" style="min-width:200px;"><input type="text" class="form-input" placeholder="🔍 Поиск по забаненным..."></div>
+          <select class="form-select" style="width:auto;"><option value="">Все причины</option><option>Спам</option><option>Ненормативная лексика</option><option>Токсичность</option><option>Другое</option></select>
+          <input type="date" class="form-input" style="width:auto;">
+        </div>
+        <div class="card mb-4">
+          <div class="flex items-center justify-between mb-2"><strong style="color:var(--text-primary);">user_spam</strong><span class="chip chip--danger">Забанен</span></div>
+          <p class="text-sm text-secondary mb-2">Причина: Спам (7 жалоб от 5 пользователей)</p>
+          <p class="text-xs text-muted mb-2">Забанен: 15.07.2026 • Подтвердили: 4/4 админов</p>
+          <p class="text-xs text-muted mb-3">Обжалование доступно: ещё 2 часа 15 минут</p>
+          <div class="flex gap-2"><button class="btn btn--secondary btn--sm">🔓 Снять бан</button><button class="btn btn--tertiary btn--sm" onclick="openModal('modal-ban-details')">📋 Подробнее</button></div>
+        </div>
+        <div class="card mb-4">
+          <div class="flex items-center justify-between mb-2"><strong style="color:var(--text-primary);">user_toxic</strong><span class="chip chip--danger">Забанен</span></div>
+          <p class="text-sm text-secondary mb-2">Причина: Ненормативная лексика (5 жалоб)</p>
+          <p class="text-xs text-muted mb-3">Забанен: 10.07.2026 • Обжалование истекло</p>
+          <div class="flex gap-2"><button class="btn btn--secondary btn--sm">🔓 Снять бан</button><button class="btn btn--tertiary btn--sm" onclick="openModal('modal-ban-details')">📋 Подробнее</button></div>
+        </div>
+        <!-- Pagination -->
+        <div class="flex items-center justify-between mt-4">
+          <span class="text-xs text-muted">Показано 2 из 15</span>
+          <div class="flex gap-1">
+            <button class="btn btn--tertiary btn--xs" disabled>←</button>
+            <button class="btn btn--primary btn--xs">1</button>
+            <button class="btn btn--tertiary btn--xs">2</button>
+            <button class="btn btn--tertiary btn--xs">3</button>
+            <button class="btn btn--tertiary btn--xs">→</button>
+          </div>
+        </div>
+      </div>
+      <div class="tab-panel" style="display:none;">
+        <!-- Search -->
+        <div class="form-group mb-4"><input type="text" class="form-input" placeholder="🔍 Поиск по обжалованиям..."></div>
+        <div class="card mb-4" style="border-color:var(--warning);">
+          <div class="flex items-center justify-between mb-2"><strong style="color:var(--text-primary);">user_spam</strong><span class="chip chip--warning">Обжалование</span></div>
+          <p class="text-sm text-secondary mb-2">Текст обжалования: "Я не спамил, это были legit сообщения"</p>
+          <p class="text-xs text-muted mb-2">Забанил: Админ Алексей (admin_alex) · <a href="#" style="color:var(--accent);">написать</a></p>
+          <p class="text-xs text-muted mb-3">Осталось времени: 2ч 15мин</p>
+          <!-- Criteria -->
+          <div class="card mb-3" style="background:var(--bg-tertiary);">
+            <div class="text-sm font-bold mb-2">Критерии принятия/отклонения:</div>
+            <div class="text-xs text-secondary">• Жалоб меньше 5 → можно снять<br>• Жалоб 5+ и подтверждение 4/4 → сложно снять<br>• Ошибочный бан → снять</div>
+          </div>
+          <div class="flex gap-2"><button class="btn btn--secondary btn--sm">🔓 Снять бан</button><button class="btn btn--danger btn--sm">❌ Отклонить обжалование</button></div>
+        </div>
+        <!-- Pagination -->
+        <div class="flex items-center justify-between mt-4">
+          <span class="text-xs text-muted">1 обжалование</span>
+        </div>
+      </div>
+      <div class="tab-panel" style="display:none;">
+        <div class="card mb-4">
+          <div class="flex items-center justify-between mb-2"><strong style="color:var(--text-primary);">user_new_spam</strong><span class="chip chip--warning">Ожидает подтверждения</span></div>
+          <p class="text-sm text-secondary mb-2">Причина: Спам (6 жалоб)</p>
+          <p class="text-xs text-muted mb-1">Запросил: user_reporter · 18.07.2026</p>
+          <p class="text-xs text-muted mb-3">Подтвердили: 2/4 админов</p>
+          <div class="flex gap-2">
+            <button class="btn btn--danger btn--sm">✅ Подтвердить бан</button>
+            <button class="btn btn--tertiary btn--sm">❌ Отклонить запрос</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="flex items-center justify-between mb-2"><strong style="color:var(--text-primary);">user_fake</strong><span class="chip chip--warning">Ожидает подтверждения</span></div>
+          <p class="text-sm text-secondary mb-2">Причина: Токсичность (3 жалобы)</p>
+          <p class="text-xs text-muted mb-3">Запросил: user_mod1 · 19.07.2026</p>
+          <p class="text-xs text-muted mb-3">Подтвердили: 1/4 админов</p>
+          <div class="flex gap-2">
+            <button class="btn btn--danger btn--sm">✅ Подтвердить бан</button>
+            <button class="btn btn--tertiary btn--sm">❌ Отклонить запрос</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div></div>
+</div>
+<script src="../assets/common.js"></script>
+
+<!-- Modal: Ban Details -->
+<div class="modal" id="modal-ban-details">
+  <div class="modal__header"><span class="modal__title">📋 Подробнее: user_spam</span><div class="modal__close" onclick="closeModal('modal-ban-details')">✕</div></div>
+  <div class="modal__body">
+    <div class="card mb-3" style="background:var(--bg-tertiary);">
+      <div class="text-sm font-bold mb-2">История жалоб, приведших к бану:</div>
+      <div class="text-xs text-secondary">
+        <div class="mb-1">• user_1 — 14.07.2026 10:00 — "Спам в личном чате"</div>
+        <div class="mb-1">• user_2 — 14.07.2026 12:30 — "Рассылка рекламы"</div>
+        <div class="mb-1">• user_3 — 15.07.2026 08:00 — "Спам в группе"</div>
+        <div class="mb-1">• user_4 — 15.07.2026 09:00 — "Спам"</div>
+        <div class="mb-1">• user_5 — 15.07.2026 11:00 — "Спам"</div>
+        <div>• user_6 — 15.07.2026 14:00 — "Спам"</div>
+      </div>
+    </div>
+    <div class="text-xs text-muted">Всего жалоб: 7 · Уникальных жалобщиков: 5 · Подтвердили: 4/4 админа</div>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--tertiary" onclick="closeModal('modal-ban-details')">Закрыть</button>
+  </div>
+</div>
+
+</body>
+</html>

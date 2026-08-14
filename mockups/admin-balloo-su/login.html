@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Вход</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--warning);">A</div><span>Admin</span>
+    <div class="topbar__dropdown"><div class="topbar__dropdown-item">🛡️ Admin</div><div class="topbar__dropdown-divider"></div><div class="topbar__dropdown-item">💬 Balloo</div><div class="topbar__dropdown-item">🏢 Command</div><div class="topbar__dropdown-item">💡 Features</div><div class="topbar__dropdown-item">📜 History</div><div class="topbar__dropdown-item">⬇️ Download</div><div class="topbar__dropdown-item">📚 API Docs</div></div>
+  </div>
+  <div class="topbar__title">Вход для администраторов</div>
+  <div class="topbar__right"><span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span><span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span></div>
+</div>
+<div class="auth-container">
+  <div class="auth-card" style="border-color:var(--warning);">
+    <div class="text-center mb-4">
+      <div class="topbar__logo-icon" style="background:var(--warning);width:48px;height:48px;font-size:24px;margin:0 auto;">A</div>
+    </div>
+    <h1 class="auth-title">Админ-панель Balloo</h1>
+    <p class="auth-subtitle">Вход только для администраторов системы</p>
+
+    <div class="card mb-4" style="background:var(--danger-bg);border-color:var(--danger);padding:12px 16px;">
+      <p class="text-sm" style="color:var(--danger);font-weight:600;">⚠️ Требуется 2FA</p>
+      <p class="text-xs text-secondary mt-2">Вход в админ-панель требует двухфакторную аутентификацию (TOTP / SMS)</p>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input type="email" class="form-input" placeholder="admin@balloo.su">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Пароль</label>
+      <input type="password" class="form-input" placeholder="••••••••">
+    </div>
+    <div class="form-group">
+      <label class="form-label">2FA код (TOTP)</label>
+      <input type="text" class="form-input" placeholder="123 456" maxlength="7" style="font-family:'Fira Code',monospace;letter-spacing:4px;font-size:18px;text-align:center;">
+    </div>
+
+    <button class="btn btn--primary btn--block mb-4" style="background:var(--warning);">Войти в админ-панель</button>
+
+    <div class="divider"></div>
+
+    <div class="text-center">
+      <p class="text-sm text-secondary mb-3">Уже вошли на другом устройстве?</p>
+      <button class="btn btn--secondary btn--block" onclick="alert('QR-код для привязки устройства. Отсканируйте камерой мобильного.')">📱 Войти через другое устройство (QR)</button>
+      <p class="text-xs text-muted mt-2">Требуется подтверждение 2FA на обоих устройствах</p>
+    </div>
+
+    <div class="divider"></div>
+    <p class="text-center text-xs text-muted">
+      Все действия администраторов логируются. Несанкционированный доступ преследуется по закону.
+    </p>
+  </div>
+</div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Command — Профиль сотрудника</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--info);">C</div><span>Command</span>
+    <div class="topbar__dropdown"><div class="topbar__dropdown-item">🏢 Command (текущий)</div><div class="topbar__dropdown-divider"></div><div class="topbar__dropdown-item">💬 Balloo</div><div class="topbar__dropdown-item">🛡️ Admin</div><div class="topbar__dropdown-item">💡 Features</div><div class="topbar__dropdown-item">📜 History</div><div class="topbar__dropdown-item">⬇️ Download</div><div class="topbar__dropdown-item">📚 API Docs</div></div>
+  </div>
+  <div class="topbar__title">Профиль сотрудника</div>
+  <div class="topbar__right"><div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИИ</span></div></div><span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span><span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span></div>
+</div>
+<div class="main">
+  <div class="sidebar sidebar--narrow">
+    <div class="list">
+      <div class="list__item">📊 Дашборд</div>
+      <div class="list__item list__item--active">👤 Профиль</div>
+      <div class="list__item">📝 Задачи</div>
+      <div class="list__item">📅 Календарь</div>
+      <div class="list__item">💬 Внутренний чат</div>
+      <div class="list__item">📞 Совещания</div>
+      <div class="list__item">🏢 Мой отдел</div>
+      <div class="list__item">📚 База знаний</div>
+      <div class="list__item">👥 Подразделения</div>
+    </div>
+  </div>
+  <div class="content overflow-y-auto"><div class="page-container">
+    <h1 class="page-title">👤 Профиль сотрудника</h1>
+
+    <!-- Profile card -->
+    <div class="card mb-6" style="display:flex;gap:24px;align-items:center;">
+      <div class="avatar avatar--xl avatar--bordered avatar--status-online avatar--ctx-contact">
+        <div class="avatar__inner"><span>ИИ</span></div>
+      </div>
+      <div style="flex:1;">
+        <div class="font-bold" style="font-size:24px;color:var(--text-primary);">Иван Иванов</div>
+        <div class="text-secondary mt-2">Frontend-разработчик</div>
+        <div class="flex gap-2 mt-2 items-center">
+          <span class="chip chip--accent">🟢 Онлайн</span>
+          <span class="chip">Активный сотрудник</span>
+          <span class="chip">Отдел: Фронтенд</span>
+        </div>
+        <div class="card mt-3" style="background:rgba(76,175,80,0.08);border-color:var(--accent);padding:10px;">
+          <div class="text-sm" style="color:var(--accent);">🏖 Отпуск</div>
+          <div class="text-xs text-secondary">Не активен · Бывший: 01.06.2026 — 14.06.2026 (14 дней)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Details -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div class="card">
+        <h3 class="card__title">Должность</h3>
+        <div class="card__body">Frontend-разработчик (Middle)</div>
+      </div>
+      <div class="card">
+        <h3 class="card__title">Отдел</h3>
+        <div class="card__body">Фронтенд → Команда разработки</div>
+      </div>
+      <div class="card">
+        <h3 class="card__title">Дата найма</h3>
+        <div class="card__body">15 января 2025</div>
+      </div>
+      <div class="card">
+        <h3 class="card__title">Корпоративный email</h3>
+        <div class="card__body">i.ivanov@balloo.su</div>
+      </div>
+      <div class="card">
+        <h3 class="card__title">Руководитель</h3>
+        <div class="card__body">Алексей Козлов (Team Lead)</div>
+      </div>
+      <div class="card">
+        <h3 class="card__title">Стаж</h3>
+        <div class="card__body">1 год 6 месяцев</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">Контакты</h2>
+    <div class="card mb-6">
+      <table class="table">
+        <tbody>
+          <tr class="table__row"><td>📞 Телефон</td><td>+7 (999) 123-45-67</td></tr>
+          <tr class="table__row"><td>📧 Email</td><td>i.ivanov@balloo.su</td></tr>
+          <tr class="table__row"><td>✈ Telegram</td><td>@ivan_ivanov</td></tr>
+          <tr class="table__row"><td>💬 Внутренний чат</td><td><a href="#" class="text-accent">Открыть чат</a></td></tr>
+          <tr class="table__row"><td>📍 Рабочее место</td><td>Удалённо / Москва</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 class="section-title">Метрики</h2>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+      <div class="card"><div class="text-xs text-muted mb-2">Активные задачи</div><div class="font-bold" style="font-size:24px;color:var(--accent);">7</div></div>
+      <div class="card"><div class="text-xs text-muted mb-2">Завершено за квартал</div><div class="font-bold" style="font-size:24px;color:var(--text-primary);">42</div></div>
+      <div class="card"><div class="text-xs text-muted mb-2">Встреч на неделе</div><div class="font-bold" style="font-size:24px;color:var(--text-primary);">5</div></div>
+    </div>
+  </div></div>
+</div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

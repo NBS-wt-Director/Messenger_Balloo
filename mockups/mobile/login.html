@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobile — Вход</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    html { overflow-y: auto; height: auto; }
+    body { overflow-y: auto; height: auto; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 40px 24px; }
+    .phone-frame { width:360px; height:760px; background:var(--bg-secondary); border:3px solid var(--border-strong); border-radius:36px; overflow:hidden; position:relative; display:flex; flex-direction:column; box-shadow:var(--shadow-glass); }
+    .phone-frame__notch { position:absolute; top:0; left:50%; transform:translateX(-50%); width:130px; height:26px; background:var(--bg-primary); border-bottom-left-radius:18px; border-bottom-right-radius:18px; z-index:10; }
+    .phone-frame__statusbar { height:30px; padding:4px 20px 0; display:flex; align-items:center; justify-content:space-between; font-size:12px; color:var(--text-secondary); background:var(--bg-secondary); }
+    .phone-frame__screen { flex:1; overflow:hidden; background:var(--bg-primary); display:flex; flex-direction:column; }
+    .phone-frame__home-bar { height:5px; width:120px; margin:0 auto 8px; background:var(--text-muted); border-radius:3px; }
+    .annotation { max-width:360px; margin:0 auto 8px; padding:0 8px; font-size:12px; color:var(--text-muted); }
+    .annotation strong { color:var(--accent); }
+  </style>
+</head>
+<body>
+<div class="annotation" style="margin-top:24px;"><strong>Mobile — Вход</strong> КОПИЯ WEB: balloo-su/login.html</div>
+<div class="phone-frame">
+  <div class="phone-frame__notch"></div>
+  <div class="phone-frame__statusbar"><span>9:41</span><span>📶 🔋</span></div>
+  <div class="phone-frame__screen">
+    <!-- TOPBAR (обязательный) -->
+    <div class="topbar">
+      <div class="topbar__logo">
+        <div class="topbar__logo-icon">B</div><span>Balloo</span>
+        <div class="topbar__dropdown">
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/chats.html'">💬 Balloo</div>
+          <div class="topbar__dropdown-divider"></div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div>
+        </div>
+      </div>
+      <div class="topbar__title">Вход</div>
+      <div class="topbar__right">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact" onclick="window.location.href='profile.html'"><div class="avatar__inner"><span>ИИ</span></div></div>
+        <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+        <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+      </div>
+    </div>
+    <!-- AUTH FORM -->
+    <div class="auth-container" style="padding:24px;overflow-y:auto;">
+      <div class="auth-card" style="max-width:100%;">
+        <div class="auth-title">С возвращением!</div>
+        <div class="auth-subtitle">Войдите в свой аккаунт Balloo</div>
+
+        <!-- OAuth -->
+        <div class="auth-oauth">
+          <button class="auth-oauth-btn" onclick="alert('OAuth: Яндекс')">
+            <span style="color:#fc3f1d;">Y</span> Войти через Яндекс
+          </button>
+          <button class="auth-oauth-btn" onclick="alert('OAuth: Mail.ru')">
+            <span style="color:#005ff9;">@</span> Войти через Mail.ru
+          </button>
+          <button class="auth-oauth-btn" onclick="alert('OAuth: Rambler')">
+            <span style="color:#ffcc00;">R</span> Войти через Rambler
+          </button>
+        </div>
+
+        <div class="auth-divider">или</div>
+
+        <!-- Email/Password form -->
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" placeholder="ivan@example.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Пароль</label>
+          <input type="password" class="form-input" placeholder="••••••••">
+          <div style="text-align:right;margin-top:4px;"><a href="password-reset.html" style="color:var(--accent);font-size:13px;">Забыли пароль?</a></div>
+        </div>
+
+        <button class="btn btn--primary btn--block mb-4" onclick="alert('Вход выполнен')">Войти</button>
+
+        <div class="divider"></div>
+
+        <!-- Login via another device (QR) -->
+        <div class="text-center mb-4">
+          <p class="text-sm text-secondary mb-3">Уже вошли на другом устройстве?</p>
+          <button class="btn btn--secondary btn--block" onclick="window.location.href='add-device.html'">
+            📱 Войти через другое устройство (QR)
+          </button>
+          <p class="text-xs text-muted mt-2">Отсканируйте QR-код с экрана авторизованного устройства</p>
+        </div>
+
+        <div class="divider"></div>
+
+        <p class="text-center text-sm text-secondary">
+          Нет аккаунта? <a href="register.html" style="color:var(--accent);font-weight:600;">Зарегистрироваться</a>
+        </p>
+
+        <div class="divider"></div>
+        <p class="text-center text-xs text-muted">
+          v2: Вход через Госуслуги и SMS-код (3 цифры)
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="phone-frame__home-bar"></div>
+</div>
+
+<!-- Modal: reCAPTCHA -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal('modal-recaptcha')"></div>
+<div class="modal modal--status-info" id="modal-recaptcha" style="display:none;">
+  <div class="modal__header">
+    <span class="modal__title">Проверка reCAPTCHA</span>
+    <div class="modal__close" onclick="closeModal('modal-recaptcha')">✕</div>
+  </div>
+  <div class="modal__body">
+    <div class="card">
+      <p class="text-center mb-4">🤖 Подтвердите, что вы не робот</p>
+      <div class="flex items-center gap-3 justify-center">
+        <input type="checkbox" id="recaptcha-check" class="form-checkbox" style="width:24px;height:24px;">
+        <label for="recaptcha-check">Я не робот</label>
+      </div>
+    </div>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--primary" onclick="closeModal('modal-recaptcha')">Подтвердить</button>
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+<script>
+function closeModal(id) {
+  document.getElementById(id).style.display = 'none';
+  document.getElementById('modal-overlay').style.display = 'none';
+}
+</script>
+</body>
+</html>

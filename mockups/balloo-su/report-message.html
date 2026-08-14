@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo — Пожаловаться на сообщение</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    body { background: var(--bg-primary); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 40px 24px; }
+    .report-panel {
+      width: 520px; max-width: 100%;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-strong);
+      display: flex; flex-direction: column;
+      box-shadow: var(--shadow-glass);
+    }
+    .report-panel__header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex; align-items: center; gap: 12px;
+    }
+    .report-panel__back { font-size: 18px; color: var(--text-secondary); cursor: pointer; transition: color 0.15s; }
+    .report-panel__back:hover { color: var(--accent); }
+    .report-panel__title { flex: 1; font-size: 18px; font-weight: 700; color: var(--text-primary); }
+    .report-panel__close { font-size: 18px; color: var(--text-muted); cursor: pointer; transition: color 0.15s; }
+    .report-panel__close:hover { color: var(--danger); }
+
+    .report-panel__body { padding: 20px; }
+
+    /* Quoted message */
+    .report-message {
+      display: flex; gap: 12px;
+      padding: 12px;
+      background: var(--bg-glass);
+      border-left: 3px solid var(--danger);
+      margin-bottom: 20px;
+    }
+    .report-message__avatar { flex-shrink: 0; }
+    .report-message__info { flex: 1; min-width: 0; }
+    .report-message__author { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .report-message__text { font-size: 13px; color: var(--text-secondary); margin-top: 4px; word-break: break-word; }
+    .report-message__time { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+    /* Report reasons */
+    .report-reasons { display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; }
+    .report-reason {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 16px;
+      background: var(--bg-glass);
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s;
+    }
+    .report-reason:hover { border-color: var(--border-color); background: var(--bg-hover); }
+    .report-reason--selected {
+      border-color: var(--accent);
+      background: rgba(45, 184, 77, 0.08);
+    }
+    .report-reason__radio {
+      width: 18px; height: 18px;
+      border: 2px solid var(--text-muted);
+      flex-shrink: 0;
+      margin-top: 2px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+    }
+    .report-reason--selected .report-reason__radio {
+      border-color: var(--accent);
+      background: var(--accent);
+    }
+    .report-reason--selected .report-reason__radio::after {
+      content: '✓';
+      font-size: 12px; font-weight: 700; color: var(--accent-text);
+    }
+    .report-reason__content { flex: 1; }
+    .report-reason__title { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+    .report-reason__desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+    /* Comment */
+    .report-comment { margin-bottom: 20px; }
+    .report-comment label {
+      display: block;
+      font-size: 13px; font-weight: 600; color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+    .report-comment textarea {
+      width: 100%; padding: 10px 12px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      font-size: 13px; outline: none;
+      resize: vertical; min-height: 80px;
+      font-family: inherit;
+    }
+    .report-comment textarea:focus { border-color: var(--accent); }
+
+    /* Footer */
+    .report-panel__footer {
+      padding: 16px 20px;
+      border-top: 1px solid var(--border-color);
+      display: flex; justify-content: flex-end; gap: 8px;
+    }
+
+    /* Success state */
+    .report-success {
+      display: none;
+      text-align: center; padding: 40px 20px;
+    }
+    .report-success__icon { font-size: 48px; margin-bottom: 12px; }
+    .report-success__title { font-size: 18px; font-weight: 700; color: var(--accent); margin-bottom: 8px; }
+    .report-success__desc { font-size: 14px; color: var(--text-secondary); margin-bottom: 20px; line-height: 1.5; }
+    .report-success__id {
+      font-size: 12px; color: var(--text-muted);
+      padding: 6px 12px; background: var(--bg-glass);
+      display: inline-block;
+    }
+
+    .annotation {
+      position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
+      padding: 6px 16px;
+      background: var(--bg-glass); backdrop-filter: blur(var(--blur));
+      border: 1px solid var(--border-color);
+      font-size: 13px; color: var(--text-muted);
+      z-index: 100;
+    }
+    .annotation strong { color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<div class="annotation">
+  <strong>Пожаловаться на сообщение</strong> — открывается по кнопке <span style="color:var(--danger);">🚩</span> на сообщении. Выбор причины и отправка жалобы.
+</div>
+
+<div class="report-panel">
+  <!-- Header -->
+  <div class="report-panel__header">
+    <a href="chats.html" class="report-panel__back">←</a>
+    <span class="report-panel__title">🚩 Пожаловаться</span>
+    <a href="chats.html" class="report-panel__close">✕</a>
+  </div>
+
+  <!-- Body -->
+  <div class="report-panel__body" id="report-form">
+    <!-- Quoted message -->
+    <div class="report-message">
+      <div class="avatar avatar--xs avatar--bordered avatar--ctx-contact report-message__avatar">
+        <div class="avatar__inner"><span>МА</span></div>
+      </div>
+      <div class="report-message__info">
+        <div class="report-message__author">Мария Андреева</div>
+        <div class="report-message__text">Да, посмотрела. Отличная работа! Особенно понравился дизайн аватарок — восьмигранники смотрятся очень fresh</div>
+        <div class="report-message__time">16 июля 2026 г. в 14:20</div>
+      </div>
+    </div>
+
+    <!-- Reasons -->
+    <div class="report-reasons">
+      <div class="report-reason" onclick="selectReason(this)">
+        <div class="report-reason__radio"></div>
+        <div class="report-reason__content">
+          <div class="report-reason__title">📢 Спам / Реклама</div>
+          <div class="report-reason__desc">Нежелательные рекламные сообщения, массовые рассылки</div>
+        </div>
+      </div>
+      <div class="report-reason" onclick="selectReason(this)">
+        <div class="report-reason__radio"></div>
+        <div class="report-reason__content">
+          <div class="report-reason__title">🤬 Оскорбления / Травля</div>
+          <div class="report-reason__desc">Личные оскорбления, унижения, преследование, буллинг</div>
+        </div>
+      </div>
+      <div class="report-reason" onclick="selectReason(this)">
+        <div class="report-reason__radio"></div>
+        <div class="report-reason__content">
+          <div class="report-reason__title">🔞 Неприемлемый контент</div>
+          <div class="report-reason__desc">Порнография, насилие, жестокость, контент 18+</div>
+        </div>
+      </div>
+      <div class="report-reason" onclick="selectReason(this)">
+        <div class="report-reason__radio"></div>
+        <div class="report-reason__content">
+          <div class="report-reason__title">⚠️ Дезинформация</div>
+          <div class="report-reason__desc">Ложная информация, фейки, вводящие в заблуждение данные</div>
+        </div>
+      </div>
+      <div class="report-reason" onclick="selectReason(this)">
+        <div class="report-reason__radio"></div>
+        <div class="report-reason__content">
+          <div class="report-reason__title">🔐 Нарушение приватности</div>
+          <div class="report-reason__desc">Распространение личных данных без согласия, доксинг</div>
+        </div>
+      </div>
+      <div class="report-reason" onclick="selectReason(this)">
+        <div class="report-reason__radio"></div>
+        <div class="report-reason__content">
+          <div class="report-reason__title">⚖️ Нарушение закона</div>
+          <div class="report-reason__desc">Призывы к экстремизму, терроризму, незаконные действия</div>
+        </div>
+      </div>
+      <div class="report-reason" onclick="selectReason(this)">
+        <div class="report-reason__radio"></div>
+        <div class="report-reason__content">
+          <div class="report-reason__title">📋 Другое</div>
+          <div class="report-reason__desc">Причина не подходит ни под одну из категорий</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comment -->
+    <div class="report-comment">
+      <label>Комментарий (необязательно)</label>
+      <textarea placeholder="Опишите проблему подробнее..."></textarea>
+    </div>
+  </div>
+
+  <!-- Success state -->
+  <div class="report-success" id="report-success">
+    <div class="report-success__icon">✅</div>
+    <div class="report-success__title">Жалоба отправлена</div>
+    <div class="report-success__desc">
+      Спасибо, ваша жалоба принята и будет рассмотрена модераторами.<br>
+      Решение будет принято в течение 24 часов.
+    </div>
+    <div class="report-success__id">ID жалобы: #RP-2026-0717-4281</div>
+  </div>
+
+  <!-- Footer -->
+  <div class="report-panel__footer" id="report-footer">
+    <a href="chats.html" class="btn btn--tertiary">Отмена</a>
+    <button class="btn btn--primary" onclick="submitReport()">🚩 Отправить жалобу</button>
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+<script>
+  function selectReason(el) {
+    document.querySelectorAll('.report-reason').forEach(r => r.classList.remove('report-reason--selected'));
+    el.classList.add('report-reason--selected');
+  }
+  function submitReport() {
+    const selected = document.querySelector('.report-reason--selected');
+    if (!selected) { alert('Пожалуйста, выберите причину жалобы.'); return; }
+    document.getElementById('report-form').style.display = 'none';
+    document.getElementById('report-success').style.display = 'block';
+    document.getElementById('report-footer').innerHTML = '<a href="chats.html" class="btn btn--primary">Вернуться в чат</a>';
+  }
+</script>
+</body>
+</html>

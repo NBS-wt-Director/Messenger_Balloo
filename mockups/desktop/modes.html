@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Desktop — Режимы окна</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    html { overflow-y: auto; height: auto; }
+    body { overflow-y: auto; height: auto; min-height: 100vh; background: var(--bg-primary); }
+
+    .modes-page { max-width: 1100px; margin: 0 auto; padding: 24px; }
+    .modes-grid { display: grid; grid-template-columns: 1fr; gap: 32px; }
+    .mode-section { }
+    .mode-section__title { font-size: 20px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .mode-section__desc { font-size: 14px; color: var(--text-secondary); margin-bottom: 16px; }
+
+    /* Mini window frames */
+    .mini-window {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-strong);
+      box-shadow: var(--shadow-glass);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .mini-titlebar {
+      height: 32px;
+      display: flex; align-items: center;
+      background: var(--bg-tertiary);
+      border-bottom: 1px solid var(--border-color);
+      padding: 0 8px;
+      gap: 6px;
+    }
+    .mini-titlebar__dot { width: 10px; height: 10px; border-radius: 50%; }
+    .mini-titlebar__dot--red { background: #ff5f57; }
+    .mini-titlebar__dot--yellow { background: #febc2e; }
+    .mini-titlebar__dot--green { background: #28c840; }
+    .mini-titlebar__title { flex: 1; text-align: center; font-size: 11px; color: var(--text-muted); }
+    .mini-titlebar__btns { display: flex; gap: 4px; }
+    .mini-titlebar__btn { font-size: 11px; color: var(--text-muted); cursor: pointer; padding: 0 4px; }
+
+    /* Expanded mode */
+    .mode-expanded .mini-window { height: 480px; }
+    .mode-expanded .mini-window-body { display: flex; height: 100%; overflow: hidden; }
+    .mode-expanded .mini-sidebar { width: 280px; background: var(--bg-secondary); border-right: 1px solid var(--border-color); padding: 12px; overflow: hidden; }
+    .mode-expanded .mini-content { flex: 1; background: var(--bg-primary); padding: 16px; overflow: hidden; display: flex; flex-direction: column; gap: 8px; }
+
+    /* Compact mode */
+    .mode-compact .mini-window { width: 380px; height: 560px; margin: 0 auto; }
+    .mode-compact .mini-window-body { display: flex; height: 100%; overflow: hidden; }
+    .mode-compact .mini-sidebar { width: 64px; background: var(--bg-secondary); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center; padding: 12px 0; gap: 8px; }
+    .mode-compact .mini-sidebar-icon { width: 36px; height: 36px; clip-path: var(--octagon-clip); background: var(--bg-tertiary); display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; }
+    .mode-compact .mini-sidebar-icon--active { background: var(--accent); color: #fff; }
+    .mode-compact .mini-content { flex: 1; background: var(--bg-primary); padding: 12px; overflow: hidden; display: flex; flex-direction: column; gap: 6px; }
+
+    /* Tray mode */
+    .mode-tray { display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; }
+    .mode-tray__desktop {
+      flex: 1; min-width: 400px;
+      height: 300px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .mode-tray__desktop-label { font-size: 14px; color: var(--text-muted); }
+    .mode-tray__tray-popup {
+      width: 320px;
+      background: var(--bg-glass);
+      backdrop-filter: blur(var(--blur));
+      border: 1px solid var(--border-strong);
+      box-shadow: var(--shadow-glass);
+      overflow: hidden;
+    }
+    .mode-tray__tray-header {
+      padding: 10px 14px;
+      background: var(--bg-tertiary);
+      border-bottom: 1px solid var(--border-color);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .mode-tray__tray-body { padding: 8px 0; max-height: 200px; overflow-y: auto; }
+    .mode-tray__tray-item { display: flex; align-items: center; gap: 8px; padding: 8px 14px; cursor: pointer; }
+    .mode-tray__tray-item:hover { background: var(--bg-hover); }
+
+    /* Mini chat items */
+    .mini-chat-item { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border-color); }
+    .mini-chat-item__name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .mini-chat-item__msg { font-size: 11px; color: var(--text-secondary); }
+    .mini-msg { max-width: 70%; padding: 5px 8px; font-size: 12px; line-height: 1.4; }
+    .mini-msg--sent { align-self: flex-end; background: var(--accent); color: var(--accent-text); clip-path: var(--bubble-sender); }
+    .mini-msg--recv { align-self: flex-start; background: var(--bg-tertiary); color: var(--text-primary); clip-path: var(--bubble-receiver); }
+
+    .badge-mini { min-width: 16px; height: 16px; padding: 0 4px; background: var(--accent); color: var(--accent-text); font-size: 9px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; }
+  </style>
+</head>
+<body>
+
+<div class="topbar topbar-mini">
+  <div class="topbar__logo"><div class="topbar__logo-icon">B</div><span>Balloo</span></div>
+  <div class="topbar__title">🖥️ Desktop — Режимы окна</div>
+  <div class="topbar__right"><a href="../index.html" class="btn btn--sm btn--tertiary">← Назад</a><span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span></div>
+</div>
+
+<div class="modes-page">
+  <h1 class="page-title">Режимы окна ПК-приложения</h1>
+  <p class="page-subtitle">Три режима: развёрнутый, компактный и tray. Переключение через меню «Окно» или хоткеи.</p>
+
+  <div class="modes-grid">
+
+    <!-- EXPANDED MODE -->
+    <div class="mode-section mode-expanded">
+      <div class="mode-section__title">🟢 Развёрнутый режим <span class="chip chip--accent">по умолчанию</span></div>
+      <div class="mode-section__desc">Полноценное окно с боковой панелью чатов и областью переписки. Горячая клавиша: <code>Ctrl+Shift+F</code> (fullscreen toggle)</div>
+      <div class="mini-window">
+        <div class="mini-titlebar">
+          <div class="mini-titlebar__dot mini-titlebar__dot--red"></div>
+          <div class="mini-titlebar__dot mini-titlebar__dot--yellow"></div>
+          <div class="mini-titlebar__dot mini-titlebar__dot--green"></div>
+          <div class="mini-titlebar__title">Balloo Messenger — Чаты</div>
+          <div class="mini-titlebar__btns"><span>─</span><span>▢</span><span>✕</span></div>
+        </div>
+        <div class="mini-window-body">
+          <div class="mini-sidebar">
+            <input type="text" class="search-input" placeholder="🔍 Поиск..." style="margin-bottom:8px;">
+            <div class="mini-chat-item">
+              <div class="avatar avatar--xs avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>МА</span></div></div>
+              <div class="flex-1"><div class="mini-chat-item__name">Мария</div><div class="mini-chat-item__msg">печатает...</div></div>
+              <span class="badge-mini">3</span>
+            </div>
+            <div class="mini-chat-item">
+              <div class="avatar avatar--xs avatar--bordered avatar--status-online avatar--ctx-new"><div class="avatar__inner"><span>РД</span></div></div>
+              <div class="flex-1"><div class="mini-chat-item__name">Рабочий чат</div><div class="mini-chat-item__msg">макеты готовы</div></div>
+            </div>
+            <div class="mini-chat-item">
+              <div class="avatar avatar--xs avatar--bordered avatar--status-offline"><div class="avatar__inner"><span>АС</span></div></div>
+              <div class="flex-1"><div class="mini-chat-item__name">Алексей</div><div class="mini-chat-item__msg">🎵 Голосовое</div></div>
+            </div>
+          </div>
+          <div class="mini-content">
+            <div style="font-weight:700;font-size:14px;color:var(--text-primary);border-bottom:1px solid var(--border-color);padding-bottom:8px;">Мария Андреева ● в сети</div>
+            <div class="mini-msg mini-msg--recv">Привет! Как тебе десктоп-версия?</div>
+            <div class="mini-msg mini-msg--sent">Отлично! Три режима окна 🔥</div>
+            <div class="mini-msg mini-msg--recv">А компактный — это как?</div>
+            <div class="mini-msg mini-msg--sent">Узкая панель с иконками. Удобно когда много окон открыто</div>
+            <div style="margin-top:auto;display:flex;gap:6px;">
+              <input type="text" placeholder="Сообщение..." style="flex:1;padding:6px 10px;background:var(--bg-tertiary);border:1px solid var(--border-color);color:var(--text-primary);font-size:12px;outline:none;">
+              <span style="color:var(--accent);font-size:16px;">➤</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMPACT MODE -->
+    <div class="mode-section mode-compact">
+      <div class="mode-section__title">🟡 Компактный режим <span class="chip chip--warning">узкая панель</span></div>
+      <div class="mode-section__desc">Узкая боковая панель только с иконками. Идеально для работы alongside других приложений. Горячая клавиша: <code>Ctrl+Shift+C</code></div>
+      <div class="mini-window">
+        <div class="mini-titlebar">
+          <div class="mini-titlebar__dot mini-titlebar__dot--red"></div>
+          <div class="mini-titlebar__dot mini-titlebar__dot--yellow"></div>
+          <div class="mini-titlebar__dot mini-titlebar__dot--green"></div>
+          <div class="mini-titlebar__title">Balloo — Компактный</div>
+          <div class="mini-titlebar__btns"><span>─</span><span>✕</span></div>
+        </div>
+        <div class="mini-window-body">
+          <div class="mini-sidebar">
+            <div class="mini-sidebar-icon mini-sidebar-icon--active">💬</div>
+            <div class="mini-sidebar-icon">👥</div>
+            <div class="mini-sidebar-icon">📞</div>
+            <div class="mini-sidebar-icon">🔍</div>
+            <div style="flex:1;"></div>
+            <div class="mini-sidebar-icon">⚙</div>
+            <div class="avatar avatar--xs avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИИ</span></div></div>
+          </div>
+          <div class="mini-content">
+            <div style="font-weight:700;font-size:13px;color:var(--text-primary);border-bottom:1px solid var(--border-color);padding-bottom:6px;">Мария ●</div>
+            <div class="mini-msg mini-msg--recv">Компактный режим — топ!</div>
+            <div class="mini-msg mini-msg--sent">Согласен, не мешает работе 👍</div>
+            <div class="mini-msg mini-msg--recv">А что если свернуть в tray?</div>
+            <div class="mini-msg mini-msg--sent">Тогда будет popup с последними чатами</div>
+            <div style="margin-top:auto;display:flex;gap:6px;">
+              <input type="text" placeholder="Сообщение..." style="flex:1;padding:6px 10px;background:var(--bg-tertiary);border:1px solid var(--border-color);color:var(--text-primary);font-size:12px;outline:none;">
+              <span style="color:var(--accent);font-size:16px;">➤</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRAY MODE -->
+    <div class="mode-section mode-tray">
+      <div>
+        <div class="mode-section__title">🔴 Tray-режим <span class="chip chip--danger">свёрнуто</span></div>
+        <div class="mode-section__desc">Окно скрыто, иконка в системном трее. Клик — popup с последними чатами. Двойной клик — развернуть окно. Горячая клавиша: <code>Alt+Space</code></div>
+        <div class="mode-tray__desktop">
+          <div class="mode-tray__desktop-label">🖥️ Рабочий стол (окно Balloo скрыто)</div>
+        </div>
+      </div>
+      <div class="mode-tray__tray-popup">
+        <div class="mode-tray__tray-header">
+          <div style="width:24px;height:24px;clip-path:var(--octagon-clip);background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:900;">B</div>
+          <span style="font-size:13px;font-weight:700;color:var(--text-primary);">Balloo</span>
+          <span style="margin-left:auto;font-size:11px;color:var(--text-muted);">3 непрочитанных</span>
+        </div>
+        <div class="mode-tray__tray-body">
+          <div class="mode-tray__tray-item">
+            <div class="avatar avatar--xs avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>МА</span></div></div>
+            <div class="flex-1"><div style="font-size:12px;font-weight:600;color:var(--text-primary);">Мария</div><div style="font-size:11px;color:var(--text-secondary);">Компактный режим — топ!</div></div>
+            <span class="badge-mini">3</span>
+          </div>
+          <div class="mode-tray__tray-item">
+            <div class="avatar avatar--xs avatar--bordered avatar--status-online avatar--ctx-new"><div class="avatar__inner"><span>РД</span></div></div>
+            <div class="flex-1"><div style="font-size:12px;font-weight:600;color:var(--text-primary);">Рабочий чат</div><div style="font-size:11px;color:var(--text-secondary);">Иван: макеты готовы</div></div>
+          </div>
+          <div class="mode-tray__tray-item">
+            <div class="avatar avatar--xs avatar--bordered avatar--status-offline"><div class="avatar__inner"><span>АС</span></div></div>
+            <div class="flex-1"><div style="font-size:12px;font-weight:600;color:var(--text-primary);">Алексей</div><div style="font-size:11px;color:var(--text-secondary);">🎵 Голосовое</div></div>
+          </div>
+        </div>
+        <div style="padding:8px 14px;border-top:1px solid var(--border-color);display:flex;gap:8px;">
+          <button class="btn btn--sm btn--primary flex-1">Развернуть</button>
+          <button class="btn btn--sm btn--tertiary">Выйти</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="card mt-6">
+    <h3 class="card__title">⌨️ Глобальные горячие клавиши</h3>
+    <table class="table">
+      <thead><tr><th>Комбинация</th><th>Действие</th><th>Режим</th></tr></thead>
+      <tbody>
+        <tr><td><code>Ctrl+K</code></td><td>Глобальный поиск</td><td>Любой</td></tr>
+        <tr><td><code>Ctrl+N</code></td><td>Новый чат</td><td>Развёрнутый / Компактный</td></tr>
+        <tr><td><code>Ctrl+Shift+V</code></td><td>Начать звонок</td><td>Развёрнутый / Компактный</td></tr>
+        <tr><td><code>Ctrl+Shift+C</code></td><td>Переключить в компактный режим</td><td>Развёрнутый</td></tr>
+        <tr><td><code>Ctrl+Shift+F</code></td><td>Полноэкранный режим</td><td>Развёрнутый</td></tr>
+        <tr><td><code>Alt+Space</code></td><td>Показать/скрыть окно (из tray)</td><td>Tray / Любой</td></tr>
+        <tr><td><code>Ctrl+Shift+T</code></td><td>Переключить тему (dark/light/russian)</td><td>Любой</td></tr>
+        <tr><td><code>Ctrl+,</code></td><td>Открыть настройки</td><td>Развёрнутый / Компактный</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card mt-4">
+    <h3 class="card__title">🔔 Системная интеграция</h3>
+    <div class="card__body">
+      <ul style="list-style:disc;padding-left:20px;line-height:1.8;">
+        <li><strong>Нативные уведомления ОС</strong> — push через Notification API (Electron) / Tauri plugins</li>
+        <li><strong>Tray icon</strong> — с бейджем непрочитанных, контекстным меню (развернуть/настройки/выйти)</li>
+        <li><strong>Auto-launch</strong> — опциональный запуск при старте ОС</li>
+        <li><strong>Deep links</strong> — balloo://chat/abc123 открывает чат в приложении</li>
+        <li><strong>Badge на иконке</strong> — счётчик непрочитанных на иконке в dock/taskbar</li>
+        <li><strong>Spellcheck</strong> — нативная проверка орфографии ОС</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+</body>
+</html>

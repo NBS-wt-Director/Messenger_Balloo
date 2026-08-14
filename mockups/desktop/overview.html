@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Desktop — Обёртка окна (генеральный)</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    html { overflow-y: auto; height: auto; }
+    body { overflow-y: auto; height: auto; min-height: 100vh; background: var(--bg-primary); padding: 0; }
+
+    /* Desktop window frame (Electron/Tauri style) */
+    .window-frame {
+      max-width: 1100px;
+      margin: 24px auto;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-strong);
+      box-shadow: var(--shadow-glass);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Custom titlebar */
+    .titlebar {
+      height: 40px;
+      display: flex;
+      align-items: center;
+      background: var(--bg-tertiary);
+      border-bottom: 1px solid var(--border-color);
+      -webkit-app-region: drag;
+      user-select: none;
+    }
+    .titlebar__left { display: flex; align-items: center; gap: 8px; padding: 0 12px; flex: 1; }
+    .titlebar__icon { width: 24px; height: 24px; clip-path: var(--octagon-clip); background: var(--accent); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; font-weight: 900; }
+    .titlebar__title { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+    .titlebar__center { flex: 1; text-align: center; }
+    .titlebar__menu { display: flex; gap: 0; }
+    .titlebar__menu-item { padding: 4px 10px; font-size: 12px; color: var(--text-secondary); cursor: pointer; -webkit-app-region: no-drag; }
+    .titlebar__menu-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+    .titlebar__controls { display: flex; -webkit-app-region: no-drag; }
+    .titlebar__btn { width: 46px; height: 40px; display: flex; align-items: center; justify-content: center; color: var(--text-secondary); cursor: pointer; font-size: 14px; }
+    .titlebar__btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+    .titlebar__btn--close:hover { background: var(--danger); color: #fff; }
+
+    /* Window body — messenger inside */
+    .window-body { display: flex; height: 600px; overflow: hidden; }
+    .window-sidebar {
+      width: 320px;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border-color);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .window-content {
+      flex: 1;
+      background: var(--bg-primary);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Tray indicator */
+    .tray-indicator {
+      position: fixed;
+      bottom-right: 24px;
+      width: 48px; height: 48px;
+      clip-path: var(--octagon-clip);
+      background: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; color: #fff;
+      cursor: pointer;
+      box-shadow: var(--shadow-glass);
+      z-index: 100;
+    }
+    .tray-indicator__badge {
+      position: absolute; top: -2px; right: -2px;
+      width: 18px; height: 18px;
+      background: var(--danger); color: #fff;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 700;
+      clip-path: none;
+    }
+
+    /* Status bar */
+    .statusbar {
+      height: 24px;
+      display: flex; align-items: center;
+      padding: 0 12px;
+      background: var(--bg-tertiary);
+      border-top: 1px solid var(--border-color);
+      font-size: 11px; color: var(--text-muted);
+      gap: 16px;
+    }
+    .statusbar__item { display: flex; align-items: center; gap: 4px; }
+    .statusbar__sep { margin-left: auto; }
+
+    /* Annotation labels */
+    .annotation {
+      max-width: 1100px;
+      margin: 0 auto 8px;
+      padding: 0 24px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .annotation strong { color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<div class="topbar topbar-mini">
+  <div class="topbar__logo"><div class="topbar__logo-icon">B</div><span>Balloo</span></div>
+  <div class="topbar__title">🖥️ Desktop — Генеральный макет обёртки окна</div>
+  <div class="topbar__right"><a href="../index.html" class="btn btn--sm btn--tertiary">← Назад</a><span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span></div>
+</div>
+
+<div class="annotation" style="margin-top:24px;">
+  <strong>Генеральный макет ПК-версии.</strong> Обёртка окна (Electron / Tauri) с кастомным titlebar, системными кнопками, меню, statusbar и tray-индикатором. Внутри — мессенджер Balloo.
+</div>
+
+<div class="window-frame">
+  <!-- Custom Titlebar -->
+  <div class="titlebar">
+    <div class="titlebar__left">
+      <div class="titlebar__icon">B</div>
+      <span class="titlebar__title">Balloo Messenger — Чаты</span>
+    </div>
+    <div class="titlebar__menu">
+      <div class="titlebar__menu-item">Файл</div>
+      <div class="titlebar__menu-item">Правка</div>
+      <div class="titlebar__menu-item">Вид</div>
+      <div class="titlebar__menu-item">Окно</div>
+      <div class="titlebar__menu-item">Справка</div>
+    </div>
+    <div class="titlebar__controls">
+      <div class="titlebar__btn" title="Свернуть">─</div>
+      <div class="titlebar__btn" title="Развернуть">▢</div>
+      <div class="titlebar__btn titlebar__btn--close" title="Закрыть">✕</div>
+    </div>
+  </div>
+
+  <!-- Window Body: Messenger inside -->
+  <div class="window-body">
+    <!-- Sidebar -->
+    <div class="window-sidebar">
+      <div class="sidebar__search">
+        <input type="text" class="search-input" placeholder="🔍 Поиск чатов и людей...">
+      </div>
+      <div class="list">
+        <div class="list__item list__item--active">
+          <div class="avatar avatar--md avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>МА</span></div></div>
+          <div class="list__item-body">
+            <div class="list__item-title">Мария Андреева</div>
+            <div class="list__item-subtitle"><span class="typing"><span class="typing__dots"><span class="typing__dot"></span><span class="typing__dot"></span><span class="typing__dot"></span></span> печатает...</span></div>
+          </div>
+          <div class="list__item-meta"><span class="list__item-time">14:32</span><span class="badge">3</span></div>
+        </div>
+        <div class="list__item">
+          <div class="avatar avatar--md avatar--bordered avatar--status-online avatar--ctx-new"><div class="avatar__inner"><span>РД</span></div></div>
+          <div class="list__item-body">
+            <div class="list__item-title">Рабочий чат</div>
+            <div class="list__item-subtitle">Иван: макеты готовы</div>
+          </div>
+          <div class="list__item-meta"><span class="list__item-time">14:20</span></div>
+        </div>
+        <div class="list__item">
+          <div class="avatar avatar--md avatar--bordered avatar--status-offline"><div class="avatar__inner"><span>АС</span></div></div>
+          <div class="list__item-body">
+            <div class="list__item-title">Алексей Смирнов</div>
+            <div class="list__item-subtitle">🎵 Голосовое сообщение</div>
+          </div>
+          <div class="list__item-meta"><span class="list__item-time">13:15</span></div>
+        </div>
+        <div class="list__item">
+          <div class="avatar avatar--md avatar--bordered avatar--status-busy avatar--ctx-family"><div class="avatar__inner"><span>СМ</span></div></div>
+          <div class="list__item-body">
+            <div class="list__item-title">Семья ❤️</div>
+            <div class="list__item-subtitle">Мама: 📷 фото</div>
+          </div>
+          <div class="list__item-meta"><span class="list__item-time">12:00</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat content -->
+    <div class="window-content">
+      <div class="topbar" style="height:48px;">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>МА</span></div></div>
+        <div style="flex:1;">
+          <div style="font-weight:700;font-size:15px;color:var(--text-primary);">Мария Андреева</div>
+          <div style="font-size:12px;color:var(--accent);">● в сети</div>
+        </div>
+        <div class="topbar__actions">
+          <div class="topbar__actions-btn" onclick="window.location.href='chat-attachments.html'" title="Вложения">📎</div>
+          <div class="topbar__actions-btn" title="Поиск">🔍</div>
+          <div class="topbar__actions-btn" onclick="openCall('video')" title="Видеозвонок">📹</div>
+          <div class="topbar__actions-btn" onclick="openCall('audio')" title="Аудиозвонок">📞</div>
+          <div class="topbar__actions-btn" title="Настройки">⚙</div>
+        </div>
+      </div>
+
+      <div class="messages">
+        <div class="message message--receiver">
+          <div class="message__bubble">
+            <div class="message__header"><span>Мария · 14:28</span></div>
+            <div class="message__body">Привет! Видел новый десктоп-макет? Окно выглядит как нативное приложение 🪟</div>
+            <div class="message__reactions">
+              <span class="message__reaction message__reaction--mine">👍 1</span>
+            </div>
+          </div>
+        </div>
+        <div class="message message--sender">
+          <div class="message__bubble">
+            <div class="message__header"><span>14:30</span></div>
+            <div class="message__body">Да! Кастомный titlebar с меню, системные кнопки, tray-индикатор. Полная интеграция с ОС.</div>
+            <div class="message__actions">
+              <button class="message__action-btn">↩</button>
+              <button class="message__action-btn">📋</button>
+              <button class="message__action-btn">😊</button>
+              <button class="message__action-btn">✏</button>
+              <a href="report-message.html" class="message__action-btn" title="Жалоба">🚩</a>
+            </div>
+          </div>
+          <div class="msg-ticks msg-ticks--read">✓✓</div>
+        </div>
+        <div class="message message--receiver">
+          <div class="message__bubble">
+            <div class="message__header"><span>Мария · 14:32</span></div>
+            <div class="message__body">А глобальные хоткеи есть? Например Ctrl+K для поиска?</div>
+          </div>
+        </div>
+        <div class="message message--sender">
+          <div class="message__bubble">
+            <div class="message__header"><span>14:33</span><span class="message__header-tag message__header-tag--auto">AUTO</span></div>
+            <div class="message__body">Да, и ещё Ctrl+N — новый чат, Ctrl+Shift+V — звонок, Alt+Space — показать окно из tray.</div>
+            <div class="message__actions">
+              <button class="message__action-btn">↩</button>
+              <button class="message__action-btn">📋</button>
+              <button class="message__action-btn">😊</button>
+              <button class="message__action-btn">✏</button>
+              <a href="report-message.html" class="message__action-btn" title="Жалоба">🚩</a>
+            </div>
+          </div>
+          <div class="msg-ticks msg-ticks--read">✓✓</div>
+        </div>
+      </div>
+
+      <div class="input-area">
+        <div class="input-area__btn" title="Прикрепить">📎</div>
+        <textarea class="input-area__field" placeholder="Сообщение... (Enter — отправить, Shift+Enter — новая строка)"></textarea>
+        <div class="input-area__btn" title="Emoji">😊</div>
+        <div class="input-area__btn input-area__btn--send" title="Отправить">➤</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status bar -->
+  <div class="statusbar">
+    <div class="statusbar__item"><span class="status-dot status-dot--online"></span> Подключено · WebSocket</div>
+    <div class="statusbar__item">🔒 E2E шифрование</div>
+    <div class="statusbar__sep"></div>
+    <div class="statusbar__item">💾 Yandex Disk: 4.2 ГБ / 10 ГБ</div>
+    <div class="statusbar__item">📦 Кэш: 124 МБ</div>
+    <div class="statusbar__item">v1.0.0-beta</div>
+  </div>
+</div>
+
+<!-- Tray indicator (floating) -->
+<div class="tray-indicator" title="Balloo — свёрнуто в tray">
+  B
+  <div class="tray-indicator__badge">3</div>
+</div>
+
+<div class="annotation" style="margin-bottom:40px;">
+  <strong>Tray-индикатор</strong> (справа внизу) — иконка в системном трее с бейджем непрочитанных. Клик — разворачивает окно. Alt+Space — показать/скрыть глобально.
+</div>
+
+<!-- Gallery of additional desktop screens -->
+<div class="annotation" style="margin-top:40px;">
+  <strong>Дополнительные экраны.</strong> Аутентификация, профили, сторис, контакты, звонки, настройки, опросы.
+</div>
+
+<div style="display:flex;flex-wrap:wrap;gap:24px;justify-content:center;padding:0 24px 60px;">
+
+  <!-- Login -->
+  <div>
+    <div class="window-frame" style="max-width:420px;height:480px;margin:0;">
+      <div class="titlebar" style="height:36px;">
+        <div class="titlebar__left">
+          <div class="titlebar__icon" style="width:20px;height:20px;font-size:10px;">B</div>
+          <span class="titlebar__title" style="font-size:12px;">Вход</span>
+        </div>
+        <div class="titlebar__controls">
+          <div class="titlebar__btn" style="width:36px;height:36px;font-size:12px;">─</div>
+          <div class="titlebar__btn" style="width:36px;height:36px;font-size:12px;">▢</div>
+          <div class="titlebar__btn titlebar__btn--close" style="width:36px;height:36px;font-size:12px;">✕</div>
+        </div>
+      </div>
+      <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:24px;">
+        <div style="text-align:center;width:100%;">
+          <div style="font-size:32px;">🦊</div>
+          <div style="font-size:16px;font-weight:800;color:var(--text-primary);margin:6px 0;">С возвращением!</div>
+          <div style="font-size:10px;color:var(--text-secondary);margin-bottom:12px;">Войдите в аккаунт</div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;">
+            <button style="padding:8px;background:#fc3f1d;color:#fff;border:none;border-radius:4px;font-size:11px;cursor:pointer;">Y Яндекс</button>
+            <button style="padding:8px;background:#005ff9;color:#fff;border:none;border-radius:4px;font-size:11px;cursor:pointer;">@ Mail.ru</button>
+          </div>
+          <div style="font-size:9px;color:var(--text-muted);margin-bottom:12px;">или</div>
+          <input type="email" placeholder="ivan@example.com" style="width:100%;padding:7px;background:var(--bg-tertiary);border:1px solid var(--border-color);color:var(--text-primary);font-size:11px;border-radius:4px;margin-bottom:6px;">
+          <input type="password" placeholder="••••••••" style="width:100%;padding:7px;background:var(--bg-tertiary);border:1px solid var(--border-color);color:var(--text-primary);font-size:11px;border-radius:4px;margin-bottom:10px;">
+          <button style="padding:8px;background:var(--accent);color:#fff;border:none;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer;width:100%;">Войти</button>
+          <div style="font-size:9px;color:var(--text-secondary);margin-top:10px;">Нет аккаунта? <a href="#" style="color:var(--accent);">Регистрация</a></div>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:8px;font-size:11px;color:var(--text-muted);">Вход</div>
+  </div>
+
+  <!-- Register -->
+  <div>
+    <div class="window-frame" style="max-width:420px;height:520px;margin:0;">
+      <div class="titlebar" style="height:36px;">
+        <div class="titlebar__left">
+          <div class="titlebar__icon" style="width:20px;height:20px;font-size:10px;">B</div>
+          <span class="titlebar__title" style="font-size:12px;">Регистрация</span>
+        </div>
+        <div class="titlebar__controls">
+          <div class="titlebar__btn" style="width:36px;height:36px;font-size:12px;">─</div>
+          <div class="titlebar__btn" style="width:36px;height:36px;font-size:12px;">▢</div>
+          <div class="titlebar__btn titlebar__btn--close" style="width:36px;height:36px;font-size:12px;">✕</div>
+        </div>
+      </div>
+      <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:20px;">
+        <div style="text-align:center;width:100%;">
+          <div style="font-size:14px;font-weight:800;color:var(--text-primary);margin-bottom:4px;">Создать аккаунт</div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;">
+            <button style="padding:8px;background:#fc3f1d;color:#fff;border:none;border-radius:4px;font-size:11px;cursor:pointer;">Y Яндекс</button>
+            <button style="padding:8px;background:#005ff9;color:#fff;border:none;border-radius:4px;font-size:11px;cursor:pointer;">@ Mail.ru</button>
+          </div>
+          <div style="font-size:9px;color:var(--text-muted);margin-bottom:12px;">или email</div>
+          <input type="text" placeholder="Имя" style="width:100%;padding:7px;background:var(--bg-tertiary);border:1px solid var(--border-color);color:var(--text-primary);font-size:11px;border-radius:4px;margin-bottom:6px;">
+          <input type="email" placeholder="Email" style="width:100%;padding:7px;background:var(--bg-tertiary);border:1px solid var(--border-color);color:var(--text-primary);font-size:11px;border-radius:4px;margin-bottom:6px;">
+          <input type="password" placeholder="Пароль" style="width:100%;padding:7px;background:var(--bg-tertiary);border:1px solid var(--border-color);color:var(--text-primary);font-size:11px;border-radius:4px;margin-bottom:10px;">
+          <button style="padding:8px;background:var(--accent);color:#fff;border:none;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer;width:100%;">Зарегистрироваться</button>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:8px;font-size:11px;color:var(--text-muted);">Регистрация</div>
+  </div>
+
+  <!-- Stories -->
+  <div>
+    <div class="window-frame" style="max-width:700px;height:440px;margin:0;">
+      <div class="titlebar" style="height:36px;">
+        <div class="titlebar__left">
+          <div class="titlebar__icon" style="width:20px;height:20px;font-size:10px;">B</div>
+          <span class="titlebar__title" style="font-size:12px;">Сторис</span>
+        </div>
+        <div class="titlebar__controls">
+          <div class="titlebar__btn" style="width:36px;height:36px;font-size:12px;">─</div>
+          <div class="titlebar__btn" style="width:36px;height:36px;font-size:12px;">▢</div>
+          <div class="titlebar__btn titlebar__btn--close" style="width:36px;height:36px;font-size:12px;">✕</div>
+        </div>
+      </div>
+      <div style="flex:1;display:flex;overflow:hidden;">
+        <div style="width:240px;background:var(--bg-secondary);border-right:1px solid var(--border-color);display:flex;flex-direction:column;">
+          <div style="padding:12px;border-bottom:1px solid var(--border-color);display:flex;gap:10px;overflow-x:auto;">
+            <div style="flex-shrink:0;text-align:center;cursor:pointer;">
+              <div style="width:44px;height:44px;clip-path:var(--octagon-clip);background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;font-weight:700;">+</div>
+              <div style="font-size:9px;color:var(--text-muted);margin-top:2px;">Моя</div>
+            </div>
+            <div style="flex-shrink:0;text-align:center;cursor:pointer;">
+              <div style="width:44px;height:44px;clip-path:var(--octagon-clip-stories);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:700;background:var(--bg-tertiary);">МА</div>
+              <div style="font-size:9px;color:var(--text-muted);margin-top:2px;">Мария</div>
+            </div>
+            <div style="flex-shrink:0;text-align:center;cursor:pointer;">
+              <div style="width:44px;height:44px;clip-path:var(--octagon-clip-stories);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:700;background:var(--bg-tertiary);">АК</div>
+              <div style="font-size:9px;color:var(--text-muted);margin-top:2px;">Алексей</div>
+            </div>
+          </div>
+          <div style="padding:8px 12px;border-bottom:1px solid var(--border-color);display:flex;align-items:center;gap:8px;">
+            <div class="avatar avatar--xs avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner" style="font-size:9px;">МА</div></div>
+            <div style="flex:1;min-width:0;"><div style="font-size:11px;font-weight:600;color:var(--text-primary);">Мария</div><div style="font-size:9px;color:var(--text-muted);">⭕ новая сторис</div></div>
+          </div>
+        </div>
+        <div style="flex:1;display:flex;align-items:center;justify-content:center;background:var(--bg-primary);">
+          <div style="text-align:center;">
+            <div style="width:64px;height:64px;clip-path:var(--octagon-clip-stories);background:var(--story-gradient);background-size:300% 300%;animation:story-shimmer 4s ease infinite;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:28px;">⭕</div>
+            <div style="font-size:14px;font-weight:700;color:var(--text-primary);">Сторис</div>
+            <div style="font-size:10px;color:var(--text-secondary);margin-top:4px;">Нажмите на аватарку для просмотра</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:8px;font-size:11px;color:var(--text-muted);">Сторис</div>
+  </div>
+
+  <!-- Settings -->
+  <div>
+    <div class="window-frame" style="max-width:640px;height:440px;margin:0;">
+      <div class="titlebar" style="height:36px;">
+        <div class="titlebar__left">
+          <div class="titlebar__icon" style="width:20px;height:20px;font-size:10px;">B</div>
+          <span class="titlebar__title" style="font-size:12px;">Настройки</span>
+        </div>
+        <div class="titlebar__controls">
+          <div class="titlebar__btn" style="width:36px;height:36px;font-size:12px;">─</div>
+          <div class="titlebar__btn" style="width:36px;height:36px;font-size:12px;">▢</div>
+          <div class="titlebar__btn titlebar__btn--close" style="width:36px;height:36px;font-size:12px;">✕</div>
+        </div>
+      </div>
+      <div style="flex:1;display:flex;overflow:hidden;">
+        <div style="width:180px;background:var(--bg-secondary);border-right:1px solid var(--border-color);padding:8px;overflow-y:auto;">
+          <div style="padding:6px 8px;font-size:11px;font-weight:600;color:var(--accent);border-bottom:2px solid var(--accent);border-radius:2px;">🔔 Уведомления</div>
+          <div style="padding:6px 8px;font-size:11px;color:var(--text-secondary);">🎨 Оформление</div>
+          <div style="padding:6px 8px;font-size:11px;color:var(--text-secondary);">🌍 Язык</div>
+          <div style="padding:6px 8px;font-size:11px;color:var(--text-secondary);">🔒 Приватность</div>
+          <div style="padding:6px 8px;font-size:11px;color:var(--text-secondary);">💾 Хранилище</div>
+          <div style="padding:6px 8px;font-size:11px;color:var(--text-secondary);">📱 Устройства</div>
+          <div style="padding:6px 8px;font-size:11px;color:var(--text-secondary);">👤 Аккаунты</div>
+          <div style="padding:6px 8px;font-size:11px;color:var(--text-secondary);">🔐 Безопасность</div>
+          <div style="padding:6px 8px;font-size:11px;color:var(--text-secondary);">💰 Донаты</div>
+          <div style="padding:6px 8px;font-size:11px;color:var(--text-secondary);">🎧 Поддержка</div>
+        </div>
+        <div style="flex:1;padding:16px;overflow-y:auto;">
+          <div style="font-size:16px;font-weight:700;color:var(--text-primary);margin-bottom:12px;">Уведомления</div>
+          <div style="background:var(--bg-secondary);border-radius:6px;padding:12px;margin-bottom:8px;">
+            <div style="font-size:11px;font-weight:600;color:var(--text-primary);margin-bottom:8px;">Push-уведомления</div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-secondary);margin-bottom:6px;"><span>Группировка</span><label style="color:var(--accent);">✓</label></div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-secondary);"><span>Звук</span><span>Стандартный 1</span></div>
+          </div>
+          <div style="background:var(--bg-secondary);border-radius:6px;padding:12px;">
+            <div style="font-size:11px;font-weight:600;color:var(--text-primary);margin-bottom:8px;">Не беспокоить</div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:10px;color:var(--text-secondary);">
+              <label style="color:var(--text-muted);">○</label>
+              <span>Включить DND</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:8px;font-size:11px;color:var(--text-muted);">Настройки</div>
+  </div>
+
+</div>
+
+<script src="../assets/common.js"></script>
+</body>
+</html>

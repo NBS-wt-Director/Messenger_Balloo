@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Компонент: Files — Файлы (админ)</title>
+  <link rel="stylesheet" href="../../assets/common.css">
+  <style>
+    .component-demo { padding: 24px; max-width: 640px; margin: 0 auto; }
+    .component-demo h1 { font-size: 20px; margin-bottom: 16px; }
+    .component-demo .demo-section { margin-bottom: 24px; }
+    .component-demo .demo-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+
+    .admin-files__stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+    .admin-files__stat { padding: 16px; background: var(--bg-glass); border: 1px solid var(--border-color); text-align: center; }
+    .admin-files__stat__value { font-size: 24px; font-weight: 800; color: var(--text-primary); }
+    .admin-files__stat__label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+    .admin-files__table { width: 100%; border-collapse: collapse; }
+    .admin-files__table th { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border-color); }
+    .admin-files__table td { padding: 12px; font-size: 14px; color: var(--text-primary); border-bottom: 1px solid var(--border-color); }
+    .admin-files__table__row:hover td { background: var(--bg-hover); }
+    .admin-files__table__file { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+    .admin-files__table__size { color: var(--text-muted); font-size: 13px; }
+  </style>
+</head>
+<body>
+  <div class="component-demo">
+    <h1>📦 Компонент: Files (Файлы — админ)</h1>
+
+    <div class="demo-section">
+      <div class="demo-label">Управление файлами</div>
+      <div class="admin-files__stats">
+        <div class="admin-files__stat"><div class="admin-files__stat__value">1.2 GB</div><div class="admin-files__stat__label">Всего файлов</div></div>
+        <div class="admin-files__stat"><div class="admin-files__stat__value">847</div><div class="admin-files__stat__label">Файлов</div></div>
+        <div class="admin-files__stat"><div class="admin-files__stat__value">23</div><div class="admin-files__stat__label">Заблокировано</div></div>
+      </div>
+      <table class="admin-files__table">
+        <thead><tr><th>Файл</th><th>Размер</th><th>Тип</th><th>Загружен</th></tr></thead>
+        <tbody>
+          <tr class="admin-files__table__row"><td><div class="admin-files__table__file">📄 document.pdf</div></td><td class="admin-files__table__size">2.4 MB</td><td>PDF</td><td style="color:var(--text-muted);font-size:13px;">15.07.2026</td></tr>
+          <tr class="admin-files__table__row"><td><div class="admin-files__table__file">🖼 photo.jpg</div></td><td class="admin-files__table__size">1.8 MB</td><td>JPEG</td><td style="color:var(--text-muted);font-size:13px;">14.07.2026</td></tr>
+          <tr class="admin-files__table__row"><td><div class="admin-files__table__file">🎵 audio.mp3</div></td><td class="admin-files__table__size">4.2 MB</td><td>MP3</td><td style="color:var(--text-muted);font-size:13px;">13.07.2026</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <script src="../../assets/common.js"></script>
+</body>
+</html>

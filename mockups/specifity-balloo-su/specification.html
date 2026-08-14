@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Specifity — Спецификация экрана</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    /* Split-view layout for specifity tool */
+    .spec-main { flex: 1; display: flex; overflow: hidden; min-height: 0; }
+    .spec-left {
+      width: 380px; min-width: 320px; max-width: 480px;
+      overflow-y: auto; padding: 20px;
+      border-right: 1px solid var(--border-color);
+      background: var(--bg-glass); backdrop-filter: blur(var(--blur));
+    }
+    .spec-right {
+      flex: 1; display: flex; flex-direction: column;
+      background: var(--bg-tertiary); min-width: 0;
+    }
+    .spec-toolbar {
+      display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+      border-bottom: 1px solid var(--border-color); background: var(--bg-glass);
+      flex-wrap: wrap;
+    }
+    .spec-toolbar__label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+    .spec-toolbar__select {
+      padding: 4px 8px; font-size: 13px; background: var(--bg-tertiary);
+      border: 1px solid var(--border-color); color: var(--text-primary);
+      font-family: inherit; cursor: pointer;
+    }
+    .spec-toolbar__select:focus { border-color: var(--accent); outline: none; }
+    .spec-toolbar__btn {
+      padding: 4px 10px; font-size: 12px; font-weight: 600; cursor: pointer;
+      border: 1px solid var(--border-color); background: var(--bg-tertiary);
+      color: var(--text-secondary); transition: all 0.15s;
+    }
+    .spec-toolbar__btn:hover { color: var(--text-primary); border-color: var(--accent); }
+    .spec-toolbar__btn--active { color: var(--accent); border-color: var(--accent); background: rgba(45,184,77,0.08); }
+    .spec-toolbar__size { margin-left: auto; font-size: 12px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+    .spec-frame-wrap {
+      flex: 1; overflow: auto; padding: 16px; display: flex; align-items: flex-start; justify-content: center;
+    }
+    .spec-frame {
+      width: 100%; height: 100%; min-height: 500px; border: 1px solid var(--border-color);
+      background: var(--bg-primary); transition: width 0.1s, height 0.1s;
+    }
+    .spec-resize-handle {
+      position: absolute; bottom: 0; right: 0; width: 20px; height: 20px;
+      cursor: nwse-resize; z-index: 10;
+      background: linear-gradient(135deg, transparent 50%, var(--border-color) 50%, var(--border-color) 60%, transparent 60%, transparent 70%, var(--border-color) 70%, var(--border-color) 80%, transparent 80%);
+    }
+    /* Left panel content */
+    .spec-desc-title { font-size: 18px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px; }
+    .spec-desc-id { font-size: 12px; color: var(--text-muted); font-weight: 700; margin-bottom: 12px; }
+    .spec-desc-text { font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; }
+    .spec-linked { margin-bottom: 16px; }
+    .spec-linked__title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 8px; }
+    .spec-linked__list { display: flex; flex-direction: column; gap: 4px; }
+    .spec-linked__item {
+      display: flex; align-items: center; gap: 6px; padding: 6px 10px;
+      font-size: 12px; border: 1px solid var(--border-color); background: var(--bg-tertiary);
+      color: var(--text-secondary); cursor: pointer; transition: all 0.15s;
+    }
+    .spec-linked__item:hover { border-color: var(--accent); color: var(--text-primary); }
+    .spec-linked__item code { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); }
+    .spec-linked__item-type { font-size: 10px; font-weight: 700; padding: 1px 6px; border: 1px solid var(--border-color); white-space: nowrap; }
+    .spec-linked__item-type--api { background: rgba(59,158,255,0.15); color: var(--info); border-color: var(--info); }
+    .spec-linked__item-type--data { background: rgba(255,193,7,0.15); color: var(--warning); border-color: var(--warning); }
+    .spec-linked__item-type--comp { background: rgba(45,184,77,0.15); color: var(--accent); border-color: var(--accent); }
+    .spec-linked__item-type--screen { background: rgba(156,39,176,0.15); color: #ce93d8; border-color: #ce93d8; }
+  </style>
+</head>
+<body class="app-flex">
+
+<!-- Topbar -->
+<div class="topbar">
+  <div class="topbar__logo">
+    <div class="topbar__logo-icon" style="background:var(--accent);">S</div>
+    <span>Specifity</span>
+    <div class="topbar__dropdown">
+      <div class="topbar__dropdown-item">📐 Specifity (текущий)</div>
+      <div class="topbar__dropdown-divider"></div>
+      <div class="topbar__dropdown-item">💬 Balloo</div>
+      <div class="topbar__dropdown-item">🛡️ Admin</div>
+      <div class="topbar__dropdown-item">🏢 Command</div>
+      <div class="topbar__dropdown-item">💡 Features</div>
+      <div class="topbar__dropdown-item">📜 History</div>
+      <div class="topbar__dropdown-item">⬇️ Download</div>
+      <div class="topbar__dropdown-item">📚 API Docs</div>
+    </div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Спецификация экрана (split-view)</div>
+  <div class="topbar__right">
+    <a href="home.html" style="font-size:13px;font-weight:600;color:var(--text-secondary);padding:6px 10px;border:1px solid var(--border-color);">🏠 Главная</a>
+    <a href="screens.html" style="font-size:13px;font-weight:600;color:var(--text-secondary);padding:6px 10px;border:1px solid var(--border-color);">🖼️ Экраны</a>
+    <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+    <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+  </div>
+</div>
+
+<!-- Split-view: left = spec, right = iframe preview -->
+<div class="spec-main">
+  <!-- LEFT: specification panel -->
+  <div class="spec-left" id="spec-left">
+    <div class="spec-desc-title" id="sp-title">Чаты</div>
+    <div class="spec-desc-id" id="sp-id">ID: 1_01_04 · узел у_01 (balloo.su)</div>
+    <div class="spec-desc-text" id="sp-desc">
+      Список чатов + окно переписки. Пузыри без скруглений, восьмигранные аватарки,
+      реакции, вложения, typing, галочки доставки/прочтения. WebSocket в реальном времени.
+      Главный экран мессенджера.
+    </div>
+
+    <div class="spec-linked">
+      <div class="spec-linked__title">🔗 Связанные объекты</div>
+      <div class="spec-linked__list" id="sp-linked">
+        <div class="spec-linked__item">
+          <span class="spec-linked__item-type spec-linked__item-type--api">API</span>
+          <code>GET /chats</code>
+          <span>Список чатов (пагинация)</span>
+        </div>
+        <div class="spec-linked__item">
+          <span class="spec-linked__item-type spec-linked__item-type--api">API</span>
+          <code>POST /chats/:id/messages</code>
+          <span>Отправить сообщение</span>
+        </div>
+        <div class="spec-linked__item">
+          <span class="spec-linked__item-type spec-linked__item-type--api">API</span>
+          <code>WS message:new</code>
+          <span>Новое сообщение (WebSocket)</span>
+        </div>
+        <div class="spec-linked__item">
+          <span class="spec-linked__item-type spec-linked__item-type--data">Data</span>
+          <code>chats</code>
+          <span>Таблица чатов</span>
+        </div>
+        <div class="spec-linked__item">
+          <span class="spec-linked__item-type spec-linked__item-type--data">Data</span>
+          <code>messages</code>
+          <span>Таблица сообщений</span>
+        </div>
+        <div class="spec-linked__item">
+          <span class="spec-linked__item-type spec-linked__item-type--data">Data</span>
+          <code>reactions</code>
+          <span>Реакции на сообщения</span>
+        </div>
+        <div class="spec-linked__item">
+          <span class="spec-linked__item-type spec-linked__item-type--comp">Comp</span>
+          <code>ChatList</code>
+          <span>Список чатов</span>
+        </div>
+        <div class="spec-linked__item">
+          <span class="spec-linked__item-type spec-linked__item-type--comp">Comp</span>
+          <code>ChatWindow</code>
+          <span>Окно переписки</span>
+        </div>
+        <div class="spec-linked__item">
+          <span class="spec-linked__item-type spec-linked__item-type--comp">Comp</span>
+          <code>MessageBubble</code>
+          <span>Пузырь сообщения</span>
+        </div>
+        <div class="spec-linked__item">
+          <span class="spec-linked__item-type spec-linked__item-type--screen">Screen</span>
+          <code>1_01_04</code>
+          <span>Макет: balloo-su/chats.html</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="spec-linked">
+      <div class="spec-linked__title">📋 Технологии</div>
+      <div class="spec-linked__list">
+        <div class="spec-linked__item"><span>React 18 + TypeScript</span></div>
+        <div class="spec-linked__item"><span>WebSocket (real-time)</span></div>
+        <div class="spec-linked__item"><span>Infinite scroll (пагинация по 50)</span></div>
+        <div class="spec-linked__item"><span>Optimistic UI updates</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: resizable iframe preview -->
+  <div class="spec-right">
+    <div class="spec-toolbar">
+      <span class="spec-toolbar__label">Экран:</span>
+      <select class="spec-toolbar__select" id="sp-screen-select" onchange="loadSpecScreen()">
+        <option value="../balloo-su/chats.html" data-title="Чаты" data-id="ID: 1_01_04 · узел у_01 (balloo.su)" data-desc="Список чатов + окно переписки. Пузыри без скруглений, восьмигранные аватарки, реакции, вложения, typing, галочки доставки/прочтения. WebSocket в реальном времени. Главный экран мессенджера.">💬 Чаты (1_01_04)</option>
+        <option value="../balloo-su/login.html" data-title="Вход" data-id="ID: 1_01_02 · узел у_01 (balloo.su)" data-desc="Email + OAuth (Яндекс, Mail.ru, Rambler), ссылка на регистрацию. JWT + refresh token.">🔐 Вход (1_01_02)</option>
+        <option value="../balloo-su/donate.html" data-title="Донат" data-id="ID: 1_01_24 · узел у_01 (balloo.su)" data-desc="Поддержка проекта: уровни (кофе/спонсор/VIP), прогресс цели, способы оплаты, топ доноров.">💚 Донат (1_01_24)</option>
+        <option value="../admin-balloo-su/dashboard.html" data-title="Дашборд" data-id="ID: 1_02_02 · узел у_02 (admin)" data-desc="Общая статистика, графики, активные алерты. Только для администраторов (2FA).">🛡️ Дашборд (1_02_02)</option>
+        <option value="../command-balloo-su/vacancies.html" data-title="Вакансии" data-id="ID: 1_03_07 · узел у_03 (command)" data-desc="Список вакансий для не-сотрудников. Фильтр по отделам, зарплатная вилка.">🏢 Вакансии (1_03_07)</option>
+        <option value="../mobile/chat.html" data-title="Мобильный чат" data-id="ID: 1_08_02 · узел у_08 (mobile)" data-desc="Чат в мобильном интерфейсе: swipe, long-press, вложения.">📱 Мобильный чат (1_08_02)</option>
+        <option value="../desktop/overview.html" data-title="Обёртка окна" data-id="ID: 1_09_01 · узел у_09 (desktop)" data-desc="ПК-версия в оконной рамке: titlebar, tray, системные кнопки, мессенджер внутри.">🖥️ Обёртка окна (1_09_01)</option>
+      </select>
+      <span class="spec-toolbar__btn" onclick="spResize(-10)">◀</span>
+      <span class="spec-toolbar__btn" onclick="spResize(10)">▶</span>
+      <span class="spec-toolbar__btn" onclick="spResetSize()">⟳ Reset</span>
+      <span class="spec-toolbar__btn" onclick="spToggleFullscreen()">⛶ Full</span>
+      <span class="spec-toolbar__size" id="sp-size-label">100% × 100%</span>
+    </div>
+    <div class="spec-frame-wrap" id="sp-frame-wrap" style="position:relative;">
+      <iframe class="spec-frame" id="sp-iframe" src="../balloo-su/chats.html"></iframe>
+      <div class="spec-resize-handle" id="sp-resize-handle"></div>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+<script>
+  // ==================== SPLIT-VIEW LOGIC ====================
+  let spWidth = 100, spHeight = 100;
+  let spIsFullscreen = false;
+  let spResizeDrag = null;
+
+  function initSpec() {
+    const iframe = document.getElementById('sp-iframe');
+    const handle = document.getElementById('sp-resize-handle');
+    if (!iframe || !handle) return;
+    handle.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      spResizeDrag = { startX: e.clientX, startY: e.clientY, w: spWidth, h: spHeight };
+      document.addEventListener('mousemove', spOnMouseMove);
+      document.addEventListener('mouseup', spOnMouseUp);
+    });
+    updateSpSizeLabel();
+  }
+
+  function spOnMouseMove(e) {
+    if (!spResizeDrag) return;
+    const dx = e.clientX - spResizeDrag.startX;
+    const dy = e.clientY - spResizeDrag.startY;
+    const wrap = document.getElementById('sp-frame-wrap');
+    const wrapRect = wrap.getBoundingClientRect();
+    const pctX = (dx / wrapRect.width) * 100;
+    const pctY = (dy / wrapRect.height) * 100;
+    spWidth = Math.max(30, Math.min(200, spResizeDrag.w + pctX));
+    spHeight = Math.max(30, Math.min(200, spResizeDrag.h + pctY));
+    applySpSize();
+  }
+
+  function spOnMouseUp() {
+    spResizeDrag = null;
+    document.removeEventListener('mousemove', spOnMouseMove);
+    document.removeEventListener('mouseup', spOnMouseUp);
+  }
+
+  function applySpSize() {
+    const iframe = document.getElementById('sp-iframe');
+    if (!iframe) return;
+    if (spIsFullscreen) {
+      iframe.style.width = '100%';
+      iframe.style.height = '100%';
+    } else {
+      iframe.style.width = spWidth + '%';
+      iframe.style.height = spHeight + '%';
+    }
+    updateSpSizeLabel();
+  }
+
+  function updateSpSizeLabel() {
+    const label = document.getElementById('sp-size-label');
+    if (label) {
+      label.textContent = spIsFullscreen ? 'Fullscreen' : Math.round(spWidth) + '% × ' + Math.round(spHeight) + '%';
+    }
+  }
+
+  function spResize(delta) {
+    if (spIsFullscreen) return;
+    spWidth = Math.max(30, Math.min(200, spWidth + delta));
+    spHeight = Math.max(30, Math.min(200, spHeight + delta));
+    applySpSize();
+  }
+
+  function spResetSize() {
+    spWidth = 100; spHeight = 100; spIsFullscreen = false;
+    applySpSize();
+    const wrap = document.getElementById('sp-frame-wrap');
+    if (wrap) { wrap.style.padding = '16px'; wrap.style.alignItems = 'flex-start'; }
+  }
+
+  function spToggleFullscreen() {
+    spIsFullscreen = !spIsFullscreen;
+    const wrap = document.getElementById('sp-frame-wrap');
+    if (wrap) {
+      if (spIsFullscreen) { wrap.style.padding = '0'; wrap.style.alignItems = 'stretch'; }
+      else { wrap.style.padding = '16px'; wrap.style.alignItems = 'flex-start'; }
+    }
+    applySpSize();
+  }
+
+  function loadSpecScreen() {
+    const select = document.getElementById('sp-screen-select');
+    const iframe = document.getElementById('sp-iframe');
+    if (!select || !iframe) return;
+    const opt = select.options[select.selectedIndex];
+    iframe.src = opt.value;
+    const title = document.getElementById('sp-title');
+    const id = document.getElementById('sp-id');
+    const desc = document.getElementById('sp-desc');
+    if (title) title.textContent = opt.getAttribute('data-title') || '';
+    if (id) id.textContent = opt.getAttribute('data-id') || '';
+    if (desc) desc.textContent = opt.getAttribute('data-desc') || '';
+  }
+
+  document.addEventListener('DOMContentLoaded', () => { initSpec(); });
+</script>
+</body>
+</html>

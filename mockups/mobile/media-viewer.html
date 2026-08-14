@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobile — Просмотр медиа</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    html { overflow-y: auto; height: auto; }
+    body { overflow-y: auto; height: auto; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 40px 24px; }
+    .phone-frame { width:360px; height:760px; background:var(--bg-secondary); border:3px solid var(--border-strong); border-radius:36px; overflow:hidden; position:relative; display:flex; flex-direction:column; box-shadow:var(--shadow-glass); }
+    .phone-frame__notch { position:absolute; top:0; left:50%; transform:translateX(-50%); width:130px; height:26px; background:var(--bg-primary); border-bottom-left-radius:18px; border-bottom-right-radius:18px; z-index:10; }
+    .phone-frame__statusbar { height:30px; padding:4px 20px 0; display:flex; align-items:center; justify-content:space-between; font-size:12px; color:var(--text-secondary); background:var(--bg-secondary); }
+    .phone-frame__screen { flex:1; overflow:hidden; background:var(--bg-primary); display:flex; flex-direction:column; }
+    .phone-frame__home-bar { height:5px; width:120px; margin:0 auto 8px; background:var(--text-muted); border-radius:3px; }
+    .phone-tabbar { display:flex; height:52px; background:var(--bg-secondary); border-top:1px solid var(--border-color); }
+    .phone-tabbar__item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; font-size:10px; color:var(--text-secondary); cursor:pointer; transition:color 0.15s; }
+    .phone-tabbar__item:hover { color:var(--text-primary); }
+    .phone-tabbar__item--active { color:var(--accent); }
+    .phone-tabbar__icon { font-size:20px; line-height:1; }
+
+    /* Media Viewer — Fullscreen */
+    .media-viewer { position:fixed; inset:0; background:#000; z-index:1000; display:none; flex-direction:column; }
+    .media-viewer--visible { display:flex; }
+    .media-viewer__statusbar { height:40px; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:space-between; padding:0 12px; }
+    .media-viewer__back { color:#fff; font-size:24px; cursor:pointer; }
+    .media-viewer__counter { color:rgba(255,255,255,0.8); font-size:13px; }
+    .media-viewer__actions { display:flex; gap:16px; }
+    .media-viewer__action { color:#fff; font-size:18px; cursor:pointer; }
+
+    .media-viewer__swipe-area { flex:1; display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative; touch-action:pan-y; }
+    .media-viewer__swipe-track { display:flex; transition:transform 0.3s ease; height:100%; align-items:center; }
+    .media-viewer__slide { min-width:100%; height:100%; display:flex; align-items:center; justify-content:center; }
+    .media-viewer__slide img { max-width:100%; max-height:100%; object-fit:contain; transition:transform 0.2s; }
+    .media-viewer__slide video { max-width:100%; max-height:100%; }
+    .media-viewer__slide--placeholder { background:linear-gradient(135deg,#1a1d21,#2d3742); font-size:96px; }
+
+    /* Pinch-zoom indicator */
+    .media-viewer__zoom-badge { position:absolute; bottom:16px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.6); color:#fff; font-size:11px; padding:4px 10px; border-radius:12px; opacity:0; transition:opacity 0.3s; }
+    .media-viewer__zoom-badge--visible { opacity:1; }
+
+    .media-viewer__nav-arrow { position:absolute; top:50%; transform:translateY(-50%); font-size:28px; color:rgba(255,255,255,0.6); cursor:pointer; padding:20px; }
+    .media-viewer__nav-arrow--prev { left:0; }
+    .media-viewer__nav-arrow--next { right:0; }
+
+    /* Bottom bar: caption + reactions */
+    .media-viewer__footer { background:rgba(0,0,0,0.5); padding:12px 16px; display:flex; flex-direction:column; gap:8px; }
+    .media-viewer__caption { color:#fff; font-size:13px; line-height:1.4; }
+    .media-viewer__meta { display:flex; gap:12px; font-size:11px; color:rgba(255,255,255,0.6); }
+    .media-viewer__meta span { cursor:pointer; }
+
+    /* Thumbnail strip */
+    .media-viewer__thumbnails { display:flex; gap:6px; padding:8px 12px; background:rgba(0,0,0,0.5); overflow-x:auto; }
+    .media-viewer__thumb { width:48px; height:48px; border-radius:8px; flex-shrink:0; border:2px solid transparent; cursor:pointer; transition:border-color 0.2s; display:flex; align-items:center; justify-content:center; font-size:16px; }
+    .media-viewer__thumb--active { border-color:var(--accent); }
+    .media-viewer__thumb--image { background:linear-gradient(135deg,#2db84d,#1565c0); }
+    .media-viewer__thumb--video { background:linear-gradient(135deg,#a855f7,#7c3aed); }
+
+    .phone-chat-header { padding:8px 12px; border-bottom:1px solid var(--border-color); display:flex; align-items:center; gap:8px; background:var(--bg-secondary); }
+    .phone-chat-header__btn { font-size:16px; color:var(--text-secondary); cursor:pointer; padding:4px; }
+  </style>
+</head>
+<body>
+
+<div class="phone-frame">
+  <div class="phone-frame__notch"></div>
+  <div class="phone-frame__statusbar"><span>9:41</span><span>📶 🔋</span></div>
+  <div class="phone-frame__screen">
+
+    <!-- Chat header (context) -->
+    <div class="phone-chat-header">
+      <span class="phone-chat-header__btn" onclick="window.location.href='chat.html'">←</span>
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:700;color:var(--text-primary);">Мария Андреева</div>
+        <div style="font-size:9px;color:var(--text-muted);">16 вложений</div>
+      </div>
+      <span class="phone-chat-header__btn" onclick="openMediaViewer(0)">🖼</span>
+    </div>
+
+    <!-- Chat message with attachments (context) -->
+    <div style="flex:1;overflow-y:auto;padding:12px 8px;">
+      <div style="background:var(--bg-tertiary);border:1px solid var(--border-color);border-radius:12px;padding:10px;margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <span style="font-size:11px;color:var(--text-muted);">14:34 ✓✓</span>
+          <span style="font-size:10px;color:var(--accent);cursor:pointer;" onclick="openMediaViewer(0)">Открыть все →</span>
+        </div>
+        <div style="font-size:12px;color:var(--text-primary);margin-bottom:8px;">📎 3 вложения</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
+          <div style="aspect-ratio:1;background:linear-gradient(135deg,#2db84d,#1e9e3e);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;" onclick="openMediaViewer(0)">🖼</div>
+          <div style="aspect-ratio:1;background:linear-gradient(135deg,#3b9eff,#1565c0);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;" onclick="openMediaViewer(1)">🖼</div>
+          <div style="aspect-ratio:1;background:linear-gradient(135deg,#a855f7,#7c3aed);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;" onclick="openMediaViewer(2)">🎥</div>
+        </div>
+      </div>
+      <div style="background:var(--bg-tertiary);border:1px solid var(--border-color);border-radius:12px;padding:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <span style="font-size:11px;color:var(--text-muted);">15:02 ✓✓</span>
+          <span style="font-size:10px;color:var(--accent);cursor:pointer;">Открыть все →</span>
+        </div>
+        <div style="font-size:12px;color:var(--text-primary);margin-bottom:8px;">📎 2 вложения</div>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;">
+          <div style="aspect-ratio:1;background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;">📄</div>
+          <div style="aspect-ratio:1;background:linear-gradient(135deg,#ef4444,#b91c1c);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;">📄</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="phone-frame__home-bar"></div>
+</div>
+
+<!-- Fullscreen Media Viewer -->
+<div class="media-viewer" id="media-viewer">
+  <div class="media-viewer__statusbar">
+    <span class="media-viewer__back" onclick="closeMediaViewer()">✕</span>
+    <span class="media-viewer__counter" id="media-counter">1 / 3</span>
+    <div class="media-viewer__actions">
+      <span class="media-viewer__action" onclick="showToast('Скачивание...','info')">⬇️</span>
+      <span class="media-viewer__action" onclick="showToast('Поделиться','info')">📤</span>
+      <span class="media-viewer__action" onclick="showToast('Действия','info')">⋮</span>
+    </div>
+  </div>
+
+  <!-- Thumbnail strip -->
+  <div class="media-viewer__thumbnails">
+    <div class="media-viewer__thumb media-viewer__thumb--image media-viewer__thumb--active" onclick="goToSlide(0)">🖼</div>
+    <div class="media-viewer__thumb media-viewer__thumb--image" onclick="goToSlide(1)">🖼</div>
+    <div class="media-viewer__thumb media-viewer__thumb--video" onclick="goToSlide(2)">🎥</div>
+  </div>
+
+  <!-- Swipe area -->
+  <div class="media-viewer__swipe-area" id="swipe-area">
+    <div class="media-viewer__swipe-track" id="swipe-track">
+      <div class="media-viewer__slide">
+        <div class="media-viewer__slide--placeholder" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:96px;">🌅</div>
+      </div>
+      <div class="media-viewer__slide">
+        <div class="media-viewer__slide--placeholder" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:96px;background:linear-gradient(135deg,#3b9eff,#1565c0);">🏙️</div>
+      </div>
+      <div class="media-viewer__slide">
+        <div class="media-viewer__slide--placeholder" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:96px;background:linear-gradient(135deg,#a855f7,#7c3aed);">▶️</div>
+      </div>
+    </div>
+    <span class="media-viewer__nav-arrow media-viewer__nav-arrow--prev" onclick="prevSlide()">‹</span>
+    <span class="media-viewer__nav-arrow media-viewer__nav-arrow--next" onclick="nextSlide()">›</span>
+    <div class="media-viewer__zoom-badge" id="zoom-badge">100%</div>
+  </div>
+
+  <!-- Footer: caption + meta -->
+  <div class="media-viewer__footer">
+    <div class="media-viewer__caption">Фото с конференции Balloo 2026 🎉</div>
+    <div class="media-viewer__meta">
+      <span onclick="showToast('Реакция ❤️','info')">❤️ 12</span>
+      <span onclick="showToast('Комментарии','info')">💬 4</span>
+      <span>📎 macos.png · 240 КБ</span>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+<script>
+let currentSlide = 0;
+const totalSlides = 3;
+let startX = 0;
+let startY = 0;
+let scale = 1;
+
+function openMediaViewer(index) {
+  currentSlide = index;
+  document.getElementById('media-viewer').classList.add('media-viewer--visible');
+  updateSlide();
+  initSwipe();
+}
+
+function closeMediaViewer() {
+  document.getElementById('media-viewer').classList.remove('media-viewer--visible');
+  scale = 1;
+}
+
+function goToSlide(index) {
+  currentSlide = index;
+  scale = 1;
+  updateSlide();
+}
+
+function prevSlide() {
+  if (currentSlide > 0) {
+    currentSlide--;
+    scale = 1;
+    updateSlide();
+  }
+}
+
+function nextSlide() {
+  if (currentSlide < totalSlides - 1) {
+    currentSlide++;
+    scale = 1;
+    updateSlide();
+  }
+}
+
+function updateSlide() {
+  const track = document.getElementById('swipe-track');
+  track.style.transform = `translateX(-${currentSlide * 100}%)`;
+  document.getElementById('media-counter').textContent = `${currentSlide + 1} / ${totalSlides}`;
+
+  // Update thumbnail active state
+  document.querySelectorAll('.media-viewer__thumb').forEach((t, i) => {
+    t.classList.toggle('media-viewer__thumb--active', i === currentSlide);
+  });
+}
+
+function initSwipe() {
+  const area = document.getElementById('swipe-area');
+
+  area.addEventListener('touchstart', (e) => {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+  });
+
+  area.addEventListener('touchend', (e) => {
+    const endX = e.changedTouches[0].clientX;
+    const endY = e.changedTouches[0].clientY;
+    const diffX = endX - startX;
+    const diffY = endY - startY;
+
+    // Only horizontal swipe
+    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+      if (diffX > 0) prevSlide();
+      else nextSlide();
+    }
+  });
+
+  // Pinch-zoom (simplified)
+  let initialDistance = 0;
+  area.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 2) {
+      initialDistance = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+    }
+  });
+
+  area.addEventListener('touchmove', (e) => {
+    if (e.touches.length === 2) {
+      const dist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      const ratio = dist / initialDistance;
+      scale = Math.min(Math.max(ratio, 1), 5);
+      const track = document.getElementById('swipe-track');
+      track.style.transform = `translateX(-${currentSlide * 100}%) scale(${scale})`;
+      document.getElementById('zoom-badge').textContent = Math.round(scale * 100) + '%';
+      document.getElementById('zoom-badge').classList.add('media-viewer__zoom-badge--visible');
+      setTimeout(() => {
+        document.getElementById('zoom-badge').classList.remove('media-viewer__zoom-badge--visible');
+      }, 1000);
+    }
+  });
+
+  area.addEventListener('touchend', (e) => {
+    if (e.touches.length < 2) {
+      // Reset zoom
+      scale = 1;
+      updateSlide();
+    }
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo — Запись голосового</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon">B</div><span>Balloo</span>
+    <div class="topbar__dropdown">
+      <div class="topbar__dropdown-item" onclick="window.location.href='chats.html'">💬 Balloo</div>
+      <div class="topbar__dropdown-divider"></div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div>
+    </div>
+  </div>
+  <div class="topbar__title">Запись голосового</div>
+  <div class="topbar__right">
+    <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИИ</span></div></div>
+    <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+    <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar__search"><input type="text" class="search-input" placeholder="🔍 Поиск чатов..."></div>
+    <div class="list">
+      <div class="list__item list__item--active">
+        <div class="avatar avatar--md avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>МА</span></div></div>
+        <div class="list__item-body"><div class="list__item-title">Мария Андреева</div><div class="list__item-subtitle">в сети</div></div>
+        <div class="list__item-meta"><span class="list__item-time">14:32</span></div>
+      </div>
+      <div class="list__item">
+        <div class="avatar avatar--md avatar--bordered avatar--status-online avatar--ctx-new"><div class="avatar__inner"><span>РД</span></div></div>
+        <div class="list__item-body"><div class="list__item-title">Команда разработки</div><div class="list__item-subtitle">Алексей: Отправил макеты</div></div>
+        <div class="list__item-meta"><span class="list__item-time">14:15</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content: Chat with voice message modal -->
+  <div class="content">
+    <!-- Chat header -->
+    <div style="padding:12px 16px;border-bottom:1px solid var(--border-color);display:flex;align-items:center;gap:12px;background:var(--bg-secondary);">
+      <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>МА</span></div></div>
+      <div class="flex-1"><div class="font-semibold" style="color:var(--text-primary);">Мария Андреева</div><div class="text-xs text-muted">в сети</div></div>
+      <button class="topbar__actions-btn" onclick="openCall('audio')">📞</button>
+      <button class="topbar__actions-btn" onclick="openCall('video')">📹</button>
+    </div>
+
+    <!-- Messages -->
+    <div class="messages">
+      <div style="text-align:center;padding:8px;"><span class="chip">16 июля 2026</span></div>
+      
+      <div class="message message--receiver">
+        <div class="message__bubble">
+          <div class="message__header"><span>14:31</span></div>
+          <div class="message__body">
+            <div style="display:flex;align-items:center;gap:12px;padding:8px 0;">
+              <button class="btn btn--secondary btn--icon" onclick="showToast('Воспроизведение','info')">▶</button>
+              <div style="flex:1;height:32px;display:flex;align-items:center;gap:2px;">
+                <div style="width:3px;height:8px;background:var(--accent);"></div>
+                <div style="width:3px;height:16px;background:var(--accent);"></div>
+                <div style="width:3px;height:24px;background:var(--accent);"></div>
+                <div style="width:3px;height:12px;background:var(--accent);"></div>
+                <div style="width:3px;height:28px;background:var(--accent);"></div>
+                <div style="width:3px;height:20px;background:var(--accent);"></div>
+                <div style="width:3px;height:8px;background:var(--border-strong);"></div>
+                <div style="width:3px;height:16px;background:var(--border-strong);"></div>
+                <div style="width:3px;height:12px;background:var(--border-strong);"></div>
+                <div style="width:3px;height:24px;background:var(--border-strong);"></div>
+                <div style="width:3px;height:8px;background:var(--border-strong);"></div>
+                <div style="width:3px;height:20px;background:var(--border-strong);"></div>
+              </div>
+              <span class="text-xs text-muted">0:14</span>
+            </div>
+          </div>
+          <div class="message__actions">
+            <button class="message__action-btn" title="Ответить">↩</button>
+            <button class="message__action-btn" title="Переслать">📤</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input area -->
+    <div class="input-area">
+      <button class="input-area__btn" title="Прикрепить файл">📎</button>
+      <button class="input-area__btn" title="Фото/видео">🖼</button>
+      <!-- Voice record button opens modal -->
+      <button class="input-area__btn" title="Голосовое" onclick="openModal('modal-voice-message')" style="color:var(--accent);">🎤</button>
+      <textarea class="input-area__field" placeholder="Напишите сообщение..." rows="1"></textarea>
+      <button class="input-area__btn input-area__btn--send" onclick="sendMessage()" title="Отправить">➤</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Voice Message Recorder -->
+<div class="modal-overlay" id="modal-overlay"></div>
+<div class="modal modal--status-info" id="modal-voice-message" style="width:480px;">
+  <div class="modal__header">
+    <span class="modal__title">🎤 Запись голосового сообщения</span>
+    <div class="modal__close" onclick="closeModal('modal-voice-message')">✕</div>
+  </div>
+  <div class="modal__body">
+    <!-- Recording states: idle, recording, preview, sending -->
+    
+    <!-- State 1: Idle / Ready to record -->
+    <div id="voice-idle" style="text-align:center;padding:20px 0;">
+      <div class="avatar avatar--xl" style="background:linear-gradient(135deg,var(--accent),var(--accent-hover));margin:0 auto 20px;cursor:pointer;" onclick="startRecording()">
+        <div class="avatar__inner"><span style="font-size:48px;">🎤</span></div>
+      </div>
+      <div class="text-sm font-bold mb-2" style="color:var(--text-primary);">Нажмите для записи</div>
+      <div class="text-sm text-secondary">Удерживайте для записи голосового сообщения</div>
+      <div class="text-xs text-muted mt-2">Максимум: 10 минут · OGG формат</div>
+    </div>
+
+    <!-- State 2: Recording -->
+    <div id="voice-recording" style="display:none;text-align:center;padding:20px 0;">
+      <!-- Timer -->
+      <div style="font-size:48px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--danger);" id="voice-timer">00:00</div>
+      
+      <!-- Waveform visualization -->
+      <div style="height:80px;display:flex;align-items:center;justify-content:center;gap:2px;margin:20px 0;" id="voice-waveform">
+        <!-- Generated by JS -->
+      </div>
+
+      <!-- Amplitude meter -->
+      <div style="margin-bottom:20px;">
+        <div class="text-xs text-muted mb-1">Громкость</div>
+        <div style="height:8px;background:var(--bg-tertiary);border-radius:4px;overflow:hidden;">
+          <div id="voice-volume" style="height:100%;width:30%;background:var(--accent);border-radius:4px;transition:width 0.1s;"></div>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div style="display:flex;align-items:center;justify-content:center;gap:20px;">
+        <button class="btn btn--tertiary" onclick="cancelRecording()">🗑 Отмена</button>
+        <div class="avatar avatar--lg" style="background:var(--danger);cursor:pointer;animation:pulse 1.5s infinite;" onclick="stopRecording()">
+          <div class="avatar__inner"><span style="font-size:32px;">⏹</span></div>
+        </div>
+        <button class="btn btn--tertiary" onclick="toggleVoiceSpeed()">1x</button>
+      </div>
+    </div>
+
+    <!-- State 3: Preview -->
+    <div id="voice-preview" style="display:none;">
+      <div class="text-sm font-bold mb-4" style="color:var(--text-primary);">🎧 Прослушать</div>
+      
+      <!-- Playback controls -->
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+        <button class="btn btn--primary btn--icon" id="play-btn" onclick="togglePlayback()">▶</button>
+        <div style="flex:1;">
+          <div style="height:32px;display:flex;align-items:center;gap:2px;background:var(--bg-tertiary);padding:4px;" id="preview-waveform">
+            <!-- Waveform bars -->
+          </div>
+        </div>
+        <span class="text-xs text-muted" id="voice-duration">0:14</span>
+      </div>
+
+      <!-- Speed controls -->
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex gap-1">
+          <button class="btn btn--tertiary btn--sm" onclick="setSpeed(0.5)">0.5x</button>
+          <button class="btn btn--primary btn--sm">1x</button>
+          <button class="btn btn--tertiary btn--sm" onclick="setSpeed(1.5)">1.5x</button>
+          <button class="btn btn--tertiary btn--sm" onclick="setSpeed(2)">2x</button>
+        </div>
+        <div class="text-xs text-muted">OGG · 128 kbps</div>
+      </div>
+
+      <!-- Voice note settings -->
+      <div class="form-group">
+        <label class="form-label">Преобразовать в текст</label>
+        <label class="form-checkbox"><input type="checkbox"><span>Включить транскрипцию</span></label>
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">Скорость воспроизведения по умолчанию</label>
+        <select class="form-select">
+          <option selected>1x (нормальная)</option>
+          <option>0.5x (медленно)</option>
+          <option>1.5x (быстро)</option>
+          <option>2x (очень быстро)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- State 4: Sending -->
+    <div id="voice-sending" style="display:none;text-align:center;padding:40px 0;">
+      <div style="font-size:48px;margin-bottom:16px;">📤</div>
+      <div class="text-sm font-bold" style="color:var(--text-primary);">Отправка...</div>
+      <div style="height:8px;background:var(--bg-tertiary);border-radius:4px;overflow:hidden;margin-top:12px;">
+        <div style="height:100%;width:60%;background:var(--accent);border-radius:4px;animation:skeleton-pulse 1.5s infinite;"></div>
+      </div>
+    </div>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--tertiary" onclick="closeModal('modal-voice-message')">Отмена</button>
+    <button class="btn btn--primary" id="btn-send-voice" onclick="sendVoiceMessage()" style="display:none;">➤ Отправить</button>
+  </div>
+</div>
+
+<style>
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.9; }
+}
+</style>
+
+<script src="../assets/common.js"></script>
+<script>
+let isRecording = false;
+let isPlaying = false;
+let recordSeconds = 0;
+let recordInterval = null;
+let playProgress = 0;
+let playInterval = null;
+
+function startRecording() {
+  document.getElementById('voice-idle').style.display = 'none';
+  document.getElementById('voice-recording').style.display = 'block';
+  document.getElementById('btn-send-voice').style.display = 'none';
+  isRecording = true;
+  recordSeconds = 0;
+  
+  // Generate initial waveform
+  generateWaveform('voice-waveform');
+  
+  // Start timer
+  recordInterval = setInterval(() => {
+    recordSeconds++;
+    const m = Math.floor(recordSeconds / 60).toString().padStart(2, '0');
+    const s = (recordSeconds % 60).toString().padStart(2, '0');
+    document.getElementById('voice-timer').textContent = `${m}:${s}`;
+    
+    // Simulate volume
+    const vol = Math.random() * 80 + 10;
+    document.getElementById('voice-volume').style.width = vol + '%';
+    
+    // Update waveform
+    const bars = document.getElementById('voice-waveform').children;
+    if (bars.length > 0) {
+      const lastBar = bars[bars.length - 1];
+      lastBar.style.height = (Math.random() * 60 + 8) + 'px';
+    }
+    
+    if (recordSeconds >= 600) { // 10 min limit
+      stopRecording();
+    }
+  }, 1000);
+}
+
+function stopRecording() {
+  clearInterval(recordInterval);
+  isRecording = false;
+  
+  document.getElementById('voice-recording').style.display = 'none';
+  document.getElementById('voice-preview').style.display = 'block';
+  document.getElementById('btn-send-voice').style.display = 'inline-flex';
+  
+  // Set duration
+  const m = Math.floor(recordSeconds / 60).toString().padStart(2, '0');
+  const s = (recordSeconds % 60).toString().padStart(2, '0');
+  document.getElementById('voice-duration').textContent = `${m}:${s}`;
+  
+  // Generate preview waveform
+  generateWaveform('preview-waveform');
+}
+
+function cancelRecording() {
+  clearInterval(recordInterval);
+  isRecording = false;
+  document.getElementById('voice-recording').style.display = 'none';
+  document.getElementById('voice-idle').style.display = 'block';
+}
+
+function togglePlayback() {
+  isPlaying = !isPlaying;
+  const btn = document.getElementById('play-btn');
+  
+  if (isPlaying) {
+    btn.textContent = '⏸';
+    playInterval = setInterval(() => {
+      playProgress += 2;
+      if (playProgress >= 100) { playProgress = 0; togglePlayback(); }
+    }, 200);
+  } else {
+    btn.textContent = '▶';
+    clearInterval(playInterval);
+  }
+}
+
+function setSpeed(speed) {
+  showToast(`Скорость: ${speed}x`, 'info');
+}
+
+function sendVoiceMessage() {
+  document.getElementById('voice-preview').style.display = 'none';
+  document.getElementById('voice-sending').style.display = 'block';
+  
+  setTimeout(() => {
+    closeModal('modal-voice-message');
+    showToast('Голосовое отправлено!', 'success');
+    // Reset to idle
+    document.getElementById('voice-idle').style.display = 'block';
+    document.getElementById('voice-sending').style.display = 'none';
+    playProgress = 0;
+  }, 1500);
+}
+
+function generateWaveform(containerId) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  for (let i = 0; i < 40; i++) {
+    const bar = document.createElement('div');
+    bar.style.cssText = `width:3px;height:${Math.random() * 56 + 8}px;background:var(--accent);border-radius:2px;transition:height 0.1s;`;
+    container.appendChild(bar);
+  }
+}
+</script>
+</body>
+</html>

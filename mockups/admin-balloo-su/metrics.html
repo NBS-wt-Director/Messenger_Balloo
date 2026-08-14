@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Метрики</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    .chart-placeholder { height: 200px; background: var(--bg-tertiary); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 13px; }
+    .metric-card { background: var(--bg-glass); backdrop-filter: blur(var(--blur)); border: 1px solid var(--border-color); padding: 16px; }
+    .metric-card__value { font-size: 24px; font-weight: 800; color: var(--text-primary); }
+    .metric-card__label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--warning);">A</div><span>Admin</span>
+    <div class="topbar__dropdown"><div class="topbar__dropdown-item">🛡️ Admin (текущий)</div><div class="topbar__dropdown-divider"></div><div class="topbar__dropdown-item">💬 Balloo</div><div class="topbar__dropdown-item">🏢 Command</div><div class="topbar__dropdown-item">💡 Features</div><div class="topbar__dropdown-item">📜 History</div><div class="topbar__dropdown-item">⬇️ Download</div><div class="topbar__dropdown-item">📚 API Docs</div></div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Метрики</div>
+  <div class="topbar__right"><div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>АД</span></div></div><span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span><span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span></div>
+</div>
+<div class="main">
+  <div class="sidebar sidebar--narrow">
+    <div class="list">
+      <div class="list__item">📊 Дашборд</div>
+      <div class="list__item">👤 Пользователи</div>
+      <div class="list__item">🚩 Жалобы</div>
+      <div class="list__item">🔨 Баны</div>
+      <div class="list__item list__item--active">📈 Метрики</div>
+      <div class="list__item">🎛️ Feature Flags</div>
+      <div class="list__item">📁 Файлы</div>
+      <div class="list__item">📝 Тексты</div>
+      <div class="list__item" style="border-top:1px solid var(--border-color);margin-top:8px;padding-top:12px;">🏢 Отделы</div>
+      <div class="list__item">👤 Сотрудники</div>
+      <div class="list__item">💼 Вакансии</div>
+      <div class="list__item">📜 Версии</div>
+      <div class="list__item">💡 Фичи (модерация)</div>
+      <div class="list__item">💚 Донаты</div>
+    </div>
+  </div>
+  <div class="content overflow-y-auto"><div class="page-container">
+    <h1 class="page-title">Метрики</h1>
+    <p class="page-subtitle">Prometheus + Grafana • ELK Stack • Системные метрики</p>
+
+    <div class="flex gap-4 mb-6" style="flex-wrap:wrap;">
+      <div class="metric-card flex-1" style="min-width:150px;"><div class="metric-card__value">99.7%</div><div class="metric-card__label">Uptime</div></div>
+      <div class="metric-card flex-1" style="min-width:150px;"><div class="metric-card__value">45ms</div><div class="metric-card__label">Avg. Latency</div></div>
+      <div class="metric-card flex-1" style="min-width:150px;"><div class="metric-card__value">2.4k</div><div class="metric-card__label">RPS</div></div>
+      <div class="metric-card flex-1" style="min-width:150px;"><div class="metric-card__value">8</div><div class="metric-card__label">Активных алертов</div></div>
+    </div>
+
+    <div class="card mb-4">
+      <h3 class="card__title mb-4">Нагрузка сервера (CPU / RAM / Network)</h3>
+      <div class="chart-placeholder mb-2">📊 График нагрузки CPU (Last 24h)</div>
+      <div class="chart-placeholder mb-2">📊 График использования RAM (Last 24h)</div>
+      <div class="chart-placeholder">📊 Сетевой трафик (Last 24h)</div>
+    </div>
+
+    <div class="card mb-4">
+      <h3 class="card__title mb-4">Логи (ELK Stack)</h3>
+      <div class="form-group"><input type="text" class="form-input" placeholder="🔍 Поиск по логам..."></div>
+      <div class="list__item" style="border:none;"><span class="chip chip--danger">ERROR</span><span class="flex-1 text-sm">WebSocket connection timeout</span><span class="text-xs text-muted">14:32:15</span></div>
+      <div class="list__item" style="border:none;"><span class="chip chip--warning">WARN</span><span class="flex-1 text-sm">Database query slow (>500ms)</span><span class="text-xs text-muted">14:30:01</span></div>
+      <div class="list__item" style="border:none;"><span class="chip chip--info">INFO</span><span class="flex-1 text-sm">Backup completed: 2.4GB</span><span class="text-xs text-muted">14:00:00</span></div>
+      <div class="list__item" style="border:none;"><span class="chip chip--info">INFO</span><span class="flex-1 text-sm">New user registration: 234 today</span><span class="text-xs text-muted">13:45:00</span></div>
+    </div>
+
+    <div class="card">
+      <h3 class="card__title mb-4">Prometheus Targets</h3>
+      <table class="table">
+        <thead><tr><th>Target</th><th>Status</th><th>Last Scrape</th><th>Error</th></tr></thead>
+        <tbody>
+          <tr><td>api.balloo.su:9090</td><td><span class="chip chip--accent">UP</span></td><td>15s ago</td><td>—</td></tr>
+          <tr><td>ws.balloo.su:9091</td><td><span class="chip chip--accent">UP</span></td><td>15s ago</td><td>—</td></tr>
+          <tr><td>postgres:9187</td><td><span class="chip chip--accent">UP</span></td><td>15s ago</td><td>—</td></tr>
+          <tr><td>minio:9000</td><td><span class="chip chip--warning">DOWN</span></td><td>30s ago</td><td>Connection refused</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div></div>
+</div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

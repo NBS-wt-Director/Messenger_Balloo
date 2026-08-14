@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobile — Чат</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    html { overflow-y: auto; height: auto; }
+    body { overflow-y: auto; height: auto; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 12px 24px; }
+    .phone-frame { width:360px; height:780px; background:var(--bg-secondary); border:3px solid var(--border-strong); border-radius:36px; overflow:hidden; position:relative; display:flex; flex-direction:column; box-shadow:var(--shadow-glass); }
+    .phone-frame__notch { position:absolute; top:0; left:50%; transform:translateX(-50%); width:130px; height:26px; background:var(--bg-primary); border-bottom-left-radius:18px; border-bottom-right-radius:18px; z-index:10; }
+    .phone-frame__statusbar { height:28px; padding:2px 20px 0; display:flex; align-items:center; justify-content:space-between; font-size:11px; color:var(--text-secondary); background:var(--bg-secondary); }
+    .phone-frame__screen { flex:1; overflow:hidden; background:var(--bg-primary); display:flex; flex-direction:column; }
+    .phone-frame__home-bar { height:5px; width:120px; margin:0 auto 6px; background:var(--text-muted); border-radius:3px; }
+    .phone-tabbar { display:flex; height:48px; background:var(--bg-secondary); border-top:1px solid var(--border-color); }
+    .phone-tabbar__item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; font-size:9px; color:var(--text-secondary); cursor:pointer; transition:color 0.15s; }
+    .phone-tabbar__item:hover { color:var(--text-primary); }
+    .phone-tabbar__item--active { color:var(--accent); }
+    .phone-tabbar__icon { font-size:18px; line-height:1; }
+
+    .phone-chat-header { padding:8px 12px; border-bottom:1px solid var(--border-color); display:flex; align-items:center; gap:8px; background:var(--bg-secondary); }
+    .phone-chat-header__info { flex:1; min-width:0; }
+    .phone-chat-header__name { font-size:14px; font-weight:700; color:var(--text-primary); }
+    .phone-chat-header__status { font-size:10px; color:var(--accent); }
+    .phone-chat-header__btn { font-size:16px; color:var(--text-secondary); cursor:pointer; padding:4px; }
+
+    .phone-messages { flex:1; overflow-y:auto; padding:8px 6px; display:flex; flex-direction:column; gap:3px; }
+    .phone-msg { max-width:80%; padding:6px 10px; font-size:12px; line-height:1.4; position:relative; }
+    .phone-msg--sent { align-self:flex-end; background:var(--accent); color:var(--accent-text); clip-path:var(--bubble-sender); border-right:2px solid var(--accent-hover); }
+    .phone-msg--recv { align-self:flex-start; background:var(--bg-tertiary); color:var(--text-primary); clip-path:var(--bubble-receiver); border-left:2px solid var(--border-strong); }
+    .phone-msg__time { font-size:8px; opacity:0.7; margin-top:1px; text-align:right; }
+    .phone-msg__reply { padding:3px 6px; border-left:2px solid var(--accent); background:rgba(0,0,0,0.12); margin-bottom:3px; font-size:10px; }
+    .phone-msg__reply-author { font-weight:600; }
+    .phone-msg__actions { display:flex; gap:6px; margin-top:3px; font-size:10px; opacity:0.6; }
+    .phone-msg__actions span { cursor:pointer; }
+    .phone-msg__reactions { display:flex; gap:2px; margin-top:2px; flex-wrap:wrap; }
+    .phone-msg__reaction { font-size:9px; padding:1px 4px; background:rgba(255,255,255,0.15); cursor:pointer; }
+    .phone-msg__poll { padding:6px; border-left:2px solid var(--accent); margin-bottom:3px; }
+    .phone-msg__poll-question { font-size:11px; font-weight:600; margin-bottom:3px; }
+    .phone-msg__poll-option { font-size:10px; padding:2px 4px; margin-bottom:1px; display:flex; align-items:center; gap:3px; cursor:pointer; }
+    .phone-msg__poll-bar { display:inline-block; height:6px; background:var(--accent); }
+    .phone-msg__poll-meta { font-size:8px; color:var(--text-muted); margin-top:2px; }
+    .phone-msg__ticks { font-size:9px; text-align:right; margin-top:-2px; }
+    .phone-msg__ticks--read { color:var(--accent); }
+    .phone-msg__ticks--delivered { color:var(--text-muted); }
+    .phone-msg__voice { display:flex; align-items:center; gap:8px; padding:4px 0; }
+    .phone-msg__voice-bar { flex:1; height:24px; display:flex; align-items:center; gap:1px; }
+    .phone-msg__voice-bar div { width:2px; background:var(--accent); }
+    .phone-msg__tag { font-size:8px; padding:1px 4px; background:rgba(0,0,0,0.15); margin-left:4px; }
+
+    .phone-input-area { padding:6px 10px; border-top:1px solid var(--border-color); display:flex; gap:6px; align-items:center; background:var(--bg-secondary); }
+    .phone-input-area__field { flex:1; padding:6px 10px; background:var(--bg-tertiary); border:1px solid var(--border-color); color:var(--text-primary); font-size:12px; outline:none; border-radius:16px; resize:none; line-height:1.3; max-height:60px; }
+    .phone-input-area__btn { width:30px; height:30px; display:flex; align-items:center; justify-content:center; color:var(--text-secondary); cursor:pointer; font-size:16px; }
+    .phone-input-area__btn--send { color:var(--accent); }
+
+    .reply-panel { display:none; padding:6px 10px; background:var(--bg-glass); border-top:1px solid var(--border-color); align-items:flex-start; gap:6px; }
+    .reply-panel--visible { display:flex; }
+    .reply-panel__author { font-size:10px; font-weight:600; color:var(--accent); }
+    .reply-panel__text { font-size:10px; color:var(--text-muted); }
+    .reply-panel__cancel { font-size:12px; color:var(--text-muted); cursor:pointer; }
+
+    .phone-typing { font-size:10px; color:var(--text-muted); padding:0 10px 2px; }
+  </style>
+</head>
+<body>
+
+<div class="phone-frame">
+  <div class="phone-frame__notch"></div>
+  <div class="phone-frame__statusbar"><span>9:41</span><span>📶 🔋</span></div>
+  <div class="phone-frame__screen">
+    <!-- TOPBAR (обязательный) -->
+    <div class="topbar">
+      <div class="topbar__logo">
+        <div class="topbar__logo-icon">B</div>
+        <span>Balloo</span>
+        <div class="topbar__dropdown">
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/chats.html'">💬 Balloo</div>
+          <div class="topbar__dropdown-divider"></div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div>
+          <div class="topbar__dropdown-divider"></div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/contacts.html'">👤 Контакты</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/search.html'">🔍 Поиск</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/archive.html'">📦 Архив</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/calls.html'">📞 Звонки</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/invites.html'">📨 Приглашения</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/bots.html'">🤖 О ботах</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/about-balloo.html'">ℹ️ О Balloo</div>
+        </div>
+      </div>
+      <div class="topbar__title">Мария Андреева</div>
+      <div class="topbar__right">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact" onclick="window.location.href='../balloo-su/profile.html'">
+          <div class="avatar__inner"><span>ИИ</span></div>
+        </div>
+        <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+        <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+      </div>
+    </div>
+
+    <!-- Chat header -->
+    <div class="phone-chat-header">
+      <span class="phone-chat-header__btn" onclick="window.location.href='overview.html'">←</span>
+      <div class="avatar avatar--xs avatar--bordered avatar--status-online avatar--ctx-contact">
+        <div class="avatar__inner"><span>МА</span></div>
+      </div>
+      <div class="phone-chat-header__info">
+        <div class="phone-chat-header__name">Мария Андреева</div>
+        <div class="phone-chat-header__status">в сети</div>
+      </div>
+      <span class="phone-chat-header__btn" onclick="openCall('audio')">📞</span>
+      <span class="phone-chat-header__btn" onclick="openCall('video')">📹</span>
+      <span class="phone-chat-header__btn" onclick="toggleDropdown('chat-menu')">⋮</span>
+      <div class="topbar__dropdown" id="chat-menu" style="top:100%;right:0;left:auto;">
+        <div class="topbar__dropdown-item" onclick="window.location.href='chat-attachments.html'">📎 Вложения чата</div>
+        <div class="topbar__dropdown-item" onclick="showToast('Чат закреплён','success')">📌 Закрепить чат</div>
+        <div class="topbar__dropdown-item" onclick="showToast('Чат заглушён','info')">🔇 Заглушить</div>
+        <div class="topbar__dropdown-item" onclick="showToast('Чат в архиве','info')">📦 В архив</div>
+        <div class="topbar__dropdown-item" onclick="showToast('Экспорт начат','success')">📤 Экспорт в PDF</div>
+        <div class="topbar__dropdown-divider"></div>
+        <div class="topbar__dropdown-item text-danger" onclick="showToast('Пользователь заблокирован','error')">🚫 Заблокировать</div>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div class="phone-messages">
+      <div style="text-align:center;padding:3px 0;"><span class="chip" style="font-size:9px;">16 июля 2026</span></div>
+
+      <!-- Receiver message with reply -->
+      <div class="phone-msg phone-msg--recv" id="msg-1">
+        <div class="phone-msg__reply">
+          <div class="phone-msg__reply-author">Алексей Козлов</div>
+          <div>Привет, посмотрите новые макеты</div>
+        </div>
+        Да, посмотрела. <strong>Отличная работа!</strong> Особенно понравился <em>дизайн аватарок</em> — восьмигранники смотрятся очень <code>fresh</code>
+        <div class="phone-msg__actions">
+          <span onclick="openReplyPanel('msg-1')">↩</span>
+          <span onclick="showToast('Текст скопирован','success')">📋</span>
+          <span onclick="showToast('Реакция добавлена','info')">😊</span>
+          <span onclick="openModal('modal-forward')">📤</span>
+          <span onclick="window.location.href='report-message.html'">🚩</span>
+        </div>
+        <div class="phone-msg__reactions">
+          <span class="phone-msg__reaction" onclick="showToast('Реакция 👍','info')">👍 2</span>
+          <span class="phone-msg__reaction" onclick="showToast('Реакция ❤','info')">❤ 1</span>
+          <span class="phone-msg__reaction" onclick="showToast('Реакция 🔥','info')">🔥 3</span>
+        </div>
+        <div class="phone-msg__time">14:20 · ↩ Переслано</div>
+      </div>
+
+      <!-- Sender message -->
+      <div class="phone-msg phone-msg--sent" id="msg-2">
+        Спасибо! Завтра отправлю финальную версию. <del>Старый вариант</del> — новый вариант почти готов.
+        <div class="phone-msg__actions">
+          <span onclick="openReplyPanel('msg-2')">↩</span>
+          <span onclick="showToast('Текст скопирован','success')">📋</span>
+          <span onclick="showToast('Реакция добавлена','info')">😊</span>
+          <span onclick="showToast('Режим редактирования','info')">✏</span>
+          <span onclick="showToast('Сообщение удалено','error')">🗑</span>
+        </div>
+        <div class="phone-msg__ticks phone-msg__ticks--read">✓✓</div>
+        <div class="phone-msg__time">14:25</div>
+      </div>
+
+      <!-- Poll widget -->
+      <div class="phone-msg phone-msg--recv">
+        <div class="phone-msg__poll">
+          <div class="phone-msg__poll-question">📊 Какой цвет для акцента?</div>
+          <div class="phone-msg__poll-option" onclick="showToast('Голос учтён!','success')"><span class="phone-msg__poll-bar" style="width:25%;"></span> Зелёный 25%</div>
+          <div class="phone-msg__poll-option" onclick="showToast('Голос учтён!','success')"><span class="phone-msg__poll-bar" style="width:58%;"></span> Мятный 58%</div>
+          <div class="phone-msg__poll-option" onclick="showToast('Голос учтён!','success')"><span class="phone-msg__poll-bar" style="width:17%;"></span> Бирюзовый 17%</div>
+          <div class="phone-msg__poll-meta">12 голосов · Анонимный · Можно переслать</div>
+        </div>
+        <div class="phone-msg__actions">
+          <span onclick="openReplyPanel()">↩</span>
+          <span onclick="openModal('modal-forward')">📤</span>
+          <span onclick="window.location.href='report-message.html'">🚩</span>
+        </div>
+        <div class="phone-msg__time">14:28</div>
+      </div>
+
+      <!-- Sender AI message -->
+      <div class="phone-msg phone-msg--sent">
+        <span class="phone-msg__tag">🤖 ИИ</span><span class="phone-msg__tag">⚙ Автоответ</span><br>
+        Автоматический ответ: Я сейчас занят, отвечу позже.
+        <div class="phone-msg__ticks phone-msg__ticks--delivered">✓✓</div>
+        <div class="phone-msg__time">14:30</div>
+      </div>
+
+      <!-- Receiver voice message -->
+      <div class="phone-msg phone-msg--recv">
+        <div class="phone-msg__voice">
+          <button class="btn btn--secondary btn--icon" style="width:24px;height:24px;font-size:10px;" onclick="showToast('Воспроизведение','info')">▶</button>
+          <div class="phone-msg__voice-bar">
+            <div style="height:6px;"></div><div style="height:12px;"></div><div style="height:18px;"></div><div style="height:9px;"></div>
+            <div style="height:22px;background:var(--accent);"></div><div style="height:15px;background:var(--accent);"></div><div style="height:6px;background:var(--accent);"></div>
+            <div style="height:12px;"></div><div style="height:9px;"></div><div style="height:18px;"></div><div style="height:6px;"></div><div style="height:15px;"></div>
+          </div>
+          <span style="font-size:9px;color:var(--text-muted);">0:14</span>
+          <span style="font-size:9px;color:var(--accent);cursor:pointer;" onclick="showToast('Скорость 1.5x','info')">1.5x</span>
+        </div>
+        <div class="phone-msg__time">14:31</div>
+      </div>
+
+      <!-- Sender attachment message -->
+      <div class="phone-msg phone-msg--sent">
+        📎 <span style="opacity:0.8;font-size:10px;">3 вложения</span>
+        <div class="phone-msg__time">14:34 ✓✓</div>
+      </div>
+
+      <!-- Typing indicator -->
+      <div class="phone-typing"><span class="typing"><span class="typing__dots"><span class="typing__dot"></span><span class="typing__dot"></span><span class="typing__dot"></span></span> Мария печатает...</span></div>
+    </div>
+
+    <!-- Reply panel -->
+    <div class="reply-panel" id="reply-panel">
+      <button class="reply-panel__cancel" onclick="closeReplyPanel()">✕</button>
+      <div>
+        <div class="reply-panel__author" id="reply-panel-author">Мария Андреева</div>
+        <div class="reply-panel__text" id="reply-panel-text">Текст сообщения...</div>
+      </div>
+    </div>
+
+    <!-- Input area -->
+    <div class="phone-input-area">
+      <span class="phone-input-area__btn" onclick="openAttachmentsPanel()" title="Прикрепить">📎</span>
+      <textarea class="phone-input-area__field" placeholder="Сообщение... (или / для команд)" rows="1"></textarea>
+      <span class="phone-input-area__btn" onclick="toggleEmojiPanel()" title="Эмодзи">😊</span>
+      <span class="phone-input-area__btn" onclick="openPollEditor()" title="Интерактив">📊</span>
+      <span class="phone-input-area__btn phone-input-area__btn--send" onclick="sendMessage()" title="Отправить">➤</span>
+    </div>
+
+    <!-- Tabbar — активен Чаты -->
+    <div class="phone-tabbar">
+      <div class="phone-tabbar__item phone-tabbar__item--active" onclick="window.location.href='chat.html'">
+        <span class="phone-tabbar__icon">💬</span>Чаты
+      </div>
+      <div class="phone-tabbar__item" onclick="window.location.href='contacts.html'">
+        <span class="phone-tabbar__icon">👥</span>Контакты
+      </div>
+      <div class="phone-tabbar__item" onclick="window.location.href='stories.html'">
+        <span class="phone-tabbar__icon">📷</span>Сторис
+      </div>
+      <div class="phone-tabbar__item" onclick="window.location.href='calls-history.html'">
+        <span class="phone-tabbar__icon">📞</span>Звонки
+      </div>
+      <div class="phone-tabbar__item" onclick="window.location.href='settings.html'">
+        <span class="phone-tabbar__icon">⚙</span>Настройки
+      </div>
+    </div>
+  </div>
+  <div class="phone-frame__home-bar"></div>
+</div>
+
+<!-- Modal: New Chat -->
+<div class="modal-overlay" id="modal-overlay"></div>
+<div class="modal" id="modal-new-chat">
+  <div class="modal__header">
+    <span class="modal__title">Новый чат</span>
+    <div class="modal__close" onclick="closeModal('modal-new-chat')">✕</div>
+  </div>
+  <div class="modal__body">
+    <div class="form-group">
+      <input type="text" class="form-input" placeholder="🔍 Поиск человека...">
+    </div>
+    <div class="list" style="max-height:200px;">
+      <div class="list__item">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>АК</span></div></div>
+        <div class="list__item-body"><div class="list__item-title">Алексей Козлов</div><div class="list__item-subtitle">в сети</div></div>
+      </div>
+      <div class="list__item">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-offline avatar--ctx-contact"><div class="avatar__inner"><span>ДП</span></div></div>
+        <div class="list__item-body"><div class="list__item-title">Дмитрий Петров</div><div class="list__item-subtitle">был 2 часа назад</div></div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <button class="btn btn--secondary btn--block" onclick="window.location.href='group-create.html'">👥 Создать группу</button>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--tertiary" onclick="closeModal('modal-new-chat')">Отмена</button>
+  </div>
+</div>
+
+<!-- Modal: Forward -->
+<div class="modal" id="modal-forward">
+  <div class="modal__header">
+    <span class="modal__title">📤 Переслать сообщение</span>
+    <div class="modal__close" onclick="closeModal('modal-forward')">✕</div>
+  </div>
+  <div class="modal__body">
+    <div class="form-group">
+      <input type="text" class="form-input" placeholder="🔍 Поиск чатов..." style="padding-left:36px;">
+    </div>
+    <div class="list" style="max-height:200px;">
+      <div class="list__item">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>МА</span></div></div>
+        <div class="list__item-body"><div class="list__item-title">Мария Андреева</div><div class="list__item-subtitle">в сети</div></div>
+      </div>
+      <div class="list__item">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-new"><div class="avatar__inner"><span>РД</span></div></div>
+        <div class="list__item-body"><div class="list__item-title">Команда разработки</div><div class="list__item-subtitle">5 участников</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--tertiary" onclick="closeModal('modal-forward')">Отмена</button>
+    <button class="btn btn--primary" onclick="closeModal('modal-forward'); showToast('Переслано','success')">Переслать</button>
+  </div>
+</div>
+
+<!-- Modal: Scheduled Message -->
+<div class="modal" id="modal-scheduled">
+  <div class="modal__header">
+    <span class="modal__title">⏰ Отложенное сообщение</span>
+    <div class="modal__close" onclick="closeModal('modal-scheduled')">✕</div>
+  </div>
+  <div class="modal__body">
+    <div class="form-group">
+      <label class="form-label">Дата и время отправки</label>
+      <input type="datetime-local" class="form-input">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Повтор</label>
+      <select class="form-select">
+        <option>Не повторять</option>
+        <option>Ежедневно</option>
+        <option>Еженедельно</option>
+      </select>
+    </div>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--tertiary" onclick="closeModal('modal-scheduled')">Отмена</button>
+    <button class="btn btn--primary" onclick="closeModal('modal-scheduled'); showToast('Запланировано','success')">Запланировать</button>
+  </div>
+</div>
+
+<!-- Call Overlay -->
+<div class="call-overlay" id="call-overlay">
+  <div class="call-overlay__header">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="avatar avatar--sm avatar--bordered avatar--status-busy avatar--ctx-contact"><div class="avatar__inner"><span>МА</span></div></div>
+      <div>
+        <div class="font-semibold" style="color:var(--text-primary);font-size:13px;">Мария Андреева</div>
+        <div class="call-overlay__timer" id="call-timer" style="font-size:11px;">00:00</div>
+      </div>
+    </div>
+    <div class="chip chip--warning" style="font-size:9px;">⚠ Низкая скорость</div>
+    <button class="btn btn--tertiary" style="font-size:11px;padding:4px 8px;" onclick="closeCall()">Свернуть</button>
+  </div>
+  <div class="call-overlay__participants">
+    <div class="call-participant">
+      <div class="call-participant__video call-participant__video--speaking">
+        <div class="avatar avatar--lg avatar--bordered avatar--status-busy avatar--ctx-contact"><div class="avatar__inner"><span>МА</span></div></div>
+      </div>
+      <span class="call-participant__name">Мария (говорит)</span>
+    </div>
+    <div class="call-participant">
+      <div class="call-participant__video">
+        <div class="avatar avatar--lg avatar--bordered avatar--status-busy avatar--ctx-contact"><div class="avatar__inner"><span>ИИ</span></div></div>
+      </div>
+      <span class="call-participant__name">Вы</span>
+    </div>
+  </div>
+  <div class="call-overlay__controls">
+    <div class="call-control call-control--mute" id="call-mute" onclick="toggleMute()" title="Микрофон">🎤</div>
+    <div class="call-control call-control--video" id="call-video" onclick="toggleVideo()" title="Камера">📹</div>
+    <div class="call-control call-control--screen" id="call-screen" onclick="toggleScreen()" title="Демонстрация">🖥</div>
+    <div class="call-control call-control--hangup" onclick="closeCall()" title="Завершить">📞</div>
+  </div>
+</div>
+
+<!-- Attachments Panel (C1.1) -->
+<div class="attachments-panel" id="attachments-panel">
+  <div class="attachments-panel__header">
+    <span class="attachments-panel__title">📎 Вложения чата</span>
+    <div class="attachments-panel__close" onclick="closeAttachmentsPanel()">✕</div>
+  </div>
+  <div class="attachments-panel__body">
+    <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;">
+      <button class="btn btn--primary btn--sm" style="font-size:10px;">📤 Загрузить</button>
+      <button class="btn btn--tertiary btn--sm" style="font-size:10px;">🖼 Фото</button>
+      <button class="btn btn--tertiary btn--sm" style="font-size:10px;">🎥 Видео</button>
+      <button class="btn btn--tertiary btn--sm" style="font-size:10px;">📄 Документы</button>
+      <button class="btn btn--tertiary btn--sm" style="font-size:10px;">📎 Файлы</button>
+    </div>
+    <div class="attachment-grid" style="grid-template-columns:repeat(3,1fr);">
+      <div><div class="attachment-item" style="background:linear-gradient(135deg,#2db84d,#1e9e3e);aspect-ratio:1;"></div><div class="attachment-item__meta" style="font-size:10px;">macos.png<br>240 КБ</div></div>
+      <div><div class="attachment-item" style="background:linear-gradient(135deg,#3b9eff,#1565c0);aspect-ratio:1;"></div><div class="attachment-item__meta" style="font-size:10px;">design.png<br>1.2 МБ</div></div>
+      <div><div class="attachment-item" style="background:linear-gradient(135deg,#a855f7,#7c3aed);aspect-ratio:1;"></div><div class="attachment-item__meta" style="font-size:10px;">demo.mp4<br>15 МБ</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- Poll Editor Overlay -->
+<div class="slide-panel" id="poll-editor-overlay">
+  <div class="slide-panel__header">
+    <span class="slide-panel__title">📊 Создать опрос / квиз</span>
+    <div class="slide-panel__close" onclick="closePollEditor()">✕</div>
+  </div>
+  <div class="slide-panel__body">
+    <div style="display:flex;gap:6px;margin-bottom:12px;">
+      <button class="btn btn--primary btn--sm" style="font-size:10px;">📊 Опрос</button>
+      <button class="btn btn--tertiary btn--sm" style="font-size:10px;">🧠 Квиз</button>
+      <button class="btn btn--tertiary btn--sm" style="font-size:10px;">📋 Список</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label" style="font-size:11px;">Вопрос</label>
+      <input type="text" class="form-input" placeholder="Введите вопрос..." style="font-size:12px;">
+    </div>
+    <div class="form-group">
+      <label class="form-label" style="font-size:11px;">Варианты</label>
+      <input type="text" class="form-input mb-2" placeholder="Вариант 1" style="font-size:12px;">
+      <input type="text" class="form-input mb-2" placeholder="Вариант 2" style="font-size:12px;">
+      <input type="text" class="form-input mb-2" placeholder="Вариант 3" style="font-size:12px;">
+      <button class="btn btn--tertiary btn--sm" onclick="showToast('Вариант добавлен','success')">+ Добавить</button>
+    </div>
+    <button class="btn btn--primary btn--block mt-3" onclick="closePollEditor(); showToast('Опубликовано','success')">📤 Опубликовать</button>
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+<script>
+function openCall(type) { document.getElementById('call-overlay').classList.add('call-overlay--visible'); }
+function closeCall() { document.getElementById('call-overlay').classList.remove('call-overlay--visible'); }
+function toggleMute() { const b=document.getElementById('call-mute'); b.classList.toggle('call-control--active'); b.style.opacity=b.classList.contains('call-control--active')?'0.5':'1'; }
+function toggleVideo() { const b=document.getElementById('call-video'); b.classList.toggle('call-control--active'); b.style.opacity=b.classList.contains('call-control--active')?'0.5':'1'; }
+function toggleScreen() { showToast('Демонстрация экрана','info'); }
+function toggleEmojiPanel() { showToast('Панель эмодзи','info'); }
+function openPollEditor() { document.getElementById('poll-editor-overlay').classList.add('slide-panel--visible'); }
+function closePollEditor() { document.getElementById('poll-editor-overlay').classList.remove('slide-panel--visible'); }
+function openAttachmentsPanel() { document.getElementById('attachments-panel').classList.add('attachments-panel--visible'); }
+function closeAttachmentsPanel() { document.getElementById('attachments-panel').classList.remove('attachments-panel--visible'); }
+function sendMessage() { const f=document.querySelector('.phone-input-area__field'); if(f&&f.value.trim()){ showToast('Отправлено','success'); f.value=''; } }
+function openReplyPanel(msgId) { document.getElementById('reply-panel').classList.add('reply-panel--visible'); }
+function closeReplyPanel() { document.getElementById('reply-panel').classList.remove('reply-panel--visible'); }
+</script>
+</body>
+</html>

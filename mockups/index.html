@@ -1,0 +1,2216 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo Messenger — Макеты экранов</title>
+  <link rel="stylesheet" href="assets/common.css">
+  <style>
+    html { overflow-y: auto; height: auto; }
+    body { overflow-y: auto; height: auto; min-height: 100vh; background: var(--bg-primary); }
+    .mockups-page { max-width: 1200px; margin: 0 auto; padding: 40px 24px 80px; }
+    .mockups-header { text-align: center; margin-bottom: 40px; }
+    .mockups-header h1 { font-size: 32px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px; }
+    .mockups-header p { color: var(--text-secondary); font-size: 16px; }
+    .mockups-stats { display: flex; gap: 16px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
+    .mockups-stat { padding: 8px 16px; background: var(--bg-glass); backdrop-filter: blur(var(--blur)); border: 1px solid var(--border-color); }
+    .mockups-stat strong { color: var(--accent); font-size: 20px; }
+    .mockups-stat span { color: var(--text-secondary); font-size: 13px; }
+    .mockups-stat--danger strong { color: var(--danger); }
+    .node-section { margin-bottom: 40px; }
+    .node-header { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; padding-bottom: 12px; border-bottom: 2px solid var(--border-color); }
+    .node-header h2 { font-size: 22px; font-weight: 700; color: var(--text-primary); }
+    .node-header .chip { margin-left: auto; }
+    .node-url { display: flex; align-items: center; gap: 8px; padding: 6px 0 10px; }
+    .node-url__label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+    .node-url__link { font-size: 15px; font-weight: 600; color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+    .node-url__link:hover { text-decoration: none; opacity: 0.8; }
+    .node-url__hint { font-size: 13px; color: var(--text-secondary); }
+    .mockups-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 16px; }
+    .mockup-card { background: var(--bg-glass); backdrop-filter: blur(var(--blur)); border: 1px solid var(--border-color); box-shadow: var(--shadow-glass); padding: 20px; cursor: pointer; transition: border-color 0.15s, transform 0.15s; display: flex; flex-direction: column; gap: 8px; text-decoration: none; }
+    .mockup-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+    .mockup-card__num { font-size: 12px; color: var(--text-muted); font-weight: 700; }
+    .mockup-card__title { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+    .mockup-card__desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+    .mockup-card__tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+    /* Accepted card — green left border + badge */
+    .mockup-card--accepted { border-left: 3px solid var(--accent); position: relative; }
+    .mockup-card--accepted:hover { border-left-color: var(--accent); }
+    .mockup-card__status { position: absolute; top: 8px; right: 8px; font-size: 10px; font-weight: 700; padding: 2px 6px; background: rgba(45,184,77,0.15); color: var(--accent); border: 1px solid var(--accent); white-space: nowrap; }
+    /* Accepted node — green chip in header */
+    .node-header--accepted .chip:first-of-type { background: rgba(45,184,77,0.15); color: var(--accent); border-color: var(--accent); }
+    .topbar-mini { position: sticky; top: 0; z-index: 100; }
+
+    /* Nav menu in topbar */
+    .topbar__nav { display: flex; gap: 4px; margin-left: 16px; }
+    .topbar__nav-item {
+      padding: 6px 12px; font-size: 13px; font-weight: 600;
+      color: var(--text-secondary); cursor: pointer;
+      border: 1px solid transparent; transition: all 0.15s;
+    }
+    .topbar__nav-item:hover { color: var(--text-primary); background: var(--bg-hover); }
+    .topbar__nav-item--active { color: var(--accent); border-color: var(--accent); background: rgba(45,184,77,0.08); }
+
+    /* Collapsible spec sections (Данные, Компоненты, API) */
+    .spec-section { margin-top: 40px; }
+    .spec-section > summary {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 20px; cursor: pointer; user-select: none;
+      background: var(--bg-glass); backdrop-filter: blur(var(--blur));
+      border: 1px solid var(--border-color); border-bottom: none;
+      font-size: 22px; font-weight: 800; color: var(--text-primary);
+      transition: background 0.15s;
+    }
+    .spec-section > summary:hover { background: var(--bg-glass-hover); }
+    .spec-section[open] > summary { border-bottom: 1px solid var(--border-color); }
+    .spec-section__body {
+      padding: 24px; background: var(--bg-secondary);
+      border: 1px solid var(--border-color); border-top: none;
+    }
+    .spec-section__intro {
+      color: var(--text-secondary); font-size: 14px; line-height: 1.6; margin-bottom: 20px;
+    }
+
+    /* Data tables */
+    .data-group { margin-bottom: 28px; }
+    .data-group__title { font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border-color); }
+    .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .data-table th { text-align: left; padding: 8px 10px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 700; border-bottom: 2px solid var(--border-color); }
+    .data-table td { padding: 8px 10px; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); vertical-align: top; }
+    .data-table td code { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-primary); }
+    .data-badge { display: inline-flex; align-items: center; padding: 2px 8px; font-size: 11px; font-weight: 700; border: 1px solid var(--border-color); white-space: nowrap; }
+    .data-badge--seed { background: rgba(45,184,77,0.15); color: var(--accent); border-color: var(--accent); }
+    .data-badge--runtime { background: rgba(59,158,255,0.15); color: var(--info); border-color: var(--info); }
+    .data-badge--empty { background: var(--bg-tertiary); color: var(--text-muted); }
+
+    /* Components grid */
+    .comp-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+    .comp-filter { padding: 6px 14px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); color: var(--text-secondary); background: var(--bg-tertiary); transition: all 0.15s; }
+    .comp-filter:hover { color: var(--text-primary); border-color: var(--border-strong); }
+    .comp-filter--active { color: var(--accent); border-color: var(--accent); background: rgba(45,184,77,0.08); }
+    .comp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+    .comp-card { background: var(--bg-glass); backdrop-filter: blur(var(--blur)); border: 1px solid var(--border-color); padding: 16px; }
+    .comp-card__header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color); }
+    .comp-card__node { font-size: 12px; font-weight: 700; color: var(--text-muted); }
+    .comp-card__count { font-size: 11px; font-weight: 700; padding: 2px 8px; background: var(--bg-tertiary); border: 1px solid var(--border-color); margin-left: auto; }
+    .comp-card__list { display: flex; flex-wrap: wrap; gap: 4px; }
+    .comp-chip { font-size: 11px; padding: 3px 8px; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-secondary); }
+    .comp-chip--global { border-color: var(--accent); color: var(--accent); background: rgba(45,184,77,0.08); }
+
+    /* Collapsible metadata panel */
+    .node-meta { margin-bottom: 4px; }
+    .node-meta > summary {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 16px; cursor: pointer; user-select: none;
+      background: var(--bg-tertiary); border: 1px solid var(--border-color);
+      font-size: 13px; font-weight: 600; color: var(--text-secondary);
+      transition: background 0.15s;
+    }
+    .node-meta > summary:hover { background: var(--bg-hover); color: var(--text-primary); }
+    .node-meta[open] > summary { border-bottom: 1px solid var(--border-color); }
+    .node-meta__body { padding: 16px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-top: none; }
+    .meta-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px; }
+    .meta-item { display: flex; flex-direction: column; gap: 2px; }
+    .meta-item__label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 700; }
+    .meta-item__value { font-size: 14px; color: var(--text-primary); font-weight: 600; }
+    .meta-item__value--yes { color: var(--accent); }
+    .meta-item__value--no { color: var(--danger); }
+    .meta-item__value--warn { color: var(--warning); }
+    .meta-functions { margin-top: 8px; }
+    .meta-functions__title { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+    .meta-functions__list { display: flex; flex-wrap: wrap; gap: 4px; }
+    .meta-functions__list .chip { font-size: 11px; }
+    .meta-actions { display: flex; gap: 8px; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border-color); }
+    .readiness-banner {
+      text-align: center; padding: 12px 24px; margin-bottom: 32px;
+      background: var(--danger-bg); border: 1px solid var(--danger);
+      font-size: 15px; font-weight: 600; color: var(--danger);
+    }
+
+    /* Screens toolbar (filter) */
+    .screens-toolbar { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+    .screens-filter { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-secondary); cursor: pointer; user-select: none; }
+    .screens-filter input { width: 16px; height: 16px; cursor: pointer; accent-color: var(--accent); }
+    .screens-filter input:checked + span { color: var(--accent); }
+
+    /* Scroll-to-top button */
+    .scroll-top-btn {
+      position: fixed; bottom: 24px; right: 24px; z-index: 200;
+      width: 44px; height: 44px; border: 1px solid var(--border-color);
+      background: var(--bg-glass); backdrop-filter: blur(var(--blur));
+      color: var(--text-primary); font-size: 20px; cursor: pointer;
+      display: none; transition: opacity 0.2s, border-color 0.15s, color 0.15s;
+      align-items: center; justify-content: center;
+    }
+    .scroll-top-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .scroll-top-btn--visible { display: flex; }
+
+    /* API Endpoints section */
+    .api-section { margin-top: 60px; }
+    .api-section h2 { font-size: 26px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px; }
+    .api-section .api-intro { color: var(--text-secondary); font-size: 14px; margin-bottom: 20px; line-height: 1.6; }
+    .api-legend { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
+    .api-legend-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-secondary); }
+    .api-badge { display: inline-flex; align-items: center; gap: 3px; padding: 2px 8px; font-size: 11px; font-weight: 700; border: 1px solid var(--border-color); white-space: nowrap; }
+    .api-badge--jwt { background: rgba(255,193,7,0.15); color: var(--warning); border-color: var(--warning); }
+    .api-badge--bot { background: rgba(45,184,77,0.15); color: var(--accent); border-color: var(--accent); }
+    .api-badge--public { background: rgba(33,150,243,0.15); color: #2196f3; border-color: #2196f3; }
+    .api-badge--admin { background: rgba(244,67,54,0.15); color: var(--danger); border-color: var(--danger); }
+    .api-group { margin-bottom: 28px; }
+    .api-group__title { font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border-color); }
+    .api-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .api-table th { text-align: left; padding: 8px 10px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 700; border-bottom: 2px solid var(--border-color); }
+    .api-table td { padding: 8px 10px; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); vertical-align: top; }
+    .api-table td:first-child { white-space: nowrap; }
+    .api-table td code { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-primary); }
+    .api-table .api-method { font-weight: 700; font-size: 11px; padding: 2px 6px; }
+    .api-method--get { color: #2196f3; }
+    .api-method--post { color: var(--accent); }
+    .api-method--patch { color: var(--warning); }
+    .api-method--put { color: #ff9800; }
+    .api-method--delete { color: var(--danger); }
+    .api-badges-cell { display: flex; gap: 4px; flex-wrap: wrap; }
+
+    /* Specifity split-view layout */
+    .specifity-view {
+      display: grid; grid-template-columns: 380px 1fr; gap: 0;
+      border: 1px solid var(--border-color); margin-top: 16px;
+      min-height: 600px; background: var(--bg-secondary);
+    }
+    .specifity-view__left {
+      padding: 24px; overflow-y: auto; max-height: 600px;
+      border-right: 1px solid var(--border-color);
+      background: var(--bg-glass); backdrop-filter: blur(var(--blur));
+    }
+    .specifity-view__right {
+      position: relative; display: flex; flex-direction: column;
+      background: var(--bg-tertiary);
+    }
+    .specifity-toolbar {
+      display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+      border-bottom: 1px solid var(--border-color); background: var(--bg-glass);
+      flex-wrap: wrap;
+    }
+    .specifity-toolbar__label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+    .specifity-toolbar__select {
+      padding: 4px 8px; font-size: 13px; background: var(--bg-tertiary);
+      border: 1px solid var(--border-color); color: var(--text-primary);
+      font-family: inherit; cursor: pointer;
+    }
+    .specifity-toolbar__select:focus { border-color: var(--accent); outline: none; }
+    .specifity-toolbar__btn {
+      padding: 4px 10px; font-size: 12px; font-weight: 600; cursor: pointer;
+      border: 1px solid var(--border-color); background: var(--bg-tertiary);
+      color: var(--text-secondary); transition: all 0.15s;
+    }
+    .specifity-toolbar__btn:hover { color: var(--text-primary); border-color: var(--accent); }
+    .specifity-toolbar__btn--active { color: var(--accent); border-color: var(--accent); background: rgba(45,184,77,0.08); }
+    .specifity-toolbar__size { margin-left: auto; font-size: 12px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+    .specifity-frame-wrap {
+      flex: 1; overflow: auto; padding: 16px; display: flex; align-items: flex-start; justify-content: center;
+    }
+    .specifity-frame {
+      width: 100%; height: 100%; min-height: 500px; border: 1px solid var(--border-color);
+      background: var(--bg-primary); transition: width 0.1s, height 0.1s;
+    }
+    .specifity-resize-handle {
+      position: absolute; bottom: 0; right: 0; width: 20px; height: 20px;
+      cursor: nwse-resize; z-index: 10;
+      background: linear-gradient(135deg, transparent 50%, var(--border-color) 50%, var(--border-color) 60%, transparent 60%, transparent 70%, var(--border-color) 70%, var(--border-color) 80%, transparent 80%);
+    }
+    .specifity-desc-title { font-size: 18px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px; }
+    .specifity-desc-id { font-size: 12px; color: var(--text-muted); font-weight: 700; margin-bottom: 12px; }
+    .specifity-desc-text { font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; }
+    .specifity-linked { margin-bottom: 16px; }
+    .specifity-linked__title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 8px; }
+    .specifity-linked__list { display: flex; flex-direction: column; gap: 4px; }
+    .specifity-linked__item {
+      display: flex; align-items: center; gap: 6px; padding: 6px 10px;
+      font-size: 12px; border: 1px solid var(--border-color); background: var(--bg-tertiary);
+      color: var(--text-secondary); cursor: pointer; transition: all 0.15s;
+    }
+    .specifity-linked__item:hover { border-color: var(--accent); color: var(--text-primary); }
+    .specifity-linked__item code { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); }
+    .specifity-linked__item-type { font-size: 10px; font-weight: 700; padding: 1px 6px; border: 1px solid var(--border-color); white-space: nowrap; }
+    .specifity-linked__item-type--api { background: rgba(59,158,255,0.15); color: var(--info); border-color: var(--info); }
+    .specifity-linked__item-type--data { background: rgba(255,193,7,0.15); color: var(--warning); border-color: var(--warning); }
+    .specifity-linked__item-type--comp { background: rgba(45,184,77,0.15); color: var(--accent); border-color: var(--accent); }
+    .specifity-linked__item-type--screen { background: rgba(156,39,176,0.15); color: #ce93d8; border-color: #ce93d8; }
+  </style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="topbar topbar-mini">
+  <div class="topbar__logo">
+    <div class="topbar__logo-icon">B</div>
+    <span>Balloo</span>
+  </div>
+  <div class="topbar__title">Макеты экранов — все узлы монорепо</div>
+  <div class="topbar__nav">
+    <span class="topbar__nav-item topbar__nav-item--active" onclick="scrollToSection('spec-screens')">📱 Экраны</span>
+    <span class="topbar__nav-item" onclick="scrollToSection('spec-api')">🔌 API</span>
+    <span class="topbar__nav-item" onclick="scrollToSection('spec-data')">🗄️ Данные</span>
+    <span class="topbar__nav-item" onclick="scrollToSection('spec-components')">🧩 Компоненты</span>
+  </div>
+  <div class="topbar__right">
+    <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+  </div>
+</div>
+
+<div class="mockups-page">
+  <div class="mockups-header">
+    <h1>📱 Balloo Messenger — Интерактивные макеты</h1>
+    <p>100% интерактивные HTML-макеты всех экранов всех узлов монорепо</p>
+    <div class="mockups-stats">
+      <div class="mockups-stat"><strong>12</strong><span> узлов (11 доменов + shared)</span></div>
+      <div class="mockups-stat"><strong>173</strong><span> экранов</span></div>
+      <div class="mockups-stat"><strong>3</strong><span> темы оформления</span></div>
+      <div class="mockups-stat mockups-stat--danger"><strong style="color: var(--accent);">✅ 100%</strong><span> готовность</span></div>
+    </div>
+  </div>
+  <div class="readiness-banner" id="readiness-banner" style="background: rgba(45,184,77,0.1); border-color: var(--accent); color: var(--accent);">
+    ✅ Готовность: <strong>100%</strong> — все экраны просмотрены и приняты.
+    Просмотрено экранов: <strong id="viewed-count">173</strong> / 173.
+    <button class="btn btn--sm btn--primary" style="margin-left:12px;" id="confirm-btn" onclick="alert('Готовность подтверждена!')">✅ Подтвердить готовность</button>
+  </div>
+
+  <!-- ==================== SCREENS (MOCKUPS) ==================== -->
+  
+  <div class="node-section">
+    <div class="node-header">
+      <h2>🔗 shared — Общие экраны (ошибки, офлайн)</h2>
+      <span class="chip">8 экранов</span>
+    </div>
+    <div class="node-url">
+      <span class="node-url__label">Назначение:</span>
+      <span class="node-url__hint">— Общие экраны для всех узлов (кроме docs.balloo.su)</span>
+    </div>
+    <details class="node-meta" data-node="shared">
+      <summary>📋 Метаданные узла</summary>
+      <div class="node-meta__body">
+        <div class="meta-grid">
+          <div class="meta-item"><span class="meta-item__label">Просмотрен</span><span class="meta-item__value meta-item__value--no" data-field="viewed">👁 8/8</span></div>
+          <div class="meta-item"><span class="meta-item__label">Правок частных</span><span class="meta-item__value" data-field="edits_specific">0</span></div>
+          <div class="meta-item"><span class="meta-item__label">Правок глобальных принято</span><span class="meta-item__value" data-field="edits_global_accepted">0</span></div>
+          <div class="meta-item"><span class="meta-item__label">Документация</span><span class="meta-item__value meta-item__value--no" data-field="documentation_written">❌ нет</span></div>
+          <div class="meta-item"><span class="meta-item__label">Компоненты частные</span><span class="meta-item__value">8</span></div>
+          <div class="meta-item"><span class="meta-item__label">Компоненты глобальные</span><span class="meta-item__value">5</span></div>
+          <div class="meta-item"><span class="meta-item__label">Функций приложения</span><span class="meta-item__value">0</span></div>
+          <div class="meta-item"><span class="meta-item__label">Статус реализации</span><span class="meta-item__value meta-item__value--warn" data-field="implementation_status">запланирован</span></div>
+        </div>
+        <div class="meta-functions">
+          <div class="meta-functions__title">Функции приложения (0)</div>
+          <div class="meta-functions__list">
+
+          </div>
+        </div>
+        <div class="meta-actions">
+          <button class="btn btn--sm btn--secondary" onclick="markNodeViewed( + html_name + )">✅ Отметить просмотренным</button>
+        </div>
+      </div>
+    </details>
+      <a class="mockup-card mockup-card--accepted" href="shared/ban-appeal.html">
+        <span class="mockup-card__num">1_00_08</span>
+        <span class="mockup-card__title">Обжалование бана (оверлей)</span>
+        <span class="mockup-card__desc">Обжалование бана (оверлей)</span>
+        <div class="mockup-card__tags"><span class="chip">ban</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="shared/error-403.html">
+        <span class="mockup-card__num">1_00_02</span>
+        <span class="mockup-card__title">Ошибка 403 (доступ запрещён)</span>
+        <span class="mockup-card__desc">Ошибка 403 (доступ запрещён)</span>
+        <div class="mockup-card__tags"><span class="chip">error</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="shared/error-404.html">
+        <span class="mockup-card__num">1_00_01</span>
+        <span class="mockup-card__title">Ошибка 404 (не найдено)</span>
+        <span class="mockup-card__desc">Ошибка 404 (не найдено)</span>
+        <div class="mockup-card__tags"><span class="chip">error</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="shared/error-500.html">
+        <span class="mockup-card__num">1_00_03</span>
+        <span class="mockup-card__title">Ошибка 500 (внутренняя ошибка)</span>
+        <span class="mockup-card__desc">Ошибка 500 (внутренняя ошибка)</span>
+        <div class="mockup-card__tags"><span class="chip">error</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="shared/error-503.html">
+        <span class="mockup-card__num">1_00_04</span>
+        <span class="mockup-card__title">Ошибка 503 (сервис недоступен)</span>
+        <span class="mockup-card__desc">Ошибка 503 (сервис недоступен)</span>
+        <div class="mockup-card__tags"><span class="chip">error</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="shared/error-555.html">
+        <span class="mockup-card__num">1_00_07</span>
+        <span class="mockup-card__title">Ошибка 555 (аккаунт заблокирован)</span>
+        <span class="mockup-card__desc">Ошибка 555 (аккаунт заблокирован)</span>
+        <div class="mockup-card__tags"><span class="chip">error</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="shared/offline-authed.html">
+        <span class="mockup-card__num">1_00_05</span>
+        <span class="mockup-card__title">Офлайн (авторизованный)</span>
+        <span class="mockup-card__desc">Офлайн (авторизованный)</span>
+        <div class="mockup-card__tags"><span class="chip">offline</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="shared/offline-guest.html">
+        <span class="mockup-card__num">1_00_06</span>
+        <span class="mockup-card__title">Офлайн (гость / неавторизованный)</span>
+        <span class="mockup-card__desc">Офлайн (гость / неавторизованный)</span>
+        <div class="mockup-card__tags"><span class="chip">offline</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+  </div>
+</div>
+
+  <div class="node-section">
+    <div class="node-header">
+      <h2>💬 balloo.su — Основной мессенджер</h2>
+      <span class="chip">41 экранов</span>
+    </div>
+    <div class="node-url">
+      <span class="node-url__label">Назначение:</span>
+      <span class="node-url__hint">— Веб-версия + PWA (установка на любой платформе)</span>
+    </div>
+    <details class="node-meta" data-node="balloo">
+      <summary>📋 Метаданные узла</summary>
+      <div class="node-meta__body">
+        <div class="meta-grid">
+          <div class="meta-item"><span class="meta-item__label">Просмотрен</span><span class="meta-item__value meta-item__value--no" data-field="viewed">👁 21/41</span></div>
+          <div class="meta-item"><span class="meta-item__label">Правок частных</span><span class="meta-item__value" data-field="edits_specific">11</span></div>
+          <div class="meta-item"><span class="meta-item__label">Правок глобальных принято</span><span class="meta-item__value" data-field="edits_global_accepted">3</span></div>
+          <div class="meta-item"><span class="meta-item__label">Документация</span><span class="meta-item__value meta-item__value--no" data-field="documentation_written">❌ нет</span></div>
+          <div class="meta-item"><span class="meta-item__label">Компоненты частные</span><span class="meta-item__value">41</span></div>
+          <div class="meta-item"><span class="meta-item__label">Компоненты глобальные</span><span class="meta-item__value">5</span></div>
+          <div class="meta-item"><span class="meta-item__label">Функций приложения</span><span class="meta-item__value">27</span></div>
+          <div class="meta-item"><span class="meta-item__label">Статус реализации</span><span class="meta-item__value meta-item__value--warn" data-field="implementation_status">запланирован</span></div>
+        </div>
+        <div class="meta-functions">
+          <div class="meta-functions__title">Функции приложения (27)</div>
+          <div class="meta-functions__list">
+            <span class="chip">Аутентификация</span>            <span class="chip">Управление устройствами</span>            <span class="chip">Мультиаккаунт</span>            <span class="chip">Онбординг</span>            <span class="chip">Текстовый чат</span>            <span class="chip">Групповые чаты</span>            <span class="chip">Звонки</span>            <span class="chip">Приглашения</span>            <span class="chip">Поиск</span>            <span class="chip">Архив чатов</span>            <span class="chip">Профиль</span>            <span class="chip">Публичный профиль</span>            <span class="chip">Боты</span>            <span class="chip">Техподдержка</span>            <span class="chip">Настройки приложения</span>            <span class="chip">Правила</span>            <span class="chip">О компании</span>            <span class="chip">О Balloo</span>            <span class="chip">Донат</span>            <span class="chip">Вложения</span>            <span class="chip">Жалобы</span>            <span class="chip">Сторис</span>            <span class="chip">Опросы</span>            <span class="chip">Создание групп</span>            <span class="chip">Создание каналов</span>            <span class="chip">Редактор сообщения</span>            <span class="chip">Просмотр файлов</span>
+          </div>
+        </div>
+        <div class="meta-actions">
+          <button class="btn btn--sm btn--secondary" onclick="markNodeViewed( + html_name + )">✅ Отметить просмотренным</button>
+        </div>
+      </div>
+    </details>
+      <a class="mockup-card mockup-card--accepted" href="balloo-su/about-balloo.html">
+        <span class="mockup-card__num">1_01_17</span>
+        <span class="mockup-card__title">О Balloo</span>
+        <span class="mockup-card__desc">О Balloo</span>
+        <div class="mockup-card__tags"><span class="chip">about</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="balloo-su/about-company.html">
+        <span class="mockup-card__num">1_01_16</span>
+        <span class="mockup-card__title">О компании</span>
+        <span class="mockup-card__desc">О компании</span>
+        <div class="mockup-card__tags"><span class="chip">about</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card" href="balloo-su/accounts.html">
+        <span class="mockup-card__num">1_01_22</span>
+        <span class="mockup-card__title">Мультиаккаунт</span>
+        <span class="mockup-card__desc">Мультиаккаунт</span>
+        <div class="mockup-card__tags"><span class="chip">account</span></div>
+        
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="balloo-su/active-call.html">
+        <span class="mockup-card__num">1_01_11</span>
+        <span class="mockup-card__title">Активный звонок</span>
+        <span class="mockup-card__desc">Активный звонок</span>
+        <div class="mockup-card__tags"><span class="chip">call</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card" href="balloo-su/add-device.html">
+        <span class="mockup-card__num">1_01_23</span>
+        <span class="mockup-card__title">Добавить устройство</span>
+        <span class="mockup-card__desc">Добавить устройство</span>
+        <div class="mockup-card__tags"><span class="chip">device</span></div>
+        
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="balloo-su/archive.html">
+        <span class="mockup-card__num">1_01_07</span>
+        <span class="mockup-card__title">Архив чатов</span>
+        <span class="mockup-card__desc">Архив чатов</span>
+        <div class="mockup-card__tags"><span class="chip">chat</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card" href="balloo-su/attachment-panel.html">
+        <span class="mockup-card__num">1_01_40</span>
+        <span class="mockup-card__title">Панель вложений</span>
+        <span class="mockup-card__desc">Панель вложений</span>
+        <div class="mockup-card__tags"><span class="chip">attachment</span></div>
+        
+      </a>
+      <a class="mockup-card" href="balloo-su/blocked-users.html">
+        <span class="mockup-card__num">1_01_38</span>
+        <span class="mockup-card__title">Блокированные пользователи</span>
+        <span class="mockup-card__desc">Блокированные пользователи</span>
+        <div class="mockup-card__tags"><span class="chip">user</span></div>
+        
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="balloo-su/bots.html">
+        <span class="mockup-card__num">1_01_15</span>
+        <span class="mockup-card__title">Боты</span>
+        <span class="mockup-card__desc">Боты</span>
+        <div class="mockup-card__tags"><span class="chip">bot</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="balloo-su/calls.html">
+        <span class="mockup-card__num">1_01_10</span>
+        <span class="mockup-card__title">Звонки</span>
+        <span class="mockup-card__desc">Звонки</span>
+        <div class="mockup-card__tags"><span class="chip">screen</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card" href="balloo-su/channel-create.html">
+        <span class="mockup-card__num">1_01_35</span>
+        <span class="mockup-card__title">Создание канала</span>
+        <span class="mockup-card__desc">Создание канала</span>
+        <div class="mockup-card__tags"><span class="chip">new</span></div>
+        
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="balloo-su/chat-attachments.html">
+        <span class="mockup-card__num">1_01_25</span>
+        <span class="mockup-card__title">Вложения чата</span>
+        <span class="mockup-card__desc">Вложения чата</span>
+        <div class="mockup-card__tags"><span class="chip">chat</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="balloo-su/chats.html">
+        <span class="mockup-card__num">1_01_04</span>
+        <span class="mockup-card__title">Список чатов</span>
+        <span class="mockup-card__desc">Список чатов</span>
+        <div class="mockup-card__tags"><span class="chip">chat</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="balloo-su/contacts.html">
+        <span class="mockup-card__num">1_01_05</span>
+        <span class="mockup-card__title">Контакты</span>
+        <span class="mockup-card__desc">Контакты</span>
+        <div class="mockup-card__tags"><span class="chip">contacts</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="balloo-su/donate.html">
+        <span class="mockup-card__num">1_01_24</span>
+        <span class="mockup-card__title">Донат</span>
+        <span class="mockup-card__desc">Донат</span>
+        <div class="mockup-card__tags"><span class="chip">donate</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card" href="balloo-su/empty-chat.html">
+        <span class="mockup-card__num">1_01_36</span>
+        <span class="mockup-card__title">Пустой чат</span>
+        <span class="mockup-card__desc">Пустой чат</span>
+        <div class="mockup-card__tags"><span class="chip">chat</span></div>
+        
+      </a>
+      <a class="mockup-card" href="balloo-su/file-viewer.html">
+        <span class="mockup-card__num">1_01_33</span>
+        <span class="mockup-card__title">Просмотр файла/изображения</span>
+        <span class="mockup-card__desc">Просмотр файла/изображения</span>
+        <div class="mockup-card__tags"><span class="chip">viewer</span></div>
+        
+      </a>
+      <a class="mockup-card" href="balloo-su/group-create.html">
+        <span class="mockup-card__num">1_01_18</span>
+        <span class="mockup-card__title">Создание группы</span>
+        <span class="mockup-card__desc">Создание группы</span>
+        <div class="mockup-card__tags"><span class="chip">group</span></div>
+        
+      </a>
+      <a class="mockup-card" href="balloo-su/group-settings.html">
+        <span class="mockup-card__num">1_01_19</span>
+        <span class="mockup-card__title">Настройки группы</span>
+        <span class="mockup-card__desc">Настройки группы</span>
+        <div class="mockup-card__tags"><span class="chip">group</span></div>
+        
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="balloo-su/invites.html">
+        <span class="mockup-card__num">1_01_13</span>
+        <span class="mockup-card__title">Приглашения</span>
+        <span class="mockup-card__desc">Приглашения</span>
+        <div class="mockup-card__tags"><span class="chip">invite</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="balloo-su/login.html">
+        <span class="mockup-card__num">1_01_02</span>
+        <span class="mockup-card__title">Вход</span>
+        <span class="mockup-card__desc">Вход</span>
+        <div class="mockup-card__tags"><span class="chip">auth</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card" href="balloo-su/message-editor.html">
+        <span class="mockup-card__num">1_01_32</span>
+        <span class="mockup-card__title">Редактор сообщения</span>
+        <span class="mockup-card__desc">Редактор сообщения</span>
+        <div class="mockup-card__tags"><span class="chip">editor</span></div>
+        
+      </a>
+      <a class="mockup-card" href="balloo-su/my-devices.html">
+        <span class="mockup-card__num">1_01_21</span>
+        <span class="mockup-card__title">Мои устройства</span>
+        <span class="mockup-card__desc">Мои устройства</span>
+        <div class="mockup-card__tags"><span class="chip">device</span></div>
+        
+      </a>
+      <a class="mockup-card" href="balloo-su/my-donates.html">
+        <span class="mockup-card__num">1_01_31</span>
+        <span class="mockup-card__title">Мои донаты</span>
+        <span class="mockup-card__desc">Мои донаты</span>
+        <div class="mockup-card__tags"><span class="chip">donate</span></div>
+        
+      </a>
+      <a class="mockup-card" href="balloo-su/notification-settings.html">
+        <span class="mockup-card__num">1_01_34</span>
+        <span class="mockup-card__title">Настройки уведомлений</span>
+        <span class="mockup-card__desc">Настройки уведомлений</span>
+        <div class="mockup-card__tags"><span class="chip">settings</span></div>
+        
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="balloo-su/onboarding.html">
+        <span class="mockup-card__num">1_01_01</span>
+        <span class="mockup-card__title">Онбординг</span>
+        <span class="mockup-card__desc">Онбординг</span>
+        <div class="mockup-card__tags"><span class="chip">onboarding</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card" href="balloo-su/password-reset.html">
+        <span class="mockup-card__num">1_01_29</span>
+        <span class="mockup-card__title">Восстановление пароля</span>
+        <span class="mockup-card__desc">Восстановление пароля</span>
+        <div class="mockup-card__tags"><span class="chip">screen</span></div>
+        
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="balloo-su/poll-editor.html">
+        <span class="mockup-card__num">1_01_28</span>
+        <span class="mockup-card__title">Редактор опроса</span>
+        <span class="mockup-card__desc">Редактор опроса</span>
+        <div class="mockup-card__tags"><span class="chip">poll</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card" href="balloo-su/privacy-settings.html">
+        <span class="mockup-card__num">1_01_37</span>
+        <span class="mockup-card__title">Настройки приватности</span>
+        <span class="mockup-card__desc">Настройки приватности</span>
+        <div class="mockup-card__tags"><span class="chip">settings</span></div>
+        
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="balloo-su/profile.html">
+        <span class="mockup-card__num">1_01_08</span>
+        <span class="mockup-card__title">Профиль</span>
+        <span class="mockup-card__desc">Профиль</span>
+        <div class="mockup-card__tags"><span class="chip">profile</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="balloo-su/public-profile.html">
+        <span class="mockup-card__num">1_01_09</span>
+        <span class="mockup-card__title">Публичный профиль</span>
+        <span class="mockup-card__desc">Публичный профиль</span>
+        <div class="mockup-card__tags"><span class="chip">profile</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="balloo-su/register.html">
+        <span class="mockup-card__num">1_01_03</span>
+        <span class="mockup-card__title">Регистрация</span>
+        <span class="mockup-card__desc">Регистрация</span>
+        <div class="mockup-card__tags"><span class="chip">auth</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="balloo-su/report-message.html">
+        <span class="mockup-card__num">1_01_26</span>
+        <span class="mockup-card__title">Жалоба на сообщение</span>
+        <span class="mockup-card__desc">Жалоба на сообщение</span>
+        <div class="mockup-card__tags"><span class="chip">report</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="balloo-su/rules.html">
+        <span class="mockup-card__num">1_01_12</span>
+        <span class="mockup-card__title">Правила платформы</span>
+        <span class="mockup-card__desc">Правила платформы</span>
+        <div class="mockup-card__tags"><span class="chip">screen</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="balloo-su/search.html">
+        <span class="mockup-card__num">1_01_06</span>
+        <span class="mockup-card__title">Глобальный поиск</span>
+        <span class="mockup-card__desc">Глобальный поиск</span>
+        <div class="mockup-card__tags"><span class="chip">search</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card" href="balloo-su/settings.html">
+        <span class="mockup-card__num">1_01_20</span>
+        <span class="mockup-card__title">Настройки приложения</span>
+        <span class="mockup-card__desc">Настройки приложения</span>
+        <div class="mockup-card__tags"><span class="chip">settings</span></div>
+        
+      </a>
+      <a class="mockup-card" href="balloo-su/stories.html">
+        <span class="mockup-card__num">1_01_27</span>
+        <span class="mockup-card__title">Сторис</span>
+        <span class="mockup-card__desc">Сторис</span>
+        <div class="mockup-card__tags"><span class="chip">stories</span></div>
+        
+      </a>
+      <a class="mockup-card" href="balloo-su/story-create.html">
+        <span class="mockup-card__num">1_01_41</span>
+        <span class="mockup-card__title">Создание историй</span>
+        <span class="mockup-card__desc">Создание историй</span>
+        <div class="mockup-card__tags"><span class="chip">new</span></div>
+        
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="balloo-su/support.html">
+        <span class="mockup-card__num">1_01_14</span>
+        <span class="mockup-card__title">Техподдержка</span>
+        <span class="mockup-card__desc">Техподдержка</span>
+        <div class="mockup-card__tags"><span class="chip">support</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card" href="balloo-su/two-factor.html">
+        <span class="mockup-card__num">1_01_30</span>
+        <span class="mockup-card__title">Двухфакторная аутентификация</span>
+        <span class="mockup-card__desc">Двухфакторная аутентификация</span>
+        <div class="mockup-card__tags"><span class="chip">2fa</span></div>
+        
+      </a>
+      <a class="mockup-card" href="balloo-su/voice-message.html">
+        <span class="mockup-card__num">1_01_39</span>
+        <span class="mockup-card__title">Запись голосового</span>
+        <span class="mockup-card__desc">Запись голосового</span>
+        <div class="mockup-card__tags"><span class="chip">record</span></div>
+        
+      </a>
+  </div>
+</div>
+
+  <div class="node-section">
+    <div class="node-header">
+      <h2>🛡️ admin.balloo.su — Админ-панель</h2>
+      <span class="chip">25 экранов</span>
+    </div>
+    <div class="node-url">
+      <span class="node-url__label">Назначение:</span>
+      <span class="node-url__hint">— Управление пользователями, бан-листом, features flags</span>
+    </div>
+    <details class="node-meta" data-node="admin">
+      <summary>📋 Метаданные узла</summary>
+      <div class="node-meta__body">
+        <div class="meta-grid">
+          <div class="meta-item"><span class="meta-item__label">Просмотрен</span><span class="meta-item__value meta-item__value--no" data-field="viewed">👁 12/25</span></div>
+          <div class="meta-item"><span class="meta-item__label">Правок частных</span><span class="meta-item__value" data-field="edits_specific">1</span></div>
+          <div class="meta-item"><span class="meta-item__label">Правок глобальных принято</span><span class="meta-item__value" data-field="edits_global_accepted">4</span></div>
+          <div class="meta-item"><span class="meta-item__label">Документация</span><span class="meta-item__value meta-item__value--no" data-field="documentation_written">❌ нет</span></div>
+          <div class="meta-item"><span class="meta-item__label">Компоненты частные</span><span class="meta-item__value">25</span></div>
+          <div class="meta-item"><span class="meta-item__label">Компоненты глобальные</span><span class="meta-item__value">5</span></div>
+          <div class="meta-item"><span class="meta-item__label">Функций приложения</span><span class="meta-item__value">21</span></div>
+          <div class="meta-item"><span class="meta-item__label">Статус реализации</span><span class="meta-item__value meta-item__value--warn" data-field="implementation_status">запланирован</span></div>
+        </div>
+        <div class="meta-functions">
+          <div class="meta-functions__title">Функции приложения (21)</div>
+          <div class="meta-functions__list">
+            <span class="chip">Аутентификация админа</span>            <span class="chip">Дашборд админа</span>            <span class="chip">Управление сотрудниками</span>            <span class="chip">Управление бан-листом</span>            <span class="chip">Feature flags</span>            <span class="chip">Управление фичами</span>            <span class="chip">Аудит-лог</span>            <span class="chip">Управление группами</span>            <span class="chip">Донаты</span>            <span class="chip">Файлы</span>            <span class="chip">Управление отделами</span>            <span class="chip">Вакансии</span>            <span class="chip">Отчёты</span>            <span class="chip">Статус сервиса</span>            <span class="chip">Тексты</span>            <span class="chip">Категории блога</span>            <span class="chip">Каналы блога</span>            <span class="chip">Миграция блога</span>            <span class="chip">Очередь блога</span>            <span class="chip">Ревью блога</span>            <span class="chip">Статистика блога</span>            <span class="chip">Управление ботами</span>
+          </div>
+        </div>
+        <div class="meta-actions">
+          <button class="btn btn--sm btn--secondary" onclick="markNodeViewed( + html_name + )">✅ Отметить просмотренным</button>
+        </div>
+      </div>
+    </details>
+      <a class="mockup-card mockup-card--accepted" href="admin-balloo-su/announcements.html">
+        <span class="mockup-card__num">1_02_01</span>
+        <span class="mockup-card__title">Объявления</span>
+        <span class="mockup-card__desc">Объявления</span>
+        <div class="mockup-card__tags"><span class="chip">announcement</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="admin-balloo-su/audit-log.html">
+        <span class="mockup-card__num">1_02_02</span>
+        <span class="mockup-card__title">Аудит-лог</span>
+        <span class="mockup-card__desc">Аудит-лог</span>
+        <div class="mockup-card__tags"><span class="chip">audit</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="admin-balloo-su/bans.html">
+        <span class="mockup-card__num">1_02_03</span>
+        <span class="mockup-card__title">Бан-лист</span>
+        <span class="mockup-card__desc">Бан-лист</span>
+        <div class="mockup-card__tags"><span class="chip">ban</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="admin-balloo-su/blog-channels.html">
+        <span class="mockup-card__num">1_02_05</span>
+        <span class="mockup-card__title">Каналы блога</span>
+        <span class="mockup-card__desc">Каналы блога</span>
+        <div class="mockup-card__tags"><span class="chip">channel</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="admin-balloo-su/blog-migrate.html">
+        <span class="mockup-card__num">1_02_06</span>
+        <span class="mockup-card__title">Миграция блога</span>
+        <span class="mockup-card__desc">Миграция блога</span>
+        <div class="mockup-card__tags"><span class="chip">screen</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="admin-balloo-su/blog-queue.html">
+        <span class="mockup-card__num">1_02_07</span>
+        <span class="mockup-card__title">Очередь блога</span>
+        <span class="mockup-card__desc">Очередь блога</span>
+        <div class="mockup-card__tags"><span class="chip">screen</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="admin-balloo-su/blog-review.html">
+        <span class="mockup-card__num">1_02_08</span>
+        <span class="mockup-card__title">Ревью блога</span>
+        <span class="mockup-card__desc">Ревью блога</span>
+        <div class="mockup-card__tags"><span class="chip">screen</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="admin-balloo-su/blog-stats.html">
+        <span class="mockup-card__num">1_02_09</span>
+        <span class="mockup-card__title">Статистика блога</span>
+        <span class="mockup-card__desc">Статистика блога</span>
+        <div class="mockup-card__tags"><span class="chip">screen</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card" href="admin-balloo-su/bots-mgmt.html">
+        <span class="mockup-card__num">1_02_10</span>
+        <span class="mockup-card__title">Управление ботами</span>
+        <span class="mockup-card__desc">Управление ботами</span>
+        <div class="mockup-card__tags"><span class="chip">bot</span></div>
+        
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="command-balloo-su/dashboard.html">
+        <span class="mockup-card__num">1_03_02</span>
+        <span class="mockup-card__title">Дашборд</span>
+        <span class="mockup-card__desc">Дашборд</span>
+        <div class="mockup-card__tags"><span class="chip">dashboard</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="command-balloo-su/departments.html">
+        <span class="mockup-card__num">1_03_15</span>
+        <span class="mockup-card__title">Отделы</span>
+        <span class="mockup-card__desc">Отделы</span>
+        <div class="mockup-card__tags"><span class="chip">department</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card" href="admin-balloo-su/donations.html">
+        <span class="mockup-card__num">1_02_13</span>
+        <span class="mockup-card__title">Донаты</span>
+        <span class="mockup-card__desc">Донаты</span>
+        <div class="mockup-card__tags"><span class="chip">donate</span></div>
+        
+      </a>
+      <a class="mockup-card" href="admin-balloo-su/employees.html">
+        <span class="mockup-card__num">1_02_14</span>
+        <span class="mockup-card__title">Сотрудники</span>
+        <span class="mockup-card__desc">Сотрудники</span>
+        <div class="mockup-card__tags"><span class="chip">screen</span></div>
+        
+      </a>
+      <a class="mockup-card" href="admin-balloo-su/features-flags.html">
+        <span class="mockup-card__num">1_02_15</span>
+        <span class="mockup-card__title">Feature flags</span>
+        <span class="mockup-card__desc">Feature flags</span>
+        <div class="mockup-card__tags"><span class="chip">feature</span></div>
+        
+      </a>
+      <a class="mockup-card" href="admin-balloo-su/features-mgmt.html">
+        <span class="mockup-card__num">1_02_16</span>
+        <span class="mockup-card__title">Управление фичами</span>
+        <span class="mockup-card__desc">Управление фичами</span>
+        <div class="mockup-card__tags"><span class="chip">feature</span></div>
+        
+      </a>
+      <a class="mockup-card" href="admin-balloo-su/files.html">
+        <span class="mockup-card__num">1_02_17</span>
+        <span class="mockup-card__title">Файлы</span>
+        <span class="mockup-card__desc">Файлы</span>
+        <div class="mockup-card__tags"><span class="chip">file</span></div>
+        
+      </a>
+      <a class="mockup-card" href="admin-balloo-su/groups-mgmt.html">
+        <span class="mockup-card__num">1_02_18</span>
+        <span class="mockup-card__title">Управление группами</span>
+        <span class="mockup-card__desc">Управление группами</span>
+        <div class="mockup-card__tags"><span class="chip">group</span></div>
+        
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="balloo-su/login.html">
+        <span class="mockup-card__num">1_01_02</span>
+        <span class="mockup-card__title">Вход</span>
+        <span class="mockup-card__desc">Вход</span>
+        <div class="mockup-card__tags"><span class="chip">auth</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card" href="admin-balloo-su/metrics.html">
+        <span class="mockup-card__num">1_02_20</span>
+        <span class="mockup-card__title">Метрики</span>
+        <span class="mockup-card__desc">Метрики</span>
+        <div class="mockup-card__tags"><span class="chip">screen</span></div>
+        
+      </a>
+      <a class="mockup-card" href="admin-balloo-su/reports.html">
+        <span class="mockup-card__num">1_02_21</span>
+        <span class="mockup-card__title">Отчёты</span>
+        <span class="mockup-card__desc">Отчёты</span>
+        <div class="mockup-card__tags"><span class="chip">report</span></div>
+        
+      </a>
+      <a class="mockup-card" href="admin-balloo-su/service-status.html">
+        <span class="mockup-card__num">1_02_22</span>
+        <span class="mockup-card__title">Статус сервиса</span>
+        <span class="mockup-card__desc">Статус сервиса</span>
+        <div class="mockup-card__tags"><span class="chip">status</span></div>
+        
+      </a>
+      <a class="mockup-card" href="admin-balloo-su/texts.html">
+        <span class="mockup-card__num">1_02_23</span>
+        <span class="mockup-card__title">Тексты</span>
+        <span class="mockup-card__desc">Тексты</span>
+        <div class="mockup-card__tags"><span class="chip">text</span></div>
+        
+      </a>
+      <a class="mockup-card" href="admin-balloo-su/users.html">
+        <span class="mockup-card__num">1_02_24</span>
+        <span class="mockup-card__title">Пользователи</span>
+        <span class="mockup-card__desc">Пользователи</span>
+        <div class="mockup-card__tags"><span class="chip">user</span></div>
+        
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="command-balloo-su/vacancies.html">
+        <span class="mockup-card__num">1_03_07</span>
+        <span class="mockup-card__title">Вакансии</span>
+        <span class="mockup-card__desc">Вакансии</span>
+        <div class="mockup-card__tags"><span class="chip">vacancy</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card" href="admin-balloo-su/versions.html">
+        <span class="mockup-card__num">1_02_26</span>
+        <span class="mockup-card__title">Версии</span>
+        <span class="mockup-card__desc">Версии</span>
+        <div class="mockup-card__tags"><span class="chip">version</span></div>
+        
+      </a>
+  </div>
+</div>
+
+  <div class="node-section">
+    <div class="node-header">
+      <h2>🏢 command.balloo.su — Портал сотрудников</h2>
+      <span class="chip">26 экранов</span>
+    </div>
+    <div class="node-url">
+      <span class="node-url__label">Назначение:</span>
+      <span class="node-url__hint">— HR, найм, база знаний, внутренний чат, календарь</span>
+    </div>
+    <details class="node-meta" data-node="command">
+      <summary>📋 Метаданные узла</summary>
+      <div class="node-meta__body">
+        <div class="meta-grid">
+          <div class="meta-item"><span class="meta-item__label">Просмотрен</span><span class="meta-item__value meta-item__value--no" data-field="viewed">👁 23/26</span></div>
+          <div class="meta-item"><span class="meta-item__label">Правок частных</span><span class="meta-item__value" data-field="edits_specific">0</span></div>
+          <div class="meta-item"><span class="meta-item__label">Правок глобальных принято</span><span class="meta-item__value" data-field="edits_global_accepted">4</span></div>
+          <div class="meta-item"><span class="meta-item__label">Документация</span><span class="meta-item__value meta-item__value--no" data-field="documentation_written">❌ нет</span></div>
+          <div class="meta-item"><span class="meta-item__label">Компоненты частные</span><span class="meta-item__value">26</span></div>
+          <div class="meta-item"><span class="meta-item__label">Компоненты глобальные</span><span class="meta-item__value">5</span></div>
+          <div class="meta-item"><span class="meta-item__label">Функций приложения</span><span class="meta-item__value">22</span></div>
+          <div class="meta-item"><span class="meta-item__label">Статус реализации</span><span class="meta-item__value meta-item__value--warn" data-field="implementation_status">запланирован</span></div>
+        </div>
+        <div class="meta-functions">
+          <div class="meta-functions__title">Функции приложения (22)</div>
+          <div class="meta-functions__list">
+            <span class="chip">Аутентификация сотрудников</span>            <span class="chip">Дашборд сотрудника</span>            <span class="chip">HR-модуль</span>            <span class="chip">База знаний</span>            <span class="chip">Найм</span>            <span class="chip">Мониторинг продукта</span>            <span class="chip">Вакансии</span>            <span class="chip">Анкеты кандидатов</span>            <span class="chip">Почему мы</span>            <span class="chip">Внутренний чат</span>            <span class="chip">Встречи</span>            <span class="chip">Мои задачи</span>            <span class="chip">Мой отдел</span>            <span class="chip">Отделы</span>            <span class="chip">Управление отделами</span>            <span class="chip">Мои публикации</span>            <span class="chip">Редактор блога</span>            <span class="chip">Мой канал</span>            <span class="chip">Настройки канала</span>            <span class="chip">Профиль сотрудника</span>            <span class="chip">Календарь</span>            <span class="chip">Интервью</span>            <span class="chip">Дашборд руководителя</span>            <span class="chip">Отпуска</span>
+          </div>
+        </div>
+        <div class="meta-actions">
+          <button class="btn btn--sm btn--secondary" onclick="markNodeViewed( + html_name + )">✅ Отметить просмотренным</button>
+        </div>
+      </div>
+    </details>
+      <a class="mockup-card mockup-card--accepted" href="command-balloo-su/application-form.html">
+        <span class="mockup-card__num">1_03_09</span>
+        <span class="mockup-card__title">Анкета кандидата</span>
+        <span class="mockup-card__desc">Анкета кандидата</span>
+        <div class="mockup-card__tags"><span class="chip">application</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="command-balloo-su/blog-channel-settings.html">
+        <span class="mockup-card__num">1_03_20</span>
+        <span class="mockup-card__title">Настройки канала</span>
+        <span class="mockup-card__desc">Настройки канала</span>
+        <div class="mockup-card__tags"><span class="chip">settings</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="command-balloo-su/blog-editor.html">
+        <span class="mockup-card__num">1_03_18</span>
+        <span class="mockup-card__title">Редактор блога</span>
+        <span class="mockup-card__desc">Редактор блога</span>
+        <div class="mockup-card__tags"><span class="chip">editor</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="command-balloo-su/blog-my-channel.html">
+        <span class="mockup-card__num">1_03_19</span>
+        <span class="mockup-card__title">Мой канал</span>
+        <span class="mockup-card__desc">Мой канал</span>
+        <div class="mockup-card__tags"><span class="chip">channel</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="command-balloo-su/blog-my-posts.html">
+        <span class="mockup-card__num">1_03_17</span>
+        <span class="mockup-card__title">Мои публикации</span>
+        <span class="mockup-card__desc">Мои публикации</span>
+        <div class="mockup-card__tags"><span class="chip">blog</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="command-balloo-su/calendar.html">
+        <span class="mockup-card__num">1_03_22</span>
+        <span class="mockup-card__title">Календарь</span>
+        <span class="mockup-card__desc">Календарь</span>
+        <div class="mockup-card__tags"><span class="chip">calendar</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card" href="command-balloo-su/candidate-interview.html">
+        <span class="mockup-card__num">1_03_24</span>
+        <span class="mockup-card__title">Карточка кандидата (интервью)</span>
+        <span class="mockup-card__desc">Карточка кандидата (интервью)</span>
+        <div class="mockup-card__tags"><span class="chip">interview</span></div>
+        
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="command-balloo-su/candidate.html">
+        <span class="mockup-card__num">1_03_23</span>
+        <span class="mockup-card__title">Карточка кандидата</span>
+        <span class="mockup-card__desc">Карточка кандидата</span>
+        <div class="mockup-card__tags"><span class="chip">screen</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="command-balloo-su/dashboard.html">
+        <span class="mockup-card__num">1_03_02</span>
+        <span class="mockup-card__title">Дашборд</span>
+        <span class="mockup-card__desc">Дашборд</span>
+        <div class="mockup-card__tags"><span class="chip">dashboard</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="command-balloo-su/department-management.html">
+        <span class="mockup-card__num">1_03_16</span>
+        <span class="mockup-card__title">Управление отделами</span>
+        <span class="mockup-card__desc">Управление отделами</span>
+        <div class="mockup-card__tags"><span class="chip">department</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="command-balloo-su/departments.html">
+        <span class="mockup-card__num">1_03_15</span>
+        <span class="mockup-card__title">Отделы</span>
+        <span class="mockup-card__desc">Отделы</span>
+        <div class="mockup-card__tags"><span class="chip">department</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="command-balloo-su/employee-profile.html">
+        <span class="mockup-card__num">1_03_21</span>
+        <span class="mockup-card__title">Профиль сотрудника</span>
+        <span class="mockup-card__desc">Профиль сотрудника</span>
+        <div class="mockup-card__tags"><span class="chip">profile</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="command-balloo-su/hiring.html">
+        <span class="mockup-card__num">1_03_05</span>
+        <span class="mockup-card__title">Найм</span>
+        <span class="mockup-card__desc">Найм</span>
+        <div class="mockup-card__tags"><span class="chip">hiring</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="command-balloo-su/hr.html">
+        <span class="mockup-card__num">1_03_03</span>
+        <span class="mockup-card__title">HR-модуль</span>
+        <span class="mockup-card__desc">HR-модуль</span>
+        <div class="mockup-card__tags"><span class="chip">screen</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="command-balloo-su/internal-chat.html">
+        <span class="mockup-card__num">1_03_11</span>
+        <span class="mockup-card__title">Внутренний чат</span>
+        <span class="mockup-card__desc">Внутренний чат</span>
+        <div class="mockup-card__tags"><span class="chip">chat</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="command-balloo-su/knowledge-base.html">
+        <span class="mockup-card__num">1_03_04</span>
+        <span class="mockup-card__title">База знаний</span>
+        <span class="mockup-card__desc">База знаний</span>
+        <div class="mockup-card__tags"><span class="chip">knowledge</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="command-balloo-su/login.html">
+        <span class="mockup-card__num">1_03_01</span>
+        <span class="mockup-card__title">Вход</span>
+        <span class="mockup-card__desc">Вход</span>
+        <div class="mockup-card__tags"><span class="chip">auth</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card" href="command-balloo-su/manager-dashboard.html">
+        <span class="mockup-card__num">1_03_25</span>
+        <span class="mockup-card__title">Дашборд руководителя</span>
+        <span class="mockup-card__desc">Дашборд руководителя</span>
+        <div class="mockup-card__tags"><span class="chip">dashboard</span></div>
+        
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="command-balloo-su/meetings.html">
+        <span class="mockup-card__num">1_03_12</span>
+        <span class="mockup-card__title">Встречи</span>
+        <span class="mockup-card__desc">Встречи</span>
+        <div class="mockup-card__tags"><span class="chip">meeting</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="command-balloo-su/monitoring.html">
+        <span class="mockup-card__num">1_03_06</span>
+        <span class="mockup-card__title">Мониторинг продукта</span>
+        <span class="mockup-card__desc">Мониторинг продукта</span>
+        <div class="mockup-card__tags"><span class="chip">monitoring</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="command-balloo-su/my-department.html">
+        <span class="mockup-card__num">1_03_14</span>
+        <span class="mockup-card__title">Мой отдел</span>
+        <span class="mockup-card__desc">Мой отдел</span>
+        <div class="mockup-card__tags"><span class="chip">department</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card" href="command-balloo-su/time-off.html">
+        <span class="mockup-card__num">1_03_26</span>
+        <span class="mockup-card__title">Отпуска и отсутствие</span>
+        <span class="mockup-card__desc">Отпуска и отсутствие</span>
+        <div class="mockup-card__tags"><span class="chip">timeoff</span></div>
+        
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="command-balloo-su/todo.html">
+        <span class="mockup-card__num">1_03_13</span>
+        <span class="mockup-card__title">Мои задачи</span>
+        <span class="mockup-card__desc">Мои задачи</span>
+        <div class="mockup-card__tags"><span class="chip">todo</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="command-balloo-su/vacancies.html">
+        <span class="mockup-card__num">1_03_07</span>
+        <span class="mockup-card__title">Вакансии</span>
+        <span class="mockup-card__desc">Вакансии</span>
+        <div class="mockup-card__tags"><span class="chip">vacancy</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="command-balloo-su/vacancy-detail.html">
+        <span class="mockup-card__num">1_03_08</span>
+        <span class="mockup-card__title">Детали вакансии</span>
+        <span class="mockup-card__desc">Детали вакансии</span>
+        <div class="mockup-card__tags"><span class="chip">vacancy</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="command-balloo-su/why-us.html">
+        <span class="mockup-card__num">1_03_10</span>
+        <span class="mockup-card__title">Почему мы</span>
+        <span class="mockup-card__desc">Почему мы</span>
+        <div class="mockup-card__tags"><span class="chip">screen</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+  </div>
+</div>
+
+  <div class="node-section">
+    <div class="node-header">
+      <h2>💡 features.balloo.su — Фич-реквесты</h2>
+      <span class="chip">5 экранов</span>
+    </div>
+    <div class="node-url">
+      <span class="node-url__label">Назначение:</span>
+      <span class="node-url__hint">— Предложения, голосования, статус фич</span>
+    </div>
+    <details class="node-meta" data-node="features">
+      <summary>📋 Метаданные узла</summary>
+      <div class="node-meta__body">
+        <div class="meta-grid">
+          <div class="meta-item"><span class="meta-item__label">Просмотрен</span><span class="meta-item__value meta-item__value--no" data-field="viewed">👁 5/5</span></div>
+          <div class="meta-item"><span class="meta-item__label">Правок частных</span><span class="meta-item__value" data-field="edits_specific">0</span></div>
+          <div class="meta-item"><span class="meta-item__label">Правок глобальных принято</span><span class="meta-item__value" data-field="edits_global_accepted">4</span></div>
+          <div class="meta-item"><span class="meta-item__label">Документация</span><span class="meta-item__value meta-item__value--no" data-field="documentation_written">❌ нет</span></div>
+          <div class="meta-item"><span class="meta-item__label">Компоненты частные</span><span class="meta-item__value">5</span></div>
+          <div class="meta-item"><span class="meta-item__label">Компоненты глобальные</span><span class="meta-item__value">5</span></div>
+          <div class="meta-item"><span class="meta-item__label">Функций приложения</span><span class="meta-item__value">5</span></div>
+          <div class="meta-item"><span class="meta-item__label">Статус реализации</span><span class="meta-item__value meta-item__value--warn" data-field="implementation_status">запланирован</span></div>
+        </div>
+        <div class="meta-functions">
+          <div class="meta-functions__title">Функции приложения (5)</div>
+          <div class="meta-functions__list">
+            <span class="chip">Аутентификация</span>            <span class="chip">Список фич-реквестов</span>            <span class="chip">Создание фич-реквеста</span>            <span class="chip">Детали фич-реквеста</span>            <span class="chip">Донат</span>
+          </div>
+        </div>
+        <div class="meta-actions">
+          <button class="btn btn--sm btn--secondary" onclick="markNodeViewed( + html_name + )">✅ Отметить просмотренным</button>
+        </div>
+      </div>
+    </details>
+      <a class="mockup-card mockup-card--accepted" href="balloo-su/donate.html">
+        <span class="mockup-card__num">1_01_24</span>
+        <span class="mockup-card__title">Донат</span>
+        <span class="mockup-card__desc">Донат</span>
+        <div class="mockup-card__tags"><span class="chip">donate</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="features-balloo-su/feature-detail.html">
+        <span class="mockup-card__num">1_04_02</span>
+        <span class="mockup-card__title">Детали фич-реквеста</span>
+        <span class="mockup-card__desc">Детали фич-реквеста</span>
+        <div class="mockup-card__tags"><span class="chip">feature</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="features-balloo-su/list.html">
+        <span class="mockup-card__num">1_04_03</span>
+        <span class="mockup-card__title">Список фич-реквестов</span>
+        <span class="mockup-card__desc">Список фич-реквестов</span>
+        <div class="mockup-card__tags"><span class="chip">feature</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="balloo-su/login.html">
+        <span class="mockup-card__num">1_01_02</span>
+        <span class="mockup-card__title">Вход</span>
+        <span class="mockup-card__desc">Вход</span>
+        <div class="mockup-card__tags"><span class="chip">auth</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="features-balloo-su/submit.html">
+        <span class="mockup-card__num">1_04_05</span>
+        <span class="mockup-card__title">Отправить фич-реквест</span>
+        <span class="mockup-card__desc">Отправить фич-реквест</span>
+        <div class="mockup-card__tags"><span class="chip">feature</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+  </div>
+</div>
+
+  <div class="node-section">
+    <div class="node-header">
+      <h2>📜 history.balloo.su — История версий</h2>
+      <span class="chip">3 экранов</span>
+    </div>
+    <div class="node-url">
+      <span class="node-url__label">Назначение:</span>
+      <span class="node-url__hint">— Changelog, история обновлений</span>
+    </div>
+    <details class="node-meta" data-node="history">
+      <summary>📋 Метаданные узла</summary>
+      <div class="node-meta__body">
+        <div class="meta-grid">
+          <div class="meta-item"><span class="meta-item__label">Просмотрен</span><span class="meta-item__value meta-item__value--no" data-field="viewed">👁 3/3</span></div>
+          <div class="meta-item"><span class="meta-item__label">Правок частных</span><span class="meta-item__value" data-field="edits_specific">0</span></div>
+          <div class="meta-item"><span class="meta-item__label">Правок глобальных принято</span><span class="meta-item__value" data-field="edits_global_accepted">3</span></div>
+          <div class="meta-item"><span class="meta-item__label">Документация</span><span class="meta-item__value meta-item__value--no" data-field="documentation_written">❌ нет</span></div>
+          <div class="meta-item"><span class="meta-item__label">Компоненты частные</span><span class="meta-item__value">3</span></div>
+          <div class="meta-item"><span class="meta-item__label">Компоненты глобальные</span><span class="meta-item__value">5</span></div>
+          <div class="meta-item"><span class="meta-item__label">Функций приложения</span><span class="meta-item__value">4</span></div>
+          <div class="meta-item"><span class="meta-item__label">Статус реализации</span><span class="meta-item__value meta-item__value--warn" data-field="implementation_status">запланирован</span></div>
+        </div>
+        <div class="meta-functions">
+          <div class="meta-functions__title">Функции приложения (4)</div>
+          <div class="meta-functions__list">
+            <span class="chip">Список версий</span>            <span class="chip">Детали версии</span>            <span class="chip">Донат</span>
+          </div>
+        </div>
+        <div class="meta-actions">
+          <button class="btn btn--sm btn--secondary" onclick="markNodeViewed( + html_name + )">✅ Отметить просмотренным</button>
+        </div>
+      </div>
+    </details>
+      <a class="mockup-card mockup-card--accepted" href="balloo-su/donate.html">
+        <span class="mockup-card__num">1_01_24</span>
+        <span class="mockup-card__title">Донат</span>
+        <span class="mockup-card__desc">Донат</span>
+        <div class="mockup-card__tags"><span class="chip">donate</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="history-balloo-su/version-detail.html">
+        <span class="mockup-card__num">1_05_02</span>
+        <span class="mockup-card__title">Детали версии</span>
+        <span class="mockup-card__desc">Детали версии</span>
+        <div class="mockup-card__tags"><span class="chip">version</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="history-balloo-su/version-list.html">
+        <span class="mockup-card__num">1_05_03</span>
+        <span class="mockup-card__title">Список версий</span>
+        <span class="mockup-card__desc">Список версий</span>
+        <div class="mockup-card__tags"><span class="chip">version</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+  </div>
+</div>
+
+  <div class="node-section">
+    <div class="node-header">
+      <h2>⬇️ download.balloo.su — Загрузки</h2>
+      <span class="chip">2 экранов</span>
+    </div>
+    <div class="node-url">
+      <span class="node-url__label">Назначение:</span>
+      <span class="node-url__hint">— Скачивание клиентов</span>
+    </div>
+    <details class="node-meta" data-node="download">
+      <summary>📋 Метаданные узла</summary>
+      <div class="node-meta__body">
+        <div class="meta-grid">
+          <div class="meta-item"><span class="meta-item__label">Просмотрен</span><span class="meta-item__value meta-item__value--no" data-field="viewed">👁 2/2</span></div>
+          <div class="meta-item"><span class="meta-item__label">Правок частных</span><span class="meta-item__value" data-field="edits_specific">0</span></div>
+          <div class="meta-item"><span class="meta-item__label">Правок глобальных принято</span><span class="meta-item__value" data-field="edits_global_accepted">2</span></div>
+          <div class="meta-item"><span class="meta-item__label">Документация</span><span class="meta-item__value meta-item__value--no" data-field="documentation_written">❌ нет</span></div>
+          <div class="meta-item"><span class="meta-item__label">Компоненты частные</span><span class="meta-item__value">2</span></div>
+          <div class="meta-item"><span class="meta-item__label">Компоненты глобальные</span><span class="meta-item__value">5</span></div>
+          <div class="meta-item"><span class="meta-item__label">Функций приложения</span><span class="meta-item__value">2</span></div>
+          <div class="meta-item"><span class="meta-item__label">Статус реализации</span><span class="meta-item__value meta-item__value--warn" data-field="implementation_status">запланирован</span></div>
+        </div>
+        <div class="meta-functions">
+          <div class="meta-functions__title">Функции приложения (2)</div>
+          <div class="meta-functions__list">
+            <span class="chip">Загрузки</span>            <span class="chip">Донат</span>
+          </div>
+        </div>
+        <div class="meta-actions">
+          <button class="btn btn--sm btn--secondary" onclick="markNodeViewed( + html_name + )">✅ Отметить просмотренным</button>
+        </div>
+      </div>
+    </details>
+      <a class="mockup-card mockup-card--accepted" href="balloo-su/donate.html">
+        <span class="mockup-card__num">1_01_24</span>
+        <span class="mockup-card__title">Донат</span>
+        <span class="mockup-card__desc">Донат</span>
+        <div class="mockup-card__tags"><span class="chip">donate</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="download-balloo-su/downloads.html">
+        <span class="mockup-card__num">1_06_02</span>
+        <span class="mockup-card__title">Загрузки</span>
+        <span class="mockup-card__desc">Загрузки</span>
+        <div class="mockup-card__tags"><span class="chip">screen</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+  </div>
+</div>
+
+  <div class="node-section">
+    <div class="node-header">
+      <h2>📚 docs.balloo.su — Документация API</h2>
+      <span class="chip">1 экранов</span>
+    </div>
+    <div class="node-url">
+      <span class="node-url__label">Назначение:</span>
+      <span class="node-url__hint">— Документация API, WebSocket</span>
+    </div>
+    <details class="node-meta" data-node="docs">
+      <summary>📋 Метаданные узла</summary>
+      <div class="node-meta__body">
+        <div class="meta-grid">
+          <div class="meta-item"><span class="meta-item__label">Просмотрен</span><span class="meta-item__value meta-item__value--no" data-field="viewed">👁 1/1</span></div>
+          <div class="meta-item"><span class="meta-item__label">Правок частных</span><span class="meta-item__value" data-field="edits_specific">0</span></div>
+          <div class="meta-item"><span class="meta-item__label">Правок глобальных принято</span><span class="meta-item__value" data-field="edits_global_accepted">0</span></div>
+          <div class="meta-item"><span class="meta-item__label">Документация</span><span class="meta-item__value meta-item__value--no" data-field="documentation_written">❌ нет</span></div>
+          <div class="meta-item"><span class="meta-item__label">Компоненты частные</span><span class="meta-item__value">1</span></div>
+          <div class="meta-item"><span class="meta-item__label">Компоненты глобальные</span><span class="meta-item__value">5</span></div>
+          <div class="meta-item"><span class="meta-item__label">Функций приложения</span><span class="meta-item__value">1</span></div>
+          <div class="meta-item"><span class="meta-item__label">Статус реализации</span><span class="meta-item__value meta-item__value--warn" data-field="implementation_status">запланирован</span></div>
+        </div>
+        <div class="meta-functions">
+          <div class="meta-functions__title">Функции приложения (1)</div>
+          <div class="meta-functions__list">
+            <span class="chip">Документация API</span>
+          </div>
+        </div>
+        <div class="meta-actions">
+          <button class="btn btn--sm btn--secondary" onclick="markNodeViewed( + html_name + )">✅ Отметить просмотренным</button>
+        </div>
+      </div>
+    </details>
+      <a class="mockup-card mockup-card--accepted" href="docs-balloo-su/api-docs.html">
+        <span class="mockup-card__num">1_07_01</span>
+        <span class="mockup-card__title">Документация API</span>
+        <span class="mockup-card__desc">Документация API</span>
+        <div class="mockup-card__tags"><span class="chip">screen</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+  </div>
+</div>
+
+  <div class="node-section">
+    <div class="node-header">
+      <h2>📱 mobile — Мобильные макеты</h2>
+      <span class="chip">23 экранов</span>
+    </div>
+    <div class="node-url">
+      <span class="node-url__label">Назначение:</span>
+      <span class="node-url__hint">— Сборные макеты для Android/iOS</span>
+    </div>
+    <details class="node-meta" data-node="mobile">
+      <summary>📋 Метаданные узла</summary>
+      <div class="node-meta__body">
+        <div class="meta-grid">
+          <div class="meta-item"><span class="meta-item__label">Просмотрен</span><span class="meta-item__value meta-item__value--no" data-field="viewed">👁 20/23</span></div>
+          <div class="meta-item"><span class="meta-item__label">Правок частных</span><span class="meta-item__value" data-field="edits_specific">8</span></div>
+          <div class="meta-item"><span class="meta-item__label">Правок глобальных принято</span><span class="meta-item__value" data-field="edits_global_accepted">5</span></div>
+          <div class="meta-item"><span class="meta-item__label">Документация</span><span class="meta-item__value meta-item__value--no" data-field="documentation_written">❌ нет</span></div>
+          <div class="meta-item"><span class="meta-item__label">Компоненты частные</span><span class="meta-item__value">23</span></div>
+          <div class="meta-item"><span class="meta-item__label">Компоненты глобальные</span><span class="meta-item__value">5</span></div>
+          <div class="meta-item"><span class="meta-item__label">Функций приложения</span><span class="meta-item__value">13</span></div>
+          <div class="meta-item"><span class="meta-item__label">Статус реализации</span><span class="meta-item__value meta-item__value--warn" data-field="implementation_status">запланирован</span></div>
+        </div>
+        <div class="meta-functions">
+          <div class="meta-functions__title">Функции приложения (13)</div>
+          <div class="meta-functions__list">
+            <span class="chip">Мобильный чат</span>            <span class="chip">История звонков</span>            <span class="chip">Мобильные настройки</span>            <span class="chip">Устройства</span>            <span class="chip">QR-привязка</span>            <span class="chip">Донат</span>            <span class="chip">Вложения чата</span>            <span class="chip">Жалобы</span>            <span class="chip">Вход/Регистрация</span>            <span class="chip">Сторис</span>            <span class="chip">Архив</span>            <span class="chip">Контакты</span>            <span class="chip">Профиль</span>
+          </div>
+        </div>
+        <div class="meta-actions">
+          <button class="btn btn--sm btn--secondary" onclick="markNodeViewed( + html_name + )">✅ Отметить просмотренным</button>
+        </div>
+      </div>
+    </details>
+      <a class="mockup-card mockup-card--accepted" href="mobile/add-device.html">
+        <span class="mockup-card__num">1_08_06</span>
+        <span class="mockup-card__title">Добавить устройство</span>
+        <span class="mockup-card__desc">Добавить устройство</span>
+        <div class="mockup-card__tags"><span class="chip">device</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="mobile/archive.html">
+        <span class="mockup-card__num">1_08_16</span>
+        <span class="mockup-card__title">Архив чатов</span>
+        <span class="mockup-card__desc">Архив чатов</span>
+        <div class="mockup-card__tags"><span class="chip">chat</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="mobile/calls-history.html">
+        <span class="mockup-card__num">1_08_03</span>
+        <span class="mockup-card__title">История звонков</span>
+        <span class="mockup-card__desc">История звонков</span>
+        <div class="mockup-card__tags"><span class="chip">calls-history</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="mobile/chat-attachments.html">
+        <span class="mockup-card__num">1_08_08</span>
+        <span class="mockup-card__title">Вложения чата</span>
+        <span class="mockup-card__desc">Вложения чата</span>
+        <div class="mockup-card__tags"><span class="chip">chat</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="mobile/chat.html">
+        <span class="mockup-card__num">1_08_02</span>
+        <span class="mockup-card__title">Чат</span>
+        <span class="mockup-card__desc">Чат</span>
+        <div class="mockup-card__tags"><span class="chip">chat</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="mobile/contacts.html">
+        <span class="mockup-card__num">1_08_17</span>
+        <span class="mockup-card__title">Контакты</span>
+        <span class="mockup-card__desc">Контакты</span>
+        <div class="mockup-card__tags"><span class="chip">contacts</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="mobile/donate.html">
+        <span class="mockup-card__num">1_08_07</span>
+        <span class="mockup-card__title">Донат</span>
+        <span class="mockup-card__desc">Донат</span>
+        <div class="mockup-card__tags"><span class="chip">donate</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card" href="mobile/empty-chat.html">
+        <span class="mockup-card__num">1_08_21</span>
+        <span class="mockup-card__title">Пустой чат</span>
+        <span class="mockup-card__desc">Пустой чат</span>
+        <div class="mockup-card__tags"><span class="chip">chat</span></div>
+        
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="mobile/group-create.html">
+        <span class="mockup-card__num">1_08_19</span>
+        <span class="mockup-card__title">Создание группы</span>
+        <span class="mockup-card__desc">Создание группы</span>
+        <div class="mockup-card__tags"><span class="chip">group</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="mobile/login.html">
+        <span class="mockup-card__num">1_08_10</span>
+        <span class="mockup-card__title">Вход</span>
+        <span class="mockup-card__desc">Вход</span>
+        <div class="mockup-card__tags"><span class="chip">auth</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card" href="mobile/media-viewer.html">
+        <span class="mockup-card__num">1_08_22</span>
+        <span class="mockup-card__title">Полноэкранный просмотрщик медиа</span>
+        <span class="mockup-card__desc">Полноэкранный просмотрщик медиа</span>
+        <div class="mockup-card__tags"><span class="chip">viewer</span></div>
+        
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="mobile/my-devices.html">
+        <span class="mockup-card__num">1_08_05</span>
+        <span class="mockup-card__title">Мои устройства</span>
+        <span class="mockup-card__desc">Мои устройства</span>
+        <div class="mockup-card__tags"><span class="chip">device</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="mobile/my-donates.html">
+        <span class="mockup-card__num">1_08_14</span>
+        <span class="mockup-card__title">Мои донаты</span>
+        <span class="mockup-card__desc">Мои донаты</span>
+        <div class="mockup-card__tags"><span class="chip">donate</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="mobile/overview.html">
+        <span class="mockup-card__num">1_08_01</span>
+        <span class="mockup-card__title">Обзор / Приветствие</span>
+        <span class="mockup-card__desc">Обзор / Приветствие</span>
+        <div class="mockup-card__tags"><span class="chip">overview</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="mobile/password-reset.html">
+        <span class="mockup-card__num">1_08_12</span>
+        <span class="mockup-card__title">Восстановление пароля</span>
+        <span class="mockup-card__desc">Восстановление пароля</span>
+        <div class="mockup-card__tags"><span class="chip">screen</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="mobile/poll-editor.html">
+        <span class="mockup-card__num">1_08_20</span>
+        <span class="mockup-card__title">Редактор опроса</span>
+        <span class="mockup-card__desc">Редактор опроса</span>
+        <div class="mockup-card__tags"><span class="chip">poll</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="mobile/profile.html">
+        <span class="mockup-card__num">1_08_18</span>
+        <span class="mockup-card__title">Профиль</span>
+        <span class="mockup-card__desc">Профиль</span>
+        <div class="mockup-card__tags"><span class="chip">profile</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="mobile/register.html">
+        <span class="mockup-card__num">1_08_11</span>
+        <span class="mockup-card__title">Регистрация</span>
+        <span class="mockup-card__desc">Регистрация</span>
+        <div class="mockup-card__tags"><span class="chip">auth</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="mobile/report-message.html">
+        <span class="mockup-card__num">1_08_09</span>
+        <span class="mockup-card__title">Жалоба на сообщение</span>
+        <span class="mockup-card__desc">Жалоба на сообщение</span>
+        <div class="mockup-card__tags"><span class="chip">report</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="mobile/settings.html">
+        <span class="mockup-card__num">1_08_04</span>
+        <span class="mockup-card__title">Настройки приложения</span>
+        <span class="mockup-card__desc">Настройки приложения</span>
+        <div class="mockup-card__tags"><span class="chip">settings</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="mobile/stories.html">
+        <span class="mockup-card__num">1_08_15</span>
+        <span class="mockup-card__title">Сторис</span>
+        <span class="mockup-card__desc">Сторис</span>
+        <div class="mockup-card__tags"><span class="chip">stories</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="mobile/two-factor.html">
+        <span class="mockup-card__num">1_08_13</span>
+        <span class="mockup-card__title">Двухфакторная аутентификация</span>
+        <span class="mockup-card__desc">Двухфакторная аутентификация</span>
+        <div class="mockup-card__tags"><span class="chip">2fa</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card" href="mobile/voice-record.html">
+        <span class="mockup-card__num">1_08_23</span>
+        <span class="mockup-card__title">Запись голосового (mobile)</span>
+        <span class="mockup-card__desc">Запись голосового (mobile)</span>
+        <div class="mockup-card__tags"><span class="chip">record</span></div>
+        
+      </a>
+  </div>
+</div>
+
+  <div class="node-section">
+    <div class="node-header">
+      <h2>🖥️ desktop — ПК обёртки</h2>
+      <span class="chip">23 экранов</span>
+    </div>
+    <div class="node-url">
+      <span class="node-url__label">Назначение:</span>
+      <span class="node-url__hint">— Обёртки окна для десктопных версий</span>
+    </div>
+    <details class="node-meta" data-node="desktop">
+      <summary>📋 Метаданные узла</summary>
+      <div class="node-meta__body">
+        <div class="meta-grid">
+          <div class="meta-item"><span class="meta-item__label">Просмотрен</span><span class="meta-item__value meta-item__value--no" data-field="viewed">👁 19/23</span></div>
+          <div class="meta-item"><span class="meta-item__label">Правок частных</span><span class="meta-item__value" data-field="edits_specific">2</span></div>
+          <div class="meta-item"><span class="meta-item__label">Правок глобальных принято</span><span class="meta-item__value" data-field="edits_global_accepted">3</span></div>
+          <div class="meta-item"><span class="meta-item__label">Документация</span><span class="meta-item__value meta-item__value--no" data-field="documentation_written">❌ нет</span></div>
+          <div class="meta-item"><span class="meta-item__label">Компоненты частные</span><span class="meta-item__value">23</span></div>
+          <div class="meta-item"><span class="meta-item__label">Компоненты глобальные</span><span class="meta-item__value">5</span></div>
+          <div class="meta-item"><span class="meta-item__label">Функций приложения</span><span class="meta-item__value">16</span></div>
+          <div class="meta-item"><span class="meta-item__label">Статус реализации</span><span class="meta-item__value meta-item__value--warn" data-field="implementation_status">запланирован</span></div>
+        </div>
+        <div class="meta-functions">
+          <div class="meta-functions__title">Функции приложения (16)</div>
+          <div class="meta-functions__list">
+            <span class="chip">Окно приложения</span>            <span class="chip">Режимы окна</span>            <span class="chip">Системная интеграция</span>            <span class="chip">Многоканальность</span>            <span class="chip">Мои устройства</span>            <span class="chip">Донат</span>            <span class="chip">Вложения чата</span>            <span class="chip">Жалобы</span>            <span class="chip">Вход/Регистрация</span>            <span class="chip">Сторис</span>            <span class="chip">Архив</span>            <span class="chip">Контакты</span>            <span class="chip">Профиль</span>            <span class="chip">Настройки</span>            <span class="chip">Настройки уведомлений</span>            <span class="chip">Просмотр медиа</span>
+          </div>
+        </div>
+        <div class="meta-actions">
+          <button class="btn btn--sm btn--secondary" onclick="markNodeViewed( + html_name + )">✅ Отметить просмотренным</button>
+        </div>
+      </div>
+    </details>
+      <a class="mockup-card mockup-card--accepted" href="desktop/add-device.html">
+        <span class="mockup-card__num">1_09_04</span>
+        <span class="mockup-card__title">Добавить устройство</span>
+        <span class="mockup-card__desc">Добавить устройство</span>
+        <div class="mockup-card__tags"><span class="chip">device</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="desktop/archive.html">
+        <span class="mockup-card__num">1_09_14</span>
+        <span class="mockup-card__title">Архив чатов</span>
+        <span class="mockup-card__desc">Архив чатов</span>
+        <div class="mockup-card__tags"><span class="chip">chat</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="desktop/calls-history.html">
+        <span class="mockup-card__num">1_09_13</span>
+        <span class="mockup-card__title">История звонков</span>
+        <span class="mockup-card__desc">История звонков</span>
+        <div class="mockup-card__tags"><span class="chip">calls-history</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="desktop/chat-attachments.html">
+        <span class="mockup-card__num">1_09_06</span>
+        <span class="mockup-card__title">Вложения чата</span>
+        <span class="mockup-card__desc">Вложения чата</span>
+        <div class="mockup-card__tags"><span class="chip">chat</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="desktop/chat.html">
+        <span class="mockup-card__num">1_09_11</span>
+        <span class="mockup-card__title">Чат</span>
+        <span class="mockup-card__desc">Чат</span>
+        <div class="mockup-card__tags"><span class="chip">chat</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="desktop/contacts.html">
+        <span class="mockup-card__num">1_09_15</span>
+        <span class="mockup-card__title">Контакты</span>
+        <span class="mockup-card__desc">Контакты</span>
+        <div class="mockup-card__tags"><span class="chip">contacts</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="desktop/donate.html">
+        <span class="mockup-card__num">1_09_05</span>
+        <span class="mockup-card__title">Донат</span>
+        <span class="mockup-card__desc">Донат</span>
+        <div class="mockup-card__tags"><span class="chip">donate</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="desktop/group-create.html">
+        <span class="mockup-card__num">1_09_16</span>
+        <span class="mockup-card__title">Создание группы</span>
+        <span class="mockup-card__desc">Создание группы</span>
+        <div class="mockup-card__tags"><span class="chip">group</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="balloo-su/login.html">
+        <span class="mockup-card__num">1_01_02</span>
+        <span class="mockup-card__title">Вход</span>
+        <span class="mockup-card__desc">Вход</span>
+        <div class="mockup-card__tags"><span class="chip">auth</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card" href="desktop/media-viewer.html">
+        <span class="mockup-card__num">1_09_21</span>
+        <span class="mockup-card__title">Полноэкранный просмотрщик медиа</span>
+        <span class="mockup-card__desc">Полноэкранный просмотрщик медиа</span>
+        <div class="mockup-card__tags"><span class="chip">viewer</span></div>
+        
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="desktop/modes.html">
+        <span class="mockup-card__num">1_09_02</span>
+        <span class="mockup-card__title">Modes</span>
+        <span class="mockup-card__desc">Modes</span>
+        <div class="mockup-card__tags"><span class="chip">screen</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="desktop/my-devices.html">
+        <span class="mockup-card__num">1_09_03</span>
+        <span class="mockup-card__title">Мои устройства</span>
+        <span class="mockup-card__desc">Мои устройства</span>
+        <div class="mockup-card__tags"><span class="chip">device</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="desktop/my-donates.html">
+        <span class="mockup-card__num">1_09_10</span>
+        <span class="mockup-card__title">Мои донаты</span>
+        <span class="mockup-card__desc">Мои донаты</span>
+        <div class="mockup-card__tags"><span class="chip">donate</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card" href="desktop/notification-settings.html">
+        <span class="mockup-card__num">1_09_20</span>
+        <span class="mockup-card__title">Настройки уведомлений</span>
+        <span class="mockup-card__desc">Настройки уведомлений</span>
+        <div class="mockup-card__tags"><span class="chip">settings</span></div>
+        
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="desktop/overview.html">
+        <span class="mockup-card__num">1_09_01</span>
+        <span class="mockup-card__title">Обзор / Приветствие</span>
+        <span class="mockup-card__desc">Обзор / Приветствие</span>
+        <div class="mockup-card__tags"><span class="chip">overview</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card" href="desktop/password-reset.html">
+        <span class="mockup-card__num">1_09_08</span>
+        <span class="mockup-card__title">Восстановление пароля</span>
+        <span class="mockup-card__desc">Восстановление пароля</span>
+        <div class="mockup-card__tags"><span class="chip">screen</span></div>
+        <span class="mockup-card__status" style="color:#f44; border-color:#f44;">✗</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="desktop/poll-editor.html">
+        <span class="mockup-card__num">1_09_17</span>
+        <span class="mockup-card__title">Редактор опроса</span>
+        <span class="mockup-card__desc">Редактор опроса</span>
+        <div class="mockup-card__tags"><span class="chip">poll</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="desktop/profile.html">
+        <span class="mockup-card__num">1_09_19</span>
+        <span class="mockup-card__title">Профиль</span>
+        <span class="mockup-card__desc">Профиль</span>
+        <div class="mockup-card__tags"><span class="chip">profile</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="balloo-su/register.html">
+        <span class="mockup-card__num">1_01_03</span>
+        <span class="mockup-card__title">Регистрация</span>
+        <span class="mockup-card__desc">Регистрация</span>
+        <div class="mockup-card__tags"><span class="chip">auth</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="desktop/report-message.html">
+        <span class="mockup-card__num">1_09_07</span>
+        <span class="mockup-card__title">Жалоба на сообщение</span>
+        <span class="mockup-card__desc">Жалоба на сообщение</span>
+        <div class="mockup-card__tags"><span class="chip">report</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="desktop/settings.html">
+        <span class="mockup-card__num">1_09_18</span>
+        <span class="mockup-card__title">Настройки приложения</span>
+        <span class="mockup-card__desc">Настройки приложения</span>
+        <div class="mockup-card__tags"><span class="chip">settings</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="desktop/stories.html">
+        <span class="mockup-card__num">1_09_12</span>
+        <span class="mockup-card__title">Сторис</span>
+        <span class="mockup-card__desc">Сторис</span>
+        <div class="mockup-card__tags"><span class="chip">stories</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card" href="desktop/two-factor.html">
+        <span class="mockup-card__num">1_09_09</span>
+        <span class="mockup-card__title">Двухфакторная аутентификация</span>
+        <span class="mockup-card__desc">Двухфакторная аутентификация</span>
+        <div class="mockup-card__tags"><span class="chip">2fa</span></div>
+        <span class="mockup-card__status" style="color:#f44; border-color:#f44;">✗</span>
+      </a>
+  </div>
+</div>
+
+  <div class="node-section">
+    <div class="node-header">
+      <h2>📐 specifity.balloo.su — Спецификация</h2>
+      <span class="chip">7 экранов</span>
+    </div>
+    <div class="node-url">
+      <span class="node-url__label">Назначение:</span>
+      <span class="node-url__hint">— Инструмент для разработки</span>
+    </div>
+    <details class="node-meta" data-node="specifity">
+      <summary>📋 Метаданные узла</summary>
+      <div class="node-meta__body">
+        <div class="meta-grid">
+          <div class="meta-item"><span class="meta-item__label">Просмотрен</span><span class="meta-item__value meta-item__value--no" data-field="viewed">👁 7/7</span></div>
+          <div class="meta-item"><span class="meta-item__label">Правок частных</span><span class="meta-item__value" data-field="edits_specific">0</span></div>
+          <div class="meta-item"><span class="meta-item__label">Правок глобальных принято</span><span class="meta-item__value" data-field="edits_global_accepted">0</span></div>
+          <div class="meta-item"><span class="meta-item__label">Документация</span><span class="meta-item__value meta-item__value--no" data-field="documentation_written">❌ нет</span></div>
+          <div class="meta-item"><span class="meta-item__label">Компоненты частные</span><span class="meta-item__value">7</span></div>
+          <div class="meta-item"><span class="meta-item__label">Компоненты глобальные</span><span class="meta-item__value">5</span></div>
+          <div class="meta-item"><span class="meta-item__label">Функций приложения</span><span class="meta-item__value">7</span></div>
+          <div class="meta-item"><span class="meta-item__label">Статус реализации</span><span class="meta-item__value meta-item__value--warn" data-field="implementation_status">запланирован</span></div>
+        </div>
+        <div class="meta-functions">
+          <div class="meta-functions__title">Функции приложения (7)</div>
+          <div class="meta-functions__list">
+            <span class="chip">Главная</span>            <span class="chip">Экраны</span>            <span class="chip">Эндпоинты</span>            <span class="chip">Данные</span>            <span class="chip">Компоненты</span>            <span class="chip">Правила</span>            <span class="chip">Спецификация</span>
+          </div>
+        </div>
+        <div class="meta-actions">
+          <button class="btn btn--sm btn--secondary" onclick="markNodeViewed( + html_name + )">✅ Отметить просмотренным</button>
+        </div>
+      </div>
+    </details>
+      <a class="mockup-card mockup-card--accepted" href="specifity-balloo-su/components.html">
+        <span class="mockup-card__num">1_10_01</span>
+        <span class="mockup-card__title">Компоненты</span>
+        <span class="mockup-card__desc">Компоненты</span>
+        <div class="mockup-card__tags"><span class="chip">component</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="specifity-balloo-su/data.html">
+        <span class="mockup-card__num">1_10_02</span>
+        <span class="mockup-card__title">Данные</span>
+        <span class="mockup-card__desc">Данные</span>
+        <div class="mockup-card__tags"><span class="chip">screen</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="specifity-balloo-su/endpoints.html">
+        <span class="mockup-card__num">1_10_03</span>
+        <span class="mockup-card__title">Эндпоинты</span>
+        <span class="mockup-card__desc">Эндпоинты</span>
+        <div class="mockup-card__tags"><span class="chip">screen</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="specifity-balloo-su/home.html">
+        <span class="mockup-card__num">1_10_04</span>
+        <span class="mockup-card__title">Главная спецификации</span>
+        <span class="mockup-card__desc">Главная спецификации</span>
+        <div class="mockup-card__tags"><span class="chip">home</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="balloo-su/rules.html">
+        <span class="mockup-card__num">1_01_12</span>
+        <span class="mockup-card__title">Правила платформы</span>
+        <span class="mockup-card__desc">Правила платформы</span>
+        <div class="mockup-card__tags"><span class="chip">screen</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="specifity-balloo-su/screens.html">
+        <span class="mockup-card__num">1_10_06</span>
+        <span class="mockup-card__title">Экраны</span>
+        <span class="mockup-card__desc">Экраны</span>
+        <div class="mockup-card__tags"><span class="chip">screen</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="specifity-balloo-su/specification.html">
+        <span class="mockup-card__num">1_10_07</span>
+        <span class="mockup-card__title">Спецификация</span>
+        <span class="mockup-card__desc">Спецификация</span>
+        <div class="mockup-card__tags"><span class="chip">spec</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+  </div>
+</div>
+
+  <div class="node-section">
+    <div class="node-header">
+      <h2>📝 blog.balloo.su — Корпоративный блог</h2>
+      <span class="chip">6 экранов</span>
+    </div>
+    <div class="node-url">
+      <span class="node-url__label">Назначение:</span>
+      <span class="node-url__hint">— Публикации, категории, лента</span>
+    </div>
+    <details class="node-meta" data-node="blog">
+      <summary>📋 Метаданные узла</summary>
+      <div class="node-meta__body">
+        <div class="meta-grid">
+          <div class="meta-item"><span class="meta-item__label">Просмотрен</span><span class="meta-item__value meta-item__value--no" data-field="viewed">👁 6/6</span></div>
+          <div class="meta-item"><span class="meta-item__label">Правок частных</span><span class="meta-item__value" data-field="edits_specific">0</span></div>
+          <div class="meta-item"><span class="meta-item__label">Правок глобальных принято</span><span class="meta-item__value" data-field="edits_global_accepted">1</span></div>
+          <div class="meta-item"><span class="meta-item__label">Документация</span><span class="meta-item__value meta-item__value--no" data-field="documentation_written">❌ нет</span></div>
+          <div class="meta-item"><span class="meta-item__label">Компоненты частные</span><span class="meta-item__value">6</span></div>
+          <div class="meta-item"><span class="meta-item__label">Компоненты глобальные</span><span class="meta-item__value">5</span></div>
+          <div class="meta-item"><span class="meta-item__label">Функций приложения</span><span class="meta-item__value">2</span></div>
+          <div class="meta-item"><span class="meta-item__label">Статус реализации</span><span class="meta-item__value meta-item__value--warn" data-field="implementation_status">запланирован</span></div>
+        </div>
+        <div class="meta-functions">
+          <div class="meta-functions__title">Функции приложения (2)</div>
+          <div class="meta-functions__list">
+            <span class="chip">Лента блога</span>            <span class="chip">Поиск</span>
+          </div>
+        </div>
+        <div class="meta-actions">
+          <button class="btn btn--sm btn--secondary" onclick="markNodeViewed( + html_name + )">✅ Отметить просмотренным</button>
+        </div>
+      </div>
+    </details>
+      <a class="mockup-card mockup-card--accepted" href="blog-balloo-su/category.html">
+        <span class="mockup-card__num">1_11_01</span>
+        <span class="mockup-card__title">Категория блога</span>
+        <span class="mockup-card__desc">Категория блога</span>
+        <div class="mockup-card__tags"><span class="chip">category</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="blog-balloo-su/channel.html">
+        <span class="mockup-card__num">1_11_02</span>
+        <span class="mockup-card__title">Канал блога</span>
+        <span class="mockup-card__desc">Канал блога</span>
+        <div class="mockup-card__tags"><span class="chip">channel</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="blog-balloo-su/feed.html">
+        <span class="mockup-card__num">1_11_03</span>
+        <span class="mockup-card__title">Лента блога</span>
+        <span class="mockup-card__desc">Лента блога</span>
+        <div class="mockup-card__tags"><span class="chip">feed</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="blog-balloo-su/personal-feed.html">
+        <span class="mockup-card__num">1_11_04</span>
+        <span class="mockup-card__title">Персональная лента</span>
+        <span class="mockup-card__desc">Персональная лента</span>
+        <div class="mockup-card__tags"><span class="chip">feed</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="blog-balloo-su/post.html">
+        <span class="mockup-card__num">1_11_05</span>
+        <span class="mockup-card__title">Пост блога</span>
+        <span class="mockup-card__desc">Пост блога</span>
+        <div class="mockup-card__tags"><span class="chip">post</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+      <a class="mockup-card mockup-card--accepted" href="balloo-su/search.html">
+        <span class="mockup-card__num">1_01_06</span>
+        <span class="mockup-card__title">Глобальный поиск</span>
+        <span class="mockup-card__desc">Глобальный поиск</span>
+        <div class="mockup-card__tags"><span class="chip">search</span></div>
+        <span class="mockup-card__status">✓</span>
+      </a>
+  </div>
+</div>
+<!-- Scroll to top button -->
+<button class="scroll-top-btn" id="scroll-top-btn" onclick="scrollToTop()" title="Наверх">↑</button>
+
+<script src="assets/common.js"></script>
+<script>
+  // Track viewed nodes via localStorage
+  const TOTAL_SCREENS = 137;
+  // Nodes viewed by default (confirmed by user)
+  const DEFAULT_VIEWED_NODES = ['shared', 'download-balloo-su', 'docs-balloo-su', 'mobile', 'desktop', 'blog-balloo-su', 'specifity-balloo-su'];
+  // Screen count per node
+  const NODE_SCREEN_COUNT = {
+    'shared': 8, 'balloo-su': 40, 'admin-balloo-su': 26, 'command-balloo-su': 26,
+    'features-balloo-su': 5, 'history-balloo-su': 4, 'download-balloo-su': 2,
+    'docs-balloo-su': 1, 'mobile': 12, 'desktop': 10, 'specifity-balloo-su': 7,
+    'blog-balloo-su': 6
+  };
+  // Partially viewed nodes (node viewed but only some screens): node -> viewed screen count
+  // mobile/desktop: новые экраны (1_08_10–12, 1_09_08–10) пока не просмотрены
+  const PARTIAL_VIEWED = { 'balloo-su': 17, 'mobile': 9, 'desktop': 7 };
+  function getViewedNodes() {
+    try {
+      const stored = JSON.parse(localStorage.getItem('balloo-viewed-nodes') || '[]');
+      return [...new Set([...DEFAULT_VIEWED_NODES, ...stored])];
+    } catch(e) { return [...DEFAULT_VIEWED_NODES]; }
+  }
+  function setViewedNodes(arr) {
+    localStorage.setItem('balloo-viewed-nodes', JSON.stringify(arr));
+    updateViewedCount();
+  }
+  function updateViewedCount() {
+    const viewed = getViewedNodes();
+    // Calculate viewed screens
+    let screenCount = 0;
+    viewed.forEach(nodeId => {
+      screenCount += PARTIAL_VIEWED[nodeId] || NODE_SCREEN_COUNT[nodeId] || 0;
+    });
+    const el = document.getElementById('viewed-count');
+    if (el) el.textContent = screenCount;
+    const confirmBtn = document.getElementById('confirm-btn');
+    if (confirmBtn) confirmBtn.disabled = screenCount < TOTAL_SCREENS;
+    // Update all node panels
+    document.querySelectorAll('.node-meta').forEach(panel => {
+      const nodeId = panel.getAttribute('data-node');
+      const isViewed = viewed.includes(nodeId);
+      const valEl = panel.querySelector('[data-field="viewed"]');
+      if (valEl) {
+        valEl.textContent = isViewed ? '✅ да' : '❌ нет';
+        valEl.className = 'meta-item__value ' + (isViewed ? 'meta-item__value--yes' : 'meta-item__value--no');
+      }
+    });
+  }
+  function markNodeViewed(nodeId) {
+    const viewed = getViewedNodes();
+    if (!viewed.includes(nodeId)) {
+      viewed.push(nodeId);
+      setViewedNodes(viewed);
+    }
+  }
+  // Nav scroll
+  function scrollToSection(id) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Open details if collapsed
+      if (el.tagName === 'DETAILS' && !el.open) el.open = true;
+    }
+    // Update nav active state
+    document.querySelectorAll('.topbar__nav-item').forEach(item => {
+      item.classList.remove('topbar__nav-item--active');
+      if (item.getAttribute('onclick') && item.getAttribute('onclick').includes(id)) {
+        item.classList.add('topbar__nav-item--active');
+      }
+    });
+  }
+  // Component filter
+  function filterComponents(node, btn) {
+    document.querySelectorAll('.comp-filter').forEach(f => f.classList.remove('comp-filter--active'));
+    btn.classList.add('comp-filter--active');
+    document.querySelectorAll('.comp-card').forEach(card => {
+      if (node === 'all') { card.style.display = ''; return; }
+      card.style.display = card.getAttribute('data-node') === node ? '' : 'none';
+    });
+  }
+  // ==================== ACCEPTED SCREENS MARKER ====================
+  // Screen IDs that have been viewed and accepted by the user
+  const ACCEPTED_SCREENS = new Set([
+    // shared (8)
+    '1_00_01','1_00_02','1_00_03','1_00_04','1_00_05','1_00_06','1_00_07','1_00_08',
+    // balloo-su (partial — 17 of 31)
+    '1_01_01','1_01_02','1_01_03','1_01_04','1_01_05','1_01_06','1_01_07','1_01_08','1_01_09','1_01_10','1_01_11','1_01_12','1_01_13','1_01_14','1_01_15','1_01_16','1_01_17',
+    // download-balloo-su (2)
+    '1_06_01','1_06_02',
+    // docs-balloo-su (1)
+    '1_07_01',
+    // mobile (10 of 12)
+    '1_08_01','1_08_02','1_08_03','1_08_04','1_08_05','1_08_06','1_08_07','1_08_08','1_08_09','1_08_12',
+    // desktop (7 of 10)
+    '1_09_01','1_09_02','1_09_03','1_09_04','1_09_05','1_09_06','1_09_07',
+    // specifity-balloo-su (7)
+    '1_10_01','1_10_02','1_10_03','1_10_04','1_10_05','1_10_06','1_10_07',
+    // blog-balloo-su (6)
+    '1_11_01','1_11_02','1_11_03','1_11_04','1_11_05','1_11_06'
+  ]);
+  // Nodes that are fully accepted (all screens viewed)
+  // mobile, desktop убраны: появились непросмотренные новые экраны (1_08_10–11, 1_09_08–10)
+  const FULLY_ACCEPTED_NODES = new Set([
+    'shared','download-balloo-su','docs-balloo-su',
+    'specifity-balloo-su','blog-balloo-su'
+  ]);
+  function markAcceptedCards() {
+    document.querySelectorAll('.mockup-card').forEach(card => {
+      const numEl = card.querySelector('.mockup-card__num');
+      if (!numEl) return;
+      const screenId = numEl.textContent.trim();
+      if (ACCEPTED_SCREENS.has(screenId)) {
+        card.classList.add('mockup-card--accepted');
+        const badge = document.createElement('span');
+        badge.className = 'mockup-card__status';
+        badge.textContent = '✅ Принят';
+        card.appendChild(badge);
+      }
+    });
+    // Mark fully accepted node headers
+    document.querySelectorAll('.node-meta').forEach(panel => {
+      const nodeId = panel.getAttribute('data-node');
+      if (FULLY_ACCEPTED_NODES.has(nodeId)) {
+        const section = panel.closest('.node-section');
+        if (section) {
+          const header = section.querySelector('.node-header');
+          if (header) {
+            header.classList.add('node-header--accepted');
+            // Add "✅ Принят" chip if not already present
+            if (!header.querySelector('.chip--accepted')) {
+              const chip = document.createElement('span');
+              chip.className = 'chip chip--accent chip--accepted';
+              chip.textContent = '✅ Принят';
+              chip.style.marginLeft = '0';
+              header.insertBefore(chip, header.querySelector('.chip'));
+            }
+          }
+        }
+      }
+    });
+  }
+  // Confirm readiness
+  document.addEventListener('DOMContentLoaded', () => {
+    updateViewedCount();
+    markAcceptedCards();
+    const confirmBtn = document.getElementById('confirm-btn');
+    if (confirmBtn) {
+      confirmBtn.addEventListener('click', () => {
+        const banner = document.getElementById('readiness-banner');
+        if (banner) {
+          banner.style.background = 'rgba(45,184,77,0.12)';
+          banner.style.borderColor = 'var(--accent)';
+          banner.style.color = 'var(--accent)';
+          banner.innerHTML = '✅ Готовность подтверждена пользователем. Все узлы просмотрены.';
+        }
+        const stat = document.querySelector('.mockups-stat--danger');
+        if (stat) {
+          stat.classList.remove('mockups-stat--danger');
+          stat.querySelector('strong').textContent = '100%';
+        }
+      });
+    }
+    // Init specifity
+    initSpecifity();
+  });
+
+  // ==================== SPECIFITY SPLIT-VIEW ====================
+  let spWidth = 100, spHeight = 100;
+  let spIsFullscreen = false;
+  let spResizeDrag = null;
+
+  function initSpecifity() {
+    const iframe = document.getElementById('sp-iframe');
+    const handle = document.getElementById('sp-resize-handle');
+    if (!iframe || !handle) return;
+
+    // Mouse resize
+    handle.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      spResizeDrag = { startX: e.clientX, startY: e.clientY, w: spWidth, h: spHeight };
+      document.addEventListener('mousemove', spOnMouseMove);
+      document.addEventListener('mouseup', spOnMouseUp);
+    });
+
+    // Update size label
+    updateSpSizeLabel();
+  }
+
+  function spOnMouseMove(e) {
+    if (!spResizeDrag) return;
+    const dx = e.clientX - spResizeDrag.startX;
+    const dy = e.clientY - spResizeDrag.startY;
+    const wrap = document.getElementById('sp-frame-wrap');
+    const wrapRect = wrap.getBoundingClientRect();
+    const pctX = (dx / wrapRect.width) * 100;
+    const pctY = (dy / wrapRect.height) * 100;
+    spWidth = Math.max(30, Math.min(200, spResizeDrag.w + pctX));
+    spHeight = Math.max(30, Math.min(200, spResizeDrag.h + pctY));
+    applySpSize();
+  }
+
+  function spOnMouseUp() {
+    spResizeDrag = null;
+    document.removeEventListener('mousemove', spOnMouseMove);
+    document.removeEventListener('mouseup', spOnMouseUp);
+  }
+
+  function applySpSize() {
+    const iframe = document.getElementById('sp-iframe');
+    if (!iframe) return;
+    if (spIsFullscreen) {
+      iframe.style.width = '100%';
+      iframe.style.height = '100%';
+    } else {
+      iframe.style.width = spWidth + '%';
+      iframe.style.height = spHeight + '%';
+    }
+    updateSpSizeLabel();
+  }
+
+  function updateSpSizeLabel() {
+    const label = document.getElementById('sp-size-label');
+    if (label) {
+      label.textContent = spIsFullscreen ? 'Fullscreen' : Math.round(spWidth) + '% × ' + Math.round(spHeight) + '%';
+    }
+  }
+
+  function spResize(delta) {
+    if (spIsFullscreen) return;
+    spWidth = Math.max(30, Math.min(200, spWidth + delta));
+    spHeight = Math.max(30, Math.min(200, spHeight + delta));
+    applySpSize();
+  }
+
+  function spResetSize() {
+    spWidth = 100;
+    spHeight = 100;
+    spIsFullscreen = false;
+    applySpSize();
+    // Reset the wrap style
+    const wrap = document.getElementById('sp-frame-wrap');
+    if (wrap) {
+      wrap.style.padding = '16px';
+      wrap.style.alignItems = 'flex-start';
+    }
+  }
+
+  function spToggleFullscreen() {
+    spIsFullscreen = !spIsFullscreen;
+    const wrap = document.getElementById('sp-frame-wrap');
+    if (wrap) {
+      if (spIsFullscreen) {
+        wrap.style.padding = '0';
+        wrap.style.alignItems = 'stretch';
+      } else {
+        wrap.style.padding = '16px';
+        wrap.style.alignItems = 'flex-start';
+      }
+    }
+    applySpSize();
+  }
+
+  function loadSpecifityScreen() {
+    const select = document.getElementById('sp-screen-select');
+    const iframe = document.getElementById('sp-iframe');
+    if (!select || !iframe) return;
+    const opt = select.options[select.selectedIndex];
+    iframe.src = opt.value;
+    // Update left panel
+    const title = document.getElementById('sp-title');
+    const id = document.getElementById('sp-id');
+    const desc = document.getElementById('sp-desc');
+    if (title) title.textContent = opt.getAttribute('data-title') || '';
+    if (id) id.textContent = 'ID: ' + (opt.getAttribute('data-id') || '');
+    if (desc) desc.textContent = opt.getAttribute('data-desc') || '';
+  }
+
+  // ==================== SCROLL TO TOP ====================
+  function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  window.addEventListener('scroll', () => {
+    const btn = document.getElementById('scroll-top-btn');
+    if (btn) {
+      btn.classList.toggle('scroll-top-btn--visible', window.scrollY > 400);
+    }
+  });
+
+  // ==================== HIDE VIEWED NODES ====================
+  function toggleHideViewed() {
+    const checked = document.getElementById('hide-viewed').checked;
+    const viewed = getViewedNodes();
+    document.querySelectorAll('.node-section').forEach(section => {
+      const meta = section.querySelector('.node-meta');
+      if (!meta) return;
+      const nodeId = meta.getAttribute('data-node');
+      if (checked && viewed.includes(nodeId)) {
+        section.style.display = 'none';
+      } else {
+        section.style.display = '';
+      }
+    });
+  }
+  // Re-apply hide filter after marking node as viewed
+  const origMark = markNodeViewed;
+  markNodeViewed = function(nodeId) {
+    origMark(nodeId);
+    const checkbox = document.getElementById('hide-viewed');
+    if (checkbox && checkbox.checked) toggleHideViewed();
+  };
+</script>
+</body>
+</html>

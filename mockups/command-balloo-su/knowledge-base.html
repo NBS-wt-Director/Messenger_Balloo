@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Command — База знаний</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--info);">C</div><span>Command</span>
+    <div class="topbar__dropdown"><div class="topbar__dropdown-item">🏢 Command (текущий)</div><div class="topbar__dropdown-divider"></div><div class="topbar__dropdown-item">💬 Balloo</div><div class="topbar__dropdown-item">🛡️ Admin</div><div class="topbar__dropdown-item">💡 Features</div><div class="topbar__dropdown-item">📜 History</div><div class="topbar__dropdown-item">⬇️ Download</div><div class="topbar__dropdown-item">📚 API Docs</div></div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">База знаний</div>
+  <div class="topbar__right"><div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИВ</span></div></div><span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span><span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span></div>
+</div>
+<div class="main">
+  <div class="sidebar sidebar--narrow">
+    <div class="list">
+      <div class="list__item">🏠 Дашборд</div>
+      <div class="list__item">💬 Внутренний чат</div>
+      <div class="list__item">📅 Совещания</div>
+      <div class="list__item">📋 Задачи</div>
+      <div class="list__item">🏢 Мой отдел</div>
+      <div class="list__item">🏛️ Подразделения</div>
+      <div class="list__item">👥 HR</div>
+      <div class="list__item list__item--active">📚 База знаний</div>
+      <div class="list__item">🎯 Найм</div>
+      <div class="list__item">📊 Мониторинг</div>
+      <div class="list__item" style="border-top:1px solid var(--border-color);margin-top:8px;padding-top:12px;">💼 Вакансии</div>
+      <div class="list__item">⭐ Почему мы</div>
+    </div>
+  </div>
+  <div class="content overflow-y-auto"><div class="page-container">
+    <h1 class="page-title">База знаний</h1>
+    <p class="page-subtitle">Инструкции • Гайды • Changelog • Внутренние документы</p>
+
+    <div class="form-group">
+      <input type="text" class="form-input" placeholder="🔍 Поиск по базе знаний..." style="font-size:16px;padding:14px;">
+    </div>
+
+    <div class="flex gap-2 mb-4">
+      <button class="btn btn--tertiary btn--sm" onclick="openModal('modal-search-filters')">🔧 Фильтры</button>
+      <select class="form-select form-select--sm" style="width:auto;">
+        <option>Сортировка: по дате</option>
+        <option>Сортировка: по популярности</option>
+      </select>
+    </div>
+
+    <div data-tab-group="kb" class="mb-4">
+      <div class="tabs">
+        <div class="tab tab--active" onclick="switchTab('kb',0)">📖 Инструкции</div>
+        <div class="tab" onclick="switchTab('kb',1)">🔧 Гайды</div>
+        <div class="tab" onclick="switchTab('kb',2)">📜 Changelog</div>
+        <div class="tab" onclick="switchTab('kb',3)">📄 Документы</div>
+      </div>
+
+      <div class="tab-panel" style="display:block;">
+        <div class="card card--hover kb-card mb-2">
+          <div class="flex items-center justify-between mb-1">
+            <h3 class="card__title mb-0">🚀 Быстрый старт для разработчика</h3>
+            <span class="chip chip--danger">Новое</span>
+          </div>
+          <p class="card__body">Как развернуть проект локально: pnpm install, docker compose up, настройка переменных окружения.</p>
+          <div class="flex items-center justify-between mt-2">
+            <div class="flex gap-2"><span class="chip">onboarding</span><span class="chip">setup</span><span class="chip chip--accent">15 мин</span></div>
+            <span class="text-xs text-muted">✅ Прочитано</span>
+          </div>
+        </div>
+        <div class="card card--hover kb-card mb-2">
+          <div class="flex items-center justify-between mb-1">
+            <h3 class="card__title mb-0">🎨 Дизайн-система Balloo</h3>
+            <span class="chip chip--info">Обновлено</span>
+          </div>
+          <p class="card__body">Восьмигранные аватарки, пузыри без скруглений, темы оформления, Glassmorphism.</p>
+          <div class="flex items-center justify-between mt-2">
+            <div class="flex gap-2"><span class="chip">design</span><span class="chip">ui</span><span class="chip">css</span></div>
+            <span class="text-xs text-muted">50% · 2/4</span>
+          </div>
+        </div>
+        <div class="card card--hover kb-card mb-2">
+          <div class="flex items-center justify-between mb-1">
+            <h3 class="card__title mb-0">🔐 Авторизация и NextAuth.js</h3>
+          </div>
+          <p class="card__body">Настройка OAuth (Яндекс, Mail.ru, Rambler), JWT refresh tokens, сессии.</p>
+          <div class="flex items-center justify-between mt-2">
+            <div class="flex gap-2"><span class="chip">auth</span><span class="chip">security</span></div>
+            <span class="text-xs text-muted">⬜ Не начато</span>
+          </div>
+        </div>
+        <div class="card card--hover kb-card">
+          <div class="flex items-center justify-between mb-1">
+            <h3 class="card__title mb-0">🗄️ База данных и Prisma</h3>
+          </div>
+          <p class="card__body">Схема БД, миграции (Flyway), сидирование, PostgREST.</p>
+          <div class="flex items-center justify-between mt-2">
+            <div class="flex gap-2"><span class="chip">database</span><span class="chip">prisma</span></div>
+            <span class="text-xs text-muted">⬜ Не начато</span>
+          </div>
+        </div>
+      </div>
+      <div class="tab-panel" style="display:none;">
+        <div class="card card--hover kb-card mb-2">
+          <div class="flex items-center justify-between mb-1">
+            <h3 class="card__title mb-0">🐳 Docker и Kubernetes</h3>
+            <span class="chip chip--danger">Новое</span>
+          </div>
+          <p class="card__body">Сборка образов, деплой в K8s, настройка ingress.</p>
+          <div class="flex gap-2 mt-2"><span class="chip">devops</span><span class="chip">docker</span><span class="chip">k8s</span></div>
+        </div>
+        <div class="card card--hover kb-card mb-2">
+          <div class="flex items-center justify-between mb-1">
+            <h3 class="card__title mb-0">⚡ WebSocket (Hono + uWebSockets.js)</h3>
+            <span class="chip chip--info">Обновлено</span>
+          </div>
+          <p class="card__body">Realtime сообщения, звонки, статусы. Масштабирование.</p>
+          <div class="flex gap-2 mt-2"><span class="chip">realtime</span><span class="chip">websocket</span></div>
+        </div>
+        <div class="card card--hover kb-card">
+          <div class="flex items-center justify-between mb-1">
+            <h3 class="card__title mb-0">🧪 Тестирование</h3>
+          </div>
+          <p class="card__body">Jest + RTL, Playwright (e2e), Supertest (API). Turborepo параллелизм.</p>
+          <div class="flex gap-2 mt-2"><span class="chip">testing</span><span class="chip">jest</span><span class="chip">playwright</span></div>
+        </div>
+      </div>
+      <div class="tab-panel" style="display:none;">
+        <div class="card kb-card mb-2">
+          <div class="flex items-center justify-between mb-1">
+            <h3 class="card__title">v1.0.0-beta — 16 июля 2026</h3>
+            <span class="chip chip--accent">Фичи</span>
+          </div>
+          <div class="card__body"><strong>Новые функции:</strong><br>• 38 интерактивных макетов экранов<br>• 7 узлов монорепо<br>• 3 темы оформления<br>• Базовые чаты, группы, звонки<br>• Интерактивы (опросы, квизы, списки, персонали)</div>
+          <div class="flex gap-2 mt-2"><button class="btn btn--tertiary btn--xs">← Предыдущая</button><button class="btn btn--tertiary btn--xs">Полный релиз-нот →</button></div>
+        </div>
+        <div class="card kb-card mb-2">
+          <div class="flex items-center justify-between mb-1">
+            <h3 class="card__title">v0.9.0 — 10 июля 2026</h3>
+            <span class="chip chip--info">Улучшения</span>
+          </div>
+          <div class="card__body">• Настройка CI/CD pipeline<br>• Миграция на Kubernetes<br>• Docker-образы для всех сервисов</div>
+          <div class="flex gap-2 mt-2"><button class="btn btn--tertiary btn--xs">← Предыдущая</button><button class="btn btn--tertiary btn--xs">Следующая →</button></div>
+        </div>
+        <div class="card kb-card">
+          <div class="flex items-center justify-between mb-1">
+            <h3 class="card__title">v0.8.0 — 1 июля 2026</h3>
+            <span class="chip">Исправления</span>
+          </div>
+          <div class="card__body">• Архитектурные решения зафиксированы<br>• Дизайн-система спроектирована<br>• Схема БД утверждена</div>
+          <div class="flex gap-2 mt-2"><button class="btn btn--tertiary btn--xs" disabled>← Предыдущая</button><button class="btn btn--tertiary btn--xs">Следующая →</button></div>
+        </div>
+      </div>
+      <div class="tab-panel" style="display:none;">
+        <div class="flex gap-2 mb-4">
+          <select class="form-select form-select--sm" style="width:auto;"><option>Все категории</option><option>Шаблоны</option><option>Регламенты</option><option>Контакты</option></select>
+          <input type="text" class="form-input" placeholder="🔍 Поиск по документам..." style="width:200px;">
+        </div>
+        <div class="card card--hover kb-card mb-2">
+          <h3 class="card__title">📋 Регламент работы</h3>
+          <p class="card__body">GitHub Flow, код-ревью, время реакции на инциденты.</p>
+          <div class="flex gap-2 mt-2"><span class="chip">шаблон</span><button class="btn btn--tertiary btn--xs">📥 Скачать</button></div>
+        </div>
+        <div class="card card--hover kb-card mb-2">
+          <h3 class="card__title">🔒 Политика безопасности</h3>
+          <p class="card__body">CORS, CSP, JWT, 2FA (v2), ограничение запросов.</p>
+          <div class="flex gap-2 mt-2"><span class="chip">регламент</span><button class="btn btn--tertiary btn--xs">📥 Скачать</button></div>
+        </div>
+        <div class="card card--hover kb-card">
+          <h3 class="card__title">📞 Контакты и эскалация</h3>
+          <p class="card__body">Telegram-бот алерты, email всем админам, каналы связи.</p>
+          <div class="flex gap-2 mt-2"><span class="chip">контакты</span><button class="btn btn--tertiary btn--xs">📥 Скачать</button></div>
+        </div>
+      </div>
+    </div>
+  </div></div>
+</div>
+<script src="../assets/common.js"></script>
+
+<!-- Modal: Search Filters -->
+<div class="modal" id="modal-search-filters">
+  <div class="modal__header"><span class="modal__title">🔧 Фильтры поиска</span><div class="modal__close" onclick="closeModal('modal-search-filters')">✕</div></div>
+  <div class="modal__body">
+    <div class="form-group"><label class="form-label">Категория</label>
+      <select class="form-select"><option>Все категории</option><option>onboarding</option><option>design</option><option>auth</option><option>database</option><option>devops</option><option>testing</option></select></div>
+    <div class="form-group"><label class="form-label">Теги</label>
+      <div class="flex gap-2 flex-wrap">
+        <label class="form-checkbox"><input type="checkbox"> onboarding</label>
+        <label class="form-checkbox"><input type="checkbox"> design</label>
+        <label class="form-checkbox"><input type="checkbox"> auth</label>
+        <label class="form-checkbox"><input type="checkbox"> database</label>
+        <label class="form-checkbox"><input type="checkbox"> devops</label>
+        <label class="form-checkbox"><input type="checkbox"> testing</label>
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">Дата публикации</label>
+      <div class="flex gap-2">
+        <input type="date" class="form-input" placeholder="С">
+        <span class="text-muted">—</span>
+        <input type="date" class="form-input" placeholder="По">
+      </div>
+    </div>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--tertiary" onclick="closeModal('modal-search-filters')">Сбросить</button>
+    <button class="btn btn--primary" onclick="closeModal('modal-search-filters')">Применить</button>
+  </div>
+</div>
+
+</body>
+</html>

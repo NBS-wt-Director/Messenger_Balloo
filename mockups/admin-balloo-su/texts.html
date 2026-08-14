@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Тексты</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--warning);">A</div><span>Admin</span>
+    <div class="topbar__dropdown"><div class="topbar__dropdown-item">🛡️ Admin (текущий)</div><div class="topbar__dropdown-divider"></div><div class="topbar__dropdown-item">💬 Balloo</div><div class="topbar__dropdown-item">🏢 Command</div><div class="topbar__dropdown-item">💡 Features</div><div class="topbar__dropdown-item">📜 History</div><div class="topbar__dropdown-item">⬇️ Download</div><div class="topbar__dropdown-item">📚 API Docs</div></div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Тексты</div>
+  <div class="topbar__actions"><div class="topbar__actions-btn" onclick="openModal('modal-new-step')" title="Новый шаг">✏</div></div>
+  <div class="topbar__right"><div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>АД</span></div></div><span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span><span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span></div>
+</div>
+<div class="main">
+  <div class="sidebar sidebar--narrow">
+    <div class="list">
+      <div class="list__item">📊 Дашборд</div>
+      <div class="list__item">👤 Пользователи</div>
+      <div class="list__item">🚩 Жалобы <span class="badge" style="margin-left:auto;">12</span></div>
+      <div class="list__item">🔨 Баны</div>
+      <div class="list__item">📈 Метрики</div>
+      <div class="list__item">🎛️ Feature Flags</div>
+      <div class="list__item">📁 Файлы</div>
+      <div class="list__item list__item--active">📝 Тексты</div>
+      <div class="list__item" style="border-top:1px solid var(--border-color);margin-top:8px;padding-top:12px;">🏢 Отделы</div>
+      <div class="list__item">👤 Сотрудники</div>
+      <div class="list__item">💼 Вакансии</div>
+      <div class="list__item">📜 Версии</div>
+      <div class="list__item">💡 Фичи (модерация)</div>
+      <div class="list__item">💚 Донаты</div>
+    </div>
+  </div>
+  <div class="content overflow-y-auto"><div class="page-container">
+    <h1 class="page-title">Тексты</h1>
+    <p class="page-subtitle">Контент приложения • Онбординг • Информационные страницы</p>
+
+    <!-- Tabs -->
+    <div class="flex gap-2 mb-4" style="flex-wrap:wrap;">
+      <button class="btn btn--primary btn--sm">Онбординг</button>
+      <button class="btn btn--tertiary btn--sm">Правила</button>
+      <button class="btn btn--tertiary btn--sm">О компании</button>
+      <button class="btn btn--tertiary btn--sm">О Balloo</button>
+    </div>
+
+    <!-- Onboarding steps -->
+    <div class="card mb-4">
+      <h3 class="card__title mb-4">Шаги онбординга <span class="chip chip--info" style="margin-left:8px;">5 шагов</span></h3>
+      <p class="text-xs text-muted mb-4">Шаги загружаются из БД и выводятся в приложении динамически. Порядок задаётся перетаскиванием. Иллюстрация — PNG/SVG, загружается через форму.</p>
+      <table class="table">
+        <thead><tr><th style="width:40px;">№</th><th style="width:64px;">Иллюстрация</th><th>Заголовок</th><th>Текст</th><th>Язык</th><th style="width:120px;">Действия</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="text-muted">1</span></td>
+            <td><div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;background:var(--bg-tertiary);font-size:24px;">💬</div></td>
+            <td>Добро пожаловать в Balloo!</td>
+            <td class="text-secondary text-xs">Кроссплатформенный мессенджер с уникальным дизайном…</td>
+            <td><span class="chip">🇷🇺 RU</span></td>
+            <td>
+              <button class="btn btn--tertiary btn--sm" onclick="openModal('modal-edit-step')">✏</button>
+              <button class="btn btn--tertiary btn--sm">⬆</button>
+              <button class="btn btn--tertiary btn--sm">🗑</button>
+            </td>
+          </tr>
+          <tr>
+            <td><span class="text-muted">2</span></td>
+            <td><div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;background:var(--bg-tertiary);font-size:24px;">📞</div></td>
+            <td>Звонки и группы</td>
+            <td class="text-secondary text-xs">Аудио и видео звонки до 30 человек, групповые чаты…</td>
+            <td><span class="chip">🇷🇺 RU</span></td>
+            <td>
+              <button class="btn btn--tertiary btn--sm" onclick="openModal('modal-edit-step')">✏</button>
+              <button class="btn btn--tertiary btn--sm">⬆</button>
+              <button class="btn btn--tertiary btn--sm">🗑</button>
+            </td>
+          </tr>
+          <tr>
+            <td><span class="text-muted">3</span></td>
+            <td><div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;background:var(--bg-tertiary);font-size:24px;">🔐</div></td>
+            <td>Приватность и безопасность</td>
+            <td class="text-secondary text-xs">JWT-сессии, шифрование на сервере, 3 темы оформления…</td>
+            <td><span class="chip">🇷🇺 RU</span></td>
+            <td>
+              <button class="btn btn--tertiary btn--sm" onclick="openModal('modal-edit-step')">✏</button>
+              <button class="btn btn--tertiary btn--sm">⬆</button>
+              <button class="btn btn--tertiary btn--sm">🗑</button>
+            </td>
+          </tr>
+          <tr>
+            <td><span class="text-muted">4</span></td>
+            <td><div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;background:var(--bg-tertiary);font-size:24px;">🛡️</div></td>
+            <td>Устройства и сессии</td>
+            <td class="text-secondary text-xs">Привязывайте устройства по QR, управляйте сессиями…</td>
+            <td><span class="chip">🇷🇺 RU</span></td>
+            <td>
+              <button class="btn btn--tertiary btn--sm" onclick="openModal('modal-edit-step')">✏</button>
+              <button class="btn btn--tertiary btn--sm">⬆</button>
+              <button class="btn btn--tertiary btn--sm">🗑</button>
+            </td>
+          </tr>
+          <tr>
+            <td><span class="text-muted">5</span></td>
+            <td><div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;background:var(--bg-tertiary);font-size:24px;">🎨</div></td>
+            <td>Темы и языки</td>
+            <td class="text-secondary text-xs">3 темы оформления и 6 языков — настройте под себя…</td>
+            <td><span class="chip">🇷🇺 RU</span></td>
+            <td>
+              <button class="btn btn--tertiary btn--sm" onclick="openModal('modal-edit-step')">✏</button>
+              <button class="btn btn--tertiary btn--sm">⬆</button>
+              <button class="btn btn--tertiary btn--sm">🗑</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="flex gap-2 mt-4">
+        <button class="btn btn--primary btn--sm" onclick="openModal('modal-new-step')">➕ Добавить шаг</button>
+        <button class="btn btn--tertiary btn--sm" onclick="openModal('modal-preview')">👁 Предпросмотр</button>
+      </div>
+    </div>
+
+    <!-- Translations note -->
+    <div class="card">
+      <h3 class="card__title mb-4">Локализация шагов</h3>
+      <p class="text-xs text-secondary mb-4">Каждый шаг может иметь переводы для 6 языков (RU, EN, ZH, FR, BE, HI). Если перевод отсутствует — показывается язык по умолчанию (RU).</p>
+      <table class="table">
+        <thead><tr><th>Шаг</th><th>🇷🇺 RU</th><th>🇬🇧 EN</th><th>🇨🇳 ZH</th><th>🇫🇷 FR</th><th>🇧🇾 BE</th><th>🇮🇳 HI</th></tr></thead>
+        <tbody>
+          <tr><td>1. Добро пожаловать</td><td><span class="chip chip--accent">✓</span></td><td><span class="chip chip--accent">✓</span></td><td><span class="chip chip--warning">—</span></td><td><span class="chip chip--accent">✓</span></td><td><span class="chip chip--warning">—</span></td><td><span class="chip chip--warning">—</span></td></tr>
+          <tr><td>2. Звонки и группы</td><td><span class="chip chip--accent">✓</span></td><td><span class="chip chip--accent">✓</span></td><td><span class="chip chip--accent">✓</span></td><td><span class="chip chip--warning">—</span></td><td><span class="chip chip--warning">—</span></td><td><span class="chip chip--warning">—</span></td></tr>
+          <tr><td>3. Приватность</td><td><span class="chip chip--accent">✓</span></td><td><span class="chip chip--accent">✓</span></td><td><span class="chip chip--warning">—</span></td><td><span class="chip chip--warning">—</span></td><td><span class="chip chip--warning">—</span></td><td><span class="chip chip--warning">—</span></td></tr>
+          <tr><td>4. Устройства</td><td><span class="chip chip--accent">✓</span></td><td><span class="chip chip--warning">—</span></td><td><span class="chip chip--warning">—</span></td><td><span class="chip chip--warning">—</span></td><td><span class="chip chip--warning">—</span></td><td><span class="chip chip--warning">—</span></td></tr>
+          <tr><td>5. Темы и языки</td><td><span class="chip chip--accent">✓</span></td><td><span class="chip chip--warning">—</span></td><td><span class="chip chip--warning">—</span></td><td><span class="chip chip--warning">—</span></td><td><span class="chip chip--warning">—</span></td><td><span class="chip chip--warning">—</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div></div>
+</div>
+
+<div class="modal-overlay" id="modal-overlay"></div>
+
+<!-- Modal: New / Edit step -->
+<div class="modal modal--status-info" id="modal-new-step">
+  <div class="modal__header"><span class="modal__title">Новый шаг онбординга</span><div class="modal__close" onclick="closeModal('modal-new-step')">✕</div></div>
+  <div class="modal__body">
+    <div class="form-group">
+      <label class="form-label">Иллюстрация (PNG / SVG)</label>
+      <div style="border:2px dashed var(--border-strong);padding:24px;text-align:center;color:var(--text-muted);cursor:pointer;">
+        <div style="font-size:32px;margin-bottom:8px;">📷</div>
+        <div class="text-xs">Перетащите файл или нажмите для выбора</div>
+        <div class="text-xs text-muted">PNG, SVG до 2 МБ</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Заголовок + Текст — языковые табы</label>
+      <div style="display:flex;gap:4px;margin-bottom:8px;">
+        <span class="chip chip--accent" style="cursor:pointer;">🇷🇺 RU</span>
+        <span class="chip" style="cursor:pointer;">🇬🇧 EN</span>
+        <span class="chip" style="cursor:pointer;">🇨🇳 ZH</span>
+        <span class="chip" style="cursor:pointer;">🇫🇷 FR</span>
+        <span class="chip" style="cursor:pointer;">🇧🇾 BE</span>
+        <span class="chip" style="cursor:pointer;">🇮🇳 HI</span>
+      </div>
+      <input type="text" class="form-input mb-2" placeholder="Заголовок (RU)" value="Добро пожаловать в Balloo!">
+      <textarea class="form-textarea" placeholder="Текст (RU)">Кроссплатформенный мессенджер с уникальным дизайном, групповыми звонками и защитой ваших данных.</textarea>
+      <div class="text-xs text-muted mt-1">Переключайте табы для редактирования каждого языка</div>
+    </div>
+    <div class="form-group"><label class="form-label">Порядок</label><input type="number" class="form-input" value="6" min="1"></div>
+    <div class="form-group"><label class="form-label">Активен</label><label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label></div>
+  </div>
+  <div class="modal__footer"><button class="btn btn--tertiary" onclick="closeModal('modal-new-step')">Отмена</button><button class="btn btn--primary" onclick="closeModal('modal-new-step')">Создать</button></div>
+</div>
+
+<!-- Modal: Edit step -->
+<div class="modal modal--status-info" id="modal-edit-step">
+  <div class="modal__header"><span class="modal__title">Редактирование шага</span><div class="modal__close" onclick="closeModal('modal-edit-step')">✕</div></div>
+  <div class="modal__body">
+    <div class="form-group">
+      <label class="form-label">Иллюстрация</label>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="width:64px;height:64px;display:flex;align-items:center;justify-content:center;background:var(--bg-tertiary);font-size:32px;">💬</div>
+        <button class="btn btn--tertiary btn--sm">Заменить</button>
+        <button class="btn btn--tertiary btn--sm">Удалить</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Заголовок + Текст — языковые табы</label>
+      <div style="display:flex;gap:4px;margin-bottom:8px;">
+        <span class="chip chip--accent" style="cursor:pointer;">🇷🇺 RU</span>
+        <span class="chip" style="cursor:pointer;">🇬🇧 EN</span>
+        <span class="chip" style="cursor:pointer;">🇨🇳 ZH</span>
+        <span class="chip" style="cursor:pointer;">🇫🇷 FR</span>
+        <span class="chip" style="cursor:pointer;">🇧🇾 BE</span>
+        <span class="chip" style="cursor:pointer;">🇮🇳 HI</span>
+      </div>
+      <input type="text" class="form-input mb-2" value="Добро пожаловать в Balloo!">
+      <textarea class="form-textarea">Кроссплатформенный мессенджер с уникальным дизайном, групповыми звонками и защитой ваших данных.</textarea>
+    </div>
+    <div class="form-group"><label class="form-label">Порядок</label><input type="number" class="form-input" value="1" min="1"></div>
+    <div class="form-group"><label class="form-label">Активен</label><label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label></div>
+    <div class="form-group">
+      <label class="form-label">Переводы</label>
+      <div class="flex gap-2" style="flex-wrap:wrap;">
+        <button class="btn btn--tertiary btn--sm">🇬🇧 EN</button>
+        <button class="btn btn--tertiary btn--sm">🇨🇳 ZH</button>
+        <button class="btn btn--tertiary btn--sm">🇫🇷 FR</button>
+        <button class="btn btn--tertiary btn--sm">🇧🇾 BE</button>
+        <button class="btn btn--tertiary btn--sm">🇮🇳 HI</button>
+      </div>
+    </div>
+  </div>
+  <div class="modal__footer"><button class="btn btn--tertiary" onclick="closeModal('modal-edit-step')">Отмена</button><button class="btn btn--primary" onclick="closeModal('modal-edit-step')">Сохранить</button></div>
+</div>
+
+<!-- Modal: Preview -->
+<div class="modal modal--status-info" id="modal-preview">
+  <div class="modal__header"><span class="modal__title">Предпросмотр онбординга</span><div class="modal__close" onclick="closeModal('modal-preview')">✕</div></div>
+  <div class="modal__body" style="text-align:center;padding:32px;">
+    <div style="font-size:64px;margin-bottom:16px;">💬</div>
+    <h2 style="margin-bottom:8px;">Добро пожаловать в Balloo!</h2>
+    <p class="text-secondary text-sm" style="margin-bottom:16px;">Кроссплатформенный мессенджер с уникальным дизайном, групповыми звонками и защитой ваших данных.</p>
+    <div class="flex gap-4" style="justify-content:center;margin-bottom:16px;">
+      <span style="width:8px;height:8px;background:var(--accent);"></span>
+      <span style="width:8px;height:8px;background:var(--bg-tertiary);"></span>
+      <span style="width:8px;height:8px;background:var(--bg-tertiary);"></span>
+      <span style="width:8px;height:8px;background:var(--bg-tertiary);"></span>
+      <span style="width:8px;height:8px;background:var(--bg-tertiary);"></span>
+    </div>
+    <div class="flex gap-2" style="justify-content:center;">
+      <button class="btn btn--tertiary btn--sm">Пропустить</button>
+      <button class="btn btn--primary btn--sm">Далее →</button>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+</body>
+</html>

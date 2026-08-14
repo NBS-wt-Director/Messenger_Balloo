@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balloo — Сводная статистика проекта</title>
+    <style>
+        :root {
+            --bg: #1a1a2e;
+            --bg-card: #16213e;
+            --bg-row-alt: #1a1a3e;
+            --text: #e0e0e0;
+            --text-muted: #888;
+            --accent: #2db84d;
+            --accent-dim: #1a6b2a;
+            --border: #2a2a4a;
+            --radius: 8px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', 'Manrope', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header {
+            text-align: center;
+            padding: 3rem 0;
+            border-bottom: 2px solid var(--accent);
+            margin-bottom: 2rem;
+        }
+        header h1 {
+            font-size: 2.5rem;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+        header .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+        }
+        header .status {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.4rem 1.2rem;
+            background: var(--accent-dim);
+            color: var(--accent);
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        h2 {
+            font-size: 1.5rem;
+            color: var(--accent);
+            margin: 2rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        h3 {
+            font-size: 1.2rem;
+            color: #fff;
+            margin: 1.5rem 0 0.8rem;
+        }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        .summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.2rem;
+            text-align: center;
+        }
+        .summary-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        .summary-card .label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.3rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        th {
+            background: #0f1628;
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        tr:nth-child(even) { background: var(--bg-row-alt); }
+        tr:hover { background: #1e2a4a; }
+        .progress-bar {
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 0.3rem 0;
+        }
+        .progress-bar .fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 4px;
+        }
+        .section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.15rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .badge-green { background: var(--accent-dim); color: var(--accent); }
+        .badge-blue { background: #1a3a5e; color: #4da6ff; }
+        .badge-purple { background: #3a1a5e; color: #a64dff; }
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+            margin-top: 3rem;
+        }
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            header h1 { font-size: 1.8rem; }
+            .summary-grid { grid-template-columns: repeat(2, 1fr); }
+            table { font-size: 0.8rem; }
+            th, td { padding: 0.5rem; }
+        }
+        @media print {
+            body { background: #fff; color: #000; padding: 1rem; }
+            .section, table, .summary-card { border-color: #ccc; }
+            th { color: #333; }
+            .summary-card .value { color: #2db84d; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎈 Balloo Messenger</h1>
+            <div class="subtitle">Сводная статистика проекта — Монорепо</div>
+            <div class="status">v1.0.0 · Фаза 3 · Завершена 30 июля 2026</div>
+        </header>
+
+        <!-- Общая сводка -->
+        <h2>📦 Общая сводка</h2>
+        <div class="summary-grid">
+            <div class="summary-card">
+                <div class="value">1 617</div>
+                <div class="label">Файлов (без node_modules)</div>
+            </div>
+            <div class="summary-card">
+                <div class="value">13,3 МБ</div>
+                <div class="label">Размер (без node_modules)</div>
+            </div>
+            <div class="summary-card">
+                <div class="value">~201K</div>
+                <div class="label">Строк кода</div>
+            </div>
+            <div class="summary-card">
+                <div class="value">13</div>
+                <div class="label">Узлов спроектировано</div>
+            </div>
+            <div class="summary-card">
+                <div class="value">~440</div>
+                <div class="label">Экранов спроектировано</div>
+            </div>
+            <div class="summary-card">
+                <div class="value">66/66</div>
+                <div class="label">Тикетов выполнено</div>
+            </div>
+        </div>
+
+        <!-- Структура проекта -->
+        <h2>📁 Структура проекта</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Каталог</th>
+                    <th>Файлов</th>
+                    <th>Размер</th>
+                    <th>Описание</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>mockups/</strong></td>
+                    <td>443</td>
+                    <td>4,4 МБ</td>
+                    <td>Макеты экранов (источник правды)</td>
+                </tr>
+                <tr>
+                    <td><strong>packages/</strong></td>
+                    <td>1 115</td>
+                    <td>5,1 МБ</td>
+                    <td>Исходный код приложения</td>
+                </tr>
+                <tr>
+                    <td><strong>tickets/</strong></td>
+                    <td>14</td>
+                    <td>2,3 МБ</td>
+                    <td>Документы задач и тикетов</td>
+                </tr>
+                <tr>
+                    <td><strong>docs/</strong></td>
+                    <td>15</td>
+                    <td>508 КБ</td>
+                    <td>Документация проекта</td>
+                </tr>
+                <tr>
+                    <td><strong>assets/</strong></td>
+                    <td>5</td>
+                    <td>600 КБ</td>
+                    <td>Ресурсы (логотипы, изображения)</td>
+                </tr>
+                <tr>
+                    <td><strong>docker/</strong></td>
+                    <td>4</td>
+                    <td>24 КБ</td>
+                    <td>Docker-инфраструктура</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Макеты -->
+        <h2>🎨 Макеты (mockups/)</h2>
+        <div class="section">
+            <h3>По узлам</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Узел</th>
+                        <th>ID</th>
+                        <th>HTML</th>
+                        <th>MD</th>
+                        <th>Всего</th>
+                        <th>Размер</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>balloo.su</td>
+                        <td><span class="badge badge-green">у_01</span></td>
+                        <td>33</td>
+                        <td>33</td>
+                        <td>82</td>
+                        <td>828 КБ</td>
+                    </tr>
+                    <tr>
+                        <td>admin.balloo.su</td>
+                        <td><span class="badge badge-green">у_02</span></td>
+                        <td>26</td>
+                        <td>26</td>
+                        <td>52</td>
+                        <td>412 КБ</td>
+                    </tr>
+                    <tr>
+                        <td>command.balloo.su</td>
+                        <td><span class="badge badge-green">у_03</span></td>
+                        <td>26</td>
+                        <td>26</td>
+                        <td>52</td>
+                        <td>468 КБ</td>
+                    </tr>
+                    <tr>
+                        <td>features.balloo.su</td>
+                        <td><span class="badge badge-blue">у_04</span></td>
+                        <td>—</td>
+                        <td>5</td>
+                        <td>10</td>
+                        <td>68 КБ</td>
+                    </tr>
+                    <tr>
+                        <td>history.balloo.su</td>
+                        <td><span class="badge badge-blue">у_05</span></td>
+                        <td>—</td>
+                        <td>2</td>
+                        <td>6</td>
+                        <td>40 КБ</td>
+                    </tr>
+                    <tr>
+                        <td>download.balloo.su</td>
+                        <td><span class="badge badge-blue">у_06</span></td>
+                        <td>—</td>
+                        <td>1</td>
+                        <td>4</td>
+                        <td>28 КБ</td>
+                    </tr>
+                    <tr>
+                        <td>docs.balloo.su</td>
+                        <td><span class="badge badge-blue">у_07</span></td>
+                        <td>—</td>
+                        <td>1</td>
+                        <td>2</td>
+                        <td>24 КБ</td>
+                    </tr>
+                    <tr>
+                        <td>mobile</td>
+                        <td><span class="badge badge-purple">у_08</span></td>
+                        <td>23</td>
+                        <td>23</td>
+                        <td>46</td>
+                        <td>484 КБ</td>
+                    </tr>
+                    <tr>
+                        <td>desktop</td>
+                        <td><span class="badge badge-purple">у_09</span></td>
+                        <td>22</td>
+                        <td>23</td>
+                        <td>45</td>
+                        <td>552 КБ</td>
+                    </tr>
+                    <tr>
+                        <td>specifity.balloo.su</td>
+                        <td><span class="badge badge-blue">у_10</span></td>
+                        <td>—</td>
+                        <td>7</td>
+                        <td>15</td>
+                        <td>200 КБ</td>
+                    </tr>
+                    <tr>
+                        <td>blog.balloo.su</td>
+                        <td><span class="badge badge-blue">у_11</span></td>
+                        <td>6</td>
+                        <td>6</td>
+                        <td>12</td>
+                        <td>88 КБ</td>
+                    </tr>
+                    <tr>
+                        <td>shared (общие)</td>
+                        <td><span class="badge badge-green">у_00</span></td>
+                        <td>8</td>
+                        <td>8</td>
+                        <td>16</td>
+                        <td>92 КБ</td>
+                    </tr>
+                    <tr>
+                        <td>components</td>
+                        <td>—</td>
+                        <td>12</td>
+                        <td>12</td>
+                        <td>84</td>
+                        <td>616 КБ</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Исходный код -->
+        <h2>💻 Исходный код (packages/)</h2>
+        <div class="section">
+            <h3>По подпроектам</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Подпроект</th>
+                        <th>Файлов</th>
+                        <th>Размер</th>
+                        <th>Основные языки</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>web/</strong></td>
+                        <td>398</td>
+                        <td>8,0 МБ</td>
+                        <td>TSX, TS, CSS</td>
+                    </tr>
+                    <tr>
+                        <td><strong>server/</strong></td>
+                        <td>416</td>
+                        <td>3,0 МБ</td>
+                        <td>TS, JSON</td>
+                    </tr>
+                    <tr>
+                        <td><strong>desktop/</strong></td>
+                        <td>136</td>
+                        <td>2,0 МБ</td>
+                        <td>JS, TSX, TS</td>
+                    </tr>
+                    <tr>
+                        <td><strong>shared/</strong></td>
+                        <td>93</td>
+                        <td>600 КБ</td>
+                        <td>TS, JSON, Prisma</td>
+                    </tr>
+                    <tr>
+                        <td><strong>mobile-android/</strong></td>
+                        <td>61</td>
+                        <td>608 КБ</td>
+                        <td>TSX, TS, Kotlin</td>
+                    </tr>
+                    <tr>
+                        <td><strong>mobile-ios/</strong></td>
+                        <td>11</td>
+                        <td>136 КБ</td>
+                        <td>JSON</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Строки кода по языкам</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Язык</th>
+                        <th>Расширение</th>
+                        <th>Строк</th>
+                        <th>Доля</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>TypeScript React</td>
+                        <td><code>.tsx</code></td>
+                        <td>50 982</td>
+                        <td>
+                            <div class="progress-bar"><div class="fill" style="width: 28%"></div></div>
+                            28%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>TypeScript</td>
+                        <td><code>.ts</code></td>
+                        <td>24 758</td>
+                        <td>
+                            <div class="progress-bar"><div class="fill" style="width: 14%"></div></div>
+                            14%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>HTML</td>
+                        <td><code>.html</code></td>
+                        <td>44 867</td>
+                        <td>
+                            <div class="progress-bar"><div class="fill" style="width: 25%"></div></div>
+                            25%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Markdown</td>
+                        <td><code>.md</code></td>
+                        <td>40 882</td>
+                        <td>
+                            <div class="progress-bar"><div class="fill" style="width: 22%"></div></div>
+                            22%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>JSON</td>
+                        <td><code>.json</code></td>
+                        <td>14 524</td>
+                        <td>
+                            <div class="progress-bar"><div class="fill" style="width: 8%"></div></div>
+                            8%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>CSS</td>
+                        <td><code>.css</code></td>
+                        <td>4 597</td>
+                        <td>
+                            <div class="progress-bar"><div class="fill" style="width: 3%"></div></div>
+                            3%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>JavaScript</td>
+                        <td><code>.js</code></td>
+                        <td>1 531</td>
+                        <td>
+                            <div class="progress-bar"><div class="fill" style="width: 1%"></div></div>
+                            1%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>YAML</td>
+                        <td><code>.yml</code></td>
+                        <td>1 015</td>
+                        <td>
+                            <div class="progress-bar"><div class="fill" style="width: 1%"></div></div>
+                            1%
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Тикеты -->
+        <h2>🎫 Тикеты и документы (tickets/)</h2>
+        <div class="section">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Файл</th>
+                        <th>Размер</th>
+                        <th>Описание</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>balloo-implementation.md</code></td>
+                        <td>287 КБ</td>
+                        <td>Основная реализация</td>
+                    </tr>
+                    <tr>
+                        <td><code>balloo-status.json</code></td>
+                        <td>104 КБ</td>
+                        <td>Статус-файл</td>
+                    </tr>
+                    <tr>
+                        <td><code>v2-promo-booklet.pdf</code></td>
+                        <td>1,6 МБ</td>
+                        <td>Промо-буклет v2</td>
+                    </tr>
+                    <tr>
+                        <td><code>v2-promo-booklet.html</code></td>
+                        <td>25 КБ</td>
+                        <td>HTML-версия промо-буклета</td>
+                    </tr>
+                    <tr>
+                        <td><code>v2-features-audit.pdf</code></td>
+                        <td>103 КБ</td>
+                        <td>Аудит фич v2</td>
+                    </tr>
+                    <tr>
+                        <td><code>v2-features-audit.html</code></td>
+                        <td>43 КБ</td>
+                        <td>HTML-версия аудита</td>
+                    </tr>
+                    <tr>
+                        <td><code>api-keys-status.html</code></td>
+                        <td>17 КБ</td>
+                        <td>Статус API-ключей</td>
+                    </tr>
+                    <tr>
+                        <td><code>deferred-to-v2.md</code></td>
+                        <td>27 КБ</td>
+                        <td>Отложенные задачи v2</td>
+                    </tr>
+                    <tr>
+                        <td><code>Мультитикет_Balloo_реестр_решений_v2.md</code></td>
+                        <td>15 КБ</td>
+                        <td>Реестр решений v2</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Документация -->
+        <h2>📚 Документация (docs/)</h2>
+        <div class="section">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Файл</th>
+                        <th>Описание</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>00-master-build-guide.md</code></td><td>Руководство по сборке</td></tr>
+                    <tr><td><code>01-architecture-decisions.md</code></td><td>Архитектурные решения</td></tr>
+                    <tr><td><code>02-requirements-checklist.md</code></td><td>Чеклист требований</td></tr>
+                    <tr><td><code>03-database-schema.md</code></td><td>Схема БД</td></tr>
+                    <tr><td><code>04-api-websocket-spec.md</code></td><td>Спецификация API/WebSocket</td></tr>
+                    <tr><td><code>05-frontend-spec.md</code></td><td>Фронтенд-спецификация</td></tr>
+                    <tr><td><code>06-devops-infrastructure.md</code></td><td>DevOps-инфраструктура</td></tr>
+                    <tr><td><code>project-report.md</code></td><td>Этот файл (Markdown)</td></tr>
+                    <tr><td><code>project-report.html</code></td><td>Этот файл (HTML)</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Docker -->
+        <h2>🐳 Docker (docker/)</h2>
+        <div class="section">
+            <table>
+                <thead>
+                    <tr><th>Файл</th><th>Описание</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>docker-compose.yml</code></td><td>Оркестрация сервисов</td></tr>
+                    <tr><td><code>nginx.conf</code></td><td>Конфигурация Nginx</td></tr>
+                    <tr><td><code>server/Dockerfile</code></td><td>Docker-образ сервера</td></tr>
+                    <tr><td><code>web/Dockerfile</code></td><td>Docker-образ веб-клиента</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Статус -->
+        <h2>🚦 Статус проекта</h2>
+        <div class="summary-grid">
+            <div class="summary-card">
+                <div class="value">v1.0.0</div>
+                <div class="label">Версия</div>
+            </div>
+            <div class="summary-card">
+                <div class="value">Фаза 3</div>
+                <div class="label">Текущая фаза</div>
+            </div>
+            <div class="summary-card">
+                <div class="value">30.07.2026</div>
+                <div class="label">Дата завершения</div>
+            </div>
+            <div class="summary-card">
+                <div class="value">3</div>
+                <div class="label">Темы оформления</div>
+            </div>
+            <div class="summary-card">
+                <div class="value">20</div>
+                <div class="label">Языков</div>
+            </div>
+            <div class="summary-card">
+                <div class="value">66/66</div>
+                <div class="label">Тикетов выполнено</div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Отчёт сгенерирован автоматически на основе файловой системы проекта.</p>
+            <p>31 июля 2026 · Balloo Messenger v1.0.0</p>
+        </footer>
+    </div>
+</body>
+</html>

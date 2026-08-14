@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Компонент: Service Status — Статус сервиса</title>
+  <link rel="stylesheet" href="../../assets/common.css">
+  <style>
+    .component-demo { padding: 24px; max-width: 640px; margin: 0 auto; }
+    .component-demo h1 { font-size: 20px; margin-bottom: 16px; }
+    .component-demo .demo-section { margin-bottom: 24px; }
+    .component-demo .demo-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+
+    .service-status { display: flex; flex-direction: column; gap: 2px; }
+    .service-status__item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+    }
+    .service-status__item + .service-status__item { border-top: none; }
+    .service-status__item__name { font-weight: 600; color: var(--text-primary); font-size: 14px; }
+    .service-status__item__uptime { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .service-status__item__status { font-size: 12px; padding: 3px 10px; font-weight: 700; }
+    .service-status__item__status--ok { background: rgba(45,184,77,0.12); color: var(--accent); }
+    .service-status__item__status--warning { background: rgba(232,163,23,0.12); color: var(--warning); }
+    .service-status__item__status--error { background: rgba(227,66,45,0.12); color: var(--danger); }
+    .service-status__overall {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      background: var(--bg-glass);
+      border: 1px solid var(--border-color);
+      margin-bottom: 12px;
+    }
+    .service-status__overall__dot {
+      width: 16px; height: 16px;
+      clip-path: var(--octagon-clip);
+      background: var(--accent);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.6} }
+    .service-status__overall__text { font-size: 16px; font-weight: 700; color: var(--accent); }
+    .service-status__overall__sub { font-size: 12px; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+  <div class="component-demo">
+    <h1>📦 Компонент: Service Status (Статус сервиса)</h1>
+
+    <div class="demo-section">
+      <div class="demo-label">Статус сервисов</div>
+      <div class="service-status__overall">
+        <div class="service-status__overall__dot"></div>
+        <div>
+          <div class="service-status__overall__text">Все системы работают</div>
+          <div class="service-status__overall__sub">Аптайм: 99.98% за 30 дней</div>
+        </div>
+      </div>
+      <div class="service-status">
+        <div class="service-status__item">
+          <div>
+            <div class="service-status__item__name">API Gateway</div>
+            <div class="service-status__item__uptime">30 дней без сбоев</div>
+          </div>
+          <div class="service-status__item__status service-status__item__status--ok">OK</div>
+        </div>
+        <div class="service-status__item">
+          <div>
+            <div class="service-status__item__name">WebSocket Server</div>
+            <div class="service-status__item__uptime">15 дней без сбоев</div>
+          </div>
+          <div class="service-status__item__status service-status__item__status--ok">OK</div>
+        </div>
+        <div class="service-status__item">
+          <div>
+            <div class="service-status__item__name">File Storage</div>
+            <div class="service-status__item__uptime">Обновление...</div>
+          </div>
+          <div class="service-status__item__status service-status__item__status--warning">Maintenance</div>
+        </div>
+        <div class="service-status__item">
+          <div>
+            <div class="service-status__item__name">Email Service</div>
+            <div class="service-status__item__uptime">Недоступен</div>
+          </div>
+          <div class="service-status__item__status service-status__item__status--error">Error</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="../../assets/common.js"></script>
+</body>
+</html>

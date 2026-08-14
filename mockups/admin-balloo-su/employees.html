@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Сотрудники и отделы</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--danger);">A</div><span>Admin</span>
+    <div class="topbar__dropdown"></div>
+  </div>
+  <div class="topbar__title">Сотрудники и отделы</div>
+  <div class="topbar__actions">
+    <div class="topbar__actions-btn" onclick="alert('Добавление сотрудника: выбор пользователя, назначение отдела, выдача прав')" title="Добавить сотрудника">➕</div>
+  </div>
+  <div class="topbar__right"><div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>АД</span></div></div></div>
+</div>
+<div class="main">
+  <div class="sidebar sidebar--narrow">
+    <div class="list">
+      <div class="list__item">📊 Дашборд</div>
+      <div class="list__item">👥 Пользователи</div>
+      <div class="list__item">📋 Жалобы</div>
+      <div class="list__item">🔨 Баны</div>
+      <div class="list__item">📈 Метрики</div>
+      <div class="list__item">🚩 Feature Flags</div>
+      <div class="list__item">📦 Файлы</div>
+      <div class="list__item">📝 Тексты</div>
+      <div class="list__item" style="border-top:1px solid var(--border-color);margin-top:8px;padding-top:12px;">🏢 Отделы</div>
+      <div class="list__item list__item--active">👤 Сотрудники</div>
+      <div class="list__item">💼 Вакансии</div>
+      <div class="list__item">📜 Версии</div>
+      <div class="list__item">💡 Фичи (модерация)</div>
+      <div class="list__item">💚 Донаты</div>
+    </div>
+  </div>
+  <div class="content overflow-y-auto"><div class="page-container">
+    <h1 class="page-title">👤 Сотрудники</h1>
+    <p class="page-subtitle">Назначение по отделам, выдача прав по отделам</p>
+
+    <div class="tabs mb-6" data-tab-group="emp">
+      <div class="tab tab--active" onclick="switchTab('emp',0)">Все сотрудники</div>
+      <div class="tab" onclick="switchTab('emp',1)">По отделам</div>
+      <div class="tab" onclick="switchTab('emp',2)">Права доступа</div>
+    </div>
+
+    <!-- Tab 0: Все сотрудники -->
+    <div class="tab-panel" style="display:block;">
+      <div class="card mb-6">
+        <h3 class="card__title mb-4">👥 Сотрудники (18)</h3>
+        <!-- Search and filters -->
+        <div class="flex gap-3 mb-4" style="flex-wrap:wrap;">
+          <div class="form-group flex-1 mb-0" style="min-width:200px;"><input type="text" class="form-input" placeholder="🔍 Поиск по сотрудникам (имя/email)..."></div>
+          <select class="form-select" style="width:auto;"><option value="">Все отделы</option><option>Разработка</option><option>Дизайн</option><option>Инфраструктура</option><option>Документация</option></select>
+          <select class="form-select" style="width:auto;"><option value="">Все статусы</option><option>Активен</option><option>Неактивен</option></select>
+          <button class="btn btn--tertiary btn--sm">📥 Экспорт списка</button>
+        </div>
+        <table class="table">
+          <thead><tr><th>Сотрудник</th><th>Email</th><th>Отдел</th><th>Должность</th><th>Права</th><th>Статус</th><th>Действия</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><div class="flex items-center gap-2"><div class="avatar avatar--xs avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИВ</span></div></div> Иван Воронцов</div></td>
+              <td>ivan@balloo.su</td>
+              <td><span class="chip chip--accent">Разработка</span></td>
+              <td>Lead Developer</td>
+              <td><span class="chip chip--warning">Руководитель отдела</span></td>
+              <td><span class="status-dot status-dot--online"></span> Активен</td>
+              <td><button class="btn btn--tertiary btn--sm" onclick="openModal('modal-employee-settings')">⚙ Настроить</button></td>
+            </tr>
+            <tr>
+              <td><div class="flex items-center gap-2"><div class="avatar avatar--xs avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ЕК</span></div></div> Елена Киселёва</div></td>
+              <td>elena@balloo.su</td>
+              <td><span class="chip chip--accent">Разработка</span></td>
+              <td>Senior Backend</td>
+              <td><span class="chip chip--accent">Полные права</span></td>
+              <td><span class="status-dot status-dot--online"></span> Активен</td>
+              <td><button class="btn btn--tertiary btn--sm" onclick="openModal('modal-employee-settings')">⚙ Настроить</button></td>
+            </tr>
+            <tr>
+              <td><div class="flex items-center gap-2"><div class="avatar avatar--xs avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>МА</span></div></div> Мария Андреева</div></td>
+              <td>maria@balloo.su</td>
+              <td><span class="chip" style="background:rgba(168,85,247,0.12);color:#a855f7;border-color:#a855f7;">Дизайн</span></td>
+              <td>UI/UX Designer</td>
+              <td><span class="chip chip--warning">Руководитель отдела</span></td>
+              <td><span class="status-dot status-dot--online"></span> Активен</td>
+              <td><button class="btn btn--tertiary btn--sm" onclick="openModal('modal-employee-settings')">⚙ Настроить</button></td>
+            </tr>
+            <tr>
+              <td><div class="flex items-center gap-2"><div class="avatar avatar--xs avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ДС</span></div></div> Дмитрий Соколов</div></td>
+              <td>dmitry@balloo.su</td>
+              <td><span class="chip chip--info">Инфраструктура</span></td>
+              <td>DevOps Engineer</td>
+              <td><span class="chip chip--warning">Руководитель отдела</span></td>
+              <td><span class="status-dot status-dot--online"></span> Активен</td>
+              <td><button class="btn btn--tertiary btn--sm" onclick="openModal('modal-employee-settings')">⚙ Настроить</button></td>
+            </tr>
+            <tr>
+              <td><div class="flex items-center gap-2"><div class="avatar avatar--xs avatar--bordered avatar--status-offline avatar--ctx-contact"><div class="avatar__inner"><span>АП</span></div></div> Антон Петров</div></td>
+              <td>anton@balloo.su</td>
+              <td><span class="chip chip--accent">Разработка</span></td>
+              <td>Middle Frontend</td>
+              <td><span class="chip">Ограниченные</span></td>
+              <td><span class="status-dot status-dot--offline"></span> Неактивен</td>
+              <td><button class="btn btn--tertiary btn--sm" onclick="openModal('modal-employee-settings')">⚙ Настроить</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <!-- Sortable column headers hint -->
+        <p class="text-xs text-muted mt-2">↕ Кликните на заголовок колонки для сортировки</p>
+      </div>
+
+    <div class="card mb-6">
+      <h3 class="card__title mb-4">👥 Сотрудники (18)</h3>
+      <table class="table">
+        <thead><tr><th>Сотрудник</th><th>Email</th><th>Отдел</th><th>Должность</th><th>Права</th><th>Статус</th><th>Действия</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><div class="flex items-center gap-2"><div class="avatar avatar--xs avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИВ</span></div></div> Иван Воронцов</div></td>
+            <td>ivan@balloo.su</td>
+            <td><span class="chip chip--accent">Разработка</span></td>
+            <td>Lead Developer</td>
+            <td><span class="chip chip--warning">Руководитель отдела</span></td>
+            <td><span class="status-dot status-dot--online"></span> Активен</td>
+            <td><button class="btn btn--tertiary btn--sm">⚙ Настроить</button></td>
+          </tr>
+          <tr>
+            <td><div class="flex items-center gap-2"><div class="avatar avatar--xs avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ЕК</span></div></div> Елена Киселева</div></td>
+            <td>elena@balloo.su</td>
+            <td><span class="chip chip--accent">Разработка</span></td>
+            <td>Senior Backend</td>
+            <td><span class="chip chip--accent">Полные права</span></td>
+            <td><span class="status-dot status-dot--online"></span> Активен</td>
+            <td><button class="btn btn--tertiary btn--sm">⚙ Настроить</button></td>
+          </tr>
+          <tr>
+            <td><div class="flex items-center gap-2"><div class="avatar avatar--xs avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>МА</span></div></div> Мария Андреева</div></td>
+            <td>maria@balloo.su</td>
+            <td><span class="chip" style="background:rgba(168,85,247,0.12);color:#a855f7;border-color:#a855f7;">Дизайн</span></td>
+            <td>UI/UX Designer</td>
+            <td><span class="chip chip--warning">Руководитель отдела</span></td>
+            <td><span class="status-dot status-dot--online"></span> Активен</td>
+            <td><button class="btn btn--tertiary btn--sm">⚙ Настроить</button></td>
+          </tr>
+          <tr>
+            <td><div class="flex items-center gap-2"><div class="avatar avatar--xs avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ДС</span></div></div> Дмитрий Соколов</div></td>
+            <td>dmitry@balloo.su</td>
+            <td><span class="chip chip--info">Инфраструктура</span></td>
+            <td>DevOps Engineer</td>
+            <td><span class="chip chip--warning">Руководитель отдела</span></td>
+            <td><span class="status-dot status-dot--online"></span> Активен</td>
+            <td><button class="btn btn--tertiary btn--sm">⚙ Настроить</button></td>
+          </tr>
+          <tr>
+            <td><div class="flex items-center gap-2"><div class="avatar avatar--xs avatar--bordered avatar--status-offline avatar--ctx-contact"><div class="avatar__inner"><span>АП</span></div></div> Антон Петров</div></td>
+            <td>anton@balloo.su</td>
+            <td><span class="chip chip--accent">Разработка</span></td>
+            <td>Middle Frontend</td>
+            <td><span class="chip">Ограниченные</span></td>
+            <td><span class="status-dot status-dot--offline"></span> Неактивен</td>
+            <td><button class="btn btn--tertiary btn--sm">⚙ Настроить</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Tab 1: По отделам -->
+    <div class="tab-panel" style="display:none;">
+      <div class="flex gap-4">
+        <!-- Left: Department tree -->
+        <div class="card" style="min-width:280px;max-width:320px;">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="card__title mb-0">🏢 Отделы</h3>
+            <button class="btn btn--primary btn--sm" onclick="openModal('modal-new-dept')">➕ Создать</button>
+          </div>
+          <div style="max-height:500px;overflow-y:auto;">
+            <!-- Tree: Разработка -->
+            <div class="mb-2">
+              <div class="flex items-center gap-2 p-2 rounded cursor-pointer" style="background:var(--bg-active);font-weight:700;" onclick="toggleDeptTree(this)">
+                <span>📁</span> Разработка <span class="text-xs text-muted ml-2">5 чел.</span>
+                <span class="ml-auto">▼</span>
+              </div>
+              <div class="dept-tree-children" style="display:block;padding-left:20px;">
+                <!-- Руководитель -->
+                <div class="flex items-center gap-2 p-2 rounded cursor-pointer" style="border-left:2px solid var(--warning);margin-bottom:2px;">
+                  <span>👤</span> Иван Воронцов <span class="text-xs chip chip--warning ml-auto">Руководитель</span>
+                </div>
+                <!-- Сотрудники -->
+                <div class="flex items-center gap-2 p-2 rounded cursor-pointer" style="margin-bottom:2px;">
+                  <span>👤</span> Елена Киселёва <span class="chip chip--accent ml-auto">Senior</span>
+                </div>
+                <div class="flex items-center gap-2 p-2 rounded cursor-pointer" style="margin-bottom:2px;">
+                  <span>👤</span> Антон Петров <span class="chip ml-auto">Middle</span>
+                </div>
+              </div>
+            </div>
+            <!-- Tree: Дизайн -->
+            <div class="mb-2">
+              <div class="flex items-center gap-2 p-2 rounded cursor-pointer" style="font-weight:700;" onclick="toggleDeptTree(this)">
+                <span>📁</span> Дизайн <span class="text-xs text-muted ml-2">3 чел.</span>
+                <span class="ml-auto">▶</span>
+              </div>
+              <div class="dept-tree-children" style="display:none;padding-left:20px;">
+                <div class="flex items-center gap-2 p-2 rounded cursor-pointer" style="border-left:2px solid var(--warning);margin-bottom:2px;">
+                  <span>👤</span> Мария Андреева <span class="text-xs chip chip--warning ml-auto">Руководитель</span>
+                </div>
+              </div>
+            </div>
+            <!-- Tree: Инфраструктура -->
+            <div class="mb-2">
+              <div class="flex items-center gap-2 p-2 rounded cursor-pointer" style="font-weight:700;" onclick="toggleDeptTree(this)">
+                <span>📁</span> Инфраструктура <span class="text-xs text-muted ml-2">2 чел.</span>
+                <span class="ml-auto">▶</span>
+              </div>
+              <div class="dept-tree-children" style="display:none;padding-left:20px;">
+                <div class="flex items-center gap-2 p-2 rounded cursor-pointer" style="border-left:2px solid var(--warning);margin-bottom:2px;">
+                  <span>👤</span> Дмитрий Соколов <span class="text-xs chip chip--warning ml-auto">Руководитель</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Right: Selected dept content -->
+        <div class="flex-1">
+          <div class="card mb-4">
+            <h3 class="card__title mb-2">📁 Разработка</h3>
+            <div class="flex gap-3 mb-4" style="flex-wrap:wrap;">
+              <div class="card flex-1" style="min-width:100px;"><div class="text-xs text-muted">Всего</div><div style="font-size:20px;font-weight:800;">5</div></div>
+              <div class="card flex-1" style="min-width:100px;"><div class="text-xs text-muted">Активных</div><div style="font-size:20px;font-weight:800;color:var(--accent);">4</div></div>
+              <div class="card flex-1" style="min-width:100px;"><div class="text-xs text-muted">Задач в работе</div><div style="font-size:20px;font-weight:800;color:var(--warning);">12</div></div>
+            </div>
+            <h4 class="text-sm font-bold mb-3">Сотрудники отдела:</h4>
+            <div class="mb-3">
+              <div class="flex items-center gap-3 p-2 rounded" style="border-bottom:1px solid var(--border-color);">
+                <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИВ</span></div></div>
+                <div class="flex-1"><div class="text-sm font-bold">Иван Воронцов</div><div class="text-xs text-muted">Lead Developer</div></div>
+                <span class="chip chip--warning">Руководитель</span>
+                <button class="btn btn--tertiary btn--xs" onclick="openModal('modal-employee-settings')">⚙</button>
+                <button class="btn btn--tertiary btn--xs" title="Переместить">🔄</button>
+              </div>
+              <div class="flex items-center gap-3 p-2 rounded" style="border-bottom:1px solid var(--border-color);">
+                <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ЕК</span></div></div>
+                <div class="flex-1"><div class="text-sm font-bold">Елена Киселёва</div><div class="text-xs text-muted">Senior Backend</div></div>
+                <span class="chip chip--accent">Полные права</span>
+                <button class="btn btn--tertiary btn--xs" onclick="openModal('modal-employee-settings')">⚙</button>
+                <button class="btn btn--tertiary btn--xs" title="Переместить">🔄</button>
+              </div>
+              <div class="flex items-center gap-3 p-2 rounded" style="border-bottom:1px solid var(--border-color);">
+                <div class="avatar avatar--sm avatar--bordered avatar--status-offline avatar--ctx-contact"><div class="avatar__inner"><span>АП</span></div></div>
+                <div class="flex-1"><div class="text-sm font-bold">Антон Петров</div><div class="text-xs text-muted">Middle Frontend</div></div>
+                <span class="chip">Ограниченные</span>
+                <button class="btn btn--tertiary btn--xs" onclick="openModal('modal-employee-settings')">⚙</button>
+                <button class="btn btn--tertiary btn--xs" title="Переместить">🔄</button>
+              </div>
+            </div>
+            <button class="btn btn--secondary btn--sm" onclick="openModal('modal-move-employee')">🔄 Переместить сотрудника</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 2: Права доступа -->
+    <div class="tab-panel" style="display:none;">
+      <div class="card mb-6">
+        <h3 class="card__title mb-4">🔐 Матрица прав по отделам</h3>
+        <table class="table">
+          <thead><tr><th>Право</th><th>Разработка</th><th>Дизайн</th><th>Инфраструктура</th><th>Документация</th></tr></thead>
+          <tbody>
+            <tr><td>Создание задач</td><td>✅ Все</td><td>✅ Все</td><td>✅ Все</td><td>✅ Все</td></tr>
+            <tr><td>Назначение задач</td><td>✅ Руководитель</td><td>✅ Руководитель</td><td>✅ Руководитель</td><td>✅ Руководитель</td></tr>
+            <tr><td>Мерж в main</td><td>✅ Руководитель + Senior</td><td>❌</td><td>❌</td><td>❌</td></tr>
+            <tr><td>Деплой</td><td>❌</td><td>❌</td><td>✅ Все</td><td>❌</td></tr>
+            <tr><td>Управление вакансиями</td><td>✅ Руководитель</td><td>✅ Руководитель</td><td>✅ Руководитель</td><td>✅ Руководитель</td></tr>
+            <tr><td>Назначение прав</td><td>✅ Руководитель</td><td>✅ Руководитель</td><td>✅ Руководитель</td><td>✅ Руководитель</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card mb-6">
+        <h3 class="card__title mb-4">📝 Детальные описания прав</h3>
+        <div class="list__item" style="border:none;padding:12px;"><strong>Создание задач</strong> — создавать новые задачи в канбан-доске отдела</div>
+        <div class="list__item" style="border:none;padding:12px;"><strong>Назначение задач</strong> — назначать исполнителей (только руководитель)</div>
+        <div class="list__item" style="border:none;padding:12px;"><strong>Мерж в main</strong> — мержить pull-requests в основную ветку</div>
+        <div class="list__item" style="border:none;padding:12px;"><strong>Деплой</strong> — деплоить на продакшен</div>
+        <div class="list__item" style="border:none;padding:12px;"><strong>Управление вакансиями</strong> — создавать и закрывать вакансии</div>
+        <div class="list__item" style="border:none;padding:12px;"><strong>Назначение прав</strong> — менять права других сотрудников (не выше своих)</div>
+      </div>
+      <div class="card mb-6">
+        <h3 class="card__title mb-4">👤 Индивидуальные права сотрудника</h3>
+        <p class="text-sm text-secondary mb-4">Руководитель может менять права, но не выше своих. Директор и его помощники — права всех отделов.</p>
+        <div class="form-group mb-4">
+          <label class="form-label">Сотрудник</label>
+          <select class="form-select"><option>Антон Петров (Разработка)</option><option>Елена Киселёва (Разработка)</option><option>Мария Андреева (Дизайн)</option></select>
+        </div>
+        <div class="grid grid-cols-3 gap-3">
+          <label class="form-checkbox"><input type="checkbox" checked><span>Создание задач</span></label>
+          <label class="form-checkbox"><input type="checkbox"><span>Назначение задач</span></label>
+          <label class="form-checkbox"><input type="checkbox" checked><span>Мерж в main</span></label>
+          <label class="form-checkbox"><input type="checkbox"><span>Деплой</span></label>
+          <label class="form-checkbox"><input type="checkbox"><span>Управление вакансиями</span></label>
+          <label class="form-checkbox"><input type="checkbox"><span>Назначение прав</span></label>
+        </div>
+        <button class="btn btn--primary mt-4">Сохранить индивидуальные права</button>
+      </div>
+      <div class="card">
+        <h3 class="card__title mb-4">📜 Лог изменений прав</h3>
+        <div class="text-xs text-secondary">
+          <div class="mb-2 p-2" style="background:var(--bg-tertiary);border-radius:4px;"><span class="text-muted">18.07.2026 14:30</span> — Иван Воронцов изменил права Антона Петрова: +Мерж в main</div>
+          <div class="mb-2 p-2" style="background:var(--bg-tertiary);border-radius:4px;"><span class="text-muted">15.07.2026 10:00</span> — Админ создал нового сотрудника Антон Петров, права: Ограниченные</div>
+          <div class="p-2" style="background:var(--bg-tertiary);border-radius:4px;"><span class="text-muted">10.07.2026 09:00</span> — Елена Киселёва получила полные права в отделе Разработка</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Employee Settings -->
+<div class="modal" id="modal-employee-settings">
+  <div class="modal__header"><span class="modal__title">⚙ Настройки сотрудника</span><div class="modal__close" onclick="closeModal('modal-employee-settings')">✕</div></div>
+  <div class="modal__body">
+    <div class="form-group"><label class="form-label">Имя</label><input type="text" class="form-input" value="Антон Петров"></div>
+    <div class="form-group"><label class="form-label">Email / Контакты</label><input type="email" class="form-input" value="anton@balloo.su"></div>
+    <div class="form-group"><label class="form-label">Отдел</label>
+      <select class="form-select"><option selected>Разработка</option><option>Дизайн</option><option>Инфраструктура</option><option>Документация</option></select></div>
+    <div class="form-group"><label class="form-label">Должность</label><input type="text" class="form-input" value="Middle Frontend"></div>
+    <div class="form-group"><label class="form-label">Права</label>
+      <div class="grid grid-cols-2 gap-2">
+        <label class="form-checkbox"><input type="checkbox" checked><span>Создание задач</span></label>
+        <label class="form-checkbox"><input type="checkbox"><span>Назначение задач</span></label>
+        <label class="form-checkbox"><input type="checkbox" checked><span>Мерж в main</span></label>
+        <label class="form-checkbox"><input type="checkbox"><span>Деплой</span></label>
+        <label class="form-checkbox"><input type="checkbox"><span>Управление вакансиями</span></label>
+        <label class="form-checkbox"><input type="checkbox"><span>Назначение прав</span></label>
+      </div>
+    </div>
+    <div class="card mb-3" style="background:var(--bg-tertiary);">
+      <div class="text-sm font-bold mb-2">📜 История изменений</div>
+      <div class="text-xs text-secondary">
+        <div class="mb-1"><span class="text-muted">18.07.2026</span> — +Мерж в main (Иван Воронцов)</div>
+        <div><span class="text-muted">10.07.2026</span> — Создан, права: Ограниченные</div>
+      </div>
+    </div>
+    <div class="card" style="border-color:var(--danger);">
+      <div class="text-sm font-bold mb-2" style="color:var(--danger);">⚠️ Увольнение</div>
+      <p class="text-xs text-secondary mb-2">Удалить доступ сотрудника ко всем системам</p>
+      <div class="form-group"><label class="form-label">Причина увольнения</label><textarea class="form-textarea" style="min-height:50px;" placeholder="Укажите причину..."></textarea></div>
+      <button class="btn btn--danger btn--sm">Уволить сотрудника</button>
+    </div>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--tertiary" onclick="closeModal('modal-employee-settings')">Отмена</button>
+    <button class="btn btn--primary" onclick="closeModal('modal-employee-settings')">Сохранить</button>
+  </div>
+</div>
+
+<!-- Modal: Move Employee -->
+<div class="modal" id="modal-move-employee">
+  <div class="modal__header"><span class="modal__title">🔄 Переместить сотрудника</span><div class="modal__close" onclick="closeModal('modal-move-employee')">✕</div></div>
+  <div class="modal__body">
+    <p class="text-sm text-secondary mb-4">Перетащите сотрудника в другой отдел или выберите из списка:</p>
+    <div class="form-group"><label class="form-label">Сотрудник</label>
+      <select class="form-select"><option>Антон Петров (Разработка)</option></select></div>
+    <div class="form-group"><label class="form-label">Новый отдел</label>
+      <select class="form-select"><option>Дизайн</option><option>Инфраструктура</option><option>Документация</option></select></div>
+    <p class="text-xs text-muted mt-2">Также можно перетащить сотрудника из дерева отделов слева</p>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--tertiary" onclick="closeModal('modal-move-employee')">Отмена</button>
+    <button class="btn btn--primary" onclick="closeModal('modal-move-employee')">Переместить</button>
+  </div>
+</div>
+
+<!-- Modal: New Department -->
+<div class="modal" id="modal-new-dept">
+  <div class="modal__header"><span class="modal__title">➕ Создать отдел</span><div class="modal__close" onclick="closeModal('modal-new-dept')">✕</div></div>
+  <div class="modal__body">
+    <div class="form-group"><label class="form-label">Название отдела</label><input type="text" class="form-input" placeholder="Например: Маркетинг"></div>
+    <div class="form-group"><label class="form-label">Руководитель</label>
+      <select class="form-select"><option>Выберите руководителя...</option><option>Иван Воронцов</option><option>Мария Андреева</option></select></div>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--tertiary" onclick="closeModal('modal-new-dept')">Отмена</button>
+    <button class="btn btn--primary" onclick="closeModal('modal-new-dept')">Создать</button>
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+<script>
+function toggleDeptTree(el) {
+  const children = el.nextElementSibling;
+  if (children) {
+    const isShown = children.style.display === 'block';
+    children.style.display = isShown ? 'none' : 'block';
+    const arrow = el.querySelector('.ml-auto');
+    if (arrow) arrow.textContent = isShown ? '▶' : '▼';
+  }
+}
+</script>
+</body>
+</html>

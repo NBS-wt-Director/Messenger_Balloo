@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Компонент: Chat Empty — Пустой чат</title>
+  <link rel="stylesheet" href="../../assets/common.css">
+  <style>
+    .component-demo { padding: 24px; max-width: 480px; margin: 0 auto; }
+    .component-demo h1 { font-size: 20px; margin-bottom: 16px; }
+    .component-demo .demo-section { margin-bottom: 24px; }
+    .component-demo .demo-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+    .empty-chat-demo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 24px;
+      text-align: center;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      min-height: 300px;
+    }
+    .empty-chat-demo__animation {
+      width: 120px;
+      height: 120px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      clip-path: var(--octagon-clip);
+      background: var(--bg-glass);
+      border: 1px solid var(--border-color);
+    }
+    .empty-chat-demo__title { font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+    .empty-chat-demo__subtitle { font-size: 14px; color: var(--text-secondary); margin-bottom: 20px; }
+    .empty-chat-demo__hint { font-size: 12px; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+  <div class="component-demo">
+    <h1>📦 Компонент: Chat Empty (Пустой чат)</h1>
+
+    <div class="demo-section">
+      <div class="demo-label">Пустой чат — начните диалог</div>
+      <div class="empty-chat-demo">
+        <div class="empty-chat-demo__animation">💬</div>
+        <div class="empty-chat-demo__title">Начните диалог</div>
+        <div class="empty-chat-demo__subtitle">Это начало вашей истории сообщений.<br>Напишите первое сообщение!</div>
+        <div class="empty-chat-demo__hint">Сообщения шифруются end-to-end</div>
+      </div>
+    </div>
+
+    <div class="demo-section">
+      <div class="demo-label">Пустой чат — группа без сообщений</div>
+      <div class="empty-chat-demo">
+        <div class="empty-chat-demo__animation">👥</div>
+        <div class="empty-chat-demo__title">Группа создана</div>
+        <div class="empty-chat-demo__subtitle">Добро пожаловать в группу «Команда»<br>5 участников</div>
+        <div class="empty-chat-demo__hint">Добавьте описание группы в настройках</div>
+      </div>
+    </div>
+  </div>
+  <script src="../../assets/common.js"></script>
+</body>
+</html>

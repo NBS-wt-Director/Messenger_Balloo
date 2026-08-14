@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Specifity — Эндпоинты API</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <link rel="stylesheet" href="spec.css">
+</head>
+<body class="app-flex">
+
+<div class="topbar">
+  <div class="topbar__logo">
+    <div class="topbar__logo-icon" style="background:var(--accent);">S</div>
+    <span>Specifity</span>
+    <div class="topbar__dropdown">
+      <div class="topbar__dropdown-item topbar__dropdown-item--node topbar__dropdown-item--node--current">📐 Specifity (текущий)</div>
+      <div class="topbar__dropdown-divider"></div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">💬 Balloo</div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">🛡️ Admin</div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">🏢 Command</div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">💡 Features</div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">📜 History</div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">⬇️ Download</div>
+      <div class="topbar__dropdown-item topbar__dropdown-item--node">📚 API Docs</div>
+    </div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Эндпоинты · API каталог</div>
+  <div class="topbar__right">
+    <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+    <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+  </div>
+</div>
+
+<div class="spec-app">
+  <div class="spec-sidebar">
+    <div class="spec-sidebar__search"><input type="text" class="search-input" placeholder="🔍 Поиск endpoint..."></div>
+    <div class="spec-sidebar__group">Разделы</div>
+    <a class="spec-sidebar__item" href="home.html"><span class="spec-sidebar__item-icon">🏠</span> Главная</a>
+    <a class="spec-sidebar__item" href="rules.html"><span class="spec-sidebar__item-icon">📋</span> Правила</a>
+    <a class="spec-sidebar__item" href="screens.html"><span class="spec-sidebar__item-icon">🖼️</span> Экраны <span class="spec-sidebar__item-num">110</span></a>
+    <a class="spec-sidebar__item spec-sidebar__item--active" href="endpoints.html"><span class="spec-sidebar__item-icon">🔌</span> Эндпоинты</a>
+    <a class="spec-sidebar__item" href="data.html"><span class="spec-sidebar__item-icon">🗄️</span> Данные <span class="spec-sidebar__item-num">34</span></a>
+    <a class="spec-sidebar__item" href="components.html"><span class="spec-sidebar__item-icon">🧩</span> Компоненты <span class="spec-sidebar__item-num">241</span></a>
+    <div class="spec-sidebar__divider"></div>
+    <a class="spec-sidebar__item" href="specification.html"><span class="spec-sidebar__item-icon">📐</span> Спецификация экрана</a>
+  </div>
+
+  <div class="spec-content">
+    <div class="spec-pagehead">
+      <div class="spec-pagehead__id">ID: 1_10_05 · узел у_10 (specifity)</div>
+      <h1>Эндпоинты · API каталог</h1>
+      <p>Единое API для всех узлов (<code>/api/v1/...</code>). Различия только в правах доступа (RBAC). WebSocket: <code>ws://balloo.su/ws?token=&lt;JWT&gt;</code>. Полная интерактивная документация — на <a href="../docs-balloo-su/api-docs.html" style="color:var(--accent);">docs.balloo.su</a>.</p>
+    </div>
+
+    <div class="spec-filters">
+      <span class="spec-filter spec-filter--active">Все</span>
+      <span class="api-badge api-badge--public">🌐 Public</span>
+      <span class="api-badge api-badge--jwt">🔑 JWT</span>
+      <span class="api-badge api-badge--bot">🤖 Bot</span>
+      <span class="api-badge api-badge--admin">⛔ Admin</span>
+    </div>
+
+    <!-- Auth -->
+    <div class="spec-block">
+      <div class="spec-group__title">Auth — <code>/api/v1/auth</code></div>
+      <table class="spec-table">
+        <thead><tr><th>Method</th><th>Path</th><th>Описание</th><th>Доступ</th></tr></thead>
+        <tbody>
+          <tr><td><span class="api-method api-method--post">POST</span></td><td><code>/auth/register</code></td><td>Регистрация (email + reCAPTCHA v3)</td><td><span class="api-badge api-badge--public">🌐 Public</span></td></tr>
+          <tr><td><span class="api-method api-method--post">POST</span></td><td><code>/auth/login</code></td><td>Вход (email + пароль) → JWT + refresh</td><td><span class="api-badge api-badge--public">🌐 Public</span></td></tr>
+          <tr><td><span class="api-method api-method--post">POST</span></td><td><code>/auth/oauth/{yandex|mailru|rambler}</code></td><td>OAuth-вход</td><td><span class="api-badge api-badge--public">🌐 Public</span></td></tr>
+          <tr><td><span class="api-method api-method--post">POST</span></td><td><code>/auth/refresh</code></td><td>Обновление JWT</td><td><span class="api-badge api-badge--jwt">🔑 JWT</span></td></tr>
+          <tr><td><span class="api-method api-method--post">POST</span></td><td><code>/auth/logout</code></td><td>Выход, инвалидация JWT</td><td><span class="api-badge api-badge--jwt">🔑 JWT</span></td></tr>
+          <tr><td><span class="api-method api-method--get">GET</span></td><td><code>/auth/session</code></td><td>Текущая сессия + устройства</td><td><span class="api-badge api-badge--jwt">🔑 JWT</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Devices -->
+    <div class="spec-block">
+      <div class="spec-group__title">Devices &amp; Sessions — <code>/api/v1/devices</code></div>
+      <table class="spec-table">
+        <thead><tr><th>Method</th><th>Path</th><th>Описание</th><th>Доступ</th></tr></thead>
+        <tbody>
+          <tr><td><span class="api-method api-method--get">GET</span></td><td><code>/devices</code></td><td>Список устройств с сессиями</td><td><span class="api-badge api-badge--jwt">🔑 JWT</span></td></tr>
+          <tr><td><span class="api-method api-method--delete">DELETE</span></td><td><code>/devices/:id</code></td><td>Удалить устройство (завершить сессии)</td><td><span class="api-badge api-badge--jwt">🔑 JWT</span></td></tr>
+          <tr><td><span class="api-method api-method--post">POST</span></td><td><code>/devices/pair-token</code></td><td>QR-токен привязки (TTL 60 сек)</td><td><span class="api-badge api-badge--jwt">🔑 JWT</span></td></tr>
+          <tr><td><span class="api-method api-method--post">POST</span></td><td><code>/devices/pair/confirm</code></td><td>Подтверждение привязки</td><td><span class="api-badge api-badge--jwt">🔑 JWT</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Accounts -->
+    <div class="spec-block">
+      <div class="spec-group__title">Accounts (мультиаккаунт) — <code>/api/v1/accounts</code></div>
+      <table class="spec-table">
+        <thead><tr><th>Method</th><th>Path</th><th>Описание</th><th>Доступ</th></tr></thead>
+        <tbody>
+          <tr><td><span class="api-method api-method--get">GET</span></td><td><code>/accounts</code></td><td>Список подключённых аккаунтов</td><td><span class="api-badge api-badge--jwt">🔑 JWT</span></td></tr>
+          <tr><td><span class="api-method api-method--post">POST</span></td><td><code>/accounts/switch</code></td><td>Переключение активного аккаунта</td><td><span class="api-badge api-badge--jwt">🔑 JWT</span></td></tr>
+          <tr><td><span class="api-method api-method--post">POST</span></td><td><code>/accounts/add</code></td><td>Добавление аккаунта (login flow)</td><td><span class="api-badge api-badge--jwt">🔑 JWT</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Users -->
+    <div class="spec-block">
+      <div class="spec-group__title">Users &amp; Contacts — <code>/api/v1/users</code></div>
+      <table class="spec-table">
+        <thead><tr><th>Method</th><th>Path</th><th>Описание</th><th>Доступ</th></tr></thead>
+        <tbody>
+          <tr><td><span class="api-method api-method--get">GET</span></td><td><code>/users/me</code></td><td>Текущий профиль</td><td><span class="api-badge api-badge--jwt">🔑 JWT</span></td></tr>
+          <tr><td><span class="api-method api-method--patch">PATCH</span></td><td><code>/users/me</code></td><td>Обновить профиль (имя, био, аватар, тема, язык)</td><td><span class="api-badge api-badge--jwt">🔑 JWT</span></td></tr>
+          <tr><td><span class="api-method api-method--get">GET</span></td><td><code>/users/contacts</code></td><td>Список контактов</td><td><span class="api-badge api-badge--jwt">🔑 JWT</span></td></tr>
+          <tr><td><span class="api-method api-method--post">POST</span></td><td><code>/users/block/:id</code></td><td>Заблокировать пользователя</td><td><span class="api-badge api-badge--jwt">🔑 JWT</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Chats -->
+    <div class="spec-block">
+      <div class="spec-group__title">Chats &amp; Messages — <code>/api/v1/chats</code></div>
+      <table class="spec-table">
+        <thead><tr><th>Method</th><th>Path</th><th>Описание</th><th>Доступ</th></tr></thead>
+        <tbody>
+          <tr><td><span class="api-method api-method--get">GET</span></td><td><code>/chats</code></td><td>Список чатов (пагинация, infinite scroll)</td><td><span class="api-badge api-badge--jwt">🔑 JWT</span></td></tr>
+          <tr><td><span class="api-method api-method--post">POST</span></td><td><code>/chats/:id/messages</code></td><td>Отправить сообщение</td><td><span class="api-badge api-badge--jwt">🔑 JWT</span> <span class="api-badge api-badge--bot">🤖 Bot</span></td></tr>
+          <tr><td><span class="api-method api-method--get">GET</span></td><td><code>/chats/:id/messages</code></td><td>История сообщений (пагинация по 100)</td><td><span class="api-badge api-badge--jwt">🔑 JWT</span> <span class="api-badge api-badge--bot">🤖 Bot</span></td></tr>
+          <tr><td><span class="api-method api-method--patch">PATCH</span></td><td><code>/chats/:id/messages/:msgId</code></td><td>Редактировать (до 5 мин)</td><td><span class="api-badge api-badge--jwt">🔑 JWT</span></td></tr>
+          <tr><td><span class="api-method api-method--delete">DELETE</span></td><td><code>/chats/:id/messages/:msgId</code></td><td>Удалить (soft delete)</td><td><span class="api-badge api-badge--jwt">🔑 JWT</span></td></tr>
+          <tr><td><span class="api-method api-method--post">POST</span></td><td><code>/chats/:id/messages/:msgId/reactions</code></td><td>Поставить реакцию</td><td><span class="api-badge api-badge--jwt">🔑 JWT</span> <span class="api-badge api-badge--bot">🤖 Bot</span></td></tr>
+          <tr><td><span class="api-method api-method--patch">PATCH</span></td><td><code>/chats/:id/mute</code></td><td>Mute чата (8ч/1д/1н/вечно)</td><td><span class="api-badge api-badge--jwt">🔑 JWT</span></td></tr>
+          <tr><td><span class="api-method api-method--post">POST</span></td><td><code>/chats/:id/export</code></td><td>Экспорт чата в PDF</td><td><span class="api-badge api-badge--jwt">🔑 JWT</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Calls -->
+    <div class="spec-block">
+      <div class="spec-group__title">Calls (WebRTC) — <code>/api/v1/calls</code></div>
+      <table class="spec-table">
+        <thead><tr><th>Method</th><th>Path</th><th>Описание</th><th>Доступ</th></tr></thead>
+        <tbody>
+          <tr><td><span class="api-method api-method--post">POST</span></td><td><code>/calls/initiate</code></td><td>Инициировать звонок (audio/video, group до 30)</td><td><span class="api-badge api-badge--jwt">🔑 JWT</span></td></tr>
+          <tr><td><span class="api-method api-method--post">POST</span></td><td><code>/calls/:id/accept</code></td><td>Принять звонок</td><td><span class="api-badge api-badge--jwt">🔑 JWT</span></td></tr>
+          <tr><td><span class="api-method api-method--post">POST</span></td><td><code>/calls/:id/end</code></td><td>Завершить звонок</td><td><span class="api-badge api-badge--jwt">🔑 JWT</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Admin -->
+    <div class="spec-block">
+      <div class="spec-group__title">Admin (модерация) — <code>/api/v1/admin</code></div>
+      <table class="spec-table">
+        <thead><tr><th>Method</th><th>Path</th><th>Описание</th><th>Доступ</th></tr></thead>
+        <tbody>
+          <tr><td><span class="api-method api-method--get">GET</span></td><td><code>/admin/reports</code></td><td>Список жалоб (pending/reviewing/resolved)</td><td><span class="api-badge api-badge--admin">⛔ Admin</span></td></tr>
+          <tr><td><span class="api-method api-method--post">POST</span></td><td><code>/admin/bans</code></td><td>Бан пользователя (4 подтверждения, 5 жалоб)</td><td><span class="api-badge api-badge--admin">⛔ Admin</span></td></tr>
+          <tr><td><span class="api-method api-method--post">POST</span></td><td><code>/admin/appeals/:id/decision</code></td><td>Решение по обжалованию бана</td><td><span class="api-badge api-badge--admin">⛔ Admin</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Specifity -->
+    <div class="spec-block">
+      <div class="spec-group__title">Specifity — <code>/api/v1/specifity</code></div>
+      <table class="spec-table">
+        <thead><tr><th>Method</th><th>Path</th><th>Описание</th><th>Доступ</th></tr></thead>
+        <tbody>
+          <tr><td><span class="api-method api-method--get">GET</span></td><td><code>/specifity/overview</code></td><td>Сводка монорепо (счётчики, фаза)</td><td><span class="api-badge api-badge--public">🌐 Public</span></td></tr>
+          <tr><td><span class="api-method api-method--get">GET</span></td><td><code>/specifity/nodes</code></td><td>Список узлов</td><td><span class="api-badge api-badge--public">🌐 Public</span></td></tr>
+          <tr><td><span class="api-method api-method--get">GET</span></td><td><code>/specifity/screens</code></td><td>Список экранов для селектора</td><td><span class="api-badge api-badge--public">🌐 Public</span></td></tr>
+          <tr><td><span class="api-method api-method--get">GET</span></td><td><code>/specifity/screens/:id</code></td><td>Полная спецификация экрана</td><td><span class="api-badge api-badge--public">🌐 Public</span></td></tr>
+          <tr><td><span class="api-method api-method--get">GET</span></td><td><code>/specifity/endpoints</code></td><td>Каталог эндпоинтов</td><td><span class="api-badge api-badge--public">🌐 Public</span></td></tr>
+          <tr><td><span class="api-method api-method--get">GET</span></td><td><code>/specifity/data</code></td><td>Сущности БД</td><td><span class="api-badge api-badge--public">🌐 Public</span></td></tr>
+          <tr><td><span class="api-method api-method--get">GET</span></td><td><code>/specifity/components</code></td><td>Каталог компонентов</td><td><span class="api-badge api-badge--public">🌐 Public</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- WebSocket -->
+    <div class="spec-block">
+      <div class="spec-group__title">WebSocket Events — <code>wss://balloo.su/ws?token=&lt;JWT&gt;</code></div>
+      <table class="spec-table">
+        <thead><tr><th>Направление</th><th>Event</th><th>Payload</th><th>Описание</th></tr></thead>
+        <tbody>
+          <tr><td>client → server</td><td><code>message:send</code></td><td>{ chatId, text, attachments? }</td><td>Отправить сообщение</td></tr>
+          <tr><td>client → server</td><td><code>typing:start</code></td><td>{ chatId }</td><td>Начал печатать</td></tr>
+          <tr><td>client → server</td><td><code>reaction:add</code></td><td>{ msgId, emoji }</td><td>Добавить реакцию</td></tr>
+          <tr><td>server → client</td><td><code>message:new</code></td><td>{ id, chatId, author, text }</td><td>Новое сообщение</td></tr>
+          <tr><td>server → client</td><td><code>message:edit</code></td><td>{ id, text, editedAt }</td><td>Сообщение изменено</td></tr>
+          <tr><td>server → client</td><td><code>presence:update</code></td><td>{ userId, status }</td><td>Статус пользователя</td></tr>
+          <tr><td>server → client</td><td><code>call:incoming</code></td><td>{ callId, caller, type }</td><td>Входящий звонок</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p style="font-size:12px;color:var(--text-muted);margin-top:20px;line-height:1.6;">📋 Полный интерактивный список эндпоинтов (OpenAPI 3.0) — на <a href="../docs-balloo-su/api-docs.html" style="color:var(--accent);">docs.balloo.su</a>. Спецификация в <code>docs/04-api-websocket-spec.md</code>.</p>
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+</body>
+</html>

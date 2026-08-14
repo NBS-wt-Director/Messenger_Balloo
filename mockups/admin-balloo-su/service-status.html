@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Статус сервиса</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--warning);">A</div><span>Admin</span>
+    <div class="topbar__dropdown"><div class="topbar__dropdown-item">🛡️ Admin (текущий)</div><div class="topbar__dropdown-divider"></div><div class="topbar__dropdown-item">💬 Balloo</div><div class="topbar__dropdown-item">🏢 Command</div><div class="topbar__dropdown-item">💡 Features</div><div class="topbar__dropdown-item">📜 History</div><div class="topbar__dropdown-item">⬇️ Download</div><div class="topbar__dropdown-item">📚 API Docs</div></div>
+  </div>
+  <div class="topbar__title">Статус сервиса</div>
+  <div class="topbar__right"><div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>АД</span></div></div><span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span><span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span></div>
+</div>
+<div class="main">
+  <div class="sidebar sidebar--narrow">
+    <div class="list">
+      <div class="list__item">📊 Дашборд</div>
+      <div class="list__item">👤 Пользователи</div>
+      <div class="list__item">🚩 Жалобы <span class="badge" style="margin-left:auto;">12</span></div>
+      <div class="list__item">🔨 Баны</div>
+      <div class="list__item">🤖 Боты</div>
+      <div class="list__item">👥 Группы</div>
+      <div class="list__item">📢 Объявления</div>
+      <div class="list__item">📋 Журнал аудита</div>
+      <div class="list__item list__item--active">🚦 Статус сервиса</div>
+      <div class="list__item">📈 Метрики</div>
+      <div class="list__item">💚 Донаты</div>
+    </div>
+  </div>
+  <div class="content overflow-y-auto"><div class="page-container">
+    <div class="flex justify-between items-center mb-4">
+      <h1 class="page-title" style="margin:0;">🚦 Статус сервиса</h1>
+      <span class="chip chip--accent" style="font-size:14px;padding:8px 14px;">● Все системы работают</span>
+    </div>
+    <p class="page-subtitle">Мониторинг узлов Balloo в реальном времени. Обновление каждые 30 секунд.</p>
+
+    <!-- Node status grid -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-bottom:32px;">
+      <div class="card"><div class="flex items-center gap-2 mb-2"><span class="status-dot status-dot--online"></span>💬 balloo.su</div><div class="text-xs text-muted">Задержка: 42 мс</div><div class="text-xs text-muted">Аптайм: 99.98%</div></div>
+      <div class="card"><div class="flex items-center gap-2 mb-2"><span class="status-dot status-dot--online"></span>🛡️ admin.balloo.su</div><div class="text-xs text-muted">Задержка: 38 мс</div><div class="text-xs text-muted">Аптайм: 99.99%</div></div>
+      <div class="card"><div class="flex items-center gap-2 mb-2"><span class="status-dot status-dot--online"></span>🏢 command.balloo.su</div><div class="text-xs text-muted">Задержка: 51 мс</div><div class="text-xs text-muted">Аптайм: 99.95%</div></div>
+      <div class="card"><div class="flex items-center gap-2 mb-2"><span class="status-dot status-dot--online"></span>💡 features.balloo.su</div><div class="text-xs text-muted">Задержка: 47 мс</div><div class="text-xs text-muted">Аптайм: 99.97%</div></div>
+      <div class="card"><div class="flex items-center gap-2 mb-2"><span class="status-dot status-dot--busy"></span>📜 history.balloo.su</div><div class="text-xs text-muted">Задержка: 320 мс</div><div class="text-xs" style="color:var(--warning);">Деградация</div></div>
+      <div class="card"><div class="flex items-center gap-2 mb-2"><span class="status-dot status-dot--online"></span>⬇️ download.balloo.su</div><div class="text-xs text-muted">Задержка: 40 мс</div><div class="text-xs text-muted">Аптайм: 100%</div></div>
+      <div class="card"><div class="flex items-center gap-2 mb-2"><span class="status-dot status-dot--online"></span>📚 docs.balloo.su</div><div class="text-xs text-muted">Задержка: 44 мс</div><div class="text-xs text-muted">Аптайм: 100%</div></div>
+      <div class="card"><div class="flex items-center gap-2 mb-2"><span class="status-dot status-dot--online"></span>📝 blog.balloo.su</div><div class="text-xs text-muted">Задержка: 49 мс</div><div class="text-xs text-muted">Аптайм: 99.96%</div></div>
+    </div>
+
+    <!-- Active incidents -->
+    <h2 class="section-title">Активные инциденты</h2>
+    <div class="card mb-6" style="border-color:var(--warning);">
+      <div class="flex justify-between items-center mb-2">
+        <span class="font-bold" style="color:var(--text-primary);">📜 history.balloo.su — повышенная задержка</span>
+        <span class="chip chip--warning">investigating</span>
+      </div>
+      <div class="text-sm text-secondary mb-2">Заметили повышенную задержку на history.balloo.su (320 мс). Investigating.</div>
+      <div class="text-xs text-muted">Затронутые узлы: history · Начало: 18.07 14:00 · Создал: АД</div>
+    </div>
+
+    <!-- Create incident -->
+    <h2 class="section-title">Создать инцидент</h2>
+    <div class="card mb-6">
+      <div class="form-group"><label class="form-label">Заголовок</label><input type="text" class="form-input" placeholder="Краткое описание"></div>
+      <div class="form-group"><label class="form-label">Описание</label><textarea class="form-textarea" placeholder="Детали инцидента..."></textarea></div>
+      <div class="form-group"><label class="form-label">Серьёзность</label><select class="form-select"><option>minor — минорный</option><option>major — серьёзный</option><option>critical — критический</option></select></div>
+      <div class="form-group"><label class="form-label">Затронутые узлы</label><input type="text" class="form-input" placeholder="balloo, history, blog..."></div>
+      <button class="btn btn--primary">Создать инцидент</button>
+    </div>
+
+    <!-- Incident history -->
+    <h2 class="section-title">История инцидентов</h2>
+    <div class="card">
+      <table class="table">
+        <thead><tr><th>Инцидент</th><th>Серьёзность</th><th>Узлы</th><th>Начало</th><th>Конец</th><th>Статус</th></tr></thead>
+        <tbody>
+          <tr class="table__row"><td>Сбой WebRTC</td><td><span class="chip chip--danger">critical</span></td><td>balloo</td><td>10.07 09:00</td><td>10.07 10:30</td><td><span class="chip chip--accent">resolved</span></td></tr>
+          <tr class="table__row"><td>Медленная загрузка файлов</td><td><span class="chip chip--warning">minor</span></td><td>balloo, admin</td><td>05.07 14:00</td><td>05.07 15:00</td><td><span class="chip chip--accent">resolved</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div></div>
+</div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

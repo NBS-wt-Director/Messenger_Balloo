@@ -1,0 +1,482 @@
+{
+  "version": "2.0.0",
+  "date": "2026-07-23",
+  "source": "Экраны_Balloo_полный_реестр.md",
+  "multiticket": "tickets/Мультитикет_Balloo_реестр_решений_v2.md",
+
+  "accepted_screens": [
+    {
+      "id": "1_01_22",
+      "name": "Мультиаккаунт",
+      "node": "balloo.su",
+      "file": "balloo-su/accounts.html",
+      "comment": "Управление аккаунтами: переключение, добавление, отключение"
+    },
+    {
+      "id": "1_01_23",
+      "name": "Добавить устройство",
+      "node": "balloo.su",
+      "file": "balloo-su/add-device.html",
+      "comment": "QR-код привязки нового устройства, таймер 60 сек"
+    },
+    {
+      "id": "1_01_40",
+      "name": "Панель вложений",
+      "node": "balloo.su",
+      "file": "balloo-su/attachment-panel.html",
+      "comment": "Выезжающая панель справа, drag & drop зона"
+    },
+    {
+      "id": "1_01_38",
+      "name": "Блокированные пользователи",
+      "node": "balloo.su",
+      "file": "balloo-su/blocked-users.html",
+      "comment": "Список заблокированных, разблокировка, причина"
+    },
+    {
+      "id": "1_01_35",
+      "name": "Создание канала",
+      "node": "balloo.su",
+      "file": "balloo-su/channel-create.html",
+      "comment": "Аналог создания группы, но с настройками подписчиков"
+    },
+    {
+      "id": "1_01_36",
+      "name": "Пустой чат",
+      "node": "balloo.su",
+      "file": "balloo-su/empty-chat.html",
+      "comment": "Состояние чата без сообщений, подсказка"
+    },
+    {
+      "id": "1_01_33",
+      "name": "Просмотр файла/изображения",
+      "node": "balloo.su",
+      "file": "balloo-su/file-viewer.html",
+      "comment": "Полноэкранный viewer с зумом, свайпом"
+    },
+    {
+      "id": "1_01_18",
+      "name": "Создание группы",
+      "node": "balloo.su",
+      "file": "balloo-su/group-create.html",
+      "comment": "Форма: название, тип, аватар, описание, участники"
+    },
+    {
+      "id": "1_01_19",
+      "name": "Настройки группы",
+      "node": "balloo.su",
+      "file": "balloo-su/group-settings.html",
+      "comment": "Роли, типы доступа, разрешения, бан-лист, корпоративные"
+    },
+    {
+      "id": "1_01_32",
+      "name": "Редактор сообщения",
+      "node": "balloo.su",
+      "file": "balloo-su/message-editor.html",
+      "comment": "Модалка reply/edit: текст, markdown, вложения"
+    },
+    {
+      "id": "1_01_21",
+      "name": "Мои устройства",
+      "node": "balloo.su",
+      "file": "balloo-su/my-devices.html",
+      "comment": "Список сессий: устройство, ОС, IP, время"
+    },
+    {
+      "id": "1_01_31",
+      "name": "Мои донаты",
+      "node": "balloo.su",
+      "file": "balloo-su/my-donates.html",
+      "comment": "История пожертвований, управление подписками"
+    },
+    {
+      "id": "1_01_34",
+      "name": "Настройки уведомлений",
+      "node": "balloo.su",
+      "file": "balloo-su/notification-settings.html",
+      "comment": "Детальные: звуки, превью, DND, каналы"
+    },
+    {
+      "id": "1_01_29",
+      "name": "Восстановление пароля",
+      "node": "balloo.su",
+      "file": "balloo-su/password-reset.html",
+      "comment": "3 шага: email → письмо → новый пароль"
+    },
+    {
+      "id": "1_01_37",
+      "name": "Настройки приватности",
+      "node": "balloo.su",
+      "file": "balloo-su/privacy-settings.html",
+      "comment": "Онлайн, кто добавляет, кто звонит, архив"
+    },
+    {
+      "id": "1_01_20",
+      "name": "Настройки приложения",
+      "node": "balloo.su",
+      "file": "balloo-su/settings.html",
+      "comment": "Уведомления, приватность, темы, языки, автозагрузка"
+    },
+    {
+      "id": "1_01_27",
+      "name": "Сторис",
+      "node": "balloo.su",
+      "file": "balloo-su/stories.html",
+      "comment": "Лента историй над чатами, просмотрщик"
+    },
+    {
+      "id": "1_01_41",
+      "name": "Создание историй",
+      "node": "balloo.su",
+      "file": "balloo-su/story-create.html",
+      "comment": "Загрузка фото/видео, текст, стикеры, аудитория (+ кнопка камеры)"
+    },
+    {
+      "id": "1_01_30",
+      "name": "Двухфакторная аутентификация",
+      "node": "balloo.su",
+      "file": "balloo-su/two-factor.html",
+      "comment": "TOTP: QR + secret, код, backup-коды"
+    },
+    {
+      "id": "1_01_39",
+      "name": "Запись голосового",
+      "node": "balloo.su",
+      "file": "balloo-su/voice-message.html",
+      "comment": "Модалка записи: удержание, волна, превью"
+    },
+    {
+      "id": "1_02_10",
+      "name": "Управление ботами",
+      "node": "admin.balloo.su",
+      "file": "admin-balloo-su/bots-mgmt.html",
+      "comment": "Список, токены, верификация, жалобы"
+    },
+    {
+      "id": "1_02_13",
+      "name": "Донаты",
+      "node": "admin.balloo.su",
+      "file": "admin-balloo-su/donations.html",
+      "comment": "Цели, доноры, статистика, выгрузка Excel"
+    },
+    {
+      "id": "1_02_14",
+      "name": "Сотрудники",
+      "node": "admin.balloo.su",
+      "file": "admin-balloo-su/employees.html",
+      "comment": "Назначение по отделам, права по отделам"
+    },
+    {
+      "id": "1_02_15",
+      "name": "Feature flags",
+      "node": "admin.balloo.su",
+      "file": "admin-balloo-su/features-flags.html",
+      "comment": "Вкл/выкл функций, группировка, причина"
+    },
+    {
+      "id": "1_02_16",
+      "name": "Управление фичами",
+      "node": "admin.balloo.su",
+      "file": "admin-balloo-su/features-mgmt.html",
+      "comment": "Модерация фич-реквестов: одобрение, отклонение"
+    },
+    {
+      "id": "1_02_17",
+      "name": "Файлы",
+      "node": "admin.balloo.su",
+      "file": "admin-balloo-su/files.html",
+      "comment": "MinIO/Yandex Disk: объём, типы, хранение"
+    },
+    {
+      "id": "1_02_18",
+      "name": "Управление группами",
+      "node": "admin.balloo.su",
+      "file": "admin-balloo-su/groups-mgmt.html",
+      "comment": "Типы, СМИ-заявки, роли, лимиты, верификация"
+    },
+    {
+      "id": "1_02_20",
+      "name": "Метрики",
+      "node": "admin.balloo.su",
+      "file": "admin-balloo-su/metrics.html",
+      "comment": "Grafana/Prometheus/ELK: графики нагрузки"
+    },
+    {
+      "id": "1_02_21",
+      "name": "Отчёты",
+      "node": "admin.balloo.su",
+      "file": "admin-balloo-su/reports.html",
+      "comment": "Различные отчёты: пользователи, донаты, жалобы"
+    },
+    {
+      "id": "1_02_22",
+      "name": "Статус сервиса",
+      "node": "admin.balloo.su",
+      "file": "admin-balloo-su/service-status.html",
+      "comment": "Мониторинг узлов real-time, инциденты"
+    },
+    {
+      "id": "1_02_23",
+      "name": "Тексты",
+      "node": "admin.balloo.su",
+      "file": "admin-balloo-su/texts.html",
+      "comment": "Онбординг, страницы, локализация (6 языков)"
+    },
+    {
+      "id": "1_02_24",
+      "name": "Пользователи",
+      "node": "admin.balloo.su",
+      "file": "admin-balloo-su/users.html",
+      "comment": "Поиск, бан, роли, фильтрация по статусу"
+    },
+    {
+      "id": "1_02_26",
+      "name": "Версии",
+      "node": "admin.balloo.su",
+      "file": "admin-balloo-su/versions.html",
+      "comment": "Управление версиями: создание релизов"
+    },
+    {
+      "id": "1_03_24",
+      "name": "Карточка кандидата (интервью)",
+      "node": "command.balloo.su",
+      "file": "command-balloo-su/candidate-interview.html",
+      "comment": "Таймер, заметки interviewer, оценка по критериям"
+    },
+    {
+      "id": "1_03_25",
+      "name": "Дашборд руководителя",
+      "node": "command.balloo.su",
+      "file": "command-balloo-su/manager-dashboard.html",
+      "comment": "Метрики команды, задачи, дедлайны, burn-down"
+    },
+    {
+      "id": "1_03_26",
+      "name": "Отпуска и отсутствие",
+      "node": "command.balloo.su",
+      "file": "command-balloo-su/time-off.html",
+      "comment": "Запросы, утверждение, календарь отсутствий"
+    },
+    {
+      "id": "1_08_21",
+      "name": "Пустой чат",
+      "node": "mobile",
+      "file": "mobile/empty-chat.html",
+      "comment": "Мобильный первый экран чата"
+    },
+    {
+      "id": "1_08_22",
+      "name": "Полноэкранный просмотрщик медиа",
+      "node": "mobile",
+      "file": "mobile/media-viewer.html",
+      "comment": "Swipe-просмотрщик, pinch-zoom"
+    },
+    {
+      "id": "1_08_23",
+      "name": "Запись голосового (mobile)",
+      "node": "mobile",
+      "file": "mobile/voice-record.html",
+      "comment": "UI записи: удержание, волна, превью"
+    },
+    {
+      "id": "1_09_21",
+      "name": "Полноэкранный просмотрщик медиа",
+      "node": "desktop",
+      "file": "desktop/media-viewer.html",
+      "comment": "Полноэкранный viewer для изображений/видео"
+    },
+    {
+      "id": "1_09_20",
+      "name": "Настройки уведомлений",
+      "node": "desktop",
+      "file": "desktop/notification-settings.html",
+      "comment": "Десктопная версия детальных настроек"
+    },
+    {
+      "id": "1_09_08",
+      "name": "Восстановление пароля",
+      "node": "desktop",
+      "file": "desktop/password-reset.html",
+      "comment": "3 шага: email → письмо → новый пароль"
+    },
+    {
+      "id": "1_09_09",
+      "name": "Двухфакторная аутентификация",
+      "node": "desktop",
+      "file": "desktop/two-factor.html",
+      "comment": "Опциональный TOTP: QR + secret, код"
+    }
+  ],
+
+  "deferred_to_v2": [
+    {
+      "id": "1_01_42",
+      "name": "Избранные сообщения",
+      "node": "balloo.su",
+      "function": "0_01_05",
+      "reason": "Неплохая фича для вкладки в экран чаты, но отложить до v2"
+    },
+    {
+      "id": "1_01_43",
+      "name": "Управление подписками на каналы",
+      "node": "balloo.su",
+      "function": "0_01_06",
+      "reason": "Управление подписками на каналы/группы — кнопки на плитках каналов/групп в экране чата. Отдельный экран не нужен."
+    },
+    {
+      "id": "1_01_44",
+      "name": "Экран 'Кто онлайн'",
+      "node": "balloo.su",
+      "function": "0_01_08",
+      "reason": "В v1 хватит индикации на уже существующих экранах"
+    },
+    {
+      "id": "1_03_27",
+      "name": "Онбординг сотрудника",
+      "node": "command.balloo.su",
+      "function": "0_03_03",
+      "reason": "V2 — чек-лист, прогресс-бар, обучение, ментор"
+    },
+    {
+      "id": "1_03_28",
+      "name": "Оценка сотрудников (KPI/OKR)",
+      "node": "command.balloo.su",
+      "function": "0_03_03",
+      "reason": "V2 — метрики, графики прогресса, комментарии руководителя"
+    },
+    {
+      "id": "1_03_29",
+      "name": "Внутренний маркетплейс",
+      "node": "command.balloo.su",
+      "function": "0_03_11",
+      "reason": "Не нужно — обмен услугами между отделами не требуется"
+    },
+    {
+      "id": "1_08_24",
+      "name": "Управление подписками (mobile)",
+      "node": "mobile",
+      "function": "0_08_07",
+      "reason": "Управление подписками на каналы/группы — кнопки на плитках в экране чата. Отдельный экран не нужен."
+    },
+    {
+      "id": "1_08_25",
+      "name": "Избранные сообщения (mobile)",
+      "node": "mobile",
+      "function": "0_08_04",
+      "reason": "V2 — вкладка в экран чаты с поиском и фильтрами"
+    },
+    {
+      "id": "1_09_22",
+      "name": "Настройки окна приложения",
+      "node": "desktop",
+      "function": "0_09_02",
+      "reason": "V2 — автостарт, сворачивание в трей, уведомления в системный лоток"
+    },
+    {
+      "id": "1_09_23",
+      "name": "Управление расширениями",
+      "node": "desktop",
+      "function": "0_09_04",
+      "reason": "V2 — функционал 'расширения и приложения' весь в v2 переносим"
+    },
+    {
+      "id": "1_02_27",
+      "name": "Экспорт данных (GDPR)",
+      "node": "admin.balloo.su",
+      "function": "0_02_03",
+      "reason": "V2 — запросы на экспорт/удаление данных пользователей"
+    },
+    {
+      "id": "1_02_28",
+      "name": "Аудит действий пользователей",
+      "node": "admin.balloo.su",
+      "function": "0_02_25",
+      "reason": "V2 — аудит действий обычных пользователей для compliance"
+    }
+  ],
+
+  "rejected": [
+    {
+      "id": null,
+      "name": "Управление подписками на каналы (balloo.su)",
+      "node": "balloo.su",
+      "function": "0_01_06",
+      "reason": "Управление подписками на каналы/группы — кнопки на плитках каналов/групп в экране чата. Отдельный экран не нужен."
+    },
+    {
+      "id": null,
+      "name": "Внутренний маркетплейс",
+      "node": "command.balloo.su",
+      "function": "0_03_11",
+      "reason": "Не нужно — обмен услугами между отделами не требуется"
+    },
+    {
+      "id": null,
+      "name": "Управление подписками (mobile)",
+      "node": "mobile",
+      "function": "0_08_07",
+      "reason": "Управление подписками на каналы/группы — кнопки на плитках в экране чата. Отдельный экран не нужен."
+    }
+  ],
+
+  "accepted_from_missing": [
+    {
+      "id": "1_04_05",
+      "name": "Голосование по фичам",
+      "node": "features.balloo.su",
+      "file": "features-balloo-su/vote.html",
+      "function": "0_04_04",
+      "comment": "Давай — экран с рейтингом, комментариями, кнопками 'поддержать'/'критика', статусом разработки"
+    },
+    {
+      "id": "1_01_34",
+      "name": "Настройки медиа (автозагрузка)",
+      "node": "balloo.su",
+      "function": "0_01_16",
+      "comment": "Отдельная вкладка в настройках на всех платформах: toggle Wi-Fi, mobile, максимальное качество, размер превью"
+    },
+    {
+      "id": "1_01_15",
+      "name": "История сообщений (чат)",
+      "node": "balloo.su",
+      "function": "0_01_05",
+      "comment": "Экран чата — это и есть история всех сообщений. Если есть неясность — пояснить в документацию."
+    }
+  ],
+
+  "summary": {
+    "total_screens_reviewed": 58,
+    "accepted_from_unaccepted": 43,
+    "accepted_from_missing": 3,
+    "deferred_to_v2": 12,
+    "rejected": 3,
+    "total_project_screens": 173
+  },
+
+  "notes": [
+    {
+      "screen_id": "1_01_41",
+      "screen_name": "Создание историй",
+      "type": "modification",
+      "detail": "Добавить кнопку камеры на story-create.html"
+    },
+    {
+      "screen_id": "1_01_34",
+      "screen_name": "Настройки медиа (автозагрузка)",
+      "type": "implementation",
+      "detail": "Реализовать как отдельную вкладку в настройках на всех платформах (balloo.su, mobile, desktop)"
+    },
+    {
+      "screen_id": "1_01_15",
+      "screen_name": "История сообщений (чат)",
+      "type": "documentation",
+      "detail": "Экран чата — это и есть история всех сообщений. Пояснить в документации."
+    },
+    {
+      "screen_id": "1_03_25",
+      "screen_name": "Дашборд руководителя",
+      "type": "note",
+      "detail": "Экран не открывался при проверке, но был принят по описанию. Проверить перед разработкой."
+    }
+  ]
+}

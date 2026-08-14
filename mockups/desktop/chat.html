@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo — Чаты</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+
+<!-- TOPBAR (обязательный) -->
+<div class="topbar">
+  <div class="topbar__logo">
+    <div class="topbar__logo-icon">B</div>
+    <span>Balloo</span>
+    <div class="topbar__dropdown">
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/index.html'">💬 Balloo</div>
+      <div class="topbar__dropdown-divider"></div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div>
+      <div class="topbar__dropdown-divider"></div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/contacts.html'">👤 Контакты</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/search.html'">🔍 Поиск</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/archive.html'">📦 Архив</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/calls.html'">📞 Звонки</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/invites.html'">📨 Приглашения</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/bots.html'">🤖 О ботах</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/about-balloo.html'">ℹ️ О Balloo</div>
+    </div>
+  </div>
+  <div class="topbar__title">Чаты</div>
+  <div class="topbar__right">
+    <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact" onclick="window.location.href='../balloo-su/profile.html'">
+      <div class="avatar__inner"><span>ИИ</span></div>
+    </div>
+    <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+    <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+  </div>
+</div>
+
+<!-- Desktop Window Frame -->
+<div class="window-frame">
+  <!-- Titlebar -->
+  <div class="titlebar">
+    <div class="titlebar__left">
+      <div class="titlebar__icon">B</div>
+      <span class="titlebar__title">Balloo Messenger — Чаты</span>
+    </div>
+    <div class="titlebar__menu">
+      <div class="titlebar__menu-item" onclick="window.location.href='chat.html'">Чаты</div>
+      <div class="titlebar__menu-item" onclick="window.location.href='stories.html'">Сторис</div>
+      <div class="titlebar__menu-item" onclick="window.location.href='contacts.html'">Контакты</div>
+      <div class="titlebar__menu-item" onclick="window.location.href='archive.html'">Архив</div>
+      <div class="titlebar__menu-item" onclick="window.location.href='calls-history.html'">Звонки</div>
+      <div class="titlebar__menu-item" onclick="window.location.href='../balloo-su/invites.html'">Приглашения</div>
+    </div>
+    <div class="titlebar__controls">
+      <div class="titlebar__btn" title="Свернуть">─</div>
+      <div class="titlebar__btn" title="Развернуть">▢</div>
+      <div class="titlebar__btn titlebar__btn--close" title="Закрыть">✕</div>
+    </div>
+  </div>
+
+  <div class="window-body">
+    <!-- SIDEBAR: Chat List (320px) -->
+    <div class="window-sidebar">
+      <div style="padding:10px 12px;border-bottom:1px solid var(--border-color);">
+        <input type="text" class="form-input" placeholder="🔍 Поиск чатов и людей..." style="width:100%;padding:8px 12px;background:var(--bg-tertiary);border:1px solid var(--border-color);border-radius:8px;color:var(--text-primary);font-size:13px;outline:none;">
+      </div>
+      <!-- Кнопка "Новая группа" -->
+      <div style="padding:8px 12px;">
+        <button class="btn btn--primary btn--block btn--sm" onclick="window.location.href='group-create.html'">👥 Новая группа</button>
+      </div>
+      <!-- Кнопка "Звонки" с бейджем -->
+      <div style="padding:4px 12px 8px;">
+        <a href="calls-history.html" style="display:flex;align-items:center;gap:8px;padding:6px 12px;border-radius:4px;text-decoration:none;color:var(--text-secondary);font-size:13px;" onmouseover="this.style.background='var(--bg-tertiary)';this.style.color='var(--text-primary)'" onmouseout="this.style.background='';this.style.color='var(--text-secondary)'">
+          <span>📞</span>
+          <span class="flex-1">Звонки</span>
+          <span class="badge" style="font-size:10px;">2</span>
+        </a>
+      </div>
+      <div style="flex:1;overflow-y:auto;">
+        <!-- Active chat -->
+        <div class="list__item list__item--active" style="padding:10px 12px;">
+          <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>МА</span></div></div>
+          <div class="list__item-body" style="margin-left:8px;"><div class="list__item-title" style="font-size:13px;">Мария Андреева</div><div class="list__item-subtitle" style="font-size:11px;"><span class="typing"><span class="typing__dots"><span class="typing__dot"></span><span class="typing__dot"></span><span class="typing__dot"></span></span> печатает...</span></div></div>
+          <div class="list__item-meta"><span style="font-size:10px;">14:32</span><span class="badge" style="font-size:9px;">3</span></div>
+        </div>
+        <!-- Group chat -->
+        <div class="list__item" style="padding:10px 12px;">
+          <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-new"><div class="avatar__inner"><span>РД</span></div></div>
+          <div class="list__item-body" style="margin-left:8px;"><div class="list__item-title" style="font-size:13px;">Команда разработки</div><div class="list__item-subtitle" style="font-size:11px;">Алексей: Отправил макеты в Figma</div></div>
+          <div class="list__item-meta"><span style="font-size:10px;">14:15</span><span class="badge badge--dots" style="font-size:9px;">•••</span></div>
+        </div>
+        <!-- Family -->
+        <div class="list__item" style="padding:10px 12px;">
+          <div class="avatar avatar--sm avatar--bordered avatar--status-busy avatar--ctx-family"><div class="avatar__inner"><span>СМ</span></div></div>
+          <div class="list__item-body" style="margin-left:8px;"><div class="list__item-title" style="font-size:13px;">Семья ❤️</div><div class="list__item-subtitle" style="font-size:11px;">Мама: Не забудь позвонить бабушке!</div></div>
+          <div class="list__item-meta"><span style="font-size:10px;">13:50</span><span class="badge badge--square-dot" style="font-size:9px;"></span></div>
+        </div>
+        <!-- Blocked -->
+        <div class="list__item" style="padding:10px 12px;">
+          <div class="avatar avatar--sm avatar--bordered avatar--status-offline avatar--ctx-blocked"><div class="avatar__inner"><span>??</span></div></div>
+          <div class="list__item-body" style="margin-left:8px;"><div class="list__item-title" style="font-size:13px;">Заблокированный пользователь</div><div class="list__item-subtitle" style="font-size:11px;color:var(--text-muted);">Сообщения не отправляются</div></div>
+          <div class="list__item-meta"><span style="font-size:10px;">--:--</span></div>
+        </div>
+        <!-- DND -->
+        <div class="list__item" style="padding:10px 12px;">
+          <div class="avatar avatar--sm avatar--bordered avatar--status-dnd avatar--ctx-contact"><div class="avatar__inner"><span>ДП</span></div></div>
+          <div class="list__item-body" style="margin-left:8px;"><div class="list__item-title" style="font-size:13px;">Дмитрий Петров</div><div class="list__item-subtitle" style="font-size:11px;">🔇 Не беспокоить</div></div>
+          <div class="list__item-meta"><span style="font-size:10px;">12:00</span></div>
+        </div>
+        <!-- Media -->
+        <div class="list__item" style="padding:10px 12px;">
+          <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-new"><div class="avatar__inner"><span>РТ</span></div></div>
+          <div class="list__item-body" style="margin-left:8px;"><div class="list__item-title" style="font-size:13px;">Российская Газета <span class="chip chip--info" style="font-size:8px;">СМИ</span></div><div class="list__item-subtitle" style="font-size:11px;">📰 Главные новости дня</div></div>
+          <div class="list__item-meta"><span style="font-size:10px;">11:30</span><span class="badge badge--square-filled" style="font-size:9px;"></span></div>
+        </div>
+        <!-- Corporate -->
+        <div class="list__item" style="padding:10px 12px;">
+          <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-new"><div class="avatar__inner"><span>ТК</span></div></div>
+          <div class="list__item-body" style="margin-left:8px;"><div class="list__item-title" style="font-size:13px;">Технологии будущего <span class="chip chip--warning" style="font-size:8px;">КОРП</span></div><div class="list__item-subtitle" style="font-size:11px;">Витрина обновлена: 3 новых товара</div></div>
+          <div class="list__item-meta"><span style="font-size:10px;">10:00</span></div>
+        </div>
+        <!-- Read -->
+        <div class="list__item" style="padding:10px 12px;">
+          <div class="avatar avatar--sm avatar--bordered avatar--status-offline avatar--ctx-contact"><div class="avatar__inner"><span>АК</span></div></div>
+          <div class="list__item-body" style="margin-left:8px;"><div class="list__item-title" style="font-size:13px;">Алексей Козлов</div><div class="list__item-subtitle" style="font-size:11px;">Спасибо за помощь! 👍</div></div>
+          <div class="list__item-meta"><span style="font-size:10px;">Вчера</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENT: Chat Window -->
+    <div class="window-content">
+      <!-- Chat header -->
+      <div style="padding:12px 16px;border-bottom:1px solid var(--border-color);display:flex;align-items:center;gap:12px;background:var(--bg-secondary);">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact">
+          <div class="avatar__inner"><span>МА</span></div>
+        </div>
+        <div class="flex-1">
+          <div class="font-semibold" style="color:var(--text-primary);">Мария Андреева</div>
+          <div class="text-xs text-muted">в сети</div>
+        </div>
+        <button class="topbar__actions-btn" onclick="window.location.href='chat-attachments.html'" title="Вложения чата">📎</button>
+        <button class="topbar__actions-btn" onclick="openCall('audio')" title="Аудиозвонок">📞</button>
+        <button class="topbar__actions-btn" onclick="openCall('video')" title="Видеозвонок">📹</button>
+        <button class="topbar__actions-btn" onclick="toggleDropdown('chat-menu')">⋮</button>
+        <div class="topbar__dropdown" id="chat-menu" style="top:100%;right:0;left:auto;">
+          <div class="topbar__dropdown-item" onclick="window.location.href='chat-attachments.html'">📎 Вложения чата</div>
+          <div class="topbar__dropdown-item">📌 Закрепить чат</div>
+          <div class="topbar__dropdown-item">🔇 Заглушить</div>
+          <div class="topbar__dropdown-item">📦 В архив</div>
+          <div class="topbar__dropdown-item">📤 Экспорт в PDF</div>
+          <div class="topbar__dropdown-divider"></div>
+          <div class="topbar__dropdown-item text-danger">🚫 Заблокировать</div>
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div class="messages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px;">
+        <!-- Date separator -->
+        <div style="text-align:center;padding:8px;">
+          <span class="chip">16 июля 2026</span>
+        </div>
+
+        <!-- Receiver message with reply -->
+        <div class="message message--receiver" id="msg-1">
+          <div class="message__bubble">
+            <div class="message__header">
+              <span>14:20</span>
+              <span class="message__header-tag message__header-tag--forwarded">↩ Переслано</span>
+            </div>
+            <div class="message__reply">
+              <div class="message__reply-author">Алексей Козлов</div>
+              <div>Привет, посмотрите новые макеты</div>
+            </div>
+            <div class="message__body message__body--markdown">
+              Да, посмотрела. <strong>Отличная работа!</strong> Особенно понравился <em>дизайн аватарок</em> — восьмигранники смотрятся очень <code>fresh</code>
+            </div>
+            <div class="message__attachments" id="att-1">
+              <div class="message__attachments-toggle" onclick="toggleAttachments('msg-1')">
+                <span>📎 3 вложения</span>
+                <span>▼</span>
+              </div>
+              <div class="message__attachments-content">
+                <div class="message__attachment-thumb" style="background:linear-gradient(135deg,#2db84d,#1e9e3e);"></div>
+                <div class="message__attachment-thumb" style="background:linear-gradient(135deg,#3b9eff,#1565c0);"></div>
+                <div class="message__attachment-thumb" style="background:linear-gradient(135deg,#a855f7,#7c3aed);"></div>
+              </div>
+            </div>
+            <div class="message__reactions">
+              <span class="message__reaction message__reaction--mine" data-emoji="👍" onclick="addReaction('msg-1','👍')">👍 <span>2</span></span>
+              <span class="message__reaction" data-emoji="❤" onclick="addReaction('msg-1','❤')">❤ <span>1</span></span>
+              <span class="message__reaction" data-emoji="🔥" onclick="addReaction('msg-1','🔥')">🔥 <span>3</span></span>
+            </div>
+            <div class="message__actions">
+              <button class="message__action-btn" title="Ответить" onclick="openReplyPanel('msg-1')">↩</button>
+              <button class="message__action-btn" title="Копировать" onclick="copyMessage()">📋</button>
+              <button class="message__action-btn" title="Реакция" onclick="openQuickReactions()">😊</button>
+              <button class="message__action-btn" title="Переслать" onclick="openModal('modal-forward')">📤</button>
+              <a href="report-message.html" class="message__action-btn" title="Жалоба">🚩</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sender message -->
+        <div class="message message--sender" id="msg-2">
+          <div class="message__bubble">
+            <div class="message__header">
+              <span>14:25</span>
+            </div>
+            <div class="message__body message__body--markdown">
+              Спасибо! Завтра отправлю финальную версию. <del>Старый вариант</del> — новый вариант почти готов.
+            </div>
+            <div class="message__actions">
+              <button class="message__action-btn" title="Ответить" onclick="openReplyPanel('msg-2')">↩</button>
+              <button class="message__action-btn" title="Копировать" onclick="copyMessage()">📋</button>
+              <button class="message__action-btn" title="Реакция" onclick="openQuickReactions()">😊</button>
+              <button class="message__action-btn" title="Изменить" onclick="editMessage('msg-2')">✏</button>
+              <button class="message__action-btn" title="Удалить" onclick="showToast('Сообщение удалено','error')">🗑</button>
+            </div>
+            <div class="message__edit-history" id="edit-hist-2">
+              <div class="text-xs text-muted mb-2">История изменений:</div>
+              <div class="mb-2">
+                <span class="diff-old">Старый вариант почти готов</span>
+                →
+                <span class="diff-new">Старый вариант — новый вариант почти готов</span>
+              </div>
+              <div class="text-xs text-muted">Изменено: 14:26</div>
+            </div>
+          </div>
+          <div class="msg-ticks msg-ticks--read">✓✓</div>
+        </div>
+
+        <!-- Poll widget -->
+        <div class="message message--receiver" id="msg-3">
+          <div class="message__bubble">
+            <div class="message__header">
+              <span>14:28</span>
+            </div>
+            <div class="poll" id="poll-1">
+              <div class="poll__question">📊 Какой цвет для акцента?</div>
+              <div class="poll__option" onclick="votePoll('poll-1', 0)">
+                <div class="poll__option-bar" style="width:25%;"></div>
+                <span class="poll__option-text">Зелёный</span>
+                <span class="poll__option-percent">25%</span>
+              </div>
+              <div class="poll__option" onclick="votePoll('poll-1', 1)">
+                <div class="poll__option-bar" style="width:58%;"></div>
+                <span class="poll__option-text">Мятный</span>
+                <span class="poll__option-percent">58%</span>
+              </div>
+              <div class="poll__option" onclick="votePoll('poll-1', 2)">
+                <div class="poll__option-bar" style="width:17%;"></div>
+                <span class="poll__option-text">Бирюзовый</span>
+                <span class="poll__option-percent">17%</span>
+              </div>
+              <div class="poll__meta">
+                <span>12 голосов</span>
+                <span>• Анонимный</span>
+                <span>• Можно переслать</span>
+              </div>
+            </div>
+            <div class="message__actions">
+              <button class="message__action-btn" title="Ответить" onclick="openReplyPanel('msg-3')">↩</button>
+              <button class="message__action-btn" title="Переслать" onclick="openModal('modal-forward')">📤</button>
+              <a href="report-message.html" class="message__action-btn" title="Жалоба">🚩</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sender message with AI tag -->
+        <div class="message message--sender" id="msg-4">
+          <div class="message__bubble">
+            <div class="message__header">
+              <span>14:30</span>
+              <span class="message__header-tag message__header-tag--ai">🤖 ИИ</span>
+              <span class="message__header-tag message__header-tag--auto">⚙ Автоответ</span>
+            </div>
+            <div class="message__body">
+              Автоматический ответ: Я сейчас занят, отвечу позже.
+            </div>
+            <div class="message__actions">
+              <button class="message__action-btn" title="Ответить" onclick="openReplyPanel('msg-4')">↩</button>
+              <button class="message__action-btn" title="Копировать" onclick="copyMessage()">📋</button>
+              <button class="message__action-btn" title="Удалить" onclick="showToast('Сообщение удалено','error')">🗑</button>
+            </div>
+          </div>
+          <div class="msg-ticks msg-ticks--delivered">✓✓</div>
+        </div>
+
+        <!-- Receiver voice message -->
+        <div class="message message--receiver" id="msg-5">
+          <div class="message__bubble">
+            <div class="message__header">
+              <span>14:31</span>
+            </div>
+            <div class="message__body">
+              <div style="display:flex;align-items:center;gap:12px;padding:8px 0;">
+                <button class="btn btn--secondary btn--icon">▶</button>
+                <div style="flex:1;height:32px;display:flex;align-items:center;gap:2px;">
+                  <div style="width:3px;height:8px;background:var(--accent);"></div>
+                  <div style="width:3px;height:16px;background:var(--accent);"></div>
+                  <div style="width:3px;height:24px;background:var(--accent);"></div>
+                  <div style="width:3px;height:12px;background:var(--accent);"></div>
+                  <div style="width:3px;height:28px;background:var(--accent);"></div>
+                  <div style="width:3px;height:20px;background:var(--accent);"></div>
+                  <div style="width:3px;height:8px;background:var(--border-strong);"></div>
+                  <div style="width:3px;height:16px;background:var(--border-strong);"></div>
+                  <div style="width:3px;height:12px;background:var(--border-strong);"></div>
+                  <div style="width:3px;height:24px;background:var(--border-strong);"></div>
+                  <div style="width:3px;height:8px;background:var(--border-strong);"></div>
+                  <div style="width:3px;height:20px;background:var(--border-strong);"></div>
+                  <div style="width:3px;height:16px;background:var(--border-strong);"></div>
+                  <div style="width:3px;height:12px;background:var(--border-strong);"></div>
+                </div>
+                <span class="text-xs text-muted">0:14</span>
+                <button class="text-xs text-accent">1.5x</button>
+              </div>
+            </div>
+            <div class="message__reactions">
+              <span class="message__reaction" onclick="this.remove()">👍 <span>1</span></span>
+            </div>
+            <div class="message__actions">
+              <button class="message__action-btn" title="Ответить" onclick="openReplyPanel('msg-5')">↩</button>
+              <button class="message__action-btn" title="Переслать" onclick="openModal('modal-forward')">📤</button>
+              <a href="report-message.html" class="message__action-btn" title="Жалоба">🚩</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Typing indicator -->
+        <div class="message message--receiver">
+          <div class="message__bubble">
+            <div class="message__body">
+              <span class="typing"><span class="typing__dots"><span class="typing__dot"></span><span class="typing__dot"></span><span class="typing__dot"></span></span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reply panel -->
+      <div class="reply-panel" id="reply-panel">
+        <button class="reply-panel__cancel" onclick="closeReplyPanel()">✕</button>
+        <div class="reply-panel__preview">
+          <div class="reply-panel__author" id="reply-panel-author">Имя</div>
+          <div class="reply-panel__text" id="reply-panel-text">Текст сообщения...</div>
+        </div>
+      </div>
+
+      <!-- Input area -->
+      <div class="input-area" style="position:relative;">
+        <!-- Emoji panel -->
+        <div class="emoji-panel" id="emoji-panel">
+          <span class="emoji-panel__btn" onclick="insertEmoji('😀')">😀</span>
+          <span class="emoji-panel__btn" onclick="insertEmoji('😂')">😂</span>
+          <span class="emoji-panel__btn" onclick="insertEmoji('🥰')">🥰</span>
+          <span class="emoji-panel__btn" onclick="insertEmoji('😍')">😍</span>
+          <span class="emoji-panel__btn" onclick="insertEmoji('🤩')">🤩</span>
+          <span class="emoji-panel__btn" onclick="insertEmoji('😎')">😎</span>
+          <span class="emoji-panel__btn" onclick="insertEmoji('🤔')">🤔</span>
+          <span class="emoji-panel__btn" onclick="insertEmoji('😢')">😢</span>
+          <span class="emoji-panel__btn" onclick="insertEmoji('😡')">😡</span>
+          <span class="emoji-panel__btn" onclick="insertEmoji('🤮')">🤮</span>
+          <span class="emoji-panel__btn" onclick="insertEmoji('👍')">👍</span>
+          <span class="emoji-panel__btn" onclick="insertEmoji('👎')">👎</span>
+          <span class="emoji-panel__btn" onclick="insertEmoji('❤')">❤</span>
+          <span class="emoji-panel__btn" onclick="insertEmoji('🔥')">🔥</span>
+          <span class="emoji-panel__btn" onclick="insertEmoji('🎉')">🎉</span>
+          <span class="emoji-panel__btn" onclick="insertEmoji('💯')">💯</span>
+          <span class="emoji-panel__btn" onclick="insertEmoji('✅')">✅</span>
+          <span class="emoji-panel__btn" onclick="insertEmoji('❌')">❌</span>
+          <span class="emoji-panel__btn" onclick="insertEmoji('⭐')">⭐</span>
+          <span class="emoji-panel__btn" onclick="insertEmoji('👋')">👋</span>
+          <span class="emoji-panel__btn" onclick="insertEmoji('🙏')">🙏</span>
+          <span class="emoji-panel__btn" onclick="insertEmoji('💪')">💪</span>
+          <span class="emoji-panel__btn" onclick="insertEmoji('🤝')">🤝</span>
+          <span class="emoji-panel__btn" onclick="insertEmoji('🚀')">🚀</span>
+        </div>
+
+        <!-- Slash command hint -->
+        <div class="input-hint" id="input-hint">
+          <div class="input-hint__item" data-cmd="poll" onclick="selectHint('poll', document.querySelector('.input-area__field'))">
+            <code>/poll_</code> — Создать опрос
+          </div>
+          <div class="input-hint__item" data-cmd="quiz" onclick="selectHint('quiz', document.querySelector('.input-area__field'))">
+            <code>/quiz_</code> — Создать квиз
+          </div>
+          <div class="input-hint__item" data-cmd="list_active" onclick="selectHint('list_active', document.querySelector('.input-area__field'))">
+            <code>/list_active_</code> — Активный список
+          </div>
+          <div class="input-hint__item" data-cmd="list_passive" onclick="selectHint('list_passive', document.querySelector('.input-area__field'))">
+            <code>/list_passive_</code> — Пассивный список
+          </div>
+          <div class="input-hint__item" data-cmd="personali" onclick="selectHint('personali', document.querySelector('.input-area__field'))">
+            <code>/personali_</code> — Персонали
+          </div>
+        </div>
+
+        <button class="input-area__btn" title="Прикрепить файл" onclick="openAttachmentsPanel()">📎</button>
+        <button class="input-area__btn" title="Фото/видео">🖼</button>
+        <button class="input-area__btn" title="Голосовое">🎤</button>
+        <textarea class="input-area__field" placeholder="Напишите сообщение... (или / для команд)" rows="1"></textarea>
+        <button class="input-area__btn" title="Интерактив" onclick="openPollEditor()">📊</button>
+        <button class="input-area__btn" title="Эмодзи" onclick="toggleEmojiPanel()">😊</button>
+        <button class="input-area__btn input-area__btn--send" onclick="sendMessage()" title="Отправить">➤</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status bar -->
+  <div class="statusbar">
+    <div><span class="status-dot status-dot--online"></span> Подключено · WebSocket</div>
+    <div class="statusbar__sep">💾 Кэш: 124 МБ · v1.0.0-beta</div>
+  </div>
+</div>
+
+<!-- Modal: New Chat -->
+<div class="modal-overlay" id="modal-overlay"></div>
+<div class="modal" id="modal-new-chat">
+  <div class="modal__header">
+    <span class="modal__title">Новый чат</span>
+    <div class="modal__close" onclick="closeModal('modal-new-chat')">✕</div>
+  </div>
+  <div class="modal__body">
+    <div class="form-group">
+      <input type="text" class="form-input" placeholder="🔍 Поиск человека...">
+    </div>
+    <div class="list" style="max-height:300px;">
+      <div class="list__item">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact">
+          <div class="avatar__inner"><span>АК</span></div>
+        </div>
+        <div class="list__item-body">
+          <div class="list__item-title">Алексей Козлов</div>
+          <div class="list__item-subtitle">в сети</div>
+        </div>
+      </div>
+      <div class="list__item">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-offline avatar--ctx-contact">
+          <div class="avatar__inner"><span>ДП</span></div>
+        </div>
+        <div class="list__item-body">
+          <div class="list__item-title">Дмитрий Петров</div>
+          <div class="list__item-subtitle">был 2 часа назад</div>
+        </div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <button class="btn btn--secondary btn--block" onclick="window.location.href='group-create.html'">👥 Создать группу</button>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--tertiary" onclick="closeModal('modal-new-chat')">Отмена</button>
+  </div>
+</div>
+
+<!-- Call Overlay -->
+<div class="call-overlay" id="call-overlay">
+  <div class="call-overlay__header">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div class="avatar avatar--sm avatar--bordered avatar--status-busy avatar--ctx-contact">
+        <div class="avatar__inner"><span>МА</span></div>
+      </div>
+      <div>
+        <div class="font-semibold" style="color:var(--text-primary);">Мария Андреева</div>
+        <div class="call-overlay__timer" id="call-timer">00:00</div>
+      </div>
+    </div>
+    <div class="chip chip--warning">⚠ Низкая скорость — переключено на аудио</div>
+    <button class="btn btn--tertiary" onclick="closeCall()">Свернуть</button>
+  </div>
+  <div class="call-overlay__participants">
+    <div class="call-participant">
+      <div class="call-participant__video call-participant__video--speaking">
+        <div class="avatar avatar--lg avatar--bordered avatar--status-busy avatar--ctx-contact">
+          <div class="avatar__inner"><span>МА</span></div>
+        </div>
+      </div>
+      <span class="call-participant__name">Мария (говорит)</span>
+    </div>
+    <div class="call-participant">
+      <div class="call-participant__video">
+        <div class="avatar avatar--lg avatar--bordered avatar--status-busy avatar--ctx-contact">
+          <div class="avatar__inner"><span>ИИ</span></div>
+        </div>
+      </div>
+      <span class="call-participant__name">Вы</span>
+    </div>
+  </div>
+  <div class="call-overlay__controls">
+    <div class="call-control call-control--mute" id="call-mute" onclick="toggleMute()" title="Микрофон">🎤</div>
+    <div class="call-control call-control--video" id="call-video" onclick="toggleVideo()" title="Камера">📹</div>
+    <div class="call-control call-control--screen" id="call-screen" onclick="toggleScreen()" title="Демонстрация">🖥</div>
+    <div class="call-control call-control--hangup" onclick="closeCall()" title="Завершить">📞</div>
+  </div>
+</div>
+
+<!-- Modal: Forward -->
+<div class="modal" id="modal-forward">
+  <div class="modal__header">
+    <span class="modal__title">📤 Переслать сообщение</span>
+    <div class="modal__close" onclick="closeModal('modal-forward')">✕</div>
+  </div>
+  <div class="modal__body">
+    <div class="forward-search">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="🔍 Поиск чатов..." style="padding-left:36px;">
+    </div>
+    <div class="list" style="max-height:300px;">
+      <div class="list__item">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact">
+          <div class="avatar__inner"><span>МА</span></div>
+        </div>
+        <div class="list__item-body">
+          <div class="list__item-title">Мария Андреева</div>
+          <div class="list__item-subtitle">в сети</div>
+        </div>
+      </div>
+      <div class="list__item">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-new">
+          <div class="avatar__inner"><span>РД</span></div>
+        </div>
+        <div class="list__item-body">
+          <div class="list__item-title">Команда разработки</div>
+          <div class="list__item-subtitle">5 участников</div>
+        </div>
+      </div>
+      <div class="list__item">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-busy avatar--ctx-family">
+          <div class="avatar__inner"><span>СМ</span></div>
+        </div>
+        <div class="list__item-body">
+          <div class="list__item-title">Семья ❤️</div>
+          <div class="list__item-subtitle">8 участников</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--tertiary" onclick="closeModal('modal-forward')">Отмена</button>
+    <button class="btn btn--primary" onclick="closeModal('modal-forward')">Переслать</button>
+  </div>
+</div>
+
+<!-- Modal: Scheduled -->
+<div class="modal" id="modal-scheduled">
+  <div class="modal__header">
+    <span class="modal__title">⏰ Отложенное сообщение</span>
+    <div class="modal__close" onclick="closeModal('modal-scheduled')">✕</div>
+  </div>
+  <div class="modal__body">
+    <div class="form-group">
+      <label class="form-label">Дата и время отправки</label>
+      <input type="datetime-local" class="form-input">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Повтор</label>
+      <select class="form-select">
+        <option>Не повторять</option>
+        <option>Ежедневно</option>
+        <option>Ежедневно в рабочее время</option>
+        <option>Еженедельно</option>
+      </select>
+    </div>
+    <div class="scheduled-preview">
+      <span class="scheduled-preview__icon">📝</span>
+      <span class="scheduled-preview__text">Текст сообщения будет отправлен автоматически</span>
+      <span class="scheduled-preview__time" id="scheduled-time">14:30</span>
+    </div>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--tertiary" onclick="closeModal('modal-scheduled')">Отмена</button>
+    <button class="btn btn--primary" onclick="closeModal('modal-scheduled')">Запланировать</button>
+  </div>
+</div>
+
+<!-- Attachments Panel (fullscreen) -->
+<div class="attachments-panel" id="attachments-panel">
+  <div class="attachments-panel__header">
+    <span class="attachments-panel__title">📎 Вложения чата</span>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <input type="text" class="form-input" placeholder="🔍 Поиск..." style="width:160px;padding:6px 12px;font-size:13px;">
+      <div class="attachments-panel__close" onclick="closeAttachmentsPanel()">✕</div>
+    </div>
+  </div>
+  <div class="attachments-panel__body">
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+      <button class="btn btn--primary btn--sm">📤 Загрузить файл</button>
+      <div class="divider" style="width:1px;margin:0 4px;"></div>
+      <button class="btn btn--tertiary btn--sm">🖼 Фото</button>
+      <button class="btn btn--tertiary btn--sm">🎥 Видео</button>
+      <button class="btn btn--tertiary btn--sm">📄 Документы</button>
+      <button class="btn btn--tertiary btn--sm">🎵 Аудио</button>
+      <button class="btn btn--tertiary btn--sm">📎 Файлы</button>
+    </div>
+    <div class="attachment-grid">
+      <div>
+        <div class="attachment-item" style="background:linear-gradient(135deg,#2db84d,#1e9e3e);">
+          <span class="attachment-item__icon">🖼</span>
+        </div>
+        <div class="attachment-item__meta">macos.png<br>240 КБ</div>
+      </div>
+      <div>
+        <div class="attachment-item" style="background:linear-gradient(135deg,#3b9eff,#1565c0);">
+          <span class="attachment-item__icon">🖼</span>
+        </div>
+        <div class="attachment-item__meta">design.png<br>1.2 МБ</div>
+      </div>
+      <div>
+        <div class="attachment-item" style="background:linear-gradient(135deg,#a855f7,#7c3aed);">
+          <span class="attachment-item__icon">🎥</span>
+        </div>
+        <div class="attachment-item__meta">demo.mp4<br>15 МБ</div>
+      </div>
+      <div>
+        <div class="attachment-item" style="background:linear-gradient(135deg,#e8a317,#c97d00);">
+          <span class="attachment-item__icon">📄</span>
+        </div>
+        <div class="attachment-item__meta">spec.pdf<br>340 КБ</div>
+      </div>
+      <div>
+        <div class="attachment-item" style="background:linear-gradient(135deg,#e3422d,#a83220);">
+          <span class="attachment-item__icon">📄</span>
+        </div>
+        <div class="attachment-item__meta">notes.txt<br>4 КБ</div>
+      </div>
+      <div>
+        <div class="attachment-item" style="background:linear-gradient(135deg,#6b7785,#4a5568);">
+          <span class="attachment-item__icon">🎵</span>
+        </div>
+        <div class="attachment-item__meta">voice.ogg<br>88 КБ</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Message Settings Slide Panel -->
+<div class="slide-panel" id="message-settings-panel">
+  <div class="slide-panel__header">
+    <span class="slide-panel__title">⚙️ Настройки сообщения</span>
+    <div class="slide-panel__close" onclick="closeMessageSettings()">✕</div>
+  </div>
+  <div class="slide-panel__body">
+    <div class="message-settings">
+      <div class="message-settings__item" onclick="showToast('Сообщение закреплено', 'success')">
+        <span class="message-settings__icon">📌</span>
+        <span class="message-settings__label">Закрепить сообщение</span>
+      </div>
+      <div class="message-settings__item" onclick="showToast('Уведомления заглушены', 'info')">
+        <span class="message-settings__icon">🔇</span>
+        <span class="message-settings__label">Заглушить уведомления</span>
+      </div>
+      <div class="message-settings__item" onclick="showToast('Экспорт начат', 'success')">
+        <span class="message-settings__icon">📤</span>
+        <span class="message-settings__label">Экспорт в PDF</span>
+      </div>
+      <div class="message-settings__item" onclick="openModal('modal-forward')">
+        <span class="message-settings__icon">↩</span>
+        <span class="message-settings__label">Ответить</span>
+      </div>
+      <div class="message-settings__item" onclick="openModal('modal-forward')">
+        <span class="message-settings__icon">📤</span>
+        <span class="message-settings__label">Переслать</span>
+      </div>
+      <div class="message-settings__item" onclick="openModal('modal-scheduled')">
+        <span class="message-settings__icon">⏰</span>
+        <span class="message-settings__label">Отложить отправку</span>
+      </div>
+      <div class="message-settings__item">
+        <span class="message-settings__icon">📋</span>
+        <span class="message-settings__label">Копировать текст</span>
+      </div>
+      <div class="message-settings__item" onclick="openModal('report-message')">
+        <span class="message-settings__icon">🚩</span>
+        <span class="message-settings__label">Пожаловаться</span>
+      </div>
+      <div class="message-settings__item message-settings__item--danger" onclick="showToast('Сообщение удалено', 'error')">
+        <span class="message-settings__icon">🗑</span>
+        <span class="message-settings__label">Удалить сообщение</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Scheduled Messages Slide Panel -->
+<div class="slide-panel" id="scheduled-messages-panel">
+  <div class="slide-panel__header">
+    <span class="slide-panel__title">⏰ Отложенные сообщения</span>
+    <div class="slide-panel__close" onclick="closeScheduledPanel()">✕</div>
+  </div>
+  <div class="slide-panel__body">
+    <div class="form-group">
+      <button class="btn btn--primary btn--block" onclick="openModal('modal-scheduled'); closeScheduledPanel();">➕ Запланировать сообщение</button>
+    </div>
+    <div class="divider"></div>
+    <div class="scheduled-preview">
+      <span class="scheduled-preview__icon">📝</span>
+      <span class="scheduled-preview__text">Привет! Как дела?</span>
+      <span class="scheduled-preview__time">Сегодня 15:00</span>
+    </div>
+    <div class="scheduled-preview">
+      <span class="scheduled-preview__icon">📝</span>
+      <span class="scheduled-preview__text">Не забудь про встречу</span>
+      <span class="scheduled-preview__time">Завтра 10:00</span>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Reactions Float -->
+<div class="reaction-float" id="quick-reactions">
+  <span class="reaction-float__btn" onclick="addReactionQuick('👍')">👍</span>
+  <span class="reaction-float__btn" onclick="addReactionQuick('❤')">❤</span>
+  <span class="reaction-float__btn" onclick="addReactionQuick('🔥')">🔥</span>
+  <span class="reaction-float__btn" onclick="addReactionQuick('😂')">😂</span>
+  <span class="reaction-float__btn" onclick="addReactionQuick('😮')">😮</span>
+  <span class="reaction-float__btn" onclick="addReactionQuick('😢')">😢</span>
+  <span class="reaction-float__btn" onclick="addReactionQuick('🤮')">🤮</span>
+  <span class="reaction-float__btn" onclick="addReactionQuick('👎')">👎</span>
+</div>
+
+<!-- Message Context Menu -->
+<div class="context-menu" id="message-context-menu">
+  <div class="context-menu__item" onclick="openReplyPanel('msg-current')">↩ Ответить</div>
+  <div class="context-menu__item" onclick="copyMessage()">📋 Копировать текст</div>
+  <div class="context-menu__item" onclick="openQuickReactions()">😊 Добавить реакцию</div>
+  <div class="context-menu__item" onclick="openModal('modal-forward'); hideContextMenu();">📤 Переслать</div>
+  <div class="context-menu__item" onclick="showToast('Режим редактирования', 'info')">✏ Изменить</div>
+  <div class="context-menu__divider"></div>
+  <div class="context-menu__item" onclick="openModal('modal-scheduled'); hideContextMenu();">⏰ Отложить</div>
+  <div class="context-menu__item" onclick="openModal('modal-forward'); hideContextMenu();">↩ Переслать себе</div>
+  <div class="context-menu__divider"></div>
+  <div class="context-menu__item context-menu__item--danger" onclick="showToast('Сообщение удалено', 'error')">🗑 Удалить</div>
+  <div class="context-menu__item" onclick="openModal('report-message'); hideContextMenu();">🚩 Жалоба</div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- Poll Editor Slide Panel -->
+<div class="slide-panel" id="poll-editor-overlay">
+  <div class="slide-panel__header">
+    <span class="slide-panel__title">📊 Создать опрос / квиз</span>
+    <div class="slide-panel__close" onclick="closePollEditor()">✕</div>
+  </div>
+  <div class="slide-panel__body">
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <button class="btn btn--primary btn--sm" onclick="this.parentElement.querySelectorAll('.btn').forEach(b=>b.classList.remove('btn--primary'));this.classList.add('btn--primary');">📊 Опрос</button>
+      <button class="btn btn--tertiary btn--sm" onclick="this.parentElement.querySelectorAll('.btn').forEach(b=>b.classList.remove('btn--primary'));this.classList.add('btn--primary');">🧠 Квиз</button>
+      <button class="btn btn--tertiary btn--sm" onclick="this.parentElement.querySelectorAll('.btn').forEach(b=>b.classList.remove('btn--primary'));this.classList.add('btn--primary');">📋 Список</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Вопрос</label>
+      <input type="text" class="form-input" placeholder="Введите вопрос...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Варианты ответов</label>
+      <input type="text" class="form-input mb-2" placeholder="Вариант 1">
+      <input type="text" class="form-input mb-2" placeholder="Вариант 2">
+      <input type="text" class="form-input mb-2" placeholder="Вариант 3">
+      <button class="btn btn--tertiary btn--sm" onclick="showToast('Вариант добавлен','success')">+ Добавить вариант</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Тип</label>
+      <select class="form-select">
+        <option>Один ответ</option>
+        <option>Несколько ответов</option>
+        <option>Анонимный</option>
+        <option>Публичный</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">
+        <input type="checkbox"> Опубликовать как сторис
+      </label>
+    </div>
+    <button class="btn btn--primary btn--block mt-3" onclick="closePollEditor(); showToast('Опрос создан!', 'success');">📤 Опубликовать</button>
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+<script>
+/* A1.1 Эмодзи-панель */
+function toggleEmojiPanel() {
+  document.getElementById('emoji-panel').classList.toggle('emoji-panel--visible');
+}
+
+/* A1.5 Функция видеозвонка / аудиозвонка */
+function openCall(type) {
+  if (type === 'video') {
+    document.getElementById('call-overlay').classList.add('call-overlay--visible');
+  } else {
+    document.getElementById('call-overlay').classList.add('call-overlay--visible');
+  }
+}
+
+function closeCall() {
+  document.getElementById('call-overlay').classList.remove('call-overlay--visible');
+}
+
+function toggleMute() {
+  const btn = document.getElementById('call-mute');
+  btn.classList.toggle('call-control--muted');
+  btn.textContent = btn.classList.contains('call-control--muted') ? '🎤🚫' : '🎤';
+}
+
+function toggleVideo() {
+  const btn = document.getElementById('call-video');
+  btn.classList.toggle('call-control--muted');
+  btn.textContent = btn.classList.contains('call-control--muted') ? '📹🚫' : '📹';
+}
+
+function toggleScreen() {
+  showToast('Демонстрация экрана', 'info');
+}
+
+/* A1.8 Функция создания опроса/квиза */
+function openPollEditor() {
+  document.getElementById('poll-editor-overlay').classList.add('slide-panel--visible');
+}
+
+/* A1.9 Функция создания сторис */
+function openStoryCreate() {
+  window.location.href = 'stories.html';
+}
+
+/* A1.10 Функция голосования в опросе */
+function votePoll(pollId, optionIndex) {
+  const poll = document.getElementById(pollId);
+  if (!poll) return;
+  const options = poll.querySelectorAll('.poll__option');
+  options.forEach((opt, i) => {
+    const bar = opt.querySelector('.poll__option-bar');
+    const percent = opt.querySelector('.poll__option-percent');
+    if (i === optionIndex) {
+      bar.style.width = '75%';
+      percent.textContent = '75%';
+      opt.style.background = 'rgba(45,184,77,0.15)';
+    } else if (i === 0) {
+      bar.style.width = '10%';
+      percent.textContent = '10%';
+    } else if (i === 2) {
+      bar.style.width = '15%';
+      percent.textContent = '15%';
+    }
+  });
+  showToast('Ваш голос учтён!', 'success');
+}
+
+/* A1.11 Функция редактирования сообщения */
+function editMessage(msgId) {
+  const msg = document.getElementById(msgId);
+  if (!msg) return;
+  const bubble = msg.querySelector('.message__body');
+  if (!bubble) return;
+  const currentText = bubble.textContent.trim();
+  bubble.contentEditable = 'true';
+  bubble.style.background = 'var(--bg-tertiary)';
+  bubble.style.borderRadius = '4px';
+  bubble.style.padding = '8px';
+  bubble.focus();
+  showToast('Режим редактирования', 'info');
+}
+
+function insertEmoji(emoji) {
+  const field = document.querySelector('.input-area__field');
+  if (field) {
+    field.value += emoji;
+    field.focus();
+  }
+  document.getElementById('emoji-panel').classList.remove('emoji-panel--visible');
+}
+
+/* A1.2 Панель ответа */
+function openReplyPanel(msgId) {
+  const msg = document.getElementById(msgId) || document.querySelector('.message--receiver');
+  if (!msg) return;
+  const author = msg.querySelector('.message__reply-author, .list__item-title');
+  const body = msg.querySelector('.message__body');
+  const panel = document.getElementById('reply-panel');
+  if (author) document.getElementById('reply-panel-author').textContent = author.textContent;
+  if (body) document.getElementById('reply-panel-text').textContent = body.textContent.substring(0, 60);
+  panel.classList.add('reply-panel--visible');
+  hideContextMenu();
+}
+
+function closeReplyPanel() {
+  document.getElementById('reply-panel').classList.remove('reply-panel--visible');
+}
+
+/* A1.3 Быстрые реакции */
+function openQuickReactions() {
+  document.getElementById('quick-reactions').classList.add('reaction-float--visible');
+  hideContextMenu();
+}
+
+function addReactionQuick(emoji) {
+  showToast('Реакция ' + emoji + ' добавлена', 'info');
+  document.getElementById('quick-reactions').classList.remove('reaction-float--visible');
+}
+
+/* A1.6 Отложенные */
+function openScheduledPanel() {
+  document.getElementById('scheduled-messages-panel').classList.add('slide-panel--visible');
+}
+
+function closeScheduledPanel() {
+  document.getElementById('scheduled-messages-panel').classList.remove('slide-panel--visible');
+}
+
+/* A1.8 Закрытие редактора опросов */
+function closePollEditor() {
+  document.getElementById('poll-editor-overlay').classList.remove('slide-panel--visible');
+}
+
+/* C1.1 Вложения */
+function openAttachmentsPanel() {
+  document.getElementById('attachments-panel').classList.add('attachments-panel--visible');
+}
+
+function closeAttachmentsPanel() {
+  document.getElementById('attachments-panel').classList.remove('attachments-panel--visible');
+}
+
+/* C1.2 Настройки сообщения */
+function openMessageSettings() {
+  document.getElementById('message-settings-panel').classList.add('slide-panel--visible');
+}
+
+function closeMessageSettings() {
+  document.getElementById('message-settings-panel').classList.remove('slide-panel--visible');
+}
+
+/* A1.7 Контекстное меню */
+function showContextMenu(e) {
+  e.preventDefault();
+  const menu = document.getElementById('message-context-menu');
+  menu.style.display = 'block';
+  menu.style.left = e.clientX + 'px';
+  menu.style.top = e.clientY + 'px';
+}
+
+function hideContextMenu() {
+  const menu = document.getElementById('message-context-menu');
+  if (menu) menu.style.display = 'none';
+}
+
+function addReaction(msgId, emoji) {
+  showToast('Реакция ' + emoji + ' добавлена', 'info');
+}
+
+function copyMessage() {
+  showToast('Текст скопирован', 'success');
+}
+
+function selectHint(cmd, field) {
+  if (field) {
+    field.value = '/' + cmd + '_';
+    field.focus();
+  }
+  document.getElementById('input-hint').style.display = 'none';
+}
+
+function toggleAttachments(msgId) {
+  const content = document.getElementById(msgId + '-content');
+  if (content) content.style.display = content.style.display === 'none' ? 'flex' : 'none';
+}
+
+function sendMessage() {
+  showToast('Сообщение отправлено', 'success');
+  const field = document.querySelector('.input-area__field');
+  if (field) field.value = '';
+}
+
+function toggleDropdown(id) {
+  const menu = document.getElementById(id);
+  if (menu) menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+}
+
+function openModal(id) {
+  const overlay = document.getElementById('modal-overlay');
+  const modal = document.getElementById(id);
+  if (overlay) overlay.style.display = 'block';
+  if (modal) modal.style.display = 'block';
+}
+
+function closeModal(id) {
+  const overlay = document.getElementById('modal-overlay');
+  const modal = document.getElementById(id);
+  if (overlay) overlay.style.display = 'none';
+  if (modal) modal.style.display = 'none';
+}
+
+/* Click outside to close menus */
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.topbar__actions-btn') && !e.target.closest('.topbar__dropdown')) {
+    const menus = document.querySelectorAll('.topbar__dropdown');
+    menus.forEach(m => { if (!m.id || m.id !== 'chat-menu') m.style.display = 'none'; });
+  }
+  if (!e.target.closest('.message__bubble') && !e.target.closest('.context-menu')) {
+    hideContextMenu();
+  }
+});
+</script>
+</body>
+</html>

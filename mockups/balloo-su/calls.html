@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo — Звонки</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon">B</div><span>Balloo</span>
+    <div class="topbar__dropdown"><div class="topbar__dropdown-item" onclick="window.location.href='chats.html'">💬 Balloo</div><div class="topbar__dropdown-divider"></div><div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div><div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div><div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div><div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div><div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div><div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div></div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Звонки</div>
+  <div class="topbar__right">
+    <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИИ</span></div></div>
+    <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span><span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+  </div>
+</div>
+
+<div class="main">
+  <div class="content overflow-y-auto">
+    <div class="page-container">
+      <h1 class="page-title">Звонки</h1>
+      <p class="page-subtitle">История всех звонков</p>
+
+      <div class="flex gap-2 mb-4">
+        <button class="btn btn--primary btn--icon">📞</button>
+        <button class="btn btn--secondary btn--icon">📹</button>
+      </div>
+
+      <div class="list">
+        <div class="list__item">
+          <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>МА</span></div></div>
+          <div class="list__item-body">
+            <div class="list__item-title">Мария Андреева</div>
+            <div class="list__item-subtitle">📹 Видео • Принятый • 12:30 • 0:45:23</div>
+          </div>
+          <span class="chip chip--accent">✅ Принят</span>
+        </div>
+        <div class="list__item">
+          <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-new"><div class="avatar__inner"><span>РД</span></div></div>
+          <div class="list__item-body">
+            <div class="list__item-title">Команда разработки</div>
+            <div class="list__item-subtitle">📹 Видео группа • Пропущенный • 11:00 • 0:02:15</div>
+          </div>
+          <span class="chip chip--danger">❌ Пропущен</span>
+        </div>
+        <div class="list__item">
+          <div class="avatar avatar--sm avatar--bordered avatar--status-offline avatar--ctx-contact"><div class="avatar__inner"><span>АК</span></div></div>
+          <div class="list__item-body">
+            <div class="list__item-title">Алексей Козлов</div>
+            <div class="list__item-subtitle">📞 Аудио • Исходящий • Вчера • 0:15:42</div>
+          </div>
+          <span class="chip chip--accent">✅ Принят</span>
+        </div>
+        <div class="list__item">
+          <div class="avatar avatar--sm avatar--bordered avatar--status-busy avatar--ctx-contact"><div class="avatar__inner"><span>ОС</span></div></div>
+          <div class="list__item-body">
+            <div class="list__item-title">Ольга Смирнова</div>
+            <div class="list__item-subtitle">📹 Видео • Пропущенный • 15.07 • 0:00:30</div>
+          </div>
+          <span class="chip chip--danger">❌ Пропущен</span>
+        </div>
+        <div class="list__item">
+          <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-new"><div class="avatar__inner"><span>ТГ</span></div></div>
+          <div class="list__item-body">
+            <div class="list__item-title">Технологии будущего</div>
+            <div class="list__item-subtitle">📞 Аудио группа • Принятый • 14.07 • 1:23:05</div>
+          </div>
+          <span class="chip chip--accent">✅ Принят</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo — 555 Аккаунт заблокирован</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    .error-page { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:calc(100vh - 56px); padding:40px 24px; text-align:center; }
+    .error-code { font-size:120px; font-weight:900; color:var(--danger); line-height:1; margin-bottom:8px; letter-spacing:-4px; }
+    .error-mascot { font-size:72px; margin-bottom:16px; }
+    .error-title { font-size:24px; font-weight:800; color:var(--text-primary); margin-bottom:8px; }
+    .error-desc { font-size:16px; color:var(--text-secondary); max-width:480px; line-height:1.6; margin-bottom:20px; }
+    .error-actions { display:flex; gap:12px; flex-wrap:wrap; justify-content:center; }
+
+    /* Instruction card 55501 */
+    .instruction-card {
+      max-width:560px; width:100%; margin:0 auto 24px;
+      background:var(--bg-glass); backdrop-filter:blur(var(--blur));
+      border:1px solid var(--border-color); padding:20px 24px;
+      text-align:left;
+    }
+    .instruction-card__header {
+      display:flex; align-items:center; gap:10px; margin-bottom:14px;
+      padding-bottom:12px; border-bottom:1px solid var(--border-color);
+    }
+    .instruction-card__id {
+      font-size:11px; font-weight:700; color:var(--text-muted);
+      background:var(--bg-tertiary); padding:2px 8px;
+      border:1px solid var(--border-color); letter-spacing:0.3px;
+    }
+    .instruction-card__title {
+      font-size:15px; font-weight:700; color:var(--text-primary);
+    }
+    .instruction-card__step {
+      display:flex; gap:12px; padding:10px 0;
+      border-bottom:1px solid var(--border-color);
+    }
+    .instruction-card__step:last-child { border-bottom:none; }
+    .instruction-card__step-num {
+      flex-shrink:0; width:24px; height:24px; display:flex;
+      align-items:center; justify-content:center;
+      background:var(--accent); color:var(--accent-text);
+      font-size:12px; font-weight:800;
+    }
+    .instruction-card__step-text {
+      font-size:14px; color:var(--text-secondary); line-height:1.5;
+    }
+    .instruction-card__step-text strong {
+      color:var(--text-primary); font-weight:600;
+    }
+    .instruction-card__footer {
+      margin-top:14px; padding-top:12px; border-top:1px solid var(--border-color);
+      font-size:13px; color:var(--text-muted); line-height:1.5;
+    }
+    .instruction-card__footer a {
+      color:var(--accent); text-decoration:underline;
+    }
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon">B</div><span>Balloo</span></div>
+  <div class="topbar__title">Ошибка 555</div>
+  <div class="topbar__right"><div class="mascot">🦊</div><span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span><span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span></div>
+</div>
+<div class="main"><div class="content overflow-y-auto">
+  <div class="error-page">
+    <div class="error-mascot">🦊🔒</div>
+    <div class="error-code">555</div>
+    <h1 class="error-title">Аккаунт заблокирован</h1>
+    <p class="error-desc">Ваш аккаунт был заблокирован за нарушение правил платформы. Вы можете подать обжалование в течение ограниченного времени.</p>
+
+    <!-- Instruction Card 55501 -->
+    <div class="instruction-card" id="instruction-55501">
+      <div class="instruction-card__header">
+        <span class="instruction-card__id">ID 55501</span>
+        <span class="instruction-card__title">Инструкция по разбану</span>
+      </div>
+
+      <div class="instruction-card__step">
+        <span class="instruction-card__step-num">1</span>
+        <span class="instruction-card__step-text">
+          <strong>Ознакомьтесь с причиной бана.</strong> Проверьте уведомление — в нём указано, какое правило нарушено и какие действия привели к блокировке.
+        </span>
+      </div>
+
+      <div class="instruction-card__step">
+        <span class="instruction-card__step-num">2</span>
+        <span class="instruction-card__step-text">
+          <strong>Подайте обжалование.</strong> Нажмите кнопку «Обжаловать бан» ниже. У вас есть <strong>72 часа</strong> с момента блокировки, чтобы подать заявку.
+        </span>
+      </div>
+
+      <div class="instruction-card__step">
+        <span class="instruction-card__step-num">3</span>
+        <span class="instruction-card__step-text">
+          <strong>Опишите ситуацию.</strong> В форме обжалования укажите, почему вы считаете бан ошибочным, или принесите извинения, если нарушение было случайным. Приложите доказательства при необходимости.
+        </span>
+      </div>
+
+      <div class="instruction-card__step">
+        <span class="instruction-card__step-num">4</span>
+        <span class="instruction-card__step-text">
+          <strong>Ожидайте решения.</strong> Администрация рассматривает обжалования в течение <strong>24 часов</strong>. Статус заявки можно отслеживать в окне обжалования.
+        </span>
+      </div>
+
+      <div class="instruction-card__step">
+        <span class="instruction-card__step-num">5</span>
+        <span class="instruction-card__step-text">
+          <strong>Решение принято.</strong> Если бан снят — вы получите уведомление и сможете продолжить пользоваться Balloo. Если отклонён — вы сможете подать повторное обжалование через <strong>30 дней</strong>.
+        </span>
+      </div>
+
+      <div class="instruction-card__footer">
+        ⚖️ Если вы считаете, что бан ошибочен, вы также можете обратиться в чат поддержки: <a href="#">support@balloo.su</a>
+      </div>
+    </div>
+
+    <div class="error-actions">
+      <button class="btn btn--primary" onclick="alert('Открыть окно обжалования')">📝 Обжаловать бан</button>
+      <a class="btn btn--secondary" href="mailto:support@balloo.su">✉️ Написать в поддержку</a>
+    </div>
+  </div>
+</div></div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

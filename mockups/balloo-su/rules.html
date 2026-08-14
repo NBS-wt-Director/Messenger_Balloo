@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo — Правила</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon">B</div><span>Balloo</span>
+    <div class="topbar__dropdown"><div class="topbar__dropdown-item" onclick="window.location.href='chats.html'">💬 Balloo</div><div class="topbar__dropdown-divider"></div><div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div><div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div><div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div><div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div><div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div><div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div></div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Правила</div>
+  <div class="topbar__right"><div class="mascot">🦊</div><span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span><span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span></div>
+</div>
+<div class="main"><div class="content overflow-y-auto"><div class="page-container">
+  <h1 class="page-title">Правила</h1>
+  <p class="page-subtitle">Редакция от 1 января 2026</p>
+
+  <div data-tab-group="rules" class="mb-4">
+    <div class="tabs">
+      <div class="tab tab--active" onclick="switchTab('rules',0)">Правила</div>
+      <div class="tab" onclick="switchTab('rules',1)">Политика неразглашения</div>
+    </div>
+    <div class="tab-panel" style="display:block;padding-top:16px;">
+      <div class="card mb-4"><h3 class="section-title" style="margin-top:0;">1. Общие положения</h3><p class="card__body">Balloo Messenger — кроссплатформенный мессенджер. Используя сервис, вы соглашаетесь с настоящими правилами.</p></div>
+      <div class="card mb-4"><h3 class="section-title" style="margin-top:0;">2. Запрещённый контент</h3><p class="card__body">Запрещается: спам, ненормативная лексика, оскорбления, реклама без согласования, вредоносные файлы. Нарушения → бан (5 жалоб + подтверждение 4 админов).</p></div>
+      <div class="card mb-4"><h3 class="section-title" style="margin-top:0;">3. Приватность</h3><p class="card__body">Администраторы НЕ читают содержимое чатов — только статистика. Удаление аккаунта → анонимизация через 90 дней.</p></div>
+      <div class="card mb-4"><h3 class="section-title" style="margin-top:0;">4. Обжалование бана</h3><p class="card__body">Пользователь может обжаловать бан в течение 3 часов после блокировки.</p></div>
+      <div class="card"><h3 class="section-title" style="margin-top:0;">5. Файлы и хранилище</h3><p class="card__body">Без Yandex Disk: до 10 МБ. С диском: до 1 ГБ. Аватарки и медиа групп — в MinIO.</p></div>
+      <p class="text-xs text-muted mt-4">Контент загружается из <code>RULES.md</code> в корне монорепо</p>
+    </div>
+    <div class="tab-panel" style="display:none;padding-top:16px;">
+      <div class="card mb-4"><h3 class="section-title" style="margin-top:0;">1. Сбор данных</h3><p class="card__body">Balloo собирает минимальный объём данных, необходимый для функционирования мессенджера: email, отображаемое имя, аватар, устройства и сессии.</p></div>
+      <div class="card mb-4"><h3 class="section-title" style="margin-top:0;">2. Хранение сообщений</h3><p class="card__body">Сообщения хранятся на сервере в зашифрованном виде. Администраторы не имеют доступа к содержимому чатов — только метаданные (время, участники).</p></div>
+      <div class="card mb-4"><h3 class="section-title" style="margin-top:0;">3. Передача третьим лицам</h3><p class="card__body">Balloo не передаёт данные пользователей третьим лицам. Исключение — требования законодательства РФ (при официальном запросе).</p></div>
+      <div class="card mb-4"><h3 class="section-title" style="margin-top:0;">4. Удаление данных</h3><p class="card__body">При удалении аккаунта все персональные данные анонимизируются в течение 90 дней. Сообщения в групповых чатах сохраняются для других участников.</p></div>
+      <div class="card"><h3 class="section-title" style="margin-top:0;">5. Файлы и вложения</h3><p class="card__body">Файлы хранятся в MinIO (аватарки, медиа) или Yandex Disk (пользовательские файлы). Доступ к файлам — только у участников чата.</p></div>
+      <p class="text-xs text-muted mt-4">Контент загружается из <code>PRIVACY.md</code> в корне монорепо</p>
+    </div>
+  </div>
+</div></div></div>
+<script src="../assets/common.js"></script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Компонент: Reports — Отчёты</title>
+  <link rel="stylesheet" href="../../assets/common.css">
+  <style>
+    .component-demo { padding: 24px; max-width: 640px; margin: 0 auto; }
+    .component-demo h1 { font-size: 20px; margin-bottom: 16px; }
+    .component-demo .demo-section { margin-bottom: 24px; }
+    .component-demo .demo-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+
+    .reports-list { display: flex; flex-direction: column; gap: 2px; }
+    .report-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+    }
+    .report-item + .report-item { border-top: none; }
+    .report-item__icon { font-size: 24px; width: 36px; text-align: center; flex-shrink: 0; }
+    .report-item__info { flex: 1; }
+    .report-item__name { font-weight: 600; color: var(--text-primary); font-size: 14px; }
+    .report-item__date { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .report-item__action {
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      cursor: pointer;
+      border: 1px solid var(--accent);
+    }
+    .report-item__action:hover { background: rgba(45,184,77,0.1); }
+  </style>
+</head>
+<body>
+  <div class="component-demo">
+    <h1>📦 Компонент: Reports (Отчёты)</h1>
+
+    <div class="demo-section">
+      <div class="demo-label">Список отчётов</div>
+      <div class="reports-list">
+        <div class="report-item">
+          <div class="report-item__icon">📊</div>
+          <div class="report-item__info">
+            <div class="report-item__name">Ежемесячный отчёт — Июль 2026</div>
+            <div class="report-item__date">Сформирован: 23.07.2026</div>
+          </div>
+          <div class="report-item__action">Скачать</div>
+        </div>
+        <div class="report-item">
+          <div class="report-item__icon">📊</div>
+          <div class="report-item__info">
+            <div class="report-item__name">Ежемесячный отчёт — Июнь 2026</div>
+            <div class="report-item__date">Сформирован: 01.07.2026</div>
+          </div>
+          <div class="report-item__action">Скачать</div>
+        </div>
+        <div class="report-item">
+          <div class="report-item__icon">📋</div>
+          <div class="report-item__info">
+            <div class="report-item__name">Аудит безопасности</div>
+            <div class="report-item__date">Сформирован: 15.07.2026</div>
+          </div>
+          <div class="report-item__action">Скачать</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="../../assets/common.js"></script>
+</body>
+</html>

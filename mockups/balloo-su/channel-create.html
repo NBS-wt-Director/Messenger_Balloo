@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo — Создание канала</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon">B</div><span>Balloo</span>
+    <div class="topbar__dropdown">
+      <div class="topbar__dropdown-item" onclick="window.location.href='chats.html'">💬 Balloo</div>
+      <div class="topbar__dropdown-divider"></div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div>
+    </div>
+  </div>
+  <div class="topbar__title">Создание канала</div>
+  <div class="topbar__right">
+    <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИИ</span></div></div>
+    <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+    <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <div class="sidebar">
+    <div class="sidebar__search"><input type="text" class="search-input" placeholder="🔍 Поиск чатов..."></div>
+    <div class="list">
+      <div class="list__item list__item--active">
+        <div class="avatar avatar--md avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>МА</span></div></div>
+        <div class="list__item-body"><div class="list__item-title">Мария Андреева</div><div class="list__item-subtitle">привет!</div></div>
+        <div class="list__item-meta"><span class="list__item-time">14:32</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content"><div class="page-container page-container--narrow">
+    
+    <!-- Header -->
+    <div class="flex items-center gap-3 mb-6">
+      <div class="avatar avatar--lg" style="background:linear-gradient(135deg,#e8a317,#c97d00);"><div class="avatar__inner"><span>📢</span></div></div>
+      <div>
+        <h1 class="page-title mb-1">Создать канал</h1>
+        <p class="text-sm text-secondary">Канал — рассылка сообщений для неограниченного числа подписчиков</p>
+      </div>
+    </div>
+
+    <!-- Step 1: Basic info -->
+    <div class="card mb-4">
+      <h3 class="card__title mb-4">📋 Основное</h3>
+      <div class="form-group">
+        <label class="form-label">Название канала *</label>
+        <input type="text" class="form-input" id="channel-name" placeholder="Например: Новости Balloo" maxlength="70">
+        <div class="form-hint"><span id="name-count">0</span>/70 символов</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Аватар</label>
+        <div class="flex items-center gap-3">
+          <div class="avatar avatar--xl" style="background:var(--bg-tertiary);cursor:pointer;border:2px dashed var(--border-color);" onclick="showToast('Выберите изображение','info')">
+            <div class="avatar__inner"><span style="font-size:36px;color:var(--text-muted);">📷</span></div>
+          </div>
+          <div>
+            <button class="btn btn--secondary btn--sm mb-2">📷 Загрузить фото</button>
+            <div class="text-xs text-muted">JPG, PNG до 5 МБ</div>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Описание</label>
+        <textarea class="form-textarea" id="channel-desc" placeholder="О чём этот канал..." maxlength="500" style="min-height:80px;"></textarea>
+        <div class="form-hint"><span id="desc-count">0</span>/500 символов</div>
+      </div>
+    </div>
+
+    <!-- Step 2: Channel type -->
+    <div class="card mb-4">
+      <h3 class="card__title mb-4">🔖 Тип канала</h3>
+      <div class="form-group">
+        <label class="form-label">Тип видимости</label>
+        <div class="flex gap-3" style="flex-wrap:wrap;">
+          <label class="form-checkbox" style="padding:12px 16px;background:var(--bg-tertiary);border:2px solid var(--accent);border-radius:0;cursor:pointer;">
+            <input type="radio" name="channel-type" value="public" checked onchange="toggleChannelLink(true)">
+            <span>🌍 Публичный</span>
+          </label>
+          <label class="form-checkbox" style="padding:12px 16px;background:var(--bg-tertiary);border:2px solid var(--border-color);border-radius:0;cursor:pointer;" onclick="toggleChannelLink(false)">
+            <input type="radio" name="channel-type" value="private" onchange="toggleChannelLink(false)">
+            <span>🔒 Приватный</span>
+          </label>
+        </div>
+      </div>
+      <div class="form-group" id="channel-link-group">
+        <label class="form-label">Ссылка-приглашение</label>
+        <div class="flex gap-2">
+          <input type="text" class="form-input flex-1" id="channel-link" value="https://balloo.su/join/newsballoo" readonly>
+          <button class="btn btn--tertiary btn--sm">Копировать</button>
+        </div>
+        <div class="form-hint">Публичные каналы можно найти через поиск по ссылке</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Категория</label>
+        <select class="form-select">
+          <option>Новости</option>
+          <option>Технологии</option>
+          <option>Наука</option>
+          <option>Бизнес</option>
+          <option>Развлечения</option>
+          <option>Образование</option>
+          <option>Спорт</option>
+          <option>Другое</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Step 3: Subscriber settings -->
+    <div class="card mb-4">
+      <h3 class="card__title mb-4">👥 Подписчики</h3>
+      <div class="form-group">
+        <label class="form-label">Кто может писать в канал</label>
+        <select class="form-select">
+          <option>Только администратор</option>
+          <option>Администратор и модераторы</option>
+          <option>Все подписчики (обсуждаемый канал)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Редактирование постов</label>
+        <select class="form-select">
+          <option>Редактировать 24 часа</option>
+          <option>Редактировать навсегда</option>
+          <option>Без редактирования</option>
+        </select>
+      </div>
+      <div class="list__item" style="border:none;"><span class="flex-1">Разрешить пересылку из канала</span><label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label></div>
+      <div class="list__item" style="border:none;"><span class="flex-1">Скрыть счётчик подписчиков</span><label class="switch"><input type="checkbox"><span class="switch__slider"></span></label></div>
+      <div class="list__item" style="border:none;"><span class="flex-1">Требовать одобрение при вступлении</span><label class="switch"><input type="checkbox"><span class="switch__slider"></span></label></div>
+    </div>
+
+    <!-- Step 4: Discussion (if all subscribers can write) -->
+    <div class="card mb-4" id="discussion-settings" style="display:none;">
+      <h3 class="card__title mb-4">💬 Обсуждение</h3>
+      <p class="text-sm text-secondary mb-3">При включённом обсуждении каждый пост получает группу-чат для комментариев</p>
+      <div class="list__item" style="border:none;"><span class="flex-1">Включить обсуждение</span><label class="switch"><input type="checkbox" onchange="document.getElementById('discussion-group').style.display=this.checked?'block':'none'"><span class="switch__slider"></span></label></div>
+      <div id="discussion-group" style="display:none;">
+        <div class="form-group"><label class="form-label">Группа обсуждения</label>
+          <select class="form-select">
+            <option>Создать новую группу</option>
+            <option>Выбрать существующую</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 5: Admins -->
+    <div class="card mb-4">
+      <h3 class="card__title mb-4">🛡️ Администраторы</h3>
+      <div class="text-sm text-secondary mb-3">У администраторов есть дополнительные права: удаление постов, управление подписчиками, редактирование настроек</div>
+      <div class="flex gap-2 mb-3">
+        <input type="text" class="form-input flex-1" placeholder="🔍 Добавить администратора...">
+        <button class="btn btn--primary btn--sm">➕</button>
+      </div>
+      <!-- Current admin -->
+      <div class="list__item" style="border:none;">
+        <div class="flex items-center gap-3">
+          <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИИ</span></div></div>
+          <div class="flex-1">
+            <div class="text-sm font-bold">Иван Иванов</div>
+            <div class="text-xs text-muted">Создатель · Все права</div>
+          </div>
+          <span class="chip chip--danger">Создатель</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 6: Bot commands -->
+    <div class="card mb-4">
+      <h3 class="card__title mb-4">🤖 Бот-команды</h3>
+      <p class="text-sm text-secondary mb-3">Добавьте бота для автоматической публикации</p>
+      <div class="flex gap-2">
+        <input type="text" class="form-input flex-1" placeholder="@botname /publish">
+        <button class="btn btn--secondary btn--sm">➕ Добавить</button>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex gap-3 mt-4">
+      <button class="btn btn--primary btn--block flex-1" onclick="createChannel()">📢 Создать канал</button>
+      <button class="btn btn--tertiary" onclick="window.history.back()">Отмена</button>
+    </div>
+
+  </div></div>
+</div>
+
+<script src="../assets/common.js"></script>
+<script>
+// Character counters
+document.getElementById('channel-name').addEventListener('input', function() {
+  document.getElementById('name-count').textContent = this.value.length;
+  // Auto-generate link from name
+  const slug = this.value.toLowerCase().replace(/\s+/g, 'news').replace(/[^a-z0-9]/g, '');
+  if (slug) document.getElementById('channel-link').value = `https://balloo.su/join/${slug || 'channel'}`;
+});
+
+document.getElementById('channel-desc').addEventListener('input', function() {
+  document.getElementById('desc-count').textContent = this.value.length;
+});
+
+function toggleChannelLink(show) {
+  document.getElementById('channel-link-group').style.display = show ? 'block' : 'none';
+}
+
+function createChannel() {
+  const name = document.getElementById('channel-name').value.trim();
+  if (!name) { alert('Введите название канала'); return; }
+  showToast('Канал «' + name + '» создан!', 'success');
+  setTimeout(() => window.location.href = 'chats.html', 1500);
+}
+</script>
+</body>
+</html>

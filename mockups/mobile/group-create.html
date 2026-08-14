@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobile — Создание группы</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    html { overflow-y: auto; height: auto; }
+    body { overflow-y: auto; height: auto; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 40px 24px; }
+    .phone-frame { width:360px; height:760px; background:var(--bg-secondary); border:3px solid var(--border-strong); border-radius:36px; overflow:hidden; position:relative; display:flex; flex-direction:column; box-shadow:var(--shadow-glass); }
+    .phone-frame__notch { position:absolute; top:0; left:50%; transform:translateX(-50%); width:130px; height:26px; background:var(--bg-primary); border-bottom-left-radius:18px; border-bottom-right-radius:18px; z-index:10; }
+    .phone-frame__statusbar { height:30px; padding:4px 20px 0; display:flex; align-items:center; justify-content:space-between; font-size:12px; color:var(--text-secondary); background:var(--bg-secondary); }
+    .phone-frame__screen { flex:1; overflow:hidden; background:var(--bg-primary); display:flex; flex-direction:column; }
+    .phone-frame__home-bar { height:5px; width:120px; margin:0 auto 8px; background:var(--text-muted); border-radius:3px; }
+    .phone-tabbar { display:flex; height:52px; background:var(--bg-secondary); border-top:1px solid var(--border-color); }
+    .phone-tabbar__item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; font-size:10px; color:var(--text-secondary); cursor:pointer; transition:color 0.15s; }
+    .phone-tabbar__item--active { color:var(--accent); }
+    .phone-tabbar__icon { font-size:20px; line-height:1; }
+    .phone-scroll { flex:1; overflow-y:auto; }
+    .avatar-gradient { background:linear-gradient(135deg, #2db84d, #1565c0, #7c3aed); display:flex; align-items:center; justify-content:center; font-size:36px; color:#fff; font-weight:800; }
+    .regen-btn { font-size:14px; padding:4px 8px; }
+    .cover-preview { width:100%; height:100px; overflow:hidden; margin-bottom:10px; background:linear-gradient(135deg,#2d6a4f,#40916c); display:flex; align-items:center; justify-content:center; }
+    .corp-note { background:rgba(59,158,255,0.08); border-color:var(--info); padding:10px; font-size:12px; line-height:1.5; }
+  </style>
+</head>
+<body>
+<div class="phone-frame">
+  <div class="phone-frame__notch"></div>
+  <div class="phone-frame__statusbar"><span>9:41</span><span>📶 🔋</span></div>
+  <div class="phone-frame__screen">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar__logo">
+        <div class="topbar__logo-icon">B</div><span>Balloo</span>
+        <div class="topbar__dropdown">
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/chats.html'">💬 Balloo</div>
+          <div class="topbar__dropdown-divider"></div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div>
+          <div class="topbar__dropdown-divider"></div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/contacts.html'">👤 Контакты</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/search.html'">🔍 Поиск</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/archive.html'">📦 Архив</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/calls.html'">📞 Звонки</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/invites.html'">📨 Приглашения</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/bots.html'">🤖 О ботах</div>
+          <div class="topbar__dropdown-item" onclick="window.location.href='../balloo-su/about-balloo.html'">ℹ️ О Balloo</div>
+        </div>
+      </div>
+      <div class="topbar__title">Создание группы</div>
+      <div class="topbar__right">
+        <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact" onclick="window.location.href='profile.html'"><div class="avatar__inner"><span>ИИ</span></div></div>
+        <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+        <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="phone-scroll">
+      <div style="padding:12px;">
+
+        <h1 style="font-size:20px;font-weight:800;color:var(--text-primary);margin-bottom:12px;">Создать группу</h1>
+
+        <!-- Cover -->
+        <div class="card mb-3">
+          <h3 class="card__title mb-2" style="font-size:14px;">Обложка (необязательно)</h3>
+          <div class="cover-preview" id="cover-preview">
+            <span style="color:rgba(255,255,255,0.7);font-size:12px;">📷 Нажмите для загрузки обложки</span>
+          </div>
+          <button class="btn btn--tertiary btn--sm" onclick="document.getElementById('cover-upload').click()">Загрузить обложку</button>
+          <input type="file" id="cover-upload" style="display:none;" accept="image/*">
+        </div>
+
+        <!-- Avatar -->
+        <div class="card mb-3">
+          <h3 class="card__title mb-2" style="font-size:14px;">Аватар группы</h3>
+          <div style="display:flex;align-items:center;gap:14px;">
+            <div style="position:relative;">
+              <div class="avatar avatar--lg avatar--bordered avatar--status-online avatar--ctx-new" style="margin:0;">
+                <div class="avatar__inner avatar-gradient" id="avatar-display">🏢</div>
+              </div>
+              <div style="position:absolute;bottom:-2px;right:-2px;">
+                <button class="btn btn--sm btn--secondary regen-btn" onclick="regenerateAvatar()" title="Перегенерировать">🔄</button>
+              </div>
+            </div>
+            <div>
+              <div class="text-xs text-secondary mb-2">Авто: случайный градиент + символ</div>
+              <div style="display:flex;gap:4px;">
+                <button class="btn btn--secondary btn--sm regen-btn" onclick="regenerateAvatar()">🔄 Ещё</button>
+                <button class="btn btn--tertiary btn--sm" onclick="document.getElementById('avatar-upload').click()">📷 Своя</button>
+                <input type="file" id="avatar-upload" style="display:none;" accept="image/*">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Basic info -->
+        <div class="card mb-3">
+          <div class="form-group"><label class="form-label">Название группы *</label><input type="text" class="form-input" placeholder="Моя группа" style="font-size:13px;"></div>
+          <div class="form-group"><label class="form-label">Описание</label><textarea class="form-textarea" placeholder="О чём эта группа?" style="font-size:13px;"></textarea></div>
+        </div>
+
+        <!-- Group type DROPDOWN (not radio) -->
+        <div class="card mb-3">
+          <h3 class="card__title mb-2" style="font-size:14px;">Тип группы *</h3>
+          <div class="form-group">
+            <select class="form-select" id="group-type-select" onchange="onGroupTypeChange()" style="font-size:13px;">
+              <option value="">— Выберите тип —</option>
+              <option value="ordinary">👥 Обычная — закрытая группа</option>
+              <option value="public">📢 Публичная — открытая, подписка</option>
+              <option value="media">📰 СМИ — канал с комментариями</option>
+              <option value="corporate">🏢 Корпоративная — чат + витрина</option>
+            </select>
+            <div class="form-hint mt-2 text-xs" id="group-type-hint">С v2 преднастроенные типы корпоративных групп</div>
+          </div>
+
+          <!-- Corporate note -->
+          <div class="corp-note" id="corp-note" style="display:none;">
+            <div style="font-weight:700;color:var(--info);margin-bottom:4px;">📌 Корпоративная группа</div>
+            <div>С <strong>v2</strong> преднастроенные типы. Все функции <strong>бесплатны</strong>. С v2 — реклама продукции.</div>
+          </div>
+
+          <!-- Type-specific options -->
+          <div id="type-specific" style="display:none;margin-top:8px;">
+            <div class="card" style="background:var(--bg-tertiary);border-color:var(--border-color);padding:8px;">
+              <div id="type-specific-content" class="text-xs"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Settings (no link expiration) -->
+        <div class="card mb-3">
+          <h3 class="card__title mb-2" style="font-size:14px;">Настройки приватности</h3>
+          <div class="list__item" style="border:none;padding:8px 0;"><span class="flex-1" style="font-size:13px;">Ознакомление с правилами</span><label class="switch"><input type="checkbox"><span class="switch__slider"></span></label></div>
+          <div class="list__item" style="border:none;padding:8px 0;"><span class="flex-1" style="font-size:13px;">История для новых</span><select class="form-select" style="width:auto;font-size:12px;"><option>Вся</option><option>Последние 100</option><option>С момента</option></select></div>
+          <div class="list__item" style="border:none;padding:8px 0;"><span class="flex-1" style="font-size:13px;">Разрешить вложения</span><label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label></div>
+          <div class="text-xs text-muted mt-2">📌 Ссылки-приглашения: <a href="../balloo-su/settings.html" style="color:var(--accent);">Настройки → Приглашения</a></div>
+        </div>
+
+        <button class="btn btn--secondary btn--block btn--sm mb-2" onclick="window.location.href='../balloo-su/invites.html'">📨 Пригласить участников</button>
+        <button class="btn btn--primary btn--block btn--lg" onclick="window.location.href='chat.html'">Создать группу</button>
+      </div>
+    </div>
+
+    <!-- TABBAR -->
+    <div class="phone-tabbar">
+      <div class="phone-tabbar__item phone-tabbar__item--active" onclick="window.location.href='chat.html'"><span class="phone-tabbar__icon">💬</span>Чаты</div>
+      <div class="phone-tabbar__item" onclick="window.location.href='contacts.html'"><span class="phone-tabbar__icon">👥</span>Контакты</div>
+      <div class="phone-tabbar__item" onclick="window.location.href='stories.html'"><span class="phone-tabbar__icon">📷</span>Сторис</div>
+      <div class="phone-tabbar__item" onclick="window.location.href='calls-history.html'"><span class="phone-tabbar__icon">📞</span>Звонки</div>
+      <div class="phone-tabbar__item" onclick="window.location.href='settings.html'"><span class="phone-tabbar__icon">⚙</span>Настройки</div>
+    </div>
+
+  </div>
+  <div class="phone-frame__home-bar"></div>
+</div>
+
+<script src="../assets/common.js"></script>
+<script>
+const gradients = [
+  ['#2db84d','#1565c0','#7c3aed'],
+  ['#e76f51','#f4a261','#e9c46a'],
+  ['#264653','#2a9d8f','#a8dadc'],
+  ['#6a040f','#9d0208','#d00000'],
+  ['#003049','#d62828','#f77f00'],
+  ['#3d405b','#81b29a','#f2cc8f'],
+  ['#1d3557','#457b9d','#a8dadc'],
+  ['#2b2d42','#8d99ae','#edf2f4'],
+  ['#001219','#38b000','#70e000'],
+  ['#4a0e4e','#812481','#b239b2']
+];
+const symbols = ['🏢','🌐','💡','📰','🎯','⚡','🔥','🌟','🚀','🎨','📦','💎','🏆','🎪','🌈','🎭','🔮','🧩','🎲','🎸'];
+
+function regenerateAvatar() {
+  const grad = gradients[Math.floor(Math.random() * gradients.length)];
+  const sym = symbols[Math.floor(Math.random() * symbols.length)];
+  const display = document.getElementById('avatar-display');
+  display.style.background = `linear-gradient(135deg, ${grad[0]}, ${grad[1]}, ${grad[2]})`;
+  display.textContent = sym;
+}
+
+function onGroupTypeChange() {
+  const val = document.getElementById('group-type-select').value;
+  const corpNote = document.getElementById('corp-note');
+  const typeSpecific = document.getElementById('type-specific');
+  const typeContent = document.getElementById('type-specific-content');
+  
+  if (val === 'corporate') {
+    corpNote.style.display = 'block';
+    typeSpecific.style.display = 'block';
+    typeContent.innerHTML = `
+      <div class="text-secondary mb-2">Для корпоративных групп:</div>
+      <div class="list__item" style="border:none;padding:4px 0;"><span class="flex-1">🏪 Витрина товаров/услуг</span></div>
+      <div class="list__item" style="border:none;padding:4px 0;"><span class="flex-1">📅 Расписание офисов</span></div>
+      <div class="list__item" style="border:none;padding:4px 0;"><span class="flex-1">👥 Чат клиентов</span></div>
+      <div class="list__item" style="border:none;padding:4px 0;"><span class="flex-1">👔 Чат сотрудников</span></div>
+      <div class="list__item" style="border:none;padding:4px 0;"><span class="flex-1">📢 Реклама (v2)</span></div>
+    `;
+  } else if (val === 'ordinary') {
+    corpNote.style.display = 'none';
+    typeSpecific.style.display = 'block';
+    typeContent.innerHTML = `<div class="text-secondary">Закрытая группа для общения. Только участники могут писать.</div>`;
+  } else if (val === 'public') {
+    corpNote.style.display = 'none';
+    typeSpecific.style.display = 'block';
+    typeContent.innerHTML = `<div class="text-secondary">Открытая группа: может писать любой. Подписка вместо вступления.</div>`;
+  } else if (val === 'media') {
+    corpNote.style.display = 'none';
+    typeSpecific.style.display = 'block';
+    typeContent.innerHTML = `<div class="text-secondary">Канал с комментариями. Нужна верификация как СМИ.</div>`;
+  } else {
+    corpNote.style.display = 'none';
+    typeSpecific.style.display = 'none';
+  }
+}
+
+// Init random avatar
+regenerateAvatar();
+</script>
+</body>
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balloo — Чеклист API-ключей</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif; background: #0a0c10; color: #f4f0e8; min-height: 100vh; padding: 2rem; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { font-size: 2rem; margin-bottom: 0.5rem; background: linear-gradient(135deg, #2db84d, #1e9e3e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .subtitle { color: #888; margin-bottom: 2rem; font-size: 0.95rem; }
+        .progress-section { background: #141720; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; }
+        .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .progress-header h2 { font-size: 1.1rem; color: #ccc; }
+        .progress-count { font-size: 1.5rem; font-weight: 700; color: #2db84d; }
+        .progress-bar-bg { width: 100%; height: 12px; background: #1e2230; border-radius: 6px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #2db84d, #1e9e3e); border-radius: 6px; transition: width 0.5s ease; }
+        .progress-stats { display: flex; gap: 2rem; margin-top: 1rem; font-size: 0.85rem; color: #888; }
+        .progress-stats span { color: #2db84d; font-weight: 600; }
+        .service-group { background: #141720; border-radius: 12px; margin-bottom: 1rem; overflow: hidden; }
+        .service-group-header { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 1.5rem; cursor: pointer; user-select: none; transition: background 0.2s; }
+        .service-group-header:hover { background: #1a1e2a; }
+        .service-group-header h3 { font-size: 1.05rem; display: flex; align-items: center; gap: 0.75rem; }
+        .service-group-header .badge { font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 4px; font-weight: 600; }
+        .badge-selfhost { background: #1a3a2a; color: #2db84d; }
+        .badge-saas { background: #1a2a3a; color: #4d9eff; }
+        .badge-generate { background: #3a2a1a; color: #e8a84d; }
+        .service-group-body { padding: 0 1.5rem; display: none; }
+        .service-group.open .service-group-body { display: block; }
+        .service-group.open .chevron { transform: rotate(180deg); }
+        .chevron { transition: transform 0.3s; font-size: 1.2rem; color: #666; }
+        .key-row { display: flex; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid #1e2230; gap: 1rem; }
+        .key-row:last-child { border-bottom: none; }
+        .key-row input[type="checkbox"] { width: 20px; height: 20px; accent-color: #2db84d; cursor: pointer; flex-shrink: 0; }
+        .key-info { flex: 1; min-width: 0; }
+        .key-name { font-size: 0.9rem; font-weight: 600; color: #e0e0e0; }
+        .key-desc { font-size: 0.8rem; color: #666; margin-top: 0.15rem; }
+        .key-value { padding: 0.4rem 0.8rem; background: #0a0c10; border: 1px solid #2a2e3a; border-radius: 6px; color: #ccc; font-size: 0.8rem; font-family: 'JetBrains Mono', 'Fira Code', monospace; width: 220px; text-align: center; transition: border-color 0.2s; }
+        .key-value.filled { border-color: #2db84d; color: #2db84d; }
+        .key-value.empty { border-color: #3a3e4a; color: #666; }
+        .actions { display: flex; gap: 1rem; margin-top: 2rem; flex-wrap: wrap; }
+        .btn { padding: 0.8rem 1.5rem; border: none; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 0.5rem; }
+        .btn-primary { background: #2db84d; color: #fff; }
+        .btn-primary:hover { background: #1e9e3e; transform: translateY(-1px); }
+        .btn-secondary { background: #1e2230; color: #ccc; border: 1px solid #2a2e3a; }
+        .btn-secondary:hover { background: #2a2e3a; }
+        .btn-danger { background: #3a1a1a; color: #e84d4d; border: 1px solid #4a2a2a; }
+        .btn-danger:hover { background: #4a2a2a; }
+        .env-preview { background: #0a0c10; border: 1px solid #2a2e3a; border-radius: 12px; padding: 1.5rem; margin-top: 2rem; display: none; }
+        .env-preview.show { display: block; }
+        .env-preview h3 { margin-bottom: 1rem; color: #2db84d; }
+        .env-code { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.8rem; color: #ccc; white-space: pre-wrap; line-height: 1.6; max-height: 400px; overflow-y: auto; padding: 1rem; background: #0a0c10; border-radius: 8px; }
+        .env-code .comment { color: #555; }
+        .env-code .key { color: #4d9eff; }
+        .env-code .value { color: #2db84d; }
+        .env-code .value-empty { color: #666; }
+        .toast { position: fixed; bottom: 2rem; right: 2rem; background: #2db84d; color: #fff; padding: 1rem 1.5rem; border-radius: 8px; font-weight: 600; opacity: 0; transform: translateY(20px); transition: all 0.3s; z-index: 1000; }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        @media (max-width: 768px) { body { padding: 1rem; } h1 { font-size: 1.5rem; } .key-row { flex-wrap: wrap; } .key-value { width: 100%; } .actions { flex-direction: column; } .btn { width: 100%; justify-content: center; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗝️ Чеклист API-ключей Balloo</h1>
+        <p class="subtitle">Отмечайте полученные ключи и экспортируйте .env файл</p>
+        <div class="progress-section">
+            <div class="progress-header"><h2>Прогресс заполнения</h2><div class="progress-count"><span id="filledCount">0</span> / <span id="totalCount">0</span></div></div>
+            <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressBar" style="width: 0%"></div></div>
+            <div class="progress-stats"><div>Заполнено: <span id="filledPct">0%</span></div><div>Осталось: <span id="remaining">0</span></div></div>
+        </div>
+        <div id="serviceGroups"></div>
+        <div class="actions">
+            <button class="btn btn-primary" onclick="exportEnv()">📋 Экспорт в .env</button>
+            <button class="btn btn-secondary" onclick="copyEnv()">📄 Копировать .env</button>
+            <button class="btn btn-secondary" onclick="printPage()">🖨️ Печать в PDF</button>
+            <button class="btn btn-danger" onclick="resetAll()">🗑️ Сбросить всё</button>
+        </div>
+        <div class="env-preview" id="envPreview"><h3>📄 Содержимое .env</h3><div class="env-code" id="envCode"></div></div>
+    </div>
+    <div class="toast" id="toast"></div>
+    <script>
+    const services = [
+        { name: 'PostgreSQL', type: 'selfhost', desc: 'База данных (локально)', link: 'https://www.postgresql.org/', keys: [
+            { name: 'DATABASE_URL', desc: 'Connection string', default: 'postgresql://balloo:PASSWORD@localhost:5432/balloo?schema=public', section: 'БД' },
+            { name: 'POSTGRES_HOST', desc: 'Хост БД', default: 'localhost', section: 'БД' },
+            { name: 'POSTGRES_PORT', desc: 'Порт БД', default: '5432', section: 'БД' },
+            { name: 'POSTGRES_USER', desc: 'Имя пользователя', default: 'balloo', section: 'БД' },
+            { name: 'POSTGRES_PASSWORD', desc: 'Пароль пользователя', default: 'PASSWORD', section: 'БД' },
+            { name: 'POSTGRES_DB', desc: 'Имя базы данных', default: 'balloo', section: 'БД' }
+        ]},
+        { name: 'Redis', type: 'selfhost', desc: 'Кэш и сессии (локально)', link: 'https://redis.io/', keys: [
+            { name: 'REDIS_URL', desc: 'Connection string', default: 'redis://localhost:6379', section: 'Redis' },
+            { name: 'REDIS_HOST', desc: 'Хост Redis', default: 'localhost', section: 'Redis' },
+            { name: 'REDIS_PORT', desc: 'Порт Redis', default: '6379', section: 'Redis' },
+            { name: 'REDIS_PASSWORD', desc: 'Пароль (опционально)', default: '', section: 'Redis' }
+        ]},
+        { name: 'MinIO', type: 'selfhost', desc: 'Хранилище файлов (S3-совместимое)', link: 'https://min.io/', keys: [
+            { name: 'MINIO_ENDPOINT', desc: 'Хост MinIO', default: 'localhost', section: 'CDN' },
+            { name: 'MINIO_PORT', desc: 'Порт MinIO', default: '9000', section: 'CDN' },
+            { name: 'MINIO_USE_SSL', desc: 'Использовать SSL', default: 'false', section: 'CDN' },
+            { name: 'MINIO_ACCESS_KEY', desc: 'Access key', default: 'minioadmin', section: 'CDN' },
+            { name: 'MINIO_SECRET_KEY', desc: 'Secret key', default: 'minioadmin', section: 'CDN' },
+            { name: 'MINIO_BUCKET', desc: 'Имя bucket', default: 'balloo-media', section: 'CDN' }
+        ]},
+        { name: 'Postfix (SMTP)', type: 'selfhost', desc: 'Email (self-hosted)', link: 'https://wiki.postfix.org/', keys: [
+            { name: 'SMTP_HOST', desc: 'Хост SMTP', default: 'localhost', section: 'Email' },
+            { name: 'SMTP_PORT', desc: 'Порт SMTP', default: '25', section: 'Email' },
+            { name: 'SMTP_USER', desc: 'Пользователь SMTP', default: '', section: 'Email' },
+            { name: 'SMTP_PASSWORD', desc: 'Пароль SMTP', default: '', section: 'Email' },
+            { name: 'SMTP_FROM', desc: 'Адрес отправителя', default: 'noreply@balloo.su', section: 'Email' }
+        ]},
+        { name: 'Yandex ID', type: 'saas', desc: 'OAuth авторизация', link: 'https://developer.tech.yandex.ru/', keys: [
+            { name: 'YANDEX_CLIENT_ID', desc: 'Client ID из Yandex Developer Console', default: '', section: 'OAuth' },
+            { name: 'YANDEX_CLIENT_SECRET', desc: 'Client Secret из Yandex Developer Console', default: '', section: 'OAuth' }
+        ]},
+        { name: 'VK ID', type: 'saas', desc: 'OAuth авторизация', link: 'https://vk.com/apps?act=manage', keys: [
+            { name: 'VK_CLIENT_ID', desc: 'ID приложения VK', default: '', section: 'OAuth' },
+            { name: 'VK_CLIENT_SECRET', desc: 'Защищённый ключ VK', default: '', section: 'OAuth' }
+        ]},
+        { name: 'Mail.ru ID', type: 'saas', desc: 'OAuth авторизация', link: 'https://help.mail.ru/developer/oauth/docs', keys: [
+            { name: 'MAILRU_CLIENT_ID', desc: 'Client ID Mail.ru', default: '', section: 'OAuth' },
+            { name: 'MAILRU_CLIENT_SECRET', desc: 'Client Secret Mail.ru', default: '', section: 'OAuth' }
+        ]},
+        { name: 'ЮKassa', type: 'saas', desc: 'Платёжная система', link: 'https://yookassa.ru', keys: [
+            { name: 'YOOKASSA_SHOP_ID', desc: 'ID магазина ЮKassa', default: '', section: 'Платежи' },
+            { name: 'YOOKASSA_API_KEY', desc: 'Ключ авторизации ЮKassa', default: '', section: 'Платежи' }
+        ]},
+        { name: 'Yandex Object Storage', type: 'saas', desc: 'S3 Cloud CDN (опционально)', link: 'https://cloud.yandex.ru/services/object-storage', keys: [
+            { name: 'CDN_YANDEX_ACCESS_KEY', desc: 'Access key сервисного аккаунта', default: '', section: 'CDN' },
+            { name: 'CDN_YANDEX_SECRET_KEY', desc: 'Secret key сервисного аккаунта', default: '', section: 'CDN' },
+            { name: 'CDN_YANDEX_BUCKET', desc: 'Имя bucket', default: '', section: 'CDN' },
+            { name: 'CDN_YANDEX_REGION', desc: 'Регион (например, ru-1)', default: '', section: 'CDN' }
+        ]},
+        { name: 'Яндекс.Метрика', type: 'saas', desc: 'Аналитика', link: 'https://metrika.yandex.ru/', keys: [
+            { name: 'METRIKA_COUNTER_ID', desc: 'Номер счётчика', default: '', section: 'Аналитика' }
+        ]},
+        { name: 'JWT Secrets', type: 'generate', desc: 'Генерируются автоматически (openssl)', link: null, keys: [
+            { name: 'JWT_ACCESS_SECRET', desc: 'Секрет для access токенов (min 32 символа)', default: '', section: 'Безопасность' },
+            { name: 'JWT_REFRESH_SECRET', desc: 'Секрет для refresh токенов (min 32 символа)', default: '', section: 'Безопасность' }
+        ]}
+    ];
+    let state = {};
+    try { const s = localStorage.getItem('balloo_apikeys_state'); if (s) state = JSON.parse(s); } catch(e) {}
+    function save() { localStorage.setItem('balloo_apikeys_state', JSON.stringify(state)); }
+    function escapeHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+    function render() {
+        const c = document.getElementById('serviceGroups'); let h = '';
+        services.forEach((svc, si) => {
+            const tl = svc.type === 'selfhost' ? 'Self-hosted' : svc.type === 'saas' ? 'SaaS' : 'Self-gen';
+            const tc = svc.type === 'selfhost' ? 'badge-selfhost' : svc.type === 'saas' ? 'badge-saas' : 'badge-generate';
+            h += `<div class="service-group open" data-service="${si}"><div class="service-group-header" onclick="toggle(${si})"><h3>${svc.name} <span class="badge ${tc}">${tl}</span></h3><div style="display:flex;align-items:center;gap:0.75rem;">${svc.link ? '<a href="'+svc.link+'" target="_blank" style="color:#4d9eff;text-decoration:none;font-size:0.85rem;">🔗 Регистрация</a>' : ''} <span class="chevron">▼</span></div></div><div class="service-group-body"><p style="color:#888;font-size:0.85rem;margin-bottom:1rem;">${svc.desc}</p>`;
+            svc.keys.forEach((key, ki) => {
+                const id = si+'-'+ki; const ch = state[id]?.checked || false; const val = state[id]?.value || key.default || ''; const filled = val.trim() !== '' && val !== key.default;
+                h += `<div class="key-row"><input type="checkbox" ${ch?'checked':''} onchange="tog(${si},${ki},this.checked)"><div class="key-info"><div class="key-name">${key.name}</div><div class="key-desc">${key.desc}</div></div><input type="text" class="key-value ${filled?'filled':'empty'}" value="${escapeHtml(val)}" onchange="upd(${si},${ki},this.value)" placeholder="${escapeHtml(key.default||'')}" style="cursor:pointer;"></div>`;
+            });
+            h += '</div></div>';
+        });
+        c.innerHTML = h; updProg();
+    }
+    function toggle(i) { document.querySelector('.service-group[data-service="'+i+'"]').classList.toggle('open'); }
+    function tog(si, ki, v) { const id=si+'-'+ki; if(!state[id])state[id]={checked:false,value:''}; state[id].checked=v; save(); updProg(); }
+    function upd(si, ki, v) { const id=si+'-'+ki; if(!state[id])state[id]={checked:false,value:''}; state[id].value=v; state[id].checked=v.trim()!==''; save(); render(); }
+    function updProg() {
+        let t=0,f=0;
+        services.forEach((s,i)=>{s.keys.forEach((k,j)=>{t++;const v=state[i+'-'+j]?.value||k.default||'';if(v.trim()!==''&&v!==k.default)f++;});});
+        const p=t>0?Math.round((f/t)*100):0;
+        document.getElementById('filledCount').textContent=f; document.getElementById('totalCount').textContent=t;
+        document.getElementById('progressBar').style.width=p+'%'; document.getElementById('filledPct').textContent=p+'%';
+        document.getElementById('remaining').textContent=t-f;
+    }
+    function genEnv() {
+        let l=['# ============================================','# Balloo Messenger — Environment Variables','# Generated from api-keys-status.html','# ============================================',''];
+        const ak=[]; services.forEach(s=>{s.keys.forEach(k=>{const id=s.indexOf(s)+'-'+s.keys.indexOf(k); const v=state[id]?.value||k.default||'';ak.push({n:k.name,v:v,s:k.section||'Прочее'});});});
+        const so=['БД','Redis','CDN','Email','OAuth','Платежи','Аналитика','Безопасность','Прочее'];
+        so.forEach(sec=>{const items=ak.filter(k=>k.s===sec);if(items.length){l.push('');l.push('# === '+sec+' ===');items.forEach(k=>{l.push(k.n+'="'+k.v+'"');}});});
+        return l.join('\n');
+    }
+    function exportEnv() { const b=new Blob([genEnv()],{type:'text/plain'}); const u=URL.createObjectURL(b); const a=document.createElement('a'); a.href=u; a.download='.env'; a.click(); URL.revokeObjectURL(u); toast('✅ .env файл скачан'); }
+    function copyEnv() { navigator.clipboard.writeText(genEnv()).then(()=>toast('📋 .env скопирован в буфер обмена')); }
+    function printPage() { window.print(); }
+    function resetAll() { if(confirm('Вы уверены? Все данные будут удалены.')) { state={}; save(); render(); toast('🗑️ Данные сброшены'); } }
+    function toast(m) { const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
+    render();
+    </script>
+</body>
+</html>

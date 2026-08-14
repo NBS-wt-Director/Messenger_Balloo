@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Command — Календарь</title>
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo"><div class="topbar__logo-icon" style="background:var(--info);">C</div><span>Command</span>
+    <div class="topbar__dropdown"><div class="topbar__dropdown-item">🏢 Command (текущий)</div><div class="topbar__dropdown-divider"></div><div class="topbar__dropdown-item">💬 Balloo</div><div class="topbar__dropdown-item">🛡️ Admin</div><div class="topbar__dropdown-item">💡 Features</div><div class="topbar__dropdown-item">📜 History</div><div class="topbar__dropdown-item">⬇️ Download</div><div class="topbar__dropdown-item">📚 API Docs</div></div>
+  </div>
+  <div class="topbar__title">Календарь</div>
+  <div class="topbar__actions">
+    <button class="btn btn--secondary btn--sm">‹</button>
+    <span class="font-semibold" style="color:var(--text-primary);">Июль 2026</span>
+    <button class="btn btn--secondary btn--sm">›</button>
+  </div>
+  <div class="topbar__right"><div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИИ</span></div></div><span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span><span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span></div>
+</div>
+<div class="main">
+  <div class="sidebar sidebar--narrow">
+    <div class="list">
+      <div class="list__item">📊 Дашборд</div>
+      <div class="list__item" onclick="window.location.href='employee-profile.html'">👤 Профиль</div>
+      <div class="list__item">📝 Задачи</div>
+      <div class="list__item list__item--active">📅 Календарь</div>
+      <div class="list__item">💬 Внутренний чат</div>
+      <div class="list__item">📞 Совещания</div>
+      <div class="list__item">🏢 Мой отдел</div>
+      <div class="list__item">📚 База знаний</div>
+    </div>
+  </div>
+  <div class="content overflow-y-auto"><div class="page-container">
+    <div class="flex justify-between items-center mb-4">
+      <h1 class="page-title" style="margin:0;">📅 Календарь</h1>
+      <div class="flex gap-2">
+        <div class="tabs" style="border:none;">
+          <div class="tab tab--active">Месяц</div>
+          <div class="tab">Неделя</div>
+        </div>
+        <button class="btn btn--primary btn--sm" onclick="openModal('modal-new-event')">+ Событие</button>
+      </div>
+    </div>
+
+    <!-- Calendar grid -->
+    <div class="card mb-6">
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:11px;color:var(--text-muted);padding:8px 0;border-bottom:1px solid var(--border-color);">
+        <div>ПН</div><div>ВТ</div><div>СР</div><div>ЧТ</div><div>ПТ</div><div>СБ</div><div>ВС</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--border-color);">
+        <!-- Week 1 -->
+        <div style="background:var(--bg-secondary);min-height:90px;padding:6px;color:var(--text-muted);">29</div>
+        <div style="background:var(--bg-secondary);min-height:90px;padding:6px;color:var(--text-muted);">30</div>
+        <div style="background:var(--bg-secondary);min-height:90px;padding:6px;">1</div>
+        <div style="background:var(--bg-secondary);min-height:90px;padding:6px;">2</div>
+        <div style="background:var(--bg-secondary);min-height:90px;padding:6px;">3<div class="chip chip--accent" style="font-size:9px;margin-top:4px;">Демо</div></div>
+        <div style="background:var(--bg-secondary);min-height:90px;padding:6px;color:var(--text-muted);">4</div>
+        <div style="background:var(--bg-secondary);min-height:90px;padding:6px;color:var(--text-muted);">5<div class="chip" style="font-size:9px;margin-top:4px;background:rgba(76,175,80,0.15);color:#4CAF50;border-color:#4CAF50;">🏖 Отпуск</div></div>
+        <!-- Week 2 -->
+        <div style="background:var(--bg-secondary);min-height:90px;padding:6px;">6</div>
+        <div style="background:var(--bg-secondary);min-height:90px;padding:6px;">7<div class="chip chip--info" style="font-size:9px;margin-top:4px;">Стендап</div></div>
+        <div style="background:var(--bg-secondary);min-height:90px;padding:6px;">8</div>
+        <div style="background:var(--bg-secondary);min-height:90px;padding:6px;">9</div>
+        <div style="background:var(--bg-secondary);min-height:90px;padding:6px;">10<div class="chip chip--danger" style="font-size:9px;margin-top:4px;">Дедлайн</div></div>
+        <div style="background:var(--bg-secondary);min-height:90px;padding:6px;color:var(--text-muted);">11</div>
+        <div style="background:var(--bg-secondary);min-height:90px;padding:6px;color:var(--text-muted);">12</div>
+        <!-- Week 3 -->
+        <div style="background:var(--bg-secondary);min-height:90px;padding:6px;">13</div>
+        <div style="background:var(--bg-secondary);min-height:90px;padding:6px;">14<div class="chip chip--info" style="font-size:9px;margin-top:4px;">Стендап</div></div>
+        <div style="background:var(--bg-secondary);min-height:90px;padding:6px;">15</div>
+        <div style="background:var(--bg-secondary);min-height:90px;padding:6px;">16</div>
+        <div style="background:var(--bg-secondary);min-height:90px;padding:6px;">17<div class="chip chip--accent" style="font-size:9px;margin-top:4px;">Релиз v2</div></div>
+        <div style="background:var(--bg-secondary);min-height:90px;padding:6px;color:var(--text-muted);">18</div>
+        <div style="background:var(--bg-secondary);min-height:90px;padding:6px;color:var(--text-muted);">19</div>
+        <!-- Week 4 (today = 18) -->
+        <div style="background:var(--bg-active);min-height:90px;padding:6px;border:2px solid var(--accent);">20<div class="chip chip--warning" style="font-size:9px;margin-top:4px;">1:1</div></div>
+        <div style="background:var(--bg-secondary);min-height:90px;padding:6px;">21<div class="chip chip--info" style="font-size:9px;margin-top:4px;">Стендап</div></div>
+        <div style="background:var(--bg-secondary);min-height:90px;padding:6px;">22</div>
+        <div style="background:var(--bg-secondary);min-height:90px;padding:6px;">23<div class="chip chip--accent" style="font-size:9px;margin-top:4px;">Ретро</div></div>
+        <div style="background:var(--bg-secondary);min-height:90px;padding:6px;">24</div>
+        <div style="background:var(--bg-secondary);min-height:90px;padding:6px;color:var(--text-muted);">25</div>
+        <div style="background:var(--bg-secondary);min-height:90px;padding:6px;color:var(--text-muted);">26</div>
+        <!-- Week 5 -->
+        <div style="background:var(--bg-secondary);min-height:90px;padding:6px;">27</div>
+        <div style="background:var(--bg-secondary);min-height:90px;padding:6px;">28<div class="chip chip--info" style="font-size:9px;margin-top:4px;">Стендап</div></div>
+        <div style="background:var(--bg-secondary);min-height:90px;padding:6px;">29</div>
+        <div style="background:var(--bg-secondary);min-height:90px;padding:6px;">30</div>
+        <div style="background:var(--bg-secondary);min-height:90px;padding:6px;">31<div class="chip chip--danger" style="font-size:9px;margin-top:4px;">Дедлайн</div></div>
+        <div style="background:var(--bg-secondary);min-height:90px;padding:6px;color:var(--text-muted);">1</div>
+        <div style="background:var(--bg-secondary);min-height:90px;padding:6px;color:var(--text-muted);">2</div>
+      </div>
+    </div>
+
+    <!-- Upcoming events -->
+    <h2 class="section-title">Ближайшие события</h2>
+    <div class="card">
+      <table class="table">
+        <thead><tr><th>Дата</th><th>Время</th><th>Событие</th><th>Тип</th><th>Участники</th></tr></thead>
+        <tbody>
+          <tr class="table__row"><td>20.07</td><td>11:00</td><td>1:1 с руководителем</td><td><span class="chip chip--warning">Встреча</span></td><td>ИИ, АК</td></tr>
+          <tr class="table__row"><td>21.07</td><td>10:00</td><td>Стендап команды</td><td><span class="chip chip--info">Встреча</span></td><td>Команда разработки</td></tr>
+          <tr class="table__row"><td>23.07</td><td>16:00</td><td>Ретроспектива спринта</td><td><span class="chip chip--accent">Встреча</span></td><td>Команда разработки</td></tr>
+          <tr class="table__row"><td>25.07</td><td>—</td><td>🏖 Отпуск (14 дней)</td><td><span class="chip" style="background:rgba(76,175,80,0.15);color:#4CAF50;border-color:#4CAF50;">Отпуск</span></td><td>ИИ</td></tr>
+          <tr class="table__row"><td>31.07</td><td>—</td><td>Дедлайн: релиз фичи сторис</td><td><span class="chip chip--danger">Дедлайн</span></td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div></div>
+</div>
+<script src="../assets/common.js"></script>
+
+<!-- Modal: New Event -->
+<div class="modal-overlay" id="modal-overlay"></div>
+<div class="modal modal--status-info" id="modal-new-event">
+  <div class="modal__header"><span class="modal__title">📅 Новое событие</span><div class="modal__close" onclick="closeModal('modal-new-event')">✕</div></div>
+  <div class="modal__body">
+    <div class="form-group"><label class="form-label">Название события *</label><input type="text" class="form-input" placeholder="Например: Стендап команды"></div>
+    <div class="form-group">
+      <label class="form-label">Тип события *</label>
+      <select class="form-select">
+        <option>📅 Встреча</option>
+        <option>🏖 Отпуск</option>
+        <option>⏰ Дедлайн</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Дата начала *</label>
+      <input type="date" class="form-input">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Время начала</label>
+      <input type="time" class="form-input">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Дата окончания</label>
+      <input type="date" class="form-input">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Участники</label>
+      <select class="form-select" multiple style="min-height:80px;">
+        <option>Иван Иванов</option>
+        <option>Елена Киселева</option>
+        <option>Антон Петров</option>
+        <option>Сергей Морозов</option>
+        <option>Ольга Зайцева</option>
+      </select>
+      <div class="form-hint">Удерживайте Ctrl для выбора нескольких</div>
+    </div>
+    <div class="form-group"><label class="form-label">Описание</label><textarea class="form-textarea" placeholder="Подробности события..." style="min-height:60px;"></textarea></div>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--tertiary" onclick="closeModal('modal-new-event')">Отмена</button>
+    <button class="btn btn--primary" onclick="closeModal('modal-new-event')">Создать</button>
+  </div>
+</div>
+</script>
+</body>
+</html>
