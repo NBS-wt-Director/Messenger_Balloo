@@ -4,79 +4,57 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSearchStore, type SearchTab } from '@/store/searchStore';
 import { SearchTabs, SearchResultItem, EmptyState } from '@/components/search';
+import { api } from '@/services/api';
 
-// Mock data for demo purposes
-const MOCK_RECENT = [
-  {
-    id: '1',
-    type: 'person',
-    title: 'Мария Андреева',
-    subtitle: 'Чат • 12 сообщений',
-    avatarInitials: 'МА',
-    messageCount: 12,
-  },
-  {
-    id: '2',
-    type: 'chat',
-    title: 'Команда разработки',
-    subtitle: 'Группа • 156 сообщений',
-    avatarInitials: 'РД',
-    messageCount: 156,
-  },
-  {
-    id: '3',
-    type: 'file',
-    title: 'Макеты_v2.pdf',
-    subtitle: 'Файл • 2.4 МБ • Из чата с М. Андреевой',
-    icon: '📄',
-    size: '2.4 МБ',
-    source: 'Чат с М. Андреевой',
-  },
-  {
-    id: '4',
-    type: 'media',
-    title: 'Демо_звонка.mp4',
-    subtitle: 'Видео • 15 МБ • Из группы "Команда разработки"',
-    icon: '🎬',
-    size: '15 МБ',
-    source: 'Группа "Команда разработки"',
-  },
-];
+// Типы результатов поиска
+interface SearchPerson {
+  id: string;
+  type: 'person';
+  title: string;
+  subtitle: string;
+  avatarInitials: string;
+  messageCount?: number;
+}
 
-const MOCK_PEOPLE = [
-  { id: 'p1', type: 'person', title: 'Иван Петров', subtitle: 'Разработчик • Онлайн', avatarInitials: 'ИП' },
-  { id: 'p2', type: 'person', title: 'Елена Сидорова', subtitle: 'Дизайнер • Был(а) 5 мин назад', avatarInitials: 'ЕС' },
-  { id: 'p3', type: 'person', title: 'Алексей Козлов', subtitle: 'Менеджер • Онлайн', avatarInitials: 'АК' },
-];
+interface SearchChat {
+  id: string;
+  type: 'chat';
+  title: string;
+  subtitle: string;
+  avatarInitials: string;
+  messageCount?: number;
+}
 
-const MOCK_CHATS = [
-  { id: 'c1', type: 'chat', title: 'Личные сообщения', subtitle: 'Личный чат • 45 сообщений', avatarInitials: 'ЛС', messageCount: 45 },
-  { id: 'c2', type: 'chat', title: 'Отдел дизайна', subtitle: 'Группа • 230 сообщений', avatarInitials: 'ОД', messageCount: 230 },
-];
+interface SearchFile {
+  id: string;
+  type: 'file';
+  title: string;
+  subtitle: string;
+  icon: string;
+  size?: string;
+  source?: string;
+}
 
-const MOCK_FILES = [
-  { id: 'f1', type: 'file', title: 'Отчёт_Q2.docx', subtitle: 'Документ • 1.2 МБ • 3 дня назад', icon: '📄', size: '1.2 МБ', source: 'Чат "Личные сообщения"' },
-  { id: 'f2', type: 'file', title: 'Презентация.pptx', subtitle: 'Презентация • 5.8 МБ • 1 неделю назад', icon: '📊', size: '5.8 МБ', source: 'Чат "Отдел дизайна"' },
-];
+interface SearchMedia {
+  id: string;
+  type: 'media';
+  title: string;
+  subtitle: string;
+  icon: string;
+  size?: string;
+  source?: string;
+}
 
-const MOCK_MEDIA = [
-  { id: 'm1', type: 'media', title: 'Скриншот_экрана.png', subtitle: 'Изображение • 2.1 МБ • Вчера', icon: '🖼️', size: '2.1 МБ', source: 'Чат "Личные сообщения"' },
-  { id: 'm2', type: 'media', title: 'Голосовое_сообщение.ogg', subtitle: 'Аудио • 0.5 МБ • 2 дня назад', icon: '🎙️', size: '0.5 МБ', source: 'Чат "Команда разработки"' },
-];
+interface SearchLink {
+  id: string;
+  type: 'link';
+  title: string;
+  subtitle: string;
+  icon: string;
+  source?: string;
+}
 
-const MOCK_LINKS = [
-  { id: 'l1', type: 'link', title: 'Документация Balloo API', subtitle: 'docs.balloo.su • 2 дня назад', icon: '🔗', source: 'Чат "Команда разработки"' },
-  { id: 'l2', type: 'link', title: 'Figma — Макеты v3', subtitle: 'figma.com/file/... • 5 дней назад', icon: '🔗', source: 'Чат "Отдел дизайна"' },
-];
-
-const tabDataMap: Record<string, any> = {
-  all: [...MOCK_RECENT],
-  chats: MOCK_CHATS,
-  people: MOCK_PEOPLE,
-  files: MOCK_FILES,
-  media: MOCK_MEDIA,
-  links: MOCK_LINKS,
-};
+type SearchResult = SearchPerson | SearchChat | SearchFile | SearchMedia | SearchLink;
 
 const tabEmojis: Record<string, string> = {
   all: '🔍',
@@ -101,6 +79,7 @@ function SearchScreen() {
   } = useSearchStore();
 
   const [debouncedQuery, setDebouncedQuery] = useState(query);
+  const [allResults, setAllResults] = useState<SearchResult[]>([]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -109,21 +88,48 @@ function SearchScreen() {
     return () => clearTimeout(timer);
   }, [query]);
 
-  const filteredResults = useMemo(() => {
-    let data: typeof MOCK_RECENT;
-    if (debouncedQuery.trim()) {
-      const q = debouncedQuery.toLowerCase();
-      const allData = Object.values(tabDataMap).flat();
-      data = allData.filter(
-        (item) =>
-          item.title.toLowerCase().includes(q) ||
-          item.subtitle.toLowerCase().includes(q)
-      );
-    } else {
-      data = tabDataMap[activeTab];
+  // Load search results from API
+  useEffect(() => {
+    if (!debouncedQuery.trim()) {
+      setAllResults([]);
+      return;
     }
-    return data;
-  }, [debouncedQuery, activeTab]);
+
+    setLoading(true);
+    api.searchUsers(debouncedQuery)
+      .then((users) => {
+        const people: SearchPerson[] = (users || []).map((u: any) => ({
+          id: u.id,
+          type: 'person' as const,
+          title: u.displayName || u.username,
+          subtitle: `${u.status === 'online' ? 'Онлайн' : 'Был(а) недавно'} • ${u.role || 'Пользователь'}`,
+          avatarInitials: (u.displayName || u.username || '?')
+            .split(' ')
+            .map((n: string) => n[0])
+            .join('')
+            .toUpperCase()
+            .slice(0, 2),
+        }));
+        setAllResults(people);
+        setLoading(false);
+      })
+      .catch(() => {
+        setAllResults([]);
+        setLoading(false);
+      });
+  }, [debouncedQuery]);
+
+  const filteredResults = useMemo(() => {
+    if (!debouncedQuery.trim()) {
+      return [];
+    }
+    const q = debouncedQuery.toLowerCase();
+    return allResults.filter(
+      (item) =>
+        item.title.toLowerCase().includes(q) ||
+        item.subtitle.toLowerCase().includes(q)
+    );
+  }, [debouncedQuery, allResults]);
 
   useEffect(() => {
     if (debouncedQuery.trim()) {

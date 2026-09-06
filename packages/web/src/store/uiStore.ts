@@ -1,7 +1,16 @@
 // UI Store — Zustand
 // Theme, language, sidebar state
+// Функциональные настройки (тема, язык, sidebar) хранятся в cookie
+// с доменом `.balloo.su` — читаются всеми поддоменами (см. тикет №3 deploy-ready.md)
 
 import { create } from 'zustand';
+import {
+  getCookie,
+  setCookie,
+  THEME_COOKIE,
+  LANGUAGE_COOKIE,
+  SIDEBAR_COOKIE,
+} from '../utils/cookieUtils';
 
 export type Theme = 'dark' | 'light' | 'russian';
 export type Language = 'ru' | 'en' | 'zh' | 'fr' | 'be' | 'hi' | 'tt' | 'ba' | 'ce' | 'cv' | 'av' | 'dar' | 'udm' | 'lez' | 'kbd' | 'chm' | 'os' | 'sah' | 'bua' | 'ukr';
@@ -54,18 +63,18 @@ export const SUPPORTED_LANGUAGES: { code: Language; name: string; nativeName: st
 // Default theme
 const DEFAULT_THEME: Theme = 'dark';
 
-// Load saved theme or use default
+// Load saved theme from cookie or use default
 function getInitialTheme(): Theme {
-  const saved = localStorage.getItem('balloo-theme');
+  const saved = getCookie(THEME_COOKIE);
   if (saved && ['dark', 'light', 'russian'].includes(saved)) {
     return saved as Theme;
   }
   return DEFAULT_THEME;
 }
 
-// Load saved language or use default
+// Load saved language from cookie or use default
 function getInitialLanguage(): Language {
-  const saved = localStorage.getItem('balloo-language');
+  const saved = getCookie(LANGUAGE_COOKIE);
   if (saved && SUPPORTED_LANGUAGES.some((l) => l.code === saved)) {
     return saved as Language;
   }
@@ -79,9 +88,21 @@ function getInitialLanguage(): Language {
   return 'en';
 }
 
+// Load saved sidebar state from cookie (default: open)
+function getInitialSidebarOpen(): boolean {
+  const saved = getCookie(SIDEBAR_COOKIE);
+  return saved !== 'closed';
+}
+
+// Persist sidebar state to cookie ('open' | 'closed')
+function persistSidebar(isOpen: boolean): void {
+  setCookie(SIDEBAR_COOKIE, isOpen ? 'open' : 'closed', 365);
+}
+
 export const useUIStore = create<UIState>()((set) => {
   const theme = getInitialTheme();
   const language = getInitialLanguage();
+  const sidebarOpen = getInitialSidebarOpen();
 
   // Apply theme to document
   document.documentElement.setAttribute('data-theme', theme);
@@ -90,25 +111,33 @@ export const useUIStore = create<UIState>()((set) => {
   return {
     theme,
     language,
-    isSidebarOpen: true,
+    isSidebarOpen: sidebarOpen,
     isRightPanelOpen: false,
     isSettingsOpen: false,
     isSearchOpen: false,
 
     setTheme: (theme) => {
       document.documentElement.setAttribute('data-theme', theme);
-      localStorage.setItem('balloo-theme', theme);
+      setCookie(THEME_COOKIE, theme, 365);
       set({ theme });
     },
 
     setLanguage: (language) => {
       document.documentElement.setAttribute('lang', language);
-      localStorage.setItem('balloo-language', language);
+      setCookie(LANGUAGE_COOKIE, language, 365);
       set({ language });
     },
 
-    toggleSidebar: () => set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),
-    setSidebarOpen: (isOpen) => set({ isSidebarOpen: isOpen }),
+    toggleSidebar: () =>
+      set((state) => {
+        const next = !state.isSidebarOpen;
+        persistSidebar(next);
+        return { isSidebarOpen: next };
+      }),
+    setSidebarOpen: (isOpen) => {
+      persistSidebar(isOpen);
+      set({ isSidebarOpen: isOpen });
+    },
 
     toggleRightPanel: () => set((state) => ({ isRightPanelOpen: !state.isRightPanelOpen })),
     setRightPanelOpen: (isOpen) => set({ isRightPanelOpen: isOpen }),

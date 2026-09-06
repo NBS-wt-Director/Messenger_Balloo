@@ -31,12 +31,12 @@ export default function BlogLandingPostScreen() {
         if (cancelled) return;
         setPost(res.post);
         setRelated(res.related || []);
-        setComments(res.post?.commentsList || MOCK_COMMENTS);
+        setComments(res.post?.commentsList || []);
       } catch {
         if (!cancelled) {
-          setPost(MOCK_POST);
+          setPost(null);
           setRelated([]);
-          setComments(MOCK_COMMENTS);
+          setComments([]);
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -337,59 +337,3 @@ function RenderContent({ content }: { content: string }) {
 }
 
 // ============================================================
-// Mock data
-// ============================================================
-const MOCK_POST: BlogLandingPost = {
-  id: 'mock-post',
-  title: 'Релиз v1.0.0-beta — первый публичный бета-релиз Balloo',
-  excerpt: 'Сегодня мы запускаем первую бета-версию мессенджера Balloo для всех желающих.',
-  content: `Сегодня важный день для нашей команды — мы запускаем **первую бета-версию** мессенджера Balloo. После месяцев разработки, проектирования макетов и настройки инфраструктуры, продукт готов к тестированию широкой аудиторией.
-
-## Что внутри беты?
-
-Balloo v1.0.0-beta включает:
-
-- Онбординг с 3 приветственными экранами
-- Аутентификация: Email + OAuth (Яндекс, Mail.ru, Rambler)
-- Текстовые сообщения с Markdown, реакции, вложения
-- 1:1 и групповые чаты
-- Голосовые и видеозвонки 1:1 (WebRTC)
-- Восьмигранные аватарки с двойной рамкой
-- 3 темы оформления: тёмная, светлая, «Наша»
-- 6 языков: RU, EN, ZH, FR, BE, HI
-
-> Balloo — это не просто мессенджер. Это российская технологическая платформа с уникальной визуальной идентичностью.
-
-## Что дальше?
-
-В v1.1 мы планируем групповые видеозвонки до 12 человек, а в v2 — P2G threading, истории и бот-маркетплейс.
-
-Спасибо всем, кто поддерживал проект на этом этапе! 🙏`,
-  coverEmoji: '🚀',
-  coverGradient: 'linear-gradient(135deg, #1a1d21, #2d3742)',
-  channel: { id: 'news', name: '📰 Новости' },
-  categories: [],
-  author: { id: '1', name: 'Иван Воронов', initials: 'ИВ' },
-  publishedAt: Date.now() / 1000,
-  publishedAtFormatted: '16 июля 2026',
-  readTime: 5,
-  views: 1234,
-  reactions: 34,
-  comments: 12,
-  tags: ['#релиз', '#beta', '#v1.0.0', '#обновление'],
-};
-
-const MOCK_COMMENTS = [
-  {
-    id: 'c1',
-    author: { id: 'u1', name: 'Анна Петрова', initials: 'АП' },
-    content: 'Поздравляю с релизом! Дизайн действительно уникальный, октагоны смотрятся круто 🔥',
-    createdAtFormatted: '2 часа назад',
-  },
-  {
-    id: 'c2',
-    author: { id: 'u2', name: 'Дмитрий Соколов', initials: 'ДС' },
-    content: 'Когда ждать мобильное приложение на iOS?',
-    createdAtFormatted: '3 часа назад',
-  },
-];

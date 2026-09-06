@@ -1,7 +1,8 @@
 // VersionsScreen — управление версиями сервиса
 // Список версий, publish new version, changelog editor
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { api } from '@/services/api';
 
 // --- Types ---
 interface ServiceVersion {
@@ -16,53 +17,6 @@ interface ServiceVersion {
 }
 
 // --- Mock data ---
-const MOCK_VERSIONS: ServiceVersion[] = [
-  {
-    id: 'v-001',
-    version: '1.0.0',
-    changelog:
-      '🎉 Первая публичная версия Balloo Messenger!\n\n✨ Новое:\n• Чаты и группы\n• Каналы с подпиской\n• Истории (stories)\n• Голосовые сообщения\n• Опросы и квизы\n• Блог и каналы\n• База знаний\n• Админ-панель\n• 20 языков\n• 3 темы оформления\n\n🐛 Исправлено:\n• Стабильность WebSocket\n• Производительность чатов\n• Корректная работа 2FA',
-    publishedAt: 1719724800000,
-    isLatest: true,
-    status: 'published',
-    platform: ['web', 'android', 'ios', 'desktop'],
-    downloadCount: 15234,
-  },
-  {
-    id: 'v-0.9.5',
-    version: '0.9.5',
-    changelog:
-      '🧪 Бета-версия для тестирования\n\n✨ Новое:\n• Предварительный просмотр историй\n• Реакции на сообщения\n\n🐛 Исправлено:\n• Утечка памяти в WebSocket\n• Ошибка при загрузке аватаров',
-    publishedAt: 1719120000000,
-    isLatest: false,
-    status: 'archived',
-    platform: ['web', 'android'],
-    downloadCount: 3421,
-  },
-  {
-    id: 'v-0.9.0',
-    version: '0.9.0',
-    changelog:
-      '🧪 Ранняя бета\n\n✨ Новое:\n• Базовые чаты\n• Регистрация и авторизация\n• Профили пользователей',
-    publishedAt: 1718515200000,
-    isLatest: false,
-    status: 'archived',
-    platform: ['web'],
-    downloadCount: 892,
-  },
-  {
-    id: 'v-1.1.0-draft',
-    version: '1.1.0-draft',
-    changelog:
-      '🚧 Черновик следующей версии\n\n🔄 В разработке:\n• Видеозвонки\n• Шифрование E2EE\n• AI-ассистент\n• Новый дизайн чатов',
-    publishedAt: 0,
-    isLatest: false,
-    status: 'draft',
-    platform: [],
-    downloadCount: 0,
-  },
-];
-
 const STATUS_LABELS: Record<string, string> = {
   published: 'Опубликована',
   draft: 'Черновик',
@@ -326,7 +280,18 @@ function PublishVersionModal({
 
 // --- Main Screen ---
 export function VersionsScreen() {
-  const [versions, setVersions] = useState(MOCK_VERSIONS);
+  const [versions, setVersions] = useState<ServiceVersion[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.getHistoryVersions().then((res) => {
+      setVersions(res || []);
+      setLoading(false);
+    }).catch(() => {
+      setVersions([]);
+      setLoading(false);
+    });
+  }, []);
   const [filter, setFilter] = useState<string>('all');
   const [editModal, setEditModal] = useState<{ open: boolean; versionId: string | null }>({
     open: false,

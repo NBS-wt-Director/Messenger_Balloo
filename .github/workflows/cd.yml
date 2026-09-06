@@ -1,8 +1,9 @@
-name: CD — Staging Deploy
+name: CD — Docker Release & Deploy
 
 on:
   push:
-    branches: [main]
+    tags:
+      - 'v*'
 
 env:
   NODE_VERSION: '22'
@@ -11,12 +12,11 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  # ─── Build & Push Docker images ───
-  docker-build-push:
-    name: Build & Push Docker Images
+  # ─── Docker Build & Push ───
+  docker-release:
+    name: Docker Release
     runs-on: ubuntu-latest
     timeout-minutes: 30
-
     permissions:
       contents: read
       packages: write
@@ -35,17 +35,19 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # ─── Server image ───
-      - name: Extract server metadata
+      - name: Extract metadata (server)
         id: meta-server
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/server
           tags: |
+            type=semver,pattern={{version}},prefix=server-
+            type=semver,pattern={{major}}.{{minor}},prefix=server-
+            type=semver,pattern={{major}},prefix=server-
             type=sha,prefix=server-,format=short
-            type=ref,event=branch
+            type=raw,value=latest,prefix=server-
 
-      - name: Build & push server image
+      - name: Build & push server
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -57,19 +59,20 @@ jobs:
           cache-to: type=gha,mode=max
           build-args: |
             NODE_ENV=production
-            VERSION=${{ github.sha }}
 
-      # ─── Web image ───
-      - name: Extract web metadata
+      - name: Extract metadata (web)
         id: meta-web
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/web
           tags: |
+            type=semver,pattern={{version}},prefix=web-
+            type=semver,pattern={{major}}.{{minor}},prefix=web-
+            type=semver,pattern={{major}},prefix=web-
             type=sha,prefix=web-,format=short
-            type=ref,event=branch
+            type=raw,value=latest,prefix=web-
 
-      - name: Build & push web image
+      - name: Build & push web
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -80,66 +83,70 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  # ─── Deploy to Staging ───
-  deploy-staging:
-    name: Deploy to Staging
+  # ─── GitHub Release ───
+  create-release:
+    name: Create GitHub Release
     runs-on: ubuntu-latest
-    needs: docker-build-push
-    timeout-minutes: 15
-    environment: staging
+    needs: docker-release
+    timeout-minutes: 10
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Deploy to staging via SSH
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Release ${{ github.ref_name }}
+          generate_release_notes: true
+          draft: false
+          prerelease: ${{ contains(github.ref_name, '-rc') || contains(github.ref_name, '-alpha') || contains(github.ref_name, '-beta') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ─── Deploy to Production ───
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [docker-release, create-release]
+    timeout-minutes: 15
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.STAGING_HOST }}
-          username: ${{ secrets.STAGING_USER }}
-          key: ${{ secrets.STAGING_SSH_KEY }}
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.PROD_USER }}
+          key: ${{ secrets.PROD_SSH_KEY }}
           script: |
             cd /opt/balloo
-            docker compose pull
-            docker compose up -d
+            docker compose -f docker/prod/docker-compose.prod.yml down
+            docker compose -f docker/prod/docker-compose.prod.yml pull
+            docker compose -f docker/prod/docker-compose.prod.yml run --rm server npx prisma migrate deploy
+            docker compose -f docker/prod/docker-compose.prod.yml up -d
             docker image prune -f
 
-      - name: Wait for staging to be ready
+      - name: Health check
         run: |
-          echo "Waiting for staging to be ready..."
           for i in {1..30}; do
-            if curl -sf https://staging.balloo.su/health > /dev/null; then
-              echo "✅ Staging is healthy"
+            if curl -sf https://balloo.su/ > /dev/null; then
+              echo "✅ Production is healthy"
               exit 0
             fi
-            echo "Attempt $i/30 failed, retrying in 10s..."
             sleep 10
           done
-          echo "❌ Staging health check failed"
+          echo "❌ Health check failed"
           exit 1
 
-      - name: Run E2E tests on staging
-        uses: cypress-io/github-action@v6
-        with:
-          working-directory: packages/web
-          browser: chrome
-          wait-on: 'https://staging.balloo.su'
-          config: baseUrl=https://staging.balloo.su
-        env:
-          CYPRESS_BASE_URL: https://staging.balloo.su
-
-      - name: Notify team
+      - name: Notify
         if: always()
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_CHANNEL: deployments
-          SLACK_USERNAME: Balloo CI
-          SLACK_ICON: https://balloo.su/logo.png
-          SLACK_COLOR: ${{ job.status == 'success' && 'good' || 'danger' }}
-          SLACK_TITLE: "Staging Deploy ${{ github.sha }}"
-          SLACK_MESSAGE: |
-            Balloo staging deployed
-            Commit: ${{ github.sha }}
-            Branch: ${{ github.ref_name }}
-            Status: ${{ job.status == 'success' && '✅ Deployed' || '❌ Failed' }}
+          SLACK_CHANNEL: releases
+          SLACK_TITLE: "Release ${{ github.ref_name }}"
+          SLACK_MESSAGE: "Status: ${{ job.status == 'success' && '✅ Deployed' || '❌ Failed' }}"

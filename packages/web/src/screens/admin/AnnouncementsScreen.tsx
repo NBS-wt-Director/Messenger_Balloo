@@ -1,7 +1,8 @@
 // AnnouncementsScreen — управление объявлениями и баннерами в админ-панели
 // CRUD объявлений: список, создание, редактирование, удаление, toggle active
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { api } from '@/services/api';
 
 // --- Types ---
 interface Announcement {
@@ -16,49 +17,6 @@ interface Announcement {
 }
 
 // --- Mock data ---
-const MOCK_ANNOUNCEMENTS: Announcement[] = [
-  {
-    id: 'ann-001',
-    title: '🛠 Технические работы 20 июля',
-    content: '20 июля с 02:00 до 04:00 (МСК) будут проводиться технические работы. Сервис может быть недоступен.',
-    audience: 'all',
-    startDate: '20.07.2026',
-    endDate: '20.07.2026',
-    dismissible: true,
-    status: 'active',
-  },
-  {
-    id: 'ann-002',
-    title: '🎉 Новая версия 2.0',
-    content: 'Вышла новая версия Balloo 2.0! Обновите приложение, чтобы получить все новые функции: видеозвонки, шифрование, новый дизайн чатов.',
-    audience: 'all',
-    startDate: '25.07.2026',
-    endDate: '01.08.2026',
-    dismissible: true,
-    status: 'scheduled',
-  },
-  {
-    id: 'ann-003',
-    title: '📋 Обновление правил использования',
-    content: 'Мы обновили правила использования сервиса. Просим всех сотрудников ознакомиться с новыми правилами до 30 июля.',
-    audience: 'employees',
-    startDate: '15.07.2026',
-    endDate: '30.07.2026',
-    dismissible: false,
-    status: 'active',
-  },
-  {
-    id: 'ann-004',
-    title: '🔒 Обновление политики безопасности',
-    content: 'С 1 августа 2026 года станет обязательным использование двухфакторной аутентификации для всех администраторов.',
-    audience: 'admins',
-    startDate: '01.08.2026',
-    endDate: '31.12.2026',
-    dismissible: true,
-    status: 'scheduled',
-  },
-];
-
 const AUDIENCE_LABELS: Record<string, string> = {
   all: 'Все пользователи',
   employees: 'Сотрудники',
@@ -359,7 +317,18 @@ function DeleteConfirmModal({
 
 // --- Main Screen ---
 export function AnnouncementsScreen() {
-  const [announcements, setAnnouncements] = useState(MOCK_ANNOUNCEMENTS);
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.getAnnouncements().then((res) => {
+      setAnnouncements(res || []);
+      setLoading(false);
+    }).catch(() => {
+      setAnnouncements([]);
+      setLoading(false);
+    });
+  }, []);
   const [formModal, setFormModal] = useState<{ open: boolean; initial: Announcement | null }>({
     open: false,
     initial: null,

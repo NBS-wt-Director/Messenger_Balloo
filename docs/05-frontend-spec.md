@@ -321,3 +321,62 @@ interface AccountStore {
 - Поля: вопрос, варианты ответов (добавление/удаление), настройки (анонимность, множественный выбор, правильный ответ для квиза, сообщение по выбору пункта для персонали).
 - Превью в реальном времени. Создание через `POST /polls`.
 
+
+### Юридические страницы (`PrivacyScreen`, `RulesScreen`, `CookiesScreen`)
+- Маршруты: `/privacy`, `/rules`, `/cookies` — публичные, без авторизации, индексируемые (no `noindex`).
+- Компоненты: `packages/web/src/screens/legal/PrivacyScreen.tsx`, `RulesScreen.tsx`, `CookiesScreen.tsx`.
+- **PrivacyScreen** — политика конфиденциальности (152-ФЗ, Конституция РФ ст.23, ст.24). Содержит: данные оператора, собираемые данные, цели обработки, правовые основания, хранение и защита, права пользователя, cookie, третьи лица, контакты.
+- **RulesScreen** — пользовательское соглашение (публичная оферта, 149-ФЗ, ГК РФ ст.437). Содержит: общие положения, предмет соглашения, регистрация, правила поведения, интеллектуальная собственность, ограничение ответственности, персональные данные, разрешение споров, изменение условий.
+- **CookiesScreen** — политика использования cookie. Содержит: что такое cookie, категории (необходимые, функциональные, аналитические, сторонние), управление, хранение, передача третьим лицам, согласие.
+- **Ссылки размещены:**
+  - Левое меню (Sidebar) — пункты «Правила», «Конфиденциальность», «Cookies» (видны при развёрнутом sidebar).
+  - Подвал LoginScreen — внизу страницы авторизации.
+  - LegalCheckbox (RegisterScreen) — чекбокс согласия с ссылками на `/rules` и `/privacy`.
+- **sitemap.xml** — `packages/web/public/sitemap.xml` содержит URL всех 6 доменов.
+- **Дата обновления** указана в заголовке каждой страницы.
+
+### Юридические страницы (, , )
+- Маршруты: , ,  — публичные, без авторизации, индексируемые.
+- Компоненты:  — PrivacyScreen, RulesScreen, CookiesScreen.
+- Ссылки в: Sidebar (левое меню), LoginScreen (подвал), LegalCheckbox (регистрация).
+- sitemap.xml:  — URL всех 6 доменов.
+
+
+### Юридические страницы (PrivacyScreen, RulesScreen, CookiesScreen)
+- Маршруты: /privacy, /rules, /cookies - публичные, без авторизации, индексируемые.
+- Компоненты: packages/web/src/screens/legal/ - PrivacyScreen, RulesScreen, CookiesScreen.
+- PrivacyScreen - политика конфиденциальности (152-ФЗ, Конституция РФ ст.23, ст.24).
+- RulesScreen - пользовательское соглашение (публичная оферта, 149-ФЗ, ГК РФ).
+- CookiesScreen - политика использования cookie (категории, управление, хранение).
+- Ссылки размещены: Sidebar (левое меню), LoginScreen (подвал), LegalCheckbox (регистрация).
+- sitemap.xml: packages/web/public/sitemap.xml - URL всех 6 доменов.
+
+### Cookie Banner и утилиты (CookieBanner, cookieUtils)
+- CookieBanner: `packages/web/src/components/ui/CookieBanner.tsx` — всплывающее уведомление внизу экрана.
+- Показывается при первом визите, если выбор по cookie ещё не сделан (`hasCookieChoice()` = false).
+- Кнопки: «Принять все» (acceptCookieConsent + initYandexMetrika) и «Только необходимые» (declineCookieConsent).
+- Согласие хранится в cookie `balloo-cookie-consent` на 365 дней, значения: `accepted` (аналитика + сторонние) / `essential` (только необходимые).
+- Утилиты: `packages/web/src/utils/cookieUtils.ts` — setCookie, getCookie, deleteCookie, hasCookieChoice, hasCookieConsent, hasAnalyticsConsent, hasThirdPartyConsent, acceptCookieConsent, declineCookieConsent.
+- Подключён в App.tsx после RouterProvider.
+
+### Яндекс.Метрика (consent-based аналитика)
+- Утилита: `packages/web/src/utils/yandex-metrika.ts` — lazy-load скрипта `mc.yandex.ru/metrika/tag.js`.
+- ID счётчика: env `VITE_YM_METRIKA_ID` (число; пусто = Метрика не подключается).
+- **Consent-based загрузка:** скрипт подключается ТОЛЬКО после «Принять все» в CookieBanner либо при старте приложения, если согласие уже дано (`hasAnalyticsConsent()` в App.tsx).
+- **Анонимизация IP:** параметр `ip: true` в `ym(..., 'init', ...)` (требование 152-ФЗ).
+- Параметры init: clickmap, trackLinks, accurateTrackBounce; webvisor отключён (приватность).
+- SPA-навигация: после init патчатся `history.pushState/replaceState` + `popstate`, на каждую смену маршрута отправляется `ym(id, 'hit', path)` (trackPageview).
+- Cookie Метрики (`_ym_uid`, `_ym_isad`, `_ym_d`) ставятся только после загрузки скрипта.
+- Описано в политике cookies (`CookiesScreen.tsx`, разделы 2.3, 6).
+
+### Сторонние cookie (OAuth, ЮKassa) — согласие
+- OAuth-провайдеры (Яндекс ID, VK ID, Mail.ru ID) и ЮKassa ставят временные cookie на своих внешних доменах.
+- Согласие на сторонние cookie фиксируется в cookie `balloo-cookie-consent` (значение `accepted`) на домене `.balloo.su` — проверка через `hasThirdPartyConsent()`.
+- CookieBanner информирует о сторонних сервисах в тексте баннера; детали — в `/cookies` (разделы 2.4, 5, 6).
+- Срок жизни внешних cookie: сессия авторизации (OAuth) / сессия оплаты (ЮKassa).
+
+### Footer (MainLayout)
+- Footer в  — внизу каждого экрана основного приложения.
+- Ссылки: Правила (/rules), Конфиденциальность (/privacy), Cookies (/cookies).
+- Стили: серый фон (var(--bg-secondary)), серая линия сверху, размер 13px.
+- Логотип/копирайт: 'Balloo Messenger © 2026'.

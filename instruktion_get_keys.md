@@ -1,402 +1,110 @@
-# 🔑 Инструкция: Как получить API-ключи для Balloo Messenger
+# 🔑 Получение всех ключей и данных для Balloo Messenger
 
-> **Цель:** Получить все внешние ключи и вписать их в `apikeys.json`
-> **Время:** ~2-3 часа (если все аккаунты уже есть)
-> **Безопасность:** Никогда не коммить `apikeys.json` в git. Файл уже в `.gitignore`.
-
----
-
-## 📋 Список всех ключей
-
-| # | Категория | Где получить | Сложность |
-|---|-----------|-------------|-----------|
-| 1 | PostgreSQL | Генерируется | 🟢 Просто |
-| 2 | Redis | Генерируется | 🟢 Просто |
-| 3 | JWT | Генерируется | 🟢 Просто |
-| 4 | VAPID (Push) | Генерируется | 🟢 Просто |
-| 5 | MinIO | Генерируется | 🟢 Просто |
-| 6 | OAuth: Яндекс | OAuth.tech.yandex.ru | 🟡 Средне |
-| 7 | OAuth: VK | dev.vk.com | 🟡 Средне |
-| 8 | OAuth: Mail.ru | oauth.mail.ru | 🟡 Средне |
-| 9 | OAuth: Max | developer.max.ru | 🟡 Средне |
-| 10 | SMTP (email) | Mail.ru / Yandex / Postfix | 🟡 Средне |
-| 11 | YooKassa | yookassa.ru | 🔴 Сложно |
+> **Цель:** Получить ВСЕ ключи, вписать их в таблицу ниже, передать AI  
+> **Время:** ~2-3 часа (если все аккаунты уже есть)  
+> **Безопасность:** Никогда не коммить `.env` в git (уже в `.gitignore`)
 
 ---
 
-## 1️⃣ Автоматические ключи (PostgreSQL, Redis, JWT, VAPID, MinIO)
+## 📊 Сводная таблица ключей
 
-Эти ключи генерируются локально — ничего регистрировать не нужно.
+Скопируй эту таблицу, заполни поля и отправь обратно AI.  
+Поля со значением `*(сгенерировать)*` или `*(оставить)*` — AI сделает сам.
 
-### Шаг 1: Запусти генератор
-
-```bash
-cd "/home/ivan/Рабочий стол/проекты/balloo"
-bash scripts/generate-secrets.sh
-```
-
-Скрипт выведет в терминал:
-- `POSTGRES_PASSWORD`
-- `REDIS_PASSWORD`
-- `JWT_ACCESS_SECRET`
-- `JWT_REFRESH_SECRET`
-- `MINIO_ACCESS_KEY`
-- `MINIO_SECRET_KEY`
-
-### Шаг 2: Сгенерируй VAPID-ключи (для push-уведомлений)
-
-```bash
-npx web-push generate-vapid-keys
-```
-
-Выведет:
-- `VAPID_PUBLIC_KEY`
-- `VAPID_PRIVATE_KEY`
-
-### Шаг 3: Впиши в apikeys.json
-
-Открой `apikeys.json` и вписывай значения в секции `dev` и `production`.
-
-**Для dev** — можно оставить простые пароли (`balloo123` и т.д.).
-**Для production** — использовать сгенерированные значения.
-
----
-
-## 2️⃣ OAuth: Яндекс
-
-### Где получить
-🔗 **https://oauth.yandex.ru/client/new** (или https://developer.tech.yandex.ru → OAuth → Новый клиент)
-
-### Шаги
-
-1. Войди в Яндекс ID (нужен подтверждённый аккаунт)
-2. Создай новое приложение:
-   - **Название:** `Balloo Messenger`
-   - **Описание:** `Российский мессенджер`
-3. В разделе «Доступы» выбери:
-   - `Яндекс ID` → `Логин пользователя`
-   - `Яндекс ID` → `Аватар пользователя`
-   - `Яндекс ID` → `Имя пользователя`
-   - `Яндекс ID` → `Пол пользователя`
-   - `Яндекс ID` → `Дата рождения пользователя`
-4. В разделе «Redirect URI» добавь:
-   - **Dev:** `http://localhost:3000/api/auth/oauth/yandex/callback`
-   - **Prod:** `https://app.balloo.su/api/auth/oauth/yandex/callback`
-5. Нажми «Создать приложение»
-
-### Что получишь
-
-- **ClientID** → `YANDEX_CLIENT_ID`
-- **ClientSecret** → `YANDEX_CLIENT_SECRET`
-
-### Куда вписать
-
-```json
-// apikeys.json → dev.oauth.yandex
-"YANDEX_CLIENT_ID": "твой_client_id",
-"YANDEX_CLIENT_SECRET": "твой_client_secret"
-
-// apikeys.json → production.oauth.yandex
-"YANDEX_CLIENT_ID": "твой_client_id",
-"YANDEX_CLIENT_SECRET": "твой_client_secret",
-"YANDEX_REDIRECT_URI": "https://app.balloo.su/api/auth/oauth/yandex/callback"
-```
+| # | Категория | ENV-переменная | Значение | Где взять | Сложность |
+|---|-----------|---------------|----------|-----------|-----------|
+| **🟢 БАЗА** | | | | | |
+| 1 | PostgreSQL | `POSTGRES_PASSWORD` | `balloo` | Уже установлено | 🟢 Готово |
+| 2 | PostgreSQL | `POSTGRES_USER` | `balloo` | Уже установлено | 🟢 Готово |
+| 3 | PostgreSQL | `POSTGRES_DB` | `balloo` | Уже установлено | 🟢 Готово |
+| 4 | PostgreSQL | `POSTGRES_HOST` | `localhost` | Docker/сервер | 🟢 Готово |
+| 5 | PostgreSQL | `POSTGRES_PORT` | `5432` | Docker/сервер | 🟢 Готово |
+| 6 | Redis | `REDIS_HOST` | `localhost` | Docker/сервер | 🟢 Готово |
+| 7 | Redis | `REDIS_PORT` | `6379` | Docker/сервер | 🟢 Готово |
+| 8 | Redis | `REDIS_PASSWORD` | `ef7f5327f2312bd2a5a88d5815467f14853bebfb22aeb9fd6a5e57d43c66e83a` | Сгенерирован | 🟢 Готово ✅ |
+| 9 | MinIO | `MINIO_ENDPOINT` | `localhost` | Docker/сервер | 🟢 Готово |
+| 10 | MinIO | `MINIO_PORT` | `9000` | Docker/сервер | 🟢 Готово |
+| 11 | MinIO | `MINIO_ACCESS_KEY` | `minioadmin` | По умолчанию | 🟢 Готово |
+| 12 | MinIO | `MINIO_SECRET_KEY` | `d283226061a57f9254d86186297a0b562b6e78918445e84a11942b8935e238ed` | Кастомный | 🟢 Готово ✅ |
+| 13 | MinIO | `MINIO_BUCKET` | `balloo-media` | По умолчанию | 🟢 Готово |
+| 14 | JWT | `JWT_SECRET` | `d7514f34bc858be576aa20507943394fbb825f0c9f7672de93fbd8e431c19bac...` | Сгенерирован | 🟢 Готово ✅ |
+| 15 | JWT | `JWT_REFRESH_SECRET` | `518af7a683cdb4ca16d467d2db2f457d3ae0623caf7555314160d1c0fe6fc5e66d...` | Сгенерирован | 🟢 Готово ✅ |
+| 16 | VAPID (Push) | `VAPID_PUBLIC_KEY` | `BI9QmrSEq90qGCDpylu-BmfKKyoI-HyWuCMvdVuXbnigV5VmJ84xTDYidkOIZR-jtfbUTyi-IsOQVWbwKRU9o8Q` | Сгенерирован | 🟢 Готово ✅ |
+| 17 | VAPID (Push) | `VAPID_PRIVATE_KEY` | `Jnh4N3EU-2F0i9j_4tt_8fLVq-ZWoXG2cHNP6QuPVpQ` | Сгенерирован | 🟢 Готово ✅ |
+| 18 | Setup | `SETUP_PASSWORD` | `06041996ОИА` | Уже установлено | 🟢 Готово |
+| **🟡 OAUTH** | | | | | |
+| 19 | **Яндекс OAuth** | `YANDEX_CLIENT_ID` | `ccee3f45f25f4e5d8193ce26124822dc` | developer.tech.yandex.ru | 🟢 Готово ✅ |
+| 20 | **Яндекс OAuth** | `YANDEX_CLIENT_SECRET` | `387bed4d64574869b422c431cf8491d4` | developer.tech.yandex.ru | 🟢 Готово ✅ |
+| 21 | **VK OAuth** | `VK_CLIENT_ID` | `54752550` | vk.com/apps | 🟢 Готово ✅ |
+| 22 | **VK OAuth** | `VK_CLIENT_SECRET` | `iwjsvqAhRMUeNjRMdMO1` | vk.com/apps | 🟢 Готово ✅ |
+| 23 | **Mail.ru OAuth** | `MAIL_CLIENT_ID` | `01a067110db474148019fe5602471858` | oauth.mail.ru | 🟢 Готово ✅ |
+| 24 | **Mail.ru OAuth** | `MAIL_CLIENT_SECRET` | `01a067110db4741fae9f5ccda45ba826` | oauth.mail.ru | 🟢 Готово ✅ |
+| **🟡 EMAIL** | | | | | |
+| 25 | **SMTP** | `SMTP_HOST` | `localhost` | ✅ Настроен | ✅ Готово |
+| 26 | **SMTP** | `SMTP_PORT` | `587` | ✅ Настроен | ✅ Готово |
+| 27 | **SMTP** | `SMTP_USER` | `noreply@balloo.su` | ✅ Настроен | ✅ Готово |
+| 28 | **SMTP** | `SMTP_PASSWORD` | `08B09a09l26lu` | ✅ Записан | ✅ Готово |
+| 29 | **SMTP** | `SMTP_FROM` | `noreply@balloo.su` | По умолчанию | ✅ Готово |
+| **🟡 АНАЛИТИКА** | | | | | |
+| 30 | **Яндекс.Метрика** | `VITE_YM_METRIKA_ID` | `112269610` | metrika.yandex.ru | 🟢 Готово ✅ |
+| **🟠 ПЛАТЕЖИ (опц.)** | | | | | |
+| 31 | **ЮKassa** | `YOOKASSA_SHOP_ID` | _________________ | yookassa.ru (опционально) | 🟠 Позже |
+| 32 | **ЮKassa** | `YOOKASSA_API_KEY` | _________________ | yookassa.ru (опционально) | 🟠 Позже |
+| **🟠 CDN (опц.)** | | | | | |
+| 33 | **Yandex Disk** | `YANDEX_DISK_API_KEY` | _________________ | disk.yandex.ru (опционально) | 🟠 Позже |
+| **🔵 CI/CD (GitHub)** | | | | | |
+| 34 | **SSH: хост** | `VPS_HOST` (GitHub Secret) | `188.73.176.34` | ✅ Получен | ✅ Готово |
+| 35 | **SSH: пользователь** | `VPS_USER` (GitHub Secret) | `cfr_balloo` | ✅ Получен | ✅ Готово |
+| 36 | **SSH: приватный ключ** | `VPS_SSH_KEY` (GitHub Secret) | ✅ Получен | `/home/cfr_balloo/.ssh/id_ed25519` | ✅ Готово |
 
 ---
 
-## 3️⃣ OAuth: VK
+## 📝 Как заполнять
 
-### Где получить
-🔗 **https://vk.com/apps?act=manage**
+### Что заполняешь ты:
+- **OAuth** (все 3 — Яндекс, VK, Mail.ru) — клиент ID + секрет ✅
+- **ЮKassa** — shop ID + API ключ (если нужны платежи)
+- **Yandex Disk** — API ключ (если нужен диск)
 
-### Шаги
+### Что уже сгенерировано:
+- `REDIS_PASSWORD` ✅
+- `JWT_SECRET` + `JWT_REFRESH_SECRET` ✅
+- `VAPID_PUBLIC_KEY` + `VAPID_PRIVATE_KEY` ✅
 
-1. Войди в VK (нужен подтверждённый аккаунт)
-2. Нажми «Создать приложение»:
-   - **Название:** `Balloo Messenger`
-   - **Платформа:** `Веб-сайт`
-   - **Адрес сайта:** `https://balloo.su`
-   - **Базовый домен:** `balloo.su`
-   - **Доверенный redirect URI:**
-     - Dev: `http://localhost:3000/api/auth/oauth/vk/callback`
-     - Prod: `https://app.balloo.su/api/auth/oauth/vk/callback`
-3. Тип приложения: `Web`
-4. Нажми «Подключить приложение»
-
-### Что получишь
-
-- **ID приложения** → `VK_CLIENT_ID`
-- **Защищённый ключ** → `VK_CLIENT_SECRET`
-
-### Куда вписать
-
-```json
-// apikeys.json → dev.oauth.vk
-"VK_CLIENT_ID": "твой_id",
-"VK_CLIENT_SECRET": "твой_secret"
-
-// apikeys.json → production.oauth.vk
-"VK_CLIENT_ID": "твой_id",
-"VK_CLIENT_SECRET": "твой_secret",
-"VK_REDIRECT_URI": "https://app.balloo.su/api/auth/oauth/vk/callback"
-```
+### Что уже готово:
+- SSH-ключи для CI/CD ✅
+- PostgreSQL, Redis, MinIO — стандартные настройки ✅
+- `SETUP_PASSWORD` ✅
+- **SMTP** — Postfix + Dovecot установлены, noreply@balloo.su и inbox@balloo.su созданы, пересылка inbox→o8eryuhtin@yandex.ru настроена ✅
+  - Пароли: noreply=`08B09a09l26lu`, inbox=`Ko89Iv93Ki93`
 
 ---
 
-## 4️⃣ OAuth: Mail.ru
+## ✅ Итоговый чек-лист
 
-### Где получить
-🔗 **https://oauth.mail.ru/app/stopapp** (или https://appsmail.ru/devapp)
-
-### Шаги
-
-1. Войди в Mail.ru (нужен подтверждённый аккаунт)
-2. Создай новое приложение:
-   - **Название:** `Balloo Messenger`
-   - **Описание:** `Российский мессенджер`
-   - **Адрес сайта:** `https://balloo.su`
-   - **Redirect URI:**
-     - Dev: `http://localhost:3000/api/auth/oauth/mail/callback`
-     - Prod: `https://app.balloo.su/api/auth/oauth/mail/callback`
-3. Доступы:
-   - `userinfo` — получение данных пользователя
-4. Нажми «Зарегистрировать»
-
-### Что получишь
-
-- **Client ID** → `MAIL_CLIENT_ID`
-- **Client Secret** → `MAIL_CLIENT_SECRET`
-
-### Куда вписать
-
-```json
-// apikeys.json → dev.oauth.mail
-"MAIL_CLIENT_ID": "твой_id",
-"MAIL_CLIENT_SECRET": "твой_secret"
-
-// apikeys.json → production.oauth.mail
-"MAIL_CLIENT_ID": "твой_id",
-"MAIL_CLIENT_SECRET": "твой_secret",
-"MAIL_REDIRECT_URI": "https://app.balloo.su/api/auth/oauth/mail/callback"
-```
+- [x] **SMTP** — Postfix + Dovecot установлены, пароли записаны, пересылка inbox→o8eryuhtin@yandex.ru настроена
+- [x] **SSH** — IP: 188.73.176.34, пользователь: cfr_balloo, приватный ключ получен
+- [x] **OAuth: VK** — ID + Secret ✅
+- [x] **OAuth: Яндекс** — ID + Secret ✅
+- [x] **OAuth: Mail.ru** — ID + Secret ✅
+- [x] **Яндекс.Метрика** — ID счётчика ✅
+- [x] **VAPID (Push)** — ключи сгенерированы ✅
+- [x] **JWT** — секреты сгенерированы ✅
+- [x] **Redis** — пароль сгенерирован ✅
+- [x] **MinIO** — кастомный SECRET_KEY ✅
+- [ ] **ЮKassa** — shop ID + API key (или «позже»)
+- [ ] **Yandex Disk** — API key (или «позже»)
+- [ ] **SSH-ключ** добавлен в GitHub Secrets (VPS_HOST, VPS_USER, VPS_SSH_KEY)
+- [ ] **PTR-запись** — настроить у хостера (188.73.176.34 → mail.balloo.su)
+- [ ] **DMARC** — TXT-запись: `_dmarc v=DMARC1; p=quarantine; rua=mailto:noreply@balloo.su`
+- [x] **Сервер-репорт** — Node.js скрипт настроен, cron (8:00, 14:00, 20:00) активен
 
 ---
 
-## 5️⃣ OAuth: Max
+## 🚀 Что будет дальше
 
-### Где получить
-🔗 **https://max.ru/dev** (или аналог — проверь актуальную ссылку)
-
-### Шаги
-
-1. Войди в Max (нужен аккаунт)
-2. Создай новое приложение:
-   - **Название:** `Balloo Messenger`
-   - **Redirect URI:**
-     - Dev: `http://localhost:3000/api/auth/oauth/max/callback`
-     - Prod: `https://app.balloo.su/api/auth/oauth/max/callback`
-3. Запроси доступы:
-   - `user.info` — данные пользователя
-
-### Что получишь
-
-- **Client ID** → `MAX_CLIENT_ID`
-- **Client Secret** → `MAX_CLIENT_SECRET`
-
-### Куда вписать
-
-```json
-// apikeys.json → dev.oauth.max
-"MAX_CLIENT_ID": "твой_id",
-"MAX_CLIENT_SECRET": "твой_secret"
-
-// apikeys.json → production.oauth.max
-"MAX_CLIENT_ID": "твой_id",
-"MAX_CLIENT_SECRET": "твой_secret",
-"MAX_REDIRECT_URI": "https://app.balloo.su/api/auth/oauth/max/callback"
-```
-
-> ⚠️ **Важно:** Max — новый сервис. Если OAuth ещё недоступен публично, оставь поля пустыми — вход через Max можно добавить позже.
-
----
-
-## 6️⃣ SMTP (Email)
-
-### Вариант A: Mail.ru для домена (бесплатно)
-
-🔗 **https://business.mail.ru/mail/**
-
-1. Зарегистрируй домен `balloo.su` (если ещё не зарегистрирован)
-2. Добавь домен в Mail.ru для бизнеса
-3. Подтверди владение доменом (через DNS-запись)
-4. Создай ящик `noreply@balloo.su`
-5. Настрой DKIM и SPF записи в DNS
-
-### Что получишь
-
-- **SMTP сервер:** `smtp.mail.ru`
-- **Порт:** `465` (SSL) или `587` (STARTTLS)
-- **Логин:** `noreply@balloo.su`
-- **Пароль:** пароль от ящика
-
-### Вариант B: Yandex 360 для бизнеса
-
-🔗 **https://360.yandex.ru/business/**
-
-1. Добавь домен `balloo.su`
-2. Подтверди владение доменом
-3. Создай ящик `noreply@balloo.su`
-4. Разреши SMTP-отправку в настройках
-
-### Что получишь
-
-- **SMTP сервер:** `smtp.yandex.ru`
-- **Порт:** `465` (SSL) или `587` (STARTTLS)
-- **Логин:** `noreply@balloo.su`
-- **Пароль:** пароль от ящика (или app-specific password)
-
-### Вариант C: Self-hosted Postfix
-
-```bash
-sudo apt install postfix
-sudo postconf -e 'myhostname = mail.balloo.su'
-sudo postconf -e 'mydomain = balloo.su'
-sudo postconf -e 'smtpd_sasl_auth_enable = yes'
-sudo systemctl restart postfix
-```
-
-- **SMTP сервер:** `localhost`
-- **Порт:** `587`
-- **Логин/пароль:** системный пользователь
-
-### Куда вписать
-
-```json
-// apikeys.json → dev.smtp
-"SMTP_HOST": "localhost",
-"SMTP_PORT": "587",
-"SMTP_USER": "",
-"SMTP_PASSWORD": ""
-
-// apikeys.json → production.smtp
-"SMTP_HOST": "smtp.mail.ru",
-"SMTP_PORT": "465",
-"SMTP_USER": "noreply@balloo.su",
-"SMTP_PASSWORD": "пароль_от_ящика",
-"SMTP_FROM": "noreply@balloo.su",
-"SMTP_TLS": "true"
-```
-
----
-
-## 7️⃣ YooKassa (Платежи)
-
-### Где получить
-🔗 **https://yookassa.ru/`
-
-### Шаги
-
-1. Зарегистрируйся на YooKassa как юридическое лицо или ИП
-2. Пройди идентификацию (ИНН, ОГРН, расчётный счёт)
-3. Дождись активации (1-3 рабочих дня)
-4. В личном кабинете:
-   - **Настройки → API → Ключ API** → скопируй
-   - **Настройки → Магазин → shopId** → скопируй
-5. Настрой Webhook:
-   - URL: `https://api.balloo.su/api/payments/webhook/yookassa`
-   - События: `payment.succeeded`, `payment.canceled`, `refund.succeeded`
-
-### Что получишь
-
-- **shopId** → `YOOKASSA_SHOP_ID`
-- **API ключ** → `YOOKASSA_API_KEY`
-
-### Куда вписать
-
-```json
-// apikeys.json → dev.payments
-"YOOKASSA_SHOP_ID": "",
-"YOOKASSA_API_KEY": ""
-
-// apikeys.json → production.payments
-"YOOKASSA_SHOP_ID": "твой_shop_id",
-"YOOKASSA_API_KEY": "твой_api_key",
-"YOOKASSA_WEBHOOK_URL": "https://api.balloo.su/api/payments/webhook/yookassa"
-```
-
-> ⚠️ **Важно:** YooKassa требует верификации бизнеса. Если её ещё нет — оставь пустым, донаты можно включить позже.
-
----
-
-## 8️⃣ MinIO (для production)
-
-MinIO — self-hosted S3-совместимое хранилище. Ключи генерируются при установке.
-
-### Для dev (в Docker)
-
-```bash
-cd "/home/ivan/Рабочий стол/проекты/balloo"
-docker compose -f docker/docker-compose.yml up -d minio
-```
-
-Дефолтные ключи:
-- `MINIO_ACCESS_KEY` = `minioadmin`
-- `MINIO_SECRET_KEY` = `minioadmin`
-
-### Для production
-
-Сгенерируй через `generate-secrets.sh` и вписывай.
-
-### Создание бакетов
-
-После запуска MinIO создай бакеты:
-
-```bash
-docker exec balloo-minio-prod mc alias set local http://localhost:9000 ACCESS_KEY SECRET_KEY
-docker exec balloo-minio-prod mc mb local/balloo-avatars
-docker exec balloo-minio-prod mc mb local/balloo-chats
-docker exec balloo-minio-prod mc mb local/balloo-public
-docker exec balloo-minio-prod mc mb local/balloo-backups
-```
-
----
-
-## ✅ Чек-лист готовности apikeys.json
-
-После заполнения проверь:
-
-- [ ] `dev.database.POSTGRES_PASSWORD` — заполнен
-- [ ] `dev.jwt.JWT_ACCESS_SECRET` — заполнен (≥32 символа)
-- [ ] `dev.jwt.JWT_REFRESH_SECRET` — заполнен (≥32 символа)
-- [ ] `dev.oauth.yandex` — заполнен (или пустой, если OAuth не нужен для dev)
-- [ ] `dev.smtp` — заполнен (или localhost для dev)
-- [ ] `dev.push.VAPID_*` — заполнен
-- [ ] `production.database.POSTGRES_PASSWORD` — заполнен
-- [ ] `production.jwt.JWT_*` — заполнен (≥32 символа)
-- [ ] `production.oauth.yandex` — заполнен
-- [ ] `production.oauth.vk` — заполнен
-- [ ] `production.oauth.mail` — заполнен
-- [ ] `production.oauth.max` — заполнен (или пустой)
-- [ ] `production.smtp` — заполнен
-- [ ] `production.cdn.MINIO_*` — заполнен
-- [ ] `production.push.VAPID_*` — заполнен
-- [ ] `production.payments.YOOKASSA_*` — заполнен (или пустой)
-- [ ] `production.setup.ADMIN_INSTALL_PASSWORD` — заполнен
-- [ ] `production.setup.SETUP_PASSWORD` — заполнен
-
----
-
-## 📤 Что делать после заполнения
-
-1. Сохрани `apikeys.json`
-2. Пришли мне файл целиком в новом тикете:
-
-```
-прочитай документ: tickets/production-readiness-migration.md и выполни тикет №2
-
-Вот заполненный apikeys.json:
-[содержимое файла]
-```
-
-3. Я извлеку ключи и создам `.env.dev` и `.env.production`
-4. **Никогда** не отправляй `apikeys.json` в публичные каналы (git, чаты, email)
+1. **Все OAuth готовы** — Яндекс, VK, Mail.ru ✅
+2. **Внести `.env.production` на сервер** — все ключи уже собраны
+3. **Перезапустить сервер** на сервере
+4. **Запушить SSH-ключ в GitHub Secrets** для CI/CD
+5. **Настроить DNS** (PTR, DMARC) для почты

@@ -4,6 +4,9 @@
 import { createHashRouter, Navigate } from 'react-router-dom';
 import { Suspense, lazy } from 'react';
 import { ErrorBoundary } from '@/components/providers/ErrorBoundary';
+import { PrivacyScreen } from '@/screens/legal/PrivacyScreen';
+import { RulesScreen } from '@/screens/legal/RulesScreen';
+import { CookiesScreen } from '@/screens/legal/CookiesScreen';
 
 // Lazy-loaded screen components
 const LandingScreen = lazy(() => import('@/screens/landing/LandingScreen'));
@@ -56,6 +59,7 @@ const AdminDonationsScreen = lazy(() => import('@/screens/admin/AdminDonationsSc
 
 // Landing pages
 const ForKassaScreen = lazy(() => import('@/screens/landing/ForKassaScreen').then((m) => ({ default: m.ForKassaScreen })));
+const DonateScreen = lazy(() => import('@/screens/donate/DonateScreen').then((m) => ({ default: m.DonateScreen })));
 
 // Command (employee portal) screens
 const CommandLayout = lazy(() => import('@/screens/command/CommandLayout').then((m) => ({ default: m.CommandLayout })));
@@ -156,6 +160,49 @@ export const router = createHashRouter([
       </ErrorBoundary>
     ),
   },
+  {
+    path: '/donat',
+    element: (
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingFallback />}>
+          <DonateScreen />
+        </Suspense>
+      </ErrorBoundary>
+    ),
+  },
+
+  // --- Legal pages (public, indexable, no auth required) ---
+  {
+    path: '/privacy',
+    element: (
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingFallback />}>
+          <PrivacyScreen />
+        </Suspense>
+      </ErrorBoundary>
+    ),
+  },
+  {
+    path: '/rules',
+    element: (
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingFallback />}>
+          <RulesScreen />
+        </Suspense>
+      </ErrorBoundary>
+    ),
+  },
+  {
+    path: '/cookies',
+    element: (
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingFallback />}>
+          <CookiesScreen />
+        </Suspense>
+      </ErrorBoundary>
+    ),
+  },
+
   {
     path: '/login',
     element: (

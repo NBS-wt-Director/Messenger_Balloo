@@ -18,7 +18,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { getThemeColors, spacing, fontSize as fontSizes } from '../../styles/theme';
 import { useUIStore } from '../../store/uiStore';
 import { useAuthStore } from '../../store/authStore';
-import { api } from '../../services/api';
+import { api, saveAuthTokens } from '../../services/api';
 
 interface LoginScreenProps {
   navigation: any;
@@ -30,7 +30,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
   const [loading, setLoading] = useState(false);
   const theme = useUIStore((s) => s.theme);
   const colors = getThemeColors(theme);
-  const { setUser, setTokens, setAuthenticated } = useAuthStore();
+  const { setUser, setAuthenticated } = useAuthStore();
 
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
@@ -41,7 +41,16 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
     setLoading(true);
     try {
       const response = await api.login(email.trim(), password);
-      setTokens(response.accessToken, response.refreshToken);
+
+      if (response.user?.needs2FA) {
+        // Требуется 2FA — переходим на экран ввода кода
+        navigation.navigate('TwoFactor', { email: email.trim() });
+        return;
+      }
+
+      if (response.tokens) {
+        await saveAuthTokens(response.tokens);
+      }
       setUser(response.user);
       setAuthenticated(true);
     } catch (error: any) {

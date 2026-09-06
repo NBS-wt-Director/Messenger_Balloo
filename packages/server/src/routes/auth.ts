@@ -5,19 +5,23 @@ import {
   register,
   login,
   verify2FA,
-  refresh,
+  refreshCookie,
+  clearCookie,
   logout,
   verifyEmail,
   requestReset,
   resetPassword,
   oauthLogin,
+  yandexCallback,
   enable2FA,
   verify2FAEnable,
   disable2FA,
   getDevices,
   revokeDeviceController,
+
 } from '../controllers/authController';
 import { authRequired, authRefresh } from '../middleware/auth';
+import { wsToken as wsTokenCtrl } from '../controllers/wsTokenController';
 
 // ============================================================
 // Публичные маршруты (без auth)
@@ -32,10 +36,19 @@ router.post('/login', login);
 // Верификация 2FA (после login с needs2FA)
 router.post('/2fa/verify', verify2FA);
 
-// Обновление токена
-router.post('/refresh', authRefresh, refresh);
+// Обновление cookie через refresh token (принимает refreshToken из body)
 
-// Выход
+// Временный токен для WebSocket
+router.get('/ws-token', wsTokenCtrl);
+router.post('/refresh-cookie', refreshCookie);
+
+// Удаление cookie (logout для web)
+router.post('/clear-cookie', clearCookie);
+
+// Обновление токена (старый endpoint, для обратной совместимости)
+router.post('/refresh', authRefresh, refreshCookie);
+
+// Выход (старый endpoint, для обратной совместимости)
 router.post('/logout', logout);
 
 // Верификация email
@@ -51,7 +64,11 @@ router.post('/reset-password', resetPassword);
 // OAuth маршруты (публичные)
 // ============================================================
 
+// POST — фронтенд сам получает данные от провайдера и шлёт на бэкенд
 router.post('/oauth/:provider', oauthLogin);
+
+// GET — callback от OAuth-провайдера (Яндекс)
+router.get('/oauth/yandex-callback', yandexCallback);
 
 // ============================================================
 // Защищённые маршруты (требуют auth)

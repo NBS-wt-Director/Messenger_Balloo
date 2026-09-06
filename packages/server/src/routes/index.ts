@@ -17,6 +17,10 @@ import { router as historyRouter } from './history';
 import { router as docsRouter } from './docs';
 import { router as specRouter } from './spec';
 import { router as blogLandingRouter } from './blog-landing';
+import { router as archiveRouter } from './archive';
+import { router as devicesRouter } from './devices';
+import { router as reportsRouter } from './reports';
+import { router as callsRouter } from './calls';
 
 const router = Router() as import('express').Router;
 
@@ -50,5 +54,11 @@ router.use('/api/history', historyRouter);
 router.use('/api/docs', docsRouter);
 router.use('/api/specs', specRouter);
 router.use('/api/blog-landing', blogLandingRouter);
+
+// Desktop-specific routes
+router.use('/api/archive', archiveRouter);
+router.use('/api/devices', devicesRouter);
+router.use('/api/reports', reportsRouter);
+router.use('/api/calls', callsRouter);
 
 export { router };

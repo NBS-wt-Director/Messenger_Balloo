@@ -8,6 +8,8 @@ import {
   requestPasswordReset as requestResetService,
   resetPassword as resetPasswordService,
   oauthLogin as oauthLoginService,
+  exchangeYandexCode,
+  getYandexUser,
   enable2FA as enable2FAService,
   verify2FA as verify2FAService,
   verify2FAEnable as verify2FAEnableService,
@@ -16,6 +18,20 @@ import {
   revokeDevice,
 } from '../services/authService';
 import { AuthenticatedRequest } from '../middleware/auth';
+import { setAuthCookies, clearAuthCookies, ACCESS_COOKIE, REFRESH_COOKIE } from '../middleware/auth';
+import { getWsToken } from '../services/authService';
+export { wsToken } from './wsTokenController';
+
+// ============================================================
+// Helper: мобильный клиент?
+// Мобильные приложения (Expo/RN) не могут использовать httpOnly cookie
+// надёжно (Bearer-заголовок + WebSocket), поэтому для них токены
+// дополнительно возвращаются в body. Web-клиенты продолжают
+// получать токены только через httpOnly cookie.
+// DeviceType enum в БД: web | desktop | android | ios
+const MOBILE_DEVICE_TYPES = ['mobile', 'android', 'ios'];
+const isMobileClient = (req: Request): boolean =>
+  MOBILE_DEVICE_TYPES.includes(req.body?.deviceInfo?.type);
 
 // ============================================================
 // Helper: извлечение тела запроса с валидацией
@@ -50,6 +66,9 @@ export const register = async (req: Request, res: Response, next: NextFunction):
 
     const result = await registerService({ email, password, username });
 
+    // Устанавливаем httpOnly cookie вместо возврата токенов в body
+    setAuthCookies(res, result.tokens!.accessToken, result.tokens!.refreshToken);
+
     res.status(201).json({
       message: 'Регистрация успешна',
       user: {
@@ -60,7 +79,8 @@ export const register = async (req: Request, res: Response, next: NextFunction):
         language: result.user.language,
         avatarUrl: result.user.avatarUrl,
       },
-      tokens: result.tokens,
+      // Токены в body — только для мобильных клиентов (web получает их через httpOnly cookie)
+      ...(isMobileClient(req) ? { tokens: result.tokens } : {}),
     });
   } catch (error: any) {
     if (error.message.includes('уже') || error.message.includes('занят')) {
@@ -93,7 +113,26 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
       deviceInfo: deviceInfo || { type: 'web' },
     });
 
-    const response: any = {
+    if (result.user.needs2FA) {
+      // 2FA required — токены не устанавливаем
+      res.json({
+        user: {
+          id: result.user.id,
+          email: result.user.email,
+          username: result.user.username,
+          status: result.user.status,
+          language: result.user.language,
+          avatarUrl: result.user.avatarUrl,
+          needs2FA: true,
+        },
+      });
+      return;
+    }
+
+    // Устанавливаем httpOnly cookie
+    setAuthCookies(res, result.tokens!.accessToken, result.tokens!.refreshToken);
+
+    res.json({
       user: {
         id: result.user.id,
         email: result.user.email,
@@ -101,15 +140,11 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
         status: result.user.status,
         language: result.user.language,
         avatarUrl: result.user.avatarUrl,
-        needs2FA: result.user.needs2FA,
+        needs2FA: false,
       },
-    };
-
-    if (!result.user.needs2FA && result.tokens) {
-      response.tokens = result.tokens;
-    }
-
-    res.json(response);
+      // Токены в cookie, не в body (для мобильных клиентов — в body, см. isMobileClient)
+      ...(isMobileClient(req) ? { tokens: result.tokens } : {}),
+    });
   } catch (error: any) {
     res.status(401).json({ error: 'Unauthorized', message: error.message });
   }
@@ -137,6 +172,9 @@ export const verify2FA = async (req: Request, res: Response, next: NextFunction)
       deviceInfo: deviceInfo || { type: 'web' },
     });
 
+    // Устанавливаем httpOnly cookie
+    setAuthCookies(res, result.tokens!.accessToken, result.tokens!.refreshToken);
+
     res.json({
       user: {
         id: result.user.id,
@@ -147,7 +185,7 @@ export const verify2FA = async (req: Request, res: Response, next: NextFunction)
         avatarUrl: result.user.avatarUrl,
         needs2FA: false,
       },
-      tokens: result.tokens,
+      ...(isMobileClient(req) ? { tokens: result.tokens } : {}),
     });
   } catch (error: any) {
     res.status(401).json({ error: 'Unauthorized', message: error.message });
@@ -155,12 +193,15 @@ export const verify2FA = async (req: Request, res: Response, next: NextFunction)
 };
 
 // ============================================================
-// Refresh токена
+// Refresh cookie — обновление httpOnly cookie
+// Принимает refreshToken из body (для первоначального refresh)
 // ============================================================
 
-export const refresh = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const refreshCookie = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { refreshToken } = req.body;
+    // Refresh token берём из body (для мобильных/API клиентов)
+    // либо из httpOnly cookie (для web — авто-refresh при 401 в api.ts)
+    const refreshToken = req.body?.refreshToken || req.cookies?.[REFRESH_COOKIE];
 
     if (!refreshToken) {
       res.status(400).json({
@@ -172,14 +213,43 @@ export const refresh = async (req: Request, res: Response, next: NextFunction): 
 
     const tokens = await refreshService(refreshToken);
 
-    res.json({ tokens });
+    // Обновляем httpOnly cookie
+    setAuthCookies(res, tokens.accessToken, tokens.refreshToken);
+
+    // Для мобильных клиентов возвращаем новые токены в body
+    res.json(
+      req.body?.client === 'mobile'
+        ? { message: 'Tokens refreshed', tokens }
+        : { message: 'Tokens refreshed' }
+    );
   } catch (error: any) {
     res.status(401).json({ error: 'Unauthorized', message: error.message });
   }
 };
 
 // ============================================================
-// Logout
+// Clear cookie — удаление httpOnly cookie (logout)
+// ============================================================
+
+export const clearCookie = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    // Очищаем httpOnly cookie
+    clearAuthCookies(res);
+
+    // Также очищаем refresh токен из body, если передан
+    const { refreshToken } = req.body;
+    if (refreshToken) {
+      await logoutService(refreshToken);
+    }
+
+    res.json({ message: 'Выход выполнен успешно' });
+  } catch (error: any) {
+    res.status(500).json({ error: 'Internal Error', message: error.message });
+  }
+};
+
+// ============================================================
+// Logout (старый — для обратной совместимости с API)
 // ============================================================
 
 export const logout = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -275,6 +345,45 @@ export const resetPassword = async (req: Request, res: Response, next: NextFunct
 };
 
 // ============================================================
+// OAuth callback — Яндекс (GET)
+// ============================================================
+
+export const yandexCallback = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { code, state } = req.query;
+
+    if (!code) {
+      res.status(400).json({ error: 'Bad Request', message: 'Authorization code is required' });
+      return;
+    }
+
+    // Обмен code на access token
+    const tokenData = (await exchangeYandexCode(code as string)) as { access_token: string };
+    const accessToken = tokenData.access_token;
+
+    // Получение данных пользователя
+    const userData = await getYandexUser(accessToken);
+
+    // Логин/регистрация пользователя
+    const result = await oauthLoginService({
+      provider: 'yandex',
+      providerId: userData.providerId,
+      email: userData.email,
+      username: userData.username,
+      avatarUrl: userData.avatarUrl,
+      accessToken,
+    });
+
+    // Редирект на фронтенд — токены теперь в cookie, не в URL
+    const frontendUrl = `${process.env.CORS_ORIGIN || 'https://balloo.su'}/auth/success?cookie_set=true`;
+    res.redirect(302, frontendUrl);
+  } catch (error: any) {
+    console.error('[YANDEX CALLBACK] Error:', error);
+    res.status(500).json({ error: 'Internal Error', message: error.message });
+  }
+};
+
+// ============================================================
 // OAuth логин
 // ============================================================
 
@@ -302,6 +411,9 @@ export const oauthLogin = async (req: Request, res: Response, next: NextFunction
       deviceInfo: deviceInfo || { type: 'web' },
     });
 
+    // Устанавливаем httpOnly cookie
+    setAuthCookies(res, result.tokens!.accessToken, result.tokens!.refreshToken);
+
     res.json({
       user: {
         id: result.user.id,
@@ -312,7 +424,7 @@ export const oauthLogin = async (req: Request, res: Response, next: NextFunction
         avatarUrl: result.user.avatarUrl,
         needs2FA: result.user.needs2FA,
       },
-      tokens: result.tokens,
+      // Токены в cookie, не в body
     });
   } catch (error: any) {
     res.status(500).json({ error: 'Internal Error', message: error.message });

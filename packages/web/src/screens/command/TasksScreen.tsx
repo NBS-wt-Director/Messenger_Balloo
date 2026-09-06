@@ -1,7 +1,8 @@
 // TasksScreen — Kanban board for employee portal
 // Портал сотрудников: задачи и проекты
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { api } from '@/services/api';
 
 // --- Types ---
 
@@ -26,189 +27,6 @@ interface Task {
 }
 
 // --- Mock Data ---
-
-const MOCK_TASKS: Task[] = [
-  {
-    id: 'tsk_001',
-    title: 'Интеграция платёжной системы ЮMoney',
-    description: 'Подключить платёжный шлюз ЮMoney для донатов и подписок',
-    status: 'in_progress',
-    priority: 'high',
-    type: 'feature',
-    assignee: 'Алексей К.',
-    assigneeAvatar: 'https://api.dicebear.com/7.x/initials/svg?seed=AK',
-    dueDate: '2026-08-05',
-    tags: ['backend', 'payments'],
-    comments: 7,
-    votes: 12,
-    createdAt: '2026-07-20',
-  },
-  {
-    id: 'tsk_002',
-    title: 'Фикс: аватарки не обрезаются в Safari',
-    description: 'Октагон-clip работает некорректно в Safari на macOS',
-    status: 'todo',
-    priority: 'urgent',
-    type: 'bug',
-    assignee: 'Мария Д.',
-    assigneeAvatar: 'https://api.dicebear.com/7.x/initials/svg?seed=MD',
-    dueDate: '2026-08-01',
-    tags: ['frontend', 'css', 'bug'],
-    comments: 3,
-    votes: 5,
-    createdAt: '2026-07-22',
-  },
-  {
-    id: 'tsk_003',
-    title: 'Добавить поддержку 20 языков в i18n',
-    description: 'Расширить словарь переводов: 14 языков народов РФ + дружественные',
-    status: 'in_review',
-    priority: 'high',
-    type: 'task',
-    assignee: 'Дмитрий В.',
-    assigneeAvatar: 'https://api.dicebear.com/7.x/initials/svg?seed=ДВ',
-    dueDate: '2026-08-10',
-    tags: ['i18n', 'shared'],
-    comments: 11,
-    votes: 23,
-    createdAt: '2026-07-15',
-  },
-  {
-    id: 'tsk_004',
-    title: 'Оптимизация WebSocket-подключений',
-    description: 'Уменьшить количество переподключений при нестабильном интернете',
-    status: 'backlog',
-    priority: 'medium',
-    type: 'improvement',
-    assignee: 'Иван С.',
-    assigneeAvatar: 'https://api.dicebear.com/7.x/initials/svg?seed=ИС',
-    dueDate: '2026-08-20',
-    tags: ['backend', 'websocket', 'performance'],
-    comments: 2,
-    votes: 8,
-    createdAt: '2026-07-25',
-  },
-  {
-    id: 'tsk_005',
-    title: 'Дизайн экрана настроек хранилища',
-    description: 'Макет для управления кэшем, Yandex Disk и MinIO',
-    status: 'done',
-    priority: 'low',
-    type: 'task',
-    assignee: 'Елена Р.',
-    assigneeAvatar: 'https://api.dicebear.com/7.x/initials/svg?seed=ЕР',
-    dueDate: '2026-07-28',
-    tags: ['design', 'settings'],
-    comments: 4,
-    votes: 6,
-    createdAt: '2026-07-18',
-  },
-  {
-    id: 'tsk_006',
-    title: 'Настройка CI/CD для Electron-сборки',
-    description: 'Автоматическая сборка .deb, .AppImage, .exe при push в main',
-    status: 'in_progress',
-    priority: 'medium',
-    type: 'task',
-    assignee: 'Алексей К.',
-    assigneeAvatar: 'https://api.dicebear.com/7.x/initials/svg?seed=AK',
-    dueDate: '2026-08-15',
-    tags: ['devops', 'electron'],
-    comments: 9,
-    votes: 15,
-    createdAt: '2026-07-21',
-  },
-  {
-    id: 'tsk_007',
-    title: 'Исправить утечку памяти в чате',
-    description: 'При длительном открытии чата память растёт на 50 МБ/час',
-    status: 'todo',
-    priority: 'urgent',
-    type: 'bug',
-    assignee: 'Дмитрий В.',
-    assigneeAvatar: 'https://api.dicebear.com/7.x/initials/svg?seed=ДВ',
-    dueDate: '2026-07-31',
-    tags: ['frontend', 'bug', 'memory'],
-    comments: 5,
-    votes: 18,
-    createdAt: '2026-07-26',
-  },
-  {
-    id: 'tsk_008',
-    title: 'Добавить реакции на сообщения',
-    description: 'Поддержка эмодзи-реакций в стиле Telegram',
-    status: 'backlog',
-    priority: 'medium',
-    type: 'feature',
-    assignee: 'Мария Д.',
-    assigneeAvatar: 'https://api.dicebear.com/7.x/initials/svg?seed=MD',
-    dueDate: '2026-09-01',
-    tags: ['frontend', 'backend', 'feature'],
-    comments: 14,
-    votes: 32,
-    createdAt: '2026-07-10',
-  },
-  {
-    id: 'tsk_009',
-    title: 'Миграция на PostgreSQL 16',
-    description: 'Обновить версию PostgreSQL с 14 до 16, проверить совместимость',
-    status: 'done',
-    priority: 'high',
-    type: 'task',
-    assignee: 'Иван С.',
-    assigneeAvatar: 'https://api.dicebear.com/7.x/initials/svg?seed=ИС',
-    dueDate: '2026-07-25',
-    tags: ['devops', 'database'],
-    comments: 6,
-    votes: 9,
-    createdAt: '2026-07-12',
-  },
-  {
-    id: 'tsk_010',
-    title: 'Документация API для разработчиков',
-    description: 'Swagger/OpenAPI спецификация для всех эндпоинтов',
-    status: 'in_progress',
-    priority: 'low',
-    type: 'improvement',
-    assignee: 'Елена Р.',
-    assigneeAvatar: 'https://api.dicebear.com/7.x/initials/svg?seed=ЕР',
-    dueDate: '2026-08-25',
-    tags: ['docs', 'api'],
-    comments: 1,
-    votes: 4,
-    createdAt: '2026-07-27',
-  },
-  {
-    id: 'tsk_011',
-    title: 'Push-уведомления через WebSocket VAPID',
-    description: 'Self-hosted push-уведомления без Firebase',
-    status: 'todo',
-    priority: 'high',
-    type: 'feature',
-    assignee: 'Алексей К.',
-    assigneeAvatar: 'https://api.dicebear.com/7.x/initials/svg?seed=AK',
-    dueDate: '2026-08-12',
-    tags: ['backend', 'push', 'feature'],
-    comments: 8,
-    votes: 20,
-    createdAt: '2026-07-19',
-  },
-  {
-    id: 'tsk_012',
-    title: 'Адаптивный дизайн для мобильных',
-    description: 'Пересмотреть breakpoint\'ы для планшетов и телефонов',
-    status: 'backlog',
-    priority: 'medium',
-    type: 'improvement',
-    assignee: 'Мария Д.',
-    assigneeAvatar: 'https://api.dicebear.com/7.x/initials/svg?seed=MD',
-    dueDate: '2026-09-10',
-    tags: ['frontend', 'design', 'responsive'],
-    comments: 3,
-    votes: 11,
-    createdAt: '2026-07-28',
-  },
-];
 
 // --- Constants ---
 
@@ -792,7 +610,33 @@ function TaskModal({
 // --- Main Screen ---
 
 export function TasksScreen() {
-  const [tasks, setTasks] = useState<Task[]>(MOCK_TASKS);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.getTasks().then((res) => {
+      const mapped: Task[] = (res || []).map((t: any) => ({
+        id: t.id,
+        title: t.title,
+        description: t.description || '',
+        status: (t.status || 'backlog') as Task['status'],
+        priority: (t.priority || 'medium') as Task['priority'],
+        type: (t.type || 'task') as Task['type'],
+        assignee: t.assignee || 'Не назначен',
+        assigneeAvatar: t.assigneeAvatar || '',
+        dueDate: t.dueDate || '',
+        tags: t.tags || [],
+        comments: t.comments || 0,
+        votes: t.votes || 0,
+        createdAt: t.createdAt || '',
+      }));
+      setTasks(mapped);
+      setLoading(false);
+    }).catch(() => {
+      setTasks([]);
+      setLoading(false);
+    });
+  }, []);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterAssignee, setFilterAssignee] = useState('all');
   const [filterPriority, setFilterPriority] = useState('all');
@@ -832,22 +676,55 @@ export function TasksScreen() {
   }, [filteredTasks]);
 
   // Handlers
-  const handleSaveTask = (savedTask: Task) => {
-    if (modalTask) {
-      setTasks((prev) => prev.map((t) => (t.id === savedTask.id ? savedTask : t)));
-    } else {
-      setTasks((prev) => [...prev, savedTask]);
+  const handleSaveTask = async (savedTask: Task) => {
+    try {
+      if (modalTask) {
+        await api.updateTask(modalTask.id, {
+          title: savedTask.title,
+          description: savedTask.description,
+          status: savedTask.status,
+          priority: savedTask.priority,
+          assignee: savedTask.assignee,
+          dueDate: savedTask.dueDate,
+          tags: savedTask.tags,
+        });
+        setTasks((prev) => prev.map((t) => (t.id === savedTask.id ? savedTask : t)));
+      } else {
+        const created = await api.createTask({
+          title: savedTask.title,
+          description: savedTask.description,
+          status: savedTask.status,
+          priority: savedTask.priority,
+          type: savedTask.type,
+          assignee: savedTask.assignee,
+          dueDate: savedTask.dueDate,
+          tags: savedTask.tags,
+        });
+        setTasks((prev) => [...prev, { ...savedTask, id: created.id }]);
+      }
+    } catch {
+      // Опционально: показать ошибку
     }
     setShowModal(false);
     setModalTask(null);
   };
 
-  const handleDeleteTask = (id: string) => {
-    setTasks((prev) => prev.filter((t) => t.id !== id));
+  const handleDeleteTask = async (id: string) => {
+    try {
+      await api.deleteTask(id);
+      setTasks((prev) => prev.filter((t) => t.id !== id));
+    } catch {
+      // Опционально: показать ошибку
+    }
   };
 
-  const handleDropTask = (taskId: string, newStatus: TaskStatus) => {
-    setTasks((prev) => prev.map((t) => (t.id === taskId ? { ...t, status: newStatus } : t)));
+  const handleDropTask = async (taskId: string, newStatus: TaskStatus) => {
+    try {
+      await api.updateTask(taskId, { status: newStatus });
+      setTasks((prev) => prev.map((t) => (t.id === taskId ? { ...t, status: newStatus } : t)));
+    } catch {
+      // Опционально: показать ошибку
+    }
   };
 
   return (

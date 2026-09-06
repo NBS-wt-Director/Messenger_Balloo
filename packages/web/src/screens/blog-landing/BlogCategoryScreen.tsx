@@ -38,10 +38,10 @@ export default function BlogCategoryScreen() {
         const categoriesRes = await api.getBlogLandingCategories();
         if (cancelled) return;
 
-        const found = (categoriesRes.categories || MOCK_CATEGORIES).find(
+        const found = (categoriesRes.categories || []).find(
           (c: BlogLandingCategory) => c.slug === slug
         );
-        setCategory(found || MOCK_CATEGORIES.find((c) => c.slug === slug) || null);
+        setCategory(found || null);
 
         if (found) {
           const postsRes = await api.getBlogLandingPosts({
@@ -56,9 +56,8 @@ export default function BlogCategoryScreen() {
         }
       } catch {
         if (!cancelled) {
-          const mockCat = MOCK_CATEGORIES.find((c) => c.slug === slug);
-          setCategory(mockCat || null);
-          setPosts(MOCK_POSTS);
+          setCategory(null);
+          setPosts([]);
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -213,30 +212,3 @@ function formatNumber(n: number): string {
   return String(n);
 }
 
-const MOCK_CATEGORIES: BlogLandingCategory[] = [
-  { id: 'news', name: 'Новости', slug: 'news', postCount: 24, totalViews: 45200 },
-  { id: 'tech', name: 'Технологии', slug: 'tech', postCount: 18, totalViews: 32100 },
-  { id: 'team', name: 'Команда', slug: 'team', postCount: 8, totalViews: 5400 },
-  { id: 'metrics', name: 'Метрики', slug: 'metrics', postCount: 5, totalViews: 3200 },
-];
-
-const MOCK_POSTS: BlogLandingPost[] = [
-  {
-    id: 'mock-cat-1',
-    title: 'Дизайн-система Balloo: октагоны, пузыри и glassmorphism',
-    excerpt: 'Как мы построили уникальную визуальную идентичность…',
-    content: '',
-    coverEmoji: '🎨',
-    coverGradient: 'linear-gradient(135deg, #a855f7, #6b21a8)',
-    channel: { id: 'tech', name: '⚙️ Технологии' },
-    categories: [],
-    author: { id: '2', name: 'Мария Андреева', initials: 'МА' },
-    publishedAt: Date.now() / 1000,
-    publishedAtFormatted: '14 июля 2026',
-    readTime: 8,
-    views: 856,
-    reactions: 21,
-    comments: 0,
-    tags: [],
-  },
-];

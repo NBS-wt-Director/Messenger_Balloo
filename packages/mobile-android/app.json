@@ -23,7 +23,10 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0d1117"
       },
-      "package": "su.balloo.messenger"
+      "package": "su.balloo.messenger",
+      "versionCode": 1,
+      "permissions": ["INTERNET"],
+      "allowBackup": true
     },
     "web": {
       "favicon": "./assets/favicon.png"

@@ -1,7 +1,8 @@
 // AuditLogsScreen — таблица логов действий администраторов
 // Фильтры: admin, action, date range | Pagination
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { api } from '@/services/api';
 
 // --- Types ---
 interface AuditLog {
@@ -15,81 +16,6 @@ interface AuditLog {
 }
 
 // --- Mock data ---
-const MOCK_LOGS: AuditLog[] = [
-  {
-    id: 'log-001',
-    admin: { name: 'Иван Админов', avatar: '' },
-    action: 'ban_user',
-    target: 'user_abc123',
-    details: 'Глобальный бан на 30 дней. Причина: спам',
-    ip: '192.168.1.100',
-    timestamp: '2026-07-29T14:30:00Z',
-  },
-  {
-    id: 'log-002',
-    admin: { name: 'Мария Петрова', avatar: '' },
-    action: 'delete_post',
-    target: 'post_xyz789',
-    details: 'Удаление поста за нарушение правил',
-    ip: '10.0.0.55',
-    timestamp: '2026-07-29T13:15:00Z',
-  },
-  {
-    id: 'log-003',
-    admin: { name: 'Иван Админов', avatar: '' },
-    action: 'create_announcement',
-    target: 'announcement_001',
-    details: 'Создано объявление "Технические работы"',
-    ip: '192.168.1.100',
-    timestamp: '2026-07-29T12:00:00Z',
-  },
-  {
-    id: 'log-004',
-    admin: { name: 'Алексей Сидоров', avatar: '' },
-    action: 'toggle_feature_flag',
-    target: 'feature_dark_mode',
-    details: 'Feature flag "dark_mode" включён',
-    ip: '172.16.0.10',
-    timestamp: '2026-07-29T11:45:00Z',
-  },
-  {
-    id: 'log-005',
-    admin: { name: 'Мария Петрова', avatar: '' },
-    action: 'resolve_report',
-    target: 'report_456',
-    details: 'Жалоба решена: одобрена, пользователь заблокирован',
-    ip: '10.0.0.55',
-    timestamp: '2026-07-29T10:30:00Z',
-  },
-  {
-    id: 'log-006',
-    admin: { name: 'Иван Админов', avatar: '' },
-    action: 'update_user',
-    target: 'user_def456',
-    details: 'Смена роли на admin',
-    ip: '192.168.1.100',
-    timestamp: '2026-07-29T09:00:00Z',
-  },
-  {
-    id: 'log-007',
-    admin: { name: 'Алексей Сидоров', avatar: '' },
-    action: 'publish_version',
-    target: 'v1.2.0',
-    details: 'Опубликована версия 1.2.0',
-    ip: '172.16.0.10',
-    timestamp: '2026-07-28T18:00:00Z',
-  },
-  {
-    id: 'log-008',
-    admin: { name: 'Мария Петрова', avatar: '' },
-    action: 'ban_user',
-    target: 'user_ghi789',
-    details: 'Глобальный бан навсегда. Причина: мошенничество',
-    ip: '10.0.0.55',
-    timestamp: '2026-07-28T16:30:00Z',
-  },
-];
-
 const ACTION_LABELS: Record<string, string> = {
   ban_user: '🚫 Бан пользователя',
   unban_user: '✅ Снятие бана',
@@ -134,7 +60,18 @@ function formatTimestamp(ts: string): string {
 }
 
 export function AuditLogsScreen() {
-  const [logs] = useState<AuditLog[]>(MOCK_LOGS);
+  const [logs, setLogs] = useState<AuditLog[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.getAuditLogs().then((res) => {
+      setLogs(res || []);
+      setLoading(false);
+    }).catch(() => {
+      setLogs([]);
+      setLoading(false);
+    });
+  }, []);
   const [filterAction, setFilterAction] = useState<string>('all');
   const [filterAdmin, setFilterAdmin] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');

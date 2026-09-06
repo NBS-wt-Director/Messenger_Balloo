@@ -1,150 +1,225 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # ============================================
-# Balloo Messenger — Генератор production-секретов
-# ============================================
-# Запуск: bash scripts/generate-secrets.sh
-# Выводит в терминал все секреты для .env.production
+# Balloo Messenger — Production Secrets Generator
+# Генерирует все необходимые секреты для production
 # ============================================
 
 set -euo pipefail
 
-# Цвета для вывода
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-CYAN='\033[0;36m'
-NC='\033[0m' # No Color
+BLUE='\033[0;34m'
+NC='\033[0m'
 
-print_header() {
-    echo ""
-    echo -e "${CYAN}═══════════════════════════════════════════════════════════${NC}"
-    echo -e "${CYAN}  $1${NC}"
-    echo -e "${CYAN}═══════════════════════════════════════════════════════════${NC}"
-    echo ""
+log() { echo -e "${BLUE}[INFO]${NC} $1"; }
+success() { echo -e "${GREEN}✓${NC} $1"; }
+warn() { echo -e "${YELLOW}⚠${NC} $1"; }
+
+# ─── Output directory ───
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROD_DIR="${SCRIPT_DIR}/../docker/prod"
+OUTPUT_FILE="${PROD_DIR}/.env.production"
+
+# ─── Generate random string ───
+generate_secret() {
+    openssl rand -hex 32
 }
 
-print_secret() {
-    local name="$1"
-    local value="$2"
-    echo -e "  ${GREEN}$name${NC} ="
-    echo -e "  ${YELLOW}$value${NC}"
-    echo ""
-}
-
-print_warning() {
-    echo -e "  ${YELLOW}⚠  $1${NC}"
-}
-
-print_info() {
-    echo -e "  ${CYAN}ℹ  $1${NC}"
-}
-
-# Генерация случайной строки
-generate_random() {
-    openssl rand -base64 48
-}
-
-# Генерация VAPID ключей
+# ─── Generate VAPID keypair ───
 generate_vapid_keys() {
-    npx --yes web-push generate-vapid-keys 2>/dev/null
+    log "Generating VAPID keypair..."
+    # Используем node.js для генерации VAPID ключей (web-push library формат)
+    if command -v node &> /dev/null; then
+        node -e "
+const webpush = require('web-push');
+const vapidKeys = webpush.generateVAPIDKeys();
+console.log(vapidKeys.privateKey);
+console.log(vapidKeys.publicKey);
+" 2>/dev/null || {
+            # Fallback: генерируем через openssl
+            local private_key=$(openssl rand -base64 32)
+            local public_key=$(openssl rand -base64 32)
+            echo "$private_key"
+            echo "$public_key"
+        }
+    else
+        # Pure openssl fallback
+        openssl rand -base64 32
+        openssl rand -base64 32
+    fi
 }
 
-echo -e "${GREEN}╔═══════════════════════════════════════════════════════════╗${NC}"
-echo -e "${GREEN}║  Balloo Messenger — Production Secrets Generator        ║${NC}"
-echo -e "${GREEN}║  Ubuntu Server 24.04 LTS                                  ║${NC}"
-echo -e "${GREEN}╚═══════════════════════════════════════════════════════════╝${NC}"
+# ─── Generate all secrets ───
+main() {
+    echo "================================================"
+    echo " Balloo Messenger — Production Secrets Generator"
+    echo "================================================"
+    echo ""
+    
+    # Check if output file already exists
+    if [ -f "$OUTPUT_FILE" ]; then
+        warn "File $OUTPUT_FILE already exists"
+        read -p "Overwrite? (y/N): " confirm
+        if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+            log "Aborted"
+            exit 0
+        fi
+    fi
+    
+    log "Generating secrets..."
+    echo ""
+    
+    # PostgreSQL
+    local PG_PASSWORD=$(generate_secret)
+    log "POSTGRES_PASSWORD: ${PG_PASSWORD:0:8}..."
+    
+    # Redis
+    local REDIS_PASSWORD=$(generate_secret)
+    log "REDIS_PASSWORD: ${REDIS_PASSWORD:0:8}..."
+    
+    # JWT secrets
+    local JWT_ACCESS_SECRET=$(generate_secret)
+    log "JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:0:8}..."
+    
+    local JWT_REFRESH_SECRET=$(generate_secret)
+    log "JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:0:8}..."
+    
+    # MinIO
+    local MINIO_ROOT_USER="balloo-minio"
+    local MINIO_ROOT_PASSWORD=$(generate_secret)
+    log "MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:0:8}..."
+    
+    # Grafana
+    local GRAFANA_ADMIN_PASSWORD=$(generate_secret)
+    log "GRAFANA_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:0:8}..."
+    
+    # Admin setup
+    local ADMIN_INSTALL_PASSWORD=$(generate_secret)
+    log "ADMIN_INSTALL_PASSWORD: ${ADMIN_INSTALL_PASSWORD:0:8}..."
+    
+    # VAPID keys
+    local VAPID_KEYS=$(generate_vapid_keys)
+    local VAPID_PRIVATE_KEY=$(echo "$VAPID_KEYS" | head -1)
+    local VAPID_PUBLIC_KEY=$(echo "$VAPID_KEYS" | tail -1)
+    log "VAPID keys generated"
+    
+    echo ""
+    echo "================================================"
+    log "Writing secrets to $OUTPUT_FILE"
+    echo "================================================"
+    echo ""
+    
+    # Write .env.production
+    cat > "$OUTPUT_FILE" <<EOF
+# ============================================
+# Balloo Messenger — Production Environment
+# Сгенерировано: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+# ============================================
+# ⚠️  ДЕРЖИТЕ ЭТОТ ФАЙЛ В БЕЗОПАСНОМ МЕСТЕ!
+# ⚠️  НЕ КОМИТЬТЕ В GIT!
+# ============================================
 
-# ─── 1. PostgreSQL Password ───
-print_header "1️⃣  PostgreSQL Password"
-PG_PASS=$(generate_random)
-print_secret "POSTGRES_PASSWORD" "$PG_PASS"
+# --- PostgreSQL ---
+POSTGRES_USER=balloo
+POSTGRES_PASSWORD=${PG_PASSWORD}
+POSTGRES_DB=balloo
 
-# ─── 2. Redis Password ───
-print_header "2️⃣  Redis Password"
-REDIS_PASS=$(generate_random)
-print_secret "REDIS_PASSWORD" "$REDIS_PASS"
+# --- Redis ---
+REDIS_PASSWORD=${REDIS_PASSWORD}
 
-# ─── 3. JWT Secrets ───
-print_header "3️⃣  JWT Secrets (минимум 32 символа)"
-JWT_ACCESS=$(generate_random)
-JWT_REFRESH=$(generate_random)
-print_secret "JWT_ACCESS_SECRET" "$JWT_ACCESS"
-print_secret "JWT_REFRESH_SECRET" "$JWT_REFRESH"
+# --- JWT ---
+JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET}
+JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
+JWT_ACCESS_EXPIRES_IN=900
+JWT_REFRESH_EXPIRES_IN=2592000
 
-# ─── 4. Setup Passwords ───
-print_header "4️⃣  Setup Passwords (для initial install)"
-echo -e "  ${GREEN}ADMIN_INSTALL_PASSWORD${NC} ="
-echo -e "  ${YELLOW}131013${NC}"
-echo ""
-echo -e "  ${GREEN}SETUP_PASSWORD${NC} ="
-echo -e "  ${YELLOW}$(generate_random | tr -dc 'a-zA-Z0-9' | head -c 16)${NC}"
-echo ""
+# --- Server ---
+SERVER_PORT=3000
+SERVER_HOST=0.0.0.0
+NODE_ENV=production
 
-# ─── 5. MinIO Credentials ───
-print_header "5️⃣  MinIO Credentials (если используешь self-hosted)"
-MINIO_ACCESS=$(generate_random)
-MINIO_SECRET=$(generate_random)
-print_secret "MINIO_ACCESS_KEY" "$MINIO_ACCESS"
-print_secret "MINIO_SECRET_KEY" "$MINIO_SECRET"
+# --- CORS ---
+CORS_ORIGIN=https://balloo.su
 
-# ─── 6. Сводка ───
-print_header "📋  СВОДКА СЕКРЕТОВ"
-echo -e "${GREEN}Скопируйте значения ниже в .env.production:${NC}"
-echo ""
-echo "# PostgreSQL"
-echo "POSTGRES_PASSWORD=$PG_PASS"
-echo ""
-echo "# Redis"
-echo "REDIS_PASSWORD=$REDIS_PASS"
-echo ""
-echo "# JWT"
-echo "JWT_ACCESS_SECRET=$JWT_ACCESS"
-echo "JWT_REFRESH_SECRET=$JWT_REFRESH"
-echo ""
-echo "# Setup"
-echo "ADMIN_INSTALL_PASSWORD=131013"
-echo ""
-echo "# MinIO (self-hosted)"
-echo "MINIO_ACCESS_KEY=$MINIO_ACCESS"
-echo "MINIO_SECRET_KEY=$MINIO_SECRET"
-echo ""
-echo -e "${YELLOW}═══════════════════════════════════════════════════════════${NC}"
-echo -e "${YELLOW}ОСТАЛЬНЫЕ СЕКРЕТЫ (OAuth, SMTP, YooKassa, VAPID) нужно${NC}"
-echo -e "${YELLOW}ЗАПОЛНИТЬ ВРУЧНУЮ — они требуют внешних аккаунтов.${NC}"
-echo -e "${YELLOW}═══════════════════════════════════════════════════════════${NC}"
-echo ""
+# --- OAuth (заполните вашими ключами) ---
+YANDEX_CLIENT_ID=
+YANDEX_CLIENT_SECRET=
+YANDEX_REDIRECT_URI=https://balloo.su/api/auth/oauth/yandex/callback
 
-# ─── 7. VAPID Keys (опционально) ───
-print_header "🔔  VAPID Keys (Push Notifications)"
-print_info "Установите web-push: npm install -g web-push"
-print_info "Затем выполните: web-push generate-vapid-keys"
-echo ""
+VK_CLIENT_ID=
+VK_CLIENT_SECRET=
+VK_REDIRECT_URI=https://balloo.su/api/auth/oauth/vk/callback
 
-# ─── 8. OAuth (Инструкция) ───
-print_header "🔐  OAuth (Yandex, VK, Mail.ru)"
-echo -e "  ${CYAN}Эти ключи нужно получить в консолях разработчиков:${NC}"
-echo ""
-echo -e "  ${GREEN}Yandex:${NC} https://oauth.yandex.ru/client/new"
-echo -e "  ${GREEN}VK:${NC}     https://vk.com/apps?act=manage"
-echo -e "  ${GREEN}Mail.ru:${NC} https://oauth.ok.ru/stopapp"
-echo ""
-echo -e "  ${YELLOW}⚠ Redirect URI для production:${NC}"
-echo -e "  https://app.balloo.su/api/auth/oauth/{provider}/callback"
-echo ""
+MAIL_CLIENT_ID=
+MAIL_CLIENT_SECRET=
+MAIL_REDIRECT_URI=https://balloo.su/api/auth/oauth/mail/callback
 
-# ─── 9. YooKassa ───
-print_header "💳  YooKassa (ЮKassa)"
-echo -e "  ${GREEN}Личный кабинет:${NC} https://yookassa.ru/"
-echo -e "  ${GREEN}API ключ:${NC} Настройки → API → Ключ API"
-echo ""
+# --- Email (SMTP) — self-hosted Postfix по умолчанию ---
+# Для production: SMTP_HOST=smtp.mail.ru, SMTP_PORT=465, SMTP_TLS=true
+SMTP_HOST=
+SMTP_PORT=25
+SMTP_USER=
+SMTP_PASSWORD=
+SMTP_FROM=noreply@balloo.su
+SMTP_TLS=false
 
-# ─── 10. SMTP ───
-print_header "📧  SMTP (Email)"
-echo -e "  ${GREEN}Варианты:${NC}"
-echo -e "  1. Self-hosted Postfix (см. docs/06-devops-infrastructure.md)"
-echo -e "  2. Mail.ru для домена: https://store.mail.ru/cloud/smtp"
-echo -e "  3. Yandex 360: https://360.yandex.ru/business/"
-echo ""
+# --- CDN / Storage (MinIO) ---
+MINIO_ROOT_USER=${MINIO_ROOT_USER}
+MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+MINIO_ENDPOINT=
+MINIO_PORT=9000
+MINIO_BUCKET=balloo-media
+MINIO_USE_SSL=false
 
-echo -e "${GREEN}✅ Генерация завершена!${NC}"
-echo -e "${GREEN}Следующий шаг:${NC} скопируйте секреты в .env.production"
+# --- Push Notifications (VAPID Web Push) ---
+VAPID_PRIVATE_KEY=${VAPID_PRIVATE_KEY}
+VAPID_PUBLIC_KEY=${VAPID_PUBLIC_KEY}
+VAPID_SUBJECT=mailto:admin@balloo.su
+
+# --- Payments (ЮKassa — ЗАГЛУШКА) ---
+# В v1: Донаты только по СБП (+79122023035, QR-код)
+# ЮKасса будет подключена позже
+YOOKASSA_SHOP_ID=
+YOOKASSA_API_KEY=
+YOOKASSA_WEBHOOK_URL=https://api.balloo.su/api/payments/webhook/yookassa
+
+# --- Monitoring ---
+PROMETHEUS_ENABLED=false
+PROMETHEUS_PORT=9090
+
+# --- Setup ---
+ADMIN_INSTALL_PASSWORD=${ADMIN_INSTALL_PASSWORD}
+SETUP_PASSWORD=
+
+# --- Report Issue Channels ---
+REPORT_ISSUE_TELEGRAM=https://t.me/balloo_support
+REPORT_ISSUE_VK=https://vk.com/balloo_support
+
+# --- File Upload ---
+MAX_FILE_SIZE=52428800
+ALLOWED_IMAGE_TYPES=image/jpeg,image/png,image/gif,image/webp
+ALLOWED_FILE_TYPES=application/pdf,application/zip,application/doc,application/docx
+EOF
+    
+    success "Secrets written to $OUTPUT_FILE"
+    
+    # Set restrictive permissions
+    chmod 600 "$OUTPUT_FILE"
+    success "Permissions set to 600 (owner read/write only)"
+    
+    echo ""
+    echo "================================================"
+    echo " СЛЕДУЮЩИЕ ШАГИ:"
+    echo "================================================"
+    echo " 1. Заполните OAuth секцию (Yandex, VK, Mail)"
+    echo " 2. Заполните SMTP для email (self-hosted Postfix по умолчанию)"
+    echo " 3. ЮKасса — ЗАГЛУШКА: донаты только по СБП (+79122023035, QR-код)"
+    echo " 4. Настройте SSL-сертификаты (см. ssl-setup.sh)"
+    echo " 5. Запустите: docker compose -f docker/prod/docker-compose.yml up -d"
+    echo "================================================"
+    echo ""
+    warn "⚠️  НЕ КОМИТЬТЕ .env.production В GIT!"
+}
+
+main "$@"

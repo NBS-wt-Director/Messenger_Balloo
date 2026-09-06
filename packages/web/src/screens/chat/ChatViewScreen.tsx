@@ -76,66 +76,93 @@ export const ChatViewScreen: React.FC = () => {
   useEffect(() => {
     if (!chatId) return;
 
-    const token = localStorage.getItem('balloo-accessToken');
-    if (!token) return;
+    const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3100';
+    let ws: WebSocket | null = null;
+    let cancelled = false;
 
-    const ws = new WebSocket(`ws://localhost:3100/ws/?token=${token}`);
+    const connect = async () => {
+      try {
+        const response = await fetch(`${API_BASE}/api/auth/ws-token`, {
+          method: 'GET',
+          credentials: 'include',
+        });
 
-    ws.onopen = () => {
-      console.log('WS connected');
-      ws.send(JSON.stringify({ type: 'chat.join', chatId }));
-    };
+        if (!response.ok || cancelled) {
+          console.log('[WS] No auth for WebSocket');
+          return;
+        }
 
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      switch (data.type) {
-        case 'message.send':
-          if (data.chatId === chatId) {
-            addMessage(chatId, {
-              ...data.message,
-              sender: data.message.sender
-                ? {
-                    id: data.message.sender.id,
-                    username: data.message.sender.username,
-                    displayName: data.message.sender.displayName,
-                    avatarUrl: data.message.sender.avatarUrl,
-                  }
-                : { id: '', username: '' },
-            });
-          }
-          break;
-        case 'message.read':
-          if (data.chatId === chatId) {
-            updateMessage(chatId, data.messageId, { status: 'read' });
-          }
-          break;
-        case 'typing.start':
-          if (data.chatId === chatId) {
-            setTypingUsers(chatId, [
-              ...(useChatStore.getState().typingUsers[chatId] || []),
-              { userId: data.userId, username: data.username },
-            ]);
-          }
-          break;
-        case 'typing.stop':
-          if (data.chatId === chatId) {
-            setTypingUsers(
-              chatId,
-              (useChatStore.getState().typingUsers[chatId] || []).filter(
-                (u) => u.userId !== data.userId
-              )
-            );
-          }
-          break;
+        const { token } = await response.json();
+        const wsUrl = `${API_BASE.replace('http', 'ws')}/ws/?token=${token}`;
+        ws = new WebSocket(wsUrl);
+      } catch {
+        console.log('[WS] Connection failed');
+        return;
       }
+
+      if (!ws || cancelled) return;
+
+      if (ws) {
+        ws.onopen = () => {
+        console.log('WS connected');
+        ws!.send(JSON.stringify({ type: 'chat.join', chatId }));
+      };
+
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        switch (data.type) {
+          case 'message.send':
+            if (data.chatId === chatId) {
+              addMessage(chatId, {
+                ...data.message,
+                sender: data.message.sender
+                  ? {
+                      id: data.message.sender.id,
+                      username: data.message.sender.username,
+                      displayName: data.message.sender.displayName,
+                      avatarUrl: data.message.sender.avatarUrl,
+                    }
+                  : { id: '', username: '' },
+              });
+            }
+            break;
+          case 'message.read':
+            if (data.chatId === chatId) {
+              updateMessage(chatId, data.messageId, { status: 'read' });
+            }
+            break;
+          case 'typing.start':
+            if (data.chatId === chatId) {
+              setTypingUsers(chatId, [
+                ...(useChatStore.getState().typingUsers[chatId] || []),
+                { userId: data.userId, username: data.username },
+              ]);
+            }
+            break;
+          case 'typing.stop':
+            if (data.chatId === chatId) {
+              setTypingUsers(
+                chatId,
+                (useChatStore.getState().typingUsers[chatId] || []).filter(
+                  (u) => u.userId !== data.userId
+                )
+              );
+            }
+            break;
+        }
+      };
+
+      ws.onclose = () => {
+      }
+        console.log('WS disconnected');
+      };
     };
 
-    ws.onclose = () => {
-      console.log('WS disconnected');
-    };
+    connect();
 
     return () => {
-      ws.close();
+      cancelled = true;
+      if (ws) ws.close();
     };
   }, [chatId]);
 

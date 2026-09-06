@@ -11,6 +11,7 @@
     "web": "expo start --web",
     "build": "echo \"No build yet\" && exit 0",
     "build:android:apk": "npx expo run:android --variant release",
+    "build:android:eas": "eas build --platform android --profile apk",
     "build:android:aab": "cd android && ./gradlew bundleRelease",
     "build:android:split": "cd android && ./gradlew assembleRelease -PabiSplit=true",
     "build:android:universal": "cd android && ./gradlew assembleRelease",

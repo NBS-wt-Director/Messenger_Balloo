@@ -1,7 +1,8 @@
 // DesktopArchiveScreen.tsx — Desktop archived chats screen
 // Shows archived conversations with restore/delete options
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { api } from '@balloo/web/services/api';
 
 interface ArchivedChat {
   id: string;
@@ -14,13 +15,25 @@ interface ArchivedChat {
 
 export function DesktopArchiveScreen() {
   const [selectedChats, setSelectedChats] = useState<Set<string>>(new Set());
+  const [archivedChats, setArchivedChats] = useState<ArchivedChat[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Placeholder data
-  const archivedChats: ArchivedChat[] = [
-    { id: '1', name: 'Старый проект', lastMessage: 'Всё готово, можно сдавать', lastMessageTime: Date.now() - 86400000 * 7, unreadCount: 0 },
-    { id: '2', name: 'Чат поддержки', lastMessage: 'Спасибо за обращение!', lastMessageTime: Date.now() - 86400000 * 14, unreadCount: 2 },
-    { id: '3', name: 'Группа выпускников', lastMessage: 'Фото с встречи', lastMessageTime: Date.now() - 86400000 * 30, unreadCount: 0 },
-  ];
+  const fetchArchived = useCallback(async () => {
+    try {
+      setLoading(true);
+      const result = await api.getArchived();
+      setArchivedChats(result.chats || []);
+    } catch (err: any) {
+      setError(err.message || 'Ошибка загрузки архива');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchArchived();
+  }, [fetchArchived]);
 
   const toggleSelect = (id: string) => {
     const next = new Set(selectedChats);
@@ -29,14 +42,28 @@ export function DesktopArchiveScreen() {
     setSelectedChats(next);
   };
 
-  const handleRestore = () => {
-    // TODO: API call to restore selected chats
+  const handleRestore = async () => {
+    for (const chatId of selectedChats) {
+      try {
+        await api.restoreArchivedChat(chatId);
+      } catch (err) {
+        console.error('Restore failed:', err);
+      }
+    }
     setSelectedChats(new Set());
+    fetchArchived();
   };
 
-  const handleDelete = () => {
-    // TODO: API call to delete selected chats
+  const handleDelete = async () => {
+    for (const chatId of selectedChats) {
+      try {
+        await api.deleteArchivedChat(chatId);
+      } catch (err) {
+        console.error('Delete failed:', err);
+      }
+    }
     setSelectedChats(new Set());
+    fetchArchived();
   };
 
   const formatTime = (timestamp: number): string => {
@@ -103,7 +130,18 @@ export function DesktopArchiveScreen() {
       </div>
 
       <div style={{ flex: 1, overflow: 'auto' }}>
-        {archivedChats.length === 0 ? (
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '48px 0', color: 'var(--text-secondary, #8a8aa0)' }}>
+            <p style={{ fontSize: '16px' }}>Загрузка...</p>
+          </div>
+        ) : error ? (
+          <div style={{ textAlign: 'center', padding: '48px 0', color: '#e74c3c' }}>
+            <p style={{ fontSize: '16px' }}>{error}</p>
+            <button onClick={fetchArchived} style={{ marginTop: '12px', padding: '6px 14px', background: 'var(--accent)', color: '#fff', border: 'none', cursor: 'pointer' }}>
+              Повторить
+            </button>
+          </div>
+        ) : archivedChats.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '48px 0', color: 'var(--text-secondary, #8a8aa0)' }}>
             <p style={{ fontSize: '16px' }}>Нет archived чатов</p>
             <p style={{ fontSize: '13px', marginTop: '8px' }}>Архивированные чаты появятся здесь</p>

@@ -14,8 +14,8 @@ interface LegalCheckboxProps {
 export function LegalCheckbox({
   checked,
   onChange,
-  rulesUrl = 'rules.html',
-  privacyUrl = 'rules.html',
+  rulesUrl = '/rules',
+  privacyUrl = '/privacy',
   label,
   error,
 }: LegalCheckboxProps) {

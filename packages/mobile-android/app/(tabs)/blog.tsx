@@ -1,33 +1,10 @@
-// Blog screen — placeholder
-// Will be implemented in ticket #37
+// Blog tab — real blog screen (connected to API)
 
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import BlogScreen from '../../src/screens/BlogScreen';
+import { useExpoNavigation } from '../../src/router/expoNavigation';
 
-export default function BlogScreen() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Блог</Text>
-      <Text style={styles.subtitle}>Лента постов будет здесь</Text>
-    </View>
-  );
+export default function BlogTab() {
+  const navigation = useExpoNavigation();
+  return <BlogScreen navigation={navigation} />;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#0d1117',
-    paddingTop: 60,
-    paddingHorizontal: 16,
-  },
-  title: {
-    fontSize: 28,
-    color: '#e6edf3',
-    fontWeight: 'bold',
-    marginBottom: 16,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#8b949e',
-  },
-});

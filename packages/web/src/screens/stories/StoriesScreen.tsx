@@ -39,101 +39,6 @@ interface StoryReaction {
   createdAt: number;
 }
 
-// --- Mock data (демо до подключения бэкенда) ---
-
-const MOCK_STORY_USERS: StoryUser[] = [
-  {
-    id: 'u1',
-    userId: 'u1',
-    username: 'maria_andreeva',
-    displayName: 'Мария Андреева',
-    avatarUrl: null,
-    stories: [
-      {
-        id: 's1',
-        userId: 'u1',
-        type: 'image',
-        mediaUrl: '',
-        thumbnail: null,
-        createdAt: Date.now() - 3600000,
-        expiresAt: Date.now() + 82800000,
-        viewCount: 24,
-        reactions: [
-          { userId: 'me', emoji: '❤️', createdAt: Date.now() - 1800000 },
-        ],
-      },
-      {
-        id: 's2',
-        userId: 'u1',
-        type: 'image',
-        mediaUrl: '',
-        thumbnail: null,
-        createdAt: Date.now() - 7200000,
-        expiresAt: Date.now() + 82800000,
-        viewCount: 18,
-        reactions: [],
-      },
-    ],
-    hasUnviewed: true,
-  },
-  {
-    id: 'u2',
-    userId: 'u2',
-    username: 'alex_dev',
-    displayName: 'Алексей Петров',
-    avatarUrl: null,
-    stories: [
-      {
-        id: 's3',
-        userId: 'u2',
-        type: 'video',
-        mediaUrl: '',
-        thumbnail: null,
-        createdAt: Date.now() - 1800000,
-        expiresAt: Date.now() + 86400000,
-        viewCount: 42,
-        reactions: [
-          { userId: 'me', emoji: '🔥', createdAt: Date.now() - 900000 },
-          { userId: 'u1', emoji: '👍', createdAt: Date.now() - 600000 },
-        ],
-      },
-    ],
-    hasUnviewed: true,
-  },
-  {
-    id: 'u3',
-    userId: 'u3',
-    username: 'elena_k',
-    displayName: 'Елена Козлова',
-    avatarUrl: null,
-    stories: [
-      {
-        id: 's4',
-        userId: 'u3',
-        type: 'text',
-        mediaUrl: '',
-        thumbnail: null,
-        text: 'Новый дизайн Balloo — просто 🔥',
-        bgColor: '#1a1a2e',
-        createdAt: Date.now() - 5400000,
-        expiresAt: Date.now() + 79200000,
-        viewCount: 15,
-        reactions: [],
-      },
-    ],
-    hasUnviewed: false,
-  },
-  {
-    id: 'u4',
-    userId: 'u4',
-    username: 'dmitry_v',
-    displayName: 'Дмитрий Волков',
-    avatarUrl: null,
-    stories: [],
-    hasUnviewed: false,
-  },
-];
-
 // --- Story Circle Component ---
 
 function StoryCircle({
@@ -512,7 +417,7 @@ function StoryViewer({
 
 function StoriesScreen() {
   const navigate = useNavigate();
-  const [users, setUsers] = useState<StoryUser[]>(MOCK_STORY_USERS);
+  const [users, setUsers] = useState<StoryUser[]>([]);
   const [viewer, setViewer] = useState<{
     userId: string;
     storyIndex: number;
@@ -525,7 +430,7 @@ function StoriesScreen() {
       const data = await api.get<StoryUser[]>('/api/stories');
       setUsers(data);
     } catch {
-      setUsers(MOCK_STORY_USERS);
+      setUsers([]);
     } finally {
       setLoading(false);
     }

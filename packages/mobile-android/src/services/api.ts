@@ -5,6 +5,26 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const API_BASE = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3100';
 
+// ============================================================
+// Хранение токенов (мобильные клиенты: Bearer-заголовок + AsyncStorage)
+// ============================================================
+
+export async function saveAuthTokens(tokens: AuthTokens): Promise<void> {
+  await AsyncStorage.setItem('balloo-accessToken', tokens.accessToken);
+  await AsyncStorage.setItem('balloo-refreshToken', tokens.refreshToken);
+}
+
+export async function clearAuthTokens(): Promise<void> {
+  await AsyncStorage.multiRemove([
+    'balloo-accessToken',
+    'balloo-refreshToken',
+  ]);
+}
+
+export async function getAccessToken(): Promise<string | null> {
+  return AsyncStorage.getItem('balloo-accessToken');
+}
+
 interface ApiOptions extends RequestInit {
   data?: unknown;
 }
@@ -38,28 +58,33 @@ async function request<T>(
 
   let response = await fetch(`${API_BASE}${endpoint}`, config);
 
-  // If 401, try refresh token
+  // If 401, try refresh token (mobile clients: tokens returned in body)
   if (response.status === 401 && refreshToken) {
     try {
       const refreshResponse = await fetch(`${API_BASE}/api/auth/refresh`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refreshToken }),
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${refreshToken}`,
+        },
+        body: JSON.stringify({ client: 'mobile' }),
       });
 
       if (refreshResponse.ok) {
-        const { accessToken, refreshToken: newRefresh } =
-          await refreshResponse.json();
-        await AsyncStorage.setItem('balloo-accessToken', accessToken);
-        await AsyncStorage.setItem('balloo-refreshToken', newRefresh);
+        const refreshed = await refreshResponse.json();
+        const { accessToken, refreshToken: newRefresh } = refreshed.tokens || {};
+        if (accessToken && newRefresh) {
+          await AsyncStorage.setItem('balloo-accessToken', accessToken);
+          await AsyncStorage.setItem('balloo-refreshToken', newRefresh);
 
-        // Retry original request with new token
-        headers['Authorization'] = `Bearer ${accessToken}`;
-        response = await fetch(`${API_BASE}${endpoint}`, {
-          ...rest,
-          headers,
-          body: data ? JSON.stringify(data) : undefined,
-        });
+          // Retry original request with new token
+          headers['Authorization'] = `Bearer ${accessToken}`;
+          response = await fetch(`${API_BASE}${endpoint}`, {
+            ...rest,
+            headers,
+            body: data ? JSON.stringify(data) : undefined,
+          });
+        }
       }
     } catch {
       // Refresh failed — clear tokens
@@ -80,13 +105,26 @@ async function request<T>(
   return response.json();
 }
 
+export interface AuthTokens {
+  accessToken: string;
+  refreshToken: string;
+}
+
+export interface AuthResponse {
+  user: any;
+  // Токены возвращаются в body только для мобильных клиентов (deviceInfo.type=mobile)
+  tokens?: AuthTokens;
+  needs2FA?: boolean;
+}
+
 export const api = {
   // Auth
+  // deviceInfo.type должен совпадать с Prisma-enum DeviceType: web | desktop | android | ios
   login: (email: string, password: string) =>
-    request<{ accessToken: string; refreshToken: string; user: any }>(
-      '/api/auth/login',
-      { method: 'POST', data: { email, password } }
-    ),
+    request<AuthResponse>('/api/auth/login', {
+      method: 'POST',
+      data: { email, password, deviceInfo: { type: 'android', name: 'Android' } },
+    }),
 
   register: (data: {
     email: string;
@@ -94,10 +132,17 @@ export const api = {
     username: string;
     displayName?: string;
   }) =>
-    request<{ accessToken: string; refreshToken: string; user: any }>(
-      '/api/auth/register',
-      { method: 'POST', data }
-    ),
+    request<AuthResponse>('/api/auth/register', {
+      method: 'POST',
+      data: { ...data, deviceInfo: { type: 'android', name: 'Android' } },
+    }),
+
+  // Верификация 2FA после логина (needs2FA=true)
+  verify2FALogin: (email: string, code: string) =>
+    request<AuthResponse>('/api/auth/2fa/verify', {
+      method: 'POST',
+      data: { email, code, deviceInfo: { type: 'android', name: 'Android' } },
+    }),
 
   verifyEmail: (code: string) =>
     request<{ success: boolean }>('/api/auth/verify-email', {
@@ -161,8 +206,9 @@ export const api = {
   getBlockedUsers: () => request<any[]>('/api/users/blocked'),
 
   // Chats
+  // Сервер возвращает { chats: [...], pagination } — тип any, маппинг на клиенте
   getChats: (cursor?: string, limit = 50) =>
-    request<any[]>('/api/chats', { method: 'GET' }),
+    request<any>('/api/chats', { method: 'GET' }),
 
   createChat: (data: { type: string; name: string; description?: string }) =>
     request<any>('/api/chats', { method: 'POST', data }),
@@ -201,8 +247,9 @@ export const api = {
     }),
 
   // Messages
+  // Сервер возвращает { messages: [...], pagination } — тип any, маппинг на клиенте
   getMessages: (chatId: string, cursor?: string, limit = 50) =>
-    request<any[]>(`/api/chats/${chatId}/messages`, { method: 'GET' }),
+    request<any>(`/api/chats/${chatId}/messages`, { method: 'GET' }),
 
   sendMessage: (
     chatId: string,

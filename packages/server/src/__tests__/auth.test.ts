@@ -1,6 +1,18 @@
 import request from 'supertest';
 import { app, registerTestUser, loginTestUser } from './helpers';
 
+// Проверка наличия httpOnly cookie в ответе (после тикета №2 токены не в body)
+function getCookie(res: request.Response, name: string): string {
+  const raw: unknown = res.headers['set-cookie'];
+  const cookies = Array.isArray(raw) ? (raw as string[]) : [];
+  for (const c of cookies) {
+    const [pair] = c.split(';');
+    const [key, ...rest] = pair.split('=');
+    if (key.trim() === name) return decodeURIComponent(rest.join('='));
+  }
+  return '';
+}
+
 describe('Auth API', () => {
   describe('POST /api/auth/register', () => {
     it('registers a new user successfully', async () => {
@@ -14,11 +26,11 @@ describe('Auth API', () => {
 
       expect(res.status).toBe(201);
       expect(res.body).toHaveProperty('user');
-      expect(res.body).toHaveProperty('tokens');
-      expect(res.body.tokens).toHaveProperty('accessToken');
-      expect(res.body.tokens).toHaveProperty('refreshToken');
       expect(res.body.user).toHaveProperty('id');
       expect(res.body.user).toHaveProperty('email');
+      // Токены выдаются через httpOnly cookie
+      expect(getCookie(res, 'balloo-access-token')).toBeTruthy();
+      expect(getCookie(res, 'balloo-refresh-token')).toBeTruthy();
     });
 
     it('rejects registration without email', async () => {
@@ -50,6 +62,22 @@ describe('Auth API', () => {
 
       expect(res.status).toBe(409);
     });
+
+    it('returns tokens in body for mobile clients (deviceInfo.type=android)', async () => {
+      const res = await request(app)
+        .post('/api/auth/register')
+        .send({
+          email: `mobile_reg_${Date.now()}@test.balloo.ru`,
+          password: 'Test1234',
+          username: `mobileuser_${Date.now()}`,
+          deviceInfo: { type: 'android' },
+        });
+
+      expect(res.status).toBe(201);
+      expect(res.body.tokens).toBeTruthy();
+      expect(res.body.tokens.accessToken).toBeTruthy();
+      expect(res.body.tokens.refreshToken).toBeTruthy();
+    });
   });
 
   describe('POST /api/auth/login', () => {
@@ -61,9 +89,10 @@ describe('Auth API', () => {
         .send({ email: user.email, password: user.password });
 
       expect(res.status).toBe(200);
-      expect(res.body).toHaveProperty('tokens');
-      expect(res.body.tokens).toHaveProperty('accessToken');
       expect(res.body.user.needs2FA).toBe(false);
+      // Токены выдаются через httpOnly cookie
+      expect(getCookie(res, 'balloo-access-token')).toBeTruthy();
+      expect(getCookie(res, 'balloo-refresh-token')).toBeTruthy();
     });
 
     it('rejects login with wrong password', async () => {
@@ -91,6 +120,23 @@ describe('Auth API', () => {
 
       expect(res.status).toBe(400);
     });
+
+    it('returns tokens in body for mobile clients (deviceInfo.type=android)', async () => {
+      const user = await registerTestUser();
+
+      const res = await request(app)
+        .post('/api/auth/login')
+        .send({
+          email: user.email,
+          password: user.password,
+          deviceInfo: { type: 'android' },
+        });
+
+      expect(res.status).toBe(200);
+      expect(res.body.tokens).toBeTruthy();
+      expect(res.body.tokens.accessToken).toBeTruthy();
+      expect(res.body.tokens.refreshToken).toBeTruthy();
+    });
   });
 
   describe('POST /api/auth/refresh', () => {
@@ -103,9 +149,9 @@ describe('Auth API', () => {
         .send({ refreshToken: user.refreshToken });
 
       expect(res.status).toBe(200);
-      expect(res.body).toHaveProperty('tokens');
-      expect(res.body.tokens).toHaveProperty('accessToken');
-      expect(res.body.tokens).toHaveProperty('refreshToken');
+      // Обновлённые токены возвращаются через httpOnly cookie
+      expect(getCookie(res, 'balloo-access-token')).toBeTruthy();
+      expect(getCookie(res, 'balloo-refresh-token')).toBeTruthy();
     });
 
     it('rejects refresh without token', async () => {
@@ -119,6 +165,7 @@ describe('Auth API', () => {
     it('rejects refresh with invalid token', async () => {
       const res = await request(app)
         .post('/api/auth/refresh')
+        .set('Authorization', 'Bearer invalid-token')
         .send({ refreshToken: 'invalid-token' });
 
       expect(res.status).toBe(401);

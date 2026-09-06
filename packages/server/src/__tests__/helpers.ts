@@ -1,3 +1,10 @@
+// Mock emailService — prevents real email sending during tests
+jest.mock('../services/emailService', () => ({
+  sendWelcomeEmail: jest.fn().mockResolvedValue(true),
+  sendVerificationEmail: jest.fn().mockResolvedValue(true),
+  sendResetPasswordEmail: jest.fn().mockResolvedValue(true),
+}));
+
 // Test helpers — register a user and get auth token
 import { app } from '../app';
 import jwt from 'jsonwebtoken';
@@ -25,6 +32,19 @@ export interface TestUser {
   refreshToken: string;
 }
 
+// Извлечение JWT из httpOnly cookie ответа (после тикета №2 токены не в body)
+function extractCookie(res: any, name: string): string {
+  const cookies: string[] = res.headers['set-cookie'] || [];
+  for (const c of cookies) {
+    const [pair] = c.split(';');
+    const [key, ...rest] = pair.split('=');
+    if (key.trim() === name) {
+      return decodeURIComponent(rest.join('='));
+    }
+  }
+  return '';
+}
+
 /**
  * Register a new user via API and return credentials
  */
@@ -50,8 +70,8 @@ export async function registerTestUser(overrides?: {
     email,
     username,
     password,
-    accessToken: res.body.tokens.accessToken,
-    refreshToken: res.body.tokens.refreshToken,
+    accessToken: extractCookie(res, 'balloo-access-token'),
+    refreshToken: extractCookie(res, 'balloo-refresh-token'),
   };
 }
 
@@ -72,8 +92,8 @@ export async function loginTestUser(email: string, password: string): Promise<{
   }
 
   return {
-    accessToken: res.body.tokens.accessToken,
-    refreshToken: res.body.tokens.refreshToken,
+    accessToken: extractCookie(res, 'balloo-access-token'),
+    refreshToken: extractCookie(res, 'balloo-refresh-token'),
     userId: res.body.user.id,
   };
 }

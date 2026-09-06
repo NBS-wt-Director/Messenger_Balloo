@@ -98,7 +98,7 @@ const getDonationTiers = async (): Promise<DonationTier[]> => {
     name: t.name,
     amount: Number(t.amount),
     currency: t.currency || 'RUB',
-    features: t.features || {},
+    features: t.features ? JSON.parse(t.features) : [],
   }));
 };
 

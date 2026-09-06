@@ -12,8 +12,8 @@
       "REDIS_PASSWORD": ""
     },
     "jwt": {
-      "JWT_ACCESS_SECRET": "CHANGE_ME_TO_SECURE_RANDOM_STRING",
-      "JWT_REFRESH_SECRET": "CHANGE_ME_TO_ANOTHER_SECURE_RANDOM_STRING"
+      "JWT_ACCESS_SECRET": "1ede20439e8333616b35eb5b64e6a7acb3389bdc25d97c0369754d880e31836c",
+      "JWT_REFRESH_SECRET": "458bddfa49870f135286ef32c0f8d26415e6fdf29dfdb711502102b1e9663a3e"
     },
     "oauth": {
       "yandex": {
@@ -52,8 +52,8 @@
       "YOOKASSA_API_KEY": ""
     },
     "setup": {
-      "SETUP_PASSWORD": "CHANGE_ME",
-      "ADMIN_INSTALL_PASSWORD": "CHANGE_ME"
+      "SETUP_PASSWORD": "06041996ОИА",
+      "ADMIN_INSTALL_PASSWORD": "131013"
     }
   },
   "production": {
@@ -66,8 +66,8 @@
       "REDIS_PASSWORD": ""
     },
     "jwt": {
-      "JWT_ACCESS_SECRET": "",
-      "JWT_REFRESH_SECRET": ""
+      "JWT_ACCESS_SECRET": "1ede20439e8333616b35eb5b64e6a7acb3389bdc25d97c0369754d880e31836c",
+      "JWT_REFRESH_SECRET": "458bddfa49870f135286ef32c0f8d26415e6fdf29dfdb711502102b1e9663a3e"
     },
     "jwt_timeouts": {
       "JWT_ACCESS_EXPIRES_IN": "900",
@@ -75,9 +75,9 @@
     },
     "oauth": {
       "yandex": {
-        "YANDEX_CLIENT_ID": "",
-        "YANDEX_CLIENT_SECRET": "",
-        "YANDEX_REDIRECT_URI": "https://app.balloo.su/api/auth/oauth/yandex/callback"
+        "YANDEX_CLIENT_ID": "ccee3f45f25f4e5d8193ce26124822dc",
+        "YANDEX_CLIENT_SECRET": "387bed4d64574869b422c431cf8491d4",
+        "YANDEX_REDIRECT_URI": "https://balloo.su/api/auth/yandex-callback"
       },
       "vk": {
         "VK_CLIENT_ID": "",

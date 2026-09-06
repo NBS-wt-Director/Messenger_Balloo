@@ -191,10 +191,6 @@ router.post('/apply', (req: Request, res: Response) => {
     yookassaApiKey: config.yookassaApiKey || '',
 
     // CDN
-    yandexOsbucket: config.yandexOsbucket || '',
-    yandexOsAccessKey: config.yandexOsAccessKey || '',
-    yandexOsSecretKey: config.yandexOsSecretKey || '',
-    yandexOsEndpoint: config.yandexOsEndpoint || '',
     minioEndpoint: config.minioEndpoint || 'localhost',
     minioPort: parseInt(config.minioPort) || 9000,
     minioAccessKey: config.minioAccessKey || 'minioadmin',
@@ -203,23 +199,16 @@ router.post('/apply', (req: Request, res: Response) => {
 
     // SMTP
     smtpHost: config.smtpHost || 'localhost',
-    smtpPort: parseInt(config.smtpPort) || 587,
+    smtpPort: parseInt(config.smtpPort) || 25,
     smtpUser: config.smtpUser || '',
     smtpPassword: config.smtpPassword || '',
     smtpFromEmail: config.smtpFromEmail || 'noreply@balloo.su',
+    smtpTls: config.smtpTls || 'false',
 
     // Push
     pushPublicKey: config.pushPublicKey || '',
     pushPrivateKey: config.pushPrivateKey || '',
     pushSubject: config.pushSubject || 'mailto:admin@balloo.su',
-
-    // Monitoring
-    grafanaUrl: config.grafanaUrl || '',
-    grafanaAdminPassword: config.grafanaAdminPassword || '',
-
-    // Analytics
-    yandexMetricaCounterId: config.yandexMetricaCounterId || '',
-    yandexMetricaToken: config.yandexMetricaToken || '',
 
     // Security
     jwtSecret: config.jwtSecret || generateJwtSecret(),
@@ -227,7 +216,6 @@ router.post('/apply', (req: Request, res: Response) => {
     jwtRefreshTtl: parseInt(config.jwtRefreshTtl) || 2592000,
     setupPassword: config.setupPassword || '06041996ОИА',
     adminInstallPassword: config.adminInstallPassword || '131013',
-    corsOrigins: config.corsOrigins || '*',
   };
 
   const result = applyInstallConfig(installConfig);

@@ -1,4 +1,5 @@
 // Sidebar — навигация: чаты, контакты, настройки, блог, админка
+// + юридические ссылки (правила, конфиденциальность, cookies)
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -33,6 +34,13 @@ export function Sidebar() {
   if (user.isAdmin) {
     navItems.splice(4, 0, { icon: '🛡️', label: 'Админка', path: '/admin' });
   }
+
+  // Legal nav items (visible only when sidebar is expanded)
+  const legalItems = [
+    { icon: '📜', label: 'Правила', path: '/rules' },
+    { icon: '🔒', label: 'Конфиденциальность', path: '/privacy' },
+    { icon: '🍪', label: 'Cookies', path: '/cookies' },
+  ];
 
   return (
     <div
@@ -116,37 +124,60 @@ export function Sidebar() {
         ))}
       </div>
 
-      {/* Bottom: Collapse indicator */}
-      {!isSidebarOpen && (
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '16px',
-            padding: '12px 0',
-            borderTop: '1px solid var(--border-color)',
-          }}
-        >
-          {navItems.slice(0, 4).map((item) => (
-            <div
-              key={item.path}
-              onClick={() => handleNavClick(item.path)}
-              style={{
-                fontSize: '18px',
-                cursor: 'pointer',
-                padding: '6px',
-                opacity: 0.7,
-                transition: 'opacity 0.15s',
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
-              onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.7')}
-            >
-              {item.icon}
-            </div>
-          ))}
-        </div>
-      )}
+      {/* Bottom: Legal links + Collapse indicator */}
+      <div
+        style={{
+          borderTop: '1px solid var(--border-color)',
+          padding: '8px 0',
+          flexShrink: 0,
+        }}
+      >
+        {isSidebarOpen ? (
+          // Expanded: show legal links as items
+          <>
+            {legalItems.map((item) => (
+              <NavItem
+                key={item.path}
+                icon={item.icon}
+                label={item.label}
+                active={false}
+                onClick={() => handleNavClick(item.path)}
+              />
+            ))}
+          </>
+        ) : (
+          // Collapsed: show legal icons as tooltip items
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '12px',
+              padding: '4px 0',
+            }}
+          >
+            {legalItems.map((item) => (
+              <div
+                key={item.path}
+                onClick={() => handleNavClick(item.path)}
+                style={{
+                  fontSize: '16px',
+                  cursor: 'pointer',
+                  padding: '4px',
+                  opacity: 0.6,
+                  transition: 'opacity 0.15s',
+                  position: 'relative',
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
+                onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.6')}
+                title={item.label}
+              >
+                {item.icon}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

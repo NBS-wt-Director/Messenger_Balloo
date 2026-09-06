@@ -74,30 +74,6 @@ const EXPIRY_OPTIONS = [
   { value: 'never', label: 'Без ограничений' },
 ];
 
-// --- Mock data ---
-
-const MOCK_POLL: Poll = {
-  id: 'p1',
-  chatId: 'c1',
-  creatorId: 'u1',
-  creatorName: 'Мария Андреева',
-  creatorAvatar: null,
-  type: 'poll',
-  question: 'Какой цвет для акцента?',
-  options: [
-    { id: 'o1', text: 'Зелёный', votes: 42 },
-    { id: 'o2', text: 'Мятный', votes: 28 },
-    { id: 'o3', text: 'Бирюзовый', votes: 15 },
-  ],
-  allowsMultiple: false,
-  anonymous: true,
-  shareable: true,
-  expiresAt: Date.now() + 86400000,
-  createdAt: Date.now() - 3600000,
-  totalVotes: 85,
-  userVoted: [0],
-};
-
 // --- Create Poll View ---
 
 function CreatePollView({
@@ -564,7 +540,7 @@ function PollScreen() {
   const navigate = useNavigate();
   const { pollId } = useParams<{ pollId: string }>();
   const [mode, setMode] = useState<'create' | 'view'>('view');
-  const [poll, setPoll] = useState<Poll | null>(MOCK_POLL);
+  const [poll, setPoll] = useState<Poll | null>(null);
   const [loading, setLoading] = useState(false);
 
   // Загрузка опроса по ID

@@ -1,33 +1,25 @@
-// Two-factor authentication screen — placeholder
-// Will be implemented in ticket #36
+// Two-factor authentication route — real 2FA screen (connected to API)
 
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
+import TwoFactorScreen from '../../src/screens/auth/TwoFactorScreen';
+import { useExpoNavigation } from '../../src/router/expoNavigation';
 
-export default function TwoFactorScreen() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Двухфакторная аутентификация</Text>
-      <Text style={styles.subtitle}>Введите код из приложения</Text>
-    </View>
-  );
+export default function TwoFactorRoute() {
+  const params = useLocalSearchParams<{ email?: string }>();
+  const navigation = useExpoNavigation();
+
+  // TwoFactorScreen работает с email через внутреннее состояние;
+  // предзаполняем его, если email передан из экрана логина
+  return <TwoFactorWithPrefill email={params.email ? String(params.email) : ''} navigation={navigation} />;
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#0d1117',
-  },
-  title: {
-    fontSize: 22,
-    color: '#e6edf3',
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#8b949e',
-  },
-});
+function TwoFactorWithPrefill({
+  email,
+  navigation,
+}: {
+  email: string;
+  navigation: ReturnType<typeof useExpoNavigation>;
+}) {
+  return <TwoFactorScreen navigation={navigation} initialEmail={email} />;
+}

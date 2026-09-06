@@ -32,31 +32,47 @@ const envSchema = z.object({
   MINIO_SECRET_KEY: z.string().default('minioadmin'),
   MINIO_BUCKET: z.string().default('balloo-media'),
 
-  // Email (self-hosted Postfix)
+  // Email (SMTP) — self-hosted Postfix по умолчанию
   SMTP_HOST: z.string().default('localhost'),
   SMTP_PORT: z.string().regex(/^\d+$/).default('25'),
   SMTP_USER: z.string().optional(),
   SMTP_PASSWORD: z.string().optional(),
   SMTP_FROM: z.string().default('noreply@balloo.su'),
+  SMTP_TLS: z.string().default('false'),
 
   // Yandex OAuth
   YANDEX_CLIENT_ID: z.string().optional(),
   YANDEX_CLIENT_SECRET: z.string().optional(),
+  YANDEX_REDIRECT_URI: z.string().optional(),
 
   // VK OAuth
   VK_CLIENT_ID: z.string().optional(),
   VK_CLIENT_SECRET: z.string().optional(),
+  VK_REDIRECT_URI: z.string().optional(),
 
   // Mail.ru OAuth
   MAILRU_CLIENT_ID: z.string().optional(),
   MAILRU_CLIENT_SECRET: z.string().optional(),
+  MAILRU_REDIRECT_URI: z.string().optional(),
 
-  // ЮKassa (платежи)
+  // VAPID (Web Push)
+  VAPID_PUBLIC_KEY: z.string().optional(),
+  VAPID_PRIVATE_KEY: z.string().optional(),
+  VAPID_SUBJECT: z.string().default('mailto:admin@balloo.su'),
+
+  // ЮKassa (платежи — заглушка, СБП по умолчанию)
   YOOKASSA_SHOP_ID: z.string().optional(),
   YOOKASSA_API_KEY: z.string().optional(),
+  YOOKASSA_WEBHOOK_URL: z.string().optional(),
 
   // Setup password (для первоначальной настройки)
   SETUP_PASSWORD: z.string().default(''),
+
+  // Admin install password
+  ADMIN_INSTALL_PASSWORD: z.string().default(''),
+
+  // File upload
+  MAX_FILE_SIZE: z.string().default('52428800'),
 });
 
 export const env = envSchema.parse(process.env);

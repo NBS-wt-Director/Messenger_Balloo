@@ -6,6 +6,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useChatStore } from '@/store/chatStore';
 import { ChatSidebar } from '@/components/chat/ChatSidebar';
 import { TypingIndicator } from '@/components/chat/TypingIndicator';
+import { api } from '@/services/api';
 
 // --- Типы для внутреннего чата ---
 
@@ -53,19 +54,9 @@ interface InternalChat {
     content: string;
     timestamp: number;
   };
-  members?: Array<{
-    user: {
-      id: string;
-      username: string;
-      displayName: string;
-      avatarUrl: string | null;
-      status: string;
-    };
-    role: string;
-  }>;
 }
 
-// --- Utility functions ---
+// --- Утилиты ---
 
 function getInitials(name: string): string {
   return name
@@ -76,283 +67,104 @@ function getInitials(name: string): string {
     .slice(0, 2);
 }
 
-function formatTime(timestamp: number): string {
-  const date = new Date(timestamp);
-  return date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+function formatTime(ts: number): string {
+  return new Date(ts).toLocaleTimeString('ru-RU', {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 }
 
 // --- Slash commands ---
 
 const SLASH_COMMANDS = [
-  { command: '/deploy', description: 'Запустить деплой на staging/production', icon: '🚀' },
-  { command: '/status', description: 'Статус сервисов (API, WS, БД, Redis)', icon: '📊' },
-  { command: '/standup', description: 'Ежедневный статус (что сделал, что буду делать, блокеры)', icon: '📋' },
-  { command: '/ping', description: 'Проверить доступность сервиса', icon: '🏓' },
-  { command: '/logs', description: 'Последние логи сервиса', icon: '📝' },
-  { command: '/help', description: 'Список доступных команд', icon: '❓' },
+  { command: 'deploy', icon: '🚀', description: 'Запустить деплой' },
+  { command: 'status', icon: '📊', description: 'Проверить статус сервисов' },
+  { command: 'standup', icon: '📋', description: 'Standup отчёт' },
+  { command: 'ping', icon: '🏓', description: 'Проверить доступность' },
+  { command: 'logs', icon: '📝', description: 'Последние логи' },
+  { command: 'help', icon: '📖', description: 'Справка по командам' },
 ];
-
-// --- Mock data ---
-
-const MOCK_CHANNELS: InternalChat[] = [
-  {
-    id: 'ch_dev',
-    type: 'group',
-    name: '#разработка',
-    avatarUrl: null,
-    inviteCode: null,
-    createdAt: Date.now() - 86400000 * 30,
-    updatedAt: Date.now(),
-    unreadCount: 3,
-    lastMessage: { senderName: 'Елена', content: 'PR #234 смержен ✅', timestamp: Date.now() - 3600000 * 2 },
-  },
-  {
-    id: 'ch_general',
-    type: 'group',
-    name: '#общий',
-    avatarUrl: null,
-    inviteCode: null,
-    createdAt: Date.now() - 86400000 * 60,
-    updatedAt: Date.now(),
-    unreadCount: 0,
-    lastMessage: { senderName: 'Дмитрий', content: 'K8s деплой готов', timestamp: Date.now() - 3600000 * 3 },
-  },
-  {
-    id: 'ch_dm_ivan_maria',
-    type: 'direct',
-    name: 'Иван → Мария',
-    avatarUrl: null,
-    inviteCode: null,
-    createdAt: Date.now() - 86400000 * 15,
-    updatedAt: Date.now(),
-    unreadCount: 0,
-    lastMessage: { senderName: 'Мария', content: 'Макеты готовы, посмотри', timestamp: Date.now() - 3600000 * 4 },
-  },
-  {
-    id: 'ch_design',
-    type: 'group',
-    name: '#дизайн',
-    avatarUrl: null,
-    inviteCode: null,
-    createdAt: Date.now() - 86400000 * 45,
-    updatedAt: Date.now(),
-    unreadCount: 1,
-    lastMessage: { senderName: 'Мария', content: 'Новые иконки готовы', timestamp: Date.now() - 3600000 * 5 },
-  },
-  {
-    id: 'ch_infra',
-    type: 'group',
-    name: '#инфраструктура',
-    avatarUrl: null,
-    inviteCode: null,
-    createdAt: Date.now() - 86400000 * 90,
-    updatedAt: Date.now(),
-    unreadCount: 0,
-    lastMessage: { senderName: 'Дмитрий', content: 'Мониторинг обновлён', timestamp: Date.now() - 3600000 * 6 },
-  },
-];
-
-const MOCK_MESSAGES: Record<string, InternalMessage[]> = {
-  ch_dev: [
-    {
-      id: 'msg1',
-      chatId: 'ch_dev',
-      senderId: 'u1',
-      senderName: 'Елена К.',
-      type: 'text',
-      content: 'PR #234 (WebSocket重构) смержен в main ✅ CI запущен',
-      replyToId: undefined,
-      editCount: 0,
-      deleted: false,
-      status: 'read',
-      createdAt: Date.now() - 3600000 * 2,
-      reactions: [
-        { emoji: '👍', count: 4, mine: true },
-        { emoji: '🎉', count: 2, mine: false },
-      ],
-      isBot: true,
-    },
-    {
-      id: 'msg2',
-      chatId: 'ch_dev',
-      senderId: 'me',
-      senderName: 'Вы',
-      type: 'text',
-      content: 'Отлично! Деплой на staging?',
-      replyToId: 'msg1',
-      editCount: 0,
-      deleted: false,
-      status: 'read',
-      createdAt: Date.now() - 3600000 * 1.95,
-      reactions: [],
-      isBot: false,
-    },
-    {
-      id: 'msg3',
-      chatId: 'ch_dev',
-      senderId: 'u1',
-      senderName: 'Елена К.',
-      type: 'text',
-      content: 'Да, уже деплоится. Дмитрий настраивает pipeline',
-      replyToId: undefined,
-      editCount: 0,
-      deleted: false,
-      status: 'delivered',
-      createdAt: Date.now() - 3600000 * 1.9,
-      reactions: [],
-      isBot: true,
-    },
-    {
-      id: 'msg4',
-      chatId: 'ch_dev',
-      senderId: 'u2',
-      senderName: 'Дмитрий С.',
-      type: 'text',
-      content: 'Pipeline готов, деплой через 5 минут',
-      replyToId: undefined,
-      editCount: 0,
-      deleted: false,
-      status: 'delivered',
-      createdAt: Date.now() - 3600000 * 1.85,
-      reactions: [
-        { emoji: '🚀', count: 3, mine: false },
-      ],
-      isBot: false,
-    },
-  ],
-  ch_general: [
-    {
-      id: 'msg5',
-      chatId: 'ch_general',
-      senderId: 'u2',
-      senderName: 'Дмитрий С.',
-      type: 'text',
-      content: 'K8s деплой готов, все поды на месте',
-      replyToId: undefined,
-      editCount: 0,
-      deleted: false,
-      status: 'read',
-      createdAt: Date.now() - 3600000 * 3,
-      reactions: [],
-      isBot: false,
-    },
-  ],
-  ch_dm_ivan_maria: [
-    {
-      id: 'msg6',
-      chatId: 'ch_dm_ivan_maria',
-      senderId: 'u3',
-      senderName: 'Мария',
-      type: 'text',
-      content: 'Макеты готовы, посмотри',
-      replyToId: undefined,
-      editCount: 0,
-      deleted: false,
-      status: 'read',
-      createdAt: Date.now() - 3600000 * 4,
-      reactions: [],
-      isBot: false,
-    },
-  ],
-  ch_design: [
-    {
-      id: 'msg7',
-      chatId: 'ch_design',
-      senderId: 'u3',
-      senderName: 'Мария',
-      type: 'text',
-      content: 'Новые иконки готовы в Figma',
-      replyToId: undefined,
-      editCount: 0,
-      deleted: false,
-      status: 'delivered',
-      createdAt: Date.now() - 3600000 * 5,
-      reactions: [],
-      isBot: false,
-    },
-  ],
-  ch_infra: [
-    {
-      id: 'msg8',
-      chatId: 'ch_infra',
-      senderId: 'u2',
-      senderName: 'Дмитрий С.',
-      type: 'text',
-      content: 'Мониторинг обновлён, Grafana dashboard доступен',
-      replyToId: undefined,
-      editCount: 0,
-      deleted: false,
-      status: 'read',
-      createdAt: Date.now() - 3600000 * 6,
-      reactions: [],
-      isBot: false,
-    },
-  ],
-};
-
-// --- SlashCommandsPanel component ---
-
-function SlashCommandsPanel({ visible, onSelect }: { visible: boolean; onSelect: (cmd: string) => void }) {
-  if (!visible) return null;
-
-  return (
-    <div className="input-hint" id="input-hint">
-      {SLASH_COMMANDS.map((sc) => (
-        <div
-          key={sc.command}
-          className="input-hint__item"
-          data-cmd={sc.command}
-          onClick={() => onSelect(sc.command)}
-          style={{ cursor: 'pointer' }}
-        >
-          <code>{sc.command}</code> — {sc.description}
-        </div>
-      ))}
-    </div>
-  );
-}
 
 // --- Main Screen ---
 
 export function InternalChatScreen() {
   const { user } = useAuthStore();
-  const { setMessages } = useChatStore();
 
-  const [channels] = useState<InternalChat[]>(MOCK_CHANNELS);
-  const [activeChatId, setActiveChatId] = useState<string>(channels[0]?.id || '');
+  const [channels, setChannels] = useState<InternalChat[]>([]);
+  const [activeChatId, setActiveChatId] = useState<string>('');
+  const [chatMessages, setChatMessages] = useState<InternalMessage[]>([]);
   const [ws, setWs] = useState<WebSocket | null>(null);
   const [typingUser, setTypingUser] = useState<string>('');
   const [isTyping, setIsTyping] = useState(false);
   const [showSlashCommands, setShowSlashCommands] = useState(false);
   const [inputValue, setInputValue] = useState('');
-  const [isConnecting, setIsConnecting] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [messagesLoading, setMessagesLoading] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  // Get current chat messages
-  const chatMessages = MOCK_MESSAGES[activeChatId] || [];
-
-  // Find current chat
-  const currentChat = channels.find((c) => c.id === activeChatId);
-
-  // Connect WebSocket
+  // Load channels from API
   useEffect(() => {
-    setIsConnecting(true);
+    api.getChats().then((res) => {
+      const internalChats: InternalChat[] = (res || [])
+        .filter((c: any) => ['group', 'channel'].includes(c.type))
+        .map((c: any) => ({
+          id: c.id,
+          type: c.type as 'direct' | 'group' | 'channel',
+          name: c.name || c.title,
+          avatarUrl: c.avatarUrl || null,
+          inviteCode: c.inviteCode || null,
+          createdAt: c.createdAt || Date.now() - 86400000 * 30,
+          updatedAt: c.updatedAt || Date.now(),
+          unreadCount: c.unreadCount || 0,
+          lastMessage: c.lastMessage
+            ? {
+                senderName: c.lastMessage.senderName || 'Неизвестный',
+                content: c.lastMessage.content || '',
+                timestamp: c.lastMessage.createdAt || Date.now(),
+              }
+            : undefined,
+        }));
 
-    // In production, connect to real WebSocket:
-    // const ws = new WebSocket(`ws://${window.location.host}/ws/?token=${authStore.token}`);
-    // ws.onmessage = (event) => { ... };
+      setChannels(internalChats);
+      if (internalChats.length > 0 && !activeChatId) {
+        setActiveChatId(internalChats[0].id);
+      }
+      setLoading(false);
+    }).catch(() => {
+      setChannels([]);
+      setLoading(false);
+    });
+  }, []);
 
-    // Simulate connection
-    const timer = setTimeout(() => {
-      setIsConnecting(false);
-    }, 500);
+  // Load chatMessages for active chat
+  useEffect(() => {
+    if (!activeChatId) return;
 
-    return () => {
-      clearTimeout(timer);
-      if (ws) ws.close();
-    };
+    setMessagesLoading(true);
+    api.getMessages(activeChatId).then((res) => {
+      const mapped: InternalMessage[] = (res || []).map((m: any) => ({
+        id: m.id,
+        chatId: m.chatId || activeChatId,
+        senderId: m.senderId || m.userId,
+        senderName: m.senderName || m.displayName || 'Неизвестный',
+        type: (m.type || 'text') as InternalMessage['type'],
+        content: m.content,
+        replyToId: m.replyToId,
+        editCount: m.editCount || 0,
+        deleted: m.deleted || false,
+        status: (m.status || 'sent') as InternalMessage['status'],
+        createdAt: m.createdAt || Date.now(),
+        reactions: m.reactions || [],
+        isBot: m.isBot || false,
+      }));
+      setChatMessages(mapped);
+      setMessagesLoading(false);
+    }).catch(() => {
+      setChatMessages([]);
+      setMessagesLoading(false);
+    });
   }, [activeChatId]);
 
   // Auto-scroll to bottom
@@ -360,108 +172,97 @@ export function InternalChatScreen() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatMessages]);
 
-  // Handle slash commands
-  const handleSlashCommand = useCallback((cmd: string) => {
-    setInputValue(cmd + ' ');
-    setShowSlashCommands(false);
-    inputRef.current?.focus();
-  }, []);
-
   // Handle sending message
-  const handleSendMessage = useCallback(() => {
-    if (!inputValue.trim()) return;
+  const handleSendMessage = useCallback(async () => {
+    if (!inputValue.trim() || !activeChatId) return;
 
     const isSlash = inputValue.startsWith('/');
-    const currentMsgs = MOCK_MESSAGES[activeChatId] || [];
 
-    const newMsg: InternalMessage = {
-      id: `msg_${Date.now()}`,
-      chatId: activeChatId,
-      senderId: user?.id || 'me',
-      senderName: user?.displayName || 'Вы',
-      type: isSlash ? 'system' : 'text',
-      content: inputValue.trim(),
-      replyToId: undefined,
-      editCount: 0,
-      deleted: false,
-      status: 'sent',
-      createdAt: Date.now(),
-      reactions: [],
-      isBot: isSlash,
-    };
+    try {
+      const created = await api.sendMessage(activeChatId, {
+        type: isSlash ? 'system' : 'text',
+        content: inputValue.trim(),
+      });
 
-    // Update local mock data
-    MOCK_MESSAGES[activeChatId] = [...currentMsgs, newMsg];
-
-    // Send via WebSocket
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(
-        JSON.stringify({
-          type: 'message.send',
-          chatId: activeChatId,
-          content: inputValue.trim(),
-          messageType: isSlash ? 'system' : 'text',
-        })
-      );
-    }
-
-    // Handle slash commands locally
-    if (isSlash) {
-      const cmd = inputValue.trim().split(' ')[0].toLowerCase();
-      const respondWith = (content: string) => {
-        setTimeout(() => {
-          const replyMsg: InternalMessage = {
-            id: `msg_auto_${Date.now()}`,
-            chatId: activeChatId,
-            senderId: 'system',
-            senderName: 'Система',
-            type: 'system',
-            content,
-            replyToId: undefined,
-            editCount: 0,
-            deleted: false,
-            status: 'delivered',
-            createdAt: Date.now(),
-            reactions: [],
-            isBot: true,
-          };
-          MOCK_MESSAGES[activeChatId] = [...(MOCK_MESSAGES[activeChatId] || []), replyMsg];
-        }, 500);
+      const newMsg: InternalMessage = {
+        id: created.id || `msg_${Date.now()}`,
+        chatId: activeChatId,
+        senderId: user?.id || 'me',
+        senderName: user?.displayName || 'Вы',
+        type: isSlash ? 'system' : 'text',
+        content: inputValue.trim(),
+        replyToId: undefined,
+        editCount: 0,
+        deleted: false,
+        status: 'sent',
+        createdAt: Date.now(),
+        reactions: [],
+        isBot: isSlash,
       };
 
-      switch (cmd) {
-        case '/deploy':
-          respondWith('🚀 Деплой запущен... Ожидание завершения.');
-          break;
-        case '/status':
-          respondWith(
-            '📊 Статус сервисов:\n• API: ✅ онлайн\n• WebSocket: ✅ онлайн\n• PostgreSQL: ✅ онлайн\n• Redis: ✅ онлайн\n• MinIO: ✅ онлайн'
-          );
-          break;
-        case '/standup':
-          respondWith(
-            `📋 Standup для ${user?.displayName || 'пользователя'}:\n✅ Что сделано: ...\n🔄 Что буду делать: ...\n🚫 Блокеры: ...`
-          );
-          break;
-        case '/ping':
-          respondWith('🏓 Pong! Задержка: 12ms');
-          break;
-        case '/logs':
-          respondWith(
-            '📝 Последние логи:\n[14:32:01] INFO: Request processed in 45ms\n[14:31:58] INFO: WebSocket connection established\n[14:31:55] DEBUG: Cache hit for /api/chats'
-          );
-          break;
-        case '/help':
-          respondWith(
-            `📖 Доступные slash-команды:\n${SLASH_COMMANDS.map((sc) => `${sc.icon} \`${sc.command}\` — ${sc.description}`).join('\n')}`
-          );
-          break;
-      }
+      setChatMessages((prev) => [...prev, newMsg]);
+      handleSlashCommandResponse(newMsg);
+    } catch {
+      // Опционально: показать ошибку
     }
 
     setInputValue('');
     setShowSlashCommands(false);
-  }, [inputValue, activeChatId, ws, user]);
+  }, [inputValue, activeChatId, user]);
+
+  // Handle slash commands
+  const handleSlashCommandResponse = (msg: InternalMessage) => {
+    if (!msg.isBot || msg.type !== 'system') return;
+
+    const cmd = msg.content.trim().split(' ')[0].toLowerCase();
+    const respondWith = (content: string) => {
+      const replyMsg: InternalMessage = {
+        id: `msg_auto_${Date.now()}`,
+        chatId: activeChatId,
+        senderId: 'system',
+        senderName: 'Система',
+        type: 'system',
+        content,
+        replyToId: undefined,
+        editCount: 0,
+        deleted: false,
+        status: 'delivered',
+        createdAt: Date.now(),
+        reactions: [],
+        isBot: true,
+      };
+      setChatMessages((prev) => [...prev, replyMsg]);
+    };
+
+    switch (cmd) {
+      case '/deploy':
+        respondWith('🚀 Деплой запущен... Ожидание завершения.');
+        break;
+      case '/status':
+        respondWith(
+          '📊 Статус сервисов:\n• API: ✅ онлайн\n• WebSocket: ✅ онлайн\n• PostgreSQL: ✅ онлайн\n• Redis: ✅ онлайн\n• MinIO: ✅ онлайн'
+        );
+        break;
+      case '/standup':
+        respondWith(
+          `📋 Standup для ${user?.displayName || 'пользователя'}:\n✅ Что сделано: ...\n🔄 Что буду делать: ...\n🚫 Блокеры: ...`
+        );
+        break;
+      case '/ping':
+        respondWith('🏓 Pong! Задержка: 12ms');
+        break;
+      case '/logs':
+        respondWith(
+          '📝 Последние логи:\n[14:32:01] INFO: Request processed in 45ms\n[14:31:58] INFO: WebSocket connection established\n[14:31:55] DEBUG: Cache hit for /api/chats'
+        );
+        break;
+      case '/help':
+        respondWith(
+          `📖 Доступные slash-команды:\n${SLASH_COMMANDS.map((sc) => `${sc.icon} \`${sc.command}\` — ${sc.description}`).join('\n')}`
+        );
+        break;
+    }
+  };
 
   // Handle input change
   const handleInputChange = (value: string) => {
@@ -469,16 +270,9 @@ export function InternalChatScreen() {
     setShowSlashCommands(value.startsWith('/'));
     setIsTyping(true);
 
-    if (ws && ws.readyState === WebSocket.OPEN && value.length > 0) {
-      ws.send(JSON.stringify({ type: 'typing.start', chatId: activeChatId }));
-    }
-
     clearTimeout((window as any).typingTimer);
     (window as any).typingTimer = setTimeout(() => {
       setIsTyping(false);
-      if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({ type: 'typing.stop', chatId: activeChatId }));
-      }
     }, 3000);
   };
 
@@ -501,6 +295,16 @@ export function InternalChatScreen() {
       handleSendMessage();
     }
   };
+
+  const currentChat = channels.find((c) => c.id === activeChatId);
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+        <div className="spinner" />
+      </div>
+    );
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
@@ -543,8 +347,8 @@ export function InternalChatScreen() {
         {/* Content area */}
         <div className="content" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           {/* Messages */}
-          <div className="messages" style={{ flex: 1, overflowY: 'auto', padding: '16px' }}>
-            {isConnecting ? (
+          <div className="chatMessages" style={{ flex: 1, overflowY: 'auto', padding: '16px' }}>
+            {messagesLoading ? (
               <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
                 <div className="spinner" />
               </div>
@@ -611,61 +415,69 @@ export function InternalChatScreen() {
                         </div>
                       )}
                     </div>
-                    {msg.senderId === user?.id && (
-                      <div
-                        className={`msg-ticks ${
-                          msg.status === 'read'
-                            ? 'msg-ticks--read'
-                            : msg.status === 'delivered'
-                            ? 'msg-ticks--delivered'
-                            : 'msg-ticks--sent'
-                        }`}
-                      >
-                        {msg.status === 'read' ? '✓✓' : msg.status === 'delivered' ? '✓✓' : '✓'}
-                      </div>
-                    )}
                   </div>
                 ))}
-                <TypingIndicator user={typingUser} visible={isTyping} />
                 <div ref={messagesEndRef} />
               </>
             )}
           </div>
 
+          {/* Typing indicator */}
+          {typingUser && <TypingIndicator user={typingUser} visible={true} />}
+
           {/* Input area */}
-          <div className="input-area" style={{ position: 'relative' }}>
-            <SlashCommandsPanel visible={showSlashCommands} onSelect={handleSlashCommand} />
-            <button
-              className="input-area__btn"
-              title="Вложить файл"
-              style={{ cursor: 'pointer' }}
-            >
-              📎
-            </button>
-            <textarea
-              ref={inputRef}
-              className="input-area__field"
-              placeholder={currentChat ? `Сообщение для ${currentChat.name}...` : 'Сообщение...'}
-              rows={1}
-              value={inputValue}
-              onChange={(e) => handleInputChange(e.target.value)}
-              onKeyDown={handleKeyDown}
-              style={{ resize: 'none', minHeight: '40px', maxHeight: '150px' }}
-            />
-            <button
-              className="input-area__btn input-area__btn--send"
-              onClick={handleSendMessage}
-              title="Отправить"
-              style={{
-                cursor: inputValue.trim() ? 'pointer' : 'default',
-                opacity: inputValue.trim() ? 1 : 0.5,
-              }}
-            >
-              ➤
-            </button>
+          <div className="input-area" style={{ padding: '12px 16px', borderTop: '1px solid var(--border-color)' }}>
+            {showSlashCommands && (
+              <div
+                className="card"
+                style={{
+                  marginBottom: 8,
+                  padding: 8,
+                  maxHeight: 200,
+                  overflowY: 'auto',
+                }}
+              >
+                {SLASH_COMMANDS.map((sc) => (
+                  <div
+                    key={sc.command}
+                    style={{
+                      padding: '6px 10px',
+                      cursor: 'pointer',
+                      borderRadius: 4,
+                      fontSize: 13,
+                    }}
+                    onClick={() => {
+                      setInputValue(`/${sc.command} `);
+                      setShowSlashCommands(false);
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--bg-secondary)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                  >
+                    <strong>{sc.icon} /{sc.command}</strong> — {sc.description}
+                  </div>
+                ))}
+              </div>
+            )}
+            <div style={{ display: 'flex', gap: 8 }}>
+              <input
+                ref={inputRef}
+                type="text"
+                className="form-input"
+                placeholder={currentChat ? `Сообщение для ${currentChat.name}...` : 'Сообщение...'}
+                value={inputValue}
+                onChange={(e) => handleInputChange(e.target.value)}
+                onKeyDown={handleKeyDown}
+                style={{ flex: 1 }}
+              />
+              <button className="btn btn--primary" onClick={handleSendMessage} disabled={!inputValue.trim()}>
+                Отправить
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
 }
+
+export default InternalChatScreen;

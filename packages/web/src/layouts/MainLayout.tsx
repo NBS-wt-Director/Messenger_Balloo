@@ -1,6 +1,7 @@
 // Main Layout — основной лейаут приложения
 // 3-column: sidebar | chat list | chat view (desktop)
 // Responsive: mobile (1 col), tablet (2 col), desktop (3 col)
+// + Footer с юридическими ссылками
 
 import { useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
@@ -18,10 +19,8 @@ function MainLayout() {
     function handleResize() {
       const w = window.innerWidth;
       if (w <= 768) {
-        // Mobile: sidebar collapsed by default
         setIsSidebarOpen(false);
       } else if (w <= 1024) {
-        // Tablet: sidebar can be open
         setIsSidebarOpen(true);
       }
     }
@@ -34,7 +33,6 @@ function MainLayout() {
   const isMobile = window.innerWidth <= 768;
   const isTablet = window.innerWidth > 768 && window.innerWidth <= 1024;
 
-  // Responsive: mobile = 1 col (chat list only), tablet = 2 col, desktop = 3 col
   const showChatList = !isMobile;
   const showChatView = !isMobile && !isTablet;
 
@@ -79,6 +77,34 @@ function MainLayout() {
         <div style={{ flex: 1, overflow: 'hidden' }}>
           <Outlet />
         </div>
+
+        {/* Footer: юридические ссылки */}
+        <footer
+          style={{
+            borderTop: '1px solid var(--border-color)',
+            padding: '12px 24px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '16px',
+            fontSize: '13px',
+            color: 'var(--text-secondary)',
+            flexShrink: 0,
+            background: 'var(--bg-secondary)',
+          }}
+        >
+          <span>Balloo Messenger © 2026</span>
+          <span style={{ opacity: 0.3 }}>|</span>
+          <a href="/rules" style={{ color: 'var(--accent)', textDecoration: 'none' }}>
+            Правила
+          </a>
+          <a href="/privacy" style={{ color: 'var(--accent)', textDecoration: 'none' }}>
+            Конфиденциальность
+          </a>
+          <a href="/cookies" style={{ color: 'var(--accent)', textDecoration: 'none' }}>
+            Cookies
+          </a>
+        </footer>
       </main>
     </div>
   );

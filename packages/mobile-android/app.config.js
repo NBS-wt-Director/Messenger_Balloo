@@ -1,0 +1,48 @@
+export default {
+  expo: {
+    name: "Balloo Messenger",
+    slug: "balloo-messenger",
+    version: "1.0.0",
+    orientation: "portrait",
+    scheme: "balloo",
+    userInterfaceStyle: "automatic",
+    splash: {
+      image: "./assets/splash.png",
+      resizeMode: "contain",
+      backgroundColor: "#0d1117"
+    },
+    assetBundlePatterns: ["**/*"],
+    ios: {
+      supportsTablet: true,
+      bundleIdentifier: "su.balloo.messenger"
+    },
+    android: {
+      adaptiveIcon: {
+        foregroundImage: "./assets/adaptive-icon.png",
+        backgroundColor: "#0d1117"
+      },
+      package: "su.balloo.messenger",
+      versionCode: 1,
+      permissions: ["INTERNET"],
+      allowBackup: true
+    },
+    web: {
+      favicon: "./assets/favicon.png"
+    },
+    plugins: [
+      "expo-router",
+      [
+        "expo-build-properties",
+        {
+          android: {
+            minSdkVersion: 24,
+            targetSdkVersion: 34,
+            compileSdkVersion: 34,
+            buildToolsVersion: "34.0.0",
+            useNextNotificationsApi: true
+          }
+        }
+      ]
+    ]
+  }
+};

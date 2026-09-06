@@ -16,18 +16,25 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { getThemeColors } from '../../styles/theme';
 import { useUIStore } from '../../store/uiStore';
+import { useAuthStore } from '../../store/authStore';
+import { api, saveAuthTokens } from '../../services/api';
 
 interface TwoFactorScreenProps {
   navigation: any;
+  // Предзаполнение email (передаётся с экрана логина при needs2FA)
+  initialEmail?: string;
 }
 
-export default function TwoFactorScreen({ navigation }: TwoFactorScreenProps) {
-  const [email, setEmail] = useState('');
+export default function TwoFactorScreen({ navigation, initialEmail }: TwoFactorScreenProps) {
+  const [email, setEmail] = useState(initialEmail || '');
   const [code, setCode] = useState('');
   const [step, setStep] = useState(1); // 1 = send code, 2 = verify
   const [cooldown, setCooldown] = useState(0);
   const theme = useUIStore((s) => s.theme);
   const colors = getThemeColors(theme);
+
+  const [verifying, setVerifying] = useState(false);
+  const { setUser, setAuthenticated } = useAuthStore();
 
   useEffect(() => {
     if (cooldown > 0) {
@@ -47,15 +54,26 @@ export default function TwoFactorScreen({ navigation }: TwoFactorScreenProps) {
     Alert.alert('Отправлено', `Код отправлен на ${email}`);
   };
 
-  const handleVerify = () => {
+  const handleVerify = async () => {
     if (code.length !== 6) {
       Alert.alert('Ошибка', 'Введите 6-значный код');
       return;
     }
-    // API: POST /auth/2fa/verify { email, code }
-    Alert.alert('Успех', 'Код подтверждён', [
-      { text: 'OK', onPress: () => navigation.navigate('Main') },
-    ]);
+    // API: POST /api/auth/2fa/verify { email, code, deviceInfo }
+    setVerifying(true);
+    try {
+      const response = await api.verify2FALogin(email.trim(), code.trim());
+      if (response.tokens) {
+        await saveAuthTokens(response.tokens);
+      }
+      setUser(response.user);
+      setAuthenticated(true);
+      navigation.navigate('Main');
+    } catch (error: any) {
+      Alert.alert('Ошибка', error.message || 'Неверный код');
+    } finally {
+      setVerifying(false);
+    }
   };
 
   const handleDisable = () => {

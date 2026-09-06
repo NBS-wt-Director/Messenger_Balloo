@@ -1,9 +1,11 @@
 // Auth Store — Zustand
 // Token, user, auth state
+// JWT tokens stored in httpOnly cookies (not localStorage)
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { UserStatus } from '@balloo/shared';
+import { setCookie, THEME_COOKIE, LANGUAGE_COOKIE } from '../utils/cookieUtils';
 
 export interface AuthUser {
   id: string;
@@ -20,14 +22,11 @@ export interface AuthUser {
 
 interface AuthState {
   user: AuthUser | null;
-  accessToken: string | null;
-  refreshToken: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
 
   // Actions
   setUser: (user: AuthUser | null) => void;
-  setTokens: (accessToken: string, refreshToken: string) => void;
   setAuthenticated: (isAuthenticated: boolean) => void;
   setLoading: (isLoading: boolean) => void;
   logout: () => void;
@@ -40,27 +39,29 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
       user: null,
-      accessToken: null,
-      refreshToken: null,
       isAuthenticated: false,
       isLoading: false,
 
       setUser: (user) => set({ user, isAuthenticated: !!user }),
 
-      setTokens: (accessToken, refreshToken) =>
-        set({ accessToken, refreshToken }),
-
       setAuthenticated: (isAuthenticated) => set({ isAuthenticated }),
 
       setLoading: (isLoading) => set({ isLoading }),
 
-      logout: () => {
-        // Clear tokens from storage
-        localStorage.removeItem('balloo-refreshToken');
+      logout: async () => {
+        // Очищаем cookie через сервер
+        try {
+          const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3100';
+          await fetch(`${API_BASE}/api/auth/clear-cookie`, {
+            method: 'POST',
+            credentials: 'include',
+          });
+        } catch {
+          // Ignore errors during logout cleanup
+        }
+
         set({
           user: null,
-          accessToken: null,
-          refreshToken: null,
           isAuthenticated: false,
         });
       },
@@ -74,7 +75,7 @@ export const useAuthStore = create<AuthState>()(
 
       setTheme: (theme) => {
         document.documentElement.setAttribute('data-theme', theme);
-        localStorage.setItem('balloo-theme', theme);
+        setCookie(THEME_COOKIE, theme, 365);
         const user = get().user;
         if (user) {
           set({ user: { ...user, theme } });
@@ -83,7 +84,7 @@ export const useAuthStore = create<AuthState>()(
 
       setLanguage: (language) => {
         document.documentElement.setAttribute('lang', language);
-        localStorage.setItem('balloo-language', language);
+        setCookie(LANGUAGE_COOKIE, language, 365);
         const user = get().user;
         if (user) {
           set({ user: { ...user, language } });
@@ -94,8 +95,7 @@ export const useAuthStore = create<AuthState>()(
       name: 'balloo-auth',
       partialize: (state) => ({
         user: state.user,
-        accessToken: state.accessToken,
-        refreshToken: state.refreshToken,
+        // Токены в httpOnly cookie — в persist попадает только user-кэш
         isAuthenticated: state.isAuthenticated,
       }),
     }

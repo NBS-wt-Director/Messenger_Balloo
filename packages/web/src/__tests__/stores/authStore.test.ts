@@ -5,8 +5,6 @@ describe('authStore', () => {
   beforeEach(() => {
     useAuthStore.setState({
       user: null,
-      accessToken: null,
-      refreshToken: null,
       isAuthenticated: false,
       isLoading: false,
     });
@@ -51,13 +49,6 @@ describe('authStore', () => {
     expect(useAuthStore.getState().isAuthenticated).toBe(false);
   });
 
-  it('setTokens sets access and refresh tokens', () => {
-    useAuthStore.getState().setTokens('access-token', 'refresh-token');
-    const state = useAuthStore.getState();
-    expect(state.accessToken).toBe('access-token');
-    expect(state.refreshToken).toBe('refresh-token');
-  });
-
   it('setAuthenticated updates isAuthenticated', () => {
     useAuthStore.getState().setAuthenticated(true);
     expect(useAuthStore.getState().isAuthenticated).toBe(true);
@@ -70,7 +61,7 @@ describe('authStore', () => {
     expect(useAuthStore.getState().isLoading).toBe(true);
   });
 
-  it('logout clears all auth state', () => {
+  it('logout clears all auth state', async () => {
     useAuthStore.getState().setUser({
       id: 'test-id',
       email: 'test@test.ru',
@@ -81,12 +72,10 @@ describe('authStore', () => {
       isAdmin: false,
       isTwoFAEnabled: false,
     });
-    useAuthStore.getState().setTokens('access', 'refresh');
-    useAuthStore.getState().logout();
+    // logout асинхронный (очищает httpOnly cookie через сервер) — ждём завершения
+    await useAuthStore.getState().logout();
     const state = useAuthStore.getState();
     expect(state.user).toBeNull();
-    expect(state.accessToken).toBeNull();
-    expect(state.refreshToken).toBeNull();
     expect(state.isAuthenticated).toBe(false);
   });
 

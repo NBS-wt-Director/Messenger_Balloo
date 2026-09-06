@@ -1,5 +1,6 @@
 // API Service — HTTP client for Balloo backend
-// Uses fetch with JWT token management
+// JWT tokens stored in httpOnly cookies (not localStorage)
+// Browser automatically sends httpOnly cookies with requests
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3100';
 
@@ -13,20 +14,14 @@ async function request<T>(
 ): Promise<T> {
   const { data, headers: customHeaders, ...rest } = options;
 
-  const token = localStorage.getItem('balloo-accessToken');
-  const refreshToken = localStorage.getItem('balloo-refreshToken');
-
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...(customHeaders as Record<string, string>),
   };
 
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-
   const config: RequestInit = {
     ...rest,
+    credentials: 'include', // Отправлять httpOnly cookie с запросом
     headers,
   };
 
@@ -36,34 +31,32 @@ async function request<T>(
 
   let response = await fetch(`${API_BASE}${endpoint}`, config);
 
-  // If 401, try refresh token
-  if (response.status === 401 && refreshToken) {
+  // If 401, try refresh token via httpOnly cookie
+  if (response.status === 401) {
     try {
-      const refreshResponse = await fetch(`${API_BASE}/api/auth/refresh`, {
+      // Сервер берёт refresh token из cookie (body не нужен)
+      const refreshResponse = await fetch(`${API_BASE}/api/auth/refresh-cookie`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refreshToken }),
+        credentials: 'include',
       });
 
       if (refreshResponse.ok) {
-        const { accessToken, refreshToken: newRefresh } =
-          await refreshResponse.json();
-        localStorage.setItem('balloo-accessToken', accessToken);
-        localStorage.setItem('balloo-refreshToken', newRefresh);
-
-        // Retry original request with new token
-        headers['Authorization'] = `Bearer ${accessToken}`;
+        // Retry original request with fresh cookies
         response = await fetch(`${API_BASE}${endpoint}`, {
           ...rest,
+          credentials: 'include',
           headers,
           body: data ? JSON.stringify(data) : undefined,
         });
+      } else {
+        // Refresh failed — redirect to login
+        window.location.hash = '#/login';
+        throw new Error('Session expired. Please login again.');
       }
     } catch {
-      // Refresh failed — clear tokens
-      localStorage.removeItem('balloo-accessToken');
-      localStorage.removeItem('balloo-refreshToken');
+      // Refresh failed — redirect to login
       window.location.hash = '#/login';
+      throw new Error('Session expired. Please login again.');
     }
   }
 
@@ -96,7 +89,7 @@ export const api = {
 
   // Auth
   login: (email: string, password: string) =>
-    request<{ accessToken: string; refreshToken: string; user: any }>('/api/auth/login', {
+    request<{ user: any }>('/api/auth/login', {
       method: 'POST',
       data: { email, password },
     }),
@@ -107,7 +100,7 @@ export const api = {
     username: string;
     displayName?: string;
   }) =>
-    request<{ accessToken: string; refreshToken: string; user: any }>('/api/auth/register', {
+    request<{ user: any }>('/api/auth/register', {
       method: 'POST',
       data,
     }),
@@ -131,7 +124,7 @@ export const api = {
     }),
 
   logout: () =>
-    request<{ success: boolean }>('/api/auth/logout', {
+    request<{ success: boolean }>('/api/auth/clear-cookie', {
       method: 'POST',
     }),
 
@@ -165,9 +158,8 @@ export const api = {
 
   // Users
   searchUsers: (query: string) =>
-    request<any[]>('/api/users/search', {
+    request<any[]>(`/api/users/search?q=${encodeURIComponent(query)}`, {
       method: 'GET',
-      data: undefined,
     }),
 
   blockUser: (userId: string) =>
@@ -377,7 +369,7 @@ export const api = {
     }),
 
   deleteBlogPost: (postId: string) =>
-    request<{ success: boolean }>(`/api/blog/posts/${postId}`, {
+    request<{ success: boolean }>('/api/blog/posts/${postId}', {
       method: 'DELETE',
     }),
 
@@ -427,7 +419,7 @@ export const api = {
     }),
 
   deleteKnowledgePage: (pageId: string) =>
-    request<{ success: boolean }>(`/api/knowledge/pages/${pageId}`, {
+    request<{ success: boolean }>('/api/knowledge/pages/${pageId}', {
       method: 'DELETE',
     }),
 
@@ -802,4 +794,85 @@ export const api = {
 
   // Hiring — Application type extension
   // (interview field is handled via separate API endpoints)
+
+  // ============================================================
+  // Desktop-specific APIs (Archive, Devices, Reports, Calls)
+  // ============================================================
+
+  // Archive
+  getArchived: (page?: number, limit?: number) =>
+    request<any>(`/api/archive?page=${page || 1}&limit=${limit || 20}`),
+  restoreArchivedChat: (chatId: string) =>
+    request<any>(`/api/archive/${chatId}/restore`, { method: 'POST' }),
+  deleteArchivedChat: (chatId: string) =>
+    request<any>(`/api/archive/${chatId}`, { method: 'DELETE' }),
+  archiveChat: (chatId: string) =>
+    request<any>(`/api/archive/${chatId}`, { method: 'POST' }),
+
+  // Devices
+  getDevices: () =>
+    request<any>('/api/devices'),
+  endSession: (sessionId: string) =>
+    request<any>(`/api/devices/${sessionId}`, { method: 'DELETE' }),
+  endAllSessions: () =>
+    request<any>('/api/devices/end-all', { method: 'POST' }),
+
+  // Reports
+  createReport: (data: { messageId?: string; reportedUserId?: string; reason: string; comment?: string; chatId?: string }) =>
+    request<any>('/api/reports', { method: 'POST', data }),
+  getUserReports: (page?: number, limit?: number) =>
+    request<any>(`/api/reports?page=${page || 1}&limit=${limit || 20}`),
+
+  // Calls
+  getCallHistory: (filter?: string, page?: number, limit?: number) =>
+    request<any>(`/api/calls?filter=${filter || 'all'}&page=${page || 1}&limit=${limit || 50}`),
+
+  // Tasks (command portal)
+  getTasks: (params?: { status?: string; assignee?: string; priority?: string; page?: number; limit?: number }) => {
+    const qs = new URLSearchParams();
+    if (params?.status) qs.set('status', params.status);
+    if (params?.assignee) qs.set('assignee', params.assignee);
+    if (params?.priority) qs.set('priority', params.priority);
+    if (params?.page) qs.set('page', String(params.page));
+    if (params?.limit) qs.set('limit', String(params.limit));
+    const query = qs.toString();
+    return request<any[]>(`/api/tasks${query ? `?${query}` : ''}`);
+  },
+
+  getTask: (taskId: string) =>
+    request<any>(`/api/tasks/${taskId}`),
+
+  createTask: (data: {
+    title: string;
+    description: string;
+    status?: string;
+    priority?: string;
+    type?: string;
+    assignee?: string;
+    dueDate?: string;
+    tags?: string[];
+  }) =>
+    request<any>('/api/tasks', {
+      method: 'POST',
+      data,
+    }),
+
+  updateTask: (taskId: string, data: {
+    title?: string;
+    description?: string;
+    status?: string;
+    priority?: string;
+    assignee?: string;
+    dueDate?: string;
+    tags?: string[];
+  }) =>
+    request<any>(`/api/tasks/${taskId}`, {
+      method: 'PUT',
+      data,
+    }),
+
+  deleteTask: (taskId: string) =>
+    request<{ success: boolean }>(`/api/tasks/${taskId}`, {
+      method: 'DELETE',
+    }),
 };

@@ -1,42 +1,10 @@
-// Register screen — placeholder
-// Will be implemented in ticket #36
+// Register route — real register screen (connected to API)
 
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { Link } from 'expo-router';
+import RegisterScreen from '../../src/screens/auth/RegisterScreen';
+import { useExpoNavigation } from '../../src/router/expoNavigation';
 
-export default function RegisterScreen() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Регистрация</Text>
-      <Text style={styles.subtitle}>Создайте аккаунт Balloo</Text>
-      <Link href="/auth/login" style={styles.link}>
-        <Text>Уже есть аккаунт? Войти</Text>
-      </Link>
-    </View>
-  );
+export default function RegisterRoute() {
+  const navigation = useExpoNavigation();
+  return <RegisterScreen navigation={navigation} />;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#0d1117',
-  },
-  title: {
-    fontSize: 28,
-    color: '#e6edf3',
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#8b949e',
-    marginBottom: 24,
-  },
-  link: {
-    marginTop: 16,
-    color: '#2db84d',
-  },
-});

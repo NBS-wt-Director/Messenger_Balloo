@@ -23,12 +23,25 @@ interface JwtPayload {
   exp: number;
 }
 
-// Извлечение JWT токена из заголовка Authorization
-const extractToken = (authHeader?: string): string | null => {
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return null;
+// Извлечение JWT токена из cookie или заголовка Authorization
+// Приоритет: cookie (httpOnly) -> Authorization header (для API/мобильных клиентов)
+const extractToken = (
+  req: Request,
+  cookieName: string
+): string | null => {
+  // 1. Проверяем httpOnly cookie (приоритет для web)
+  const cookieToken = req.cookies?.[cookieName];
+  if (cookieToken) {
+    return cookieToken;
   }
-  return authHeader.slice(7);
+
+  // 2. Fallback: Authorization header (для API, мобильных клиентов)
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    return authHeader.slice(7);
+  }
+
+  return null;
 };
 
 // Middleware для проверки access token
@@ -37,7 +50,7 @@ export const authRequired = (
   res: Response,
   next: NextFunction
 ): void => {
-  const token = extractToken(req.headers.authorization);
+  const token = extractToken(req, 'balloo-access-token');
 
   if (!token) {
     res.status(401).json({
@@ -82,13 +95,13 @@ export const authRequired = (
   }
 };
 
-// Middleware для проверки refresh token (опционально)
+// Middleware для проверки refresh token (для refresh-cookie эндпоинта)
 export const authRefresh = (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
 ): void => {
-  const token = extractToken(req.headers.authorization);
+  const token = extractToken(req, 'balloo-refresh-token');
 
   if (!token) {
     res.status(401).json({
@@ -148,4 +161,55 @@ export const adminOnly = (
   }
 
   next();
+};
+
+// ============================================================
+// Утилиты для работы с httpOnly cookie
+// ============================================================
+
+export const ACCESS_COOKIE = 'balloo-access-token';
+export const REFRESH_COOKIE = 'balloo-refresh-token';
+
+// Флаги cookie: Secure только для HTTPS (production)
+const isProduction = env.NODE_ENV === 'production';
+
+export const setAuthCookies = (
+  res: Response,
+  accessToken: string,
+  refreshToken: string
+): void => {
+  // Access token: HttpOnly; Secure; SameSite=Strict; maxAge=15 минут
+  res.cookie(ACCESS_COOKIE, accessToken, {
+    httpOnly: true,
+    secure: isProduction, // Secure только в production
+    sameSite: 'strict' as const,
+    maxAge: 15 * 60 * 1000, // 15 минут
+    path: '/',
+  });
+
+  // Refresh token: HttpOnly; Secure; SameSite=Lax; maxAge=30 дней
+  // Lax для редиректа OAuth
+  res.cookie(REFRESH_COOKIE, refreshToken, {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: 'lax' as const,
+    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 дней
+    path: '/',
+  });
+};
+
+// Удаление cookie (для logout)
+export const clearAuthCookies = (res: Response): void => {
+  res.clearCookie(ACCESS_COOKIE, {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: 'strict' as const,
+    path: '/',
+  });
+  res.clearCookie(REFRESH_COOKIE, {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: 'lax' as const,
+    path: '/',
+  });
 };

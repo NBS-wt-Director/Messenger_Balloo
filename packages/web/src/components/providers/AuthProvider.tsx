@@ -1,9 +1,12 @@
 // Auth Provider — контекст авторизации
-// Wraps app with auth state and token management
+// Аутентификация через httpOnly cookie (тикет №2 deploy-ready.md):
+// - Токены НЕ хранятся на клиенте (ни localStorage, ни состояние)
+// - Браузер сам отправляет cookie с каждым запросом (credentials: 'include')
+// - Все запросы идут через services/api.ts (единая точка с авто-refresh при 401)
 
 import { createContext, useContext, useCallback, useEffect, useState } from 'react';
 import { useAuthStore, type AuthUser } from '@/store/authStore';
-import axios from 'axios';
+import { api } from '@/services/api';
 
 interface AuthContextValue {
   user: AuthUser | null;
@@ -33,89 +36,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const user = useAuthStore((s) => s.user);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const isLoading = useAuthStore((s) => s.isLoading);
-  const accessToken = useAuthStore((s) => s.accessToken);
-  const refreshToken = useAuthStore((s) => s.refreshToken);
-  const setTokens = useAuthStore((s) => s.setTokens);
   const setUser = useAuthStore((s) => s.setUser);
   const logout = useAuthStore((s) => s.logout);
 
   const [initialLoad, setInitialLoad] = useState(true);
 
-  // Setup axios interceptors
-  useEffect(() => {
-    // Request interceptor — attach token
-    const requestInterceptor = axios.interceptors.request.use((config) => {
-      const token = useAuthStore.getState().accessToken;
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-      return config;
-    });
-
-    // Response interceptor — handle 401
-    const responseInterceptor = axios.interceptors.response.use(
-      (response) => response,
-      async (error) => {
-        const originalRequest = error.config;
-
-        // Skip retry for logout, refresh, and already retried requests
-        if (error.response?.status === 401 && !originalRequest._retry) {
-          originalRequest._retry = true;
-
-          try {
-            const store = useAuthStore.getState();
-            if (store.refreshToken) {
-              await axios.post('/api/auth/refresh', {
-                refreshToken: store.refreshToken,
-              });
-              return axios(originalRequest);
-            }
-          } catch (refreshError) {
-            // Refresh failed — logout
-            useAuthStore.getState().logout();
-            window.location.href = '/login';
-          }
-        }
-
-        return Promise.reject(error);
-      }
-    );
-
-    return () => {
-      axios.interceptors.request.eject(requestInterceptor);
-      axios.interceptors.response.eject(responseInterceptor);
-    };
-  }, []);
-
-  // Restore session on mount
+  // Restore session on mount: проверяем httpOnly cookie запросом /users/me.
+  // При 401 api.ts сам попробует /refresh-cookie и повторит запрос.
   useEffect(() => {
     const restoreSession = async () => {
-      const store = useAuthStore.getState();
-      if (store.accessToken && store.user) {
-        try {
-          // Verify token is still valid
-          const response = await axios.get('/api/users/me');
-          setUser(response.data);
-        } catch {
-          // Token invalid — try refresh
-          if (store.refreshToken) {
-            try {
-              await axios.post('/api/auth/refresh', {
-                refreshToken: store.refreshToken,
-              });
-            } catch {
-              store.logout();
-            }
-          } else {
-            store.logout();
-          }
-        }
+      try {
+        const me = await api.getMe();
+        setUser(me as AuthUser);
+      } catch {
+        // Cookie нет / refresh не удался — пользователь не авторизован
+        setUser(null);
+      } finally {
+        setInitialLoad(false);
       }
-      setInitialLoad(false);
     };
 
     restoreSession();
-  }, []);
+  }, [setUser]);
 
   const login = useCallback(
     async (email: string, password: string, _rememberDevice?: boolean) => {
@@ -123,22 +65,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       store.setLoading(true);
 
       try {
-        const response = await axios.post('/api/auth/login', {
-          email,
-          password,
-          rememberDevice: _rememberDevice,
-        });
-
-        const { user, accessToken, refreshToken } = response.data;
-        setTokens(accessToken, refreshToken);
-        setUser(user);
+        // Сервер устанавливает httpOnly cookie; в body приходит user
+        const response = await api.login(email, password);
+        setUser(response.user as AuthUser);
       } catch (error) {
         throw error;
       } finally {
         store.setLoading(false);
       }
     },
-    []
+    [setUser]
   );
 
   const register = useCallback(
@@ -147,43 +83,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       store.setLoading(true);
 
       try {
-        const response = await axios.post('/api/auth/register', {
-          email,
-          username,
-          password,
-        });
-
-        const { user, accessToken, refreshToken } = response.data;
-        setTokens(accessToken, refreshToken);
-        setUser(user);
+        // Сервер устанавливает httpOnly cookie; в body приходит user
+        const response = await api.register({ email, username, password });
+        setUser(response.user as AuthUser);
       } catch (error) {
         throw error;
       } finally {
         store.setLoading(false);
       }
     },
-    []
+    [setUser]
   );
 
   const handleLogout = useCallback(() => {
+    // logout в authStore вызывает POST /clear-cookie (очистка httpOnly cookie)
     logout();
-    window.location.href = '/login';
+    window.location.hash = '#/login';
   }, [logout]);
 
   const refreshTokenFn = useCallback(async () => {
-    const store = useAuthStore.getState();
-    if (!store.refreshToken) return;
-
     try {
-      const response = await axios.post('/api/auth/refresh', {
-        refreshToken: store.refreshToken,
-      });
-      setTokens(response.data.accessToken, response.data.refreshToken);
+      // Обновляем cookie; при неудаче api.ts уже редиректит на /login
+      await api.post('/api/auth/refresh-cookie');
     } catch {
-      store.logout();
-      window.location.href = '/login';
+      setUser(null);
     }
-  }, []);
+  }, [setUser]);
 
   return (
     <AuthContext.Provider
@@ -201,3 +126,4 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     </AuthContext.Provider>
   );
 }
+

@@ -45,13 +45,13 @@ export default function BlogLandingScreen() {
         setHasMore(postsRes.hasMore || false);
         setCategories(categoriesRes.categories || []);
         setChannels(channelsRes.channels || []);
-      } catch (err) {
-        // Fallback: use mock data if API is unavailable
+      } catch {
+        // API unavailable — show empty state
         if (!cancelled) {
-          setFeaturedPosts(MOCK_FEATURED);
-          setPosts(MOCK_POSTS);
-          setCategories(MOCK_CATEGORIES);
-          setChannels(MOCK_CHANNELS);
+          setFeaturedPosts([]);
+          setPosts([]);
+          setCategories([]);
+          setChannels([]);
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -77,7 +77,7 @@ export default function BlogLandingScreen() {
       setPosts(postsRes.posts || []);
       setHasMore(postsRes.hasMore || false);
     } catch {
-      setPosts(MOCK_POSTS);
+      setPosts([]);
       setHasMore(false);
     } finally {
       setLoading(false);
@@ -225,80 +225,3 @@ export default function BlogLandingScreen() {
   );
 }
 
-// ============================================================
-// Mock data (fallback when API is unavailable)
-// ============================================================
-
-const MOCK_FEATURED: BlogLandingPost[] = [
-  {
-    id: 'mock-1',
-    title: 'Релиз v1.0.0-beta — первый публичный бета-релиз Balloo',
-    excerpt: 'Сегодня мы запускаем первую бета-версию мессенджера Balloo. Онбординг, чаты, звонки, группы, 3 темы оформления и 6 языков — всё готово для первых пользователей…',
-    content: '',
-    coverEmoji: '🚀',
-    coverGradient: 'linear-gradient(135deg, #1a1d21, #2d3742)',
-    channel: { id: 'news', name: '📰 Новости' },
-    categories: [],
-    author: { id: '1', name: 'Иван Воронов', initials: 'ИВ' },
-    publishedAt: Date.now() / 1000,
-    publishedAtFormatted: '16 июля 2026',
-    readTime: 5,
-    views: 1200,
-    reactions: 34,
-    comments: 12,
-    tags: ['#релиз', '#beta', '#v1.0.0'],
-  },
-];
-
-const MOCK_POSTS: BlogLandingPost[] = [
-  {
-    id: 'mock-2',
-    title: 'Дизайн-система Balloo: октагоны, пузыри и glassmorphism',
-    excerpt: 'Как мы построили уникальную визуальную идентичность: восьмигранные аватарки, пузыри без скруглений, три темы оформления…',
-    content: '',
-    coverEmoji: '🎨',
-    coverGradient: 'linear-gradient(135deg, #a855f7, #6b21a8)',
-    channel: { id: 'tech', name: '⚙️ Технологии' },
-    categories: [],
-    author: { id: '2', name: 'Мария Андреева', initials: 'МА' },
-    publishedAt: Date.now() / 1000,
-    publishedAtFormatted: '14 июля 2026',
-    readTime: 8,
-    views: 856,
-    reactions: 21,
-    comments: 0,
-    tags: ['#дизайн'],
-  },
-  {
-    id: 'mock-3',
-    title: 'WebSocket на Hono + uWebSockets.js: масштабирование realtime',
-    excerpt: 'Почему мы выбрали uWebSockets.js вместо ws, как масштабируем соединения и обрабатываем миллионы сообщений…',
-    content: '',
-    coverEmoji: '⚡',
-    coverGradient: 'linear-gradient(135deg, #2db84d, #166534)',
-    channel: { id: 'tech', name: '⚙️ Технологии' },
-    categories: [],
-    author: { id: '1', name: 'Иван Воронов', initials: 'ИВ' },
-    publishedAt: Date.now() / 1000,
-    publishedAtFormatted: '12 июля 2026',
-    readTime: 12,
-    views: 2100,
-    reactions: 45,
-    comments: 0,
-    tags: ['#websocket', '#realtime'],
-  },
-];
-
-const MOCK_CATEGORIES: BlogLandingCategory[] = [
-  { id: 'news', name: 'Новости', slug: 'news', postCount: 24, totalViews: 45200 },
-  { id: 'tech', name: 'Технологии', slug: 'tech', postCount: 18, totalViews: 32100 },
-  { id: 'team', name: 'Команда', slug: 'team', postCount: 8, totalViews: 5400 },
-  { id: 'metrics', name: 'Метрики', slug: 'metrics', postCount: 5, totalViews: 3200 },
-];
-
-const MOCK_CHANNELS: BlogLandingChannel[] = [
-  { id: 'news', name: '📰 Новости', description: 'Официальные новости', postCount: 24, followers: 1200, totalViews: 45200 },
-  { id: 'tech', name: '⚙️ Технологии', description: 'Технические статьи', postCount: 18, followers: 800, totalViews: 32100 },
-  { id: 'team', name: '👥 Команда', description: 'Новости команды', postCount: 8, followers: 400, totalViews: 5400 },
-  { id: 'metrics', name: '📊 Метрики', description: 'Аналитика и метрики', postCount: 5, followers: 200, totalViews: 3200 },
-];

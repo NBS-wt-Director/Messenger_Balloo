@@ -1,0 +1,95 @@
+# Balloo Messenger — Alertmanager Configuration
+# Production environment
+
+global:
+  # SMTP для email-уведомлений (опционально)
+  # smtp_smarthost: 'smtp.balloo.su:587'
+  # smtp_from: 'alerts@balloo.su'
+  # smtp_auth_username: 'alerts@balloo.su'
+  # smtp_auth_password: 'PASSWORD'
+  # smtp_require_tls: true
+
+  # Default resolve timeout: 5 минут
+  resolve_timeout: 5m
+
+# ─── Route tree ───
+route:
+  # Default receiver for all alerts
+  receiver: 'slack-notifications'
+  
+  # Group alerts by service and severity
+  group_by: ['alertname', 'job', 'severity']
+  
+  # Group wait: ждём 30 секунд перед первой отправкой
+  group_wait: 30s
+  # Group interval: интервал между группами
+  group_interval: 5m
+  # Repeat interval: повтор отправки каждые 4 часа
+  repeat_interval: 4h
+
+  # ─── Sub-routes по severity ───
+  routes:
+    # ─── Critical ───
+    - match:
+        severity: critical
+      receiver: 'slack-critical'
+      continue: false
+
+    # ─── Warning ───
+    - match:
+        severity: warning
+      receiver: 'slack-notifications'
+      continue: false
+
+    # ─── Info ───
+    - match:
+        severity: info
+      receiver: 'slack-notifications'
+      continue: false
+
+# ─── Inhibition rules ───
+# Если сервис полностью недоступен — не шлём алерты на его компоненты
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'job']
+
+# ─── Receivers ───
+receivers:
+  # ─── Slack — критические ───
+  - name: 'slack-critical'
+    slack_configs:
+      - api_url: '${{ secrets.SLACK_WEBHOOK }}'
+        channel: '#balloo-alerts-critical'
+        title: '{{ .GroupLabels.alertname }} — CRITICAL'
+        text: >-
+          {{ range .Alerts }}
+          *Alert:* {{ .Labels.alertname }}
+          *Severity:* {{ .Labels.severity }}
+          *Description:* {{ .Annotations.description }}
+          *Summary:* {{ .Annotations.summary }}
+          {{ end }}
+        send_resolved: true
+
+  # ─── Slack — все уведомления ───
+  - name: 'slack-notifications'
+    slack_configs:
+      - api_url: '${{ secrets.SLACK_WEBHOOK }}'
+        channel: '#balloo-alerts'
+        title: '{{ .GroupLabels.alertname }}'
+        text: >-
+          {{ range .Alerts }}
+          *Alert:* {{ .Labels.alertname }}
+          *Severity:* {{ .Labels.severity }}
+          *Description:* {{ .Annotations.description }}
+          *Service:* {{ .Labels.job }}
+          {{ end }}
+        send_resolved: true
+
+  # ─── Email fallback (опционально) ───
+  # - name: 'email-admins'
+  #   email_configs:
+  #     - to: 'admin@balloo.su'
+  #       send_resolved: true

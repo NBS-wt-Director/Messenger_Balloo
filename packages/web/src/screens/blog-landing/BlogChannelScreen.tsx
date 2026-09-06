@@ -36,16 +36,16 @@ export default function BlogChannelScreen() {
 
         if (cancelled) return;
 
-        const found = (channelsRes.channels || MOCK_CHANNELS).find(
+        const found = (channelsRes.channels || []).find(
           (c: BlogLandingChannel) => c.id === id
         );
-        setChannel(found || MOCK_CHANNELS.find((c) => c.id === id) || null);
+        setChannel(found || null);
         setPosts(postsRes.posts || []);
         setHasMore(postsRes.hasMore || false);
       } catch {
         if (!cancelled) {
-          setChannel(MOCK_CHANNELS.find((c) => c.id === id) || null);
-          setPosts(MOCK_POSTS);
+          setChannel(null);
+          setPosts([]);
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -238,29 +238,3 @@ function formatNumber(n: number): string {
   return String(n);
 }
 
-const MOCK_CHANNELS: BlogLandingChannel[] = [
-  { id: 'news', name: 'Новости', description: 'Официальные новости компании Balloo: релизы, обновления, анонсы', postCount: 24, followers: 1200, totalViews: 45200 },
-  { id: 'tech', name: 'Технологии', description: 'Статьи о технических решениях, архитектуре и разработке', postCount: 18, followers: 800, totalViews: 32100 },
-  { id: 'team', name: 'Команда', description: 'Новости команды Balloo', postCount: 8, followers: 400, totalViews: 5400 },
-];
-
-const MOCK_POSTS: BlogLandingPost[] = [
-  {
-    id: 'mock-ch-1',
-    title: 'Релиз v1.0.0-beta — первый публичный бета-релиз Balloo',
-    excerpt: 'Сегодня мы запускаем первую бета-версию мессенджера Balloo для всех желающих…',
-    content: '',
-    coverEmoji: '🚀',
-    coverGradient: 'linear-gradient(135deg, #1a1d21, #2d3742)',
-    channel: { id: 'news', name: 'Новости' },
-    categories: [],
-    author: { id: '1', name: 'Иван Воронов', initials: 'ИВ' },
-    publishedAt: Date.now() / 1000,
-    publishedAtFormatted: '16 июля 2026',
-    readTime: 5,
-    views: 1200,
-    reactions: 34,
-    comments: 0,
-    tags: [],
-  },
-];

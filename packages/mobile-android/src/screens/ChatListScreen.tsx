@@ -1,7 +1,7 @@
 // Balloo Messenger — Mobile Chat List Screen
 // Scrollable list of chats with swipe actions, search, new chat
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  ActivityIndicator,
   RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -16,6 +17,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { getThemeColors } from '../styles/theme';
 import { useUIStore } from '../store/uiStore';
 import { useChatStore, Chat } from '../store/chatStore';
+import { api } from '../services/api';
 import Avatar from '../components/Avatar';
 
 interface ChatListScreenProps {
@@ -48,7 +50,42 @@ function getStatusColor(status: string | undefined, colors: any): string {
 export default function ChatListScreen({ navigation }: ChatListScreenProps) {
   const theme = useUIStore((s) => s.theme);
   const colors = getThemeColors(theme);
-  const { chats, setActiveChat, removeChat } = useChatStore();
+  const { chats, setChats, setActiveChat, removeChat } = useChatStore();
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  // Загрузка чатов с сервера
+  const fetchChats = useCallback(async () => {
+    try {
+      const data = await api.getChats();
+      const list: any[] = Array.isArray(data) ? data : data?.chats || [];
+      const mapped: Chat[] = list.map((c) => ({
+        id: c.id,
+        type:
+          c.type === 'group' || c.type === 'channel' ? c.type : 'direct',
+        name: c.name || 'Чат',
+        avatarUrl: c.avatarUrl,
+        lastMessage: c.lastMessage?.content ?? c.lastMessageContent,
+        lastMessageAt: Number(c.lastMessageAt ?? c.lastRead ?? 0) || undefined,
+        unreadCount: Number(c.unread ?? c.unreadCount ?? 0),
+        isPinned: !!c.pinned,
+        isMuted: !!c.muted,
+        online: false,
+      }));
+      setChats(mapped);
+    } catch {
+      // Сервер недоступен — показываем кэшированные чаты из store
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [setChats]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchChats();
+    }, [fetchChats])
+  );
 
   const handleChatPress = (chat: Chat) => {
     setActiveChat(chat.id);
@@ -134,14 +171,23 @@ export default function ChatListScreen({ navigation }: ChatListScreenProps) {
         keyExtractor={(item) => item.id}
         renderItem={renderChatItem}
         contentContainerStyle={chats.length === 0 ? styles.emptyContainer : undefined}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); fetchChats(); }} tintColor={colors.accent} />
+        }
         ListEmptyComponent={
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyIcon}>💬</Text>
-            <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>Нет чатов</Text>
-            <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
-              Начните общение! Нажмите ✏, чтобы создать новый чат
-            </Text>
-          </View>
+          loading ? (
+            <View style={styles.emptyState}>
+              <ActivityIndicator size="large" color={colors.accent} />
+            </View>
+          ) : (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyIcon}>💬</Text>
+              <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>Нет чатов</Text>
+              <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
+                Начните общение! Нажмите ✏, чтобы создать новый чат
+              </Text>
+            </View>
+          )
         }
       />
     </SafeAreaView>

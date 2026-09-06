@@ -1,7 +1,8 @@
 // DownloadsScreen — управление файлами загрузок в админ-панели
 // CRUD файлов для download.balloo.su: список, загрузка, удаление, статистика
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { api } from '@/services/api';
 
 // --- Types ---
 interface DownloadFile {
@@ -19,182 +20,6 @@ interface DownloadFile {
 }
 
 // --- Mock data ---
-const MOCK_FILES: DownloadFile[] = [
-  // Windows
-  {
-    id: 'dl-001',
-    name: 'Balloo Setup 1.0.0.exe',
-    platform: 'windows',
-    format: 'exe',
-    version: '1.0.0',
-    size: 89456640, // ~85MB
-    url: 'https://cdn.balloo.su/releases/windows/Balloo-1.0.0.exe',
-    checksum: 'sha256:a1b2c3d4e5f6...',
-    uploadedAt: 1719724800000,
-    isRecommended: true,
-    downloads: 5234,
-  },
-  {
-    id: 'dl-002',
-    name: 'Balloo 1.0.0.msi',
-    platform: 'windows',
-    format: 'msi',
-    version: '1.0.0',
-    size: 92160000, // ~88MB
-    url: 'https://cdn.balloo.su/releases/windows/Balloo-1.0.0.msi',
-    checksum: 'sha256:b2c3d4e5f6a7...',
-    uploadedAt: 1719724800000,
-    isRecommended: false,
-    downloads: 342,
-  },
-  {
-    id: 'dl-003',
-    name: 'Balloo 1.0.0-portable.exe',
-    platform: 'windows',
-    format: 'portable',
-    version: '1.0.0',
-    size: 94371840, // ~90MB
-    url: 'https://cdn.balloo.su/releases/windows/Balloo-1.0.0-portable.exe',
-    checksum: 'sha256:c3d4e5f6a7b8...',
-    uploadedAt: 1719724800000,
-    isRecommended: false,
-    downloads: 156,
-  },
-  // Linux
-  {
-    id: 'dl-004',
-    name: 'Balloo-1.0.0.AppImage',
-    platform: 'linux',
-    format: 'appimage',
-    version: '1.0.0',
-    size: 98566144, // ~94MB
-    url: 'https://cdn.balloo.su/releases/linux/Balloo-1.0.0.AppImage',
-    checksum: 'sha256:d4e5f6a7b8c9...',
-    uploadedAt: 1719724800000,
-    isRecommended: true,
-    downloads: 3456,
-  },
-  {
-    id: 'dl-005',
-    name: 'balloo_1.0.0_amd64.deb',
-    platform: 'linux',
-    format: 'deb',
-    version: '1.0.0',
-    size: 96467968, // ~92MB
-    url: 'https://cdn.balloo.su/releases/linux/balloo_1.0.0_amd64.deb',
-    checksum: 'sha256:e5f6a7b8c9d0...',
-    uploadedAt: 1719724800000,
-    isRecommended: false,
-    downloads: 1234,
-  },
-  {
-    id: 'dl-006',
-    name: 'balloo-1.0.0.x86_64.rpm',
-    platform: 'linux',
-    format: 'rpm',
-    version: '1.0.0',
-    size: 95418900, // ~91MB
-    url: 'https://cdn.balloo.su/releases/linux/balloo-1.0.0.x86_64.rpm',
-    checksum: 'sha256:f6a7b8c9d0e1...',
-    uploadedAt: 1719724800000,
-    isRecommended: false,
-    downloads: 567,
-  },
-  {
-    id: 'dl-007',
-    name: 'balloo-1.0.0.tar.gz',
-    platform: 'linux',
-    format: 'tar.gz',
-    version: '1.0.0',
-    size: 100664832, // ~96MB
-    url: 'https://cdn.balloo.su/releases/linux/balloo-1.0.0.tar.gz',
-    checksum: 'sha256:a7b8c9d0e1f2...',
-    uploadedAt: 1719724800000,
-    isRecommended: false,
-    downloads: 89,
-  },
-  // macOS
-  {
-    id: 'dl-008',
-    name: 'Balloo-1.0.0.dmg',
-    platform: 'macos',
-    format: 'dmg',
-    version: '1.0.0',
-    size: 104857600, // 100MB
-    url: 'https://cdn.balloo.su/releases/macos/Balloo-1.0.0.dmg',
-    checksum: 'sha256:b8c9d0e1f2a3...',
-    uploadedAt: 1719724800000,
-    isRecommended: true,
-    downloads: 4567,
-  },
-  {
-    id: 'dl-009',
-    name: 'Balloo-1.0.0-mac.zip',
-    platform: 'macos',
-    format: 'zip',
-    version: '1.0.0',
-    size: 110100480, // ~105MB
-    url: 'https://cdn.balloo.su/releases/macos/Balloo-1.0.0-mac.zip',
-    checksum: 'sha256:c9d0e1f2a3b4...',
-    uploadedAt: 1719724800000,
-    isRecommended: false,
-    downloads: 234,
-  },
-  // Android
-  {
-    id: 'dl-010',
-    name: 'Balloo Universal.apk',
-    platform: 'android',
-    format: 'apk',
-    version: '1.0.0',
-    size: 52428800, // 50MB
-    url: 'https://cdn.balloo.su/releases/android/Balloo-universal.apk',
-    checksum: 'sha256:d0e1f2a3b4c5...',
-    uploadedAt: 1719724800000,
-    isRecommended: true,
-    downloads: 8901,
-  },
-  {
-    id: 'dl-011',
-    name: 'Balloo ARM64.apk',
-    platform: 'android',
-    format: 'apk',
-    version: '1.0.0',
-    size: 36700160, // 35MB
-    url: 'https://cdn.balloo.su/releases/android/Balloo-arm64.apk',
-    checksum: 'sha256:e1f2a3b4c5d6...',
-    uploadedAt: 1719724800000,
-    isRecommended: false,
-    downloads: 5678,
-  },
-  {
-    id: 'dl-012',
-    name: 'Balloo ARM32.apk',
-    platform: 'android',
-    format: 'apk',
-    version: '1.0.0',
-    size: 31457280, // 30MB
-    url: 'https://cdn.balloo.su/releases/android/Balloo-arm32.apk',
-    checksum: 'sha256:f2a3b4c5d6e7...',
-    uploadedAt: 1719724800000,
-    isRecommended: false,
-    downloads: 2345,
-  },
-  {
-    id: 'dl-013',
-    name: 'Balloo AAB',
-    platform: 'android',
-    format: 'aab',
-    version: '1.0.0',
-    size: 41943040, // 40MB
-    url: 'https://cdn.balloo.su/releases/android/Balloo.aab',
-    checksum: 'sha256:a3b4c5d6e7f8...',
-    uploadedAt: 1719724800000,
-    isRecommended: false,
-    downloads: 12,
-  },
-];
-
 const PLATFORM_ICONS: Record<string, string> = {
   windows: '🪟',
   linux: '🐧',
@@ -589,7 +414,38 @@ function formatBytes(bytes: number): string {
 
 // --- Main Screen ---
 export function DownloadsScreen() {
-  const [files, setFiles] = useState(MOCK_FILES);
+  const [files, setFiles] = useState<DownloadFile[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.getDownloads().then((res: any) => {
+      const allFiles: DownloadFile[] = [];
+      const platforms = ['desktop', 'mobile'];
+      platforms.forEach(p => {
+        const pkgs = res?.[p] || [];
+        pkgs.forEach((pkg: any) => {
+          allFiles.push({
+            id: pkg.id || `dl-${Date.now()}`,
+            name: pkg.name || 'Unknown',
+            platform: (pkg.platform || 'windows') as DownloadFile['platform'],
+            format: (pkg.format || 'exe') as DownloadFile['format'],
+            version: pkg.version || '0.0.0',
+            size: pkg.size || 0,
+            url: pkg.url || '',
+            checksum: pkg.checksum || '',
+            uploadedAt: pkg.uploadedAt || Date.now(),
+            isRecommended: pkg.isRecommended || false,
+            downloads: pkg.downloads || 0,
+          });
+        });
+      });
+      setFiles(allFiles);
+      setLoading(false);
+    }).catch(() => {
+      setFiles([]);
+      setLoading(false);
+    });
+  }, []);
   const [filterPlatform, setFilterPlatform] = useState<string>('all');
   const [uploadModal, setUploadModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState<{ open: boolean; file: DownloadFile | null }>({

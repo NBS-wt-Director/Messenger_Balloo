@@ -256,7 +256,7 @@ docker compose -f docker/prod/docker-compose.yml ps
 ### 7.1. Проверь health сервера
 
 ```bash
-curl https://app.balloo.su/health
+curl https://balloo.su/health
 ```
 
 Должен вернуть:
@@ -264,6 +264,20 @@ curl https://app.balloo.su/health
 ```json
 {"status":"ok","timestamp":1765728000000}
 ```
+
+### 7.1.1. Проверь readiness probe (полная проверка)
+
+```bash
+curl https://balloo.su/health/ready
+```
+
+Должен вернуть:
+
+```json
+{"status":"ready","checks":{"database":{"ok":true},"redis":{"ok":true},"minio":{"ok":true}},"timestamp":1765728000000}
+```
+
+или `503 not_ready` если какая-то зависимость недоступна.
 
 ### 7.2. Проверь веб-интерфейс
 

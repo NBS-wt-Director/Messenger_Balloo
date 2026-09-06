@@ -1,7 +1,7 @@
 // Balloo Messenger — Mobile Chat View Screen
 // Messages, input, chat header, WebSocket integration
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -9,13 +9,16 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { getThemeColors } from '../styles/theme';
 import { useUIStore } from '../store/uiStore';
+import { useAuthStore } from '../store/authStore';
 import { useChatStore, Message } from '../store/chatStore';
+import { api } from '../services/api';
 import { wsService } from '../services/ws';
 import MessageBubble from '../components/MessageBubble';
 import ChatInput from '../components/ChatInput';
@@ -26,24 +29,59 @@ interface ChatViewScreenProps {
   route: any;
 }
 
+// Маппинг сообщения сервера → модель store
+function mapServerMessage(m: any): Message {
+  return {
+    id: m.id,
+    chatId: m.chatId,
+    senderId: m.senderId,
+    senderName: m.sender?.displayName || m.sender?.username || 'Пользователь',
+    senderAvatar: m.sender?.avatarUrl,
+    type: m.type || 'text',
+    content: m.content || '',
+    replyToId: m.replyToId,
+    createdAt: Number(m.createdAt) || Math.floor(Date.now() / 1000),
+    status: m.status === 'sending' ? 'sending' : 'sent',
+    reactions: m.reactions,
+    attachments: m.attachments,
+  };
+}
+
 export default function ChatViewScreen({ navigation, route }: ChatViewScreenProps) {
   const { chatId, chatName } = route.params;
   const theme = useUIStore((s) => s.theme);
   const colors = getThemeColors(theme);
-  const { messages, setActiveChat } = useChatStore();
+  const { messages, setActiveChat, addMessage, setMessages, updateMessage } = useChatStore();
+  const currentUserId = useAuthStore((s) => s.user?.id || 'current-user');
   const flatListRef = useRef<FlatList>(null);
   const [replyTo, setReplyTo] = useState<{ author: string; text: string } | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
 
   const chatMessages = messages[chatId] || [];
+
+  // Загрузка истории сообщений через API
+  const loadMessages = useCallback(async () => {
+    try {
+      const data = await api.getMessages(chatId);
+      const list: any[] = Array.isArray(data) ? data : data?.messages || [];
+      setMessages(chatId, list.map(mapServerMessage));
+    } catch {
+      // Сервер недоступен — оставляем кэшированные сообщения
+    } finally {
+      setLoading(false);
+    }
+  }, [chatId, setMessages]);
 
   useEffect(() => {
     setActiveChat(chatId);
     wsService.joinRoom(chatId);
+    loadMessages();
 
     // Listen for new messages
     const unsubscribe = wsService.on('message.new', (payload: any) => {
       if (payload.chatId === chatId) {
-        useChatStore.getState().addMessage(chatId, payload);
+        useChatStore.getState().addMessage(chatId, mapServerMessage(payload));
       }
     });
 
@@ -59,27 +97,46 @@ export default function ChatViewScreen({ navigation, route }: ChatViewScreenProp
       unsubscribeTyping();
       wsService.leaveRoom(chatId);
     };
-  }, [chatId]);
+  }, [chatId, setActiveChat, loadMessages]);
 
-  const handleSend = (text: string) => {
-    // Send via API
-    const message: Message = {
-      id: `temp-${Date.now()}`,
-      chatId,
-      senderId: 'current-user',
-      senderName: 'Я',
-      type: 'text',
-      content: text,
-      createdAt: Math.floor(Date.now() / 1000),
-      status: 'sending',
-      replyToId: undefined,
-    };
-    useChatStore.getState().addMessage(chatId, message);
-    setReplyTo(null);
-    
-    // Send via WebSocket
-    wsService.send('message.send', { chatId, content: text });
-  };
+  const handleSend = useCallback(
+    async (text: string) => {
+      const tempId = `temp-${Date.now()}`;
+      // Optimistic message
+      const message: Message = {
+        id: tempId,
+        chatId,
+        senderId: currentUserId,
+        senderName: 'Я',
+        type: 'text',
+        content: text,
+        createdAt: Math.floor(Date.now() / 1000),
+        status: 'sending',
+        replyToId: undefined,
+      };
+      addMessage(chatId, message);
+      setReplyTo(null);
+      setSending(true);
+
+      try {
+        // Отправка через REST API (основной канал)
+        const sent = await api.sendMessage(chatId, {
+          type: 'text',
+          content: text,
+          replyToId: undefined,
+        });
+        // Заменяем optimistic-сообщение на подтверждённое сервером
+        updateMessage(chatId, tempId, mapServerMessage(sent));
+      } catch {
+        // Fallback: отправка через WebSocket
+        updateMessage(chatId, tempId, { status: 'error' });
+        wsService.send('message.send', { chatId, content: text });
+      } finally {
+        setSending(false);
+      }
+    },
+    [chatId, currentUserId, addMessage, updateMessage]
+  );
 
   const handleAttach = () => {
     Alert.alert('Прикрепить', 'Выберите тип вложения', [
@@ -126,7 +183,7 @@ export default function ChatViewScreen({ navigation, route }: ChatViewScreenProp
   const renderMessage = ({ item }: { item: Message }) => (
     <MessageBubble
       message={item}
-      isSender={item.senderId === 'current-user'}
+      isSender={item.senderId === currentUserId}
       onReply={handleReply}
       onReact={handleReact}
     />
@@ -175,13 +232,19 @@ export default function ChatViewScreen({ navigation, route }: ChatViewScreenProp
           inverted={false}
           onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
           ListEmptyComponent={
-            <View style={styles.emptyChat}>
-              <Text style={styles.emptyIcon}>💬</Text>
-              <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>Чат пуст</Text>
-              <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
-                Начните общение! Отправьте первое сообщение
-              </Text>
-            </View>
+            loading ? (
+              <View style={styles.emptyChat}>
+                <ActivityIndicator size="large" color={colors.accent} />
+              </View>
+            ) : (
+              <View style={styles.emptyChat}>
+                <Text style={styles.emptyIcon}>💬</Text>
+                <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>Чат пуст</Text>
+                <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
+                  Начните общение! Отправьте первое сообщение
+                </Text>
+              </View>
+            )
           }
         />
 

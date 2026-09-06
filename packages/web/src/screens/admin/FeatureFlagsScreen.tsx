@@ -1,7 +1,8 @@
 // FeatureFlagsScreen — управление feature flags в админ-панели
 // Список флагов, toggle on/off, target version, описание
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { api } from '@/services/api';
 
 // --- Types ---
 interface FeatureFlag {
@@ -16,88 +17,6 @@ interface FeatureFlag {
 }
 
 // --- Mock data ---
-const MOCK_FLAGS: FeatureFlag[] = [
-  {
-    id: 'ff-001',
-    name: 'new-chat-ui',
-    description: 'Новый интерфейс чата с пузырьрами без скруглений и угловыми срезами',
-    enabled: true,
-    targetVersion: '1.1.0',
-    createdAt: 1719724800000,
-    updatedAt: 1720329600000,
-    category: 'ui',
-  },
-  {
-    id: 'ff-002',
-    name: 'dark-mode-v2',
-    description: 'Улучшенная тёмная тема с новыми CSS-переменными',
-    enabled: true,
-    targetVersion: '1.0.5',
-    createdAt: 1718515200000,
-    updatedAt: 1719120000000,
-    category: 'ui',
-  },
-  {
-    id: 'ff-003',
-    name: 'end-to-end-encryption',
-    description: 'Сквозное шифрование для приватных чатов (E2EE)',
-    enabled: false,
-    targetVersion: '1.2.0',
-    createdAt: 1717305600000,
-    updatedAt: 1717910400000,
-    category: 'security',
-  },
-  {
-    id: 'ff-004',
-    name: 'voice-messages',
-    description: 'Отправка и прослушивание голосовых сообщений',
-    enabled: true,
-    targetVersion: '1.0.0',
-    createdAt: 1716096000000,
-    updatedAt: 1716700800000,
-    category: 'messaging',
-  },
-  {
-    id: 'ff-005',
-    name: 'ai-assistant',
-    description: 'Встроенный AI-ассистент для ответов и рекомендаций',
-    enabled: false,
-    targetVersion: '1.3.0',
-    createdAt: 1720934400000,
-    updatedAt: 1721539200000,
-    category: 'ai',
-  },
-  {
-    id: 'ff-006',
-    name: 'story-reactions',
-    description: 'Реакции на истории (эмодзи)',
-    enabled: true,
-    targetVersion: '1.0.2',
-    createdAt: 1715491200000,
-    updatedAt: 1716096000000,
-    category: 'stories',
-  },
-  {
-    id: 'ff-007',
-    name: 'group-video-calls',
-    description: 'Видеозвонки в группах до 50 участников',
-    enabled: false,
-    targetVersion: '1.4.0',
-    createdAt: 1722144000000,
-    updatedAt: 1722748800000,
-    category: 'messaging',
-  },
-  {
-    id: 'ff-008',
-    name: 'multi-language-support',
-    description: 'Поддержка 20 языков (3 группы: русские, дружественные, остальные)',
-    enabled: true,
-    targetVersion: '1.0.0',
-    createdAt: 1714886400000,
-    updatedAt: 1715491200000,
-    category: 'i18n',
-  },
-];
 
 const CATEGORY_LABELS: Record<string, string> = {
   ui: 'UI',
@@ -219,7 +138,7 @@ function ConfirmModal({
 
 // --- Main Screen ---
 export function FeatureFlagsScreen() {
-  const [flags, setFlags] = useState(MOCK_FLAGS);
+  const [flags, setFlags] = useState<FeatureFlag[]>([]);
   const [filter, setFilter] = useState<string>('all');
   const [search, setSearch] = useState('');
   const [confirmModal, setConfirmModal] = useState<{
@@ -227,6 +146,17 @@ export function FeatureFlagsScreen() {
     flagId: string | null;
     action: 'enable' | 'disable' | null;
   }>({ open: false, flagId: null, action: null });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.getFeatureFlags().then((res) => {
+      setFlags(res || []);
+      setLoading(false);
+    }).catch(() => {
+      setFlags([]);
+      setLoading(false);
+    });
+  }, []);
 
   // Stats
   const enabledCount = flags.filter((f) => f.enabled).length;
@@ -250,13 +180,18 @@ export function FeatureFlagsScreen() {
 
   const confirmToggle = () => {
     if (!confirmModal.flagId || !confirmModal.action) return;
-    setFlags((prev) =>
-      prev.map((f) =>
-        f.id === confirmModal.flagId
-          ? { ...f, enabled: confirmModal.action === 'enable', updatedAt: Date.now() }
-          : f
-      )
-    );
+    const newEnabled = confirmModal.action === 'enable';
+    api.toggleFeatureFlag(confirmModal.flagId).then(() => {
+      setFlags((prev) =>
+        prev.map((f) =>
+          f.id === confirmModal.flagId
+            ? { ...f, enabled: newEnabled, updatedAt: Date.now() }
+            : f
+        )
+      );
+    }).catch(() => {
+      // Опционально: показать ошибку
+    });
     setConfirmModal({ open: false, flagId: null, action: null });
   };
 
@@ -264,6 +199,12 @@ export function FeatureFlagsScreen() {
 
   return (
     <div className="page-container fade-in">
+      {loading ? (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 60 }}>
+          <div className="spinner" />
+        </div>
+      ) : (
+      <>
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ fontSize: 24, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 8 }}>
@@ -451,7 +392,9 @@ export function FeatureFlagsScreen() {
         onCancel={() => setConfirmModal({ open: false, flagId: null, action: null })}
         confirmLabel={confirmModal.action === 'enable' ? 'Включить' : 'Отключить'}
         confirmVariant={confirmModal.action === 'disable' ? 'danger' : 'primary'}
-      />
+       />
+      </>
+      )}
     </div>
   );
 }

@@ -18,7 +18,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { getThemeColors, spacing, fontSize as fontSizes } from '../../styles/theme';
 import { useUIStore } from '../../store/uiStore';
 import { useAuthStore } from '../../store/authStore';
-import { api } from '../../services/api';
+import { api, saveAuthTokens } from '../../services/api';
 
 interface RegisterScreenProps {
   navigation: any;
@@ -33,7 +33,7 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
   const [loading, setLoading] = useState(false);
   const theme = useUIStore((s) => s.theme);
   const colors = getThemeColors(theme);
-  const { setUser, setTokens, setAuthenticated } = useAuthStore();
+  const { setUser, setAuthenticated } = useAuthStore();
 
   const handleRegister = async () => {
     if (!name.trim() || !email.trim() || !password.trim()) {
@@ -54,7 +54,9 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
         username,
         displayName: name.trim(),
       });
-      setTokens(response.accessToken, response.refreshToken);
+      if (response.tokens) {
+        await saveAuthTokens(response.tokens);
+      }
       setUser(response.user);
       setAuthenticated(true);
       setShowCodeStep(true);

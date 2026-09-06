@@ -1,7 +1,8 @@
 // DesktopDonateScreen.tsx — Desktop donation screen
 // Shows donation tiers and allows one-time or recurring donations
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { api } from '@balloo/web/services/api';
 
 interface DonationTier {
   id: string;
@@ -13,33 +14,29 @@ interface DonationTier {
 }
 
 export function DesktopDonateScreen() {
+  const [tiers, setTiers] = useState<DonationTier[]>([]);
   const [selectedTier, setSelectedTier] = useState<string | null>(null);
   const [customAmount, setCustomAmount] = useState('');
+  const [processing, setProcessing] = useState(false);
+  const [donated, setDonated] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const tiers: DonationTier[] = [
-    {
-      id: 'supporter',
-      name: 'Сторонник',
-      amount: 100,
-      description: 'Поддержите развитие проекта',
-      features: ['Бейдж "Сторонник" в профиле', 'Специальные стикеры'],
-    },
-    {
-      id: 'patron',
-      name: 'Патрон',
-      amount: 300,
-      description: 'Помогите нам стать лучше',
-      features: ['Бейдж "Патрон" в профиле', 'Специальные стикеры', 'Доступ к бета-функциям'],
-      popular: true,
-    },
-    {
-      id: 'benefactor',
-      name: 'Благодетель',
-      amount: 1000,
-      description: 'Внесите значительный вклад',
-      features: ['Бейдж "Благодетель" в профиле', 'Специальные стикеры', 'Доступ к бета-функциям', 'Упоминание в списке благодетелей'],
-    },
-  ];
+  const fetchTiers = useCallback(async () => {
+    try {
+      setLoading(true);
+      const result = await api.getDonationTiers();
+      setTiers(result.tiers || []);
+    } catch (err: any) {
+      setError(err.message || 'Ошибка загрузки уровней донатов');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchTiers();
+  }, [fetchTiers]);
 
   const handleDonate = async () => {
     const amount = selectedTier
@@ -48,9 +45,38 @@ export function DesktopDonateScreen() {
 
     if (!amount || amount <= 0) return;
 
-    // TODO: API call to create donation via YooMoney
-    console.log('Donate:', amount);
+    setProcessing(true);
+    try {
+      await api.createDonation({ amount, tierId: selectedTier || undefined });
+      setDonated(true);
+    } catch (err: any) {
+      alert('Ошибка оплаты: ' + err.message);
+    } finally {
+      setProcessing(false);
+    }
   };
+
+  if (donated) {
+    return (
+      <div style={{
+        padding: '48px',
+        textAlign: 'center',
+        color: 'var(--text-primary, #fff)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100%',
+      }}>
+        <div style={{ fontSize: '64px', marginBottom: '16px' }}>💚</div>
+        <h2 style={{ margin: '0 0 8px', fontSize: '24px' }}>Спасибо за поддержку!</h2>
+        <p style={{ color: 'var(--text-secondary, #8a8aa0)', fontSize: '14px', maxWidth: '400px' }}>
+          Ваша помощь помогает нам развивать Balloo Messenger. 
+          Бейдж появится в профиле в течение нескольких минут.
+        </p>
+      </div>
+    );
+  }
 
   const containerStyle: React.CSSProperties = {
     padding: '24px',
@@ -87,45 +113,61 @@ export function DesktopDonateScreen() {
         </p>
       </div>
 
-      {/* Donation Tiers */}
-      <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
-        {tiers.map(tier => (
-          <div
-            key={tier.id}
-            style={tierCardStyle(selectedTier === tier.id, !!tier.popular)}
-            onClick={() => setSelectedTier(tier.id)}
-          >
-            {tier.popular && (
-              <div style={{
-                position: 'absolute',
-                top: '-10px',
-                right: '12px',
-                background: 'var(--accent, #2db84d)',
-                color: '#fff',
-                padding: '2px 10px',
-                fontSize: '11px',
-                fontWeight: 600,
-              }}>
-                Популярное
+      {/* Loading / Error / Empty */}
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: '48px 0', color: 'var(--text-secondary, #8a8aa0)' }}>
+          <p style={{ fontSize: '16px' }}>Загрузка уровней поддержки...</p>
+        </div>
+      ) : error ? (
+        <div style={{ textAlign: 'center', padding: '48px 0', color: '#e74c3c' }}>
+          <p style={{ fontSize: '16px' }}>{error}</p>
+          <button onClick={fetchTiers} style={{ marginTop: '12px', padding: '6px 14px', background: 'var(--accent)', color: '#fff', border: 'none', cursor: 'pointer' }}>
+            Повторить
+          </button>
+        </div>
+      ) : (
+        <>
+          {/* Donation Tiers */}
+          <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
+            {tiers.map(tier => (
+              <div
+                key={tier.id}
+                style={tierCardStyle(selectedTier === tier.id, !!tier.popular)}
+                onClick={() => setSelectedTier(tier.id)}
+              >
+                {tier.popular && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '-10px',
+                    right: '12px',
+                    background: 'var(--accent, #2db84d)',
+                    color: '#fff',
+                    padding: '2px 10px',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                  }}>
+                    Популярное
+                  </div>
+                )}
+                <h3 style={{ margin: 0, fontSize: '16px', color: 'var(--text-primary, #fff)' }}>
+                  {tier.name}
+                </h3>
+                <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--accent, #2db84d)' }}>
+                  {tier.amount} ₽
+                </div>
+                <p style={{ fontSize: '13px', color: 'var(--text-secondary, #8a8aa0)', margin: 0 }}>
+                  {tier.description}
+                </p>
+                <ul style={{ margin: 0, padding: '0 0 0 16px', fontSize: '12px', color: 'var(--text-secondary, #8a8aa0)' }}>
+                  {tier.features.map((f, i) => (
+                    <li key={i} style={{ marginTop: '4px' }}>{f}</li>
+                  ))}
+                </ul>
               </div>
-            )}
-            <h3 style={{ margin: 0, fontSize: '16px', color: 'var(--text-primary, #fff)' }}>
-              {tier.name}
-            </h3>
-            <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--accent, #2db84d)' }}>
-              {tier.amount} ₽
-            </div>
-            <p style={{ fontSize: '13px', color: 'var(--text-secondary, #8a8aa0)', margin: 0 }}>
-              {tier.description}
-            </p>
-            <ul style={{ margin: 0, padding: '0 0 0 16px', fontSize: '12px', color: 'var(--text-secondary, #8a8aa0)' }}>
-              {tier.features.map((f, i) => (
-                <li key={i} style={{ marginTop: '4px' }}>{f}</li>
-              ))}
-            </ul>
+            ))}
           </div>
-        ))}
-      </div>
+        </>
+      )}
 
       {/* Custom Amount */}
       <div style={{ width: '100%', maxWidth: '400px', textAlign: 'center' }}>
@@ -150,17 +192,18 @@ export function DesktopDonateScreen() {
           />
           <button
             onClick={handleDonate}
+            disabled={processing || (!selectedTier && !customAmount)}
             style={{
-              background: 'var(--accent, #2db84d)',
-              color: '#fff',
+              background: processing || (!selectedTier && !customAmount) ? 'var(--bg-surface, #2a2a40)' : 'var(--accent, #2db84d)',
+              color: processing || (!selectedTier && !customAmount) ? 'var(--text-secondary, #8a8aa0)' : '#fff',
               border: 'none',
               padding: '10px 24px',
-              cursor: 'pointer',
+              cursor: processing || (!selectedTier && !customAmount) ? 'not-allowed' : 'pointer',
               fontWeight: 600,
               fontSize: '14px',
             }}
           >
-            Поддержать
+            {processing ? 'Обработка...' : 'Поддержать'}
           </button>
         </div>
       </div>

@@ -1,5 +1,6 @@
 // Register Screen — экран регистрации
 // Макет: mockups/balloo-su/register.html
+// JWT tokens stored in httpOnly cookies (not localStorage)
 
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -10,7 +11,6 @@ import { LegalCheckbox } from '@/components/auth/LegalCheckbox';
 
 function RegisterScreen() {
   const navigate = useNavigate();
-  const setTokens = useAuthStore((s) => s.setTokens);
   const setUser = useAuthStore((s) => s.setUser);
 
   const [displayName, setDisplayName] = useState('');
@@ -70,7 +70,7 @@ function RegisterScreen() {
   // Generate random captcha
   const [captcha, setCaptcha] = useState('');
   const generateCaptcha = () => {
-    const chars = 'АБВГДЕЖЗИКЛМНОПРСТУФХЦЧШ';
+    const chars = 'АБВГДЕЖЗИКЛМНОПРСТУФХЦЧ';
     let result = '';
     for (let i = 0; i < 6; i++) {
       result += chars[Math.floor(Math.random() * chars.length)];
@@ -123,17 +123,17 @@ function RegisterScreen() {
 
     setLoading(true);
     try {
-      const data = await api.register({
+      // Сервер установит httpOnly cookie автоматически
+      await api.register({
         email,
         password,
         username: email.split('@')[0],
         displayName,
       });
 
-      setTokens(data.accessToken, data.refreshToken);
-      setUser(data.user);
-      localStorage.setItem('balloo-accessToken', data.accessToken);
-      localStorage.setItem('balloo-refreshToken', data.refreshToken);
+      // Получаем текущего пользователя (cookie уже установлены)
+      const user = await api.getMe();
+      setUser(user);
 
       // Show email verification step
       setShowCodeStep(true);

@@ -1,7 +1,8 @@
 // DesktopCallsHistoryScreen.tsx — Desktop calls history screen
 // Shows recent calls with filters and search
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { api } from '@balloo/web/services/api';
 
 interface CallRecord {
   id: string;
@@ -14,16 +15,25 @@ interface CallRecord {
 
 export function DesktopCallsHistoryScreen() {
   const [filter, setFilter] = useState<'all' | 'incoming' | 'outgoing' | 'missed'>('all');
+  const [calls, setCalls] = useState<CallRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Placeholder data — will be replaced with API data
-  const calls: CallRecord[] = [
-    { id: '1', contactName: 'Иван Иванов', type: 'incoming', timestamp: Date.now() - 3600000, duration: 325 },
-    { id: '2', contactName: 'Мария Петрова', type: 'outgoing', timestamp: Date.now() - 7200000, duration: 180 },
-    { id: '3', contactName: 'Алексей Смирнов', type: 'missed', timestamp: Date.now() - 10800000, duration: 0 },
-    { id: '4', contactName: 'Елена Козлова', type: 'incoming', timestamp: Date.now() - 14400000, duration: 600 },
-  ];
+  const fetchCalls = useCallback(async () => {
+    try {
+      setLoading(true);
+      const result = await api.getCallHistory(filter === 'all' ? undefined : filter);
+      setCalls(result.calls || []);
+    } catch (err: any) {
+      setError(err.message || 'Ошибка загрузки истории звонков');
+    } finally {
+      setLoading(false);
+    }
+  }, [filter]);
 
-  const filteredCalls = filter === 'all' ? calls : calls.filter(c => c.type === filter);
+  useEffect(() => {
+    fetchCalls();
+  }, [fetchCalls]);
 
   const formatDuration = (seconds: number): string => {
     if (seconds === 0) return '';
@@ -87,36 +97,54 @@ export function DesktopCallsHistoryScreen() {
       </div>
 
       <div style={{ flex: 1, overflow: 'auto' }}>
-        {filteredCalls.map(call => (
-          <div key={call.id} style={callItemStyle}>
-            <div style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '50%',
-              background: 'var(--bg-surface, #2a2a40)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '16px',
-              color: 'var(--text-secondary, #8a8aa0)',
-              flexShrink: 0,
-            }}>
-              {call.contactName.charAt(0)}
-            </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontWeight: 600, color: 'var(--text-primary, #fff)', fontSize: '14px' }}>
-                {call.contactName}
-              </div>
-              <div style={{ fontSize: '12px', color: 'var(--text-secondary, #8a8aa0)', marginTop: '2px' }}>
-                {call.type === 'incoming' ? '📞 Входящий' : call.type === 'outgoing' ? '📞 Исходящий' : '📞 Пропущенный'}
-                {call.duration > 0 && ` — ${formatDuration(call.duration)}`}
-              </div>
-            </div>
-            <div style={{ fontSize: '12px', color: 'var(--text-secondary, #8a8aa0)', flexShrink: 0 }}>
-              {formatTime(call.timestamp)}
-            </div>
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '48px 0', color: 'var(--text-secondary, #8a8aa0)' }}>
+            <p style={{ fontSize: '16px' }}>Загрузка...</p>
           </div>
-        ))}
+        ) : error ? (
+          <div style={{ textAlign: 'center', padding: '48px 0', color: '#e74c3c' }}>
+            <p style={{ fontSize: '16px' }}>{error}</p>
+            <button onClick={fetchCalls} style={{ marginTop: '12px', padding: '6px 14px', background: 'var(--accent)', color: '#fff', border: 'none', cursor: 'pointer' }}>
+              Повторить
+            </button>
+          </div>
+        ) : calls.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '48px 0', color: 'var(--text-secondary, #8a8aa0)' }}>
+            <p style={{ fontSize: '16px' }}>Нет звонков</p>
+            <p style={{ fontSize: '13px', marginTop: '8px' }}>История звонков появится здесь</p>
+          </div>
+        ) : (
+          calls.map(call => (
+            <div key={call.id} style={callItemStyle}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                background: call.type === 'missed' ? 'rgba(231, 76, 60, 0.2)' : 'var(--bg-surface, #2a2a40)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '16px',
+                color: call.type === 'missed' ? '#e74c3c' : 'var(--text-secondary, #8a8aa0)',
+                flexShrink: 0,
+              }}>
+                {call.contactName.charAt(0)}
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 600, color: 'var(--text-primary, #fff)', fontSize: '14px' }}>
+                  {call.contactName}
+                </div>
+                <div style={{ fontSize: '12px', color: 'var(--text-secondary, #8a8aa0)', marginTop: '2px' }}>
+                  {call.type === 'incoming' ? '📞 Входящий' : call.type === 'outgoing' ? '📞 Исходящий' : '📞 Пропущенный'}
+                  {call.duration > 0 && ` — ${formatDuration(call.duration)}`}
+                </div>
+              </div>
+              <div style={{ fontSize: '12px', color: 'var(--text-secondary, #8a8aa0)', flexShrink: 0 }}>
+                {formatTime(call.timestamp)}
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );

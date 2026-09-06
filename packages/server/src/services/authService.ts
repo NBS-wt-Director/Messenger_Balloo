@@ -1,13 +1,24 @@
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
+import bcrypt from 'bcryptjs';
 import { env } from '../config/env';
 import { PrismaClient } from '@prisma/client';
+import { setAuthCookies, clearAuthCookies } from '../middleware/auth';
+import { sendWelcomeEmail, sendVerificationEmail, sendResetPasswordEmail } from './emailService';
 
 const prisma = new PrismaClient();
 
 // ============================================================
 // Утилиты
 // ============================================================
+
+// Проверка: есть ли в системе хотя бы один админ
+export const hasAdmin = async (): Promise<boolean> => {
+  const count = await prisma.user.count({
+    where: { role: 'admin' },
+  });
+  return count > 0;
+};
 
 const randomString = (length: number = 32): string =>
   crypto.randomBytes(length).toString('hex');
@@ -78,12 +89,35 @@ const generateTokens = (userId: string, email: string, username?: string, role?:
   };
 };
 
-// Простое хеширование пароля (SHA-256 с солью)
-const hashPassword = (password: string): string =>
+// Хеширование пароля — bcrypt (cost factor 12)
+const BCRYPT_ROUNDS = 12;
+
+const hashPassword = (password: string): Promise<string> =>
+  bcrypt.hash(password, BCRYPT_ROUNDS);
+
+// Легаси-хеш (SHA-256 с хардкод-солью) — только для миграции старых паролей
+const legacyHash = (password: string): string =>
   crypto.createHash('sha256').update(password + 'balloo-salt-2024').digest('hex');
 
-const verifyPassword = (password: string, hash: string): boolean =>
-  hashPassword(password) === hash;
+const isLegacyHash = (hash: string): boolean => /^[a-f0-9]{64}$/i.test(hash);
+
+// Проверка пароля: поддерживает bcrypt и легаси SHA-256.
+// needsRehash = true → хеш устарел и должен быть перезаписан bcrypt-хешем
+const verifyPassword = async (
+  password: string,
+  hash: string
+): Promise<{ valid: boolean; needsRehash: boolean }> => {
+  if (isLegacyHash(hash)) {
+    const valid = legacyHash(password) === hash;
+    return { valid, needsRehash: valid };
+  }
+  try {
+    const valid = await bcrypt.compare(password, hash);
+    return { valid, needsRehash: false };
+  } catch {
+    return { valid: false, needsRehash: false };
+  }
+};
 
 // ============================================================
 // Регистрация
@@ -117,7 +151,7 @@ export const register = async (input: RegisterInput) => {
     }
   }
 
-  const passwordHash = hashPassword(input.password);
+  const passwordHash = await hashPassword(input.password);
 
   const user = await prisma.user.create({
     data: {
@@ -140,6 +174,35 @@ export const register = async (input: RegisterInput) => {
   });
 
   const tokens = generateTokens(user.id, user.email!, user.username || undefined);
+
+  // Отправка welcome-письма (не блокирует регистрацию)
+  const username = input.username || user.email!.split('@')[0];
+  sendWelcomeEmail(user.email!, username).catch((err: unknown) => {
+    console.error('[REGISTER] Failed to send welcome email:', err);
+  });
+
+  // Отправка verification email (не блокирует регистрацию)
+  const verificationToken = randomString(32);
+  const expiresAt = BigInt(Math.floor(Date.now() / 1000)) + 86400n; // 24 часа
+
+  prisma.verificationToken
+    .create({
+      data: {
+        userId: user.id,
+        type: 'email_verification',
+        token: verificationToken,
+        expiresAt,
+        createdAt: BigInt(Math.floor(Date.now() / 1000)),
+      },
+    })
+    .then(() => {
+      sendVerificationEmail(user.email!, verificationToken).catch((err: unknown) => {
+        console.error('[REGISTER] Failed to send verification email:', err);
+      });
+    })
+    .catch((err: unknown) => {
+      console.error('[REGISTER] Failed to create verification token:', err);
+    });
 
   return { user, tokens };
 };
@@ -179,9 +242,20 @@ export const login = async (input: LoginInput) => {
     throw new Error('Аккаунт временно приостановлен');
   }
 
-  const validPassword = verifyPassword(input.password, user.passwordHash!);
+  const { valid: validPassword, needsRehash } = await verifyPassword(
+    input.password,
+    user.passwordHash!
+  );
   if (!validPassword) {
     throw new Error('Неверный email или пароль');
+  }
+
+  // Прозрачная миграция: перезаписываем легаси SHA-256 хеш на bcrypt
+  if (needsRehash) {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { passwordHash: await hashPassword(input.password) },
+    });
   }
 
   const has2FA = user.twoFASecrets.length > 0 && user.twoFASecrets[0].enabled;
@@ -354,8 +428,36 @@ export const logout = async (refreshToken: string): Promise<void> => {
 // Верификация email
 // ============================================================
 
-export const verifyEmail = async (_input: { token: string }): Promise<{ success: boolean }> => {
-  return { success: true };
+export const verifyEmail = async (input: { token: string }): Promise<{ success: boolean; message: string }> => {
+  const tokenRecord = await prisma.verificationToken.findUnique({
+    where: { token: input.token },
+    include: { user: true },
+  });
+
+  if (!tokenRecord) {
+    return { success: false, message: 'Недействительный токен верификации' };
+  }
+
+  if (tokenRecord.used) {
+    return { success: false, message: 'Токен уже был использован' };
+  }
+
+  if (tokenRecord.expiresAt < BigInt(Math.floor(Date.now() / 1000))) {
+    return { success: false, message: 'Токен верификации истёк' };
+  }
+
+  if (tokenRecord.type !== 'email_verification') {
+    return { success: false, message: 'Неверный тип токена' };
+  }
+
+  // Отмечаем токен как использованный
+  await prisma.verificationToken.update({
+    where: { id: tokenRecord.id },
+    data: { used: true },
+  });
+
+  console.log(`[VERIFY] Email verified for user ${tokenRecord.userId}`);
+  return { success: true, message: 'Email успешно верифицирован' };
 };
 
 // ============================================================
@@ -371,19 +473,79 @@ export const requestPasswordReset = async (input: { email: string }) => {
     return { success: true, message: 'Если пользователь существует, письмо будет отправлено' };
   }
 
+  // Удаляем старые неиспользованные токены сброса
+  await prisma.verificationToken.deleteMany({
+    where: {
+      userId: user.id,
+      type: 'password_reset',
+      used: false,
+    },
+  });
+
   const resetToken = randomString(32);
+  const expiresAt = BigInt(Math.floor(Date.now() / 1000)) + 3600n; // 1 час
+
+  // Сохраняем токен в БД
+  await prisma.verificationToken.create({
+    data: {
+      userId: user.id,
+      type: 'password_reset',
+      token: resetToken,
+      expiresAt,
+      createdAt: BigInt(Math.floor(Date.now() / 1000)),
+    },
+  });
+
+  // Отправляем email (не блокируем, не падаем если SMTP недоступен)
+  try {
+    await sendResetPasswordEmail(user.email!, resetToken);
+  } catch {
+    // Email не отправлен — не блокируем запрос
+  }
 
   return {
     success: true,
-    resetToken,
     message: 'Если пользователь существует, письмо будет отправлено',
   };
 };
 
 export const resetPassword = async (input: { token: string; newPassword: string }) => {
-  const passwordHash = hashPassword(input.newPassword);
+  const tokenRecord = await prisma.verificationToken.findUnique({
+    where: { token: input.token },
+    include: { user: true },
+  });
 
-  throw new Error('Функция сброса пароля требует настройки email-сервиса');
+  if (!tokenRecord) {
+    throw new Error('Недействительный токен сброса пароля');
+  }
+
+  if (tokenRecord.used) {
+    throw new Error('Токен уже был использован');
+  }
+
+  if (tokenRecord.expiresAt < BigInt(Math.floor(Date.now() / 1000))) {
+    throw new Error('Токен сброса пароля истёк');
+  }
+
+  if (tokenRecord.type !== 'password_reset') {
+    throw new Error('Неверный тип токена');
+  }
+
+  // Обновляем пароль
+  const passwordHash = await hashPassword(input.newPassword);
+  await prisma.user.update({
+    where: { id: tokenRecord.userId },
+    data: { passwordHash },
+  });
+
+  // Отмечаем токен как использованный
+  await prisma.verificationToken.update({
+    where: { id: tokenRecord.id },
+    data: { used: true },
+  });
+
+  console.log(`[RESET] Password reset for user ${tokenRecord.userId}`);
+  return { success: true, message: 'Пароль успешно сброшен' };
 };
 
 // ============================================================
@@ -407,6 +569,46 @@ interface OAuthLoginInput {
   };
 }
 
+// Получение данных пользователя из Яндекс OAuth
+export const getYandexUser = async (accessToken: string) => {
+  const response = await fetch('https://login.yandex.ru/info', {
+    headers: { Authorization: `OAuth ${accessToken}` },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Yandex OAuth error: ${response.status}`);
+  }
+
+  const data = (await response.json()) as { id: string; default_email: string; login: string; default_avatar_id: string };
+
+  return {
+    providerId: data.id,
+    email: data.default_email,
+    username: data.login || undefined,
+    avatarUrl: data.default_avatar_id ? `https://avatars.yandex.net/get-yapic/${data.default_avatar_id}/200` : undefined,
+  };
+};
+
+// Обмен authorization code на access token (Яндекс)
+export const exchangeYandexCode = async (code: string) => {
+  const response = await fetch('https://oauth.yandex.ru/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      client_id: process.env.YANDEX_CLIENT_ID || '',
+      client_secret: process.env.YANDEX_CLIENT_SECRET || '',
+      grant_type: 'authorization_code',
+      code,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Yandex token exchange failed: ${response.status}`);
+  }
+
+  return await response.json();
+};
+
 export const oauthLogin = async (input: OAuthLoginInput) => {
   let oAuthAccount = await prisma.oAuthAccount.findUnique({
     where: {
@@ -427,6 +629,9 @@ export const oauthLogin = async (input: OAuthLoginInput) => {
   } else {
     const passwordHash = crypto.randomBytes(32).toString('hex');
 
+    // Первый пользователь через OAuth становится админом, если админов еще нет
+    const isAdmin = await hasAdmin();
+
     user = await prisma.user.create({
       data: {
         email: input.email || null,
@@ -435,6 +640,7 @@ export const oauthLogin = async (input: OAuthLoginInput) => {
         avatarUrl: input.avatarUrl || null,
         language: 'ru',
         status: 'active',
+        role: isAdmin ? 'user' : 'admin',
         createdAt: BigInt(Math.floor(Date.now() / 1000)),
         updatedAt: BigInt(Math.floor(Date.now() / 1000)),
         oAuthAccounts: {
@@ -625,4 +831,28 @@ export const revokeDevice = async (userId: string, deviceId: string) => {
   }
   await prisma.device.delete({ where: { id: deviceId } });
   return { revoked: true };
+};
+
+// ============================================================
+// Временный токен для WebSocket
+// ============================================================
+
+export const getWsToken = async (accessToken: string): Promise<string> => {
+  try {
+    const decoded = jwt.verify(accessToken, env.JWT_ACCESS_SECRET) as any;
+    if (decoded.type !== 'access') {
+      throw new Error('Invalid token type');
+    }
+    const wsPayload: Record<string, unknown> = { 
+      userId: decoded.userId, 
+      email: decoded.email, 
+      username: decoded.username, 
+      role: decoded.role, 
+      type: 'access',
+      ws: true,
+    };
+    return jwt.sign(wsPayload, env.JWT_ACCESS_SECRET, { expiresIn: 300 });
+  } catch {
+    throw new Error('Invalid access token');
+  }
 };
