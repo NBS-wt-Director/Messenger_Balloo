@@ -21,16 +21,16 @@
 | 5 | PostgreSQL | `POSTGRES_PORT` | `5432` | Docker/сервер | 🟢 Готово |
 | 6 | Redis | `REDIS_HOST` | `localhost` | Docker/сервер | 🟢 Готово |
 | 7 | Redis | `REDIS_PORT` | `6379` | Docker/сервер | 🟢 Готово |
-| 8 | Redis | `REDIS_PASSWORD` | `ef7f5327f2312bd2a5a88d5815467f14853bebfb22aeb9fd6a5e57d43c66e83a` | Сгенерирован | 🟢 Готово ✅ |
+| 8 | Redis | `REDIS_PASSWORD` | `90594c578834ebb4bd8c679a5fbcbfec195971fa43757ee530e17c3eb8fa3648` | Сгенерирован 2026-09-07 | 🟢 Готово ✅ |
 | 9 | MinIO | `MINIO_ENDPOINT` | `localhost` | Docker/сервер | 🟢 Готово |
 | 10 | MinIO | `MINIO_PORT` | `9000` | Docker/сервер | 🟢 Готово |
 | 11 | MinIO | `MINIO_ACCESS_KEY` | `minioadmin` | По умолчанию | 🟢 Готово |
-| 12 | MinIO | `MINIO_SECRET_KEY` | `d283226061a57f9254d86186297a0b562b6e78918445e84a11942b8935e238ed` | Кастомный | 🟢 Готово ✅ |
+| 12 | MinIO | `MINIO_SECRET_KEY` | `341d3f68ad7c81499c19ab84f6309efeddfcd665d30c1b34e17fc53bedda7fbb` | Сгенерирован 2026-09-07 | 🟢 Готово ✅ |
 | 13 | MinIO | `MINIO_BUCKET` | `balloo-media` | По умолчанию | 🟢 Готово |
-| 14 | JWT | `JWT_SECRET` | `d7514f34bc858be576aa20507943394fbb825f0c9f7672de93fbd8e431c19bac...` | Сгенерирован | 🟢 Готово ✅ |
-| 15 | JWT | `JWT_REFRESH_SECRET` | `518af7a683cdb4ca16d467d2db2f457d3ae0623caf7555314160d1c0fe6fc5e66d...` | Сгенерирован | 🟢 Готово ✅ |
-| 16 | VAPID (Push) | `VAPID_PUBLIC_KEY` | `BI9QmrSEq90qGCDpylu-BmfKKyoI-HyWuCMvdVuXbnigV5VmJ84xTDYidkOIZR-jtfbUTyi-IsOQVWbwKRU9o8Q` | Сгенерирован | 🟢 Готово ✅ |
-| 17 | VAPID (Push) | `VAPID_PRIVATE_KEY` | `Jnh4N3EU-2F0i9j_4tt_8fLVq-ZWoXG2cHNP6QuPVpQ` | Сгенерирован | 🟢 Готово ✅ |
+| 14 | JWT | `JWT_ACCESS_SECRET` | `663cb016df1bd460eb4c201e1930b8a95bced252cf1d66e5d95d8973aa92304a` | Сгенерирован 2026-09-07 | 🟢 Готово ✅ |
+| 15 | JWT | `JWT_REFRESH_SECRET` | `86bc8d272f18a3ea95196e8533f005778ab61d65c85c71f178a1e74b9ac85a17` | Сгенерирован 2026-09-07 | 🟢 Готово ✅ |
+| 16 | VAPID (Push) | `VAPID_PUBLIC_KEY` | `xKFj2q_eHX5WuWDz4HuGA78whwnftdeEuLyUZMsrY18` | Сгенерирован 2026-09-07 | 🟢 Готово ✅ |
+| 17 | VAPID (Push) | `VAPID_PRIVATE_KEY` | `tJ1g5sYoxkbh5MtZj6zIwhbIQ5-yE1QVi9UsViigZOM` | Сгенерирован 2026-09-07 | 🟢 Готово ✅ |
 | 18 | Setup | `SETUP_PASSWORD` | `06041996ОИА` | Уже установлено | 🟢 Готово |
 | **🟡 OAUTH** | | | | | |
 | 19 | **Яндекс OAuth** | `YANDEX_CLIENT_ID` | `ccee3f45f25f4e5d8193ce26124822dc` | developer.tech.yandex.ru | 🟢 Готово ✅ |
@@ -67,9 +67,10 @@
 - **Yandex Disk** — API ключ (если нужен диск)
 
 ### Что уже сгенерировано:
-- `REDIS_PASSWORD` ✅
-- `JWT_SECRET` + `JWT_REFRESH_SECRET` ✅
-- `VAPID_PUBLIC_KEY` + `VAPID_PRIVATE_KEY` ✅
+- `REDIS_PASSWORD` ✅ (2026-09-07, production)
+- `JWT_ACCESS_SECRET` + `JWT_REFRESH_SECRET` ✅ (2026-09-07, production)
+- `VAPID_PUBLIC_KEY` + `VAPID_PRIVATE_KEY` ✅ (2026-09-07, production)
+- `MINIO_SECRET_KEY` ✅ (2026-09-07, production)
 
 ### Что уже готово:
 - SSH-ключи для CI/CD ✅
@@ -95,9 +96,11 @@
 - [ ] **ЮKassa** — shop ID + API key (или «позже»)
 - [ ] **Yandex Disk** — API key (или «позже»)
 - [ ] **SSH-ключ** добавлен в GitHub Secrets (VPS_HOST, VPS_USER, VPS_SSH_KEY)
-- [ ] **PTR-запись** — настроить у хостера (188.73.176.34 → mail.balloo.su)
-- [ ] **DMARC** — TXT-запись: `_dmarc v=DMARC1; p=quarantine; rua=mailto:noreply@balloo.su`
+- [x] **PTR-запись** — настроить у хостера (188.73.176.34 → mail.balloo.su) ✅ (2026-09-07)
+- [x] **DMARC** — TXT-запись: `_dmarc v=DMARC1; p=quarantine; rua=mailto:noreply@balloo.su` ✅ (2026-09-07)
 - [x] **Сервер-репорт** — Node.js скрипт настроен, cron (8:00, 14:00, 20:00) активен
+- [x] **Production-секреты** — сгенерированы 2026-09-07 ✅
+- [x] **Скрипт сборки** — build-and-deploy-downloads.sh создан ✅
 
 ---
 

@@ -14,11 +14,11 @@ output/
 .env
 .env.local
 .env.dev
-.env.production
 .env.staging
 .env.development.local
 .env.test.local
 .env.production.local
+# .env.production — коммитится (для деплоя на сервер)
 # .env.example и .env.production.example — коммитятся (шаблоны)
 
 # API Keys (секретный файл с реальными ключами)
@@ -58,6 +58,9 @@ Thumbs.db
 
 # Desktop build artifacts (large binaries, not for git)
 packages/desktop/release/
+packages/desktop/dist-electron/
+packages/desktop/dist-renderer/
+packages/desktop/dist/
 
 # Docker
 docker/data/
