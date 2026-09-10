@@ -1,0 +1,21 @@
+{
+  "name": "Balloo — Мессенджер",
+  "short_name": "Balloo",
+  "description": "Российский мессенджер для общения, работы и бизнеса",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#2db84d",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/assets/logos/product-logo.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["social", "messaging"],
+  "lang": "ru",
+  "dir": "ltr"
+}
