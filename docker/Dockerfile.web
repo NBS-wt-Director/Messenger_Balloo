@@ -1,6 +1,9 @@
-FROM node:22-alpine AS builder
+FROM node:22-slim AS builder
 
 WORKDIR /app
+
+# libatomic1 is required by the pnpm@11 prebuilt binary (@pnpm/exe)
+RUN apt-get update -y && apt-get install -y --no-install-recommends libatomic1 && rm -rf /var/lib/apt/lists/*
 
 # Install pnpm + typescript + vite globally
 RUN npm install -g pnpm@latest typescript vite@5.4.0
