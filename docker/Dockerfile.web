@@ -26,6 +26,11 @@ RUN cd packages/shared && npx prisma generate
 # Build shared
 RUN cd packages/shared && tsc
 
+# API base URL baked into the bundle at build time (Vite inlines VITE_* vars only)
+# Must be a bare origin without trailing slash: code does `${API_BASE}/api/...`
+ARG VITE_API_URL=https://balloo.su
+ENV VITE_API_URL=${VITE_API_URL}
+
 # Build web (vite build — no type-check, faster)
 RUN cd packages/web && vite build
 

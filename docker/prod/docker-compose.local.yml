@@ -152,6 +152,9 @@ services:
     build:
       context: ../..
       dockerfile: docker/Dockerfile.web
+      args:
+        # Запекается в бандль на vite build (см. docker/Dockerfile.web)
+        VITE_API_URL: ${VITE_API_URL:-https://balloo.su}
     image: balloo/web:local
     container_name: balloo-web
     restart: always
