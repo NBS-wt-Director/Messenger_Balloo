@@ -117,20 +117,29 @@ interface QueryParams {
   [key: string]: string | undefined;
 }
 
-function verifyClient(info: { origin: string; url: URL; req: IncomingMessage }, callback: (ready: boolean, code?: number, message?: string) => void): void {
-  const url = info.url;
-  const token = url.searchParams.get('token') || (url as any).query?.token;
-
-  if (!token) {
-    console.log('[WS] Connection rejected: no token');
-    // Второй аргумент — HTTP-код ответа handshake, а не код закрытия WS.
-    // 1008 сюда недопустим: Node бросает ERR_HTTP_INVALID_STATUS_CODE,
-    // соединение рвётся без ответа, и nginx отдаёт 502 вместо 401.
-    callback(false, 401, 'Authentication required');
-    return;
-  }
-
+function verifyClient(
+  info: { origin: string; secure: boolean; req: IncomingMessage },
+  callback: (ready: boolean, code?: number, message?: string) => void
+): void {
+  // ws передаёт в info только { origin, secure, req } — поля url в нём нет
+  // (websocket-server.js:327-333). Единственный источник query-параметров —
+  // строка req.url. Чтение info.url давало undefined, и следующее за ним
+  // url.searchParams бросало TypeError синхронно внутри обработчика
+  // 'upgrade': процесс падал без ответа (curl → "Empty reply from server",
+  // nginx → 502), и запрос на /ws/ ронял весь API.
   try {
+    const url = new URL(info.req.url ?? '', 'http://127.0.0.1');
+    const token = url.searchParams.get('token');
+
+    if (!token) {
+      console.log('[WS] Connection rejected: no token');
+      // Второй аргумент — HTTP-код ответа handshake, а не код закрытия WS.
+      // 1008 сюда недопустим: Node бросает ERR_HTTP_INVALID_STATUS_CODE,
+      // соединение рвётся без ответа, и nginx отдаёт 502 вместо 401.
+      callback(false, 401, 'Authentication required');
+      return;
+    }
+
     const decoded = jwt.verify(token, env.JWT_ACCESS_SECRET) as any;
 
     if (decoded.type !== 'access') {
@@ -143,7 +152,7 @@ function verifyClient(info: { origin: string; url: URL; req: IncomingMessage }, 
     // (оптимизация: проверяем только при необходимости, т.к. это adds DB call per connection)
     // В продакшене можно кэшировать активные токены в Redis
 
-    // Добавляем decoded в ws для последующего использования
+    // Добавляем decoded в req для последующего использования
     (info.req as WsAuthedRequest).wsUser = {
       userId: decoded.userId,
       email: decoded.email,
@@ -153,7 +162,10 @@ function verifyClient(info: { origin: string; url: URL; req: IncomingMessage }, 
 
     callback(true);
   } catch (error) {
-    console.log('[WS] Connection rejected: invalid token');
+    // Отсюда ничего не должно улетать наружу: verifyClient вызывается
+    // синхронно в обработчике 'upgrade', а необработанное исключение роняет
+    // весь процесс (слушателей uncaughtException в приложении нет).
+    console.log('[WS] Connection rejected:', (error as Error).message);
     callback(false, 401, 'Invalid or expired token');
   }
 }
