@@ -28,12 +28,19 @@ x-common-variables: &common-vars
   ADMIN_INSTALL_PASSWORD: ${ADMIN_INSTALL_PASSWORD}
   SETUP_PASSWORD: ${SETUP_PASSWORD}
   MAX_FILE_SIZE: ${MAX_FILE_SIZE:-52428800}
-  CDN_BASE_URL: https://cdn.balloo.su
+  # Публичный префикс для отдаваемых URL. В приложении не используется
+  # (media.service строит /uploads/<ключ>), оставлен на случай CDN.
+  CDN_BASE_URL: ${CDN_BASE_URL:-https://cdn.balloo.su}
   MINIO_ENDPOINT: minio
   MINIO_PORT: "9000"
   MINIO_USE_SSL: "false"
   MINIO_ROOT_USER: ${MINIO_ROOT_USER:-balloo-minio}
   MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+  # Приложение читает ACCESS_KEY/SECRET_KEY (config/env.ts:31-32, app.ts:77-78,
+  # services/uploadService.ts:79-80), а не ROOT_*. Без этих двух строк клиент
+  # молча берёт дефолт minioadmin и загрузка падает на AccessKeyDoesNotExist.
+  MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-balloo-minio}
+  MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
 
 services:
   # ─── PostgreSQL 16 (БД не торчит наружу) ───
