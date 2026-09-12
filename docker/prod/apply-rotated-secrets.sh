@@ -18,8 +18,9 @@ if [ ! -f "$ENV_FILE" ]; then
 fi
 
 read_key() {
-  # last assignment wins, value taken verbatim after the first '='
-  grep -E "^$1=" "$ENV_FILE" | tail -1 | cut -d= -f2-
+  # last assignment wins; value taken verbatim after the first '='
+  # and surrounding quotes stripped (docker compose --env-file strips them too)
+  grep -E "^$1=" "$ENV_FILE" | tail -1 | cut -d= -f2- | sed -E 's/^[[:space:]]*//; s/[[:space:]]*$//; s/^"(.*)"$/\1/; s/^'\''(.*)'\''$/\1/'
 }
 
 PG_USER="$(read_key POSTGRES_USER)"; PG_USER="${PG_USER:-balloo}"

@@ -46,17 +46,27 @@ for (const [key, value] of replacements) {
     console.error(`ERROR: key ${key} not found in ${ENV_FILE}. Refusing to continue.`);
     process.exit(1);
   }
-  text = text.replace(re, `${key}=${value}`);
+  // keep the file's existing style: values in double quotes
+  text = text.replace(re, `${key}="${value}"`);
   console.log(`rotated ${key} (${value.length} chars)`);
 }
 
 const pg = replacements.find(([k]) => k === 'POSTGRES_PASSWORD')[1];
 const rd = replacements.find(([k]) => k === 'REDIS_PASSWORD')[1];
-const pgUser = (text.match(/^POSTGRES_USER=(.*)$/m) || [, 'balloo'])[1].trim();
-const pgDb = (text.match(/^POSTGRES_DB=(.*)$/m) || [, 'balloo'])[1].trim();
 
-text = text.replace(/^DATABASE_URL=.*$/m, `DATABASE_URL=postgresql://${pgUser}:${pg}@postgres:5432/${pgDb}`);
-text = text.replace(/^REDIS_URL=.*$/m, `REDIS_URL=redis://:${rd}@redis:6379`);
+// Existing values in this file are double-quoted; docker compose strips the
+// quotes, so we must strip them here too before rebuilding the URLs.
+function readKey(key, fallback) {
+  const raw = (text.match(new RegExp(`^${key}=(.*)$`, 'm')) || [, ''])[1].trim();
+  const unquoted = raw.replace(/^"(.*)"$/, '$1').replace(/^'(.*)'$/, '$1').trim();
+  return unquoted || fallback;
+}
+
+const pgUser = readKey('POSTGRES_USER', 'balloo');
+const pgDb = readKey('POSTGRES_DB', 'balloo');
+
+text = text.replace(/^DATABASE_URL=.*$/m, `DATABASE_URL="postgresql://${pgUser}:${pg}@postgres:5432/${pgDb}"`);
+text = text.replace(/^REDIS_URL=.*$/m, `REDIS_URL="redis://:${rd}@redis:6379"`);
 console.log('rewritten DATABASE_URL, REDIS_URL');
 
 writeFileSync(ENV_FILE, text, 'utf8');
