@@ -28,6 +28,20 @@ export interface AuthenticatedWebSocket {
 }
 
 // ============================================================
+// Запрос handshake с данными авторизованного пользователя
+// (verifyClient заполняет wsUser, connection-хендлер читает его)
+// ============================================================
+
+export interface WsAuthedRequest extends IncomingMessage {
+  wsUser?: {
+    userId: string;
+    email: string;
+    username?: string;
+    role?: string;
+  };
+}
+
+// ============================================================
 // Типы WebSocket сообщений (direction: client→server)
 // ============================================================
 
