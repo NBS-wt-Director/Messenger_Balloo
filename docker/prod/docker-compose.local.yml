@@ -36,11 +36,9 @@ x-common-variables: &common-vars
   MINIO_USE_SSL: "false"
   MINIO_ROOT_USER: ${MINIO_ROOT_USER:-balloo-minio}
   MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
-  # Приложение читает ACCESS_KEY/SECRET_KEY (config/env.ts:31-32, app.ts:77-78,
-  # services/uploadService.ts:79-80), а не ROOT_*. Без этих двух строк клиент
-  # молча берёт дефолт minioadmin и загрузка падает на AccessKeyDoesNotExist.
-  MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-balloo-minio}
-  MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+  # MINIO_ACCESS_KEY / MINIO_SECRET_KEY объявлены у сервиса server, а не здесь:
+  # этот якорь подключён и к postgres, поэтому лишние переменные здесь
+  # заставили бы `up -d` пересоздать контейнер базы данных.
 
 services:
   # ─── PostgreSQL 16 (БД не торчит наружу) ───
@@ -115,6 +113,15 @@ services:
       <<: *common-vars
       DATABASE_URL: postgresql://${POSTGRES_USER:-balloo}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-balloo}
       REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      # Приложение читает ACCESS_KEY/SECRET_KEY (config/env.ts:31-32,
+      # app.ts:77-78, services/uploadService.ts:79-80), а не ROOT_*. Без этих
+      # строк клиент молча берёт дефолт minioadmin, и /health/ready отдаёт
+      # "The Access Key Id you provided does not exist in our records."
+      # Объявлены здесь, а не в x-common-variables: якорь подключён и к
+      # postgres, иначе up -d пересоздал бы контейнер базы данных.
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-balloo-minio}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      MINIO_BUCKET: ${MINIO_BUCKET:-balloo-media}
       SMTP_HOST: ${SMTP_HOST:-localhost}
       SMTP_PORT: ${SMTP_PORT:-587}
       SMTP_USER: ${SMTP_USER:-}
