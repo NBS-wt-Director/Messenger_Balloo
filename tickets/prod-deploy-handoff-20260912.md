@@ -28,6 +28,7 @@
 10. **Документ обновляется ДО новых действий на сервере**, если с прошлого обновления сменился этап. Прерванная из-за соединения сессия не повод терять состояние: всё найденное уже здесь.
 11. **Один батч = одна тема.** Не смешивать деплой кода, правку nginx и ротацию секретов в одном заходе: при ошибке невозможно понять, что именно сработало. Вывод батча присылается целиком (или `tail -n 40` того же лога).
 12. Долгие команды (`docker compose build`) запускать фоном в свой лог: `setsid nohup … > /tmp/<имя>.log 2>&1 < /dev/null &`, затем `tail`. Иначе сессия рвётся, а сборка остаётся сиротой.
+13. **Ожидание зашито в команду, а не в переписку.** Ассистент не пишет «подожди ~7 минут и пришли вывод». В блоке есть цикл опроса с таймаутом: `for i in $(seq 1 N); do …; [ условие ] && break; sleep 5; done`, либо `tail -f`-подобное чтение лога до маркера. Пауза между блоками = «пришли вывод», а не «подожди».
 
 ---
 
@@ -57,29 +58,48 @@
 
 ### 1.3 Единственный блокёр
 
-**WebSocket handshake роняет процесс API.** Первопричина найдена и исправлена в коде (`7f2854e`, воспроизведено локально, регресс-тест `ws-handshake.test.ts` — 5 passed), **на сервере не применён**. Всё остальное — проверки и мелочи.
+**WebSocket handshake роняет процесс API.** Первопричина найдена и исправлена в коде (`7f2854e`, воспроизведено локально, регресс-тест `__tests__/ws-handshake.test.ts` — 5 passed). **2026-09-14 применён на сервере** (батч A шаг 1–2): `git pull` → `356df36..ef74215`, `Image balloo/server:local Built`, `Container balloo-server Recreated → Started`, `balloo-postgres/redis/minio Healthy`. **Верификация (шаг 3) не пройдена** — выводов о `401`/`RestartCount` нет, блокёр считается открытым до них.
 
-### 1.4 Ближайшее действие — батч A (деплой фикса + проверка WS)
+### 1.4 Ближайшее действие — батч A шаг 3 (верификация задеплоенного фикса)
 
-```bash
-cd ~/balloo && git pull --ff-only origin fix/prisma-initial-migration-ddl && git log --oneline -1
-cd ~/balloo/docker/prod && setsid nohup docker compose -f docker-compose.local.yml --env-file .env.production up -d --build server > /tmp/ws-build-2.log 2>&1 < /dev/null & sleep 5; echo started
-# ~7 минут, затем:
-tail -n 15 /tmp/ws-build-2.log
-```
-
-После `Container balloo-server Started`:
+Шаги 1–2 (pull + пересборка) выполнены 2026-09-14, вывод в журнале №10. Остался шаг 3 — **один блок, ожидание healthy внутри блока**, отдельного «подожди и напиши» нет.
 
 ```bash
-docker inspect -f 'status={{.State.Status}} restarts={{.RestartCount}} health={{if .State.Health}}{{.State.Health.Status}}{{end}}' balloo-server
+cd ~/balloo/docker/prod
+for i in $(seq 1 30); do h=$(docker inspect -f '{{if .State.Health}}{{.State.Health.Status}}{{else}}nohealth{{end}}' balloo-server 2>/dev/null || echo nodocker); printf 'wait %02d health=%s\n' "$i" "$h"; [ "$h" = healthy ] && break; sleep 5; done
+echo '--- 1. фикс в РАБОТАЮЩЕМ образе (главный признак) ---'
+docker exec balloo-server node -e "const s=require('fs').readFileSync('/app/packages/server/dist/ws/index.js','utf8');console.log('has_req_url='+/info\.req\.url/.test(s)+' has_old_info_url='+/info\.url[^a-zA-Z]/.test(s))"
+echo '--- 2. контейнер до тестов ---'
+docker inspect -f 'status={{.State.Status}} restarts={{.RestartCount}} health={{if .State.Health}}{{.State.Health.Status}}{{end}} startedAt={{.State.StartedAt}}' balloo-server
+echo '--- 3. health + ready (снимает P2 по MinIO) ---'
 curl -sS -o /dev/null -w 'health=%{http_code}\n' --max-time 8 http://127.0.0.1:3100/health
-curl -sS -D- -o /dev/null --max-time 8 --http1.1 -H 'Connection: Upgrade' -H 'Upgrade: websocket' -H 'Sec-WebSocket-Version: 13' -H 'Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==' http://127.0.0.1:3100/ws/ | head -3
-curl -sS -D- -o /dev/null --max-time 8 --http1.1 -H 'Connection: Upgrade' -H 'Upgrade: websocket' -H 'Sec-WebSocket-Version: 13' -H 'Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==' https://balloo.su/ws/ | head -3
-docker logs --since 2m balloo-server 2>&1 | grep -E '\[WS\]' | tail -10
+curl -sS --max-time 8 http://127.0.0.1:3100/health/ready | head -c 500; echo
+echo '--- 4. WS без токена: ждём 401, не обрыв ---'
+curl -sS -o /dev/null -w 'ws_local=%{http_code}\n' --max-time 8 --http1.1 -H 'Connection: Upgrade' -H 'Upgrade: websocket' -H 'Sec-WebSocket-Version: 13' -H 'Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==' http://127.0.0.1:3100/ws/
+curl -sS -o /dev/null -w 'ws_https=%{http_code}\n' --max-time 8 --http1.1 -H 'Connection: Upgrade' -H 'Upgrade: websocket' -H 'Sec-WebSocket-Version: 13' -H 'Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==' https://balloo.su/ws/
+echo '--- 5. после тестов: сколько раз инициализировался WS и рестарты ---'
+docker logs --since 3m balloo-server 2>&1 | grep -cE 'WebSocket server initialized'
 docker inspect -f 'restarts_after_tests={{.RestartCount}}' balloo-server
 ```
 
-**Ожидание:** оба WS-теста → `HTTP/1.1 401 Unauthorized` (без токена это правильный ответ), `restarts` **не** выросло после тестов, в логах ровно одна строка `[WS] WebSocket server initialized on /ws/`. Если снова `52`/`502` или `restarts` растёт — фикс не применился либо есть второй источник падения, батч A повторяется с выводом целиком.
+**Ожидание:** `has_req_url=true`, `has_old_info_url=false`; `ws_local=401`, `ws_https=401` (без токена это правильный ответ, а не обрыв); `restarts_after_tests` == `restarts` из п.2; в п.5 число `1`. Если `has_req_url=false` — образ собран не из `ef74215`; если код `52`/`502` или рестарты растут — фикс не применился либо есть второй источник падения, вывод присылать целиком.
+
+Если цикл `wait` за 150 с не дошёл до `healthy`: `tail -n 40 /tmp/ws-build-2.log` и `docker logs --tail 40 balloo-server` — это отдельный вывод, не следующая команда.
+
+### 1.5 Батч A шаг 4 — позитивный WS-тест с настоящим токеном (после шага 3)
+
+Нужен существующий аккаунт. Регистрацию нового пользователя в прод-БД без явного «да» не делаем. Пароли через `read -s` — в `bash_history` не попадают (правило 8).
+
+```bash
+read -rsp 'email: ' E; echo; read -rsp 'password: ' P; echo
+curl -sS -c /tmp/bj -X POST https://balloo.su/api/auth/login -H 'Content-Type: application/json' -d "{\"email\":\"$E\",\"password\":\"$P\"}" -o /tmp/lg.json -w 'login=%{http_code}\n'
+curl -sS -b /tmp/bj https://balloo.su/api/auth/ws-token -o /tmp/wst.json -w 'ws_token_http=%{http_code}\n'
+T=$(sed -n 's/.*"token":"\([^"]*\)".*/\1/p' /tmp/wst.json); echo "ws_token_len=${#T}"
+curl -sS -o /dev/null -w 'ws_with_token=%{http_code}\n' --max-time 8 --http1.1 -H 'Connection: Upgrade' -H 'Upgrade: websocket' -H 'Sec-WebSocket-Version: 13' -H 'Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==' "https://balloo.su/ws/?token=$T"
+shred -u /tmp/bj /tmp/lg.json /tmp/wst.json 2>/dev/null; unset E P T
+```
+
+**Ожидание:** `login=200`, `ws_token_http=200`, `ws_token_len≈200`, `ws_with_token=101`. Локально этот путь закрыт тестом `пропускает подключение с валидным access-токеном` (5 passed на `ef74215`), на проде ещё не подтверждён.
 
 ---
 
@@ -96,6 +116,7 @@ docker inspect -f 'restarts_after_tests={{.RestartCount}}' balloo-server
 | 7 | 2026-09-12 23:27 | `356df36` — `callback(false, 401)` вместо `1008` в `verifyClient` (гипотеза: `ERR_HTTP_INVALID_STATUS_CODE` рвёт соединение → nginx 502) | ❓ На сервере применён, тест дал `Empty reply` / `502` | `⛔ ОТМЕНЕНО как первопричина`: неверный HTTP-код — реальный, но вторичный баг. Фикс оставлен (он правильный сам по себе) | Вывод не изменился после деплоя → гипотеза не объясняет `52/502`. Нужна первопричина, а не симптом |
 | 8 | 2026-09-13 00:09 | `7f2854e` — токен брать из `req.url`, тело `verifyClient` в `try/catch` | ✅ Локально воспроизведён `TypeError` на строке `websocket-server.js:335` — та же строка, что в стеке с сервера; `ws-handshake.test.ts` 5 passed | `ws` передаёт в `verifyClient` только `{origin, secure, req}`; `info.url` → `undefined` → `url.searchParams` бросает **синхронно** в обработчике `'upgrade'` → процесс падает без ответа (слушателей `uncaughtException` нет) | Ждёт применения на сервере — это батч A (§1.4). Только локальное доказательство, прод ещё не подтверждён |
 | 9 | 2026-09-14 | Инвентаризация состояния: сервер на `356df36`, фикс на сервере не применялся; составлен список `❓` (§1.2) | ✅ По выводу последней сессии | Порядок дальше: батч A (код) → батч B (read-only аудит `❓`) → шаг 4 basic-auth → финал/ребут | Сессии рвались по соединению и по размеру контекста — отсюда этот протокол ведения документа |
+| 10 | 2026-09-14 | Батч A, шаги 1–2: `git pull` → `356df36..ef74215` (`git log -1` = `ef74215`), пересборка `balloo/server:local`, `up -d server` | ✅ `Image Built`, `balloo-server Recreated → Started`, `postgres/redis/minio Healthy`. Про фикс в образе: вывод `docker exec balloo-server grep -n "req.url" packages/server/dist/ws/index.js` **не получен** | Образ сервера пересобирается только по `--build`; `restart: always` оставлен как есть (рестарты считаем по `RestartCount`, P10) | Шаг 3 (верификация WS) не выполнен — выводов нет. Батч A остаётся текущим действием, команда ожидания встроена в блок 1 (§11) |
 
 ---
 
