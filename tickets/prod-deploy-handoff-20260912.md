@@ -1,6 +1,6 @@
 # Тикет: деплой Balloo на прод — передача в новую сессию
 
-> Создан: 2026-09-12. Последнее обновление: **2026-09-14, этап 7**.
+> Создан: 2026-09-12. Последнее обновление: **2026-09-14, этап 8**.
 > Цель: довести прод-деплой balloo.su до состояния «работает по http+https, поднимается сам после ребута сервера».
 > Этот файл — единственный входной документ новой сессии. Читать целиком, до первой команды.
 
@@ -32,37 +32,53 @@
 
 ---
 
-## 1. ТЕКУЩАЯ ТОЧКА (2026-09-14, этап 7)
+## 1. ТЕКУЩАЯ ТОЧКА (2026-09-14, этап 8 — блокёр WS закрыт)
 
-### 1.1 Подтверждено выводом сервера (последняя сессия, 2026-09-12 21:58 local)
+### 1.1 Подтверждено выводом сервера (последняя вставка, 2026-09-14 ~15:30 local)
 
 | # | Вывод | Что из него следует |
 |---|---|---|
-| 1 | `git pull --ff-only` → `2b71222..356df36`, `git log -1` → `356df36` | На сервере код **`356df36`**, то есть **без** фикса `7f2854e` |
-| 2 | Сборка `balloo/server:local` завершилась, `Container balloo-server Recreated → Started`, `balloo-postgres/redis/minio Healthy` | Пайплайн пересборки сервера работает, БД/Redis/MinIO не затронуты |
-| 3 | `curl http://127.0.0.1:3100/ws/` (с Upgrade-заголовками) → `curl: (52) Empty reply from server` | Процесс API **обрывает соединение без ответа** на handshake |
-| 4 | `curl https://balloo.su/ws/` (с Upgrade) → `HTTP/1.1 502 Bad Gateway`, `Server: nginx/1.24.0 (Ubuntu)` | nginx доходит до upstream и получает обрыв. Значит живой vhost balloo.su проксирует `/ws/` на `127.0.0.1:3100` |
-| 5 | `docker logs --since 3m balloo-server \| grep '\[WS\]'` → 3× `[WS] WebSocket server initialized on /ws/` | Процесс **перезапускается** (в `docker-compose.local.yml` у server `restart: always`), между рестартами успевает быть `healthy` — поэтому цикл маскируется |
+| 1 | `git pull --ff-only` → `356df36..ef74215`, `git log -1` → `ef74215` | На сервере код **с фиксом** `7f2854e` (он входит в `ef74215`) |
+| 2 | `Image balloo/server:local Built`, `balloo-server Recreated → Started`, `startedAt=2026-09-14T10:02:27Z` | Образ пересобран и контейнер пересоздан из нового кода |
+| 3 | `ws_local=401`, `ws_https=401` (handshake без токена) | **Падение ушло.** До фикса: `(52) Empty reply from server` и `502` от nginx. Теперь корректный отказ 401 |
+| 4 | `restarts=0`, `status=running`, `health=healthy` | Цикла рестартов нет. `RestartCount` — достоверный счётчик (не healthcheck, см. P10) |
+| 5 | `docker logs --since 3m \| grep -c 'WebSocket server initialized'` → **0**; в `--tail 20` ровно **одна** строка инициализации + две `[WS] Connection rejected: no token` | Было 3 инициализации за 3 минуты. Теперь процесс поднимается один раз, а отказы handshake его не роняют |
+| 6 | `ss -ltnp` → `127.0.0.1:3100`, `127.0.0.1:8090` слушаются; `dockerd=/usr/bin/dockerd` | Порты на месте, докер на сервере свой |
+| 7 | `[EMAIL] SMTP connection error: connect ECONNREFUSED 127.0.0.1:587` | **Новая проблема P11**: SMTP не настроен, почта (верификация, сброс пароля) недоступна |
+| 8 | `cd /root/Messenger_Balloo` → `Permission denied`, `grep /root/...docker-compose*.yml` → `Permission denied` | **Моя ошибка в командах**: репозиторий на сервере в `~/balloo` = `/home/cfr_balloo/balloo` (видно по промпту). Пути `/root/*` — ложный след, в §9 |
+
+### 1.1.1 Признак «фикс в образе» — как его читать правильно
+
+Дана мной неверная команда: я искал `grep -c 'req\.headers'`, а в коде фикса такой строки **нет никогда** → `has_req_headers=0` ничего не означает. Второй признак `grep -c 'info\.url'` = 1 тоже **не** означает «код старый»: `tsconfig.json` не включает `removeComments`, tsc сохраняет комментарии, а в комментарии фикса есть подстрока `info.url` (`src/ws/index.ts:126`). Правильные признаки в `packages/server/dist/ws/index.js`:
+
+```bash
+docker exec balloo-server sh -lc 'f=/app/packages/server/dist/ws/index.js; printf "new_code_info_req_url="; grep -c "info\.req\.url" "$f"; printf "old_code_assign_info_url="; grep -c "=[[:space:]]*info\.url;" "$f"'
+# ждём new_code_info_req_url=1, old_code_assign_info_url=0
+```
+
+Поведенческие признаки (строки 3–5 таблицы) сильнее текстовых и уже закрывают вопрос: 401 вместо обрыва + `restarts=0` + одна инициализация возможны только при работающем фиксе.
 
 ### 1.2 НЕ подтверждено ни одним выводом (не считать сделанным)
 
 - `❓` P1 — удалён ли затеняющий vhost `api.balloo.su` (команды §6 шаг 1 выдавались, вывода нет).
-- `❓` P2 — состояние MinIO в `/health/ready` после фикса `MINIO_ACCESS_KEY/SECRET_KEY`.
+- `❓` P2 — состояние MinIO в `/health/ready` после фикса `MINIO_ACCESS_KEY/SECRET_KEY` (**в последнюю вставку не входило**).
 - `❓` P3/P4 — равен ли живой `/etc/nginx/sites-enabled/balloo-docker.conf` версии из репо (sha256).
 - `❓` P5 — результат `certbot renew --dry-run` после отключения майских заглушек.
 - `❓` P6 — выполнялась ли ротация секретов, `chmod 600` на `.env.production`.
-- `❓` Шаг 4 — basic-auth на probe-эндпоинтах.
-- `❓` `systemctl is-enabled balloo.service`.
-- `❓` `ufw status numbered`.
-- `❓` Ребут-тест автозапуска.
+- `❓` WS с настоящим токеном → `101` (шаг 4 батча A).
+- `❓` basic-auth на probe-эндпоинтах.
+- `❓` `systemctl is-enabled balloo.service`, `ufw status numbered`, ребут-тест автозапуска.
+- `❓` `start_period` у healthcheck (проверялось по неверному пути, Permission denied).
 
-### 1.3 Единственный блокёр
+### 1.3 Блокёр — ЗАКРЫТ 2026-09-14
 
-**WebSocket handshake роняет процесс API.** Первопричина найдена и исправлена в коде (`7f2854e`, воспроизведено локально, регресс-тест `__tests__/ws-handshake.test.ts` — 5 passed). **2026-09-14 применён на сервере** (батч A шаг 1–2): `git pull` → `356df36..ef74215`, `Image balloo/server:local Built`, `Container balloo-server Recreated → Started`, `balloo-postgres/redis/minio Healthy`. **Верификация (шаг 3) не пройдена** — выводов о `401`/`RestartCount` нет, блокёр считается открытым до них.
+**WebSocket handshake ронял процесс API.** Первопричина (`info.url` → `undefined.searchParams` → синхронный `TypeError` в обработчике `upgrade`, слушателей `uncaughtException` нет) исправлена в `7f2854e`, задеплоена и **подтверждена поведению на проде**: `ws_local=401`, `ws_https=401`, `restarts=0`, одна инициализация WS. Остался позитивный тест `101` с настоящим токеном (§11 батч A шаг 4).
 
-### 1.4 Ближайшее действие — батч A шаг 3 (верификация задеплоенного фикса)
+### 1.4 Ближайшее действие — батч A шаг 4 (позитивный WS) и батч B (аудит `❓`)
 
-Шаги 1–2 (pull + пересборка) выполнены 2026-09-14, вывод в журнале №10. Остался шаг 3 — **один блок, ожидание healthy внутри блока**, отдельного «подожди и напиши» нет.
+Порядок: сначала §11 «Батч A шаг 4» (нужен существующий аккаунт; регистрацию нового пользователя в прод-БД без явного «да» не делаем), затем §11 «Батч B» — read-only аудит всего `❓` из §1.2. Оба блока ничего не меняют на сервере, `reload` не делают.
+
+`⛔ АРХИВ (шаг 3 выполнен 2026-09-14, результат в §1.1). Не выполнять: текстовые признаки ниже были неверные — см. §1.1.1.`
 
 ```bash
 cd ~/balloo/docker/prod
@@ -117,6 +133,7 @@ shred -u /tmp/bj /tmp/lg.json /tmp/wst.json 2>/dev/null; unset E P T
 | 8 | 2026-09-13 00:09 | `7f2854e` — токен брать из `req.url`, тело `verifyClient` в `try/catch` | ✅ Локально воспроизведён `TypeError` на строке `websocket-server.js:335` — та же строка, что в стеке с сервера; `ws-handshake.test.ts` 5 passed | `ws` передаёт в `verifyClient` только `{origin, secure, req}`; `info.url` → `undefined` → `url.searchParams` бросает **синхронно** в обработчике `'upgrade'` → процесс падает без ответа (слушателей `uncaughtException` нет) | Ждёт применения на сервере — это батч A (§1.4). Только локальное доказательство, прод ещё не подтверждён |
 | 9 | 2026-09-14 | Инвентаризация состояния: сервер на `356df36`, фикс на сервере не применялся; составлен список `❓` (§1.2) | ✅ По выводу последней сессии | Порядок дальше: батч A (код) → батч B (read-only аудит `❓`) → шаг 4 basic-auth → финал/ребут | Сессии рвались по соединению и по размеру контекста — отсюда этот протокол ведения документа |
 | 10 | 2026-09-14 | Батч A, шаги 1–2: `git pull` → `356df36..ef74215` (`git log -1` = `ef74215`), пересборка `balloo/server:local`, `up -d server` | ✅ `Image Built`, `balloo-server Recreated → Started`, `postgres/redis/minio Healthy`. Про фикс в образе: вывод `docker exec balloo-server grep -n "req.url" packages/server/dist/ws/index.js` **не получен** | Образ сервера пересобирается только по `--build`; `restart: always` оставлен как есть (рестарты считаем по `RestartCount`, P10) | Шаг 3 (верификация WS) не выполнен — выводов нет. Батч A остаётся текущим действием, команда ожидания встроена в блок 1 (§11) |
+| 11 | 2026-09-14 | Верификация задеплоенного фикса: текстовые признаки в `dist/ws/index.js` + `restarts` + коды handshake + число инициализаций WS | ✅ `ws_local=401`, `ws_https=401` (было `52`/`502`), `restarts=0`, `status=running`, инициализаций WS за 3 мин `0` (было `3`), в логе одна инициализация + две `Connection rejected: no token`. Побочно: `127.0.0.1:3100`/`:8090` слушаются, `dockerd` свой, `[EMAIL] SMTP ... ECONNREFUSED 127.0.0.1:587` | **P8 закрыт** по поведению. Текстовые признаки аннулированы и заменены на `info.req.url` / `= info.url;` (§1.1.1). Достоверный счётчик падений — `RestartCount`, не `health`. Путь репо на сервере — `~/balloo` | Две мои ошибки в командах: путь `/root/Messenger_Balloo` (нет прав, ложный след) и признак `grep req.headers` (такой строки в коде нет) → `has_req_headers=0` читался как «фикса нет», хотя фикс работает. Переход: перестать проверять фикс текстом, опираться на коды ответов; дальше — батч A шаг 4 (`101`) и батч B. Новая проблема — P11 (SMTP) |
 
 ---
 
@@ -171,9 +188,10 @@ shred -u /tmp/bj /tmp/lg.json /tmp/wst.json 2>/dev/null; unset E P T
 | P5 | ACME на :80 работает только потому, что `authenticator = nginx` сам вставляет локации при продлении. Менять способ нельзя (правило 7) | `❓` | Батч B: `sudo certbot renew --dry-run 2>&1 \| tail -5` |
 | P6 | Секреты в git: `docker/prod/.env.production` закоммичен с реальными паролями | `❓` Ротация не подтверждена | §8, одним заходом в финале; решение «убрать файл из репо» — за пользователем |
 | P7 | Мелочи: `~/.bashrc:117` — `syntax error near unexpected token 'fi'`; секреты probe-эндпоинтов в `~/.bash_history`; `/metrics` в API нет (`prom-client` не подключён) | `❓` | Шаг финала (§6) |
-| P8 | **WS-путь ронял весь процесс API** (`52` локально / `502` через nginx / циклы рестартов под `restart: always`) | `🟡` исправлено `7f2854e`, на сервере не применено | Батч A: `401` на handshake + `RestartCount` не растёт |
-| P9 | В `ws/index.ts:72` `handleWsMessage()` — async, вызывается без `await` из синхронного `try/catch`; при Node 22 необработанное отклонение промиса **роняет процесс** (внутренний `try/catch` в `handlers.ts` прикрывает большую часть, но не `sendError`) | `🟡` найдено при разборе, кода не изменено | Обсудить с пользователем: (а) `void handleWsMessage(...).catch(...)`, (б) глобальные `process.on('unhandledRejection'/'uncaughtException')`. Молча не делать |
-| P10 | Healthcheck контейнера сервера не различает «жив» и «циклически перезапускается» — цикл рестартов выглядел как `healthy` | `🟡` наблюдение | В финале: смотреть `RestartCount`, не только `health` |
+| P8 | **WS-путь ронял весь процесс API** (`52` локально / `502` через nginx / повторяющиеся инициализации WS) | `✅` **ЗАКРЫТ 2026-09-14**: `ws_local=401`, `ws_https=401`, `restarts=0`, 0 лишних инициализаций за 3 мин | Осталось только `101` с настоящим токеном — §11 батч A шаг 4 |
+| P9 | В `ws/index.ts:72` `handleWsMessage()` — async, вызывается без `await` из синхронного `try/catch`; при Node 22 необработанное отклонение промиса **роняет процесс** (внутренний `try/catch` в `handlers.ts` прикрывает большую часть, но не `sendError`) | `🟡` найдено при разборе, кода не изменено. Кандидат №2 после закрытия P8 | Обсудить с пользователем: (а) `void handleWsMessage(...).catch(...)`, (б) глобальные `process.on('unhandledRejection'/'uncaughtException')`. Молча не делать |
+| P10 | Healthcheck контейнера сервера не различает «жив» и «циклически перезапускается» | `🟡` наблюдение, но **важность снижена**: `restarts=0` при `healthy` — цикла рестартов не было, были падения до фикса. `start_period` не проверен (Permission denied из-за неверного пути) | Считать достоверным `RestartCount`, а не `health`. `start_period` проверить в батче B по пути `~/balloo/docker/prod` |
+| P11 | **SMTP не настроен**: `[EMAIL] SMTP connection error: connect ECONNREFUSED 127.0.0.1:587`, «Email-функции будут недоступны до настройки SMTP» | `❓` подтверждено логом 2026-09-14, объём работ не оценен | Выяснить у пользователя: есть ли реальный SMTP-релей (хост/порт/логин/пароль/TLS) или почта отложена. Пока — верификация email и сброс пароля не работают |
 
 ---
 
@@ -236,6 +254,10 @@ sudo certbot renew --dry-run 2>&1 | tail -5     # ждём "simulated renewals" 
 - «сертификат тестовый», «таймера автопродления нет», «контейнеры в цикле рестартов из-за БД», «P1000 / неверный пароль БД», `JWT_SECRET`/`CRON_SECRET` (в этом коде таких переменных нет);
 - «`return 503` в живом конфиге», `client_max_body_size 10m`, «21 включённый конфиг», «нужен webroot `/var/www/certbot`»;
 - `⛔` (этап 7) «502 на `/ws/` вызван неверным HTTP-кодом в `callback`» — фикс `356df36` сам по себе верный, но первопричиной не являлся;
+- `⛔` (2026-09-14) путь репозитория **`/root/Messenger_Balloo`** — на сервере репозиторий в `~/balloo` = `/home/cfr_balloo/balloo` (видно по приглашению терминала). Пути `/root/*` дают `Permission denied` и ничего не доказывают;
+- `⛔` (2026-09-14) приватный реестр `192.168.68.12:5000` и «прод тянет `:latest` из реестра, поэтому пересборка не помогла» — выводом не подтверждено; на сервере свой `dockerd=/usr/bin/dockerd`, образ `balloo/server:local` собирается локально;
+- `⛔` (2026-09-14) текстовые признаки фикса в образе `has_req_headers` / `has_info_url` — первый ищет строку, которой в коде нет, второй срабатывает на комментарий (`removeComments` не включён). Правильные признаки — §1.1.1;
+- `⛔` (2026-09-14) «контейнер вечно рестартует, виноват `start_period: 30s`» — гипотеза не подтвердилась: `restarts=0`. Повторы `[WS] WebSocket server initialized` в старом логе были падениями процесса, а не рестартами healthcheck'а;
 - любые выводы о сервере, построенные на локальном checkout ноутбука.
 
 Единственный источник истины по серверу — вывод, присланный пользователем.
@@ -248,8 +270,8 @@ sudo certbot renew --dry-run 2>&1 | tail -5     # ждём "simulated renewals" 
 - [ ] `https://api.balloo.su/health` отвечает JSON от приложения, а не nginx-404 — `❓` P1
 - [ ] `/health/ready` → все три проверки `ok:true` — `❓` P2
 - [ ] Загрузка файла 5–50 МБ проходит без 413 — `❓` P3
-- [ ] WS: `wss://balloo.su/ws/?token=<access>` отвечает `101`, без токена `401`, процесс не падает — `❓` P8
-- [ ] `RestartCount` контейнера `balloo-server` = 0 после нагрузки/тестов — `❓` P10
+- [ ] WS: `wss://balloo.su/ws/?token=<access>` отвечает `101`, без токена `401`, процесс не падает — `🟡` P8: `401` и «не падает» подтверждены 2026-09-14, `101` с токеном нет
+- [x] `RestartCount` контейнера `balloo-server` = 0 после нагрузки/тестов — `✅` подтверждено 2026-09-14 (`restarts=0`, 0 лишних инициализаций WS)
 - [ ] Probe-эндпоинты закрыты basic-auth (401 снаружи), healthcheck'и контейнеров `healthy` — `❓`
 - [ ] `certbot renew --dry-run` зелёный, таймер активен — `❓` P5
 - [ ] `balloo.service` в `enabled`, после ребута стек поднимается без ручных команд — `❓`
@@ -261,28 +283,41 @@ sudo certbot renew --dry-run 2>&1 | tail -5     # ждём "simulated renewals" 
 
 ## 11. Диагностические батчи (готовые команды)
 
-### Батч A — деплой фикса WS + проверка (см. §1.4)
+### Батч A шаг 4 — позитивный WS с настоящим токеном
+
+Блок в §1.5. Нужен существующий аккаунт, пароли через `read -s`.
 
 ### Батч B — read-only аудит (ничего не меняет, `reload` не делает)
 
+Пути — от `$HOME`, репозиторий на сервере `~/balloo` (`/root/*` не использовать, §9). Блок рассчитан на обычного пользователя `cfr_balloo`; строки с `sudo` спросить пароль — это нормально, вывод прислать целиком.
+
 ```bash
-# P1: кто владеет api.balloo.su
-sudo nginx -t 2>&1 | tail -5
-sudo nginx -T 2>/dev/null | grep -n "server_name api.balloo.su"
-curl -sS -o /dev/null -w 'api_health=%{http_code}\n' --max-time 8 https://api.balloo.su/health
-# P2: готовности
-curl -sS --max-time 8 http://127.0.0.1:3100/health/ready; echo
-# P3/P4: совпадает ли живой конфиг с репо
-sha256sum ~/balloo/docker/prod/nginx/balloo-docker.conf /etc/nginx/sites-enabled/balloo-docker.conf
-# P5: сертификаты и автопродление
-sudo certbot certificates 2>/dev/null | grep -E 'Name:|Expiry' | head -20
-systemctl is-enabled certbot.timer balloo.service docker nginx 2>&1
-# P7/федеральная часть: firewall и автозапуск
-sudo ufw status numbered | head -20
-docker inspect -f 'restarts={{.RestartCount}} health={{if .State.Health}}{{.State.Health.Status}}{{end}}' balloo-server
+R=$HOME/balloo; D=$(date +%H%M)
+{ echo "=== 0. фикс в образе: правильные признаки ==="
+  docker exec balloo-server sh -lc 'f=/app/packages/server/dist/ws/index.js; printf "new_info_req_url="; grep -c "info\.req\.url" "$f"; printf "old_assign_info_url="; grep -c "=[[:space:]]*info\.url;" "$f"'
+  echo "=== 1. start_period (P10) ==="
+  grep -n 'start_period\|start_interval\|retries\|interval' "$R/docker/prod/docker-compose.local.yml" | head -8
+  echo "=== 2. P2: готовности ==="
+  curl -sS --max-time 8 http://127.0.0.1:3100/health/ready; echo
+  echo "=== 3. P1: кто владеет api.balloo.su ==="
+  sudo nginx -t 2>&1 | tail -4
+  curl -sS -o /dev/null -w 'api_health=%{http_code}\n' --max-time 8 https://api.balloo.su/health
+  ls -l /etc/nginx/sites-enabled/ | grep -iE 'api\.balloo|balloo' || echo "balloo-конфигов нет"
+  echo "=== 4. P3/P4: живой конфиг vs репозиторий ==="
+  sha256sum "$R/docker/prod/nginx/balloo-docker.conf" /etc/nginx/sites-enabled/balloo-docker.conf 2>&1
+  echo "=== 5. P5: сертификаты и таймеры ==="
+  sudo certbot certificates 2>/dev/null | grep -E 'Name:|Expiry' | head -16
+  systemctl is-enabled certbot.timer balloo.service docker nginx 2>&1
+  echo "=== 6. P7: firewall ==="
+  sudo ufw status numbered | head -20
+  echo "=== 7. чужие сайты живы (только коды) ==="
+  for h in cockpit.balloo.su alpha.balloo.su console.balloo.su; do curl -sS -o /dev/null -w "$h=%{http_code}\n" --max-time 8 "https://$h/" 2>&1; done
+  echo "=== 8. P11: SMTP в окружении контейнера ==="
+  docker exec balloo-server sh -lc 'env | grep -iE "^SMTP|MAIL" | sed -E "s/(PASS|PASSWORD)=.*/\1=***/"' || echo "нет env"
+} 2>&1 | tee /tmp/audit-$D.log
 ```
 
-**Что ожидаем:** `api_health=200` и отсутствие `conflicting server name` (иначе — шаг 3); `minio:{"ok":true}` (иначе — разбор ключей MinIO); одинаковые sha256 (иначе — шаг 4); `certbot.timer enabled`; `balloo.service enabled`; в `ufw` только 22/80/443 (+ известные чужие).
+**Что ожидаем:** п.0 `new_info_req_url=1`, `old_assign_info_url=0`; п.2 `"minio":{"ok":true}` (иначе — разбор ключей MinIO, P2 остаётся); п.3 `api_health=200` и нет `conflicting server name` (иначе — §6 шаг 3); п.4 одинаковые sha256 (иначе — §6 шаг 4, живой конфиг канон); п.5 `certbot.timer enabled`, `balloo.service enabled`, сроки сертификатов > 14 дней; п.6 в списке только 22/80/443 + известные чужие; п.7 чужие сайты не `000` и не `5xx`; п.8 — видно, задан ли `SMTP_HOST` вообще (для решения по P11).
 
 ---
 
