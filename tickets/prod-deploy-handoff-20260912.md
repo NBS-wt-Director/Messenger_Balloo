@@ -68,7 +68,7 @@
 cd ~/balloo/docker/prod
 for i in $(seq 1 30); do h=$(docker inspect -f '{{if .State.Health}}{{.State.Health.Status}}{{else}}nohealth{{end}}' balloo-server 2>/dev/null || echo nodocker); printf 'wait %02d health=%s\n' "$i" "$h"; [ "$h" = healthy ] && break; sleep 5; done
 echo '--- 1. фикс в РАБОТАЮЩЕМ образе (главный признак) ---'
-docker exec balloo-server node -e "const s=require('fs').readFileSync('/app/packages/server/dist/ws/index.js','utf8');console.log('has_req_url='+/info\.req\.url/.test(s)+' has_old_info_url='+/info\.url[^a-zA-Z]/.test(s))"
+docker exec balloo-server sh -lc 'for r in /app /usr/src/app /srv/app /home/app; do [ -d "$r" ] || continue; f=$(grep -rl "WebSocket server initialized" "$r" --include=*.js 2>/dev/null | head -1); [ -n "$f" ] && break; done; echo "ws_file=$f"; [ -n "$f" ] && { printf "has_req_headers="; grep -c "req\.headers" "$f"; printf "has_info_url="; grep -c "info\.url" "$f"; }'
 echo '--- 2. контейнер до тестов ---'
 docker inspect -f 'status={{.State.Status}} restarts={{.RestartCount}} health={{if .State.Health}}{{.State.Health.Status}}{{end}} startedAt={{.State.StartedAt}}' balloo-server
 echo '--- 3. health + ready (снимает P2 по MinIO) ---'
@@ -82,7 +82,7 @@ docker logs --since 3m balloo-server 2>&1 | grep -cE 'WebSocket server initializ
 docker inspect -f 'restarts_after_tests={{.RestartCount}}' balloo-server
 ```
 
-**Ожидание:** `has_req_url=true`, `has_old_info_url=false`; `ws_local=401`, `ws_https=401` (без токена это правильный ответ, а не обрыв); `restarts_after_tests` == `restarts` из п.2; в п.5 число `1`. Если `has_req_url=false` — образ собран не из `ef74215`; если код `52`/`502` или рестарты растут — фикс не применился либо есть второй источник падения, вывод присылать целиком.
+**Ожидание:** `has_req_headers` ≥ `1` и `has_info_url` = `0` (иначе образ собран не из `ef74215` — проверить, что `git log -1` на сервере = `ef74215`); `ws_local=401`, `ws_https=401` (без токена это правильный ответ, а не обрыв); `restarts_after_tests` == `restarts` из п.2; в п.5 число `1`. Если код `52`/`502` или рестарты растут — фикс не применился либо есть второй источник падения, вывод присылать целиком.
 
 Если цикл `wait` за 150 с не дошёл до `healthy`: `tail -n 40 /tmp/ws-build-2.log` и `docker logs --tail 40 balloo-server` — это отдельный вывод, не следующая команда.
 
