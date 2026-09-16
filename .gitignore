@@ -28,6 +28,8 @@ apikeys.json
 .context_pre/
 .old/
 tmp/
+# Песочница локальной самопроверки docker/prod/enable-probes.selftest.sh
+docker/prod/.selftest-tmp/
 
 # Logs
 *.log
