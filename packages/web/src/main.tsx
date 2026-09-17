@@ -5,6 +5,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import './styles/global.css';
 import './styles/themes.css';
+import './styles/design-system.css';
 
 // Register service worker for PWA (future)
 if ('serviceWorker' in navigator) {

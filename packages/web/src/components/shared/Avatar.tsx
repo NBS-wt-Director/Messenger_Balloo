@@ -74,7 +74,7 @@ export function Avatar({
           border: '2px solid var(--border-color)',
         }}
       >
-        {!src && initials}
+        {!src && (initials || displayInitials)}
       </div>
 
       {status && (

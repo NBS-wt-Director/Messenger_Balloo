@@ -20,14 +20,16 @@ export function PasswordInput({
   hint,
 }: PasswordInputProps) {
   const [showPassword, setShowPassword] = useState(false);
+  const inputId = React.useId();
 
   return (
     <div className="form-group">
       {label && (
-        <label className="form-label">{label}</label>
+        <label className="form-label" htmlFor={inputId}>{label}</label>
       )}
       <div style={{ display: 'flex', gap: '8px' }}>
         <input
+          id={inputId}
           type={showPassword ? 'text' : 'password'}
           className="form-input"
           placeholder={placeholder}

@@ -14,6 +14,7 @@ const LoginScreen = lazy(() => import('@/screens/auth/LoginScreen'));
 const RegisterScreen = lazy(() => import('@/screens/auth/RegisterScreen'));
 const TwoFactorScreen = lazy(() => import('@/screens/auth/TwoFactorScreen'));
 const ResetPasswordScreen = lazy(() => import('@/screens/auth/ResetPasswordScreen'));
+const AddDeviceScreen = lazy(() => import('@/screens/auth/AddDeviceScreen'));
 const MainLayout = lazy(() => import('@/layouts/MainLayout'));
 const ChatViewScreen = lazy(() => import('@/screens/chat/ChatViewScreen'));
 const ProfileScreen = lazy(() => import('@/screens/profile/ProfileScreen'));
@@ -243,6 +244,16 @@ export const router = createHashRouter([
       <ErrorBoundary>
         <Suspense fallback={<LoadingFallback />}>
           <ResetPasswordScreen />
+        </Suspense>
+      </ErrorBoundary>
+    ),
+  },
+  {
+    path: '/add-device',
+    element: (
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingFallback />}>
+          <AddDeviceScreen />
         </Suspense>
       </ErrorBoundary>
     ),

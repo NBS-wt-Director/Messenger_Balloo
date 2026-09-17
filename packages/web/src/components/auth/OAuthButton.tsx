@@ -4,7 +4,7 @@
 import React from 'react';
 
 interface OAuthButtonProps {
-  provider: 'yandex' | 'mailru' | 'vk';
+  provider: 'yandex' | 'mailru' | 'rambler' | 'vk';
   label: string;
   icon?: React.ReactNode;
   onClick: () => void;
@@ -14,6 +14,7 @@ interface OAuthButtonProps {
 const PROVIDER_STYLES: Record<string, { color: string; bgColor: string }> = {
   yandex: { color: '#fc3f1d', bgColor: 'var(--bg-tertiary)' },
   mailru: { color: '#005ff9', bgColor: 'var(--bg-tertiary)' },
+  rambler: { color: '#ffcc00', bgColor: 'var(--bg-tertiary)' },
   vk: { color: '#0077ff', bgColor: 'var(--bg-tertiary)' },
 };
 

@@ -3,7 +3,7 @@
 // JWT tokens stored in httpOnly cookies (not localStorage)
 
 import React, { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
 import { api } from '@/services/api';
 import { OAuthButton } from '@/components/auth/OAuthButton';
@@ -182,7 +182,7 @@ function RegisterScreen() {
         <h1 className="auth-title">Создать аккаунт</h1>
         <p className="auth-subtitle">Зарегистрируйтесь в Balloo Messenger</p>
 
-        {/* OAuth buttons */}
+        {/* OAuth buttons — по макету register.html: Яндекс, Mail.ru, Rambler */}
         <div className="auth-oauth">
           <OAuthButton
             provider="yandex"
@@ -191,22 +191,16 @@ function RegisterScreen() {
             onClick={() => handleOAuth('yandex')}
           />
           <OAuthButton
-            provider="vk"
-            label="Через VK"
-            icon={<span style={{ color: '#0077FF' }}>VK</span>}
-            onClick={() => handleOAuth('vk')}
-          />
-          <OAuthButton
-            provider="yandex"
-            label="Через Yandex (дубль)"
-            icon={<span style={{ color: '#fc3f1d' }}>Y</span>}
-            onClick={() => handleOAuth('yandex')}
-          />
-          <OAuthButton
             provider="mailru"
             label="Через Mail.ru"
             icon={<span style={{ color: '#005ff9' }}>@</span>}
             onClick={() => handleOAuth('mailru')}
+          />
+          <OAuthButton
+            provider="rambler"
+            label="Через Rambler"
+            icon={<span style={{ color: '#ffcc00' }}>R</span>}
+            onClick={() => handleOAuth('rambler')}
           />
         </div>
 
@@ -418,9 +412,9 @@ function RegisterScreen() {
         {/* Login link */}
         <p className="text-center text-sm text-secondary">
           Уже есть аккаунт?{' '}
-          <a href="/login" className="text-accent">
+          <Link to="/login" className="text-accent">
             Войти
-          </a>
+          </Link>
         </p>
       </div>
     </div>
