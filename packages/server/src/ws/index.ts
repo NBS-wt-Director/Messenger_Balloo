@@ -69,7 +69,18 @@ export function setupWebSocket(server: http.Server): void {
           return;
         }
 
-        handleWsMessage(authedWs, message);
+        // handleWsMessage — async: без catch() любой отвергнутый промис
+        // становился unhandledRejection и ронял процесс целиком (P9).
+        handleWsMessage(authedWs, message).catch((error) => {
+          console.error('[WS] Message handling error:', error);
+          ws.send(
+            serializeWsMessage({
+              type: 'error',
+              code: 'INTERNAL_ERROR',
+              message: 'Ошибка обработки сообщения',
+            } as any)
+          );
+        });
       } catch (error) {
         console.error('[WS] Error parsing message:', error);
         ws.send(

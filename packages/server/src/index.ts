@@ -1,10 +1,15 @@
 import { app } from './app';
 import { startCron } from './services/cron';
 import { setupWebSocket } from './ws';
+import { registerProcessErrorHandlers } from './process-handlers';
 import http from 'http';
 
 const PORT = Number(process.env.SERVER_PORT) || 3000;
 const HOST = process.env.SERVER_HOST || '0.0.0.0';
+
+// P9: подписываемся раньше всего остального, чтобы любое падение
+// на любом этапе старта давало лог причины и честный exit(1).
+registerProcessErrorHandlers();
 
 // Запуск cron job для очистки истекших историй и опросов
 startCron();

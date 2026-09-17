@@ -1,6 +1,6 @@
 # Тикет: деплой Balloo на прод — передача в новую сессию
 
-> Создан: 2026-09-12. Последнее обновление: **2026-09-16, этап 23** (батч G: на хосте уже стоит postfix+dovecot, MX=`mail.balloo.su`, SPF уже разрешает наш IP, :25 наружу открыт → схема: приложение через хостовый postfix, без нового контейнера; next — батч H + подтверждение «постфикс наш»).
+> Создан: 2026-09-12. Последнее обновление: **2026-09-17, этап 28** (батч L: P9 исправлен в репозитории — `process-handlers.ts` + `.catch()` в `ws/index.ts` + тесты, 🟡 не задеплоен; решение пользователя: **ротация секретов §8 НЕ выполняется**; таблица §6 шаг 4 устарела — актуальный канон почти совпал с живым, нужен только sha256-замер; next — коммит+push, батч L на сервере, WS `101`).
 > Цель: довести прод-деплой balloo.su до состояния «работает по http+https, поднимается сам после ребута сервера».
 > Этот файл — единственный входной документ новой сессии. Читать целиком, до первой команды.
 
@@ -35,19 +35,19 @@
 
 ---
 
-## 1. ТЕКУЩАЯ ТОЧКА (2026-09-16, этап 20 — батч F ВЫПОЛНЕН УСПЕШНО: probes закрыты basic-auth, htpasswd ротирован, autostart включён; дальше UptimeRobot + `certbot renew --dry-run`)
+## 1. ТЕКУЩАЯ ТОЧКА (2026-09-17, этап 28 — P9 исправлен в репозитории (🟡 не задеплоен); ротация §8 отменена решением пользователя; next — коммит+push, батч L на сервере)
 
 ### 1.0 Что делать в этой сессии прямо сейчас
 
-1. **Батч F закрыт (вывод — журнал, строка 20):** `ИТОГ: проверок провалено = 0`. Строгие признаки: все три пробы `без пароля=401 с паролем=200`, открытые маршруты `200/200`, `restarts=0`. Живой конфиг = канон `a905206` (2 блока `auth_basic_user_file` в загруженной конфигурации `nginx -T`). `htpasswd` перезаписан свежим паролем (`1 строка`, `root:www-data 640`, воркер `www-data` читает) → **засвеченный в чате пароль (P17) больше не действует**. `balloo.service is-enabled=enabled`. Один `reload` (предупреждения `protocol options redefined` — от чужих конфигов `cockpit`/`центр-фр.рф`, были и до нас, безвредны, §1.6). Бэкап: `~/balloo-docker.conf.bak.2026-09-16-141055`.
-2. **Что замеры «до» в этом же прогоне доказали окончательно:** живой конфиг до правки был `bfdc8b7b…` (3023 байт, 0 блоков `auth_basic`) → `cp` из упавшего этапа 17 не выполнялся никогда (журнал 16/17/18 — недостоверны, пометка после §2 остаётся); `htpasswd` до ротации содержал `uptimerobot:$6$…` (119 байт) → пароль этапа 17 был записан и действовал до сегодняшней ротации; `is-enabled=disabled` до прогона → автозапуск был выключен, теперь включён.
-3. **Следующие шаги (по §6):**
-   - **UptimeRobot (пользователь, без сервера)** — статус `❓`: подтверждения настройки нет. Пароль: `cat ~/balloo-probe-credentials.txt` (в чат не переносить). Монитор: «HTTP(s)», URL `https://api.balloo.su/health`, GET, 60 с, Basic Auth `uptimerobot` + пароль из файла.
-   - `certbot renew --dry-run` — `✅` **выполнен 2026-09-16** (журнал, строка 21): `success` по всем 7 сертификатам (наши — `balloo.su`, `api.balloo.su`; остальные 5 — чужие домены, продлеваются тем же certbot, наши правки им не мешают).
-   - Дальше по порядку: **P11 SMTP — ждёт решения пользователя** (какой релей: почти наверняка Mail.ru — рядом в env лежат `MAILRU_CLIENT_ID/SECRET/REDIRECT_URI`, но нужен подтверждённый хост/порт/пароль ящика; `SMTP_TLS` код не читает, режим задаёт только порт: 465 = implicit TLS, 587 = STARTTLS), ротация секретов §8 (один заход), WS-тест `101` (§1.5), финал/ребут по команде пользователя.
-4. **Аннулировано как выдумка предыдущих сессий (не возвращать):** эндпоинты `/livez`, `/readyz`, `/api/livez`; файл `/etc/nginx/.htpasswd-probe`; скрипт `fix-auth-probes.sh`; «пустой хеш в htpasswd — источник 401». Реальный `401` на `127.0.0.1:8080` даёт **чужой node** (батч B), к нашему стеку отношения не имеет. Наши пробы — `/health`, `/health/ready`.
-5. **Миграционный блок предыдущего сообщения — ложный дрейф, отозван.** Pending-миграций нет (этап 1: `tables=51`, «up to date»). **Данные не тронуты.**
-6. **Ничего не выдумывать:** каждый путь, имя юнита и утилита в команде — либо из §3, либо из §1.1/§1.6/журнала этого документа, либо из вывода, присланного пользователем.
+1. **Решение пользователя (2026-09-17): ротация секретов §8 НЕ выполняется.** P6, P13, остаток P17 (кроме sudo), `SMTP_PASSWORD`-остаток — остаются как есть осознанно, владельцем. Не предлагать повтор, не считать блокерами критериев. Не удалять `.env.production` из git без явной команды.
+2. **P9 исправлена в репозитории (этап 28, 🟡):** `packages/server/src/process-handlers.ts` — обработчик `unhandledRejection` (лог `[FATAL]` + `exit(1)`), подключён в `index.ts` до всего остального; в `ws/index.ts` вызов `handleWsMessage(...)` получил `.catch()` с логом и `INTERNAL_ERROR` клиенту. Тесты: `process-handlers.test.ts` (3 passed), `ws-handshake.test.ts` (5 passed), `ws.test.ts` (17 passed), `tsc --noEmit` чисто. ВАЖНО: jest на этой машине виснет без `--runInBand` (работники стартуются вечно) — гонять только `--runInBand`.
+3. **Требуется коммит+push (подтверждение пользователя на git-мутации обязателен), затем батч L (§11):** `git pull` → пересборка образа server → `up -d server` → признаки в таблице батча L. Заодно read-only: `sha256sum` живого vhost против репо (закрывает шаг 4 / CANON — см. п.6).
+4. **UptimeRobot (пользователь, без сервера)** — статус `❓`: подтверждения настройки нет. Пароль: `cat ~/balloo-probe-credentials.txt` (в чат не переносить). Монитор: «HTTP(s)», URL `https://api.balloo.su/health`, GET, 60 с, Basic Auth `uptimerobot` + пароль из файла.
+5. **`certbot renew --dry-run` — `✅`** выполнен 2026-09-16 (журнал, строка 21): `success` по всем 7 сертификатам. P5 закрыт.
+6. **Шаг 4 (§6) — таблица трёх директив устарела (замер этапа 28 чтением репо-канона):** в текущем `docker/prod/nginx/balloo-docker.conf` уже стоит `proxy_read_timeout 86400s`, редирект — `https://$server_name$request_uri` (для `www.balloo.su` даёт `https://balloo.su$request_uri`, как в живом), а `limit_req` в репо **нет вовсе** (ни зоны, ни `burst`) — приписанные таблице `3600s`/`burst=20` в истории файла отсутствуют. Живой конфиг после батча F = канон `a905206`, поэтому «байт в байт», скорее всего, уже выполнено; подтверждает только `sha256sum` на сервере (включён в батч L, read-only).
+7. **Аннулировано как выдумка предыдущих сессий (не возвращать):** эндпоинты `/livez`, `/readyz`, `/api/livez`; файл `/etc/nginx/.htpasswd-probe`; скрипт `fix-auth-probes.sh`; «пустой хеш в htpasswd — источник 401». Реальный `401` на `127.0.0.1:8080` даёт **чужой node** (батч B), к нашему стеку отношения не имеет. Наши пробы — `/health`, `/health/ready`.
+8. **Миграционный блок предыдущего сообщения — ложный дрейф, отозван.** Pending-миграций нет (этап 1: `tables=51`, «up to date»). **Данные не тронуты.**
+9. **Ничего не выдумывать:** каждый путь, имя юнита и утилита в команде — либо из §3, либо из §1.1/§1.6/журнала этого документа, либо из вывода, присланного пользователем.
 
 ### 1.0.0 Переходы: что думали → что оказалось → зачем сменили решение
 
@@ -106,6 +106,10 @@
 ### 1.0.4 Что уже решено пользователем (не спрашивать заново)
 
 Вариант **PROBES выбран**: basic-auth (`auth_basic` + `/etc/nginx/.htpasswd-balloo`, пользователь `uptimerobot`) — пачка запускалась по этому варианту, отказа не было. Альтернативы («закрыть совсем», «только CI-IP») отменены.
+
+**Ротация секретов §8 — НЕ выполняется (решение пользователя, 2026-09-17).** P6 (`tracked_in_git=1`), P13/A2 (`MAILRU_CLIENT_SECRET` в чате), засвеченные `SMTP_PASSWORD`/sudo-пароль — остаются как есть осознанно, владелец принял риски. Не предлагать повтор. Пункт «секреты ротированы» исключён из критериев готовности (§10). Смена sudo-пароля `cfr_balloo` — тоже не обязательна, только по явной команде. Удаление `.env.production` из git — не делать без отдельной команды.
+
+**SMTP (P11) — решено (этапы 22–27): свой хостовый postfix, `172.19.0.1:25`, без SASL.** Сторонние ящики не используем. Закрыто e2e.
 
 
 ### 1.1 Подтверждено выводом сервера (батч B, 2026-09-15 ~10:23, лог на сервере `/tmp/audit-<дата>.log`)
@@ -178,10 +182,10 @@ docker exec balloo-server sh -lc 'f=/app/packages/server/dist/ws/index.js; print
 **Нужно решение пользователя:**
 
 1. **PROBES** — `✅` **решение принято (2026-09-15): basic-auth** (`auth_basic` + `/etc/nginx/.htpasswd-balloo`, пользователь `uptimerobot`). Фактически пробы **всё ещё открыты** (`api_без_пароля=200` §1.0.2) → применить батчем F. Healthcheck'и контейнеров идут на `127.0.0.1:3100` мимо nginx, их не затрагивает.
-2. **P11 SMTP — ✅ ЗАКРЫТА (этап 27)**: e2e пройден (регистрация `201`, письма дошли). Схема в проде: приложение → хостовый postfix `172.19.0.1:25` (docker-подсеть в `mynetworks`, ufw 25 открыт и наружу). Не-блокеры на потом: rDNS (planeta.tc), DKIM/DMARC, судьба тестового аккаунта `e2e_smtp_test`. **Следующий шаг — ротация секретов §8 одним заходом** (состав: `POSTGRES_PASSWORD`, `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`, `REDIS_PASSWORD`, `MINIO_ROOT_PASSWORD`, `MINIO_SECRET_KEY`, `MAILRU_CLIENT_SECRET`, `SMTP_PASSWORD`-остаток — переменная убрана из env этапа 25, но её засвеченное значение жило в git и чате; скрипты: `docker/prod/rotate-secrets.mjs` + `apply-rotated-secrets.sh`), затем WS-тест `101` (§1.5), финал/ребут.
-3. **P6 секреты в git** — `.env.production` в индексе git (JWT_SECRET, POSTGRES_PASSWORD, MINIO-ключи, SMTP-пароль, Mail.ru secret) → ротация. Отдельный шаг.
-4. **A2 (новая)** — `MAILRU_CLIENT_SECRET` показан в чате из-за моей неполной маскировки → ротация. Отдельный шаг.
-5. **P9 unhandledRejection** — обработчика нет в `packages/server/src/index.ts`; предлагаю лог + `exit(1)` (под `restart: always` это превращает тихую деградацию в быстрый рестарт). Отдельный шаг.
+2. **P11 SMTP — ✅ ЗАКРЫТА (этап 27)**: e2e пройден (регистрация `201`, письма дошли). Схема в проде: приложение → хостовый postfix `172.19.0.1:25` (docker-подсеть в `mynetworks`, ufw 25 открыт и наружу). Не-блокеры на потом: rDNS (planeta.tc), DKIM/DMARC, судьба тестового аккаунта `e2e_smtp_test`. ~~Следующий шаг — ротация секретов §8 одним заходом~~ `⛔` отменено решением пользователя 2026-09-17 (§1.0.4). Актуальный порядок дальше: батч L (P9, §11) → WS-тест `101` (§1.5) → финал/ребут.
+3. **P6 секреты в git** — `⏸` отложено решением пользователя 2026-09-17 (см. §1.0.4): ротация не выполняется, файл остаётся в индексе git осознанно.
+4. **A2 (новая)** — `⏸` отложено тем же решением (ротация `MAILRU_CLIENT_SECRET` не выполняется, см. §1.0.4).
+5. **P9 unhandledRejection** — `🟡` исправлено в репозитории этапом 28 (см. §5 P9, журнал строка 28); ждёт деплоя батчем L.
 6. **P7** — `~/.bashrc`, история, права на `metrics.sh` — не проверялось.
 
 **Правим сами, решения не требуется:**
@@ -198,9 +202,7 @@ docker exec balloo-server sh -lc 'f=/app/packages/server/dist/ws/index.js; print
 
 ### 1.4 Ближайшее действие
 
-**Батч E** (§11) — остаточный замер только чтение: что реально применилось из сорванной пачки (живой конфиг vs канон, бэкапы, `htpasswd`, `is-enabled balloo.service`, `nginx -T` по пробам) плюс замеры для P12/P3/P5/чужих сайтов. `reload` не делает, чужие конфиги не трогает.
-
-После вывода батча E — **Батч F** (§11): запуск `docker/prod/enable-probes.sh` из репозитория (одна строка в терминале вместо многострочной пачки — причина, по которой переходим на скрипт, описана в §1.0.1).
+**Батч L** (§11) — деплой P9 с ноутбука: коммит+push правки (по подтверждению пользователя) → на сервере L1–L6 (pull → build → `up -d server` → строгие признаки → sha256 vhost). Батчи E и F выполнены (журнал 16, 20), батчи G–K выполнены (журнал 23–27).
 
 `⛔ АРХИВ (шаг 3 выполнен 2026-09-14, результат в §1.1). Не выполнять: текстовые признаки ниже были неверные — см. §1.1.1.`
 
@@ -306,6 +308,7 @@ shred -u /tmp/bj /tmp/lg.json /tmp/wst.json 2>/dev/null; unset E P T
 | 16 | 2026-09-15 | **Батч E (read-only, §11) выполнен полностью, запись на сервере = 0.** Дано одной строкой, переносов нет, временных файлов нет. Заодно закрыто то, из-за чего пачки 14/15 падали: `bash --version` = **4.4.20(1)-release**, то есть форма `VAR?промпт` в этом bash заведомо не работает | ✅ **ENV**: `SMTP_PASS` (длина 16), `APP_DOMAIN`, `ADMIN_EMAIL`, `SERVER_DOMAIN`, `TELEGRAM_BOT_TOKEN` (длина 46), `TELEGRAM_ADMIN_CHAT_ID`, `MAILRU_CLIENT_ID/SECRET/REDIRECT_URI` — есть; **нет `PUBLIC_URL`** (отсюда `http://localhost:3000` в ссылках) и **нет SMTP-хоста вообще** (`SMTP_HOST` в `.env` отсутствует; в контейнере `localhost` — это значение из дефолта `env.ts:12`). `DATABASE_URL`/`REDIS_URL`/`MINIO_*` в `.env` нет, живут в `docker-compose.yml`. **NGINX**: живой `/etc/nginx/sites-enabled/balloo-docker.conf` = `c32f81c` sha256 `e36b3159…` == репозиторный; в живом файле **0 вхождений `auth_basic`**; `sites-available` и `conf.d` пусты, `grep -rl alpha /etc/nginx` → `/etc/nginx/nginx.conf` (чужой, не трогаем); `nginx -T | grep -c auth_basic` = **0** → basic-auth нет нигде, включая чужие конфиги. **PROBES**: `api=200`, `web=200`, `api_излокально=200`, `ready=200`; `curl -u "uptimerobot:пусто"` → **200** (не тест, пароль не вводился). **AUTOSTART**: `balloo.service` = `disabled`/`inactive`, `enabledUnitLines=0`; в юните `Restart=always`, `StartLimitIntervalSec=0`, `Wants=` пусто; `journalctl -u balloo.service --no-pager | tail` → пусто (юнит ни разу не запускался). **P9**: `docker compose version` = **2.40.3** (`docker compose` работает, `docker-compose` нет), `docker ps -a` = 5 контейнеров `Up`/`healthy` (сервер 3100, web, nginx, redis, minio), `docker system df` = 9,36 GB / 5,36 GB reclaimable, `df -h /` = 25% (40G свободно), `docker volume ls` = 6 томов | `⛔` **выдуманный контекст ассистента аннулирован**: «билет `38-probe-auth-autostart.md`», `api.balloo.su`, `www.balloo.su`, «77 с», «`60s`» — в этом документе таких значений нет (в §7 только `restarts=0`, `83 дня`, `client_max_body_size 120m`). Дальше только по выводу этого батча E | Причина: две предыдущие пачки с записью провалились на форме ввода пароля и на склейке строк. Отсюда правила 14–16 (§0): одна команда, откатывающий самопроверяющийся скрипт, никакого `read VAR?промпт`. Следующий шаг — батч F = `docker/prod/enable-probes.sh` |
 | 17 | 2026-09-15 | **Батч F: basic-auth на probes.** Написан и закоммичен `docker/prod/enable-probes.sh` (одна команда на сервере; внутри: проверка окружения → `htpasswd` через `openssl passwd -6` с `umask 077` → сверка sha256 живого конфига с git-эталоном → правка **одним** `perl`-блоком (2 вставки, `s{}{}xms`, константы `auth_basic`/`auth_basic_user_file` вне regex) → ровно один `nginx -t && systemctl reload nginx` → **автооткат из бэкапа** при любой ошибке). Первый прогон упал на моём баге: `$B` без фигурных скобок внутри `u'''…$B'''` → `NameError: undefined character name` | ✅ `sudo bash docker/prod/enable-probes.sh` → `OK: файл записан` (sha256 `182f25f7…`), `nginx: configuration file /etc/nginx/nginx.conf test is successful`, `nginx -t` OK, **`reload выполнен, один раз`**, **`ИТОГ: применено, basic-auth активен (401)`** | `⛔` вывод **не засчитан**: тест `probe_без_пароля=$(…)` вычислялся в строке `echo` **до** срабатывания `exit 1` внутри `$()` — то есть `401` в выводе относится к состоянию *до* правки. Прогон прерван до контрольных `curl` с паролем | Причина: `echo "…$(cmd)…"` выполняется целиком, включая `$()`, прежде чем `exit` в командной подстановке завершит скрипт. Исправлено: сначала `code=$(… || true)`, потом `if [ "$code" != 401 ]`, вывод после проверки. Это ровно тот класс бага, из-за которого пачки 14/15 дали ложный успех |
 | 18 | 2026-09-15 | **AUTOSTART закрыт одной командой** (`systemctl enable balloo.service`), до прогона батча F — чтобы ошибка в probes не мешала перезагрузке сервера | ✅ `enabledUnitLines=1`, `is-enabled` = `enabled` | ✅ | Причина: `balloo.service` содержит `Restart=always` + `StartLimitIntervalSec=0`, но юнит ни разу не запускался (`journalctl` пуст, `inactive`) — до включения прод не поднимался бы после ребута. |
+| 28 | 2026-09-17 | **P9 исправлена в репозитории + два решения/уточнения в документ.** (а) `packages/server/src/process-handlers.ts` — новый модуль: `handleUnhandledRejection` (лог `[FATAL] Unhandled Rejection: <причина>` + `process.exit(1)`), `registerProcessErrorHandlers()` подписывается в `index.ts` до `startCron()`/`listen()`; (б) `ws/index.ts`: вызов `handleWsMessage(authedWs, message)` получил `.catch()` — лог `[WS] Message handling error` + клиенту `error/INTERNAL_ERROR` (был синхронный `try/catch`, отвергнутый промис уходил в unhandledRejection и ронял процесс); (в) тест `src/__tests__/process-handlers.test.ts`; (г) решение пользователя: **ротация §8 не выполняется** — P6/P13/A2 ⏸, критерий «секреты ротированы» исключён из §10; (д) таблица §6 шаг 4 аннулирована: в репо-каноне уже `86400s`, редирект `$server_name`, `limit_req` нет вовсе — переносить нечего, остался sha256-замер | 🟡 (локально) `tsc --noEmit` чисто; jest на этой машине: первые (холодные) прогоны могут висеть >2 мин, повторный проходит за секунды; надёжнее `--runInBand` — все три файла прошли со второго захода (25 passed): `process-handlers.test.ts` 3 passed, `ws-handshake.test.ts` 5 passed, `ws.test.ts` 17 passed. На сервере правка ещё не применена (коммит+push — по подтверждению пользователя) | P9 закрывается на сервере батчем L (§11): pull → build server → `up -d server` → признаки в таблице батча + sha256 vhost. Дальше: WS `101` (§1.5) → UptimeRobot (пользователь) → P7/P12 → финал/ребут |
 | 27 | 2026-09-16 | **E2E-тест письма сброса пароля (батч K).** Пользователь выбрал вариант «сброс пароля существующего аккаунта» (email `o8eryuhtin@yandex.ru` — тот же, что уже получает письма хостового cron, этап 24). Эндпоинт подтверждён по коду (не по памяти): `POST /api/auth/request-reset` (`auth.ts:58`) → `requestPasswordReset` (`authController.ts:303`) → `authService.ts:485-505`: создаёт `verificationToken` type=`password_reset` (1 час), шлёт письмо, **пароль не меняет**, ответ одинаковый для существующего/несуществующего email. Пользователь выполняет: `curl -X POST https://balloo.su/api/auth/request-reset -H 'Content-Type: application/json' -d '{"email":"o8eryuhtin@yandex.ru"}'` + `sudo tail -n 6 /var/log/mail.log \| grep -E 'from=\|to=\|status='` | ждём вывода | Признак закрытия P11: в `mail.log` `from=<noreply@balloo.su>` → `to=<o8eryuhtin@yandex.ru>` → `status=sent (250 …)` **и** письмо в ящике (не в спаме). Если в спаме — тема rDNS/DKIM с провайдером planeta.tc, отдельно |
 | 27 | 2026-09-16 | **E2E-тест SMTP пройден — P11 ЗАКРЫТА.** Пользователь подтвердил: письма дошли до ящика. Хронология: (а) сброс пароля на `o8eryuhtin@yandex.ru` — оба лога пусты → по коду (`authService.ts:467`: письмо только существующему пользователю, API всегда отвечает «успех») аккаунта с этим email не было; (б) регистрация тестового аккаунта `e2e_smtp_test` / `o8eryuhtin@yandex.ru` через `POST /api/auth/register` (вариант А, с ноутбука пользователя `ivan@ksyusha`, API публичный) → `http=201`, `status:active`; welcome + verification письма **дошли** (подтверждение пользователя). ⛔ Моя ошибка в первой команде проверки (батч K): `grep 'from=\|status='` по `tail -40` ловил **старые** записи хостового cron (08:00/14:00) и завершал цикл сразу — условие надо было фильтровать по метке времени (исправлено во второй команде через `awk -v t=…`) | ✅ `http=201` + «письма прошли» (пользователь) | **P11 закрыта**: приложение → postfix → внешний мир → ящик работает end-to-end. Остатки по почте (не блокеры, отдельные темы): rDNS у провайдера planeta.tc (188.73.176.34 → planeta.tc, не balloo.su — часть приёмников пенализирует), DKIM/DMARC-записи. Тестовый аккаунт `e2e_smtp_test` — судьбу решает пользователь (удалить/оставить). Дальше: ротация §8 → WS `101` (§1.5) → финал/ребут |
 | 26 | 2026-09-16 | **Батч J выполнен успешно — SMTP применён в приложении.** `git pull` → `b04f9bc..27552de`; `sudo ufw allow 25/tcp` → `Rule added` + `Rule added (v6)` (25 открыт наружу для входящей почты — решение пользователя этапа 25); `docker compose … up -d server` → контейнер пересоздан (`balloo-server Started` 17.4s, postgres/redis/minio Healthy); env в контейнере: `SMTP_HOST=172.19.0.1 SMTP_PORT=25 SMTP_USER=нет SMTP_PASSWORD=нет` (USER/PASSWORD действительно не попали в контейнер); в логах: **`[EMAIL] SMTP connection verified successfully`** — `emailService.ts:22 transporter.verify()` прошёл, nodemailer подключился к postfix | ✅ все признаки | **P11 закрыт на 95%**: релей + env + verified — готово; остался e2e-тест письмом (верификация/сброс пароля из UI) — последний признак: `status=sent` в `/var/log/mail.log` от `noreply@balloo.su` с доставкой наружу. Дальше: e2e-письмо → ротация §8 → WS `101` → финал/ребут |
@@ -370,14 +373,14 @@ shred -u /tmp/bj /tmp/lg.json /tmp/wst.json 2>/dev/null; unset E P T
 | P3 | Нет `client_max_body_size` в живом конфиге → 413 на >1 МБ | `🟡` `client_max_body_size 120m` **в живом конфиге есть** (строка 14). Не сверено: поведение (тест 5 МБ) и расхождение с репо по трём директивам (§7.1) | Тест загрузки >1 МБ + перенос живых директив в репо |
 | P4 | `Connection "upgrade"` проставлялся всем запросам | `✅` **ЗАКРЫТ 2026-09-15**: в живом конфиге `proxy_set_header Upgrade $http_upgrade` + `proxy_set_header Connection $balloo_upgrade_connection`, то есть `map`-версия | Остается расхождение с репо по `return 301`/`proxy_read_timeout`/`limit_req` (§7.1) |
 | P5 | ACME на :80 держится только на `authenticator = nginx` | `✅` **ЗАКРЫТ 2026-09-16**: `certbot renew --dry-run` → `success` по всем 7 сертификатам (наши `balloo.su`, `api.balloo.su` — оба success) после правки nginx батчем F; таймер `enabled` (батч B) | — |
-| P6 | Секреты в git: `docker/prod/.env.production` с реальными паролями | `❓` **подтверждено батчем B**: `tracked_in_git=1` | Ротация §8 + решение пользователя об удалении файла из репо |
+| P6 | Секреты в git: `docker/prod/.env.production` с реальными паролями | `⏸` **ОТЛОЖЕНО решением пользователя (2026-09-17): ротация §8 не выполняется**, файл остаётся в git осознанно | Ничего, пока владелец не отменит решение |
 | P7 | `~/.bashrc:117`, секреты в `~/.bash_history`, `/metrics` в API нет | `❓` не проверялось | Шаг финала (§6) |
 | P8 | WS-путь ронял весь процесс API | `✅` **ЗАКРЫТ 2026-09-14** (`401`/`401`, `restarts=0`, 0 лишних инициализаций) | Осталось `101` с настоящим токеном — §11 батч A шаг 4 |
-| P9 | Нет обработчика `unhandledRejection`; `handleWsMessage()` вызывается без `await` из синхронного `try/catch` (`ws/index.ts:72`) — на Node 22 это роняет процесс | `❓` **уточнено батчем B**: в `packages/server/src/index.ts` обработчика нет; `unhandledRejection` в коде нет вовсе | Решение: добавить лог + `exit(1)` (или `void …catch`) — §1.2 п.5 |
+| P9 | Нет обработчика `unhandledRejection`; `handleWsMessage()` вызывается без `await` из синхронного `try/catch` (`ws/index.ts:72`) — на Node 22 это роняет процесс | `🟡` **ИСПРАВЛЕНО в репозитории (этап 28, коммит — после подтверждения пользователя)**: `packages/server/src/process-handlers.ts` — `unhandledRejection` → лог `[FATAL]` + `exit(1)`, подписка в `index.ts` до старта; вызов `handleWsMessage` получил `.catch()` (лог + `INTERNAL_ERROR` клиенту). Тесты: `process-handlers.test.ts` 3 passed, `ws-handshake.test.ts` 5 passed, `ws.test.ts` 17 passed, `tsc --noEmit` чисто | Задеплоить батчем L (§11) — на сервере ещё старое поведение |
 | P10 | Healthcheck не различает «жив» и «циклически перезапускается» | `🟡` достоверный счётчик — `RestartCount` (=0) | `start_period` в compose не проверялся |
 | P11 | SMTP не настроен | `✅` **ЗАКРЫТА 2026-09-16 (этап 27)**: e2e пройден — регистрация `http=201`, welcome + verification письма дошли до `o8eryuhtin@yandex.ru` (подтверждение пользователя). Цепочка: приложение → хостовый postfix (`172.19.0.1:25`, docker-подсеть в `mynetworks`) → наружу (`status=sent`) → ящик. `ufw 25` открыт наружу (входящая тоже работает) | Не-блокеры на потом: rDNS у провайдера planeta.tc, DKIM/DMARC, судьба тестового аккаунта `e2e_smtp_test` |
 | P12 | `https://alpha.balloo.su` → `502`. В `balloo-docker.conf` для alpha только редирект `return 301`, значит отвечает другой vhost (кандидат — `000-balloo-default`, он первый по алфавиту и `default_server`). Отдельного сертификата для alpha в certbot нет | `❓` причина не установлена; базовой линии «как было» нет | Батч C: `nginx -T -V \| grep -n "alpha.balloo.su"`, `curl -sSI https://alpha.balloo.su`. **Чужие конфиги не менять** (правило 5) |
-| P13 | `MAILRU_CLIENT_SECRET` показан в чате из-за неполной маскировки в моей команде | `❓` требует ротации | §1.7, ротация §8 |
+| P13 | `MAILRU_CLIENT_SECRET` показан в чате из-за неполной маскировки в моей команде | `⏸` **ОТЛОЖЕНО решением пользователя (2026-09-17)**: ротация §8 не выполняется | Ничего, пока владелец не отменит решение |
 | P14 | **Что лежало в `/etc/nginx/.htpasswd-balloo`.** Замер батча F «до»: `uptimerobot:$6$…` 119 байт — пароль этапа 17 был записан и действовал; пустого хеша не было | `✅` **ЗАКРЫТ 2026-09-16**: батч F перезаписал файл свежим паролем, проверки: `1 строка`, `root:www-data 640`, воркер `www-data` читает | — |
 | P15 | **Дошёл ли канон до живого конфига.** Замер батча F «до»: живой = `bfdc8b7b…` 3023 байта, 0 блоков `auth_basic` → `cp` этапа 17 не выполнялся никогда | `✅` **ЗАКРЫТ 2026-09-16**: gate показал diff живого с каноном (только 2 наших блока), после применения `OK в загруженной конфигурации nginx 2 блока с нашим htpasswd-файлом` | — |
 | P17 | **Пароль от probe-доступа введён пользователем в чат** (2026-09-15, этап 17). Значение в документ не переносится | `✅` **ротация выполнена 2026-09-16**: батч F перезаписал `htpasswd` сгенерированным паролем — засвеченное значение больше не действует. Новый пароль в `~/balloo-probe-credentials.txt` (`600`), в чат не переносится. Остаток: смена sudo-пароля `cfr_balloo` — по явной команде пользователя (`passwd` на сервере), отдельный шаг | sudo-пароль `cfr_balloo` засвечен в чате тем же сообщением — ротация не выполнена, не забыть в финале |
@@ -418,6 +421,8 @@ sudo certbot renew --dry-run 2>&1 | tail -5     # ждём "simulated renewals" 
 
 Правка: эти три значения переносятся из живого файла в репо (не наоборот), затем `sudo cp` репо-файла на живое место + `nginx -t && reload` (живой файл после переноса идентичен, `reload` формально не меняет поведение) + `sha256sum` обоих + коды `200/200/301/401` + тест загрузки >1 МБ без 413.
 
+**`⛔` Уточнение этапа 28 (замер чтением репо-канона в `HEAD`): таблица выше устарела.** В текущем `docker/prod/nginx/balloo-docker.conf` уже стоит `proxy_read_timeout 86400s`; редирект — `return 301 https://$server_name$request_uri` (для `server_name balloo.su www.balloo.su` даёт `https://balloo.su$request_uri`, как в живом); `limit_req` в репо **нет вовсе** (ни `limit_req_zone`, ни `burst=20` — в истории файла этих значений не было). Живой конфиг после батча F = канон `a905206`. Практический вывод: переносить из живого в репо нечего, «байт в байт» закрывается одним read-only замером `sha256sum` обоих файлов (включён в батч L); при несовпадении — разобрать diff, не налагая ничего вслепую.
+
 ### Шаг 5. Probe-эндпоинты под basic-auth
 `🟡` Реализовано в репозитории и **готово к применению одним прогоном скрипта**. Как устроено на самом деле (проверено чтением `docker/prod/nginx/balloo-docker.conf` в `HEAD`, `⛔` прежнее описание этой строки аннулировано): `⛔` «общий `http`-блок с `map $uri $balloo_probes_needauth` и `location ~ ^/(status|metrics|health|health/ready)`» — такого в файле нет; есть **два отдельных `location ~ ^/(health|health/ready)(/|$)`** — по одному в каждом HTTPS-сервере (`api.balloo.su`, `balloo.su`), и в каждом прямо прописаны `auth_basic "balloo probes";` + `auth_basic_user_file /etc/nginx/.htpasswd-balloo;`. Прямая директива в `location` не наследует никакой `auth_basic off` из уровня `http`, поэтому версия §1.0.3 про «наследование `auth_basic off`» к этому канону неприменима.
 Канон накладывается целиком (`cp` репо-файла на живое место) после gate с `diff` и подтверждения, `nginx -t` с автооткатом, ровно один `reload`.
@@ -428,8 +433,8 @@ Healthcheck'и контейнеров ходят на `127.0.0.1:3100` мимо 
 `❓` Статус **не подтверждён**: записи «`enabled`» (журнал 18, §1.0.3) и «`disabled`, `enabledUnitLines=0`» (журнал 16) противоречат друг другу, подтверждающего вывода в переписке нет (пометка после §2). Юнит существует и рабочий (`/etc/systemd/system/balloo.service`: `Restart=always`, `StartLimitIntervalSec=0`, `WorkingDirectory=~/balloo/docker/prod`), вопрос только в флаге автозапуска.
 Лечит и проверяет тот же прогон батча F: `systemctl enable balloo.service` + вывод `is-enabled`, `is-active`, `NRestarts`. Если юнит отсутствует/переименован — скрипт печатает предупреждение и не считается проваленным (это отдельная тема, правило 11 §0). Реальный критерий «после ребута стек поднимется сам» проверяется только финальным ребутом по команде пользователя.
 
-### Шаг 7. Ротация секретов (§8) — одним заходом.
-Состав пополнен: `POSTGRES_PASSWORD`, `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`, `REDIS_PASSWORD`, `MINIO_ROOT_PASSWORD` **+ `MAILRU_CLIENT_SECRET`** (утёк в чат, §1.7).
+### Шаг 7. ~~Ротация секретов (§8) — одним заходом~~ → `⛔ ОТМЕНЁН решением пользователя (2026-09-17, §1.0.4)`
+Состав ротации был: `POSTGRES_PASSWORD`, `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`, `REDIS_PASSWORD`, `MINIO_ROOT_PASSWORD` + `MAILRU_CLIENT_SECRET`. **Не выполняется.** Вместо него — **деплой P9 (батч L, §11):** пересборка `balloo-server` с обработчиком `unhandledRejection` + read-only `sha256sum` vhost (шаг 4).
 
 ### Шаг 8. Финал
 `sudo ufw status numbered` (проверить 80/443 и что не открыто лишнее) → `certbot renew --dry-run` → починка `.bashrc` → чистка истории → **ребут по команде пользователя** → `docker compose ps` без единой команды → smoke-тест.
@@ -447,6 +452,8 @@ Healthcheck'и контейнеров ходят на `127.0.0.1:3100` мимо 
 ---
 
 ## 8. Ротация секретов (порядок)
+
+`⛔` **НЕ ВЫПОЛНЯЕТСЯ — решение пользователя 2026-09-17 (§1.0.4).** Раздел оставлен как справка: если решение будет отменено, порядок ниже актуален. Скрипты `docker/prod/rotate-secrets.mjs` + `docker/prod/apply-rotated-secrets.sh` в репо, не запускались.
 
 `POSTGRES_PASSWORD` применяется только при первой инициализации тома, поэтому: сначала `ALTER USER` внутри контейнера postgres, потом правка env, потом `up -d --force-recreate`. Ротировать: `POSTGRES_PASSWORD`, `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`, `REDIS_PASSWORD`, `MINIO_ROOT_PASSWORD`, `MINIO_SECRET_KEY`, **`MAILRU_CLIENT_SECRET`** (утёк в чат 2026-09-15, §1.7). Сессии пользователей сбросятся. Файлу `.env.production` поставить `chmod 600`; файл по-прежнему в индексе git (`tracked_in_git=1`, подтверждено батчем B) — решение об удалении из репозитория за пользователем. Скрипты: `docker/prod/rotate-secrets.mjs` (генерация) + `docker/prod/apply-rotated-secrets.sh` (применение, учитывает кавычки в `.env.production`).
 
@@ -486,7 +493,7 @@ Healthcheck'и контейнеров ходят на `127.0.0.1:3100` мимо 
 - [ ] `balloo.service` в `enabled`, после ребута стек поднимается без ручных команд — `🟡` флаг `enabled` подтверждён 2026-09-16 (батч F: `is-enabled=enabled`, `NRestarts=0`); проверка «после ребута» — только финальным ребутом по команде пользователя
 - [ ] Чужие сайты (cockpit, центр-фр.рф, alpha, console, vsc) живы и не изменены — `❓` `alpha.balloo.su=502`, причина не установлена (P12); наши конфиги правились, чужие — нет
 - [ ] Конфиг в репозитории байт-в-байт равен живому на сервере (`sha256sum` совпадает) — `❓` расходятся 3 директивы (§6 шаг 4)
-- [ ] Секреты ротированы, `.env.production` вне git или с `chmod 600` — `❓` P6: `tracked_in_git=1` подтверждён
+- [ ] ~~Секреты ротированы, `.env.production` вне git или с `chmod 600`~~ — `⛔` **ИСКЛЮЧЁН ИЗ КРИТЕРИЕВ решением пользователя 2026-09-17** (§1.0.4): ротация не выполняется, `.env.production` остаётся в git осознанно
 
 ---
 
@@ -606,6 +613,48 @@ cd ~/balloo && git pull --ff-only origin main && bash docker/prod/enable-probes.
 ```
 
 **Что ожидаем:** п.1 — `myhostname`/`mydestination` покажут, обслуживает ли postfix домен `balloo.su` (если `mydestination` пустой/дефолтный — это open relay-кандидат на правку, разбираем); `mynetworks` — если там только `127.0.0.0/8 [::1]`, docker-подсеть надо будет добавить (правка одного захода, после подтверждения); п.2 — `188.73.176.34` = этот сервер; п.3 — `active` и живые строки лога (значит, почта реально ходит); п.4 — `connected` + `banner: 220 …` (контейнер достаёт до postfix через шлюз); п.5 — есть ли правило для 25 (если нет — входящая почта домена не работает, это к хозяину postfix, не блокер для наших исходящих).
+
+### Батч L — деплой P9 + sha256-замер vhost (текущее действие; требует коммита+push с ноутбука)
+
+Правило 14 §0: каждая запись — отдельной командой, по одной. Шаги L1–L6 — по очереди, вывод присылать целиком.
+
+**L1 (запись, репо):**
+```bash
+cd ~/balloo && git pull --ff-only origin main && git log --oneline -1
+```
+Ожидаем: HEAD = новый коммит с правкой P9 (не `27552de`). Если fast-forward не прошёл — вывод целиком, ничего не делать дальше.
+
+**L2 (запись, долгая — фон в свой лог, правило 12 §0):**
+```bash
+cd ~/balloo/docker/prod && setsid nohup docker compose -f docker-compose.local.yml --env-file .env.production build server > /tmp/p9-build.log 2>&1 < /dev/null &
+```
+
+**L3 (чтение, ожидание встроено — правило 13 §0):**
+```bash
+for i in $(seq 1 120); do grep -qE 'Built|Building|ERROR|error' /tmp/p9-build.log && break; sleep 5; done; tail -n 15 /tmp/p9-build.log
+```
+Ожидаем в хвосте `Built`/`Successfully tagged`. При `ERROR` — вывод целиком, дальше не идти.
+
+**L4 (запись, пересоздание одного сервиса):**
+```bash
+cd ~/balloo/docker/prod && docker compose -f docker-compose.local.yml --env-file .env.production up -d server
+```
+
+**L5 (чтение, строгие признаки):**
+```bash
+docker exec balloo-server sh -lc 'printf "process_handlers_js="; grep -c "Unhandled Rejection" /app/packages/server/dist/process-handlers.js; printf "index_registers="; grep -c "registerProcessErrorHandlers" /app/packages/server/dist/index.js'
+for i in $(seq 1 30); do h=$(docker inspect -f '{{if .State.Health}}{{.State.Health.Status}}{{else}}nohealth{{end}}' balloo-server 2>/dev/null || echo nodocker); printf 'wait %02d health=%s\n' "$i" "$h"; [ "$h" = healthy ] && break; sleep 5; done
+docker inspect -f 'status={{.State.Status}} restarts={{.RestartCount}}' balloo-server
+curl -sS -o /dev/null -w 'health_local=%{http_code}\n' --max-time 8 http://127.0.0.1:3100/health
+curl -sS -o /dev/null -w 'ws_no_token=%{http_code}\n' --max-time 8 --http1.1 -H 'Connection: Upgrade' -H 'Upgrade: websocket' -H 'Sec-WebSocket-Version: 13' -H 'Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==' http://127.0.0.1:3100/ws/
+```
+Ожидаем: `process_handlers_js=1`, `index_registers=` ≥ `1`, `health=healthy`, `restarts=0`, `health_local=200`, `ws_no_token=401`. Любой признак не сошёлся — вывод целиком.
+
+**L6 (чтение, шаг 4 / CANON):**
+```bash
+sha256sum /etc/nginx/sites-enabled/balloo-docker.conf ~/balloo/docker/prod/nginx/balloo-docker.conf
+```
+Ожидаем: **два одинаковых хеша** → критерий «байт в байт» закрыт без правок. Разные — прислать вывод, разбираем `diff` (ничего не налагать).
 
 ### Самопроверка скрипта enable-probes (на ноутбуке, не на сервере)
 
