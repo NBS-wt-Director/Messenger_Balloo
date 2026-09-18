@@ -81,7 +81,14 @@ export const applyRateLimit = (
   }
 
   // Стратегия лимитирования зависит от пути (тикет №64)
-  if (req.path.startsWith('/api/auth/')) {
+  // P28 (2026-09-19): GET /api/auth/oauth/* — это 302-редиректы (начало OAuth
+  // и колбэки провайдеров), а не ввод учётных данных. authLimiter (5/мин)
+  // срабатывал на приёмке раньше, чем проверялись все 4 провайдера, и браузер
+  // показывал сырой JSON 429. Строгий лимит остаётся на POST (ввод данных)
+  // и остальных /api/auth/* маршрутах.
+  const isOAuthGetRedirect =
+    req.method === 'GET' && req.path.startsWith('/api/auth/oauth/');
+  if (req.path.startsWith('/api/auth/') && !isOAuthGetRedirect) {
     authLimiter(req, res, next);
   } else if (req.path.startsWith('/api/upload/')) {
     uploadLimiter(req, res, next);

@@ -1,15 +1,38 @@
 // Add Device Screen — вход через другое устройство (QR)
 // Макет: mockups/balloo-su/add-device.html (+ add-device.md)
-// QR-код генерируется авторизованным устройством (серверный pair-token — отдельный тикет);
-// эта страница — инструкции и безопасность, как в макете.
+// P30 (2026-09-19): кнопка «Войти через другое устройство» на /login ведёт
+// сюда — на ЧАСТЬ ВХОДА «НА НАСТОЛЬНОМ УСТРОЙСТВЕ»: экран показывает QR-код
+// (как в макете: таймер 60 сек, код balloо://pair/…, «Обновить код»).
+// Реальный pair-token генерирует сервер (серверный API — отдельный тикет);
+// пока QR — визуал по макету с клиентским кодом-заглушкой.
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ThemeSwitcher } from '@/components/topbar/ThemeSwitcher';
 import { LanguageSwitcher } from '@/components/topbar/LanguageSwitcher';
+import { TopbarMenu } from '@/components/topbar/TopbarMenu';
+
+// Код привязки-заглушка (до серверного pair-token API)
+const makePairCode = () =>
+  Array.from({ length: 12 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
 
 function AddDeviceScreen() {
   const navigate = useNavigate();
+  const [qrSeconds, setQrSeconds] = useState(60);
+  const [pairCode, setPairCode] = useState(makePairCode);
+
+  // Таймер QR-кода: 60 → 0, как в макете (add-device.html)
+  useEffect(() => {
+    if (qrSeconds <= 0) return;
+    const timer = setTimeout(() => setQrSeconds((s) => s - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [qrSeconds]);
+
+  // «Обновить код»: новый код + сброс таймера
+  const refreshQr = () => {
+    setPairCode(makePairCode());
+    setQrSeconds(60);
+  };
 
   return (
     <div
@@ -18,15 +41,12 @@ function AddDeviceScreen() {
         flexDirection: 'column',
         height: '100vh',
         overflowY: 'auto',
-        background: 'var(--bg-primary)',
+        // P27: фон не задаём — градиент темы russian на body не должен закрываться
       }}
     >
       {/* Topbar */}
       <div className="topbar">
-        <div className="topbar__logo" onClick={() => navigate('/login')}>
-          <div className="topbar__logo-icon">B</div>
-          <span>Balloo</span>
-        </div>
+        <TopbarMenu />
         <div className="topbar__title">Добавить устройство</div>
         <div className="topbar__right">
           <div className="mascot">🦊</div>
@@ -54,6 +74,68 @@ function AddDeviceScreen() {
         <h1 style={{ fontSize: '22px', fontWeight: 800, color: 'var(--text-primary)' }}>
           ➕ Добавить устройство
         </h1>
+
+        {/* QR-код — вход «на настольном устройстве» (P30, по макету add-device.html) */}
+        <div className="card mb-4 text-center">
+          <div className="text-sm text-secondary mb-4">
+            QR-код действует{' '}
+            <strong style={{ color: qrSeconds <= 10 ? 'var(--danger)' : 'var(--accent)' }}>
+              {qrSeconds}
+            </strong>{' '}
+            сек.
+          </div>
+
+          {/* QR Code (визуал по макету; реальный токен — серверный pair-token API) */}
+          <div style={{ display: 'inline-block', padding: '24px', background: '#fff' }}>
+            <div
+              style={{
+                width: '220px',
+                height: '220px',
+                background: 'repeating-conic-gradient(#000 0% 25%, #fff 0% 50%) 50% / 14px 14px',
+                position: 'relative',
+                opacity: qrSeconds <= 0 ? 0.25 : 1,
+                transition: 'opacity 0.3s',
+              }}
+            >
+              <div style={{ position: 'absolute', top: '10px', left: '10px', width: '48px', height: '48px', background: '#fff', border: '10px solid #000' }} />
+              <div style={{ position: 'absolute', top: '10px', right: '10px', width: '48px', height: '48px', background: '#fff', border: '10px solid #000' }} />
+              <div style={{ position: 'absolute', bottom: '10px', left: '10px', width: '48px', height: '48px', background: '#fff', border: '10px solid #000' }} />
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  width: '40px',
+                  height: '40px',
+                  clipPath: 'polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%)',
+                  background: 'var(--accent)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#fff',
+                  fontSize: '18px',
+                  fontWeight: 900,
+                }}
+              >
+                B
+              </div>
+            </div>
+          </div>
+
+          <div className="text-xs text-muted mt-4">
+            Код: <code>balloo://pair/{pairCode}</code>
+          </div>
+
+          <div className="flex gap-2 justify-center mt-6">
+            <button type="button" className="btn btn--primary" onClick={refreshQr}>
+              🔄 Обновить код
+            </button>
+            <button type="button" className="btn btn--secondary" onClick={() => navigate('/login')}>
+              Отмена
+            </button>
+          </div>
+        </div>
 
         {/* Инструкция */}
         <div className="card">
@@ -111,6 +193,7 @@ function AddDeviceScreen() {
           gap: '16px',
           padding: '16px',
           fontSize: '13px',
+          flexShrink: 0,
         }}
       >
         <Link to="/rules" className="text-secondary" style={{ textDecoration: 'none' }}>

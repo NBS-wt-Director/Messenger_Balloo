@@ -197,8 +197,11 @@ function RegisterScreen() {
       style={{
         display: 'flex',
         flexDirection: 'column',
-        minHeight: '100vh',
-        background: 'var(--bg-primary)',
+        // P28: height (не minHeight) + overflowY — иначе #root (overflow:hidden,
+        // 100vh) обрезал всё ниже вьюпорта: подвал был не виден, прокрутки не было
+        height: '100vh',
+        overflowY: 'auto',
+        // P27: фон не задаём — градиент темы russian на body не должен закрываться
       }}
     >
       {/* Topbar — как в макете register.html (P25: шапка обязательна) */}
@@ -246,16 +249,34 @@ function RegisterScreen() {
                   <div
                     className="avatar avatar--lg avatar--bordered"
                     style={{
-                      background: avatarPreview?.includes('linear-gradient')
-                        ? avatarPreview.replace('|', ' ')
-                        : 'linear-gradient(135deg, #2db84d, #1e9e3e)',
+                      // P31: градиент — только для инициалов; загруженная
+                      // картинка (data:) рисуется <img> внутри, фон не нужен
+                      background:
+                        avatarPreview && !avatarPreview.startsWith('data:') && avatarPreview.includes('linear-gradient')
+                          ? avatarPreview.split('|')[1]
+                          : 'linear-gradient(135deg, #2db84d, #1e9e3e)',
                       clipPath: 'var(--octagon-clip)',
                     }}
                   >
                     <div className="avatar__inner">
-                      <span style={{ fontSize: '28px', color: '#fff', fontWeight: 700 }}>
-                        {avatarPreview?.split('|')[0] || 'ИИ'}
-                      </span>
+                      {avatarPreview?.startsWith('data:') ? (
+                        // P31: предпросмотр загруженной картинки — раньше вместо
+                        // картинки в предпросмотр рендерилась строка data-URL
+                        <img
+                          src={avatarPreview}
+                          alt=""
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            clipPath: 'var(--octagon-clip)',
+                          }}
+                        />
+                      ) : (
+                        <span style={{ fontSize: '28px', color: '#fff', fontWeight: 700 }}>
+                          {avatarPreview?.split('|')[0] || 'ИИ'}
+                        </span>
+                      )}
                     </div>
                   </div>
                   <div className="flex-1">
@@ -446,6 +467,7 @@ function RegisterScreen() {
           gap: '16px',
           padding: '16px',
           fontSize: '13px',
+          flexShrink: 0, /* P29: подвал не сжимается и не наезжает на форму */
         }}
       >
         <Link to="/rules" className="text-secondary" style={{ textDecoration: 'none' }}>

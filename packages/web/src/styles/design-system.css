@@ -8,6 +8,7 @@
   display: flex;
   align-items: center;
   height: 56px;
+  flex-shrink: 0; /* P29: шапка не сжимается и не наезжает на форму */
   padding: 0 16px;
   background: var(--bg-glass);
   backdrop-filter: blur(var(--blur));
@@ -272,16 +273,22 @@
 }
 
 /* ---------- Auth Pages ---------- */
+/* P28/P29 (2026-09-19): прокрутка формы между шапкой и подвалом.
+   align-items: center убран — при контенте выше контейнера он обрезал
+   верх карточки под шапкой (классический flex-баг центринга);
+   вместо него .auth-card { margin: auto } — центрит и не обрезает.
+   padding 32px 24px — отступ формы от шапки и подвала. */
 .auth-container {
   display: flex;
-  align-items: center;
   justify-content: center;
   flex: 1;
   min-height: 0;
-  padding: 24px;
+  padding: 32px 24px;
+  overflow-y: auto;
 }
 
 .auth-card {
+  margin: auto;
   width: 100%;
   max-width: 420px;
   background: var(--bg-glass);

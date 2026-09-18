@@ -80,7 +80,8 @@ function LoginScreen() {
         flexDirection: 'column',
         height: '100vh',
         overflowY: 'auto',
-        background: 'var(--bg-primary)',
+        // P27: фон не задаём — тема russian рисует градиент флага на body,
+        // непрозрачный var(--bg-primary) здесь его полностью закрывал
       }}
     >
       {/* Topbar — как в макете login.html */}
@@ -210,6 +211,7 @@ function LoginScreen() {
           gap: '16px',
           padding: '16px',
           fontSize: '13px',
+          flexShrink: 0, /* P29: подвал не сжимается и не наезжает на форму */
         }}
       >
         <Link to="/rules" className="text-secondary" style={{ textDecoration: 'none' }}>
