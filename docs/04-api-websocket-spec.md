@@ -27,9 +27,11 @@
 | POST | `/auth/avatar/auto` | Генерация автоаватара (из имени, случайный градиент) |
 | POST | `/auth/avatar/upload` | Загрузка своей аватарки (PNG/JPEG/SVG) |
 | POST | `/auth/login` | Вход по email |
-| POST | `/auth/oauth/yandex` | OAuth вход через Яндекс |
-| POST | `/auth/oauth/mailru` | OAuth вход через Mail.ru |
-| POST | `/auth/oauth/rambler` | OAuth вход через Rambler |
+| GET | `/auth/oauth/:provider` | Начало OAuth (P21, 2026-09-18): 302 на authorize URL провайдера (yandex, vk, mailru — настроены по env `*_CLIENT_ID/SECRET/REDIRECT_URI`); провайдер не настроен (rambler, max) → 302 на `/#/login?oauth_error=not_configured&provider=<name>` |
+| GET | `/auth/oauth/yandex-callback` | Callback Яндекс: обмен code → профиль → httpOnly cookie → 302 на `/#/chat` |
+| GET | `/auth/oauth/vk/callback` | Callback VK (oauth.vk.com, scope=email): обмен code → user_id+email → cookie → 302 на `/#/chat` |
+| GET | `/auth/oauth/mailru/callback` | Callback Mail.ru (connect.mail.ru): обмен code → userinfo → cookie → 302 на `/#/chat` |
+| POST | `/auth/oauth/:provider` | OAuth вход: фронтенд сам получил данные провайдера и шлёт providerId/email/username на бэкенд (мобильные клиенты) |
 | POST | `/auth/logout` | Выход |
 | POST | `/auth/refresh` | Обновление JWT (refresh token) |
 | GET | `/auth/session` | Текущая сессия + список устройств |

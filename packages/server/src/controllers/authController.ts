@@ -10,6 +10,11 @@ import {
   oauthLogin as oauthLoginService,
   exchangeYandexCode,
   getYandexUser,
+  getOAuthAuthorizeUrl,
+  isOAuthProviderConfigured,
+  exchangeVkCode,
+  exchangeMailruCode,
+  getMailruUser,
   enable2FA as enable2FAService,
   verify2FA as verify2FAService,
   verify2FAEnable as verify2FAEnableService,
@@ -345,6 +350,40 @@ export const resetPassword = async (req: Request, res: Response, next: NextFunct
 };
 
 // ============================================================
+// OAuth helpers (P21): фронтенд редиректит пользователя на
+// GET /api/auth/oauth/:provider — сервер отвечает 302 на authorize URL
+// провайдера. Провайдер не настроен (нет CLIENT_ID/SECRET) → 302 обратно
+// на /#/login?oauth_error=not_configured (дружелюбная ошибка, не JSON 404).
+// ============================================================
+
+const oauthFrontendUrl = (): string =>
+  process.env.CORS_ORIGIN || process.env.APP_URL || 'https://balloo.su';
+
+const oauthErrorRedirect = (res: Response, provider: string, reason: string): void => {
+  const url = `${oauthFrontendUrl()}/#/login?oauth_error=${encodeURIComponent(reason)}&provider=${encodeURIComponent(provider)}`;
+  res.redirect(302, url);
+};
+
+// GET /api/auth/oauth/:provider — начало OAuth (302 на провайдера)
+export const oauthAuthorize = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const provider = String(req.params.provider || '').toLowerCase();
+
+    const authorizeUrl = getOAuthAuthorizeUrl(provider);
+    if (!authorizeUrl) {
+      // Провайдер не настроен (rambler/max или отсутствуют env) — дружелюбная ошибка
+      oauthErrorRedirect(res, provider, 'not_configured');
+      return;
+    }
+
+    res.redirect(302, authorizeUrl);
+  } catch (error: any) {
+    console.error(`[OAUTH AUTHORIZE] Error:`, error);
+    oauthErrorRedirect(res, String(req.params.provider || ''), 'authorize_failed');
+  }
+};
+
+// ============================================================
 // OAuth callback — Яндекс (GET)
 // ============================================================
 
@@ -374,12 +413,85 @@ export const yandexCallback = async (req: Request, res: Response, next: NextFunc
       accessToken,
     });
 
-    // Редирект на фронтенд — токены теперь в cookie, не в URL
-    const frontendUrl = `${process.env.CORS_ORIGIN || 'https://balloo.su'}/auth/success?cookie_set=true`;
-    res.redirect(302, frontendUrl);
+    // Редирект на фронтенд — токены в httpOnly cookie (P21: hash-роутер → /#/chat)
+    setAuthCookies(res, result.tokens!.accessToken, result.tokens!.refreshToken);
+    res.redirect(302, `${oauthFrontendUrl()}/#/chat`);
   } catch (error: any) {
     console.error('[YANDEX CALLBACK] Error:', error);
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    oauthErrorRedirect(res, 'yandex', 'callback_failed');
+  }
+};
+
+// ============================================================
+// OAuth callback — VK (GET /api/auth/oauth/vk/callback)
+// ============================================================
+
+export const vkCallback = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { code } = req.query;
+
+    if (!code) {
+      oauthErrorRedirect(res, 'vk', 'no_code');
+      return;
+    }
+
+    // Обмен code на access token (user_id + email при scope=email)
+    const tokenData = await exchangeVkCode(code as string);
+
+    // Логин/регистрация пользователя
+    const result = await oauthLoginService({
+      provider: 'vk',
+      providerId: tokenData.providerId,
+      email: tokenData.email,
+      username: tokenData.email ? tokenData.email.split('@')[0] : undefined,
+      accessToken: tokenData.accessToken,
+    });
+
+    setAuthCookies(res, result.tokens!.accessToken, result.tokens!.refreshToken);
+    res.redirect(302, `${oauthFrontendUrl()}/#/chat`);
+  } catch (error: any) {
+    console.error('[VK CALLBACK] Error:', error);
+    oauthErrorRedirect(res, 'vk', 'callback_failed');
+  }
+};
+
+// ============================================================
+// OAuth callback — Mail.ru (GET /api/auth/oauth/mailru/callback)
+// ============================================================
+
+export const mailruCallback = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { code } = req.query;
+
+    if (!code) {
+      oauthErrorRedirect(res, 'mailru', 'no_code');
+      return;
+    }
+
+    // Обмен code на access token
+    const tokenData = await exchangeMailruCode(code as string);
+
+    // Данные пользователя (email, имя)
+    const userData = await getMailruUser(tokenData.access_token);
+
+    // Логин/регистрация пользователя (providerId — x_mailru_vid)
+    const result = await oauthLoginService({
+      provider: 'mailru',
+      providerId: tokenData.x_mailru_vid,
+      email: userData.email,
+      username: userData.username,
+      accessToken: tokenData.access_token,
+      refreshToken: tokenData.refresh_token,
+      expiresAt: tokenData.expires_in
+        ? Math.floor(Date.now() / 1000) + tokenData.expires_in
+        : undefined,
+    });
+
+    setAuthCookies(res, result.tokens!.accessToken, result.tokens!.refreshToken);
+    res.redirect(302, `${oauthFrontendUrl()}/#/chat`);
+  } catch (error: any) {
+    console.error('[MAILRU CALLBACK] Error:', error);
+    oauthErrorRedirect(res, 'mailru', 'callback_failed');
   }
 };
 

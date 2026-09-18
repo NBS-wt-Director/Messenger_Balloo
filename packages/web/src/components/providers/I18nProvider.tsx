@@ -13,7 +13,7 @@ import {
 interface I18nContextValue {
   locale: Language;
   setLocale: (locale: Language) => void;
-  t: (key: TranslationKey) => string;
+  t: (key: TranslationKey, vars?: Record<string, string | number>) => string;
   translations: Translations;
 }
 
@@ -40,10 +40,17 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   }, [locale]);
 
   const t = useCallback(
-    (key: TranslationKey): string => {
+    (key: TranslationKey, vars?: Record<string, string | number>): string => {
       const translation = translations[key];
       if (!translation) return key;
-      return translation[currentLocale] || translation['en'] || translation['ru'] || key;
+      let str = translation[currentLocale] || translation['en'] || translation['ru'] || key;
+      // Подстановка переменных: {n}, {provider} и т.п. (P22)
+      if (vars) {
+        for (const [name, value] of Object.entries(vars)) {
+          str = str.split(`{${name}}`).join(String(value));
+        }
+      }
+      return str;
     },
     [currentLocale]
   );

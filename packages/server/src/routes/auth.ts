@@ -13,6 +13,9 @@ import {
   resetPassword,
   oauthLogin,
   yandexCallback,
+  oauthAuthorize,
+  vkCallback,
+  mailruCallback,
   enable2FA,
   verify2FAEnable,
   disable2FA,
@@ -67,8 +70,14 @@ router.post('/reset-password', resetPassword);
 // POST — фронтенд сам получает данные от провайдера и шлёт на бэкенд
 router.post('/oauth/:provider', oauthLogin);
 
-// GET — callback от OAuth-провайдера (Яндекс)
+// GET — начало OAuth (P21): 302 на authorize URL провайдера;
+// провайдер не настроен → 302 на /#/login?oauth_error=not_configured
+router.get('/oauth/:provider', oauthAuthorize);
+
+// GET — callback от OAuth-провайдера
 router.get('/oauth/yandex-callback', yandexCallback);
+router.get('/oauth/vk/callback', vkCallback);
+router.get('/oauth/mailru/callback', mailruCallback);
 
 // ============================================================
 // Защищённые маршруты (требуют auth)

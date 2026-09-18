@@ -609,6 +609,150 @@ export const exchangeYandexCode = async (code: string) => {
   return await response.json();
 };
 
+// ============================================================
+// OAuth: authorize URL (P21) — GET /api/auth/oauth/:provider
+// Возвращает URL страницы авторизации провайдера или null,
+// если провайдер не настроен (нет CLIENT_ID/SECRET в env).
+// Rambler/Max — OAuth-приложений нет → не настроены.
+// ============================================================
+
+export type OAuthProviderId = 'yandex' | 'vk' | 'mailru' | 'rambler' | 'max';
+
+const OAUTH_PROVIDER_ENV: Record<
+  string,
+  { clientId: string; clientSecret: string; redirectUri: string }
+> = {
+  yandex: {
+    clientId: 'YANDEX_CLIENT_ID',
+    clientSecret: 'YANDEX_CLIENT_SECRET',
+    redirectUri: 'YANDEX_REDIRECT_URI',
+  },
+  vk: {
+    clientId: 'VK_CLIENT_ID',
+    clientSecret: 'VK_CLIENT_SECRET',
+    redirectUri: 'VK_REDIRECT_URI',
+  },
+  mailru: {
+    clientId: 'MAILRU_CLIENT_ID',
+    clientSecret: 'MAILRU_CLIENT_SECRET',
+    redirectUri: 'MAILRU_REDIRECT_URI',
+  },
+};
+
+export const isOAuthProviderConfigured = (provider: string): boolean => {
+  const env = OAUTH_PROVIDER_ENV[provider];
+  if (!env) return false; // rambler/max — не настроены (нет OAuth-приложений)
+  return Boolean(process.env[env.clientId] && process.env[env.clientSecret]);
+};
+
+export const getOAuthAuthorizeUrl = (provider: string): string | null => {
+  const env = OAUTH_PROVIDER_ENV[provider];
+  if (!env) return null;
+
+  const clientId = process.env[env.clientId];
+  const clientSecret = process.env[env.clientSecret];
+  const redirectUri = process.env[env.redirectUri];
+
+  if (!clientId || !clientSecret || !redirectUri) return null;
+
+  switch (provider) {
+    case 'yandex':
+      // https://yandex.ru/dev/id/doc (OAuth-код)
+      return `https://oauth.yandex.ru/authorize?response_type=code&client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}`;
+    case 'vk':
+      // Классический VK OAuth (oauth.vk.com), scope=email даёт email в ответе
+      return `https://oauth.vk.com/authorize?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=email&v=5.131`;
+    case 'mailru':
+      // https://api.mail.ru/docs/guides/oauth/sites/
+      return `https://connect.mail.ru/oauth/authorize?client_id=${encodeURIComponent(clientId)}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&scope=userinfo`;
+    default:
+      return null;
+  }
+};
+
+// Обмен authorization code на access token (VK) —
+// https://oauth.vk.com/access_token возвращает access_token, user_id, email
+export const exchangeVkCode = async (code: string) => {
+  const redirectUri = process.env.VK_REDIRECT_URI || '';
+  const url =
+    `https://oauth.vk.com/access_token?client_id=${encodeURIComponent(process.env.VK_CLIENT_ID || '')}` +
+    `&client_secret=${encodeURIComponent(process.env.VK_CLIENT_SECRET || '')}` +
+    `&redirect_uri=${encodeURIComponent(redirectUri)}&code=${encodeURIComponent(code)}`;
+
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(`VK token exchange failed: ${response.status}`);
+  }
+
+  const data = (await response.json()) as {
+    access_token: string;
+    user_id: number;
+    email?: string;
+    error?: string;
+  };
+
+  if (data.error || !data.access_token) {
+    throw new Error(`VK token exchange error: ${data.error || 'no access_token'}`);
+  }
+
+  return {
+    accessToken: data.access_token,
+    providerId: String(data.user_id),
+    email: data.email,
+  };
+};
+
+// Обмен authorization code на access token (Mail.ru) —
+// POST https://connect.mail.ru/oauth/token (form-urlencoded), см. api.mail.ru/docs
+export const exchangeMailruCode = async (code: string) => {
+  const response = await fetch('https://connect.mail.ru/oauth/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      client_id: process.env.MAILRU_CLIENT_ID || '',
+      client_secret: process.env.MAILRU_CLIENT_SECRET || '',
+      grant_type: 'authorization_code',
+      code,
+      redirect_uri: process.env.MAILRU_REDIRECT_URI || '',
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Mail.ru token exchange failed: ${response.status}`);
+  }
+
+  return (await response.json()) as {
+    access_token: string;
+    refresh_token: string;
+    expires_in: number;
+    x_mailru_vid: string;
+  };
+};
+
+// Данные пользователя Mail.ru — GET https://oauth.mail.ru/userinfo
+export const getMailruUser = async (accessToken: string) => {
+  const response = await fetch(
+    `https://oauth.mail.ru/userinfo?access_token=${encodeURIComponent(accessToken)}`
+  );
+
+  if (!response.ok) {
+    throw new Error(`Mail.ru userinfo failed: ${response.status}`);
+  }
+
+  const data = (await response.json()) as {
+    email?: string;
+    first_name?: string;
+    last_name?: string;
+    name?: string;
+  };
+
+  return {
+    email: data.email,
+    username: data.name || (data.first_name ? `${data.first_name} ${data.last_name || ''}`.trim() : undefined),
+  };
+};
+
 export const oauthLogin = async (input: OAuthLoginInput) => {
   let oAuthAccount = await prisma.oAuthAccount.findUnique({
     where: {

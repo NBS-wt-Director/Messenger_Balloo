@@ -7,7 +7,8 @@ interface LegalCheckboxProps {
   onChange: (checked: boolean) => void;
   rulesUrl?: string;
   privacyUrl?: string;
-  label?: string;
+  // P22: перевод с inline-ссылками передаётся как ReactNode из RegisterScreen
+  label?: React.ReactNode;
   error?: string;
 }
 

@@ -15,10 +15,11 @@
 
 ### Auth-card (центрированная)
 1. Заголовок «Создать аккаунт» + подзаголовок
-2. **OAuth-кнопки**:
-   - Через Яндекс
-   - Через Mail.ru
-   - Через Rambler
+2. **OAuth-сетка квадратов** (P20/P21, 2026-09-18): сетка `auth-oauth-grid` — **2×2** (4 квадрата, `grid-template-columns: repeat(2, 1fr)`, `aspect-ratio: 1/1`), при наведении выбранный квадрат растёт на 50% наружу относительно сетки (`transform: scale(1.5)`, поверх соседей, `z-index: 10`):
+   - Яндекс (красный Y, `#fc3f1d`)
+   - VK (синий VK, `#0077ff`)
+   - Mail.ru (синий @, `#005ff9`)
+   - Rambler (жёлтый R, `#ffcc00`)
 3. Divider «или email»
 4. **Форма регистрации**:
    - Имя
@@ -52,7 +53,7 @@
 
 ## Компоненты
 - `AuthCard` — контейнер формы регистрации
-- `OAuthButtons` — кнопки OAuth-провайдеров
+- `OAuthGrid` — сетка квадратов OAuth-провайдеров (4 в ряд, hover +50% наружу)
 - `RegisterForm` — форма (имя, аватар, email, пароль, согласие)
 - `AutoAvatar` — превью автоаватара (инициалы + случайный градиент), кнопка загрузки
 - `CaptchaWidget` — собственная капча (изображение с кодом, обновление, ввод)
@@ -66,8 +67,10 @@
 - `POST /api/v1/auth/captcha/verify` — проверка кода капчи
 - `POST /api/v1/auth/avatar/auto` — генерация автоаватара (из имени, случайный градиент)
 - `POST /api/v1/auth/avatar/upload` — загрузка своей аватарки (PNG/JPEG/SVG)
-- `GET /api/v1/auth/oauth/:provider` — редирект на OAuth
-- `GET /api/v1/auth/oauth/:provider/callback` — callback после OAuth
+- `GET /api/v1/auth/oauth/:provider` — редирект (302) на authorize URL провайдера; провайдер не настроен → 302 на `/#/login?oauth_error=not_configured`
+- `GET /api/v1/auth/oauth/yandex-callback` — callback Яндекс
+- `GET /api/v1/auth/oauth/vk/callback` — callback VK
+- `GET /api/v1/auth/oauth/mailru/callback` — callback Mail.ru
 
 ## Безопасность
 - Пароль: минимум 8 символов, bcrypt/argon2, поддерживает кириллицу

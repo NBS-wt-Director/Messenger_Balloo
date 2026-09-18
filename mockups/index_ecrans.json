@@ -1,7 +1,7 @@
 {
   "project": "Balloo Messenger",
   "version": "1.0.0",
-  "last_updated": "2026-07-30",
+  "last_updated": "2026-09-18",
   "total_screens": 173,
   "screens_unviewed": 0,
   "nodes": [
@@ -86,7 +86,7 @@
       "domain": "Основной мессенджер",
       "total_screens": 41,
       "viewed": 41,
-      "edits_specific": 11,
+      "edits_specific": 12,
       "edits_global_accepted": 3,
       "components_private": 41,
       "components_global": 5,

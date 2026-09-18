@@ -249,6 +249,8 @@
 
 | `1_01_02` | Вход | `balloo-su/login.html` | Просмотрен | `balloo-su/login.md` |
 
+> **Правка 2026-09-18 (P20/P21):** экраны `1_01_02` (Вход) и `1_01_03` (Регистрация) — OAuth-провайдеры переработаны в сетку квадратов **2×2** (Яндекс, **VK** (добавлен), Mail.ru, Rambler); при наведении выбранный квадрат растёт на 50% наружу относительно сетки. Обновлены `login.html`, `register.html`, `common.css` (`.auth-oauth-grid`/`.auth-oauth-tile`), `login.md`, `register.md`.
+
 | `1_01_32` | Редактор сообщения | `balloo-su/message-editor.html` | Просмотрен | `balloo-su/message-editor.md` |
 
 | `1_01_21` | Мои устройства | `balloo-su/my-devices.html` | Просмотрен | `balloo-su/my-devices.md` |

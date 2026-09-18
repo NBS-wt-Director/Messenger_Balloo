@@ -38,16 +38,24 @@
     <h1 class="auth-title">Создать аккаунт</h1>
     <p class="auth-subtitle">Зарегистрируйтесь в Balloo Messenger</p>
 
-    <!-- OAuth -->
-    <div class="auth-oauth">
-      <button class="auth-oauth-btn">
-        <span style="color:#fc3f1d;">Y</span> Через Яндекс
+    <!-- OAuth: сетка квадратов 2×2 (P20/P21) — Яндекс, VK, Mail.ru, Rambler;
+         при наведении выбранный квадрат растёт на 50% наружу относительно сетки -->
+    <div class="auth-oauth-grid">
+      <button class="auth-oauth-tile" title="Через Яндекс">
+        <span class="auth-oauth-tile__icon" style="color:#fc3f1d;">Y</span>
+        <span>Яндекс</span>
       </button>
-      <button class="auth-oauth-btn">
-        <span style="color:#005ff9;">@</span> Через Mail.ru
+      <button class="auth-oauth-tile" title="Через VK">
+        <span class="auth-oauth-tile__icon" style="color:#0077ff;">VK</span>
+        <span>VK</span>
       </button>
-      <button class="auth-oauth-btn">
-        <span style="color:#ffcc00;">R</span> Через Rambler
+      <button class="auth-oauth-tile" title="Через Mail.ru">
+        <span class="auth-oauth-tile__icon" style="color:#005ff9;">@</span>
+        <span>Mail.ru</span>
+      </button>
+      <button class="auth-oauth-tile" title="Через Rambler">
+        <span class="auth-oauth-tile__icon" style="color:#ffcc00;">R</span>
+        <span>Rambler</span>
       </button>
     </div>
 

@@ -4,7 +4,7 @@
 `balloo-su/login.html`
 
 ## Описание страницы
-Экран входа в мессенджер. Поддерживает OAuth (Яндекс, Mail.ru, Rambler), email+пароль, вход через другое устройство (QR). reCAPTCHA v3. v2: Госуслуги и SMS-код.
+Экран входа в мессенджер. Поддерживает OAuth (Яндекс, VK, Mail.ru, Rambler), email+пароль, вход через другое устройство (QR). reCAPTCHA v3. v2: Госуслуги и SMS-код.
 
 ## Структура страницы
 
@@ -15,10 +15,11 @@
 
 ### Auth-card (центрированная)
 1. Заголовок «С возвращением!» + подзаголовок
-2. **OAuth-кнопки**:
-   - Войти через Яндекс (красный Y)
-   - Войти через Mail.ru (синий @)
-   - Войти через Rambler (жёлтый R)
+2. **OAuth-сетка квадратов** (P20/P21, 2026-09-18): сетка `auth-oauth-grid` — **2×2** (4 квадрата, `grid-template-columns: repeat(2, 1fr)`, `aspect-ratio: 1/1`), при наведении выбранный квадрат растёт на 50% наружу относительно сетки (`transform: scale(1.5)`, поверх соседей, `z-index: 10`):
+   - Яндекс (красный Y, `#fc3f1d`)
+   - VK (синий VK, `#0077ff`)
+   - Mail.ru (синий @, `#005ff9`)
+   - Rambler (жёлтый R, `#ffcc00`)
 3. Divider «или»
 4. **Email-форма**:
    - Email
@@ -53,15 +54,17 @@
 
 ## Компоненты
 - `AuthCard` — контейнер формы входа
-- `OAuthButtons` — кнопки OAuth-провайдеров
+- `OAuthGrid` — сетка квадратов OAuth-провайдеров (4 в ряд, hover +50% наружу)
 - `EmailLoginForm` — форма email + пароль
 - `QRLoginButton` — кнопка входа через QR
 - `ReCaptchaModal` — модалка reCAPTCHA
 
 ## API
 - `POST /api/v1/auth/login` — вход по email+пароль
-- `GET /api/v1/auth/oauth/:provider` — редирект на OAuth
-- `GET /api/v1/auth/oauth/:provider/callback` — callback после OAuth
+- `GET /api/v1/auth/oauth/:provider` — редирект (302) на authorize URL провайдера; провайдер не настроен → 302 на `/#/login?oauth_error=not_configured`
+- `GET /api/v1/auth/oauth/yandex-callback` — callback Яндекс
+- `GET /api/v1/auth/oauth/vk/callback` — callback VK
+- `GET /api/v1/auth/oauth/mailru/callback` — callback Mail.ru
 - `POST /api/v1/auth/recaptcha/verify` — проверка reCAPTCHA
 - `POST /api/v1/devices/pair-token` — QR-токен для входа через устройство
 

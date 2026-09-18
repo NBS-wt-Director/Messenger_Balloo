@@ -1,12 +1,21 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import LoginScreen from '../../screens/auth/LoginScreen';
+import { I18nProvider } from '../../components/providers/I18nProvider';
+import { useUIStore } from '../../store/uiStore';
+
+// jsdom: navigator.language = 'en' → принудительно ru для русских ожиданий
+beforeEach(() => {
+  useUIStore.getState().setLanguage('ru');
+});
 
 function renderLogin() {
   return render(
     <MemoryRouter>
-      <LoginScreen />
+      <I18nProvider>
+        <LoginScreen />
+      </I18nProvider>
     </MemoryRouter>
   );
 }
@@ -28,11 +37,21 @@ describe('LoginScreen (сценарий авторизации)', () => {
     ).toBeInTheDocument();
   });
 
-  it('renders OAuth buttons (Яндекс, Mail.ru, Rambler)', () => {
+  it('renders OAuth tiles grid (Яндекс, VK, Mail.ru, Rambler) — P20/P21', () => {
     renderLogin();
     expect(screen.getByRole('button', { name: /яндекс/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /vk/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /mail\.ru/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /rambler/i })).toBeInTheDocument();
+    // Сетка квадратов: 4 тайла в контейнере .auth-oauth-grid
+    expect(document.querySelector('.auth-oauth-grid')).toBeInTheDocument();
+    expect(document.querySelectorAll('.auth-oauth-tile')).toHaveLength(4);
+  });
+
+  it('renders topbar menu dropdown (левое меню — меню, не кнопка на главную) — P23', () => {
+    renderLogin();
+    expect(document.querySelector('.topbar__dropdown')).toBeInTheDocument();
+    expect(document.querySelectorAll('.topbar__dropdown-item').length).toBeGreaterThanOrEqual(7);
   });
 
   it('renders link to registration', () => {

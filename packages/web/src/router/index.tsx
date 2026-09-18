@@ -1,12 +1,16 @@
 // Router — React Router v6
 // Protected routes, lazy loading, error boundaries
+// P24 (2026-09-18): реальный auth-гвард — гость не попадает в /chat и другие
+// защищённые маршруты; авторизованный не видит /login и /register.
 
 import { createHashRouter, Navigate } from 'react-router-dom';
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useEffect, useState } from 'react';
 import { ErrorBoundary } from '@/components/providers/ErrorBoundary';
 import { PrivacyScreen } from '@/screens/legal/PrivacyScreen';
 import { RulesScreen } from '@/screens/legal/RulesScreen';
 import { CookiesScreen } from '@/screens/legal/CookiesScreen';
+import { useAuthStore } from '@/store/authStore';
+import { api } from '@/services/api';
 
 // Lazy-loaded screen components
 const LandingScreen = lazy(() => import('@/screens/landing/LandingScreen'));
@@ -128,14 +132,57 @@ function LoadingFallback() {
   );
 }
 
-// Protected route wrapper
+// Protected route wrapper (P24): гость → /login.
+// 1. user есть в store (persist) → пропускаем сразу.
+// 2. user нет, но есть httpOnly-cookie (например, после OAuth-callback) →
+//    пробуем getMe(): успех → пропускаем, 401/ошибка → редирект на /login.
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  // Auth check is done in the layout
+  const user = useAuthStore((s) => s.user);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const setUser = useAuthStore((s) => s.setUser);
+  const [checking, setChecking] = useState(!user && !isAuthenticated);
+
+  useEffect(() => {
+    if (user || isAuthenticated) {
+      setChecking(false);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const me = await api.getMe();
+        if (!cancelled) {
+          if (me) setUser(me);
+          setChecking(false);
+        }
+      } catch {
+        // Нет валидной сессии (cookie отсутствует/истёк) → на /login
+        if (!cancelled) {
+          setUser(null);
+          setChecking(false);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user, isAuthenticated, setUser]);
+
+  if (checking) return <LoadingFallback />;
+  if (!user && !isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
   return <>{children}</>;
 }
 
-// Guest route (redirect to main if authenticated)
+// Guest route (P24): авторизованный → /chat (не показываем login/register)
 function GuestRoute({ children }: { children: React.ReactNode }) {
+  const user = useAuthStore((s) => s.user);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+
+  if (user || isAuthenticated) {
+    return <Navigate to="/chat" replace />;
+  }
   return <>{children}</>;
 }
 
