@@ -1,38 +1,46 @@
+# syntax=docker/dockerfile:1
 FROM node:22-slim AS builder
 
 WORKDIR /app
 
-# libatomic1 is required by the pnpm@11 prebuilt binary (@pnpm/exe)
-RUN apt-get update -y && apt-get install -y --no-install-recommends libatomic1 && rm -rf /var/lib/apt/lists/*
+# libatomic1 required by pnpm@11 prebuilt binary; apt cache mount speeds rebuilds
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update -y && apt-get install -y --no-install-recommends libatomic1
 
-# Install pnpm + typescript + vite globally
-RUN npm install -g pnpm@latest typescript vite@5.4.0
+# Pin pnpm to version from packageManager field (avoids cache busting on "latest")
+ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+RUN corepack enable && corepack prepare pnpm@11.17.0 --activate
 
-# Copy workspace config and root package.json
+# Copy manifests only — this layer is cached until lockfile changes
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml* .npmrc ./
 COPY packages/shared/package.json packages/shared/
 COPY packages/web/package.json packages/web/
 
-# Install dependencies (all workspace deps)
-RUN pnpm install --frozen-lockfile || pnpm install
+# Install all deps — pnpm store AND prisma engines persist across builds
+RUN --mount=type=cache,id=pnpm-web,target=/root/.local/share/pnpm/store,sharing=shared \
+    --mount=type=cache,id=prisma-engines,target=/root/.cache/prisma,sharing=shared \
+    pnpm install --frozen-lockfile || pnpm install
 
-# Copy source
+# Copy Prisma schema SEPARATELY — prisma generate is cached unless schema changes
+COPY packages/shared/prisma/ packages/shared/prisma/
+RUN --mount=type=cache,id=prisma-engines,target=/root/.cache/prisma,sharing=shared \
+    cd packages/shared && npx prisma generate
+
+# Copy full source (invalidates only build layers, not prisma generate)
 COPY packages/shared/ packages/shared/
 COPY packages/web/ packages/web/
 
-# Generate Prisma client (needed for shared build)
-RUN cd packages/shared && npx prisma generate
-
-# Build shared
-RUN cd packages/shared && tsc
+# Build shared (local tsc from node_modules, no global install needed)
+RUN cd packages/shared && ./node_modules/.bin/tsc
 
 # API base URL baked into the bundle at build time (Vite inlines VITE_* vars only)
 # Must be a bare origin without trailing slash: code does `${API_BASE}/api/...`
 ARG VITE_API_URL=https://balloo.su
 ENV VITE_API_URL=${VITE_API_URL}
 
-# Build web (vite build — no type-check, faster)
-RUN cd packages/web && vite build
+# Build web (vite build — no type-check, faster; local vite from node_modules)
+RUN cd packages/web && ./node_modules/.bin/vite build
 
 # ---------- Production stage — serve with nginx ----------
 FROM nginx:alpine

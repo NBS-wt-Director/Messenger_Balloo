@@ -1,56 +1,75 @@
+# syntax=docker/dockerfile:1
 FROM node:22-slim AS builder
 
 WORKDIR /app
 
-# libatomic1 is required by the pnpm@11 prebuilt binary (@pnpm/exe)
-RUN apt-get update -y && apt-get install -y --no-install-recommends libatomic1 && rm -rf /var/lib/apt/lists/*
+# libatomic1 required by pnpm@11 prebuilt binary; apt cache mount speeds rebuilds
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update -y && apt-get install -y --no-install-recommends libatomic1
 
-# Install pnpm + typescript globally
-RUN npm install -g pnpm@latest typescript
+# Pin pnpm to version from packageManager field (avoids cache busting on "latest")
+ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+RUN corepack enable && corepack prepare pnpm@11.17.0 --activate
 
-# Copy workspace config and root package.json
+# Copy manifests only — this layer is cached until lockfile changes
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml* .npmrc ./
 COPY packages/shared/package.json packages/shared/
 COPY packages/server/package.json packages/server/
 
-# Install dependencies (all workspace deps)
-RUN pnpm install --frozen-lockfile || pnpm install
+# Install all deps — pnpm store AND prisma engines persist across builds
+# (prisma's postinstall downloads ~50MB of engines; cache mount skips re-download)
+RUN --mount=type=cache,id=pnpm-server,target=/root/.local/share/pnpm/store,sharing=shared \
+    --mount=type=cache,id=prisma-engines,target=/root/.cache/prisma,sharing=shared \
+    pnpm install --frozen-lockfile || pnpm install
 
-# Copy source
+# Copy Prisma schema SEPARATELY — prisma generate is cached unless schema changes
+COPY packages/shared/prisma/ packages/shared/prisma/
+RUN --mount=type=cache,id=prisma-engines,target=/root/.cache/prisma,sharing=shared \
+    cd packages/shared && npx prisma generate
+
+# Copy full source (invalidates only tsc layers, not prisma generate)
 COPY packages/shared/ packages/shared/
 COPY packages/server/ packages/server/
 
-# Generate Prisma client (needed for tsc and runtime)
-RUN cd packages/shared && npx prisma generate
-
-# Build shared first, then server
-RUN cd packages/shared && tsc
-RUN cd packages/server && tsc
+# Compile TypeScript (local tsc from node_modules, no global install)
+RUN cd packages/shared && ./node_modules/.bin/tsc
+RUN cd packages/server && ./node_modules/.bin/tsc
 
 # ---------- Production stage ----------
 FROM node:22-slim
 
 WORKDIR /app
 
-# Install OpenSSL for Prisma compatibility, curl for healthcheck, libatomic1 for pnpm binary
-RUN apt-get update -y && apt-get install -y openssl ca-certificates curl libatomic1 && rm -rf /var/lib/apt/lists/*
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update -y && apt-get install -y --no-install-recommends openssl ca-certificates curl libatomic1 \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copy built artifacts from builder
-COPY --from=builder /app/packages/shared/dist packages/shared/dist
-COPY --from=builder /app/packages/server/dist packages/server/dist
-COPY --from=builder /app/packages/shared/prisma packages/shared/prisma
+ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+RUN corepack enable && corepack prepare pnpm@11.17.0 --activate
 
-# Install pnpm
-RUN npm install -g pnpm@latest
-
-# Copy workspace config for fresh prod install
+# Copy manifests FIRST — this + pnpm install --prod layer is cached on code-only changes
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml* .npmrc ./
 COPY packages/shared/package.json packages/shared/
 COPY packages/server/package.json packages/server/
 
-# Install production dependencies and generate Prisma client
-RUN CI=true pnpm install --prod --frozen-lockfile || CI=true pnpm install --prod
-RUN export DATABASE_URL="postgresql://balloo:balloo@postgres:5432/balloo" && cd packages/shared && npx prisma@5.18.0 generate
+# Install prod deps — store is warm from builder (cache mount shared)
+RUN --mount=type=cache,id=pnpm-server,target=/root/.local/share/pnpm/store,sharing=shared \
+    --mount=type=cache,id=prisma-engines,target=/root/.cache/prisma,sharing=shared \
+    CI=true pnpm install --prod --frozen-lockfile || CI=true pnpm install --prod
+
+# Copy built artifacts LAST — only invalidates the final small layers
+COPY --from=builder /app/packages/shared/dist packages/shared/dist
+COPY --from=builder /app/packages/server/dist packages/server/dist
+COPY --from=builder /app/packages/shared/prisma packages/shared/prisma
+
+# Generate Prisma client. Pin prisma@5.18.0 to match @prisma/client 5.18.0:
+# pnpm install --prod does NOT install devDependencies, so the local prisma CLI
+# is absent and npx downloads it — npx cache + engines cache make that free.
+RUN --mount=type=cache,id=npx-prod,target=/root/.npm/_npx,sharing=shared \
+    --mount=type=cache,id=prisma-engines,target=/root/.cache/prisma,sharing=shared \
+    cd packages/shared && npx prisma@5.18.0 generate
 
 # Create non-root user
 RUN groupadd -r app && useradd -r -g app app
