@@ -1,5 +1,29 @@
 #!/bin/sh
-# husky pre-commit hook (root)
-# Запускает lint-staged для проверки изменённых файлов перед коммитом
+# pre-commit — реальная проверка, работающая без сети и без внешних зависимостей.
+#
+# Подключается скриптом `pnpm install` (core.hooksPath -> .husky, см. package.json
+# "prepare"). Хук намеренно не зависит от husky/lint-staged: прошлая версия
+# (`npx lint-staged`) не была подключена и не запускалась вовсе, а при ручном запуске
+# уходила в установку пакета из сети и выглядела как зависший git.
+#
+# Проверки:
+#   1. git diff --cached --check — whitespace errors и незакрытые конфликтные маркеры
+#      (встроенное средство git, ложных срабатываний почти не даёт).
+#   2. lint-staged — только если он реально установлен локально.
+#
+# Полный набор проверок (typecheck, линтер, тесты) живёт в CI (.github/workflows/ci.yml):
+# хук не подменяет CI, а отсекает только очевидное.
 
-npx lint-staged
+set -eu
+
+if ! git diff --cached --check; then
+    echo "pre-commit: whitespace errors или конфликтные маркеры (см. вывод выше)." >&2
+    echo "Посмотреть: git diff --cached --check" >&2
+    exit 1
+fi
+
+if [ -x "node_modules/.bin/lint-staged" ]; then
+    exec node_modules/.bin/lint-staged
+fi
+
+exit 0

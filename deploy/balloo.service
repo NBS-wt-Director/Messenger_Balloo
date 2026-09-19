@@ -1,0 +1,32 @@
+# Balloo Messenger — автозапуск прод-стека (юнит systemd)
+#
+# ВНИМАНИЕ: это канон-шаблон для версионирования в git, а НЕ снятая с сервера копия.
+# Живая версия лежит в /etc/systemd/system/balloo.service и может отличаться
+# (в прод-тикете §1.6 её ExecStart показывал `docker compose ... up` напрямую, здесь
+# вызов идёт через balloo-deploy.sh, который ждёт готовности docker-демона).
+# Перед заменой на сервере — снять diff живой копии с этим файлом, см. deploy/README.md.
+
+[Unit]
+Description=Balloo Messenger — production stack (docker compose)
+Documentation=https://balloo.su
+After=docker.service network-online.target
+Requires=docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+User=cfr_balloo
+WorkingDirectory=/home/cfr_balloo/balloo/docker/prod
+ExecStart=/usr/local/bin/balloo-deploy.sh start
+ExecStop=/usr/local/bin/balloo-deploy.sh stop
+ExecReload=/usr/local/bin/balloo-deploy.sh restart
+TimeoutStartSec=600
+# Падение стека не должно приводить к «зависанию» юнита в состоянии auto-restart:
+# для Type=oneshot это ограничение на частоту повторов запуска.
+Restart=always
+RestartSec=10
+StartLimitIntervalSec=0
+
+[Install]
+WantedBy=multi-user.target

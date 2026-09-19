@@ -141,6 +141,19 @@ export const api = {
   getMe: () =>
     request<any>('/api/users/me'),
 
+  // QR pair-token — вход/привязка устройства по QR (docs/04, add-device.md)
+  createPairToken: () =>
+    request<{ token: string; code: string; expiresIn: number }>('/api/devices/pair-token', {
+      method: 'POST',
+      data: {},
+    }),
+
+  getPairStatus: (token: string) =>
+    request<{
+      status: 'pending' | 'confirmed' | 'expired';
+      user?: { username: string | null; avatarUrl: string | null };
+    }>(`/api/devices/pair/${token}/status`),
+
   updateMe: (data: Partial<any>) =>
     request<any>(`/api/users/me`, {
       method: 'PUT',

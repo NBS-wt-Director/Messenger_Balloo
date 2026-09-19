@@ -36,7 +36,8 @@
     "db:migrate": "pnpm --filter @balloo/shared prisma migrate deploy",
     "db:seed": "pnpm --filter @balloo/shared prisma db seed",
     "db:push": "pnpm --filter @balloo/shared prisma db push",
-    "db:studio": "pnpm --filter @balloo/shared prisma studio"
+    "db:studio": "pnpm --filter @balloo/shared prisma studio",
+    "prepare": "git config core.hooksPath .husky || true"
   },
   "engines": {
     "node": ">=20.0.0",

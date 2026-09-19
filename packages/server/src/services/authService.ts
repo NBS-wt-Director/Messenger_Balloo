@@ -75,7 +75,9 @@ interface TokenPair {
   refreshToken: string;
 }
 
-const generateTokens = (userId: string, email: string, username?: string, role?: string): TokenPair => {
+// Экспортируется для QR pair-flow (deviceService): подтверждение на втором
+// устройстве выдаёт новой устройству ту же пару токенов, что и обычный вход
+export const generateTokens = (userId: string, email: string, username?: string, role?: string): TokenPair => {
   const accessPayload: Record<string, unknown> = { userId, email, username, role, type: 'access' };
   const refreshPayload: Record<string, unknown> = { userId, email, username, role, type: 'refresh' };
 

@@ -60,6 +60,8 @@
 | POST | `/devices/pair/confirm` | Подтверждение привязки (оба устройства) |
 | GET | `/devices/pair/:token/status` | Статус привязки (pending/confirmed/expired) |
 
+**Реализация pair-token (2026-09-20):** токен — 48 hex-символов (`crypto.randomBytes(24)`), хранится в Redis (`pair:<token>`, TTL 60 сек; после подтверждения TTL продлевается до 120 сек — окно выдачи). `POST /pair/confirm` требует авторизации (подтверждает устройство, где пользователь уже вошёл) и создаёт запись `Device`. Токены авторизации **не отдаются в body**: при `confirmed` сервер ставит httpOnly auth-cookie прямо в ответе `GET /pair/:token/status` и удаляет код — он одноразовый. Без Redis эндпоинты отвечают `503`. WS-события `device:pair:*` — v2 (REST-опрос статуса покрывает поток).
+
 ### Accounts (`/api/v1/accounts`)
 
 | Method | Path | Описание |

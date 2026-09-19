@@ -53,13 +53,16 @@ export default defineConfig({
   },
   server: {
     port: 5180,
+    // Сервер слушает 3100 (packages/server, PORT по умолчанию). Ранее здесь был
+    // порт 3000 — прокси указывал в нищую, а маскировал это тем, что web-клиент
+    // ходит по абсолютному VITE_API_URL и прокси в обходе.
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        target: 'http://localhost:3100',
         changeOrigin: true,
       },
       '/ws': {
-        target: 'ws://localhost:3000',
+        target: 'ws://localhost:3100',
         ws: true,
       },
     },

@@ -3,36 +3,86 @@
 // P30 (2026-09-19): кнопка «Войти через другое устройство» на /login ведёт
 // сюда — на ЧАСТЬ ВХОДА «НА НАСТОЛЬНОМ УСТРОЙСТВЕ»: экран показывает QR-код
 // (как в макете: таймер 60 сек, код balloо://pair/…, «Обновить код»).
-// Реальный pair-token генерирует сервер (серверный API — отдельный тикет);
-// пока QR — визуал по макету с клиентским кодом-заглушкой.
+// Реальный pair-token: POST /api/devices/pair-token + опрос статуса
+// GET /api/devices/pair/:token/status; при confirmed сервер ставит
+// httpOnly auth-cookie прямо в ответе статуса — экран уходит в /chat.
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ThemeSwitcher } from '@/components/topbar/ThemeSwitcher';
 import { LanguageSwitcher } from '@/components/topbar/LanguageSwitcher';
 import { TopbarMenu } from '@/components/topbar/TopbarMenu';
+import { api } from '@/services/api';
 
-// Код привязки-заглушка (до серверного pair-token API)
-const makePairCode = () =>
-  Array.from({ length: 12 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
+// Интервал опроса статуса кода (сек)
+const POLL_INTERVAL_SECONDS = 3;
 
 function AddDeviceScreen() {
   const navigate = useNavigate();
   const [qrSeconds, setQrSeconds] = useState(60);
-  const [pairCode, setPairCode] = useState(makePairCode);
+  const [pairToken, setPairToken] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  // Токен для эффектов: меняем только когда получили новый код
+  const tokenRef = useRef<string | null>(null);
 
-  // Таймер QR-кода: 60 → 0, как в макете (add-device.html)
+  // Запрос нового кода (mount, «Обновить код», истечение)
+  const refreshQr = useCallback(async () => {
+    try {
+      const info = await api.createPairToken();
+      tokenRef.current = info.token;
+      setPairToken(info.token);
+      setQrSeconds(info.expiresIn);
+      setLoadError(null);
+    } catch (e: any) {
+      // 503 — сервис привязки недоступен (нет Redis); показываем честно
+      setLoadError(e?.message || 'Не удалось получить код. Попробуйте ещё раз.');
+      tokenRef.current = null;
+      setPairToken(null);
+    }
+  }, []);
+
   useEffect(() => {
-    if (qrSeconds <= 0) return;
+    refreshQr();
+  }, [refreshQr]);
+
+  // Таймер QR-кода: N → 0, при 0 — автозапрос нового кода (как «Обновить код»)
+  useEffect(() => {
+    if (qrSeconds <= 0) {
+      refreshQr();
+      return;
+    }
     const timer = setTimeout(() => setQrSeconds((s) => s - 1), 1000);
     return () => clearTimeout(timer);
-  }, [qrSeconds]);
+  }, [qrSeconds, refreshQr]);
 
-  // «Обновить код»: новый код + сброс таймера
-  const refreshQr = () => {
-    setPairCode(makePairCode());
-    setQrSeconds(60);
-  };
+  // Опрос статуса: confirmed → сервер уже поставил auth-cookie → в /chat
+  // (роутер-гвард сам вызовет getMe по cookie)
+  useEffect(() => {
+    const token = tokenRef.current;
+    if (!token) return;
+
+    let cancelled = false;
+    const poll = async () => {
+      try {
+        const res = await api.getPairStatus(token);
+        if (cancelled) return;
+        if (res.status === 'confirmed') {
+          navigate('/chat', { replace: true });
+        } else if (res.status === 'expired') {
+          refreshQr();
+        }
+      } catch {
+        // Сетевая ошибка — просто ждём следующий тик опроса
+      }
+    };
+
+    poll();
+    const interval = setInterval(poll, POLL_INTERVAL_SECONDS * 1000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [pairToken, navigate, refreshQr]);
 
   return (
     <div
@@ -124,8 +174,14 @@ function AddDeviceScreen() {
           </div>
 
           <div className="text-xs text-muted mt-4">
-            Код: <code>balloo://pair/{pairCode}</code>
+            Код: <code>balloo://pair/{pairToken ?? '…'}</code>
           </div>
+
+          {loadError && (
+            <div className="text-xs mt-2" style={{ color: 'var(--danger)' }}>
+              {loadError}
+            </div>
+          )}
 
           <div className="flex gap-2 justify-center mt-6">
             <button type="button" className="btn btn--primary" onClick={refreshQr}>
