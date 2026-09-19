@@ -94,8 +94,9 @@ export const updatePage = async (req: AuthenticatedRequest, res: Response, next:
     });
     res.json(page);
   } catch (error: any) {
-    if (error.message === 'Страница не найдена') {
-      res.status(404).json({ error: 'Not Found', message: error.message });
+    // prisma.update на несуществующем id бросает P2025 — это 404, не 500
+    if (error.code === 'P2025' || error.message === 'Страница не найдена') {
+      res.status(404).json({ error: 'Not Found', message: 'Страница не найдена' });
     } else {
       res.status(500).json({ error: 'Internal Error', message: error.message });
     }
@@ -109,8 +110,9 @@ export const deletePage = async (req: AuthenticatedRequest, res: Response, next:
     const result = await deletePageService(id);
     res.json(result);
   } catch (error: any) {
-    if (error.message === 'Страница не найдена') {
-      res.status(404).json({ error: 'Not Found', message: error.message });
+    // prisma.delete на несуществующем id бросает P2025 — это 404, не 500
+    if (error.code === 'P2025' || error.message === 'Страница не найдена') {
+      res.status(404).json({ error: 'Not Found', message: 'Страница не найдена' });
     } else {
       res.status(500).json({ error: 'Internal Error', message: error.message });
     }
@@ -222,8 +224,8 @@ export const updateDepartment = async (req: AuthenticatedRequest, res: Response,
     const department = await updateDepartmentService(id, { name, description, parentId, headId });
     res.json(department);
   } catch (error: any) {
-    if (error.message === 'Отдел не найден') {
-      res.status(404).json({ error: 'Not Found', message: error.message });
+    if (error.code === 'P2025' || error.message === 'Отдел не найден') {
+      res.status(404).json({ error: 'Not Found', message: 'Отдел не найден' });
     } else {
       res.status(500).json({ error: 'Internal Error', message: error.message });
     }
@@ -237,8 +239,8 @@ export const deleteDepartment = async (req: AuthenticatedRequest, res: Response,
     const result = await deleteDepartmentService(id);
     res.json(result);
   } catch (error: any) {
-    if (error.message === 'Отдел не найден') {
-      res.status(404).json({ error: 'Not Found', message: error.message });
+    if (error.code === 'P2025' || error.message === 'Отдел не найден') {
+      res.status(404).json({ error: 'Not Found', message: 'Отдел не найден' });
     } else {
       res.status(500).json({ error: 'Internal Error', message: error.message });
     }
@@ -308,8 +310,8 @@ export const updateVacancy = async (req: AuthenticatedRequest, res: Response, ne
     const vacancy = await updateVacancyService(id, { title, description, requirements, salary, status });
     res.json(vacancy);
   } catch (error: any) {
-    if (error.message === 'Вакансия не найдена') {
-      res.status(404).json({ error: 'Not Found', message: error.message });
+    if (error.code === 'P2025' || error.message === 'Вакансия не найдена') {
+      res.status(404).json({ error: 'Not Found', message: 'Вакансия не найдена' });
     } else {
       res.status(500).json({ error: 'Internal Error', message: error.message });
     }
@@ -323,8 +325,8 @@ export const deleteVacancy = async (req: AuthenticatedRequest, res: Response, ne
     const result = await deleteVacancyService(id);
     res.json(result);
   } catch (error: any) {
-    if (error.message === 'Вакансия не найдена') {
-      res.status(404).json({ error: 'Not Found', message: error.message });
+    if (error.code === 'P2025' || error.message === 'Вакансия не найдена') {
+      res.status(404).json({ error: 'Not Found', message: 'Вакансия не найдена' });
     } else {
       res.status(500).json({ error: 'Internal Error', message: error.message });
     }

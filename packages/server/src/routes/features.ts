@@ -18,10 +18,12 @@ import {
 const router = Router() as import('express').Router;
 
 // --- Публичные маршруты (без авторизации) ---
+// Статические пути обязаны идти до параметрического /:id —
+// иначе Express матчит /categories и /stats как /:id и отдаёт 404
 router.get('/', getFeaturesController);
-router.get('/:id', getFeatureController);
 router.get('/categories', getCategoriesController);
 router.get('/stats', getFeatureStatsController);
+router.get('/:id', getFeatureController);
 
 // --- Маршруты с авторизацией ---
 router.post('/', authRequired, createFeatureController);
