@@ -5,6 +5,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { UserStatus } from '@balloo/shared';
+import { clearAuthCookies } from '../services/api';
 import { setCookie, THEME_COOKIE, LANGUAGE_COOKIE } from '../utils/cookieUtils';
 
 export interface AuthUser {
@@ -48,17 +49,12 @@ export const useAuthStore = create<AuthState>()(
 
       setLoading: (isLoading) => set({ isLoading }),
 
-      logout: async () => {
-        // Очищаем cookie через сервер
-        try {
-          const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3100';
-          await fetch(`${API_BASE}/api/auth/clear-cookie`, {
-            method: 'POST',
-            credentials: 'include',
-          });
-        } catch {
+      logout: () => {
+        // Fire-and-forget: выход не должен ждать ответ сервера (T-147) —
+        // локальное состояние очищается сразу, недоступный API выходу не мешает.
+        clearAuthCookies().catch(() => {
           // Ignore errors during logout cleanup
-        }
+        });
 
         set({
           user: null,

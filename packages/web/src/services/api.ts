@@ -8,6 +8,19 @@ interface ApiOptions extends RequestInit {
   data?: unknown;
 }
 
+// Очистка httpOnly refresh-cookie при выходе из аккаунта.
+// Не проходит через request(): при logout 401 и ошибки сети штатны, а
+// retry-with-refresh и редирект на #/login из общего клиента здесь только мешают.
+// keepalive — чтобы запрос дожил до навигации, которая следует за logout
+// (метод в authStore вызывает его как fire-and-forget).
+export async function clearAuthCookies(): Promise<void> {
+  await fetch(`${API_BASE}/api/auth/clear-cookie`, {
+    method: 'POST',
+    credentials: 'include',
+    keepalive: true,
+  });
+}
+
 async function request<T>(
   endpoint: string,
   options: ApiOptions = {}
@@ -123,10 +136,7 @@ export const api = {
       data: { token, password },
     }),
 
-  logout: () =>
-    request<{ success: boolean }>('/api/auth/clear-cookie', {
-      method: 'POST',
-    }),
+  logout: () => clearAuthCookies(),
 
   getMe: () =>
     request<any>('/api/users/me'),

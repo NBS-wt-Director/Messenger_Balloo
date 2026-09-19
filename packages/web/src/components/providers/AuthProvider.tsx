@@ -96,7 +96,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 
   const handleLogout = useCallback(() => {
-    // logout в authStore вызывает POST /clear-cookie (очистка httpOnly cookie)
+    // logout в authStore чистит httpOnly cookie (POST /clear-cookie, fire-and-forget)
     logout();
     window.location.hash = '#/login';
   }, [logout]);
