@@ -152,9 +152,11 @@ function LoginScreen() {
                 className="text-sm"
                 style={{ color: 'var(--warning, #f59e0b)', marginBottom: '12px', textAlign: 'center' }}
               >
-                {t('oauth.notConfigured', {
-                  provider: oauthProvider || oauthErrorShown,
-                })}
+                {/* not_configured — вход не настроен; callback_failed/authorize_failed/no_code —
+                    попытка не удалась (вход настроен). Тексты разные, чтобы не путать пользователя */}
+                {oauthErrorShown === 'not_configured'
+                  ? t('oauth.notConfigured', { provider: oauthProvider || oauthErrorShown })
+                  : t('oauth.failed', { provider: oauthProvider || oauthErrorShown })}
               </p>
             )}
 

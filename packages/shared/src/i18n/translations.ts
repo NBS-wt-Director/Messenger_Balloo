@@ -103,6 +103,7 @@ export type TranslationKey =
   | 'auth.andPrivacy'
   | 'auth.privacyLink'
   | 'oauth.notConfigured'
+  | 'oauth.failed'
   | 'oauth.yandex'
   | 'menu.balloo'
   | 'menu.admin'
@@ -2344,6 +2345,30 @@ export const translations: Translations = {
     hi: '{provider} के माध्यम से साइन इन अभी उपलब्ध नहीं है। ईमेल या किसी अन्य तरीके का उपयोग करें।',
     be: 'Уваход праз {provider} яшчэ не наладжаны. Выкарыстайце email або іншы спосаб уваходу.',
     fr: 'La connexion via {provider} n\u2019est pas encore configurée. Utilisez l\u2019email ou une autre méthode.',
+  },
+  // Ошибка колбэка/обмена code (callback_failed, authorize_failed, no_code):
+  // вход НАСТРОЕН, но попытка не удалась — текст отличается от notConfigured
+  'oauth.failed': {
+    ru: 'Не удалось войти через {provider}. Попробуйте ещё раз или используйте email.',
+    en: 'Sign-in via {provider} failed. Please try again or use email.',
+    tt: '{provider} аша керү уңышсыз булды. Тагын бер тапкыр тыгыз яки email кулланыгыз.',
+    ba: '{provider} аша инеү уңышһыҙ булды. Тағы бер тапҡыр өсөнө йәки email ҡулланығыҙ.',
+    ce: '{provider} чухула чудар аьтту бац. Цкъа аьттувле йа Email леладе.',
+    cv: '{provider} урлӑ кӗрӗш ӗҫлемӗр. Тепӗр хут ҫӗрӗр е Email усӑ курӑр.',
+    av: '{provider} ункъил гьабизе гьавур гьечӏо. Цогеб нухъде хӏалтӏизе яги Email.',
+    dar: '{provider} уркъили гьабизе муваффакъ гьечӏо. Цигеб нухъде хӏалтӏизе яги Email.',
+    udm: '{provider} уртӥ пырон ӝожтӥ. Кык полэзэ дыбытыса яко Email уже.',
+    lez: '{provider} рекьиз хьанараб авач. Гъуцӏуниз даха я муькуб рехъдал.',
+    kbd: '{provider} хэкӀуэкӀыр хэхъуэкӀыжакъым. Дауэ тӏуэкӏуэ я Email хэлъэхьэ.',
+    chm: '{provider} дене пураш лийын огыл. Вескым ыштен ончо але Email кучылт.',
+    os: '{provider} фæрцæй бацæутнæ бантысты. Фæлвар е Email ахæм.',
+    sah: '{provider} киирии сатан хаппыһыннаатах. Хатан ыллыа эбэтэр Email тутун.',
+    bua: '{provider}-аар орохо амжалтагүй болоо. Дахин оролдоорой гү Email ашагаарай.',
+    ukr: 'Не вдалося увійти через {provider}. Спробуйте ще раз або використайте email.',
+    zh: '通过 {provider} 登录失败。请重试或使用邮箱登录。',
+    hi: '{provider} के माध्यम से साइन इन विफल रहा। कृपया पुनः प्रयास करें या ईमेल का उपयोग करें।',
+    be: 'Не ўдалося ўвайсці праз {provider}. Паспрабуйце яшчэ раз або выкарыстайце email.',
+    fr: 'Échec de connexion via {provider}. Réessayez ou utilisez l\u2019email.',
   },
   'oauth.yandex': {
     ru: 'Яндекс',
