@@ -151,7 +151,13 @@ ADMIN_INSTALL_PASSWORD=  # 131013 или свой
 SETUP_PASSWORD=          # сгенерированный пароль
 
 # ОПЦИОНАЛЬНЫЕ (можно оставить пустыми):
-CORS_ORIGIN=https://app.balloo.su
+# Доменная схема Варианта C (тик. №0 мультитикета поддоменов):
+# VITE_API_URL — origin API (запекается в бандль web на vite build),
+# APP_URL — origin фронтенда (один URL: OAuth-возврат, письма, платежи),
+# CORS_ORIGIN — разрешительный СПИСОК origin'ов через запятую.
+VITE_API_URL=https://api.balloo.su
+APP_URL=https://balloo.su
+CORS_ORIGIN=https://balloo.su,https://admin.balloo.su,https://command.balloo.su,https://features.balloo.su,https://blog.balloo.su,https://history.balloo.su,https://download.balloo.su,https://docs.balloo.su
 ```
 
 ---

@@ -7,6 +7,27 @@
 - Обратная совместимость на соседние версии и через одну.
 - **Единое API для всех узлов** — все узлы экосистемы (balloo.su, admin.balloo.su, command.balloo.su, features.balloo.su, history.balloo.su, download.balloo.su, docs.balloo.su, blog.balloo.su) используют одно и то же API. Различия только в правах доступа (RBAC) и контексте узла.
 
+### Origin API (Вариант C, тикет №0 мультитикета поддоменов, 2026-09-20)
+
+- **Единая точка API — `https://api.balloo.su`** (REST + WS + OAuth-колбэки). Маршруты
+  сервера смонтированы с префиксом `/api/...` (`routes/index.ts`), поэтому клиент меняет
+  только origin: `VITE_API_URL=https://api.balloo.su`, а `/api/...` дописывает сам.
+  Итоговые URL: `https://api.balloo.su/api/auth/...` (префикс `/api/` осознанно оставлен).
+- **WS**: клиент строит `API_BASE.replace('http','ws') + '/ws/'` ⇒ `wss://api.balloo.su/ws/`.
+- **Контракт env (сервер):**
+  - `VITE_API_URL` — origin API для запекания в бандль фронтенда (build-time).
+  - `APP_URL` — публичный origin **фронтенда** (один URL, не список): возврат после OAuth,
+    ссылки писем (verify/reset), возврат платежей. Отделён от `CORS_ORIGIN`.
+  - `CORS_ORIGIN` — **разрешительный список** origin'ов через запятую (все поддомены),
+    только для `cors`-middleware (`credentials:true`) и CSP `connectSrc`. Без `*` с credentials.
+- **OAuth redirect_uri** (env `*_REDIRECT_URI`) и Callback URL в панелях Яндекс/VK/Mail.ru —
+  на api-домене: `https://api.balloo.su/api/auth/oauth/yandex-callback`,
+  `…/vk/callback`, `…/mailru/callback`. После смены домена панели перенастраиваются
+  один раз (действие владельца).
+- **Совместимость:** на переходный период сохранён compat-прокси `/api/` и `/ws/` на
+  `balloo.su` (старые кэшированные бандли, desktop/mobile до перевода env). Удаление —
+  отдельным батчем после приёмки.
+
 ## Документация
 - Swagger/OpenAPI 3.0 — автогенерация из аннотаций Next.js API Routes.
 - Отдельный сервис `docApi` доступен по адресу `balloo.su/api/docs`.

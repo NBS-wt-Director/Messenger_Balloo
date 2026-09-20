@@ -17,6 +17,23 @@ import { env } from '../config/env';
 // ============================================================
 
 // --- Helmet: security headers ---
+// connectSrc из CORS_ORIGIN: с тикета №0 мультитикета поддоменов CORS_ORIGIN —
+// список origin'ов через запятую (каждый поддомен = отдельный origin). Разбираем
+// его в массив токенов CSP и добавляем ws/wss-варианты (WebSocket на том же
+// origin). Иначе одна строка «https://a,https://b» стала бы одним битым токеном.
+// raw — параметр только для тестируемости; по умолчанию берётся из env.
+export const cspConnectSrc = (raw: string = env.CORS_ORIGIN): string[] => {
+  const base = raw === '*' ? 'https://balloo.su' : raw;
+  const origins = base
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const wsOrigins = origins
+    .filter((o) => o.startsWith('http'))
+    .map((o) => o.replace(/^http/, 'ws'));
+  return Array.from(new Set(["'self'", ...origins, ...wsOrigins]));
+};
+
 // Настройка Helmet для OWASP compliance
 export const securityHeaders = helmet({
   // Content-Security-Policy — защита от XSS и injection
@@ -26,7 +43,7 @@ export const securityHeaders = helmet({
       scriptSrc: ["'self'", "'unsafe-inline'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
       imgSrc: ["'self'", 'data:', 'https:'],
-      connectSrc: ["'self'", env.CORS_ORIGIN === '*' ? 'https://balloo.su' : env.CORS_ORIGIN],
+      connectSrc: cspConnectSrc(),
       fontSrc: ["'self'", 'data:'],
       objectSrc: ["'none'"],
       mediaSrc: ["'self'", 'https:'],

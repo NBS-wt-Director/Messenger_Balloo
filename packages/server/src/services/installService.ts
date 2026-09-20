@@ -98,6 +98,10 @@ NODE_ENV=production
 # --- CORS ---
 CORS_ORIGIN=${config.domains['balloo.su'] || 'https://balloo.su'}
 
+# --- APP_URL — публичный origin фронтенда (один URL): возврат после OAuth,
+# ссылки писем, возврат платежей. Self-install — один домен, приравнен к CORS.
+APP_URL=${config.domains['balloo.su'] || 'https://balloo.su'}
+
 # --- OAuth — Yandex ID ---
 YANDEX_CLIENT_ID=${config.yandexClientId}
 YANDEX_CLIENT_SECRET=${config.yandexClientSecret}
@@ -111,7 +115,7 @@ VK_REDIRECT_URI=${config.domains['balloo.su'] || 'https://balloo.su'}/api/auth/o
 # --- OAuth — Mail.ru ID ---
 MAILRU_CLIENT_ID=${config.mailruClientId}
 MAILRU_CLIENT_SECRET=${config.mailruClientSecret}
-MAILRU_REDIRECT_URI=${config.domains['balloo.su'] || 'https://balloo.su'}/api/auth/oauth/mail/callback
+MAILRU_REDIRECT_URI=${config.domains['balloo.su'] || 'https://balloo.su'}/api/auth/oauth/mailru/callback
 
 # --- Email (SMTP) ---
 SMTP_HOST=${config.smtpHost}

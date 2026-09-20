@@ -49,7 +49,7 @@ export function WebSocketSection() {
               fontSize: '14px',
             }}
           >
-            wss://balloo.su/ws?token=&lt;JWT&gt;
+            wss://api.balloo.su/ws/?token=&lt;JWT&gt;
           </code>
           <span className="chip chip--info">WebSocket</span>
         </div>

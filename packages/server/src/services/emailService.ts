@@ -111,7 +111,7 @@ const getWelcomeEmailHtml = (username: string): string => `
 `;
 
 const getVerificationEmailHtml = (token: string): string => {
-  const verificationUrl = `${env.CORS_ORIGIN || 'https://balloo.su'}/verify-email?token=${token}`;
+  const verificationUrl = `${env.APP_URL}/verify-email?token=${token}`;
   return `
     <!DOCTYPE html>
     <html>
@@ -160,7 +160,7 @@ const getVerificationEmailHtml = (token: string): string => {
 };
 
 const getResetPasswordEmailHtml = (token: string): string => {
-  const resetUrl = `${env.CORS_ORIGIN || 'https://balloo.su'}/reset-password?token=${token}`;
+  const resetUrl = `${env.APP_URL}/reset-password?token=${token}`;
   return `
     <!DOCTYPE html>
     <html>
@@ -234,7 +234,7 @@ export const sendVerificationEmail = async (email: string, token: string): Promi
     to: email,
     subject: 'Подтверждение email — Balloo Messenger',
     html: getVerificationEmailHtml(token),
-    text: `Подтвердите ваш email, перейдя по ссылке: ${env.CORS_ORIGIN || 'https://balloo.su'}/verify-email?token=${token}`,
+    text: `Подтвердите ваш email, перейдя по ссылке: ${env.APP_URL}/verify-email?token=${token}`,
   });
   return result.success;
 };
@@ -247,7 +247,7 @@ export const sendResetPasswordEmail = async (email: string, token: string): Prom
     to: email,
     subject: 'Сброс пароля — Balloo Messenger',
     html: getResetPasswordEmailHtml(token),
-    text: `Сбросьте пароль, перейдя по ссылке: ${env.CORS_ORIGIN || 'https://balloo.su'}/reset-password?token=${token}\n\nЭта ссылка действительна в течение 1 часа.`,
+    text: `Сбросьте пароль, перейдя по ссылке: ${env.APP_URL}/reset-password?token=${token}\n\nЭта ссылка действительна в течение 1 часа.`,
   });
   return result.success;
 };

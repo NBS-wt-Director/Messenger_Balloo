@@ -22,7 +22,7 @@ export async function getApiSpec(_req: Request, res: Response): Promise<void> {
       },
       servers: [
         { url: 'https://api.balloo.su/v1', description: 'Production' },
-        { url: 'wss://balloo.su/ws', description: 'WebSocket' },
+        { url: 'wss://api.balloo.su/ws/', description: 'WebSocket' },
       ],
       paths: API_MODULES.reduce((acc, mod) => {
         for (const ep of mod.endpoints) {
@@ -68,7 +68,7 @@ export async function getEndpoints(_req: Request, res: Response): Promise<void> 
 
     res.json({
       baseUrl: 'https://api.balloo.su/v1',
-      wsUrl: 'wss://balloo.su/ws',
+      wsUrl: 'wss://api.balloo.su/ws/',
       version: '1.0.0',
       modules,
       totalEndpoints: API_MODULES.reduce((sum, m) => sum + m.endpoints.length, 0),
@@ -106,7 +106,7 @@ export async function getEndpointDetail(req: Request, res: Response): Promise<vo
 export async function getWebSocketEvents(_req: Request, res: Response): Promise<void> {
   try {
     res.json({
-      url: 'wss://balloo.su/ws?token=<JWT>',
+      url: 'wss://api.balloo.su/ws/?token=<JWT>',
       clientToServer: WS_CLIENT_EVENTS,
       serverToClient: WS_SERVER_EVENTS,
     });

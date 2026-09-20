@@ -24,7 +24,9 @@ x-common-variables: &common-vars
   NODE_ENV: production
   SERVER_PORT: "3000"
   SERVER_HOST: "0.0.0.0"
-  CORS_ORIGIN: ${CORS_ORIGIN:-https://balloo.su}
+  # CORS_ORIGIN объявлен у сервиса server (не здесь): якорь подключён и к
+  # postgres, а смена значения CORS_ORIGIN в общем якоре заставила бы `up -d`
+  # пересоздать контейнер базы данных. Тикет №0 мультитикета поддоменов.
   ADMIN_INSTALL_PASSWORD: ${ADMIN_INSTALL_PASSWORD}
   SETUP_PASSWORD: ${SETUP_PASSWORD}
   MAX_FILE_SIZE: ${MAX_FILE_SIZE:-52428800}
@@ -111,6 +113,12 @@ services:
       - "127.0.0.1:${SERVER_HOST_PORT:-3100}:3000"
     environment:
       <<: *common-vars
+      # APP_URL / CORS_ORIGIN объявлены у server (не в x-common-variables): якорь
+      # подключён и к postgres, а новые/изменённые ключи там заставили бы `up -d`
+      # пересоздать контейнер базы данных. Тикет №0 мультитикета поддоменов:
+      # CORS_ORIGIN — список origin'ов (§3.3), APP_URL — origin фронтенда (один).
+      APP_URL: ${APP_URL:-https://balloo.su}
+      CORS_ORIGIN: ${CORS_ORIGIN:-https://balloo.su,https://admin.balloo.su,https://command.balloo.su,https://features.balloo.su,https://blog.balloo.su,https://history.balloo.su,https://download.balloo.su,https://docs.balloo.su}
       DATABASE_URL: postgresql://${POSTGRES_USER:-balloo}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-balloo}
       REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
       # Приложение читает ACCESS_KEY/SECRET_KEY (config/env.ts:31-32,
@@ -167,8 +175,9 @@ services:
       context: ../..
       dockerfile: docker/Dockerfile.web
       args:
-        # Запекается в бандль на vite build (см. docker/Dockerfile.web)
-        VITE_API_URL: ${VITE_API_URL:-https://balloo.su}
+        # Запекается в бандль на vite build (см. docker/Dockerfile.web).
+        # Тикет №0: всё API на api.balloo.su (голый origin, клиент дописывает /api/).
+        VITE_API_URL: ${VITE_API_URL:-https://api.balloo.su}
     image: balloo/web:local
     container_name: balloo-web
     restart: always

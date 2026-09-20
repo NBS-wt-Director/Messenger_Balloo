@@ -257,7 +257,9 @@ web-admin, web-command, web-features, info-сайты) используют ЕГ
   пользователя, запуск и вывод — пользователем.
 - После каждого тикета — фиксация в этот файл (статус + что сделано).
 
-**Статусы:** №0 pending · №1 pending · №2 pending · №3 pending · №4 pending · №5 pending · №6 pending
+**Статусы:** №0 🟡 выполнено в репозитории (ждёт деплоя владельцем) · №1 pending · №2 pending · №3 pending · №4 pending · №5 pending · №6 pending
+
+**Итог тикета №0 (2026-09-20, 🟡 в репо, не задеплоен).** Введена отдельная переменная `APP_URL` (origin фронтенда, один URL) — OAuth-возврат (`authController.oauthFrontendUrl`), ссылки писем (`emailService`), возврат платежей (`paymentService`) переведены с `CORS_ORIGIN` на `APP_URL`; CSP `connectSrc` в `security.ts` разбирает `CORS_ORIGIN`-список в массив + ws/wss. `docker/prod/.env.production`: `VITE_API_URL=https://api.balloo.su`, `CORS_ORIGIN` = список 8 origin'ов, добавлен `APP_URL=https://balloo.su`, все `*_REDIRECT_URI` → `https://api.balloo.su/api/auth/oauth/...`. `docker-compose.local.yml`: `APP_URL`/`CORS_ORIGIN` вынесены из общего якоря `x-common-variables` в env сервиса `server` (иначе их смена пересоздаёт контейнер PostgreSQL), дефолт build-арга `VITE_API_URL` → `api.balloo.su`; `Dockerfile.web` ARG → `api.balloo.su`. Синхронизированы `.env.production.example`, мастер self-install (`installService.ts`, +`APP_URL`, путь `mail`→`mailru`), `docs/04`, `docs/06`, `docs/07`. Проверки: `tsc` web+server чисто, server jest 231/231 `--runInBand`. Compat-прокси `/api/`+`/ws/` на balloo.su НЕ удалён. **Действие пользователя после деплоя: переставить Callback URL в панелях Яндекс/VK/Mail.ru на `https://api.balloo.su/api/auth/oauth/...`.**
 
 **Решение 2026-09-18 (пользователь):** всё API — на отдельный поддомен
 `api.balloo.su` (не `/api/` на balloo.su). Зафиксировано тикетом №0 и §3.3;

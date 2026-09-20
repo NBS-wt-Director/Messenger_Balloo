@@ -257,7 +257,7 @@ export function DocsScreen() {
                 fontSize: '14px',
               }}
             >
-              wss://balloo.su/ws
+              wss://api.balloo.su/ws/
             </code>
             <span className="chip chip--info">WebSocket</span>
           </div>

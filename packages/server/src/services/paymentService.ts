@@ -169,7 +169,7 @@ const createDonation = async (params: CreateDonationParams): Promise<{
   const paymentResult = await createYooKassaPayment({
     amount: { value: (amount / 100).toFixed(2), currency: currency || 'RUB' },
     description,
-    confirmation: { type: 'redirect', return_url: `${env.CORS_ORIGIN || 'http://localhost:5173'}/payments/success` },
+    confirmation: { type: 'redirect', return_url: `${env.APP_URL}/payments/success` },
     metadata: { donationId: donation.id, userId },
   });
 

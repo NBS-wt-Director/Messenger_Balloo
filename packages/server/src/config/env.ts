@@ -21,8 +21,17 @@ const envSchema = z.object({
   // Redis (для rate limiting и сессий)
   REDIS_URL: z.string().url().optional().default('redis://localhost:6379'),
 
-  // CORS
+  // CORS — РАЗРЕШИТЕЛЬНЫЙ СПИСОК origin'ов через запятую (Вариант C: каждый
+  // поддомен = отдельный origin). Только для middleware/cors.ts и CSP connectSrc.
+  // НЕ использовать как «адрес приложения» — для этого есть APP_URL.
   CORS_ORIGIN: z.string().default('*'),
+
+  // APP_URL — публичный origin ФРОНТЕНДА (куда возвращаем пользователя после
+  // OAuth, откуда ссылки писем и возврат платежей). Один URL, не список.
+  // Отделён от CORS_ORIGIN (2026-09-20, тикет №0 мультитикета поддоменов):
+  // CORS_ORIGIN стал списком из 8 поддоменов, и использовать его как «адрес
+  // приложения» больше нельзя — редирект/письма склеили бы весь список.
+  APP_URL: z.string().default('https://balloo.su'),
 
   // MinIO (CDN/хранилище)
   MINIO_ENDPOINT: z.string().default('localhost'),

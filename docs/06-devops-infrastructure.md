@@ -112,7 +112,35 @@ balloo-backups/     ← бэкапы БД (хранение 3 дня)
 | Blog Portal | blog.balloo.su | balloo-web (тот же образ, другой маршрут) |
 | docs.balloo.su | docs.balloo.su | balloo-web (Swagger/OpenAPI) |
 
-**WebSocket:** встроен в Next.js (native Node.js WebSocket), не отдельный сервис.
+**WebSocket:** встроен в бэкенд (native Node.js WebSocket), не отдельный сервис.
+
+### Доменная схема и env API (Вариант C — тикет №0 мультитикета поддоменов, 2026-09-20)
+
+Фактическая схема прода (не идеализированная v1-таблица выше):
+
+- **`https://api.balloo.su`** — единая точка всего API (REST `/api/...`, WS `/ws/`,
+  OAuth-колбэки). Отдаёт контейнер `balloo-server` (порт `127.0.0.1:3100`) через хостовый
+  nginx (`docker/prod/nginx/balloo-docker.conf`, vhost `api.balloo.su` — с Upgrade-заголовками
+  и `client_max_body_size 120m`).
+- **`https://balloo.su`** — SPA-фронт (`balloo-web`, `127.0.0.1:8090`). На переходный период
+  на balloo.su сохранён compat-прокси `/api/` и `/ws/` (старые бандли, desktop/mobile до
+  перевода env) — удалить отдельным батчем после приёмки.
+
+Контракт env (`docker/prod/.env.production`):
+
+| Переменная | Значение | Кто читает |
+|---|---|---|
+| `VITE_API_URL` | `https://api.balloo.su` (голый origin) | vite build web (build-arg в compose) — запeкается в бандль; клиент дописывает `/api/...`, http→ws для WS |
+| `APP_URL` | `https://balloo.su` (один URL, НЕ список) | сервер: возврат после OAuth (`authController.oauthFrontendUrl`), ссылки писем (`emailService`), возврат платежей (`paymentService`) |
+| `CORS_ORIGIN` | список origin'ов через запятую (balloo.su + 7 поддоменов) | сервер: `cors`-middleware (`credentials:true`) и CSP `connectSrc` |
+
+`APP_URL` намеренно отделён от `CORS_ORIGIN`: второй — разрешительный список, вставка
+списка в редирект/письмо дала бы битый URL. `APP_URL` и `CORS_ORIGIN` объявлены у сервиса
+`server` (не в `x-common-variables`), чтобы их смена не пересоздавала контейнер PostgreSQL.
+
+Деплой тикета №0 (пользователь, батч из 3 шагов, явные сервисы — НЕ голый `up -d`):
+`git pull` → `docker compose -f docker-compose.local.yml --env-file .env.production build web server`
+→ `… up -d web server`. Смена `VITE_API_URL` меняет только образ web; PostgreSQL не затрагивается.
 
 ### Инфраструктура
 

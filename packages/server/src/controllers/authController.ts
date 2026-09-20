@@ -356,8 +356,12 @@ export const resetPassword = async (req: Request, res: Response, next: NextFunct
 // на /#/login?oauth_error=not_configured (дружелюбная ошибка, не JSON 404).
 // ============================================================
 
+// Origin фронтенда для возврата после OAuth. Берём из APP_URL (один URL),
+// НЕ из CORS_ORIGIN — с тикета №0 мультитикета поддоменов CORS_ORIGIN это
+// разрешительный СПИСОК через запятую, вставка которого в редирект дала бы
+// битый URL вида https://balloo.su,https://admin.balloo.su,.../#/chat.
 const oauthFrontendUrl = (): string =>
-  process.env.CORS_ORIGIN || process.env.APP_URL || 'https://balloo.su';
+  process.env.APP_URL || 'https://balloo.su';
 
 const oauthErrorRedirect = (res: Response, provider: string, reason: string): void => {
   const url = `${oauthFrontendUrl()}/#/login?oauth_error=${encodeURIComponent(reason)}&provider=${encodeURIComponent(provider)}`;

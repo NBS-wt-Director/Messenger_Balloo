@@ -894,7 +894,7 @@ export const QUICK_START = [
   {
     title: 'WebSocket подключение',
     description: 'Подключитесь к WebSocket для realtime-сообщений',
-    code: `const ws = new WebSocket("wss://balloo.su/ws?token=eyJhbG...");
+    code: `const ws = new WebSocket("wss://api.balloo.su/ws/?token=eyJhbG...");
 ws.onmessage = (e) => {
   const data = JSON.parse(e.data);
   if (data.type === "message:new") {

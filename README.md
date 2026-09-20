@@ -213,6 +213,29 @@ pnpm test:all
 
 ---
 
+## 🌐 Продакшен-домены (мультитикета)
+
+Продакшен использует мультитикета поддоменов: каждый сервис — отдельный origin. API живёт
+только на `api.balloo.su`, веб-клиент обращается к нему по абсолютному URL (`VITE_API_URL`),
+WebSocket (Socket.IO) — там же (`wss://api.balloo.su/socket.io`).
+
+| Переменная | Значение | Где задаётся |
+|---|---|---|
+| `VITE_API_URL` | `https://api.balloo.su` | build-arg web-образа (запекается в бандль) |
+| `CORS_ORIGIN` | `https://balloo.su,https://app.balloo.su,https://id.balloo.su,https://api.balloo.su,https://cabinet.balloo.su,https://cdn.balloo.su,https://files.balloo.su,https://admin.balloo.su` | env api-контейнера (список через запятую) |
+| `COOKIE_DOMAIN` | `.balloo.su` | env api-контейнера (dot-домен — cookie видны всем поддоменам) |
+| `NEXT_PUBLIC_URL` | `https://app.balloo.su` | env api-контейнера |
+| `INSTALL_REDIRECT_URL` | `https://admin.balloo.su/install` | env api-контейнера |
+| `TELEGRAM_REDIRECT_URL` | `https://id.balloo.su/auth/telegram/complete` | env api-контейнера |
+
+Порядок деплоя: **сначала API, затем web** (CSP `connect-src` и CORS отдаёт API; новый web-бандль
+ожидает, что API уже принимает кросс-origin-запросы).
+
+Откат web — предыдущим тегом образа. Откат API — только вместе с web, если менялись
+`COOKIE_DOMAIN`/`CORS_ORIGIN` (смена домена cookie ломает авторизацию у уже выданных сессий).
+
+---
+
 ## 📚 Документация
 
 - **Макеты экранов**: [mockups/index.html](mockups/index.html) — интерактивный каталог всех экранов

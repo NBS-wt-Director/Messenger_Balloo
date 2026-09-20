@@ -36,7 +36,9 @@ RUN cd packages/shared && ./node_modules/.bin/tsc
 
 # API base URL baked into the bundle at build time (Vite inlines VITE_* vars only)
 # Must be a bare origin without trailing slash: code does `${API_BASE}/api/...`
-ARG VITE_API_URL=https://balloo.su
+# Ticket #0 (subdomains multitticket, 2026-09-20): all API served from the
+# dedicated api.balloo.su subdomain; the client appends /api/... itself.
+ARG VITE_API_URL=https://api.balloo.su
 ENV VITE_API_URL=${VITE_API_URL}
 
 # Build web (vite build — no type-check, faster; local vite from node_modules)
