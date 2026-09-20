@@ -243,7 +243,7 @@ export function DocsScreen() {
                 fontSize: '14px',
               }}
             >
-              https://api.balloo.su/v1
+              https://api.balloo.su/api
             </code>
             <span className="chip chip--accent">Production</span>
           </div>

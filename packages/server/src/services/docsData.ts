@@ -58,7 +58,7 @@ export const API_MODULES: ApiModule[] = [
           { code: 400, description: 'Невалидные данные' },
           { code: 409, description: 'Email/username занят' },
         ],
-        curlExample: `curl -X POST https://api.balloo.su/v1/auth/register \\
+        curlExample: `curl -X POST https://api.balloo.su/api/auth/register \\
   -H "Content-Type: application/json" \\
   -d '{"email":"user@example.com","username":"ivan","password":"secret123"}'`,
       },
@@ -81,7 +81,7 @@ export const API_MODULES: ApiModule[] = [
           { code: 401, description: 'Неверный email или пароль' },
           { code: 429, description: 'Слишком много попыток' },
         ],
-        curlExample: `curl -X POST https://api.balloo.su/v1/auth/login \\
+        curlExample: `curl -X POST https://api.balloo.su/api/auth/login \\
   -H "Content-Type: application/json" \\
   -d '{"email":"user@example.com","password":"secret123"}'`,
       },
@@ -879,14 +879,14 @@ export const QUICK_START = [
   {
     title: 'Регистрация',
     description: 'Создайте аккаунт и получите токены',
-    code: `curl -X POST https://api.balloo.su/v1/auth/register \\
+    code: `curl -X POST https://api.balloo.su/api/auth/register \\
   -H "Content-Type: application/json" \\
   -d '{"email":"user@example.com","username":"ivan","password":"secret123"}'`,
   },
   {
     title: 'Отправка сообщения',
     description: 'Используйте access token для отправки сообщений',
-    code: `curl -X POST https://api.balloo.su/v1/chats/clx.../messages \\
+    code: `curl -X POST https://api.balloo.su/api/chats/clx.../messages \\
   -H "Authorization: Bearer eyJhbG..." \\
   -H "Content-Type: application/json" \\
   -d '{"type":"text","content":"Hello!"}'`,

@@ -21,7 +21,7 @@ export async function getApiSpec(_req: Request, res: Response): Promise<void> {
         description: 'REST + WebSocket API для мессенджера Balloo',
       },
       servers: [
-        { url: 'https://api.balloo.su/v1', description: 'Production' },
+        { url: 'https://api.balloo.su/api', description: 'Production' },
         { url: 'wss://api.balloo.su/ws/', description: 'WebSocket' },
       ],
       paths: API_MODULES.reduce((acc, mod) => {
@@ -67,7 +67,7 @@ export async function getEndpoints(_req: Request, res: Response): Promise<void> 
     }));
 
     res.json({
-      baseUrl: 'https://api.balloo.su/v1',
+      baseUrl: 'https://api.balloo.su/api',
       wsUrl: 'wss://api.balloo.su/ws/',
       version: '1.0.0',
       modules,
