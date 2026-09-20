@@ -772,16 +772,52 @@ export const oauthLogin = async (input: OAuthLoginInput) => {
       where: { id: oAuthAccount.userId },
       include: { twoFASecrets: true },
     });
-  } else {
+  } else if (input.email) {
+    // P2002-фикс (живой вход Яндекс, 2026-09-20): пользователь с таким email
+    // уже есть (зарегистрировался по email раньше) — ПРИВЯЗЫВАЕМ OAuth-аккаунт
+    // к существующему пользователю, а не создаём дубликат (create падал на
+    // @unique email). Email от провайдера верифицирован им самим — привязка
+    // по email стандартна для OAuth.
+    const existing = await prisma.user.findUnique({
+      where: { email: input.email },
+      include: { twoFASecrets: true },
+    });
+
+    if (existing) {
+      await prisma.oAuthAccount.create({
+        data: {
+          userId: existing.id,
+          provider: input.provider,
+          providerId: input.providerId,
+          accessToken: input.accessToken || null,
+          refreshToken: input.refreshToken || null,
+          expiresAt: input.expiresAt ? BigInt(input.expiresAt) : null,
+          createdAt: BigInt(Math.floor(Date.now() / 1000)),
+          updatedAt: BigInt(Math.floor(Date.now() / 1000)),
+        },
+      });
+      user = existing;
+    }
+  }
+
+  if (!user) {
     const passwordHash = crypto.randomBytes(32).toString('hex');
 
     // Первый пользователь через OAuth становится админом, если админов еще нет
     const isAdmin = await hasAdmin();
 
+    // username @unique: логин провайдера может совпадать с существующим —
+    // проверяем и добавляем суффикс (иначе create падает P2002)
+    let username = input.username || undefined;
+    if (username) {
+      const taken = await prisma.user.findUnique({ where: { username } });
+      if (taken) username = `${username}_${input.providerId.slice(0, 4)}`;
+    }
+
     user = await prisma.user.create({
       data: {
         email: input.email || null,
-        username: input.username || null,
+        username,
         passwordHash,
         avatarUrl: input.avatarUrl || null,
         language: 'ru',
@@ -802,8 +838,8 @@ export const oauthLogin = async (input: OAuthLoginInput) => {
         },
         publicProfile: {
           create: {
-            username: input.username || (input.email ? input.email.split('@')[0] : `user_${input.providerId.slice(0, 6)}`),
-            displayName: input.username || input.email?.split('@')[0] || 'User',
+            username: username || (input.email ? input.email.split('@')[0] : `user_${input.providerId.slice(0, 6)}`),
+            displayName: username || input.email?.split('@')[0] || 'User',
           },
         },
       },

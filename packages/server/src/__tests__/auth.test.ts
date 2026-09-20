@@ -259,6 +259,47 @@ describe('Auth API', () => {
     });
   });
 
+  // Регрессия P2002 (живой вход Яндекс, 2026-09-20): пользователь с email
+  // уже зарегистрирован → OAuth-вход обязан ПРИВЯЗАТЬ аккаунт к существующему
+  // пользователю (200 + тот же id), а не падать на @unique email при create.
+  describe('POST /api/auth/oauth/:provider — существующий email', () => {
+    it('привязывает OAuth-аккаунт к существующему пользователю (не P2002)', async () => {
+      const existing = await registerTestUser();
+
+      const res = await request(app)
+        .post('/api/auth/oauth/yandex')
+        .send({
+          provider: 'yandex',
+          providerId: `yandex_test_${Date.now()}`,
+          email: existing.email,
+          username: 'yandexlogin',
+          accessToken: 'test-oauth-token',
+        });
+
+      expect(res.status).toBe(200);
+      expect(res.body.user).toBeTruthy();
+      expect(res.body.user.id).toBe(existing.id);
+      expect(getCookie(res, 'balloo-access-token')).toBeTruthy();
+    });
+
+    it('username провайдера при коллизии получает суффикс, а не P2002', async () => {
+      const existing = await registerTestUser();
+
+      const res = await request(app)
+        .post('/api/auth/oauth/yandex')
+        .send({
+          provider: 'yandex',
+          providerId: `yandex_test2_${Date.now()}`,
+          email: `oauth_new_${Date.now()}@test.balloo.ru`,
+          username: existing.username, // коллизия с существующим username
+          accessToken: 'test-oauth-token',
+        });
+
+      expect(res.status).toBe(200);
+      expect(res.body.user.username).not.toBe(existing.username);
+    });
+  });
+
   describe('GET /health', () => {
     it('returns health status', async () => {
       const res = await request(app).get('/health');
