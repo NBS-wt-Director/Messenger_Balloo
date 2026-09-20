@@ -229,6 +229,36 @@ describe('Auth API', () => {
     });
   });
 
+  // Регрессия бага живого входа Яндекс (2026-09-20): односегментный путь
+  // /oauth/yandex-callback перехватывался параметром :provider маршрута
+  // GET /oauth/:provider (зарегистрирован раньше колбэков) → пользователь
+  // получал 302 not_configured вместо обмена code. Колбэки обязаны
+  // матчиться раньше параметра.
+  describe('GET /api/auth/oauth/* — колбэки не перехватываются :provider', () => {
+    it('yandex-callback без code → 400 от yandexCallback (не 302 not_configured)', async () => {
+      const res = await request(app).get('/api/auth/oauth/yandex-callback');
+
+      // yandexCallback без code отвечает 400 JSON; oauthAuthorize вместо
+      // него ответил бы 302 на /#/login?oauth_error=not_configured
+      expect(res.status).toBe(400);
+      expect(res.body.error).toBe('Bad Request');
+    });
+
+    it('vk/callback без code → 302 oauth_error=no_code', async () => {
+      const res = await request(app).get('/api/auth/oauth/vk/callback');
+
+      expect(res.status).toBe(302);
+      expect(res.headers.location).toContain('oauth_error=no_code');
+    });
+
+    it('mailru/callback без code → 302 oauth_error=no_code', async () => {
+      const res = await request(app).get('/api/auth/oauth/mailru/callback');
+
+      expect(res.status).toBe(302);
+      expect(res.headers.location).toContain('oauth_error=no_code');
+    });
+  });
+
   describe('GET /health', () => {
     it('returns health status', async () => {
       const res = await request(app).get('/health');

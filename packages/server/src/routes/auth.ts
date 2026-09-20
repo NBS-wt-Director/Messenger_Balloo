@@ -70,14 +70,19 @@ router.post('/reset-password', resetPassword);
 // POST — фронтенд сам получает данные от провайдера и шлёт на бэкенд
 router.post('/oauth/:provider', oauthLogin);
 
-// GET — начало OAuth (P21): 302 на authorize URL провайдера;
-// провайдер не настроен → 302 на /#/login?oauth_error=not_configured
-router.get('/oauth/:provider', oauthAuthorize);
-
-// GET — callback от OAuth-провайдера
+// GET — callback'и от OAuth-провайдеров.
+// ⚠️ ОБЯЗАНЫ стоять ДО /oauth/:provider: Express матчит маршруты в порядке
+// регистрации, и односегментный путь /oauth/yandex-callback перехватывался
+// параметром :provider → oauthAuthorize('yandex-callback') → 302
+// not_configured вместо обмена code (баг живого входа Яндекс, 2026-09-20;
+// VK/Mail.ru не задеты — их пути /vk/callback двухсегментные).
 router.get('/oauth/yandex-callback', yandexCallback);
 router.get('/oauth/vk/callback', vkCallback);
 router.get('/oauth/mailru/callback', mailruCallback);
+
+// GET — начало OAuth (P21): 302 на authorize URL провайдера;
+// провайдер не настроен → 302 на /#/login?oauth_error=not_configured
+router.get('/oauth/:provider', oauthAuthorize);
 
 // ============================================================
 // Защищённые маршруты (требуют auth)
