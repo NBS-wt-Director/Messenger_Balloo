@@ -21,6 +21,7 @@ import {
   disable2FA as disable2FAService,
   getUserDevices,
   revokeDevice,
+  OAuthAccountInactiveError,
 } from '../services/authService';
 import { AuthenticatedRequest } from '../middleware/auth';
 import { setAuthCookies, clearAuthCookies, ACCESS_COOKIE, REFRESH_COOKIE } from '../middleware/auth';
@@ -422,6 +423,12 @@ export const yandexCallback = async (req: Request, res: Response, next: NextFunc
     res.redirect(302, `${oauthFrontendUrl()}/#/chat`);
   } catch (error: any) {
     console.error('[YANDEX CALLBACK] Error:', error);
+    // P33: неактивный аккаунт (deleted/banned/suspended) — свой код ошибки,
+    // фронт покажет понятный текст вместо общего «не удалось войти»
+    if (error instanceof OAuthAccountInactiveError) {
+      oauthErrorRedirect(res, 'yandex', 'account_inactive');
+      return;
+    }
     oauthErrorRedirect(res, 'yandex', 'callback_failed');
   }
 };
@@ -455,6 +462,11 @@ export const vkCallback = async (req: Request, res: Response, next: NextFunction
     res.redirect(302, `${oauthFrontendUrl()}/#/chat`);
   } catch (error: any) {
     console.error('[VK CALLBACK] Error:', error);
+    // P33: неактивный аккаунт — свой код ошибки (см. yandexCallback)
+    if (error instanceof OAuthAccountInactiveError) {
+      oauthErrorRedirect(res, 'vk', 'account_inactive');
+      return;
+    }
     oauthErrorRedirect(res, 'vk', 'callback_failed');
   }
 };
@@ -495,6 +507,11 @@ export const mailruCallback = async (req: Request, res: Response, next: NextFunc
     res.redirect(302, `${oauthFrontendUrl()}/#/chat`);
   } catch (error: any) {
     console.error('[MAILRU CALLBACK] Error:', error);
+    // P33: неактивный аккаунт — свой код ошибки (см. yandexCallback)
+    if (error instanceof OAuthAccountInactiveError) {
+      oauthErrorRedirect(res, 'mailru', 'account_inactive');
+      return;
+    }
     oauthErrorRedirect(res, 'mailru', 'callback_failed');
   }
 };
@@ -543,6 +560,12 @@ export const oauthLogin = async (req: Request, res: Response, next: NextFunction
       // Токены в cookie, не в body
     });
   } catch (error: any) {
+    // P33: неактивный аккаунт (deleted/banned/suspended) — 403 с понятным
+    // сообщением, не 500 и не молчаливый вход под чужим аккаунтом
+    if (error instanceof OAuthAccountInactiveError) {
+      res.status(403).json({ error: 'Forbidden', message: error.message });
+      return;
+    }
     res.status(500).json({ error: 'Internal Error', message: error.message });
   }
 };

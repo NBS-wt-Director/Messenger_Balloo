@@ -152,11 +152,14 @@ function LoginScreen() {
                 className="text-sm"
                 style={{ color: 'var(--warning, #f59e0b)', marginBottom: '12px', textAlign: 'center' }}
               >
-                {/* not_configured — вход не настроен; callback_failed/authorize_failed/no_code —
+                {/* not_configured — вход не настроен; account_inactive — аккаунт с
+                    этим email неактивен (P33); callback_failed/authorize_failed/no_code —
                     попытка не удалась (вход настроен). Тексты разные, чтобы не путать пользователя */}
                 {oauthErrorShown === 'not_configured'
                   ? t('oauth.notConfigured', { provider: oauthProvider || oauthErrorShown })
-                  : t('oauth.failed', { provider: oauthProvider || oauthErrorShown })}
+                  : oauthErrorShown === 'account_inactive'
+                    ? t('oauth.accountInactive', { provider: oauthProvider || oauthErrorShown })
+                    : t('oauth.failed', { provider: oauthProvider || oauthErrorShown })}
               </p>
             )}
 

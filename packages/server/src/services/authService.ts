@@ -554,6 +554,28 @@ export const resetPassword = async (input: { token: string; newPassword: string 
 // OAuth
 // ============================================================
 
+// ============================================================
+// OAuth
+// ============================================================
+
+// P33 (2026-09-21, приёмка владельца): oauthLogin привязывал OAuth-аккаунт
+// к существующему пользователю по email БЕЗ проверки статуса — вход прошёл
+// под мягко удалённым тестовым аккаунтом (email совпал с Яндекс-ящиком
+// владельца). login/refresh статусы проверяют, OAuth-путь — нет. Этой
+// ошибкой помечаем отказ: контроллеры отличают её от callback_failed и
+// редиректят с oauth_error=account_inactive (дружелюбный текст на фронте).
+export class OAuthAccountInactiveError extends Error {
+  constructor(public readonly status: string) {
+    const messages: Record<string, string> = {
+      banned: 'Аккаунт заблокирован',
+      deleted: 'Аккаунт удалён',
+      suspended: 'Аккаунт временно приостановлен',
+    };
+    super(messages[status] || `Аккаунт неактивен (${status})`);
+    this.name = 'OAuthAccountInactiveError';
+  }
+}
+
 interface OAuthLoginInput {
   provider: 'yandex' | 'vk' | 'mailru' | 'max';
   providerId: string;
@@ -772,6 +794,12 @@ export const oauthLogin = async (input: OAuthLoginInput) => {
       where: { id: oAuthAccount.userId },
       include: { twoFASecrets: true },
     });
+
+    // P33: привязка есть, но пользователь неактивен (deleted/banned/suspended)
+    // — вход отклоняем, как это делают login/refresh
+    if (user && user.status !== 'active') {
+      throw new OAuthAccountInactiveError(user.status);
+    }
   } else if (input.email) {
     // P2002-фикс (живой вход Яндекс, 2026-09-20): пользователь с таким email
     // уже есть (зарегистрировался по email раньше) — ПРИВЯЗЫВАЕМ OAuth-аккаунт
@@ -782,6 +810,13 @@ export const oauthLogin = async (input: OAuthLoginInput) => {
       where: { email: input.email },
       include: { twoFASecrets: true },
     });
+
+    // P33 (2026-09-21): НЕ привязываем и НЕ впускаем, если аккаунт неактивен
+    // (deleted/banned/suspended) — иначе OAuth-вход тихо проходит под
+    // удалённым/заблокированным аккаунтом с тем же email. Отказ, не привязка.
+    if (existing && existing.status !== 'active') {
+      throw new OAuthAccountInactiveError(existing.status);
+    }
 
     if (existing) {
       await prisma.oAuthAccount.create({
