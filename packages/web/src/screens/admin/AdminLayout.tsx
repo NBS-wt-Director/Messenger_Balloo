@@ -4,7 +4,7 @@
 import { useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
-import { useUIStore } from '@/store/uiStore';
+import { useUIStore } from '@balloo/ui';
 
 // Sidebar navigation items
 const NAV_ITEMS = [

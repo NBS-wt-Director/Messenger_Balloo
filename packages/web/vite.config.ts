@@ -8,6 +8,7 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
       '@balloo/shared': path.resolve(__dirname, '../shared/src'),
+      '@balloo/ui': path.resolve(__dirname, '../ui/src'),
     },
   },
   // --- Bundle optimization ---

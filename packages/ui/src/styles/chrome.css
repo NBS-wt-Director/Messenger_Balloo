@@ -1,0 +1,252 @@
+/* ===== @balloo/ui — стили единой шапки/подвала ===== */
+/* Копия .topbar* / .balloo-footer* из mockups/assets/common.css (истина).
+   Сайты, использующие @balloo/ui, импортируют этот файл вместе с themes.css. */
+
+/* ---------- Topbar ---------- */
+.topbar {
+  display: flex;
+  align-items: center;
+  height: 56px;
+  padding: 0 16px;
+  background: var(--bg-glass);
+  backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: blur(var(--blur));
+  border-bottom: 1px solid var(--border-color);
+  gap: 12px;
+  position: relative;
+  z-index: 100;
+  flex-shrink: 0;
+}
+
+.topbar__logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--text-primary);
+  cursor: pointer;
+  position: relative;
+}
+
+.topbar__logo-icon {
+  width: 32px;
+  height: 32px;
+  clip-path: var(--octagon-clip);
+  background: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-text);
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.topbar__dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 240px;
+  background: var(--bg-glass);
+  backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: blur(var(--blur));
+  border: 1px solid var(--border-strong);
+  border-radius: 0;
+  box-shadow: var(--shadow-glass);
+  padding: 8px 0;
+  display: none;
+  z-index: 200;
+}
+
+.topbar__logo:hover .topbar__dropdown,
+.topbar__dropdown:hover {
+  display: block;
+}
+
+.topbar__dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.topbar__dropdown-item:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.topbar__dropdown-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 4px 0;
+}
+
+.topbar__title {
+  flex: 1;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  position: relative;
+}
+
+.topbar__title:hover {
+  color: var(--accent);
+}
+
+.topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.topbar__actions-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+
+.topbar__actions-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.topbar__right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.topbar__lang,
+.topbar__theme {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 6px 10px;
+  transition: background 0.15s;
+}
+
+.topbar__lang:hover,
+.topbar__theme:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.topbar__menu-btn {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.topbar__menu-btn:hover,
+.topbar__menu-btn--open {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+/* ---------- Footer (unified across all nodes) ---------- */
+.balloo-footer {
+  flex-shrink: 0;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+  font-size: 12px;
+  color: var(--text-muted);
+  gap: 12px;
+  z-index: 50;
+}
+
+.balloo-footer__left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.balloo-footer__copyright {
+  cursor: pointer;
+  transition: color 0.15s;
+  white-space: nowrap;
+}
+
+.balloo-footer__copyright:hover {
+  color: var(--text-primary);
+}
+
+.balloo-footer__links {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.balloo-footer__link {
+  cursor: pointer;
+  transition: color 0.15s;
+  white-space: nowrap;
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.balloo-footer__link:hover {
+  color: var(--accent);
+}
+
+@media (max-width: 600px) {
+  .balloo-footer {
+    height: auto;
+    flex-direction: column;
+    gap: 4px;
+    padding: 6px 12px;
+  }
+}
+
+/* ---------- Ecosystem node pictogram (left logo dropdown) ---------- */
+.topbar__dropdown-item--node {
+  position: relative;
+}
+
+.topbar__dropdown-item--node::after {
+  content: '⛓';
+  margin-left: auto;
+  font-size: 13px;
+  color: var(--text-muted);
+  opacity: 0.8;
+}
+
+.topbar__dropdown-item--node--current::after {
+  content: '●';
+  color: var(--accent);
+  font-size: 10px;
+}
+
+.topbar__dropdown-item--node--current {
+  color: var(--accent);
+  font-weight: 600;
+}

@@ -4,7 +4,6 @@
 
 import React from 'react';
 import { useChatStore, type UserChat } from '@/store/chatStore';
-import { useUIStore } from '@/store/uiStore';
 import { ChatItem } from './ChatItem';
 import { ChatSearch } from './ChatSearch';
 

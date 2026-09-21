@@ -94,7 +94,7 @@
 - **Админ-панель** (`admin.balloo.su`) — отдельный экран для health checks и метрик
 
 ### 13. Кэширование
-- **Next.js ISR/SSR** — серверный рендеринг с инвалидацией
+- **SPA (React + Vite)** — статический бандл с content-hash, долгий кэш CDN/браузера (Next.js ISR/SSR — историческое решение из раннего плана, НЕ реализовано: web — чистая SPA на Vite)
 - Минимальная зависимость от внешних кэшей на старте
 
 ### 14. Безопасность
@@ -194,7 +194,7 @@
 
 ### 29. Docker Compose — сервисы и поддомены (v1)
 **Основные сервисы (Docker Compose на одном сервере):**
-- **balloo.su** — веб-клиент (Next.js)
+- **balloo.su** — веб-клиент (React + Vite SPA; Next.js — историческое решение, не реализовано)
 - **admin.balloo.su** — админ-панель
 - **command.balloo.su** — внутренний портал для сотрудников и найма
 - **features.balloo.su** — описание функций + запросы фич от пользователей
@@ -210,6 +210,32 @@
 - SMTP (Maildev для dev, свой SMTP для prod)
 
 **v2:** Kubernetes с несколькими репликами, sticky sessions, auto-scaling
+
+### 30. Поддомены (Вариант C — гибрид, решение пользователя 2026-09-12/18)
+
+> План-документ: `tickets/Мультитикет_поддомены_C.md` (тикеты №0–№6).
+> Первоначальный план «каждый узел сетки = отдельный поддомен» свёрнут в
+> гибрид: 1 SPA с auth + отдельные поддомены. **Тикет №0 выполнен: всё API —
+> на `api.balloo.su`** (REST + WS + OAuth-колбэки; клиентский origin
+> `VITE_API_URL=https://api.balloo.su`, маршруты сервера остаются с префиксом `/api/...`).
+
+| Поддомен | Узел | Тип | Код |
+|---|---|---|---|
+| `balloo.su` | 01 мессенджер + 10 авторизация + 11 лендинг | SPA с auth | `packages/web` |
+| `admin.balloo.su` | 08 админ-панель | SPA, роль `admin` | `packages/web-admin` (выделить из web) |
+| `command.balloo.su` | 09 персонал | SPA, роль `command` | `packages/web-command` (выделить из web) |
+| `features.balloo.su` | 04 предложения | SPA, вход возможен | `packages/web-features` (выделить из web) |
+| `download.balloo.su` | 03 загрузка | статический сайт | `packages/web-download` |
+| `history.balloo.su` | 02 история | статический сайт | `packages/web-history` |
+| `docs.balloo.su` | 05 документация | статический (OpenAPI/Swagger) | `packages/web-docs` |
+| `blog.balloo.su` | 07 блог | статический сайт | `packages/web-blog` |
+| `api.balloo.su` | API + WS | Express | `packages/server` — единая точка API всех сайтов |
+
+**Обязательные контракты всех сайтов:**
+- **`@balloo/ui`** (`packages/ui`, создан тикетом №1) — единые Topbar (лого-меню разделов), Footer, ThemeProvider (3 темы: dark/light/russian), I18nProvider (20 языков), дизайн-токены, cookie-persist темы/языка на `.balloo.su`
+- Один API (`api.balloo.su`) и одна БД; куки авторизации — host-only на `api.balloo.su`, `credentials:'include'` прикладывает их с любого поддомена (same-site)
+- Темы ровно 3 — эталон `mockups/assets/common.css`; языки — контракт `mockups/data_schema.json` → `conventions.languages`
+- Вход с под-сайтов: кнопка «Войти» → `https://balloo.su/#/login?next=<URL>` (белый список поддоменов)
 
 ---
 

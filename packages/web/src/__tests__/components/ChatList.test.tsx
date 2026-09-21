@@ -58,8 +58,6 @@ describe('ChatList', () => {
       isChatInfoOpen: false,
     });
     useUIStore.setState({
-      theme: 'dark',
-      language: 'ru',
       isSidebarOpen: true,
       isRightPanelOpen: false,
       isSettingsOpen: false,

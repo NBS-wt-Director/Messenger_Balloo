@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import LoginScreen from '../../screens/auth/LoginScreen';
 import { I18nProvider } from '../../components/providers/I18nProvider';
-import { useUIStore } from '../../store/uiStore';
+import { useUIStore } from '@balloo/ui';
 
 // jsdom: navigator.language = 'en' → принудительно ru для русских ожиданий
 beforeEach(() => {

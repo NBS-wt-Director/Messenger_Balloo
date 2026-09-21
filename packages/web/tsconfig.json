@@ -17,7 +17,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@balloo/shared": ["../shared/src"]
+      "@balloo/shared": ["../shared/src"],
+      "@balloo/ui": ["../ui/src"]
     }
   },
   "include": ["src"],

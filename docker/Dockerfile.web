@@ -15,6 +15,7 @@ RUN corepack enable && corepack prepare pnpm@11.17.0 --activate
 # Copy manifests only — this layer is cached until lockfile changes
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml* .npmrc ./
 COPY packages/shared/package.json packages/shared/
+COPY packages/ui/package.json packages/ui/
 COPY packages/web/package.json packages/web/
 
 # Install all deps — pnpm store AND prisma engines persist across builds
@@ -29,6 +30,8 @@ RUN --mount=type=cache,id=prisma-engines,target=/root/.cache/prisma,sharing=shar
 
 # Copy full source (invalidates only build layers, not prisma generate)
 COPY packages/shared/ packages/shared/
+# @balloo/ui (тик. №1): исходники TS импортируются web через vite/tsconfig alias
+COPY packages/ui/ packages/ui/
 COPY packages/web/ packages/web/
 
 # Build shared (local tsc from node_modules, no global install needed)
