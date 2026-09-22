@@ -7,6 +7,8 @@ import { useNavigate } from 'react-router-dom';
 import { FeatureStatusBadge } from './FeatureStatusBadge';
 import { FeatureVoteButton } from './FeatureVoteButton';
 import { api } from '@/services/api';
+import { AppTopbar } from '@/components/chrome/AppTopbar';
+import { AppFooter } from '@/components/chrome/AppFooter';
 
 interface Feature {
   id: string;
@@ -134,7 +136,11 @@ export function FeaturesListScreen() {
   }
 
   return (
-    <div className="main">
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
+      {/* P35: единая шапка (@balloo/ui) — как в макете features list.html */}
+      <AppTopbar title="Фич-реквесты" />
+
+      <div className="main" style={{ flex: 1, minHeight: 0 }}>
       {/* Sidebar */}
       <div className="sidebar sidebar--narrow">
         <div className="sidebar__search">
@@ -321,6 +327,10 @@ export function FeaturesListScreen() {
           </div>
         </div>
       </div>
+      </div>
+
+      {/* P35: единый подвал */}
+      <AppFooter />
     </div>
   );
 }

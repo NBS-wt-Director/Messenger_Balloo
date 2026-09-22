@@ -1,10 +1,12 @@
 // AdminLayout — лейаут админ-панели
 // Sidebar + breadcrumbs + user info + outlet
+// P35: единая шапка (@balloo/ui) — Topbar с лого-меню и breadcrumb в title
 
 import { useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
-import { useUIStore } from '@balloo/ui';
+import { AppTopbar } from '@/components/chrome/AppTopbar';
+import { AppFooter } from '@/components/chrome/AppFooter';
 
 // Sidebar navigation items
 const NAV_ITEMS = [
@@ -63,8 +65,6 @@ export function AdminLayout() {
   const location = useLocation();
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
-  const theme = useUIStore((s) => s.theme);
-  const setTheme = useUIStore((s) => s.setTheme);
 
   // Check if user is admin
   useEffect(() => {
@@ -88,24 +88,6 @@ export function AdminLayout() {
       return currentPath === item.path;
     }
     return currentPath.startsWith(item.path || '');
-  };
-
-  const handleThemeToggle = () => {
-    const themes: Array<'dark' | 'light' | 'russian'> = ['dark', 'light', 'russian'];
-    const nextIndex = (themes.indexOf(theme) + 1) % themes.length;
-    setTheme(themes[nextIndex]);
-  };
-
-  const themeIcons: Record<string, string> = {
-    dark: '🌙',
-    light: '☀️',
-    russian: '🇷🇺',
-  };
-
-  const themeLabels: Record<string, string> = {
-    dark: 'Тёмная',
-    light: 'Светлая',
-    russian: 'Русская',
   };
 
   return (
@@ -300,60 +282,8 @@ export function AdminLayout() {
           overflow: 'hidden',
         }}
       >
-        {/* Topbar */}
-        <div
-          style={{
-            height: 56,
-            minHeight: 56,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
-            padding: '0 24px',
-            borderBottom: '1px solid var(--border-color)',
-            background: 'var(--bg-primary)',
-          }}
-        >
-          {/* Breadcrumbs */}
-          <div
-            style={{
-              fontSize: 13,
-              color: 'var(--text-muted)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-            }}
-          >
-            <span style={{ color: 'var(--text-secondary)' }}>Admin</span>
-            <span>/</span>
-            <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
-              {breadcrumb}
-            </span>
-          </div>
-
-          <div style={{ flex: 1 }} />
-
-          {/* Theme toggle */}
-          <button
-            onClick={handleThemeToggle}
-            title={`Тема: ${themeLabels[theme]}`}
-            style={{
-              background: 'var(--bg-tertiary)',
-              border: '1px solid var(--border-color)',
-              borderRadius: 4,
-              cursor: 'pointer',
-              padding: '6px 10px',
-              fontSize: 13,
-              color: 'var(--text-primary)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              fontFamily: 'var(--font-primary)',
-            }}
-          >
-            <span>{themeIcons[theme]}</span>
-            <span>{themeLabels[theme]}</span>
-          </button>
-        </div>
+        {/* P35: единая шапка (@balloo/ui) — лого-меню + breadcrumb в title */}
+        <AppTopbar title={`Admin / ${breadcrumb}`} />
 
         {/* Page content */}
         <div

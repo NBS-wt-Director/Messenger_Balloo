@@ -1,0 +1,276 @@
+{
+  "failed": 0,
+  "total": 30,
+  "report": [
+    {
+      "theme": "dark",
+      "route": "/",
+      "pass": true,
+      "topbar": true,
+      "footer": true,
+      "expectedFooter": true,
+      "shot": "web-dark-root.png"
+    },
+    {
+      "theme": "dark",
+      "route": "/donat",
+      "pass": true,
+      "topbar": true,
+      "footer": true,
+      "expectedFooter": true,
+      "shot": "web-dark-donat.png"
+    },
+    {
+      "theme": "dark",
+      "route": "/for_kassa",
+      "pass": true,
+      "topbar": true,
+      "footer": true,
+      "expectedFooter": true,
+      "shot": "web-dark-for_kassa.png"
+    },
+    {
+      "theme": "dark",
+      "route": "/privacy",
+      "pass": true,
+      "topbar": true,
+      "footer": true,
+      "expectedFooter": true,
+      "shot": "web-dark-privacy.png"
+    },
+    {
+      "theme": "dark",
+      "route": "/login",
+      "pass": true,
+      "topbar": true,
+      "footer": true,
+      "expectedFooter": true,
+      "shot": "web-dark-login.png"
+    },
+    {
+      "theme": "dark",
+      "route": "/features",
+      "pass": true,
+      "topbar": true,
+      "footer": true,
+      "expectedFooter": true,
+      "shot": "web-dark-features.png"
+    },
+    {
+      "theme": "dark",
+      "route": "/history",
+      "pass": true,
+      "topbar": true,
+      "footer": true,
+      "expectedFooter": true,
+      "shot": "web-dark-history.png"
+    },
+    {
+      "theme": "dark",
+      "route": "/download",
+      "pass": true,
+      "topbar": true,
+      "footer": true,
+      "expectedFooter": true,
+      "shot": "web-dark-download.png"
+    },
+    {
+      "theme": "dark",
+      "route": "/doc",
+      "pass": true,
+      "topbar": true,
+      "footer": true,
+      "expectedFooter": true,
+      "shot": "web-dark-doc.png"
+    },
+    {
+      "theme": "dark",
+      "route": "/nonexistent-page-xyz",
+      "pass": true,
+      "topbar": true,
+      "footer": true,
+      "expectedFooter": false,
+      "shot": "web-dark-nonexistent-page-xyz.png"
+    },
+    {
+      "theme": "light",
+      "route": "/",
+      "pass": true,
+      "topbar": true,
+      "footer": true,
+      "expectedFooter": true,
+      "shot": "web-light-root.png"
+    },
+    {
+      "theme": "light",
+      "route": "/donat",
+      "pass": true,
+      "topbar": true,
+      "footer": true,
+      "expectedFooter": true,
+      "shot": "web-light-donat.png"
+    },
+    {
+      "theme": "light",
+      "route": "/for_kassa",
+      "pass": true,
+      "topbar": true,
+      "footer": true,
+      "expectedFooter": true,
+      "shot": "web-light-for_kassa.png"
+    },
+    {
+      "theme": "light",
+      "route": "/privacy",
+      "pass": true,
+      "topbar": true,
+      "footer": true,
+      "expectedFooter": true,
+      "shot": "web-light-privacy.png"
+    },
+    {
+      "theme": "light",
+      "route": "/login",
+      "pass": true,
+      "topbar": true,
+      "footer": true,
+      "expectedFooter": true,
+      "shot": "web-light-login.png"
+    },
+    {
+      "theme": "light",
+      "route": "/features",
+      "pass": true,
+      "topbar": true,
+      "footer": true,
+      "expectedFooter": true,
+      "shot": "web-light-features.png"
+    },
+    {
+      "theme": "light",
+      "route": "/history",
+      "pass": true,
+      "topbar": true,
+      "footer": true,
+      "expectedFooter": true,
+      "shot": "web-light-history.png"
+    },
+    {
+      "theme": "light",
+      "route": "/download",
+      "pass": true,
+      "topbar": true,
+      "footer": true,
+      "expectedFooter": true,
+      "shot": "web-light-download.png"
+    },
+    {
+      "theme": "light",
+      "route": "/doc",
+      "pass": true,
+      "topbar": true,
+      "footer": true,
+      "expectedFooter": true,
+      "shot": "web-light-doc.png"
+    },
+    {
+      "theme": "light",
+      "route": "/nonexistent-page-xyz",
+      "pass": true,
+      "topbar": true,
+      "footer": true,
+      "expectedFooter": false,
+      "shot": "web-light-nonexistent-page-xyz.png"
+    },
+    {
+      "theme": "russian",
+      "route": "/",
+      "pass": true,
+      "topbar": true,
+      "footer": true,
+      "expectedFooter": true,
+      "shot": "web-russian-root.png"
+    },
+    {
+      "theme": "russian",
+      "route": "/donat",
+      "pass": true,
+      "topbar": true,
+      "footer": true,
+      "expectedFooter": true,
+      "shot": "web-russian-donat.png"
+    },
+    {
+      "theme": "russian",
+      "route": "/for_kassa",
+      "pass": true,
+      "topbar": true,
+      "footer": true,
+      "expectedFooter": true,
+      "shot": "web-russian-for_kassa.png"
+    },
+    {
+      "theme": "russian",
+      "route": "/privacy",
+      "pass": true,
+      "topbar": true,
+      "footer": true,
+      "expectedFooter": true,
+      "shot": "web-russian-privacy.png"
+    },
+    {
+      "theme": "russian",
+      "route": "/login",
+      "pass": true,
+      "topbar": true,
+      "footer": true,
+      "expectedFooter": true,
+      "shot": "web-russian-login.png"
+    },
+    {
+      "theme": "russian",
+      "route": "/features",
+      "pass": true,
+      "topbar": true,
+      "footer": true,
+      "expectedFooter": true,
+      "shot": "web-russian-features.png"
+    },
+    {
+      "theme": "russian",
+      "route": "/history",
+      "pass": true,
+      "topbar": true,
+      "footer": true,
+      "expectedFooter": true,
+      "shot": "web-russian-history.png"
+    },
+    {
+      "theme": "russian",
+      "route": "/download",
+      "pass": true,
+      "topbar": true,
+      "footer": true,
+      "expectedFooter": true,
+      "shot": "web-russian-download.png"
+    },
+    {
+      "theme": "russian",
+      "route": "/doc",
+      "pass": true,
+      "topbar": true,
+      "footer": true,
+      "expectedFooter": true,
+      "shot": "web-russian-doc.png"
+    },
+    {
+      "theme": "russian",
+      "route": "/nonexistent-page-xyz",
+      "pass": true,
+      "topbar": true,
+      "footer": true,
+      "expectedFooter": false,
+      "shot": "web-russian-nonexistent-page-xyz.png"
+    }
+  ]
+}

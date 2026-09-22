@@ -1,15 +1,23 @@
 // RulesScreen — страница /rules
 // Пользовательское соглашение (публичная оферта) — 149-ФЗ, ГК РФ
+// P35: единая шапка/подвал (@balloo/ui), как на всех страницах
+
+import { AppTopbar } from '@/components/chrome/AppTopbar';
+import { AppFooter } from '@/components/chrome/AppFooter';
 
 export function RulesScreen() {
   return (
-    <div style={{
-      maxWidth: 800,
-      margin: '0 auto',
-      padding: '48px 24px',
-      fontFamily: 'Inter, Manrope, sans-serif',
-      color: 'var(--text-primary)',
-    }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflowY: 'auto' }}>
+      <AppTopbar title="Правила" />
+
+      <div style={{
+        maxWidth: 800,
+        width: '100%',
+        margin: '0 auto',
+        padding: '48px 24px',
+        fontFamily: 'Inter, Manrope, sans-serif',
+        color: 'var(--text-primary)',
+      }}>
       {/* Header */}
       <div style={{ marginBottom: 48 }}>
         <div style={{ fontSize: 40, marginBottom: 16 }}>📜</div>
@@ -217,16 +225,10 @@ export function RulesScreen() {
           <p><strong>Форма обратной связи:</strong> <a href="/features" style={{ color: 'var(--accent)' }}>features.balloo.su</a></p>
         </div>
       </div>
-
-      {/* Footer */}
-      <div style={{ textAlign: 'center', color: 'var(--text-secondary)', fontSize: 14, paddingTop: 24, borderTop: '1px solid var(--border)' }}>
-        <p>Balloo Messenger © 2026. Все права защищены.</p>
-        <p style={{ marginTop: 8 }}>
-          <a href="/" style={{ color: 'var(--accent)', textDecoration: 'none', marginRight: 16 }}>На главную</a>
-          <a href="/privacy" style={{ color: 'var(--accent)', textDecoration: 'none', marginRight: 16 }}>Политика конфиденциальности</a>
-          <a href="/cookies" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Политика cookies</a>
-        </p>
       </div>
+
+      {/* P35: единый подвал (@balloo/ui) */}
+      <AppFooter />
     </div>
   );
 }

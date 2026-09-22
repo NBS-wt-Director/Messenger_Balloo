@@ -1,14 +1,28 @@
 // DonateScreen — страница balloo.su/donat
 // Страница донатов: QR-код СБП, номер телефона, заглушка ЮKassa
+// P35: единая шапка/подвал (@balloo/ui)
+
+import { AppTopbar } from '@/components/chrome/AppTopbar';
+import { AppFooter } from '@/components/chrome/AppFooter';
 
 export function DonateScreen() {
   return (
     <div style={{
-      maxWidth: 600,
-      margin: '0 auto',
-      padding: '40px 24px',
+      display: 'flex',
+      flexDirection: 'column',
+      minHeight: '100vh',
       fontFamily: 'Inter, Manrope, sans-serif',
     }}>
+      {/* P35: единая шапка (@balloo/ui) */}
+      <AppTopbar title="Донаты" />
+
+      <div style={{
+        maxWidth: 600,
+        width: '100%',
+        margin: '0 auto',
+        padding: '40px 24px',
+        flex: 1,
+      }}>
       {/* Header */}
       <div style={{ textAlign: 'center', marginBottom: 48 }}>
         <div style={{ fontSize: 48, marginBottom: 16 }}>💚</div>
@@ -91,13 +105,10 @@ export function DonateScreen() {
         </div>
       </div>
 
-      {/* Footer */}
-      <div style={{ textAlign: 'center', marginTop: 48, color: 'var(--text-secondary)', fontSize: 14 }}>
-        <p>Balloo Messenger © 2026. Все права защищены.</p>
-        <p style={{ marginTop: 4 }}>
-          <a href="/" style={{ color: 'var(--accent)', textDecoration: 'none' }}>На главную</a>
-        </p>
       </div>
+
+      {/* P35: единый подвал (@balloo/ui) */}
+      <AppFooter />
     </div>
   );
 }

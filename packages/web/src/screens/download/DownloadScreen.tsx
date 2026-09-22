@@ -10,6 +10,8 @@ import { AutoDetectBanner } from './components/AutoDetectBanner';
 import { QRCode } from './components/QRCode';
 import { SystemRequirements, type SystemRequirement } from './components/SystemRequirements';
 import { InstallInstructions } from './components/InstallInstructions';
+import { AppTopbar } from '@/components/chrome/AppTopbar';
+import { AppFooter } from '@/components/chrome/AppFooter';
 import { UpdateInstructions } from './components/UpdateInstructions';
 import { AndroidArchSelector } from './components/AndroidArchSelector';
 import { PackageOption, type PackageData } from './components/PackageOption';
@@ -165,7 +167,11 @@ export function DownloadScreen() {
   };
 
   return (
-    <div className="main">
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
+      {/* P35: единая шапка (@balloo/ui) */}
+      <AppTopbar title="Загрузки" />
+
+      <div className="main" style={{ flex: 1, minHeight: 0 }}>
       <div className="content overflow-y-auto">
         <div className="page-container">
           {/* Hero */}
@@ -434,6 +440,10 @@ export function DownloadScreen() {
           )}
         </div>
       </div>
+      </div>
+
+      {/* P35: единый подвал */}
+      <AppFooter />
     </div>
   );
 }

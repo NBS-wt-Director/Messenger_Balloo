@@ -9,6 +9,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
 import { api } from '@/services/api';
 import { CodeInput } from '@/components/auth/CodeInput';
+import { AppTopbar } from '@/components/chrome/AppTopbar';
+import { AppFooter } from '@/components/chrome/AppFooter';
 
 type TwoFactorMode = 'login' | 'setup' | 'disable';
 
@@ -155,8 +157,11 @@ function TwoFactorScreen({ mode = 'login' }: TwoFactorScreenProps) {
 
   if (mode === 'login') {
     // Login 2FA screen — simple TOTP input
+    // P35: единая шапка/подвал (@balloo/ui) — как на всех страницах входа
     return (
-      <div className="auth-container">
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflowY: 'auto' }}>
+        <AppTopbar title="Двухфакторная аутентификация" right={<div className="mascot">🦊</div>} />
+        <div className="auth-container">
         <div className="auth-card">
           {/* Title */}
           <div
@@ -246,6 +251,8 @@ function TwoFactorScreen({ mode = 'login' }: TwoFactorScreenProps) {
             </a>
           </p>
         </div>
+      </div>
+        <AppFooter />
       </div>
     );
   }

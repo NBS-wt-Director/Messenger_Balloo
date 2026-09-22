@@ -9,9 +9,8 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ThemeSwitcher } from '@/components/topbar/ThemeSwitcher';
-import { LanguageSwitcher } from '@/components/topbar/LanguageSwitcher';
-import { TopbarMenu } from '@/components/topbar/TopbarMenu';
+import { AppTopbar } from '@/components/chrome/AppTopbar';
+import { AppFooter } from '@/components/chrome/AppFooter';
 import { api } from '@/services/api';
 
 // Интервал опроса статуса кода (сек)
@@ -94,16 +93,11 @@ function AddDeviceScreen() {
         // P27: фон не задаём — градиент темы russian на body не должен закрываться
       }}
     >
-      {/* Topbar */}
-      <div className="topbar">
-        <TopbarMenu />
-        <div className="topbar__title">Добавить устройство</div>
-        <div className="topbar__right">
-          <div className="mascot">🦊</div>
-          <LanguageSwitcher />
-          <ThemeSwitcher />
-        </div>
-      </div>
+      {/* Единая шапка (@balloo/ui, P35) */}
+      <AppTopbar
+        title="Добавить устройство"
+        right={<div className="mascot">🦊</div>}
+      />
 
       {/* Content (narrow) */}
       <div
@@ -241,27 +235,8 @@ function AddDeviceScreen() {
         </button>
       </div>
 
-      {/* Footer — юридические ссылки */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          gap: '16px',
-          padding: '16px',
-          fontSize: '13px',
-          flexShrink: 0,
-        }}
-      >
-        <Link to="/rules" className="text-secondary" style={{ textDecoration: 'none' }}>
-          Правила
-        </Link>
-        <Link to="/privacy" className="text-secondary" style={{ textDecoration: 'none' }}>
-          Конфиденциальность
-        </Link>
-        <Link to="/cookies" className="text-secondary" style={{ textDecoration: 'none' }}>
-          Cookies
-        </Link>
-      </div>
+      {/* Единый подвал (@balloo/ui, P35) — юридические ссылки */}
+      <AppFooter />
     </div>
   );
 }

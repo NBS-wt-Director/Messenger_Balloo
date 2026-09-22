@@ -4,6 +4,8 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AppTopbar } from '@/components/chrome/AppTopbar';
+import { AppFooter } from '@/components/chrome/AppFooter';
 
 type ResetStep = 1 | 2 | 3 | 4;
 
@@ -82,7 +84,10 @@ function ResetPasswordScreen() {
   };
 
   return (
-    <div className="auth-container">
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflowY: 'auto' }}>
+      {/* P35: единая шапка/подвал (@balloo/ui) */}
+      <AppTopbar title="Восстановление пароля" right={<div className="mascot">🦊</div>} />
+      <div className="auth-container">
       <div className="auth-card">
         <div style={{ width: '80px', height: '80px', fontSize: '36px', margin: '0 auto 16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>🔑</div>
         <h1 className="auth-title">Восстановление пароля</h1>
@@ -166,6 +171,8 @@ function ResetPasswordScreen() {
           <div className="text-xs text-secondary mt-2">Если email не подтверждён, функции ограничены. <a href="#" className="text-accent" onClick={(e) => { e.preventDefault(); }}>Отправить письмо подтверждения</a></div>
         </div>
       </div>
+      </div>
+      <AppFooter />
     </div>
   );
 }

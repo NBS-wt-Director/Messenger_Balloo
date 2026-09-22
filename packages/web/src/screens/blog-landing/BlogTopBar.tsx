@@ -1,7 +1,10 @@
-// BlogTopBar — топбар для корпоративного блога (blog.balloo.su)
-// Тикет №60 — Blog: корпоративный блог
+// BlogTopBar — топбар корпоративного блога (blog.balloo.su)
+// P35: теперь обёртка над ЕДИНОЙ шапкой @balloo/ui (AppTopbar) —
+// лого-меню разделов + переключатели языка/темы общие, как на всех сайтах.
+// Специфика блога: кнопка поиска по блогу + кнопка «На главную».
 
 import { useNavigate } from 'react-router-dom';
+import { AppTopbar } from '@/components/chrome/AppTopbar';
 
 interface BlogTopBarProps {
   title?: string;
@@ -12,30 +15,28 @@ export function BlogTopBar({ title = 'Корпоративный блог', show
   const navigate = useNavigate();
 
   return (
-    <div className="topbar">
-      <div className="topbar__logo">
-        <div className="topbar__logo-icon" style={{ background: '#a855f7' }}>📝</div>
-        <span>Blog</span>
-      </div>
-      <div className="topbar__title">{title}</div>
-      <div className="topbar__right flex items-center gap-2">
-        {showSearch && (
+    <AppTopbar
+      title={title}
+      right={
+        <>
+          {showSearch && (
+            <button
+              className="topbar__actions-btn"
+              onClick={() => navigate('/blog/search')}
+              title="Поиск по блогу"
+            >
+              🔍
+            </button>
+          )}
           <button
-            className="btn btn--tertiary btn--sm"
-            onClick={() => navigate('/blog/search')}
-            title="Поиск по блогу"
+            className="topbar__actions-btn"
+            onClick={() => navigate('/')}
+            title="На главную"
           >
-            🔍
+            🏠
           </button>
-        )}
-        <button
-          className="btn btn--tertiary btn--sm"
-          onClick={() => navigate('/')}
-          title="На главную"
-        >
-          🏠
-        </button>
-      </div>
-    </div>
+        </>
+      }
+    />
   );
 }

@@ -7,6 +7,8 @@ import { api } from '@/services/api';
 import { EndpointCard, type EndpointData } from './components/EndpointCard';
 import { WebSocketSection } from './components/WebSocketSection';
 import { CodeBlock } from './components/CodeBlock';
+import { AppTopbar } from '@/components/chrome/AppTopbar';
+import { AppFooter } from '@/components/chrome/AppFooter';
 
 // ============================================================
 // Types
@@ -494,23 +496,18 @@ export function DocsScreen() {
   // Main render
   // ============================================================
   return (
-    <div className="main">
-      {/* Topbar */}
-      <div className="topbar">
-        <div className="topbar__logo">
-          <div className="topbar__logo-icon" style={{ background: 'var(--info)' }}>D</div>
-          <span>API Docs</span>
-        </div>
-        <div className="topbar__title">API Documentation</div>
-        <div className="topbar__right">
-          <span className="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
-          <span className="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
-        </div>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
+      {/* P35: единая шапка (@balloo/ui) */}
+      <AppTopbar title="API Documentation" />
+
+      <div className="main" style={{ flex: 1, minHeight: 0 }}>
+        {/* Sidebar + Content */}
+        {renderSidebar()}
+        <div className="content overflow-y-auto">{renderContent()}</div>
       </div>
 
-      {/* Sidebar + Content */}
-      {renderSidebar()}
-      <div className="content overflow-y-auto">{renderContent()}</div>
+      {/* P35: единый подвал */}
+      <AppFooter />
     </div>
   );
 }

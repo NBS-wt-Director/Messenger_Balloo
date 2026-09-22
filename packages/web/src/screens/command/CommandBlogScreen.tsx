@@ -963,31 +963,24 @@ export function CommandBlogScreen() {
 
       {/* Main content */}
       <div className="content overflow-y-auto" style={{ flex: 1 }}>
-        {/* Topbar */}
-        <div className="topbar">
-          <div className="topbar__logo">
-            <div className="topbar__logo-icon" style={{ background: 'var(--info)' }}>C</div>
-            <span>Command</span>
-            <div className="topbar__dropdown" />
-          </div>
-          <div className="topbar__title">
+        {/* P35: единая шапка уже в CommandLayout (@balloo/ui) — здесь локальный
+            заголовок раздела + действие, без второй шапки */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '16px 24px 0' }}>
+          <h1 className="page-title" style={{ marginBottom: 0, flex: 1 }}>
             {activeTab === 'feed' && 'Корпоративный блог'}
             {activeTab === 'my-posts' && 'Мои статьи'}
             {activeTab === 'my-channel' && 'Мой канал'}
             {activeTab === 'create' && 'Редактор статьи'}
-          </div>
-          <div className="topbar__actions">
-            {activeTab !== 'create' && (
-              <button
-                className="topbar__actions-btn"
-                onClick={() => setActiveTab('create')}
-                title="Новая статья"
-              >
-                ✏
-              </button>
-            )}
-          </div>
-          <div className="topbar__right" />
+          </h1>
+          {activeTab !== 'create' && (
+            <button
+              className="topbar__actions-btn"
+              onClick={() => setActiveTab('create')}
+              title="Новая статья"
+            >
+              ✏
+            </button>
+          )}
         </div>
 
         {/* Blog navigation tabs */}

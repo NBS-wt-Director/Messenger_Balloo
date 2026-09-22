@@ -1,34 +1,39 @@
-// Main Layout — основной лейаут приложения
-// 3-column: sidebar | chat list | chat view (desktop)
+// Main Layout — основной лейаут приложения (P35: единая шапка/подвал)
+// Структура по макету mockups/balloo-su/chats.html:
+//   Topbar (на всю ширину, @balloo/ui) → main (sidebar | chat list | chat view) → Footer (@balloo/ui)
 // Responsive: mobile (1 col), tablet (2 col), desktop (3 col)
-// + Footer с юридическими ссылками
 
 import { useEffect } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { useUIStore } from '@/store/uiStore';
 import { Sidebar } from '@/components/sidebar/Sidebar';
 import { ChatList } from '@/components/chat/ChatList';
-import { TopBar } from '@/components/topbar/TopBar';
+import { AppTopbar } from '@/components/chrome/AppTopbar';
+import { AppFooter } from '@/components/chrome/AppFooter';
+import { NotificationsBell } from '@/components/topbar/NotificationsBell';
+import { useAuthStore } from '@/store/authStore';
 
 function MainLayout() {
+  const navigate = useNavigate();
   const isSidebarOpen = useUIStore((s) => s.isSidebarOpen);
-  const setIsSidebarOpen = useUIStore((s) => s.setSidebarOpen);
+  const setSidebarOpen = useUIStore((s) => s.setSidebarOpen);
+  const user = useAuthStore((s) => s.user);
 
   // Responsive handling
   useEffect(() => {
     function handleResize() {
       const w = window.innerWidth;
       if (w <= 768) {
-        setIsSidebarOpen(false);
+        setSidebarOpen(false);
       } else if (w <= 1024) {
-        setIsSidebarOpen(true);
+        setSidebarOpen(true);
       }
     }
 
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [setIsSidebarOpen]);
+  }, [setSidebarOpen]);
 
   const isMobile = window.innerWidth <= 768;
   const isTablet = window.innerWidth > 768 && window.innerWidth <= 1024;
@@ -36,76 +41,77 @@ function MainLayout() {
   const showChatList = !isMobile;
   const showChatView = !isMobile && !isTablet;
 
+  // Аватар пользователя в шапке (клик → профиль), как в макете chats.html
+  const displayName = user?.displayName || user?.username || '';
+  const initials = displayName
+    .split(' ')
+    .filter(Boolean)
+    .map((n) => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+
   return (
     <div
       className="main-layout"
       style={{
         display: 'flex',
+        flexDirection: 'column',
         height: '100vh',
         width: '100vw',
         overflow: 'hidden',
         background: 'var(--bg-primary)',
       }}
     >
-      {/* Column 1: Sidebar */}
-      {isSidebarOpen && <Sidebar />}
+      {/* Единая шапка (@balloo/ui) — на всю ширину, как в макете */}
+      <AppTopbar
+        title="Чаты"
+        right={
+          <>
+            <NotificationsBell />
+            <div
+              className="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"
+              title={displayName || 'Профиль'}
+              onClick={() => navigate('/profile')}
+              style={{ cursor: 'pointer' }}
+            >
+              <div className="avatar__inner">
+                {user?.avatarUrl ? <img src={user.avatarUrl} alt={displayName} /> : <span>{initials || '?'}</span>}
+              </div>
+            </div>
+          </>
+        }
+      />
 
-      {/* Column 2: Chat list */}
-      {showChatList && <ChatList />}
+      {/* Main: sidebar | chat list | chat view */}
+      <div className="main" style={{ display: 'flex', flex: 1, overflow: 'hidden', minHeight: 0 }}>
+        {/* Column 1: Sidebar */}
+        {isSidebarOpen && <Sidebar />}
 
-      {/* Column 3: Chat view / content */}
-      <main
-        className="main-content"
-        style={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          height: '100%',
-          overflow: 'hidden',
-          minWidth: 0,
-        }}
-      >
-        {/* TopBar */}
-        <TopBar
-          title="Balloo"
-          onSearchClick={() => {
-            window.location.hash = '#/search';
-          }}
-        />
+        {/* Column 2: Chat list */}
+        {showChatList && <ChatList />}
 
-        {/* Outlet for child routes */}
-        <div style={{ flex: 1, overflow: 'hidden' }}>
-          <Outlet />
-        </div>
-
-        {/* Footer: юридические ссылки */}
-        <footer
+        {/* Column 3: Chat view / content */}
+        <main
+          className="main-content"
           style={{
-            borderTop: '1px solid var(--border-color)',
-            padding: '12px 24px',
+            flex: 1,
             display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '16px',
-            fontSize: '13px',
-            color: 'var(--text-secondary)',
-            flexShrink: 0,
-            background: 'var(--bg-secondary)',
+            flexDirection: 'column',
+            height: '100%',
+            overflow: 'hidden',
+            minWidth: 0,
           }}
         >
-          <span>Balloo Messenger © 2026</span>
-          <span style={{ opacity: 0.3 }}>|</span>
-          <a href="/rules" style={{ color: 'var(--accent)', textDecoration: 'none' }}>
-            Правила
-          </a>
-          <a href="/privacy" style={{ color: 'var(--accent)', textDecoration: 'none' }}>
-            Конфиденциальность
-          </a>
-          <a href="/cookies" style={{ color: 'var(--accent)', textDecoration: 'none' }}>
-            Cookies
-          </a>
-        </footer>
-      </main>
+          {/* Outlet for child routes */}
+          <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+            <Outlet />
+          </div>
+        </main>
+      </div>
+
+      {/* Единый подвал (@balloo/ui) */}
+      <AppFooter onCopyrightClick={() => navigate('/')} />
     </div>
   );
 }

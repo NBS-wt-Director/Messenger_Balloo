@@ -6,6 +6,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { HistoryTimeline } from './HistoryTimeline';
 import { api } from '@/services/api';
+import { AppTopbar } from '@/components/chrome/AppTopbar';
+import { AppFooter } from '@/components/chrome/AppFooter';
 
 interface VersionItem {
   id: string;
@@ -53,7 +55,11 @@ export function HistoryScreen() {
   }, [loadVersions]);
 
   return (
-    <div className="main">
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
+      {/* P35: единая шапка (@balloo/ui) */}
+      <AppTopbar title="История версий" />
+
+      <div className="main" style={{ flex: 1, minHeight: 0 }}>
       <div className="content overflow-y-auto">
         <div className="page-container">
           <h1 className="page-title">📜 История версий</h1>
@@ -96,6 +102,10 @@ export function HistoryScreen() {
           </div>
         </div>
       </div>
+      </div>
+
+      {/* P35: единый подвал */}
+      <AppFooter />
     </div>
   );
 }

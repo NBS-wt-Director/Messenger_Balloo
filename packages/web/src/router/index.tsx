@@ -6,6 +6,7 @@
 import { createHashRouter, Navigate } from 'react-router-dom';
 import { Suspense, lazy, useEffect, useState } from 'react';
 import { ErrorBoundary } from '@/components/providers/ErrorBoundary';
+import { PageChrome } from '@/components/chrome/PageChrome';
 import { PrivacyScreen } from '@/screens/legal/PrivacyScreen';
 import { RulesScreen } from '@/screens/legal/RulesScreen';
 import { CookiesScreen } from '@/screens/legal/CookiesScreen';
@@ -667,7 +668,9 @@ export const router = createHashRouter([
     element: (
       <ErrorBoundary>
         <Suspense fallback={<LoadingFallback />}>
-          <FeatureCreateScreen />
+          <PageChrome title="Новый фич-реквест">
+            <FeatureCreateScreen />
+          </PageChrome>
         </Suspense>
       </ErrorBoundary>
     ),
@@ -677,7 +680,9 @@ export const router = createHashRouter([
     element: (
       <ErrorBoundary>
         <Suspense fallback={<LoadingFallback />}>
-          <FeatureDetailScreen />
+          <PageChrome title="Фич-реквест">
+            <FeatureDetailScreen />
+          </PageChrome>
         </Suspense>
       </ErrorBoundary>
     ),
@@ -698,7 +703,9 @@ export const router = createHashRouter([
     element: (
       <ErrorBoundary>
         <Suspense fallback={<LoadingFallback />}>
-          <VersionDetailScreen />
+          <PageChrome title="Версия">
+            <VersionDetailScreen />
+          </PageChrome>
         </Suspense>
       </ErrorBoundary>
     ),
@@ -708,7 +715,9 @@ export const router = createHashRouter([
     element: (
       <ErrorBoundary>
         <Suspense fallback={<LoadingFallback />}>
-          <CompareScreen />
+          <PageChrome title="Сравнение версий">
+            <CompareScreen />
+          </PageChrome>
         </Suspense>
       </ErrorBoundary>
     ),
@@ -728,7 +737,9 @@ export const router = createHashRouter([
     element: (
       <ErrorBoundary>
         <Suspense fallback={<LoadingFallback />}>
-          <DownloadProgressScreen />
+          <PageChrome title="Загрузка">
+            <DownloadProgressScreen />
+          </PageChrome>
         </Suspense>
       </ErrorBoundary>
     ),

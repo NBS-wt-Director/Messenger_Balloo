@@ -3,6 +3,8 @@
 
 import { useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { AppTopbar } from '@/components/chrome/AppTopbar';
+import { AppFooter } from '@/components/chrome/AppFooter';
 
 interface NavItem {
   icon: string;
@@ -200,55 +202,17 @@ export function CommandLayout() {
 
       {/* Main content */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        {/* Topbar */}
-        <div
-          className="topbar"
-          style={{
-            minHeight: 56,
-            display: 'flex',
-            alignItems: 'center',
-            padding: '0 20px',
-            borderBottom: '1px solid var(--border-color)',
-            background: 'var(--bg-secondary)',
-          }}
-        >
-          <div className="topbar__logo" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div
-              style={{
-                width: 28,
-                height: 28,
-                borderRadius: 6,
-                background: 'var(--info)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'white',
-                fontWeight: 800,
-                fontSize: 14,
-              }}
-            >
-              C
-            </div>
-            <span style={{ fontWeight: 700, fontSize: 15 }}>Command</span>
-          </div>
-
-          <div style={{ flex: 1 }} />
-
-          {/* Topbar right: user info, theme, lang */}
-          <div className="topbar__right" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <span className="topbar__lang" data-lang-toggle style={{ fontSize: 13, cursor: 'pointer' }}>
-              🇷🇺 RU
-            </span>
-            <span className="topbar__theme" data-theme-toggle style={{ fontSize: 13, cursor: 'pointer' }}>
-              🌙 Тёмная
-            </span>
+        {/* P35: единая шапка (@balloo/ui) — лого-меню разделов + аватар пользователя */}
+        <AppTopbar
+          title="Command"
+          right={
             <div className="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact">
               <div className="avatar__inner">
                 <span>ИВ</span>
               </div>
             </div>
-          </div>
-        </div>
+          }
+        />
 
         {/* Page content */}
         <div className="content overflow-y-auto" style={{ flex: 1, overflow: 'auto' }}>
@@ -256,6 +220,9 @@ export function CommandLayout() {
             <Outlet />
           </div>
         </div>
+
+        {/* P35: единый подвал */}
+        <AppFooter />
       </div>
 
       {/* Mobile overlay */}

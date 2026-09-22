@@ -7,6 +7,8 @@ import './styles/global.css';
 import './styles/themes.css';
 import './styles/design-system.css';
 import './styles/chat.css';
+// P35: стили единой шапки/подвала из @balloo/ui (.topbar*, .balloo-footer*)
+import '@balloo/ui/styles/chrome.css';
 
 // Register service worker for PWA (future)
 if ('serviceWorker' in navigator) {

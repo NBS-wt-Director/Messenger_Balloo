@@ -1,15 +1,23 @@
 // CookiesScreen — страница /cookies
 // Политика использования файлов cookie
+// P35: единая шапка/подвал (@balloo/ui), как на всех страницах
+
+import { AppTopbar } from '@/components/chrome/AppTopbar';
+import { AppFooter } from '@/components/chrome/AppFooter';
 
 export function CookiesScreen() {
   return (
-    <div style={{
-      maxWidth: 800,
-      margin: '0 auto',
-      padding: '48px 24px',
-      fontFamily: 'Inter, Manrope, sans-serif',
-      color: 'var(--text-primary)',
-    }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflowY: 'auto' }}>
+      <AppTopbar title="Cookies" />
+
+      <div style={{
+        maxWidth: 800,
+        width: '100%',
+        margin: '0 auto',
+        padding: '48px 24px',
+        fontFamily: 'Inter, Manrope, sans-serif',
+        color: 'var(--text-primary)',
+      }}>
       {/* Header */}
       <div style={{ marginBottom: 48 }}>
         <div style={{ fontSize: 40, marginBottom: 16 }}>🍪</div>
@@ -166,16 +174,10 @@ export function CookiesScreen() {
           </p>
         </div>
       </div>
-
-      {/* Footer */}
-      <div style={{ textAlign: 'center', color: 'var(--text-secondary)', fontSize: 14, paddingTop: 24, borderTop: '1px solid var(--border)' }}>
-        <p>Balloo Messenger © 2026. Все права защищены.</p>
-        <p style={{ marginTop: 8 }}>
-          <a href="/" style={{ color: 'var(--accent)', textDecoration: 'none', marginRight: 16 }}>На главную</a>
-          <a href="/privacy" style={{ color: 'var(--accent)', textDecoration: 'none', marginRight: 16 }}>Политика конфиденциальности</a>
-          <a href="/rules" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Пользовательское соглашение</a>
-        </p>
       </div>
+
+      {/* P35: единый подвал (@balloo/ui) */}
+      <AppFooter />
     </div>
   );
 }

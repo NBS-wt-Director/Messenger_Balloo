@@ -1,5 +1,9 @@
 // Not Found Screen — страница 404
-// Shared error screen
+// Shared error screen (1_00_01) — макет mockups/shared/error-404.html:
+// единый topbar (лого + «Ошибка 404» + маскот/язык/тема), футера в макете нет.
+// P35: шапка через @balloo/ui (AppTopbar).
+
+import { AppTopbar } from '@/components/chrome/AppTopbar';
 
 function NotFoundScreen() {
   return (
@@ -7,30 +11,41 @@ function NotFoundScreen() {
       style={{
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
         height: '100vh',
         textAlign: 'center',
-        padding: '2rem',
       }}
     >
-      <h1 style={{ fontSize: '3rem', marginBottom: '1rem', color: 'var(--accent)' }}>404</h1>
-      <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Страница не найдена</h2>
-      <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>
-        Запрашиваемая страница не существует.
-      </p>
-      <a
-        href="/"
+      {/* P35: единая шапка по макету error-404.html */}
+      <AppTopbar title="Ошибка 404" right={<div className="mascot">🦊</div>} />
+
+      <div
         style={{
-          padding: '0.75rem 1.5rem',
-          background: 'var(--accent)',
-          color: '#fff',
-          fontWeight: '600',
-          borderRadius: '0',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flex: 1,
+          padding: '2rem',
         }}
       >
-        На главную
-      </a>
+        <h1 style={{ fontSize: '3rem', marginBottom: '1rem', color: 'var(--accent)' }}>404</h1>
+        <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Страница не найдена</h2>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>
+          Запрашиваемая страница не существует.
+        </p>
+        <a
+          href="/"
+          style={{
+            padding: '0.75rem 1.5rem',
+            background: 'var(--accent)',
+            color: '#fff',
+            fontWeight: '600',
+            borderRadius: '0',
+          }}
+        >
+          На главную
+        </a>
+      </div>
     </div>
   );
 }

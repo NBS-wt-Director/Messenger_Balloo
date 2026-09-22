@@ -1,10 +1,18 @@
 // ForKassaScreen — страница balloo.su/for_kassa
 // Содержит реквизиты для регистрации в ЮKassa: сайт, ИНН, оферта, цены
+// P35: единая шапка/подвал (@balloo/ui)
+
+import { AppTopbar } from '@/components/chrome/AppTopbar';
+import { AppFooter } from '@/components/chrome/AppFooter';
 
 export function ForKassaScreen() {
   return (
-    <div style={{
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <AppTopbar title="Для ЮKassa" />
+
+      <div style={{
       maxWidth: 800,
+      width: '100%',
       margin: '0 auto',
       padding: '40px 24px',
       fontFamily: 'Inter, Manrope, sans-serif',
@@ -100,12 +108,8 @@ export function ForKassaScreen() {
       </div>
 
       {/* Footer */}
-      <div style={{ textAlign: 'center', marginTop: 48, color: 'var(--text-secondary)', fontSize: 14 }}>
-        <p>Balloo Messenger © 2026. Все права защищены.</p>
-        <p style={{ marginTop: 4 }}>
-          <a href="/" style={{ color: 'var(--accent)', textDecoration: 'none' }}>На главную</a>
-        </p>
-      </div>
+      <AppFooter />
+    </div>
     </div>
   );
 }

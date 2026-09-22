@@ -10,9 +10,8 @@ import { useAuthStore } from '@/store/authStore';
 import { api } from '@/services/api';
 import { OAuthGrid, type OAuthProvider } from '@/components/auth/OAuthGrid';
 import { LegalCheckbox } from '@/components/auth/LegalCheckbox';
-import { ThemeSwitcher } from '@/components/topbar/ThemeSwitcher';
-import { LanguageSwitcher } from '@/components/topbar/LanguageSwitcher';
-import { TopbarMenu } from '@/components/topbar/TopbarMenu';
+import { AppTopbar } from '@/components/chrome/AppTopbar';
+import { AppFooter } from '@/components/chrome/AppFooter';
 import { useI18n } from '@/components/providers/I18nProvider';
 
 function RegisterScreen() {
@@ -204,16 +203,11 @@ function RegisterScreen() {
         // P27: фон не задаём — градиент темы russian на body не должен закрываться
       }}
     >
-      {/* Topbar — как в макете register.html (P25: шапка обязательна) */}
-      <div className="topbar">
-        <TopbarMenu />
-        <div className="topbar__title">{t('auth.register')}</div>
-        <div className="topbar__right">
-          <div className="mascot">🦊</div>
-          <LanguageSwitcher />
-          <ThemeSwitcher />
-        </div>
-      </div>
+      {/* Единая шапка (@balloo/ui, P35) — как в макете register.html */}
+      <AppTopbar
+        title={t('auth.register')}
+        right={<div className="mascot">🦊</div>}
+      />
 
       {/* Auth */}
       <div className="auth-container">
@@ -459,27 +453,8 @@ function RegisterScreen() {
         </div>
       </div>
 
-      {/* Footer — юридические ссылки (P25: как на странице входа) */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          gap: '16px',
-          padding: '16px',
-          fontSize: '13px',
-          flexShrink: 0, /* P29: подвал не сжимается и не наезжает на форму */
-        }}
-      >
-        <Link to="/rules" className="text-secondary" style={{ textDecoration: 'none' }}>
-          {t('footer.rules')}
-        </Link>
-        <Link to="/privacy" className="text-secondary" style={{ textDecoration: 'none' }}>
-          {t('footer.privacy')}
-        </Link>
-        <Link to="/cookies" className="text-secondary" style={{ textDecoration: 'none' }}>
-          {t('footer.cookies')}
-        </Link>
-      </div>
+      {/* Единый подвал (@balloo/ui, P35) — юридические ссылки (P25: как на странице входа) */}
+      <AppFooter />
     </div>
   );
 }

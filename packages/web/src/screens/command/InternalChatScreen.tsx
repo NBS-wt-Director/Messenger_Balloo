@@ -308,29 +308,16 @@ export function InternalChatScreen() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
-      {/* Topbar */}
-      <div className="topbar">
-        <div className="topbar__logo">
-          <div className="topbar__logo-icon" style={{ background: 'var(--info)' }}>C</div>
-          <span>Command</span>
-          <div className="topbar__dropdown" />
-        </div>
-        <div className="topbar__title">Внутренний чат</div>
-        <div className="topbar__actions">
-          <div
-            className="topbar__actions-btn"
-            title="Новый чат"
-            style={{ cursor: 'pointer' }}
-          >
-            ✏
-          </div>
-        </div>
-        <div className="topbar__right">
-          <div className="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact">
-            <div className="avatar__inner">
-              <span>{user ? getInitials(user.displayName || 'ИВ') : 'ИВ'}</span>
-            </div>
-          </div>
+      {/* P35: единая шапка уже в CommandLayout (@balloo/ui) — здесь локальный
+          заголовок раздела + действие, без второй шапки */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderBottom: '1px solid var(--border-color)', background: 'var(--bg-secondary)' }}>
+        <h1 style={{ flex: 1, fontSize: 16, fontWeight: 600, color: 'var(--text-primary)' }}>Внутренний чат</h1>
+        <div
+          className="topbar__actions-btn"
+          title="Новый чат"
+          style={{ cursor: 'pointer' }}
+        >
+          ✏
         </div>
       </div>
 
