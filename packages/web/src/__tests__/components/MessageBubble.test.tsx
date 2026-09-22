@@ -37,7 +37,7 @@ describe('MessageBubble', () => {
   it('renders edited indicator', () => {
     const editedMsg = { ...baseMessage, editCount: 1 };
     render(<MessageBubble message={editedMsg} isOwn={false} />);
-    expect(screen.getByText('(изм.)')).toBeInTheDocument();
+    expect(screen.getByText('✏ Изменено')).toBeInTheDocument();
   });
 
   it('renders forwarded tag', () => {
@@ -117,7 +117,8 @@ describe('MessageBubble', () => {
       }),
     };
     render(<MessageBubble message={pollMsg} isOwn={false} />);
-    expect(screen.getByText('What?')).toBeInTheDocument();
+    // По макету вопрос опроса рендерится с префиксом 📊
+    expect(screen.getByText('📊 What?')).toBeInTheDocument();
     expect(screen.getByText('Yes')).toBeInTheDocument();
     expect(screen.getByText('No')).toBeInTheDocument();
   });

@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MessageInput } from '../../components/chat/MessageInput';
+import { ReplyPreview } from '../../components/chat/ReplyPreview';
 
 describe('MessageInput (сценарий чата)', () => {
   const onSend = vi.fn();
@@ -85,32 +86,6 @@ describe('MessageInput (сценарий чата)', () => {
     expect(onSend).toHaveBeenCalledWith('/unknown_cmd', 'text');
   });
 
-  it('shows reply panel when replyTo passed', () => {
-    render(
-      <MessageInput
-        onSend={onSend}
-        replyTo={{ id: 'm1', author: 'Alice', content: 'Сообщение Alice' }}
-      />
-    );
-
-    expect(screen.getByText('Alice')).toBeInTheDocument();
-    expect(screen.getByText('Сообщение Alice')).toBeInTheDocument();
-  });
-
-  it('cancel reply button calls onCancelReply', () => {
-    const onCancelReply = vi.fn();
-    render(
-      <MessageInput
-        onSend={onSend}
-        onCancelReply={onCancelReply}
-        replyTo={{ id: 'm1', author: 'Alice', content: 'msg' }}
-      />
-    );
-
-    fireEvent.click(screen.getByText('✕'));
-    expect(onCancelReply).toHaveBeenCalledTimes(1);
-  });
-
   it('emoji picker opens and inserts emoji', () => {
     render(<MessageInput onSend={onSend} />);
     const textarea = screen.getByPlaceholderText(/напишите сообщение/i);
@@ -121,5 +96,48 @@ describe('MessageInput (сценарий чата)', () => {
     fireEvent.click(screen.getByText('👍'));
 
     expect((textarea as HTMLTextAreaElement).value).toBe('👍');
+  });
+
+  it('renders mockup slash-hint items (input-hint)', () => {
+    render(<MessageInput onSend={onSend} />);
+    const textarea = screen.getByPlaceholderText(/напишите сообщение/i);
+
+    // Печать "/" открывает slash-подсказки (как в макете: input-hint)
+    fireEvent.change(textarea, { target: { value: '/' } });
+
+    // Hint-элементы: <code>/poll_</code> — текст описания
+    expect(screen.getByText('/poll_')).toBeInTheDocument();
+    expect(screen.getByText('/quiz_')).toBeInTheDocument();
+    expect(screen.getByText('/list_active_')).toBeInTheDocument();
+    expect(screen.getByText('/list_passive_')).toBeInTheDocument();
+    expect(screen.getByText('/personali_')).toBeInTheDocument();
+  });
+});
+
+// P34: reply-панель вынесена в ReplyPreview (по макету — A1.2 над полем ввода)
+describe('ReplyPreview (панель ответа)', () => {
+  it('renders author and content preview', () => {
+    render(
+      <ReplyPreview
+        message={{ id: 'm1', author: 'Alice', content: 'Сообщение Alice' }}
+        onCancel={() => {}}
+      />
+    );
+
+    expect(screen.getByText('Alice')).toBeInTheDocument();
+    expect(screen.getByText('Сообщение Alice')).toBeInTheDocument();
+  });
+
+  it('cancel button calls onCancel', () => {
+    const onCancel = vi.fn();
+    render(
+      <ReplyPreview
+        message={{ id: 'm1', author: 'Alice', content: 'msg' }}
+        onCancel={onCancel}
+      />
+    );
+
+    fireEvent.click(screen.getByText('✕'));
+    expect(onCancel).toHaveBeenCalledTimes(1);
   });
 });

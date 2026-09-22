@@ -6,6 +6,7 @@
 
 import { createContext, useContext, useCallback, useEffect, useState } from 'react';
 import { useAuthStore, type AuthUser } from '@/store/authStore';
+import { useChatStore } from '@/store/chatStore';
 import { api } from '@/services/api';
 
 interface AuthContextValue {
@@ -40,6 +41,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = useAuthStore((s) => s.logout);
 
   const [initialLoad, setInitialLoad] = useState(true);
+
+  // P34: currentUserId в chatStore — для isOwn в MessageList (свои/чужие пузыри)
+  const chatSetCurrentUserId = useChatStore((s) => s.setCurrentUserId);
+  useEffect(() => {
+    chatSetCurrentUserId(user?.id ?? null);
+  }, [user?.id, chatSetCurrentUserId]);
 
   // Restore session on mount: проверяем httpOnly cookie запросом /users/me.
   // При 401 api.ts сам попробует /refresh-cookie и повторит запрос.

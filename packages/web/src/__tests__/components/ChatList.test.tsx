@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { ChatList } from '../../components/chat/ChatList';
 import { useChatStore, type UserChat } from '../../store/chatStore';
-import { useUIStore } from '../../store/uiStore';
 
 const mockChats: UserChat[] = [
   {
@@ -43,12 +43,22 @@ const mockChats: UserChat[] = [
   },
 ];
 
-describe('ChatList', () => {
+// P34: ChatList использует useNavigate — обёртка MemoryRouter
+function renderChatList() {
+  return render(
+    <MemoryRouter>
+      <ChatList />
+    </MemoryRouter>
+  );
+}
+
+describe('ChatList (P34: редизайн по mockups/balloo-su/chats.html)', () => {
   beforeEach(() => {
     useChatStore.setState({
       chats: mockChats,
       activeChatId: null,
       activeChat: null,
+      currentUserId: null,
       messages: {},
       messagesCursor: {},
       hasMoreMessages: {},
@@ -57,66 +67,70 @@ describe('ChatList', () => {
       isSidebarOpen: true,
       isChatInfoOpen: false,
     });
-    useUIStore.setState({
-      isSidebarOpen: true,
-      isRightPanelOpen: false,
-      isSettingsOpen: false,
-      isSearchOpen: false,
-    });
   });
 
-  it('renders title "Чаты"', () => {
-    render(<ChatList />);
-    expect(screen.getByText('Чаты')).toBeInTheDocument();
+  it('renders search input by mockup placeholder', () => {
+    renderChatList();
+    expect(
+      screen.getByPlaceholderText('🔍 Поиск чатов и людей...')
+    ).toBeInTheDocument();
   });
 
-  it('renders all filter tabs', () => {
-    render(<ChatList />);
-    expect(screen.getByText('Все')).toBeInTheDocument();
-    expect(screen.getByText('Личные')).toBeInTheDocument();
-    expect(screen.getByText('Группы')).toBeInTheDocument();
-    expect(screen.getByText('Каналы')).toBeInTheDocument();
+  it('renders "Новая группа" quick-action button', () => {
+    renderChatList();
+    expect(screen.getByText('👥 Новая группа')).toBeInTheDocument();
+  });
+
+  it('renders "Звонки" link with missed-calls badge', () => {
+    renderChatList();
+    expect(screen.getByText('Звонки')).toBeInTheDocument();
   });
 
   it('renders all chats by default', () => {
-    render(<ChatList />);
+    renderChatList();
     expect(screen.getByText('Alice')).toBeInTheDocument();
     expect(screen.getByText('Group Chat')).toBeInTheDocument();
     expect(screen.getByText('News Channel')).toBeInTheDocument();
   });
 
-  it('filters to personal chats only', () => {
-    render(<ChatList />);
-    fireEvent.click(screen.getByText('Личные'));
-    expect(screen.getByText('Alice')).toBeInTheDocument();
-    expect(screen.queryByText('Group Chat')).not.toBeInTheDocument();
-    expect(screen.queryByText('News Channel')).not.toBeInTheDocument();
+  it('renders group chip КОРП and channel chip СМИ (mockup chips)', () => {
+    renderChatList();
+    expect(screen.getByText('КОРП')).toBeInTheDocument();
+    expect(screen.getByText('СМИ')).toBeInTheDocument();
   });
 
-  it('filters to groups only', () => {
-    render(<ChatList />);
-    fireEvent.click(screen.getByText('Группы'));
-    expect(screen.queryByText('Alice')).not.toBeInTheDocument();
-    expect(screen.getByText('Group Chat')).toBeInTheDocument();
-    expect(screen.queryByText('News Channel')).not.toBeInTheDocument();
+  it('renders unread badge counts', () => {
+    renderChatList();
+    // «2» — и badge звонков, и badge чата Alice (обе — валидные badge)
+    const badgesWith2 = screen.getAllByText('2');
+    expect(badgesWith2.length).toBeGreaterThanOrEqual(2);
+    expect(screen.getByText('5')).toBeInTheDocument();
   });
 
-  it('filters to channels only', () => {
-    render(<ChatList />);
-    fireEvent.click(screen.getByText('Каналы'));
-    expect(screen.queryByText('Alice')).not.toBeInTheDocument();
-    expect(screen.queryByText('Group Chat')).not.toBeInTheDocument();
-    expect(screen.getByText('News Channel')).toBeInTheDocument();
+  it('marks active chat with list__item--active', () => {
+    useChatStore.setState({ activeChatId: 'chat1' });
+    const { container } = renderChatList();
+    const active = container.querySelector('.list__item--active');
+    expect(active).not.toBeNull();
+    expect(active?.textContent).toContain('Alice');
+  });
+
+  it('renders chat items with octagon avatar markup (avatar--md + double border)', () => {
+    const { container } = renderChatList();
+    const avatar = container.querySelector(
+      '.avatar.avatar--md.avatar--bordered.avatar--ctx-contact'
+    );
+    expect(avatar).not.toBeNull();
   });
 
   it('shows empty state when no chats', () => {
     useChatStore.setState({ chats: [] });
-    render(<ChatList />);
+    renderChatList();
     expect(screen.getByText('Нет чатов')).toBeInTheDocument();
   });
 
   it('filters chats by search query', () => {
-    render(<ChatList />);
+    renderChatList();
     const searchInput = screen.getByPlaceholderText(/поиск/i);
     fireEvent.change(searchInput, { target: { value: 'Alice' } });
     expect(screen.getByText('Alice')).toBeInTheDocument();
@@ -124,7 +138,7 @@ describe('ChatList', () => {
   });
 
   it('shows "Чаты не найдены" for no search results', () => {
-    render(<ChatList />);
+    renderChatList();
     const searchInput = screen.getByPlaceholderText(/поиск/i);
     fireEvent.change(searchInput, { target: { value: 'nonexistent' } });
     expect(screen.getByText('Чаты не найдены')).toBeInTheDocument();

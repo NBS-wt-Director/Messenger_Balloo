@@ -1,5 +1,6 @@
-// ChatViewScreen — экран чата: сообщения, пузырьри, ввод, вложения
-// Интеграция с WebSocket для realtime
+// ChatViewScreen — окно активного чата (P34: редизайн по mockups/balloo-su/chats.html)
+// Структура макета: .content → chat-header → messages → reply-panel → input-area.
+// Интеграция с WebSocket для realtime.
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -45,6 +46,19 @@ export const ChatViewScreen: React.FC = () => {
       setIsLoading(true);
       try {
         const chatData = await api.getChatInfo(chatId);
+
+        // P34: чата может не быть в store (список ещё не загружен) —
+        // добавляем, иначе activeChat = null и шапка чата не отрисуется
+        const state = useChatStore.getState();
+        if (chatData && !state.chats.find((c) => c.id === chatId)) {
+          state.addChat({
+            ...chatData,
+            joinedAt: chatData.joinedAt ?? chatData.createdAt ?? 0,
+            pinned: !!chatData.pinned,
+            muted: !!chatData.muted,
+            unreadCount: chatData.unreadCount ?? 0,
+          });
+        }
         setActiveChat(chatId);
 
         const messagesData = await api.getMessages(chatId);
@@ -104,58 +118,58 @@ export const ChatViewScreen: React.FC = () => {
 
       if (ws) {
         ws.onopen = () => {
-        console.log('WS connected');
-        ws!.send(JSON.stringify({ type: 'chat.join', chatId }));
-      };
+          console.log('WS connected');
+          ws!.send(JSON.stringify({ type: 'chat.join', chatId }));
+        };
 
-      ws.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        switch (data.type) {
-          case 'message.send':
-            if (data.chatId === chatId) {
-              addMessage(chatId, {
-                ...data.message,
-                sender: data.message.sender
-                  ? {
-                      id: data.message.sender.id,
-                      username: data.message.sender.username,
-                      displayName: data.message.sender.displayName,
-                      avatarUrl: data.message.sender.avatarUrl,
-                    }
-                  : { id: '', username: '' },
-              });
-            }
-            break;
-          case 'message.read':
-            if (data.chatId === chatId) {
-              updateMessage(chatId, data.messageId, { status: 'read' });
-            }
-            break;
-          case 'typing.start':
-            if (data.chatId === chatId) {
-              setTypingUsers(chatId, [
-                ...(useChatStore.getState().typingUsers[chatId] || []),
-                { userId: data.userId, username: data.username },
-              ]);
-            }
-            break;
-          case 'typing.stop':
-            if (data.chatId === chatId) {
-              setTypingUsers(
-                chatId,
-                (useChatStore.getState().typingUsers[chatId] || []).filter(
-                  (u) => u.userId !== data.userId
-                )
-              );
-            }
-            break;
-        }
-      };
+        ws.onmessage = (event) => {
+          const data = JSON.parse(event.data);
+          switch (data.type) {
+            case 'message.send':
+              if (data.chatId === chatId) {
+                addMessage(chatId, {
+                  ...data.message,
+                  sender: data.message.sender
+                    ? {
+                        id: data.message.sender.id,
+                        username: data.message.sender.username,
+                        displayName: data.message.sender.displayName,
+                        avatarUrl: data.message.sender.avatarUrl,
+                      }
+                    : { id: '', username: '' },
+                });
+              }
+              break;
+            case 'message.read':
+              if (data.chatId === chatId) {
+                updateMessage(chatId, data.messageId, { status: 'read' });
+              }
+              break;
+            case 'typing.start':
+              if (data.chatId === chatId) {
+                setTypingUsers(chatId, [
+                  ...(useChatStore.getState().typingUsers[chatId] || []),
+                  { userId: data.userId, username: data.username },
+                ]);
+              }
+              break;
+            case 'typing.stop':
+              if (data.chatId === chatId) {
+                setTypingUsers(
+                  chatId,
+                  (useChatStore.getState().typingUsers[chatId] || []).filter(
+                    (u) => u.userId !== data.userId
+                  )
+                );
+              }
+              break;
+          }
+        };
 
-      ws.onclose = () => {
+        ws.onclose = () => {
+          console.log('WS disconnected');
+        };
       }
-        console.log('WS disconnected');
-      };
     };
 
     connect();
@@ -199,16 +213,13 @@ export const ChatViewScreen: React.FC = () => {
   );
 
   // React to message
-  const handleReact = useCallback(
-    async (messageId: string, emoji: string) => {
-      try {
-        await api.reactToMessage(messageId, emoji);
-      } catch (error) {
-        console.error('Failed to react:', error);
-      }
-    },
-    []
-  );
+  const handleReact = useCallback(async (messageId: string, emoji: string) => {
+    try {
+      await api.reactToMessage(messageId, emoji);
+    } catch (error) {
+      console.error('Failed to react:', error);
+    }
+  }, []);
 
   // Reply to message
   const handleReply = useCallback((message: MessageWithSender) => {
@@ -274,12 +285,8 @@ export const ChatViewScreen: React.FC = () => {
 
   return (
     <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        background: 'var(--bg-primary)',
-      }}
+      className="content"
+      style={{ overflow: 'hidden', height: '100%' }} /* скролл внутри .messages */
     >
       {/* Chat Header */}
       {activeChat && (
@@ -289,14 +296,19 @@ export const ChatViewScreen: React.FC = () => {
           onCall={handleCall}
           onAttachments={() => {}}
           onMenu={() => setShowInfo(!showInfo)}
+          onPin={() => useChatStore.getState().pinChat(activeChat.id)}
+          onMute={() => useChatStore.getState().muteChat(activeChat.id)}
+          onArchive={() => api.archiveChat(activeChat.id).catch(() => {})}
+          onExport={() => console.log('Export PDF:', activeChat.id)}
+          onBlock={() => console.log('Block chat:', activeChat.id)}
         />
       )}
 
-      {/* Main content: messages + info panel */}
-      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
-        {/* Messages area */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-          {/* Reply preview */}
+      {/* Main area: messages + info panel */}
+      <div style={{ display: 'flex', flex: 1, overflow: 'hidden', minHeight: 0 }}>
+        {/* Messages column */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minWidth: 0 }}>
+          {/* Reply preview (панель ответа — inline над полем ввода) */}
           {replyTo && (
             <ReplyPreview
               message={replyTo}
@@ -315,12 +327,7 @@ export const ChatViewScreen: React.FC = () => {
           />
 
           {/* Message input */}
-          <MessageInput
-            onSend={handleSend}
-            onReply={handleReply}
-            onCancelReply={() => setReplyTo(null)}
-            replyTo={replyTo}
-          />
+          <MessageInput onSend={handleSend} />
         </div>
 
         {/* Chat info panel (right sidebar) */}

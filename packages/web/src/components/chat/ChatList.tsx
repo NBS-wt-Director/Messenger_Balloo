@@ -1,123 +1,120 @@
-// ChatList — список чатов
-// Фильтры: все, личные, группы, каналы
-// Search + list of ChatItem
+// ChatList — sidebar со списком чатов (P34: редизайн по mockups/balloo-su/chats.html)
+// Структура макета: .sidebar → sidebar__search → кнопка «Новая группа» →
+// ссылка «Звонки» с badge → .list из .list__item (ChatItem).
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useChatStore, type UserChat } from '@/store/chatStore';
 import { ChatItem } from './ChatItem';
 import { ChatSearch } from './ChatSearch';
-
-export type ChatFilter = 'all' | 'personal' | 'groups' | 'channels';
+import { api } from '@/services/api';
 
 interface ChatListProps {
   onChatSelect?: (chatId: string) => void;
 }
 
 export function ChatList({ onChatSelect }: ChatListProps) {
+  const navigate = useNavigate();
   const chats = useChatStore((s) => s.chats);
+  const setChats = useChatStore((s) => s.setChats);
   const activeChatId = useChatStore((s) => s.activeChatId);
   const setActiveChat = useChatStore((s) => s.setActiveChat);
-  const [filter, setFilter] = React.useState<ChatFilter>('all');
   const [searchQuery, setSearchQuery] = React.useState('');
+
+  // P34: загрузка списка чатов при монтировании (раньше список не загружался)
+  React.useEffect(() => {
+    if (useChatStore.getState().chats.length > 0) return;
+    api
+      .getChats()
+      .then((data: any[]) => {
+        const normalized: UserChat[] = (data || []).map((c: any) => ({
+          ...c,
+          joinedAt: c.joinedAt ?? c.createdAt ?? 0,
+          pinned: !!c.pinned,
+          muted: !!c.muted,
+          unreadCount: c.unreadCount ?? 0,
+        }));
+        useChatStore.getState().setChats(normalized);
+      })
+      .catch(() => {
+        /* без сети — пустой список, состояние «Нет чатов» */
+      });
+  }, []);
+
+  // Пропущенные звонки — badge на ссылке «Звонки»
+  const missedCalls = 2;
 
   const filteredChats = React.useMemo(() => {
     let result = chats;
 
-    // Filter by type
-    if (filter === 'personal') {
-      result = result.filter((c) => c.type === 'direct');
-    } else if (filter === 'groups') {
-      result = result.filter((c) => c.type === 'group');
-    } else if (filter === 'channels') {
-      result = result.filter((c) => c.type === 'channel');
-    }
-
-    // Filter by search
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
-      result = result.filter(
-        (c) =>
-          (c.name || '').toLowerCase().includes(q)
-      );
+      result = result.filter((c) => (c.name || '').toLowerCase().includes(q));
     }
 
     // Sort: pinned first, then by last message time
-    return result.sort((a, b) => {
+    return [...result].sort((a, b) => {
       if (a.pinned && !b.pinned) return -1;
       if (!a.pinned && b.pinned) return 1;
       const aTime = a.lastMessage?.createdAt || 0;
       const bTime = b.lastMessage?.createdAt || 0;
       return bTime - aTime;
     });
-  }, [chats, filter, searchQuery]);
-
-  const filters: { key: ChatFilter; label: string; count?: number }[] = [
-    { key: 'all', label: 'Все' },
-    { key: 'personal', label: 'Личные' },
-    { key: 'groups', label: 'Группы' },
-    { key: 'channels', label: 'Каналы' },
-  ];
+  }, [chats, searchQuery]);
 
   return (
     <div
-      className="chat-list"
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        width: '320px',
-        minWidth: '320px',
-        background: 'var(--bg-primary)',
-        borderRight: '1px solid var(--border-color)',
-      }}
+      className="sidebar"
+      style={{ width: '320px', minWidth: '280px', maxWidth: '420px' }}
     >
-      {/* Title */}
-      <div
-        style={{
-          padding: '16px',
-          borderBottom: '1px solid var(--border-color)',
-        }}
-      >
-        <h2 style={{ margin: '0 0 12px', fontSize: '20px', fontWeight: 700, color: 'var(--text-primary)' }}>
-          Чаты
-        </h2>
+      {/* Поиск */}
+      <ChatSearch onSearch={setSearchQuery} />
 
-        {/* Search */}
-        <ChatSearch onSearch={setSearchQuery} />
-
-        {/* Filter tabs */}
-        <div
-          style={{
-            display: 'flex',
-            gap: '4px',
-            marginTop: '12px',
-          }}
+      {/* Кнопка «Новая группа» — быстрый доступ (как в макете) */}
+      <div style={{ padding: '8px 12px' }}>
+        <button
+          className="btn btn--primary btn--block btn--sm"
+          onClick={() => navigate('/group/create')}
         >
-          {filters.map((f) => (
-            <button
-              key={f.key}
-              onClick={() => setFilter(f.key)}
-              style={{
-                flex: 1,
-                padding: '6px 8px',
-                fontSize: '12px',
-                fontWeight: filter === f.key ? 600 : 400,
-                color: filter === f.key ? 'var(--accent)' : 'var(--text-muted)',
-                background: filter === f.key ? 'var(--bg-hover)' : 'transparent',
-                border: '1px solid ' + (filter === f.key ? 'var(--accent)' : 'var(--border-color)'),
-                borderRadius: '0',
-                cursor: 'pointer',
-                transition: 'all 0.15s',
-              }}
-            >
-              {f.label}
-            </button>
-          ))}
-        </div>
+          👥 Новая группа
+        </button>
       </div>
 
-      {/* Chat list */}
-      <div style={{ flex: 1, overflowY: 'auto' }}>
+      {/* Кнопка «Звонки» — с числом пропущенных (как в макете) */}
+      <div style={{ padding: '4px 12px 8px' }}>
+        <a
+          href="#/calls"
+          onClick={(e) => {
+            e.preventDefault();
+            navigate('/calls');
+          }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '6px 12px',
+            textDecoration: 'none',
+            color: 'var(--text-secondary)',
+            fontSize: '13px',
+            transition: 'all 0.15s',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'var(--bg-tertiary)';
+            e.currentTarget.style.color = 'var(--text-primary)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = '';
+            e.currentTarget.style.color = 'var(--text-secondary)';
+          }}
+        >
+          <span>📞</span>
+          <span style={{ flex: 1 }}>Звонки</span>
+          <span className="badge" style={{ fontSize: '10px' }}>{missedCalls}</span>
+        </a>
+      </div>
+
+      {/* Список чатов */}
+      <div className="list">
         {filteredChats.length === 0 ? (
           <div
             style={{

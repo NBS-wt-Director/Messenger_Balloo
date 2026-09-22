@@ -1,9 +1,11 @@
 // MessageList — виртуальный скроллинг с react-virtuoso (тикет №64)
+// P34: редизайн по mockups/balloo-su/chats.html —
+// date-separator (chip с датой), typing-пузырь (message--receiver + typing dots).
 // Оптимизация: рендерит только видимые сообщения, поддержка 10000+ без лагов
 
 import React, { useRef, useEffect, useCallback, useMemo } from 'react';
 import { Virtuoso } from 'react-virtuoso';
-import { useChatStore, type MessageWithSender, type TypingUser } from '@/store/chatStore';
+import { useChatStore, type MessageWithSender } from '@/store/chatStore';
 import { MessageBubble } from './MessageBubble';
 
 interface MessageListProps {
@@ -38,7 +40,6 @@ export const MessageList = React.memo<MessageListProps>(({
   // Auto-scroll to bottom on new messages
   useEffect(() => {
     if (listRef.current && messages.length > 0) {
-      // Scroll to last message
       setTimeout(() => {
         listRef.current?.scrollToIndex({
           index: groupedMessages.length - 1,
@@ -48,86 +49,75 @@ export const MessageList = React.memo<MessageListProps>(({
     }
   }, [messages.length, groupedMessages.length]);
 
-  // Render each row (either date separator or message)
-  const renderItem = useCallback((index: number) => {
-    const group = groupedMessages[index];
-    if (!group) return null;
+  // Render each row (either date separator + messages)
+  const renderItem = useCallback(
+    (index: number) => {
+      const group = groupedMessages[index];
+      if (!group) return null;
 
-    return (
-      <div key={index}>
-        {/* Date separator */}
-        <div style={{ textAlign: 'center', padding: '12px 0' }}>
-          <span
-            className="chip"
-            style={{ fontSize: '12px', padding: '4px 12px' }}
-          >
-            {group.date}
-          </span>
+      return (
+        <div key={index}>
+          {/* Date separator — chip с датой (как в макете) */}
+          <div style={{ textAlign: 'center', padding: '8px' }}>
+            <span className="chip">{group.date}</span>
+          </div>
+
+          {/* Messages */}
+          {group.messages.map((msg) => {
+            const currentUserId = useChatStore.getState().currentUserId;
+            const isOwn = msg.sender?.id === currentUserId;
+            return (
+              <MessageBubble
+                key={msg.id}
+                message={msg}
+                isOwn={isOwn}
+                onReact={onReact}
+                onReply={onReply}
+                onEdit={onEdit}
+                onDelete={onDelete}
+                onForward={onForward}
+              />
+            );
+          })}
         </div>
-
-        {/* Messages */}
-        {group.messages.map((msg) => {
-          const activeChat = useChatStore.getState().activeChat;
-          const isOwn = msg.sender?.id === activeChat?.id;
-          return (
-            <MessageBubble
-              key={msg.id}
-              message={msg}
-              isOwn={isOwn}
-              onReact={onReact}
-              onReply={onReply}
-              onEdit={onEdit}
-              onDelete={onDelete}
-              onForward={onForward}
-            />
-          );
-        })}
-      </div>
-    );
-  }, [groupedMessages, onReact, onReply, onEdit, onDelete, onForward]);
+      );
+    },
+    [groupedMessages, onReact, onReply, onEdit, onDelete, onForward]
+  );
 
   // Count total items (groups)
   const itemCount = groupedMessages.length;
 
   return (
-    <div
-      style={{
-        flex: 1,
-        background: 'var(--bg-primary)',
-      }}
-    >
-      {/* Virtual scroll list */}
+    <div style={{ flex: 1, background: 'var(--bg-primary)', display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}>
+      {/* Virtual scroll list — viewport = контейнер (P34: useWindowScroll не работал
+          во вложенном flex-контейнере — окно приложения не скроллится) */}
       <Virtuoso
         ref={listRef}
-        style={{ height: '100%' }}
+        style={{ height: '100%', flex: 1 }}
         totalCount={itemCount}
         itemContent={renderItem}
         defaultItemHeight={ROW_HEIGHT + HEADER_HEIGHT}
-        useWindowScroll
+        customScrollParent={undefined}
       />
 
-      {/* Typing indicator — fixed at bottom */}
+      {/* Typing indicator — пузырь с точками, как в макете (последнее сообщение) */}
       {typingUsers.length > 0 && (
-        <div
-          style={{
-            padding: '8px 16px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            background: 'var(--bg-primary)',
-          }}
-        >
-          <div className="typing">
-            <span className="typing__dots">
-              <span className="typing__dot" />
-              <span className="typing__dot" />
-              <span className="typing__dot" />
-            </span>
+        <div style={{ padding: '0 16px 8px' }}>
+          <div className="message message--receiver" style={{ maxWidth: '80px' }}>
+            <div className="message__bubble" style={{ padding: '10px 14px' }}>
+              <span className="typing">
+                <span className="typing__dots">
+                  <span className="typing__dot" />
+                  <span className="typing__dot" />
+                  <span className="typing__dot" />
+                </span>
+                <span style={{ marginLeft: '4px' }}>
+                  {typingUsers.length === 1 ? 'печатает...' : 'печатают...'}
+                </span>
+              </span>
+            </div>
           </div>
-          <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-            {typingUsers.map((u) => u.username).join(', ')}{' '}
-            {typingUsers.length === 1 ? 'печатает' : 'печатают'}...
-          </span>
         </div>
       )}
     </div>

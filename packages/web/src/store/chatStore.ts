@@ -11,7 +11,7 @@ export interface UserChat extends Chat {
   pinned: boolean;
   muted: boolean;
   unreadCount: number;
-  lastMessage?: Message;
+  lastMessage?: MessageWithSender;
   description?: string;
 }
 
@@ -29,6 +29,7 @@ export interface MessageWithSender extends Message {
   };
   forwarded?: boolean;
   ai?: boolean;
+  autoReply?: boolean;
   editHistory?: { old: string; new: string };
   reactions?: Array<{ emoji: string; userId: string }>;
   poll?: {
@@ -59,6 +60,10 @@ interface ChatState {
   chats: UserChat[];
   activeChatId: string | null;
   activeChat: UserChat | null;
+
+  // Текущий пользователь (для isOwn в MessageList) — синхронизируется из AuthProvider
+  currentUserId: string | null;
+  setCurrentUserId: (userId: string | null) => void;
 
   // Messages
   messages: Record<string, MessageWithSender[]>;
@@ -109,6 +114,8 @@ export const useChatStore = create<ChatState>()((set, get) => ({
   chats: [],
   activeChatId: null,
   activeChat: null,
+  currentUserId: null,
+  setCurrentUserId: (userId) => set({ currentUserId: userId }),
   messages: {},
   messagesCursor: {},
   hasMoreMessages: {},

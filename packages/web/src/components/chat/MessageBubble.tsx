@@ -1,5 +1,11 @@
-// MessageBubble — пузыри сообщений (sender/receiver)
-// Дизайн: без скруглений, угловые срезы — как в макетах
+// MessageBubble — пузырь сообщения (P34: редизайн по mockups/balloo-su/chats.html)
+// Дизайн-система common.css:
+//   - пузырь без скруглений, угловой срез 45° на кончике (4%): sender — справа
+//     внизу (--bubble-sender), receiver — слева внизу (--bubble-receiver)
+//   - sender: border-right 4px accent; receiver: border-left 4px border-strong
+//   - действия на противоположном от среза углу (CSS: message--sender/-receiver)
+//   - header: время + теги (Переслано / ИИ / Автоответ)
+//   - reply-quote, реакции-chips, edit history с diff, msg-ticks (✓✓)
 
 import React, { useState, useMemo } from 'react';
 import type { MessageWithSender } from '@/store/chatStore';
@@ -25,6 +31,7 @@ export const MessageBubble = React.memo<MessageBubbleProps>(({
   onForward,
 }) => {
   const [showActions, setShowActions] = useState(false);
+  const [showEditHistory, setShowEditHistory] = useState(false);
 
   // Кэшируем вычисления — не пересчитывать при ре-рендере
   const time = useMemo(() => {
@@ -42,11 +49,7 @@ export const MessageBubble = React.memo<MessageBubbleProps>(({
   // Render message content based on type
   const renderContent = () => {
     if (isDeleted) {
-      return (
-        <div style={{ fontStyle: 'italic', color: 'var(--text-muted)' }}>
-          Сообщение удалено
-        </div>
-      );
+      return <div style={{ fontStyle: 'italic', color: 'var(--text-muted)' }}>Сообщение удалено</div>;
     }
 
     switch (message.type) {
@@ -63,39 +66,37 @@ export const MessageBubble = React.memo<MessageBubbleProps>(({
       default:
         return (
           <div
-            style={{
-              whiteSpace: 'pre-wrap',
-              wordBreak: 'break-word',
-            }}
-            dangerouslySetInnerHTML={{
-              __html: formatMarkdown(message.content || ''),
-            }}
+            className="message__body--markdown"
+            style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
+            dangerouslySetInnerHTML={{ __html: formatMarkdown(message.content || '') }}
           />
         );
     }
   };
 
-  const renderVoiceMessage = () => (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '8px 0' }}>
-      <button style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--accent)', color: '#fff', borderRadius: 0, fontSize: '16px' }}>
-        ▶
-      </button>
-      <div style={{ flex: 1, height: '32px', display: 'flex', alignItems: 'center', gap: '2px' }}>
-        {Array.from({ length: 14 }).map((_, i) => (
-          <div
-            key={i}
-            style={{
-              width: '3px',
-              height: `${4 + Math.random() * 24}px`,
-              background: 'var(--accent)',
-              opacity: i < 8 ? 1 : 0.3,
-            }}
-          />
-        ))}
+  const renderVoiceMessage = () => {
+    // Waveform как в макете: чередование accent / border-strong полос
+    const bars = [8, 16, 24, 12, 28, 20, 8, 16, 12, 24, 8, 20, 16, 12];
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '8px 0' }}>
+        <button className="btn btn--secondary btn--icon">▶</button>
+        <div style={{ flex: 1, height: '32px', display: 'flex', alignItems: 'center', gap: '2px' }}>
+          {bars.map((h, i) => (
+            <div
+              key={i}
+              style={{
+                width: '3px',
+                height: `${h}px`,
+                background: i < 6 ? 'var(--accent)' : 'var(--border-strong)',
+              }}
+            />
+          ))}
+        </div>
+        <span className="text-xs text-muted">0:14</span>
+        <button className="text-xs text-accent">1.5x</button>
       </div>
-      <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>0:14</span>
-    </div>
-  );
+    );
+  };
 
   const renderImageMessage = () => (
     <div>
@@ -134,42 +135,22 @@ export const MessageBubble = React.memo<MessageBubbleProps>(({
     if (!poll) return null;
 
     return (
-      <div>
-        <div style={{ fontWeight: 600, marginBottom: '8px' }}>{poll.question}</div>
+      <div className="poll">
+        <div className="poll__question">📊 {poll.question}</div>
         {poll.options.map((option: { text: string; votes: number }, i: number) => {
           const percent = poll.votes ? Math.round((option.votes / poll.votes) * 100) : 0;
           return (
-            <div
-              key={i}
-              style={{
-                padding: '8px 12px',
-                marginBottom: '4px',
-                background: 'var(--bg-tertiary)',
-                cursor: 'pointer',
-                position: 'relative',
-                overflow: 'hidden',
-              }}
-            >
-              <div
-                style={{
-                  position: 'absolute',
-                  left: 0,
-                  top: 0,
-                  height: '100%',
-                  width: `${percent}%`,
-                  background: 'rgba(45, 184, 77, 0.15)',
-                  transition: 'width 0.3s ease',
-                }}
-              />
-              <div style={{ position: 'relative', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span>{option.text}</span>
-                {poll.votes && <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{percent}%</span>}
-              </div>
+            <div key={i} className="poll__option">
+              <div className="poll__option-bar" style={{ width: `${percent}%` }} />
+              <span className="poll__option-text">{option.text}</span>
+              <span className="poll__option-percent">{percent}%</span>
             </div>
           );
         })}
-        <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>
-          {poll.votes} голосов{poll.anonymous ? ' • Анонимный' : ''}
+        <div className="poll__meta">
+          <span>{poll.votes || 0} голосов</span>
+          {poll.anonymous && <span>• Анонимный</span>}
+          <span>• Можно переслать</span>
         </div>
       </div>
     );
@@ -189,145 +170,126 @@ export const MessageBubble = React.memo<MessageBubbleProps>(({
     }
   };
 
-  // Reactions
+  // Reactions — chips с эмодзи и счётчиком
   const reactions = message.reactions || [];
   const reactionCounts: Record<string, number> = {};
   reactions.forEach((r) => {
     reactionCounts[r.emoji] = (reactionCounts[r.emoji] || 0) + 1;
   });
 
-  const quickEmojis = ['👍', '❤', '🔥', '😂', '😮', '😢', '👎'];
-
   return (
     <div
       className={`message ${isOwn ? 'message--sender' : 'message--receiver'}`}
-      style={{ display: 'flex', flexDirection: isOwn ? 'row-reverse' : 'row', gap: '8px', padding: '4px 16px', position: 'relative' }}
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}
     >
-      <div
-        className="message__bubble"
-        style={{
-          maxWidth: '70%',
-          padding: '10px 14px',
-          background: isOwn ? 'var(--accent)' : 'var(--bg-secondary)',
-          color: isOwn ? '#fff' : 'var(--text-primary)',
-          position: 'relative',
-          // Angular cuts — без скруглений
-          clipPath: isOwn
-            ? 'polygon(0% 0%, 100% 0%, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0% 100%)'
-            : 'polygon(12px 0%, 100% 0%, 100% 100%, 0% 100%, 0% 12px)',
-        }}
-      >
-        {/* Header: time + tags */}
-        <div
-          className="message__header"
-          style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px', fontSize: '11px', opacity: 0.7 }}
-        >
+      <div className="message__bubble">
+        {/* Header: время + теги */}
+        <div className="message__header">
           <span>{time}</span>
           {message.forwarded && (
-            <span className="message__header-tag message__header-tag--forwarded" style={{ fontSize: '10px' }}>↩ Переслано</span>
+            <span className="message__header-tag message__header-tag--forwarded">↩ Переслано</span>
           )}
-          {message.ai && (
-            <span className="message__header-tag message__header-tag--ai" style={{ fontSize: '10px' }}>🤖 ИИ</span>
+          {message.ai && <span className="message__header-tag message__header-tag--ai">🤖 ИИ</span>}
+          {message.autoReply && (
+            <span className="message__header-tag message__header-tag--auto">⚙ Автоответ</span>
           )}
-          {isEdited && <span style={{ fontSize: '10px', fontStyle: 'italic' }}> (изм.)</span>}
+          {isEdited && (
+            <span
+              className="message__header-tag"
+              style={{ cursor: 'pointer' }}
+              title="История изменений"
+              onClick={() => setShowEditHistory(!showEditHistory)}
+            >
+              ✏ Изменено
+            </span>
+          )}
         </div>
 
-        {/* Reply preview */}
+        {/* Reply quote */}
         {message.replyTo && (
-          <div
-            className="message__reply"
-            style={{
-              padding: '6px 8px',
-              marginBottom: '8px',
-              borderLeft: `2px solid ${isOwn ? 'rgba(255,255,255,0.4)' : 'var(--accent)'}`,
-              background: isOwn ? 'rgba(255,255,255,0.1)' : 'var(--bg-tertiary)',
-              fontSize: '12px',
-            }}
-          >
-            <div style={{ fontWeight: 600, marginBottom: '2px' }}>{message.replyTo.sender?.displayName || message.replyTo.sender?.username || 'Пользователь'}</div>
-            <div style={{ opacity: 0.8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '250px' }}>
-              {message.replyTo.content}
+          <div className="message__reply">
+            <div className="message__reply-author">
+              {message.replyTo.sender?.displayName || message.replyTo.sender?.username || 'Пользователь'}
             </div>
+            <div>{message.replyTo.content}</div>
           </div>
         )}
 
         {/* Body */}
         <div className="message__body">{renderContent()}</div>
 
-        {/* Edit history */}
-        {isEdited && message.editHistory && (
-          <div className="message__edit-history" style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px solid rgba(128,128,128,0.2)', fontSize: '11px', color: 'var(--text-muted)' }}>
-            <div>История изменений:</div>
-            <div style={{ marginTop: '4px' }}>
-              <span style={{ textDecoration: 'line-through', opacity: 0.6 }}>{message.editHistory.old}</span>
-              {' → '}
-              <span style={{ color: 'var(--success)' }}>{message.editHistory.new}</span>
-            </div>
-            <div>Изменено: {time}</div>
+        {/* Reactions — chips с эмодзи и счётчиком */}
+        {Object.keys(reactionCounts).length > 0 && (
+          <div className="message__reactions">
+            {Object.entries(reactionCounts).map(([emoji, count]) => (
+              <span
+                key={emoji}
+                className={`message__reaction${reactions.some((r) => r.emoji === emoji) ? ' message__reaction--mine' : ''}`}
+                onClick={() => onReact?.(message.id, emoji)}
+              >
+                {emoji} <span>{count}</span>
+              </span>
+            ))}
           </div>
         )}
 
-        {/* Actions bar */}
+        {/* Actions — на противоположном от среза углу (CSS-классы) */}
         {showActions && !isDeleted && (
-          <div
-            className="message__actions"
-            style={{ display: 'flex', gap: '4px', marginTop: '8px', paddingTop: '8px', borderTop: '1px solid rgba(128,128,128,0.2)' }}
-          >
+          <div className="message__actions">
             <button className="message__action-btn" title="Ответить" onClick={() => onReply?.(message)}>↩</button>
-            <button className="message__action-btn" title="Копировать" onClick={() => navigator.clipboard.writeText(message.content || '')}>📋</button>
-            <button className="message__action-btn" title="Реакция" onClick={() => {
-              const emoji = prompt('Введите эмодзи:');
-              if (emoji) onReact?.(message.id, emoji);
-            }}>😊</button>
-            {isOwn && <button className="message__action-btn" title="Изменить" onClick={() => {
-              const newContent = prompt('Редактировать:', message.content);
-              if (newContent && newContent !== message.content) onEdit?.(message.id, newContent);
-            }}>✏</button>}
-            {isOwn && <button className="message__action-btn" title="Удалить" onClick={() => onDelete?.(message.id)}>🗑</button>}
-            <button className="message__action-btn" title="Переслать" onClick={() => onForward?.(message)}>📤</button>
+            <button
+              className="message__action-btn"
+              title="Копировать"
+              onClick={() => navigator.clipboard.writeText(message.content || '')}
+            >
+              📋
+            </button>
+            <button
+              className="message__action-btn"
+              title="Реакция"
+              onClick={() => onReact?.(message.id, '👍')}
+            >
+              😊
+            </button>
+            {!isOwn && (
+              <button className="message__action-btn" title="Переслать" onClick={() => onForward?.(message)}>📤</button>
+            )}
+            {isOwn && (
+              <button
+                className="message__action-btn"
+                title="Изменить"
+                onClick={() => {
+                  const newContent = prompt('Редактировать:', message.content);
+                  if (newContent && newContent !== message.content) onEdit?.(message.id, newContent);
+                }}
+              >
+                ✏
+              </button>
+            )}
+            {isOwn && (
+              <button className="message__action-btn" title="Удалить" onClick={() => onDelete?.(message.id)}>🗑</button>
+            )}
+          </div>
+        )}
+
+        {/* Edit history — diff (old/new) */}
+        {isEdited && message.editHistory && (
+          <div className={`message__edit-history${showEditHistory ? ' message__edit-history--open' : ''}`}>
+            <div className="text-xs text-muted mb-2">История изменений:</div>
+            <div className="mb-2">
+              <span className="diff-old">{message.editHistory.old}</span> →{' '}
+              <span className="diff-new">{message.editHistory.new}</span>
+            </div>
+            <div className="text-xs text-muted">Изменено: {time}</div>
           </div>
         )}
       </div>
 
-      {/* Read ticks (only for own messages) */}
+      {/* Read ticks — только свои сообщения (✓✓ delivered / read) */}
       {isOwn && message.status && (
-        <div className={`msg-ticks ${message.status === 'read' ? 'msg-ticks--read' : 'msg-ticks--delivered'}`} style={{ alignSelf: 'flex-end', fontSize: '11px', marginTop: '16px' }}>
-          {message.status === 'read' ? '✓✓' : '✓✓'}
-        </div>
-      )}
-
-      {/* Reactions bar */}
-      {Object.keys(reactionCounts).length > 0 && (
-        <div className="message__reactions" style={{ display: 'flex', gap: '6px', marginTop: '4px', marginLeft: isOwn ? 'auto' : '0', paddingLeft: isOwn ? 0 : '48px' }}>
-          {Object.entries(reactionCounts).map(([emoji, count]) => (
-            <span
-              key={emoji}
-              className={`message__reaction ${isOwn ? 'message__reaction--mine' : ''}`}
-              style={{
-                padding: '2px 8px',
-                background: 'var(--bg-tertiary)',
-                fontSize: '13px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px',
-              }}
-              onClick={() => onReact?.(message.id, emoji)}
-            >
-              {emoji} <span>{count}</span>
-            </span>
-          ))}
-          <button
-            style={{ fontSize: '13px', cursor: 'pointer', background: 'none', border: 'none', padding: '2px 4px' }}
-            onClick={() => {
-              const emoji = prompt('Выберите реакцию:');
-              if (emoji) onReact?.(message.id, emoji);
-            }}
-          >
-            +
-          </button>
+        <div className={`msg-ticks msg-ticks--${message.status === 'read' ? 'read' : 'delivered'}`}>
+          ✓✓
         </div>
       )}
     </div>
@@ -337,10 +299,13 @@ export const MessageBubble = React.memo<MessageBubbleProps>(({
 // Utilities
 function formatMarkdown(text: string): string {
   return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    .replace(/\`(.+?)\`/g, '<code>$1</code>')
-    .replace(/\~\~(.+?)\~\~/g, '<del>$1</del>')
+    .replace(/`(.+?)`/g, '<code>$1</code>')
+    .replace(/~~(.+?)~~/g, '<del>$1</del>')
     .replace(/\n/g, '<br/>');
 }
 

@@ -1,0 +1,197 @@
+[
+  {
+    "theme": "dark",
+    "checks": [
+      {
+        "name": "bubble-sender",
+        "status": "OK",
+        "diffs": []
+      },
+      {
+        "name": "bubble-receiver",
+        "status": "OK",
+        "diffs": []
+      },
+      {
+        "name": "avatar-octagon",
+        "status": "OK",
+        "diffs": []
+      },
+      {
+        "name": "list-item",
+        "status": "OK",
+        "diffs": []
+      },
+      {
+        "name": "badge",
+        "status": "OK",
+        "diffs": []
+      },
+      {
+        "name": "input-field",
+        "status": "OK",
+        "diffs": []
+      },
+      {
+        "name": "input-btn",
+        "status": "OK",
+        "diffs": []
+      },
+      {
+        "name": "poll-option",
+        "status": "OK",
+        "diffs": []
+      },
+      {
+        "name": "typing-dot",
+        "status": "OK",
+        "diffs": []
+      },
+      {
+        "name": "msg-ticks",
+        "status": "OK",
+        "diffs": []
+      },
+      {
+        "name": "reaction-chip",
+        "status": "OK",
+        "diffs": []
+      },
+      {
+        "name": "theme-bg",
+        "status": "OK",
+        "diffs": []
+      }
+    ]
+  },
+  {
+    "theme": "light",
+    "checks": [
+      {
+        "name": "bubble-sender",
+        "status": "OK",
+        "diffs": []
+      },
+      {
+        "name": "bubble-receiver",
+        "status": "OK",
+        "diffs": []
+      },
+      {
+        "name": "avatar-octagon",
+        "status": "OK",
+        "diffs": []
+      },
+      {
+        "name": "list-item",
+        "status": "OK",
+        "diffs": []
+      },
+      {
+        "name": "badge",
+        "status": "OK",
+        "diffs": []
+      },
+      {
+        "name": "input-field",
+        "status": "OK",
+        "diffs": []
+      },
+      {
+        "name": "input-btn",
+        "status": "OK",
+        "diffs": []
+      },
+      {
+        "name": "poll-option",
+        "status": "OK",
+        "diffs": []
+      },
+      {
+        "name": "typing-dot",
+        "status": "OK",
+        "diffs": []
+      },
+      {
+        "name": "msg-ticks",
+        "status": "OK",
+        "diffs": []
+      },
+      {
+        "name": "reaction-chip",
+        "status": "OK",
+        "diffs": []
+      },
+      {
+        "name": "theme-bg",
+        "status": "OK",
+        "diffs": []
+      }
+    ]
+  },
+  {
+    "theme": "russian",
+    "checks": [
+      {
+        "name": "bubble-sender",
+        "status": "OK",
+        "diffs": []
+      },
+      {
+        "name": "bubble-receiver",
+        "status": "OK",
+        "diffs": []
+      },
+      {
+        "name": "avatar-octagon",
+        "status": "OK",
+        "diffs": []
+      },
+      {
+        "name": "list-item",
+        "status": "OK",
+        "diffs": []
+      },
+      {
+        "name": "badge",
+        "status": "OK",
+        "diffs": []
+      },
+      {
+        "name": "input-field",
+        "status": "OK",
+        "diffs": []
+      },
+      {
+        "name": "input-btn",
+        "status": "OK",
+        "diffs": []
+      },
+      {
+        "name": "poll-option",
+        "status": "OK",
+        "diffs": []
+      },
+      {
+        "name": "typing-dot",
+        "status": "OK",
+        "diffs": []
+      },
+      {
+        "name": "msg-ticks",
+        "status": "OK",
+        "diffs": []
+      },
+      {
+        "name": "reaction-chip",
+        "status": "OK",
+        "diffs": []
+      },
+      {
+        "name": "theme-bg",
+        "status": "OK",
+        "diffs": []
+      }
+    ]
+  }
+]

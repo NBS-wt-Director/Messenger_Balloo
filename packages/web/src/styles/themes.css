@@ -30,10 +30,6 @@
 
   /* Legacy (для обратной совместимости) */
   --bg-overlay: rgba(0, 0, 0, 0.6);
-  --bubble-sender: #2db84d;
-  --bubble-sender-text: #ffffff;
-  --bubble-receiver: #14191f;
-  --bubble-receiver-text: #f2f5f8;
   --success: #2db84d;
   --glass-bg: rgba(30, 36, 44, 0.65);
   --glass-border: rgba(255, 255, 255, 0.08);
@@ -88,10 +84,6 @@
 
   /* Legacy */
   --bg-overlay: rgba(0, 0, 0, 0.4);
-  --bubble-sender: #1e9e3e;
-  --bubble-sender-text: #ffffff;
-  --bubble-receiver: #eef1f5;
-  --bubble-receiver-text: #1a1d21;
   --success: #1e9e3e;
   --glass-bg: rgba(255, 255, 255, 0.72);
   --glass-border: rgba(0, 0, 0, 0.08);
@@ -156,10 +148,6 @@
 
   /* Legacy */
   --bg-overlay: rgba(0, 0, 0, 0.6);
-  --bubble-sender: #c9a227;
-  --bubble-sender-text: #1a1d21;
-  --bubble-receiver: #1c2230;
-  --bubble-receiver-text: #f4f0e8;
   --success: #c9a227;
   --glass-bg: rgba(28, 34, 48, 0.72);
   --glass-border: rgba(255, 255, 255, 0.08);

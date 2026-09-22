@@ -1,14 +1,14 @@
-// ChatSearch — поиск по чатам
-// Input с фильтрацией
+// ChatSearch — поиск по чатам (P34: по макету chats.html)
+// Класс .sidebar__search + .search-input из common.css
 
-import React, { useState } from 'react';
+import React from 'react';
 
 interface ChatSearchProps {
   onSearch: (query: string) => void;
 }
 
 export function ChatSearch({ onSearch }: ChatSearchProps) {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = React.useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -16,54 +16,15 @@ export function ChatSearch({ onSearch }: ChatSearchProps) {
     onSearch(value);
   };
 
-  const handleClear = () => {
-    setQuery('');
-    onSearch('');
-  };
-
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '8px',
-        padding: '8px 12px',
-        background: 'var(--bg-primary)',
-        borderBottom: '1px solid var(--border-color)',
-      }}
-    >
-      <span style={{ color: 'var(--text-muted)', fontSize: '14px' }}>🔍</span>
+    <div className="sidebar__search">
       <input
         type="text"
+        className="search-input"
+        placeholder="🔍 Поиск чатов и людей..."
         value={query}
         onChange={handleChange}
-        placeholder="Поиск по чатам..."
-        style={{
-          flex: 1,
-          background: 'var(--bg-secondary)',
-          border: '1px solid var(--border-color)',
-          borderRadius: '0',
-          padding: '8px 12px',
-          color: 'var(--text-primary)',
-          fontSize: '13px',
-          outline: 'none',
-        }}
       />
-      {query && (
-        <button
-          onClick={handleClear}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: 'var(--text-muted)',
-            cursor: 'pointer',
-            fontSize: '14px',
-            padding: '4px',
-          }}
-        >
-          ✕
-        </button>
-      )}
     </div>
   );
 }
