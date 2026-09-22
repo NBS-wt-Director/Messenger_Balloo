@@ -63,10 +63,8 @@ export function ChatList({ onChatSelect }: ChatListProps) {
   }, [chats, searchQuery]);
 
   return (
-    <div
-      className="sidebar"
-      style={{ width: '320px', minWidth: '280px', maxWidth: '420px' }}
-    >
+    // sidebar--chat: ширина в chat.css (не inline) — на мобильных становится полноэкранной
+    <div className="sidebar sidebar--chat">
       {/* Поиск */}
       <ChatSearch onSearch={setSearchQuery} />
 

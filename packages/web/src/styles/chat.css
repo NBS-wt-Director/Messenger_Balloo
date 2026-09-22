@@ -91,6 +91,22 @@
   min-width: 240px;
 }
 
+/* Список чатов (ChatList): фиксированная ширина вместо inline (P35-mobile),
+   на мобильных — на весь экран (макет mockups/mobile/chat.html: 1 колонка) */
+.sidebar--chat {
+  width: 320px;
+  min-width: 280px;
+  max-width: 420px;
+}
+
+@media (max-width: 768px) {
+  .sidebar--chat {
+    width: 100%;
+    max-width: none;
+    border-right: none;
+  }
+}
+
 .content {
   flex: 1;
   background: var(--bg-primary);

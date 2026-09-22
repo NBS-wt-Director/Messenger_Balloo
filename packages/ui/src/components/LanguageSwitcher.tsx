@@ -24,7 +24,7 @@ export function LanguageSwitcher() {
   const currentLang = SUPPORTED_LANGUAGES.find((l) => l.code === language);
 
   return (
-    <div ref={ref} style={{ position: 'relative' }}>
+    <div ref={ref} className="lang-switcher" style={{ position: 'relative' }}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         style={{
@@ -40,7 +40,9 @@ export function LanguageSwitcher() {
           color: 'var(--text-primary)',
         }}
       >
-        <span>{currentLang?.nativeName || 'RU'}</span>
+        {/* Полное название на десктопе, короткий код на мобильных (chrome.css) */}
+        <span className="lang-switcher__name">{currentLang?.nativeName || 'RU'}</span>
+        <span className="lang-switcher__code">{(currentLang?.code || 'ru').toUpperCase()}</span>
         <span style={{ fontSize: '10px' }}>▼</span>
       </button>
 

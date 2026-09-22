@@ -8,6 +8,8 @@ import type { UserChat } from '@/store/chatStore';
 interface ChatHeaderProps {
   chat: UserChat;
   onlineStatus?: string;
+  /** Назад к списку чатов (мобильные ≤768px) */
+  onBack?: () => void;
   onCall?: (type: 'audio' | 'video') => void;
   onAttachments?: () => void;
   onMenu?: () => void;
@@ -39,6 +41,7 @@ function getAvatarCtx(type: string): string {
 export const ChatHeader: React.FC<ChatHeaderProps> = ({
   chat,
   onlineStatus = 'в сети',
+  onBack,
   onCall,
   onAttachments,
   onMenu,
@@ -78,6 +81,16 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
 
   return (
     <div className="chat-header">
+      {/* Назад к списку чатов — только мобильные (≤768px, макет mockups/mobile/chat.html) */}
+      <button
+        className="topbar__actions-btn chat-header__back"
+        title="Назад к чатам"
+        aria-label="Назад к чатам"
+        onClick={onBack}
+      >
+        ←
+      </button>
+
       {/* Аватар-октагон с двойной рамкой (контекст + статус) */}
       <div className={`avatar avatar--sm avatar--bordered avatar--status-online ${avatarCtx}`}>
         <div className="avatar__inner">

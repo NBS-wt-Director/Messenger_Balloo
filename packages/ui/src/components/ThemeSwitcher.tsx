@@ -28,15 +28,14 @@ export function ThemeSwitcher() {
       {THEMES.map((t) => (
         <button
           key={t.value}
+          className="theme-switcher__btn"
           onClick={() => setTheme(t.value)}
           title={t.label}
           style={{
             background: theme === t.value ? 'var(--accent)' : 'transparent',
             border: 'none',
             borderRadius: '0',
-            padding: '6px 8px',
             cursor: 'pointer',
-            fontSize: '14px',
             color: 'var(--text-primary)',
             transition: 'background 0.15s',
           }}

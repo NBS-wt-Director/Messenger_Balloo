@@ -145,6 +145,17 @@
   color: var(--text-primary);
 }
 
+/* LanguageSwitcher: десктоп — полное название, мобильные — короткий код (см. @media ниже) */
+.lang-switcher__code {
+  display: none;
+}
+
+/* ThemeSwitcher: базовые размеры кнопок (мобильные уменьшаются в @media ниже) */
+.theme-switcher__btn {
+  padding: 6px 8px;
+  font-size: 14px;
+}
+
 .topbar__menu-btn {
   width: 36px;
   height: 36px;
@@ -224,6 +235,44 @@
     flex-direction: column;
     gap: 4px;
     padding: 6px 12px;
+  }
+
+  /* ---------- Topbar: мобильная компактизация (макеты mockups/mobile/*) ---------- */
+  .topbar {
+    padding: 0 10px;
+    gap: 8px;
+  }
+
+  /* Название «Balloo» скрываем — остаётся октагон-иконка (экономия ~55px) */
+  .topbar__logo > span {
+    display: none;
+  }
+
+  .topbar__title {
+    font-size: 14px;
+    /* не растягивать шапку длинным заголовком */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+  }
+
+  .topbar__right {
+    gap: 6px;
+  }
+
+  /* Компактные переключатели: только код языка (RU) и урезанные паддинги тем */
+  .lang-switcher__name {
+    display: none;
+  }
+
+  .lang-switcher__code {
+    display: inline;
+  }
+
+  .theme-switcher__btn {
+    padding: 4px 5px;
+    font-size: 13px;
   }
 }
 

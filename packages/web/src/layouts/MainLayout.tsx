@@ -1,10 +1,11 @@
 // Main Layout — основной лейаут приложения (P35: единая шапка/подвал)
 // Структура по макету mockups/balloo-su/chats.html:
 //   Topbar (на всю ширину, @balloo/ui) → main (sidebar | chat list | chat view) → Footer (@balloo/ui)
-// Responsive: mobile (1 col), tablet (2 col), desktop (3 col)
+// Responsive: mobile (1 col: на /chat — список чатов, на /chat/:id — чат),
+//             tablet (2 col), desktop (3 col)
 
-import { useEffect } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useUIStore } from '@/store/uiStore';
 import { Sidebar } from '@/components/sidebar/Sidebar';
 import { ChatList } from '@/components/chat/ChatList';
@@ -15,18 +16,27 @@ import { useAuthStore } from '@/store/authStore';
 
 function MainLayout() {
   const navigate = useNavigate();
+  const location = useLocation();
   const isSidebarOpen = useUIStore((s) => s.isSidebarOpen);
   const setSidebarOpen = useUIStore((s) => s.setSidebarOpen);
   const user = useAuthStore((s) => s.user);
 
-  // Responsive handling
+  // Responsive handling — реактивно (state), чтобы поворот/ресайз перерисовывал колонки
+  const [viewport, setViewport] = useState<'mobile' | 'tablet' | 'desktop'>(() =>
+    typeof window === 'undefined' ? 'desktop' : window.innerWidth <= 768 ? 'mobile' : window.innerWidth <= 1024 ? 'tablet' : 'desktop'
+  );
+
   useEffect(() => {
     function handleResize() {
       const w = window.innerWidth;
       if (w <= 768) {
+        setViewport('mobile');
         setSidebarOpen(false);
       } else if (w <= 1024) {
+        setViewport('tablet');
         setSidebarOpen(true);
+      } else {
+        setViewport('desktop');
       }
     }
 
@@ -35,11 +45,15 @@ function MainLayout() {
     return () => window.removeEventListener('resize', handleResize);
   }, [setSidebarOpen]);
 
-  const isMobile = window.innerWidth <= 768;
-  const isTablet = window.innerWidth > 768 && window.innerWidth <= 1024;
+  const isMobile = viewport === 'mobile';
 
-  const showChatList = !isMobile;
-  const showChatView = !isMobile && !isTablet;
+  // Мобильный чат по макету mockups/mobile/chat.html:
+  //   /chat (без id)   → список чатов на весь экран
+  //   /chat/:chatId    → чат на весь экран (в шапке чата кнопка «←»)
+  // Прочие маршруты (/profile, /settings, ...) — как обычно, контент в Outlet.
+  const isChatIndex = /^\/chat\/?$/.test(location.pathname);
+  const showChatList = !isMobile || isChatIndex;
+  const showOutlet = !(isMobile && isChatIndex);
 
   // Аватар пользователя в шапке (клик → профиль), как в макете chats.html
   const displayName = user?.displayName || user?.username || '';
@@ -58,7 +72,7 @@ function MainLayout() {
         display: 'flex',
         flexDirection: 'column',
         height: '100vh',
-        width: '100vw',
+        width: '100%',
         overflow: 'hidden',
         background: 'var(--bg-primary)',
       }}
@@ -92,22 +106,24 @@ function MainLayout() {
         {showChatList && <ChatList />}
 
         {/* Column 3: Chat view / content */}
-        <main
-          className="main-content"
-          style={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            height: '100%',
-            overflow: 'hidden',
-            minWidth: 0,
-          }}
-        >
-          {/* Outlet for child routes */}
-          <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-            <Outlet />
-          </div>
-        </main>
+        {showOutlet && (
+          <main
+            className="main-content"
+            style={{
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              height: '100%',
+              overflow: 'hidden',
+              minWidth: 0,
+            }}
+          >
+            {/* Outlet for child routes */}
+            <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+              <Outlet />
+            </div>
+          </main>
+        )}
       </div>
 
       {/* Единый подвал (@balloo/ui) */}
