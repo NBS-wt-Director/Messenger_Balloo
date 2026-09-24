@@ -79,8 +79,10 @@
   offline, `--mount=type=cache`, prune; локально пересборка web 21s).
   **Коммит+push ещё не сделаны** (ждут подтверждения пользователя).
 - Прод-контейнеры: 5/5 Up (server/web/postgres/redis/minio). Команда
-  деплоя: `cd /home/aedgar192/balloo && git pull && docker compose up -d --build`
-  (сервер: aedgar@192.168.1.85, внешний 188.73.176.34; доступы — у владельца).
+  деплоя: `cd /home/cfr_balloo/balloo && git pull && docker compose up -d --build`
+  (сервер: `cfr_balloo@aedgar`, LAN 192.168.1.85, внешний 188.73.176.34; путь и
+  пользователь подтверждены выводом сервера 2026-09-24 — ранее здесь был
+  ошибочный `/home/aedgar192/balloo`).
 
 ## 3. Контракты (обязательны для всех новых сайтов)
 
@@ -284,8 +286,8 @@ web-admin, web-command, web-features, info-сайты) используют ЕГ
    сервере и выводит готовый блок команд для пользователя (SSH-сессия у
    пользователя, не у ассистента):
    ```bash
-   cd /home/aedgar192/balloo        # рабочий каталог прод-репозитория
-   git pull --ff-only               # pull должен быть fast-forward до origin/main
+    cd /home/cfr_balloo/balloo       # рабочий каталог прод-репозитория (факт с сервера 2026-09-24)
+    git pull --ff-only               # pull должен быть fast-forward до origin/main
    docker compose up -d --build     # пересборка изменённых образов + перезапуск
    docker compose ps                # все сервисы должны быть Up / healthy
    ```
