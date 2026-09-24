@@ -5,6 +5,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '@/services/api';
+import { AppFooter } from '@/components/chrome/AppFooter';
 import { BlogTopBar } from './BlogTopBar';
 import { BlogCard } from './BlogCard';
 import type { BlogLandingPost, BlogLandingCategory } from './types';
@@ -92,7 +93,7 @@ export default function BlogCategoryScreen() {
 
   if (loading) {
     return (
-      <div>
+      <div className="page-with-footer">
         <BlogTopBar title="Категория" />
         <div className="main">
           <div className="content overflow-y-auto">
@@ -101,13 +102,14 @@ export default function BlogCategoryScreen() {
             </div>
           </div>
         </div>
+        <AppFooter />
       </div>
     );
   }
 
   if (!category) {
     return (
-      <div>
+      <div className="page-with-footer">
         <BlogTopBar title="Категория" />
         <div className="main">
           <div className="content overflow-y-auto">
@@ -122,12 +124,13 @@ export default function BlogCategoryScreen() {
             </div>
           </div>
         </div>
+        <AppFooter />
       </div>
     );
   }
 
   return (
-    <div>
+    <div className="page-with-footer">
       <BlogTopBar title="Категория" />
       <div className="main">
         <div className="content overflow-y-auto">
@@ -202,6 +205,7 @@ export default function BlogCategoryScreen() {
           </div>
         </div>
       </div>
+      <AppFooter />
     </div>
   );
 }

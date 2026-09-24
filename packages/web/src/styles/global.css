@@ -228,6 +228,20 @@ input::placeholder, textarea::placeholder {
   animation: spin 0.8s linear infinite;
 }
 
+/* --- P37: страницы с единым подвалом (blog-landing) ---
+   Структура как в PageChrome: topbar → скролл-контент (flex:1) → footer.
+   Корневой div ветки рендера получает класс page-with-footer. */
+.page-with-footer {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+.page-with-footer > .main {
+  flex: 1;
+  min-height: 0;
+}
+
 /* --- Responsive --- */
 @media (max-width: 768px) {
   html {

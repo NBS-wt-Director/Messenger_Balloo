@@ -5,6 +5,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '@/services/api';
+import { AppFooter } from '@/components/chrome/AppFooter';
 import { BlogTopBar } from './BlogTopBar';
 import { BlogCard } from './BlogCard';
 import { BlogSidebar } from './BlogSidebar';
@@ -108,7 +109,7 @@ export default function BlogLandingScreen() {
 
   if (loading) {
     return (
-      <div>
+      <div className="page-with-footer">
         <BlogTopBar />
         <div className="main">
           <div className="content overflow-y-auto">
@@ -120,6 +121,7 @@ export default function BlogLandingScreen() {
             </div>
           </div>
         </div>
+        <AppFooter />
       </div>
     );
   }
@@ -128,7 +130,7 @@ export default function BlogLandingScreen() {
   const otherFeatured = featuredPosts.slice(1, 4);
 
   return (
-    <div>
+    <div className="page-with-footer">
       <BlogTopBar />
       <div className="main">
         <div className="content overflow-y-auto">
@@ -221,6 +223,7 @@ export default function BlogLandingScreen() {
           </div>
         </div>
       </div>
+      <AppFooter />
     </div>
   );
 }

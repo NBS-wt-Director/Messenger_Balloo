@@ -5,6 +5,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '@/services/api';
+import { AppFooter } from '@/components/chrome/AppFooter';
 import { BlogTopBar } from './BlogTopBar';
 import { BlogCard } from './BlogCard';
 import type { BlogLandingPost, BlogLandingChannel } from './types';
@@ -83,7 +84,7 @@ export default function BlogChannelScreen() {
 
   if (loading) {
     return (
-      <div>
+      <div className="page-with-footer">
         <BlogTopBar title="Канал" />
         <div className="main">
           <div className="content overflow-y-auto">
@@ -92,13 +93,14 @@ export default function BlogChannelScreen() {
             </div>
           </div>
         </div>
+        <AppFooter />
       </div>
     );
   }
 
   if (!channel) {
     return (
-      <div>
+      <div className="page-with-footer">
         <BlogTopBar title="Канал" />
         <div className="main">
           <div className="content overflow-y-auto">
@@ -113,12 +115,13 @@ export default function BlogChannelScreen() {
             </div>
           </div>
         </div>
+        <AppFooter />
       </div>
     );
   }
 
   return (
-    <div>
+    <div className="page-with-footer">
       <BlogTopBar title="Канал" />
       <div className="main">
         <div className="content overflow-y-auto">
@@ -216,6 +219,7 @@ export default function BlogChannelScreen() {
           </div>
         </div>
       </div>
+      <AppFooter />
     </div>
   );
 }

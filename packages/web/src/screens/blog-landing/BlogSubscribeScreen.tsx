@@ -2,6 +2,7 @@
 // Тикет №60 — Blog: корпоративный блог (узел 11)
 
 import { useNavigate } from 'react-router-dom';
+import { AppFooter } from '@/components/chrome/AppFooter';
 import { BlogTopBar } from './BlogTopBar';
 import { BlogSubscribeForm } from './BlogSubscribeForm';
 
@@ -9,7 +10,7 @@ export default function BlogSubscribeScreen() {
   const navigate = useNavigate();
 
   return (
-    <div>
+    <div className="page-with-footer">
       <BlogTopBar title="Подписка" />
       <div className="main">
         <div className="content overflow-y-auto">
@@ -52,6 +53,7 @@ export default function BlogSubscribeScreen() {
           </div>
         </div>
       </div>
+      <AppFooter />
     </div>
   );
 }

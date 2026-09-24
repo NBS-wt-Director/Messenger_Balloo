@@ -5,6 +5,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { api } from '@/services/api';
+import { AppFooter } from '@/components/chrome/AppFooter';
 import { BlogTopBar } from './BlogTopBar';
 import { BlogCard } from './BlogCard';
 import type { BlogLandingPost, BlogLandingChannel } from './types';
@@ -106,7 +107,7 @@ export default function BlogSearchScreen() {
   };
 
   return (
-    <div>
+    <div className="page-with-footer">
       <BlogTopBar title="Поиск" />
       <div className="main">
         <div className="content overflow-y-auto">
@@ -203,6 +204,7 @@ export default function BlogSearchScreen() {
           </div>
         </div>
       </div>
+      <AppFooter />
     </div>
   );
 }

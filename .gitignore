@@ -80,3 +80,6 @@ coverage/
 
 # Temp local dirs
 .tmp-p33-stand/
+
+# P37: локальные артефакты аудита шапки/подвала (скриншоты, JSON, логи)
+.check/
