@@ -1,9 +1,12 @@
 // Not Found Screen — страница 404
 // Shared error screen (1_00_01) — макет mockups/shared/error-404.html:
-// единый topbar (лого + «Ошибка 404» + маскот/язык/тема), футера в макете нет.
-// P35: шапка через @balloo/ui (AppTopbar).
+// единый topbar (лого + «Ошибка 404» + маскот/язык/тема).
+// P37-2 (решение владельца 2026-09-23): единый подвал добавлен на 404,
+// несмотря на его отсутствие в макете — требование «шапка и подвал одни
+// на всех страницах» приоритетнее.
 
 import { AppTopbar } from '@/components/chrome/AppTopbar';
+import { AppFooter } from '@/components/chrome/AppFooter';
 
 function NotFoundScreen() {
   return (
@@ -46,6 +49,9 @@ function NotFoundScreen() {
           На главную
         </a>
       </div>
+
+      {/* P37-2: единый подвал на 404 (решение владельца) */}
+      <AppFooter />
     </div>
   );
 }

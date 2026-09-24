@@ -1,11 +1,14 @@
 // SpecifityScreen — спецификация экрана (split-view: описание + превью макета)
 // Тикет №59 — Specifity: спецификация (узел 10 — specifity.balloo.su)
 // Макет: mockups/specifity-balloo-su/specification.html
+// P37-4 (решение владельца 2026-09-23): самодельный топбар заменён на единый
+// PageChrome (AppTopbar + AppFooter) — шапка/подвал одни на всех страницах.
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '@/services/api';
 import './specifity.css';
+import { PageChrome } from '@/components/chrome/PageChrome';
 import { ResizableSplit } from './components/ResizableSplit';
 import { NodeSelector, type SpecNodeOption } from './components/NodeSelector';
 import { ScreenSelector, type SpecScreenOption } from './components/ScreenSelector';
@@ -115,29 +118,23 @@ export function SpecifityScreen() {
   const rightPanel = <PreviewPanel mockupUrl={mockupUrl} />;
 
   return (
-    <div className="specifity-screen">
-      <div className="specifity-screen__topbar">
-        <div className="specifity-screen__logo">
-          <div className="specifity-screen__logo-icon">📐</div>
-          <span>Specifity</span>
-        </div>
-        <div className="specifity-screen__title">Спецификация экрана (split-view)</div>
-        <div className="specifity-screen__right">
-          {loading ? (
-            <span className="specifity-screen__loading">Загрузка…</span>
-          ) : (
-            <span className="specifity-screen__info">
-              {nodes.length} узлов ·{' '}
-              {nodes.reduce((s, n) => s + n.screenCount, 0)} экранов
-            </span>
-          )}
-        </div>
-      </div>
-
+    <PageChrome
+      title="Спецификация"
+      right={
+        loading ? (
+          <span className="specifity-screen__loading">Загрузка…</span>
+        ) : (
+          <span className="specifity-screen__info">
+            {nodes.length} узлов ·{' '}
+            {nodes.reduce((s, n) => s + n.screenCount, 0)} экранов
+          </span>
+        )
+      }
+    >
       <div className="specifity-screen__main">
         <ResizableSplit left={leftPanel} right={rightPanel} />
       </div>
-    </div>
+    </PageChrome>
   );
 }
 

@@ -1,8 +1,10 @@
 // InstallScreen — первичная установка Balloo
 // Настройка БД, Redis, OAuth, CDN, SMTP и других параметров системы
 // Все endpoints НЕ требуют аутентификации (система ещё не настроена)
+// P37-3 (решение владельца 2026-09-23): единая шапка/подвал через PageChrome
 
 import { useState } from 'react';
+import { PageChrome } from '@/components/chrome/PageChrome';
 
 const API_BASE = '/api/install';
 
@@ -57,49 +59,51 @@ export function InstallScreen() {
 
   if (status?.installed) {
     return (
-      <div style={{ padding: 40, textAlign: 'center' }}>
-        <h2>✅ Система уже установлена</h2>
-        <p>Версия: {status.version}</p>
-        <p>Для повторной установки введите пароль администратора:</p>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Пароль установки"
-          style={{ padding: '8px 12px', fontSize: 16, marginBottom: 12, width: 300 }}
-        />
-        <br />
-        <button
-          onClick={async () => {
-            try {
-              const res = await fetch(`${API_BASE}/verify-password`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ password }),
-              });
-              const data = await res.json();
-              if (data.ok) {
-                alert('Пароль верен. Перезапустите сервисы для сброса установки.');
-              } else {
-                alert(data.error);
+      <PageChrome title="Установка">
+        <div style={{ padding: 40, textAlign: 'center' }}>
+          <h2>✅ Система уже установлена</h2>
+          <p>Версия: {status.version}</p>
+          <p>Для повторной установки введите пароль администратора:</p>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Пароль установки"
+            style={{ padding: '8px 12px', fontSize: 16, marginBottom: 12, width: 300 }}
+          />
+          <br />
+          <button
+            onClick={async () => {
+              try {
+                const res = await fetch(`${API_BASE}/verify-password`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ password }),
+                });
+                const data = await res.json();
+                if (data.ok) {
+                  alert('Пароль верен. Перезапустите сервисы для сброса установки.');
+                } else {
+                  alert(data.error);
+                }
+              } catch (e) {
+                alert('Ошибка проверки пароля');
               }
-            } catch (e) {
-              alert('Ошибка проверки пароля');
-            }
-          }}
-          style={{
-            padding: '10px 24px',
-            fontSize: 16,
-            background: '#e67e22',
-            color: '#fff',
-            border: 'none',
-            borderRadius: 6,
-            cursor: 'pointer',
-          }}
-        >
-          Проверить пароль
-        </button>
-      </div>
+            }}
+            style={{
+              padding: '10px 24px',
+              fontSize: 16,
+              background: '#e67e22',
+              color: '#fff',
+              border: 'none',
+              borderRadius: 6,
+              cursor: 'pointer',
+            }}
+          >
+            Проверить пароль
+          </button>
+        </div>
+      </PageChrome>
     );
   }
 
@@ -287,7 +291,8 @@ export function InstallScreen() {
   };
 
   return (
-    <div style={{ padding: 40, maxWidth: 700, margin: '0 auto' }}>
+    <PageChrome title="Установка">
+      <div style={{ padding: 40, maxWidth: 700, margin: '0 auto' }}>
       <h1>🚀 Установка Balloo</h1>
       <p style={{ color: '#888', marginBottom: 32 }}>
         Первичная настройка системы. Заполните все шаги и нажмите «Применить».
@@ -353,7 +358,8 @@ export function InstallScreen() {
       {/* Messages */}
       {error && <div style={{ marginTop: 24, padding: 16, background: '#e74c3c', color: '#fff', borderRadius: 6 }}>{error}</div>}
       {success && <div style={{ marginTop: 24, padding: 16, background: '#27ae60', color: '#fff', borderRadius: 6 }}>{success}</div>}
-    </div>
+      </div>
+    </PageChrome>
   );
 }
 

@@ -52,7 +52,7 @@ export function CommandLayout() {
   }, {});
 
   return (
-    <div className="command-layout" style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
+    <div className="command-layout" style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
       {/* Mobile hamburger */}
       <button
         className="mobile-menu-btn"
@@ -77,142 +77,143 @@ export function CommandLayout() {
         ☰
       </button>
 
-      {/* Sidebar */}
-      <aside
-        className={`command-sidebar ${sidebarOpen ? '' : 'collapsed'} ${mobileSidebarOpen ? 'open' : ''}`}
-        style={{
-          width: sidebarOpen ? 240 : 56,
-          minWidth: sidebarOpen ? 240 : 56,
-          background: 'var(--bg-secondary)',
-          borderRight: '1px solid var(--border-color)',
-          display: 'flex',
-          flexDirection: 'column',
-          transition: 'width 0.2s ease',
-          overflow: 'hidden',
-          position: 'relative',
-          zIndex: 100,
-        }}
-      >
-        {/* Logo */}
-        <div
-          className="command-sidebar__header"
+      {/* P37-5: единая шапка на всю ширину, НАД сайдбаром — как в макете
+          mockups/command-balloo-su/dashboard.html (topbar → .main(sidebar+content)) */}
+      <AppTopbar
+        title="Command"
+        right={
+          <div className="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact">
+            <div className="avatar__inner">
+              <span>ИВ</span>
+            </div>
+          </div>
+        }
+      />
+
+      {/* Main: sidebar + content (как .main в макете) */}
+      <div style={{ flex: 1, display: 'flex', overflow: 'hidden', minHeight: 0 }}>
+        {/* Sidebar */}
+        <aside
+          className={`command-sidebar ${sidebarOpen ? '' : 'collapsed'} ${mobileSidebarOpen ? 'open' : ''}`}
           style={{
-            padding: sidebarOpen ? '16px 16px 12px' : '16px 8px',
-            borderBottom: '1px solid var(--border-color)',
+            width: sidebarOpen ? 240 : 56,
+            minWidth: sidebarOpen ? 240 : 56,
+            background: 'var(--bg-secondary)',
+            borderRight: '1px solid var(--border-color)',
             display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-            minHeight: 56,
+            flexDirection: 'column',
+            transition: 'width 0.2s ease',
+            overflow: 'hidden',
+            position: 'relative',
+            zIndex: 100,
           }}
         >
+          {/* Logo */}
           <div
+            className="command-sidebar__header"
             style={{
-              width: 32,
-              height: 32,
-              borderRadius: 8,
-              background: 'var(--info)',
+              padding: sidebarOpen ? '16px 16px 12px' : '16px 8px',
+              borderBottom: '1px solid var(--border-color)',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              color: 'white',
-              fontWeight: 800,
-              fontSize: 16,
-              flexShrink: 0,
+              gap: 10,
+              minHeight: 56,
             }}
           >
-            C
+            <div
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: 8,
+                background: 'var(--info)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontWeight: 800,
+                fontSize: 16,
+                flexShrink: 0,
+              }}
+            >
+              C
+            </div>
+            {sidebarOpen && (
+              <span style={{ fontWeight: 700, fontSize: 16, color: 'var(--text-primary)', whiteSpace: 'nowrap' }}>
+                Command
+              </span>
+            )}
           </div>
-          {sidebarOpen && (
-            <span style={{ fontWeight: 700, fontSize: 16, color: 'var(--text-primary)', whiteSpace: 'nowrap' }}>
-              Command
-            </span>
-          )}
-        </div>
 
-        {/* Navigation */}
-        <nav style={{ flex: 1, overflow: 'auto', padding: '8px 0' }}>
-          {Object.entries(groupedNavItems).map(([section, items]) => (
-            <div key={section}>
-              {sidebarOpen && section !== 'Основное' && (
-                <div
-                  style={{
-                    padding: '12px 16px 4px',
-                    fontSize: 10,
-                    fontWeight: 700,
-                    textTransform: 'uppercase',
-                    letterSpacing: 1,
-                    color: 'var(--text-muted)',
-                  }}
-                >
-                  {section}
-                </div>
-              )}
-              {items.map((item) => (
-                <div
-                  key={item.path}
-                  className={`list__item ${isActive(item.path) ? 'list__item--active' : ''}`}
-                  onClick={() => {
-                    navigate(item.path);
-                    setMobileSidebarOpen(false);
-                  }}
-                  style={{
-                    cursor: 'pointer',
-                    padding: sidebarOpen ? '8px 16px' : '8px 0',
-                    justifyContent: sidebarOpen ? 'flex-start' : 'center',
-                    gap: 10,
-                    margin: '1px 8px',
-                    borderRadius: 6,
-                  }}
-                  title={item.label}
-                >
-                  <span style={{ fontSize: 16, flexShrink: 0 }}>{item.icon}</span>
-                  {sidebarOpen && <span style={{ fontSize: 13, whiteSpace: 'nowrap' }}>{item.label}</span>}
-                </div>
-              ))}
-            </div>
-          ))}
-        </nav>
-
-        {/* Collapse toggle */}
-        <div
-          style={{
-            padding: '8px 12px',
-            borderTop: '1px solid var(--border-color)',
-            display: 'flex',
-            justifyContent: 'center',
-          }}
-        >
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: 'var(--text-muted)',
-              cursor: 'pointer',
-              fontSize: 14,
-              padding: '4px 8px',
-              borderRadius: 4,
-            }}
-            title={sidebarOpen ? 'Свернуть' : 'Развернуть'}
-          >
-            {sidebarOpen ? '◀' : '▶'}
-          </button>
-        </div>
-      </aside>
-
-      {/* Main content */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        {/* P35: единая шапка (@balloo/ui) — лого-меню разделов + аватар пользователя */}
-        <AppTopbar
-          title="Command"
-          right={
-            <div className="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact">
-              <div className="avatar__inner">
-                <span>ИВ</span>
+          {/* Navigation */}
+          <nav style={{ flex: 1, overflow: 'auto', padding: '8px 0' }}>
+            {Object.entries(groupedNavItems).map(([section, items]) => (
+              <div key={section}>
+                {sidebarOpen && section !== 'Основное' && (
+                  <div
+                    style={{
+                      padding: '12px 16px 4px',
+                      fontSize: 10,
+                      fontWeight: 700,
+                      textTransform: 'uppercase',
+                      letterSpacing: 1,
+                      color: 'var(--text-muted)',
+                    }}
+                  >
+                    {section}
+                  </div>
+                )}
+                {items.map((item) => (
+                  <div
+                    key={item.path}
+                    className={`list__item ${isActive(item.path) ? 'list__item--active' : ''}`}
+                    onClick={() => {
+                      navigate(item.path);
+                      setMobileSidebarOpen(false);
+                    }}
+                    style={{
+                      cursor: 'pointer',
+                      padding: sidebarOpen ? '8px 16px' : '8px 0',
+                      justifyContent: sidebarOpen ? 'flex-start' : 'center',
+                      gap: 10,
+                      margin: '1px 8px',
+                      borderRadius: 6,
+                    }}
+                    title={item.label}
+                  >
+                    <span style={{ fontSize: 16, flexShrink: 0 }}>{item.icon}</span>
+                    {sidebarOpen && <span style={{ fontSize: 13, whiteSpace: 'nowrap' }}>{item.label}</span>}
+                  </div>
+                ))}
               </div>
-            </div>
-          }
-        />
+            ))}
+          </nav>
+
+          {/* Collapse toggle */}
+          <div
+            style={{
+              padding: '8px 12px',
+              borderTop: '1px solid var(--border-color)',
+              display: 'flex',
+              justifyContent: 'center',
+            }}
+          >
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--text-muted)',
+                cursor: 'pointer',
+                fontSize: 14,
+                padding: '4px 8px',
+                borderRadius: 4,
+              }}
+              title={sidebarOpen ? 'Свернуть' : 'Развернуть'}
+            >
+              {sidebarOpen ? '◀' : '▶'}
+            </button>
+          </div>
+        </aside>
 
         {/* Page content */}
         <div className="content overflow-y-auto" style={{ flex: 1, overflow: 'auto' }}>
@@ -220,10 +221,10 @@ export function CommandLayout() {
             <Outlet />
           </div>
         </div>
-
-        {/* P35: единый подвал */}
-        <AppFooter />
       </div>
+
+      {/* P37-5: единый подвал на всю ширину */}
+      <AppFooter />
 
       {/* Mobile overlay */}
       {mobileSidebarOpen && (

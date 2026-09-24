@@ -13,6 +13,7 @@ export function ForKassaScreen() {
       <div style={{
       maxWidth: 800,
       width: '100%',
+      flex: 1,
       margin: '0 auto',
       padding: '40px 24px',
       fontFamily: 'Inter, Manrope, sans-serif',
@@ -106,10 +107,10 @@ export function ForKassaScreen() {
           <strong>Оферта:</strong> balloo.su/offer
         </div>
       </div>
-
-      {/* Footer */}
-      <AppFooter />
     </div>
+
+    {/* P37-5: единый подвал на всю ширину (был внутри контейнера 800px → 752px) */}
+    <AppFooter />
     </div>
   );
 }
