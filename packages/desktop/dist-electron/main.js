@@ -1,1 +1,362 @@
-"use strict";const t=require("electron"),c=require("path"),r=require("electron-updater"),h=require("electron-store"),n=new h({defaults:{windowBounds:{width:1280,height:800},isMaximized:!1,theme:"dark",language:"ru",autoStart:!1,minimizeToTray:!0,closeToTray:!0}});let e=null,s=null,u=!1;function b(){const{width:l,height:a}=n.get("windowBounds");e=new t.BrowserWindow({width:l,height:a,minWidth:900,minHeight:600,show:!1,icon:d("icon.png"),title:"Balloo",webPreferences:{preload:c.join(__dirname,"preload.js"),contextIsolation:!0,nodeIntegration:!1,sandbox:!1}}),process.env.VITE_DEV_SERVER_URL?(e.loadURL(process.env.VITE_DEV_SERVER_URL),e.webContents.openDevTools()):e.loadFile(c.join(__dirname,"../dist-renderer/index.html")),n.get("isMaximized")&&e.maximize(),e.once("ready-to-show",()=>{e==null||e.show()}),e.on("resize",()=>{if(!e||e.isMaximized())return;const o=e.getBounds();n.set("windowBounds",o)}),e.on("maximize",()=>n.set("isMaximized",!0)),e.on("unmaximize",()=>n.set("isMaximized",!1)),e.on("close",o=>{!u&&n.get("closeToTray")&&(o.preventDefault(),e==null||e.hide(),i("Balloo свёрнут в трей","Приложение продолжает работать в фоновом режиме"))}),e.webContents.setWindowOpenHandler(({url:o})=>(t.shell.openExternal(o),{action:"deny"}))}function f(){const a=t.nativeImage.createFromPath(d("tray-icon.png")).resize({width:16,height:16});s=new t.Tray(a),s.setToolTip("Balloo Messenger");const o=t.Menu.buildFromTemplate([{label:"Открыть Balloo",click:()=>{e==null||e.show(),e==null||e.focus()}},{type:"separator"},{label:"Статус",submenu:[{label:"Онлайн",type:"radio",checked:!0,click:()=>p("online")},{label:"Отошёл",type:"radio",click:()=>p("away")},{label:"Не беспокоить",type:"radio",click:()=>p("dnd")},{label:"Невидимка",type:"radio",click:()=>p("invisible")}]},{type:"separator"},{label:"Выйти",click:()=>{u=!0,t.app.quit()}}]);s.setContextMenu(o),s.on("double-click",()=>{e==null||e.show(),e==null||e.focus()})}function p(l){e==null||e.webContents.send("presence:update",l)}function i(l,a){if(t.Notification.isSupported()){const o=new t.Notification({title:l,body:a,icon:d("icon.png")});o.on("click",()=>{e==null||e.show(),e==null||e.focus()}),o.show()}}function g(){const l=[{label:"Balloo",submenu:[{label:"О Balloo",click:()=>e==null?void 0:e.webContents.send("navigate","/settings/about")},{type:"separator"},{label:"Настройки",accelerator:"CmdOrCtrl+,",click:()=>e==null?void 0:e.webContents.send("navigate","/settings")},{type:"separator"},{label:"Скрыть",accelerator:"CmdOrCtrl+H",role:"hide"},{label:"Скрыть остальные",accelerator:"CmdOrCtrl+Shift+H",role:"hideOthers"},{type:"separator"},{label:"Выйти",accelerator:"CmdOrCtrl+Q",click:()=>{u=!0,t.app.quit()}}]},{label:"Правка",submenu:[{role:"undo",label:"Отменить"},{role:"redo",label:"Повторить"},{type:"separator"},{role:"cut",label:"Вырезать"},{role:"copy",label:"Копировать"},{role:"paste",label:"Вставить"},{role:"selectAll",label:"Выделить всё"}]},{label:"Вид",submenu:[{label:"Переключить тему",accelerator:"CmdOrCtrl+T",click:()=>e==null?void 0:e.webContents.send("theme:toggle")},{type:"separator"},{role:"reload",label:"Обновить"},{role:"forceReload",label:"Полная перезагрузка"},{role:"toggleDevTools",label:"Инструменты разработчика"},{type:"separator"},{role:"zoomIn",label:"Увеличить"},{role:"zoomOut",label:"Уменьшить"},{role:"resetZoom",label:"Сбросить масштаб"},{type:"separator"},{role:"togglefullscreen",label:"Полный экран"}]},{label:"Чат",submenu:[{label:"Новый чат",accelerator:"CmdOrCtrl+N",click:()=>e==null?void 0:e.webContents.send("navigate","/chat/new")},{label:"Поиск",accelerator:"CmdOrCtrl+K",click:()=>e==null?void 0:e.webContents.send("search:open")},{label:"Создать группу",accelerator:"CmdOrCtrl+Shift+N",click:()=>e==null?void 0:e.webContents.send("navigate","/group/create")}]},{label:"Окно",submenu:[{role:"minimize",label:"Свернуть"},{role:"zoom",label:"Развернуть"},{role:"close",label:"Закрыть"}]},{label:"Помощь",submenu:[{label:"База знаний",click:()=>e==null?void 0:e.webContents.send("navigate","/knowledge")},{label:"Сообщить об ошибке",click:()=>e==null?void 0:e.webContents.send("navigate","/features")},{type:"separator"},{label:"О Balloo",click:()=>e==null?void 0:e.webContents.send("navigate","/settings/about")}]}];process.platform==="darwin"&&l.unshift({label:t.app.name,submenu:[{role:"about",label:"О Balloo"},{type:"separator"},{role:"services",label:"Сервисы"},{type:"separator"},{role:"hide",label:"Скрыть Balloo"},{role:"hideOthers",label:"Скрыть остальные"},{role:"unhide",label:"Показать все"},{type:"separator"},{role:"quit",label:"Выйти"}]});const a=t.Menu.buildFromTemplate(l);t.Menu.setApplicationMenu(a)}function y(){r.autoUpdater.autoDownload=!1,r.autoUpdater.autoInstallOnAppQuit=!0,r.autoUpdater.on("checking-for-update",()=>{e==null||e.webContents.send("update:checking")}),r.autoUpdater.on("update-available",l=>{e==null||e.webContents.send("update:available",l),i("Доступно обновление",`Версия ${l.version} готова к установке`)}),r.autoUpdater.on("update-not-available",()=>{e==null||e.webContents.send("update:not-available")}),r.autoUpdater.on("error",l=>{e==null||e.webContents.send("update:error",l.message)}),r.autoUpdater.on("download-progress",l=>{e==null||e.webContents.send("update:progress",l)}),r.autoUpdater.on("update-downloaded",()=>{e==null||e.webContents.send("update:downloaded"),i("Обновление загружено","Перезапустите приложение для установки")}),setInterval(()=>r.autoUpdater.checkForUpdates(),6*60*60*1e3)}function C(){t.ipcMain.handle("window:minimize",()=>e==null?void 0:e.minimize()),t.ipcMain.handle("window:maximize",()=>{e!=null&&e.isMaximized()?e.unmaximize():e==null||e.maximize()}),t.ipcMain.handle("window:close",()=>e==null?void 0:e.close()),t.ipcMain.handle("window:isMaximized",()=>e==null?void 0:e.isMaximized()),t.ipcMain.handle("store:get",(l,a)=>n.get(a)),t.ipcMain.handle("store:set",(l,a,o)=>{n.set(a,o)}),t.ipcMain.handle("notification:show",(l,a,o)=>{i(a,o)}),t.ipcMain.handle("update:check",()=>r.autoUpdater.checkForUpdates()),t.ipcMain.handle("update:download",()=>r.autoUpdater.downloadUpdate()),t.ipcMain.handle("update:install",()=>r.autoUpdater.quitAndInstall()),t.ipcMain.handle("system:platform",()=>process.platform),t.ipcMain.handle("system:version",()=>t.app.getVersion()),t.ipcMain.handle("system:arch",()=>process.arch),t.ipcMain.on("presence:set",(l,a)=>{M(a)})}function M(l){if(!s)return;const a={online:"Онлайн",away:"Отошёл",dnd:"Не беспокоить",invisible:"Невидимка"};s.setToolTip(`Balloo — ${a[l]||"Онлайн"}`)}function d(l){const a=t.app.isPackaged?c.join(process.resourcesPath,"assets"):c.join(__dirname,"../assets");return c.join(a,l)}const k=t.app.requestSingleInstanceLock();k?t.app.on("second-instance",()=>{e&&(e.isMinimized()&&e.restore(),e.show(),e.focus())}):t.app.quit();t.app.whenReady().then(()=>{b(),f(),g(),y(),C(),t.app.on("activate",()=>{t.BrowserWindow.getAllWindows().length===0&&b()})});t.app.on("window-all-closed",()=>{process.platform});t.app.on("before-quit",()=>{u=!0});t.app.on("will-quit",()=>{s&&(s.destroy(),s=null)});
+"use strict";
+const electron = require("electron");
+const path = require("path");
+const electronUpdater = require("electron-updater");
+const Store = require("electron-store");
+const store = new Store({
+  defaults: {
+    windowBounds: { width: 1280, height: 800 },
+    isMaximized: false,
+    theme: "dark",
+    language: "ru",
+    autoStart: false,
+    minimizeToTray: true,
+    closeToTray: true
+  }
+});
+let mainWindow = null;
+let tray = null;
+let isQuitting = false;
+function createWindow() {
+  const { width, height } = store.get("windowBounds");
+  mainWindow = new electron.BrowserWindow({
+    width,
+    height,
+    minWidth: 900,
+    minHeight: 600,
+    show: false,
+    icon: getAssetPath("icon.png"),
+    title: "Balloo",
+    webPreferences: {
+      preload: path.join(__dirname, "preload.js"),
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: false
+    }
+  });
+  if (process.env.VITE_DEV_SERVER_URL) {
+    mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
+    mainWindow.webContents.openDevTools();
+  } else {
+    mainWindow.loadFile(path.join(__dirname, "../dist-renderer/index.html"));
+  }
+  if (store.get("isMaximized")) {
+    mainWindow.maximize();
+  }
+  mainWindow.once("ready-to-show", () => {
+    mainWindow == null ? void 0 : mainWindow.show();
+  });
+  mainWindow.on("resize", () => {
+    if (!mainWindow || mainWindow.isMaximized()) return;
+    const bounds = mainWindow.getBounds();
+    store.set("windowBounds", bounds);
+  });
+  mainWindow.on("maximize", () => store.set("isMaximized", true));
+  mainWindow.on("unmaximize", () => store.set("isMaximized", false));
+  mainWindow.on("close", (event) => {
+    if (!isQuitting && store.get("closeToTray")) {
+      event.preventDefault();
+      mainWindow == null ? void 0 : mainWindow.hide();
+      showTrayNotification("Balloo свёрнут в трей", "Приложение продолжает работать в фоновом режиме");
+    }
+  });
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    electron.shell.openExternal(url);
+    return { action: "deny" };
+  });
+}
+function createTray() {
+  const trayIcon = electron.nativeImage.createFromPath(getAssetPath("tray-icon.png"));
+  const resizedIcon = trayIcon.resize({ width: 16, height: 16 });
+  tray = new electron.Tray(resizedIcon);
+  tray.setToolTip("Balloo Messenger");
+  const contextMenu = electron.Menu.buildFromTemplate([
+    {
+      label: "Открыть Balloo",
+      click: () => {
+        mainWindow == null ? void 0 : mainWindow.show();
+        mainWindow == null ? void 0 : mainWindow.focus();
+      }
+    },
+    { type: "separator" },
+    {
+      label: "Статус",
+      submenu: [
+        { label: "Онлайн", type: "radio", checked: true, click: () => updatePresence("online") },
+        { label: "Отошёл", type: "radio", click: () => updatePresence("away") },
+        { label: "Не беспокоить", type: "radio", click: () => updatePresence("dnd") },
+        { label: "Невидимка", type: "radio", click: () => updatePresence("invisible") }
+      ]
+    },
+    { type: "separator" },
+    {
+      label: "Выйти",
+      click: () => {
+        isQuitting = true;
+        electron.app.quit();
+      }
+    }
+  ]);
+  tray.setContextMenu(contextMenu);
+  tray.on("double-click", () => {
+    mainWindow == null ? void 0 : mainWindow.show();
+    mainWindow == null ? void 0 : mainWindow.focus();
+  });
+}
+function updatePresence(status) {
+  mainWindow == null ? void 0 : mainWindow.webContents.send("presence:update", status);
+}
+function showTrayNotification(title, body) {
+  if (electron.Notification.isSupported()) {
+    const notification = new electron.Notification({ title, body, icon: getAssetPath("icon.png") });
+    notification.on("click", () => {
+      mainWindow == null ? void 0 : mainWindow.show();
+      mainWindow == null ? void 0 : mainWindow.focus();
+    });
+    notification.show();
+  }
+}
+function createMenuBar() {
+  const template = [
+    {
+      label: "Balloo",
+      submenu: [
+        {
+          label: "О Balloo",
+          click: () => mainWindow == null ? void 0 : mainWindow.webContents.send("navigate", "/settings/about")
+        },
+        { type: "separator" },
+        {
+          label: "Настройки",
+          accelerator: "CmdOrCtrl+,",
+          click: () => mainWindow == null ? void 0 : mainWindow.webContents.send("navigate", "/settings")
+        },
+        { type: "separator" },
+        {
+          label: "Скрыть",
+          accelerator: "CmdOrCtrl+H",
+          role: "hide"
+        },
+        {
+          label: "Скрыть остальные",
+          accelerator: "CmdOrCtrl+Shift+H",
+          role: "hideOthers"
+        },
+        { type: "separator" },
+        {
+          label: "Выйти",
+          accelerator: "CmdOrCtrl+Q",
+          click: () => {
+            isQuitting = true;
+            electron.app.quit();
+          }
+        }
+      ]
+    },
+    {
+      label: "Правка",
+      submenu: [
+        { role: "undo", label: "Отменить" },
+        { role: "redo", label: "Повторить" },
+        { type: "separator" },
+        { role: "cut", label: "Вырезать" },
+        { role: "copy", label: "Копировать" },
+        { role: "paste", label: "Вставить" },
+        { role: "selectAll", label: "Выделить всё" }
+      ]
+    },
+    {
+      label: "Вид",
+      submenu: [
+        {
+          label: "Переключить тему",
+          accelerator: "CmdOrCtrl+T",
+          click: () => mainWindow == null ? void 0 : mainWindow.webContents.send("theme:toggle")
+        },
+        { type: "separator" },
+        { role: "reload", label: "Обновить" },
+        { role: "forceReload", label: "Полная перезагрузка" },
+        { role: "toggleDevTools", label: "Инструменты разработчика" },
+        { type: "separator" },
+        { role: "zoomIn", label: "Увеличить" },
+        { role: "zoomOut", label: "Уменьшить" },
+        { role: "resetZoom", label: "Сбросить масштаб" },
+        { type: "separator" },
+        { role: "togglefullscreen", label: "Полный экран" }
+      ]
+    },
+    {
+      label: "Чат",
+      submenu: [
+        {
+          label: "Новый чат",
+          accelerator: "CmdOrCtrl+N",
+          click: () => mainWindow == null ? void 0 : mainWindow.webContents.send("navigate", "/chat/new")
+        },
+        {
+          label: "Поиск",
+          accelerator: "CmdOrCtrl+K",
+          click: () => mainWindow == null ? void 0 : mainWindow.webContents.send("search:open")
+        },
+        {
+          label: "Создать группу",
+          accelerator: "CmdOrCtrl+Shift+N",
+          click: () => mainWindow == null ? void 0 : mainWindow.webContents.send("navigate", "/group/create")
+        }
+      ]
+    },
+    {
+      label: "Окно",
+      submenu: [
+        { role: "minimize", label: "Свернуть" },
+        { role: "zoom", label: "Развернуть" },
+        { role: "close", label: "Закрыть" }
+      ]
+    },
+    {
+      label: "Помощь",
+      submenu: [
+        {
+          label: "База знаний",
+          click: () => mainWindow == null ? void 0 : mainWindow.webContents.send("navigate", "/knowledge")
+        },
+        {
+          label: "Сообщить об ошибке",
+          click: () => mainWindow == null ? void 0 : mainWindow.webContents.send("navigate", "/features")
+        },
+        { type: "separator" },
+        {
+          label: "О Balloo",
+          click: () => mainWindow == null ? void 0 : mainWindow.webContents.send("navigate", "/settings/about")
+        }
+      ]
+    }
+  ];
+  if (process.platform === "darwin") {
+    template.unshift({
+      label: electron.app.name,
+      submenu: [
+        { role: "about", label: `О Balloo` },
+        { type: "separator" },
+        { role: "services", label: "Сервисы" },
+        { type: "separator" },
+        { role: "hide", label: "Скрыть Balloo" },
+        { role: "hideOthers", label: "Скрыть остальные" },
+        { role: "unhide", label: "Показать все" },
+        { type: "separator" },
+        { role: "quit", label: "Выйти" }
+      ]
+    });
+  }
+  const menu = electron.Menu.buildFromTemplate(template);
+  electron.Menu.setApplicationMenu(menu);
+}
+function setupAutoUpdater() {
+  electronUpdater.autoUpdater.autoDownload = false;
+  electronUpdater.autoUpdater.autoInstallOnAppQuit = true;
+  electronUpdater.autoUpdater.on("checking-for-update", () => {
+    mainWindow == null ? void 0 : mainWindow.webContents.send("update:checking");
+  });
+  electronUpdater.autoUpdater.on("update-available", (info) => {
+    mainWindow == null ? void 0 : mainWindow.webContents.send("update:available", info);
+    showTrayNotification(
+      "Доступно обновление",
+      `Версия ${info.version} готова к установке`
+    );
+  });
+  electronUpdater.autoUpdater.on("update-not-available", () => {
+    mainWindow == null ? void 0 : mainWindow.webContents.send("update:not-available");
+  });
+  electronUpdater.autoUpdater.on("error", (err) => {
+    mainWindow == null ? void 0 : mainWindow.webContents.send("update:error", err.message);
+  });
+  electronUpdater.autoUpdater.on("download-progress", (progress) => {
+    mainWindow == null ? void 0 : mainWindow.webContents.send("update:progress", progress);
+  });
+  electronUpdater.autoUpdater.on("update-downloaded", () => {
+    mainWindow == null ? void 0 : mainWindow.webContents.send("update:downloaded");
+    showTrayNotification(
+      "Обновление загружено",
+      "Перезапустите приложение для установки"
+    );
+  });
+  setInterval(() => electronUpdater.autoUpdater.checkForUpdates(), 6 * 60 * 60 * 1e3);
+}
+function setupIPC() {
+  electron.ipcMain.handle("window:minimize", () => mainWindow == null ? void 0 : mainWindow.minimize());
+  electron.ipcMain.handle("window:maximize", () => {
+    if (mainWindow == null ? void 0 : mainWindow.isMaximized()) {
+      mainWindow.unmaximize();
+    } else {
+      mainWindow == null ? void 0 : mainWindow.maximize();
+    }
+  });
+  electron.ipcMain.handle("window:close", () => mainWindow == null ? void 0 : mainWindow.close());
+  electron.ipcMain.handle("window:isMaximized", () => mainWindow == null ? void 0 : mainWindow.isMaximized());
+  electron.ipcMain.handle("store:get", (_event, key) => store.get(key));
+  electron.ipcMain.handle("store:set", (_event, key, value) => {
+    store.set(key, value);
+  });
+  electron.ipcMain.handle("notification:show", (_event, title, body) => {
+    showTrayNotification(title, body);
+  });
+  electron.ipcMain.handle("update:check", () => electronUpdater.autoUpdater.checkForUpdates());
+  electron.ipcMain.handle("update:download", () => electronUpdater.autoUpdater.downloadUpdate());
+  electron.ipcMain.handle("update:install", () => electronUpdater.autoUpdater.quitAndInstall());
+  electron.ipcMain.handle("system:platform", () => process.platform);
+  electron.ipcMain.handle("system:version", () => electron.app.getVersion());
+  electron.ipcMain.handle("system:arch", () => process.arch);
+  electron.ipcMain.on("presence:set", (_event, status) => {
+    updateTrayPresence(status);
+  });
+}
+function updateTrayPresence(status) {
+  if (!tray) return;
+  const labels = {
+    online: "Онлайн",
+    away: "Отошёл",
+    dnd: "Не беспокоить",
+    invisible: "Невидимка"
+  };
+  tray.setToolTip(`Balloo — ${labels[status] || "Онлайн"}`);
+}
+function getAssetPath(filename) {
+  const assetsPath = electron.app.isPackaged ? path.join(process.resourcesPath, "assets") : path.join(__dirname, "../assets");
+  return path.join(assetsPath, filename);
+}
+const gotTheLock = electron.app.requestSingleInstanceLock();
+if (!gotTheLock) {
+  electron.app.quit();
+} else {
+  electron.app.on("second-instance", () => {
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.show();
+      mainWindow.focus();
+    }
+  });
+}
+electron.app.whenReady().then(() => {
+  createWindow();
+  createTray();
+  createMenuBar();
+  setupAutoUpdater();
+  setupIPC();
+  electron.app.on("activate", () => {
+    if (electron.BrowserWindow.getAllWindows().length === 0) {
+      createWindow();
+    }
+  });
+});
+electron.app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") ;
+});
+electron.app.on("before-quit", () => {
+  isQuitting = true;
+});
+electron.app.on("will-quit", () => {
+  if (tray) {
+    tray.destroy();
+    tray = null;
+  }
+});
