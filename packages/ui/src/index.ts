@@ -18,6 +18,12 @@ export { Footer, DEFAULT_FOOTER_LINKS } from './components/Footer';
 export type { FooterLink } from './components/Footer';
 export { ThemeSwitcher } from './components/ThemeSwitcher';
 export { LanguageSwitcher } from './components/LanguageSwitcher';
+export { RightMenu } from './components/RightMenu';
+export type {
+  RightMenuAuth,
+  RightMenuItem,
+  RightMenuProps,
+} from './components/RightMenu';
 
 // Cookie utils (функциональные cookie, общие для поддоменов)
 export {

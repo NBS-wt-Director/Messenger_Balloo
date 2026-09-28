@@ -113,6 +113,13 @@ export type TranslationKey =
   | 'menu.history'
   | 'menu.download'
   | 'menu.docs'
+  | 'menu.button'
+  | 'menu.themeDark'
+  | 'menu.themeLight'
+  | 'menu.themeRussian'
+  | 'menu.profile'
+  | 'menu.settings'
+  | 'menu.accounts'
   | 'footer.rules'
   | 'footer.privacy'
   | 'footer.cookies';
@@ -2470,6 +2477,44 @@ export const translations: Translations = {
     ru: 'API Docs', en: 'API Docs', tt: 'API Docs', ba: 'API Docs', ce: 'API Docs', cv: 'API Docs', av: 'API Docs',
     dar: 'API Docs', udm: 'API Docs', lez: 'API Docs', kbd: 'API Docs', chm: 'API Docs', os: 'API Docs',
     sah: 'API Docs', bua: 'API Docs', ukr: 'API Docs', zh: 'API Docs', hi: 'API Docs', be: 'API Docs', fr: 'API Docs',
+  },
+  // Подпись кнопки правого меню (title/aria-label в @balloo/ui RightMenu)
+  'menu.button': {
+    ru: 'Меню', tt: 'Меню', ba: 'Меню', ce: 'Меню', cv: 'Меню', av: 'Меню',
+    dar: 'Меню', udm: 'Меню', lez: 'Меню', kbd: 'Меню', chm: 'Меню', os: 'Меню',
+    sah: 'Меню', bua: 'Меню', ukr: 'Меню', be: 'Меню',
+    en: 'Menu', fr: 'Menu', zh: '菜单', hi: 'मेन्यू',
+  },
+  // Названия тем в правом меню (RightMenu). Русская форма — как в эталоне
+  // макета (common.js BALLOO_THEMES: Тёмная / Светлая / «Наша»); для остальных
+  // языков t() отдаёт английскую форму — своих переводов не выдумываем.
+  'menu.themeDark': {
+    ru: 'Тёмная',
+    en: 'Dark',
+  },
+  'menu.themeLight': {
+    ru: 'Светлая',
+    en: 'Light',
+  },
+  'menu.themeRussian': {
+    ru: 'Наша',
+    en: 'Russian',
+  },
+  // Пункты секции «Аккаунт» в правом меню (RightMenu). Русские формы — по эталону
+  // макета (common.js «Профиль»/«Настройки»; accounts.md §3 «Аккаунты»).
+  // Локалей ровно две, как у соседних menu.theme*: для остальных языков t()
+  // отдаёт английскую форму (fallback в функции t() ниже).
+  'menu.profile': {
+    ru: 'Профиль',
+    en: 'Profile',
+  },
+  'menu.settings': {
+    ru: 'Настройки',
+    en: 'Settings',
+  },
+  'menu.accounts': {
+    ru: 'Аккаунты',
+    en: 'Accounts',
   },
   'footer.rules': {
     ru: 'Правила',

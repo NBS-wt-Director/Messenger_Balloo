@@ -8,8 +8,7 @@
 
 import React from 'react';
 import { TopbarMenu, type TopbarMenuItem } from './TopbarMenu';
-import { ThemeSwitcher } from './ThemeSwitcher';
-import { LanguageSwitcher } from './LanguageSwitcher';
+import { RightMenu, type RightMenuAuth } from './RightMenu';
 
 interface TopbarProps {
   /** Заголовок раздела (центр, .topbar__title) */
@@ -18,8 +17,10 @@ interface TopbarProps {
   onTitleClick?: () => void;
   /** Доп. контекст справа ПЕРЕД переключателями (аватар, уведомления, маскот) */
   right?: React.ReactNode;
-  /** Показывать ли переключатели языка/темы (default: true) */
+  /** Показывать ли правое меню (default: true) */
   showSwitchers?: boolean;
+  /** Авторизация для RightMenu (автор/настройки/аккаунты/войти-выйти) */
+  auth?: RightMenuAuth;
   /** Пункты меню лого (default: разделы balloo.su) */
   menuItems?: TopbarMenuItem[];
   /** SPA-навигация для пунктов меню (react-router navigate); нет — location.href */
@@ -31,6 +32,7 @@ export function Topbar({
   onTitleClick,
   right,
   showSwitchers = true,
+  auth,
   menuItems,
   onNavigate,
 }: TopbarProps) {
@@ -51,10 +53,12 @@ export function Topbar({
       <div className="topbar__right">
         {right}
         {showSwitchers && (
-          <>
-            <LanguageSwitcher />
-            <ThemeSwitcher />
-          </>
+          <RightMenu
+            auth={auth?.isAuthenticated ? 'user' : 'guest'}
+            userInitials={auth?.initials}
+            onLogout={auth?.onLogout}
+            onNavigate={onNavigate}
+          />
         )}
       </div>
     </header>
