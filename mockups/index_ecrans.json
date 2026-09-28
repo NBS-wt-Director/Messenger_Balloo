@@ -1,9 +1,9 @@
 {
   "project": "Balloo Messenger",
   "version": "1.0.0",
-  "last_updated": "2026-09-28",
+  "last_updated": "2026-09-29",
   "total_screens": 174,
-  "screens_unviewed": 1,
+  "screens_unviewed": 0,
   "nodes": [
     {
       "id": "у_00",
@@ -1031,7 +1031,7 @@
       "icon": "📱",
       "domain": "Мобильные макеты",
       "total_screens": 24,
-      "viewed": 23,
+      "viewed": 24,
       "edits_specific": 9,
       "edits_global_accepted": 5,
       "components_private": 24,
@@ -1221,7 +1221,7 @@
           "id": "1_08_24",
           "name": "Правое меню шапки (мобильное)",
           "file": "mobile/right-menu.html",
-          "status": "Новый",
+          "status": "Принят",
           "doc_md": "mobile/right-menu.md"
         }
       ]
