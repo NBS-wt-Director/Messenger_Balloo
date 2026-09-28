@@ -432,6 +432,10 @@ function buildNodesDropdown() {
 
 /* ---------- Right Dropdown Menu ---------- */
 function buildRightMenu() {
+  // Страницы-сториборды рисуют состояния панели статичными рамками
+  // (mobile/right-menu.html) — живой оверлей им не нужен. Конвенция та же,
+  // что у data-no-footer (common.js:581).
+  if (document.body.getAttribute('data-no-right-menu') === 'true') return;
   const ctx = detectContext();
   const ballooDir = ctx.prefix + 'balloo-su/';
 
@@ -453,6 +457,8 @@ function buildRightMenu() {
   btn.className = 'topbar__menu-btn';
   btn.id = 'balloo-menu-btn';
   btn.title = 'Меню';
+  btn.setAttribute('aria-haspopup', 'true');
+  btn.setAttribute('aria-expanded', 'false');
   if (ctx.auth === 'guest') {
     // Mascot trigger (bear PNG pending — abstraction placeholder for mockup)
     btn.innerHTML = '<div class="mascot">🐻</div>';
@@ -522,8 +528,27 @@ function buildRightMenu() {
   const menu = document.createElement('div');
   menu.className = 'right-menu';
   menu.id = 'balloo-right-menu';
+  // Панель — модальное окно над контентом (P38.5): закрывается по Escape,
+  // штора и клик вне перекрывают основной контент.
+  menu.setAttribute('role', 'dialog');
+  menu.setAttribute('aria-label', 'Меню');
+  menu.setAttribute('aria-modal', 'false');
   menu.innerHTML = html;
-  document.body.appendChild(menu);
+
+  // Мобильный макет: панель и затемнение живут ВНУТРИ экрана телефона.
+  // В body позиция fixed прилипает к окну браузера, и на десктопном экране
+  // меню открывается справа от «телефона», то есть вне зоны экрана
+  // (тик. 1790596191). Десктопные страницы — как раньше, в body.
+  const screen = document.querySelector('.phone-frame__screen');
+  if (screen) {
+    const overlay = document.createElement('div');
+    overlay.className = 'right-menu__overlay';
+    overlay.id = 'balloo-right-menu-overlay';
+    screen.appendChild(overlay);
+    screen.appendChild(menu);
+  } else {
+    document.body.appendChild(menu);
+  }
 
   // Button toggle
   btn.addEventListener('click', (e) => {
@@ -551,21 +576,66 @@ function buildRightMenu() {
       closeRightMenu();
     }
   });
+
+  // Escape закрывает панель (в исходном контракте P38.5 был; здесь не было)
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeRightMenu();
+  });
+
+  // Мобильная штора: клик по ней — то же закрытие
+  const overlay = document.getElementById('balloo-right-menu-overlay');
+  if (overlay) overlay.addEventListener('click', closeRightMenu);
+}
+
+// Скролл-лок: пока панель открыта, основной контент под шторой не прокручивается.
+// Лочаются реально прокручиваемые потомки экрана (в мобильных макетах это
+// `div` c inline `overflow-y:auto`); внутри самой панели скролл остаётся живым —
+// список из 20 языков должен листаться (right-menu.md, раздел «Структура»).
+function setScreenScrollLock(locked) {
+  const screen = document.querySelector('.phone-frame__screen');
+  if (!screen) return;
+  if (locked) {
+    screen.querySelectorAll('*').forEach((el) => {
+      if (el.closest('.right-menu')) return;
+      if (!/(auto|scroll)/.test(getComputedStyle(el).overflowY)) return;
+      if (el.scrollHeight <= el.clientHeight + 1) return;
+      if (el.dataset.ballooScrollLock) return;
+      el.dataset.ballooScrollLock = '1';
+      el.style.overflowY = 'hidden';
+    });
+    return;
+  }
+  screen.querySelectorAll('[data-balloo-scroll-lock]').forEach((el) => {
+    el.style.overflowY = '';
+    delete el.dataset.ballooScrollLock;
+  });
+}
+
+function setRightMenuOpen(open) {
+  const menu = document.getElementById('balloo-right-menu');
+  const btn = document.getElementById('balloo-menu-btn');
+  if (!menu) return false;
+  const wasOpen = menu.classList.contains('right-menu--open');
+  menu.classList.toggle('right-menu--open', open);
+  menu.setAttribute('aria-modal', open ? 'true' : 'false');
+  if (btn) {
+    btn.classList.toggle('topbar__menu-btn--open', open);
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+  const overlay = document.getElementById('balloo-right-menu-overlay');
+  if (overlay) overlay.classList.toggle('right-menu__overlay--visible', open);
+  setScreenScrollLock(open);
+  return wasOpen !== open;
 }
 
 function toggleRightMenu() {
   const menu = document.getElementById('balloo-right-menu');
-  const btn = document.getElementById('balloo-menu-btn');
   if (!menu) return;
-  const open = menu.classList.toggle('right-menu--open');
-  if (btn) btn.classList.toggle('topbar__menu-btn--open', open);
+  setRightMenuOpen(!menu.classList.contains('right-menu--open'));
 }
 
 function closeRightMenu() {
-  const menu = document.getElementById('balloo-right-menu');
-  const btn = document.getElementById('balloo-menu-btn');
-  if (menu) menu.classList.remove('right-menu--open');
-  if (btn) btn.classList.remove('topbar__menu-btn--open');
+  setRightMenuOpen(false);
 }
 
 function updateLangLabel() {

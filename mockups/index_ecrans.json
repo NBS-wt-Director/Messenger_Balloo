@@ -1,9 +1,9 @@
 {
   "project": "Balloo Messenger",
   "version": "1.0.0",
-  "last_updated": "2026-09-18",
-  "total_screens": 173,
-  "screens_unviewed": 0,
+  "last_updated": "2026-09-28",
+  "total_screens": 174,
+  "screens_unviewed": 1,
   "nodes": [
     {
       "id": "у_00",
@@ -1030,13 +1030,13 @@
       "name": "mobile (сборные)",
       "icon": "📱",
       "domain": "Мобильные макеты",
-      "total_screens": 23,
+      "total_screens": 24,
       "viewed": 23,
-      "edits_specific": 8,
+      "edits_specific": 9,
       "edits_global_accepted": 5,
-      "components_private": 23,
+      "components_private": 24,
       "components_global": 5,
-      "app_functions_count": 13,
+      "app_functions_count": 14,
       "app_functions": [
         "Мобильный чат",
         "История звонков",
@@ -1050,38 +1050,18 @@
         "Сторис",
         "Архив",
         "Контакты",
-        "Профиль"
+        "Профиль",
+        "Правое меню шапки"
       ],
       "status": "задокументирован",
       "doc_md": null,
       "screens": [
         {
-          "id": "1_08_06",
-          "name": "Добавить устройство",
-          "file": "mobile/add-device.html",
+          "id": "1_08_01",
+          "name": "Обзор / Приветствие",
+          "file": "mobile/overview.html",
           "status": "Принят",
-          "doc_md": "mobile/add-device.md"
-        },
-        {
-          "id": "1_08_16",
-          "name": "Архив чатов",
-          "file": "mobile/archive.html",
-          "status": "Принят",
-          "doc_md": "mobile/archive.md"
-        },
-        {
-          "id": "1_08_03",
-          "name": "История звонков",
-          "file": "mobile/calls-history.html",
-          "status": "Принят",
-          "doc_md": "mobile/calls-history.md"
-        },
-        {
-          "id": "1_08_08",
-          "name": "Вложения чата",
-          "file": "mobile/chat-attachments.html",
-          "status": "Принят",
-          "doc_md": "mobile/chat-attachments.md"
+          "doc_md": "mobile/overview.md"
         },
         {
           "id": "1_08_02",
@@ -1091,102 +1071,11 @@
           "doc_md": "mobile/chat.md"
         },
         {
-          "id": "1_08_17",
-          "name": "Контакты",
-          "file": "mobile/contacts.html",
+          "id": "1_08_03",
+          "name": "История звонков",
+          "file": "mobile/calls-history.html",
           "status": "Принят",
-          "doc_md": "mobile/contacts.md"
-        },
-        {
-          "id": "1_08_07",
-          "name": "Донат",
-          "file": "mobile/donate.html",
-          "status": "Принят",
-          "doc_md": "mobile/donate.md"
-        },
-        {
-          "id": "1_08_21",
-          "name": "Пустой чат",
-          "file": "mobile/empty-chat.html",
-          "status": "Просмотрен",
-          "doc_md": "mobile/empty-chat.md"
-        },
-        {
-          "id": "1_08_19",
-          "name": "Создание группы",
-          "file": "mobile/group-create.html",
-          "status": "Принят",
-          "doc_md": "mobile/group-create.md"
-        },
-        {
-          "id": "1_08_10",
-          "name": "Вход",
-          "file": "mobile/login.html",
-          "status": "Принят",
-          "doc_md": "mobile/login.md"
-        },
-        {
-          "id": "1_08_22",
-          "name": "Полноэкранный просмотрщик медиа",
-          "file": "mobile/media-viewer.html",
-          "status": "Просмотрен",
-          "doc_md": "mobile/media-viewer.md"
-        },
-        {
-          "id": "1_08_05",
-          "name": "Мои устройства",
-          "file": "mobile/my-devices.html",
-          "status": "Принят",
-          "doc_md": "mobile/my-devices.md"
-        },
-        {
-          "id": "1_08_14",
-          "name": "Мои донаты",
-          "file": "mobile/my-donates.html",
-          "status": "Принят",
-          "doc_md": "mobile/my-donates.md"
-        },
-        {
-          "id": "1_08_01",
-          "name": "Обзор / Приветствие",
-          "file": "mobile/overview.html",
-          "status": "Принят",
-          "doc_md": "mobile/overview.md"
-        },
-        {
-          "id": "1_08_12",
-          "name": "Восстановление пароля",
-          "file": "mobile/password-reset.html",
-          "status": "Принят",
-          "doc_md": "mobile/password-reset.md"
-        },
-        {
-          "id": "1_08_20",
-          "name": "Редактор опроса",
-          "file": "mobile/poll-editor.html",
-          "status": "Принят",
-          "doc_md": "mobile/poll-editor.md"
-        },
-        {
-          "id": "1_08_18",
-          "name": "Профиль",
-          "file": "mobile/profile.html",
-          "status": "Принят",
-          "doc_md": "mobile/profile.md"
-        },
-        {
-          "id": "1_08_11",
-          "name": "Регистрация",
-          "file": "mobile/register.html",
-          "status": "Принят",
-          "doc_md": "mobile/register.md"
-        },
-        {
-          "id": "1_08_09",
-          "name": "Жалоба на сообщение",
-          "file": "mobile/report-message.html",
-          "status": "Принят",
-          "doc_md": "mobile/report-message.md"
+          "doc_md": "mobile/calls-history.md"
         },
         {
           "id": "1_08_04",
@@ -1196,11 +1085,60 @@
           "doc_md": "mobile/settings.md"
         },
         {
-          "id": "1_08_15",
-          "name": "Сторис",
-          "file": "mobile/stories.html",
+          "id": "1_08_05",
+          "name": "Мои устройства",
+          "file": "mobile/my-devices.html",
           "status": "Принят",
-          "doc_md": "mobile/stories.md"
+          "doc_md": "mobile/my-devices.md"
+        },
+        {
+          "id": "1_08_06",
+          "name": "Добавить устройство",
+          "file": "mobile/add-device.html",
+          "status": "Принят",
+          "doc_md": "mobile/add-device.md"
+        },
+        {
+          "id": "1_08_07",
+          "name": "Донат",
+          "file": "mobile/donate.html",
+          "status": "Принят",
+          "doc_md": "mobile/donate.md"
+        },
+        {
+          "id": "1_08_08",
+          "name": "Вложения чата",
+          "file": "mobile/chat-attachments.html",
+          "status": "Принят",
+          "doc_md": "mobile/chat-attachments.md"
+        },
+        {
+          "id": "1_08_09",
+          "name": "Жалоба на сообщение",
+          "file": "mobile/report-message.html",
+          "status": "Принят",
+          "doc_md": "mobile/report-message.md"
+        },
+        {
+          "id": "1_08_10",
+          "name": "Вход",
+          "file": "mobile/login.html",
+          "status": "Принят",
+          "doc_md": "mobile/login.md"
+        },
+        {
+          "id": "1_08_11",
+          "name": "Регистрация",
+          "file": "mobile/register.html",
+          "status": "Принят",
+          "doc_md": "mobile/register.md"
+        },
+        {
+          "id": "1_08_12",
+          "name": "Восстановление пароля",
+          "file": "mobile/password-reset.html",
+          "status": "Принят",
+          "doc_md": "mobile/password-reset.md"
         },
         {
           "id": "1_08_13",
@@ -1210,11 +1148,81 @@
           "doc_md": "mobile/two-factor.md"
         },
         {
+          "id": "1_08_14",
+          "name": "Мои донаты",
+          "file": "mobile/my-donates.html",
+          "status": "Принят",
+          "doc_md": "mobile/my-donates.md"
+        },
+        {
+          "id": "1_08_15",
+          "name": "Сторис",
+          "file": "mobile/stories.html",
+          "status": "Принят",
+          "doc_md": "mobile/stories.md"
+        },
+        {
+          "id": "1_08_16",
+          "name": "Архив чатов",
+          "file": "mobile/archive.html",
+          "status": "Принят",
+          "doc_md": "mobile/archive.md"
+        },
+        {
+          "id": "1_08_17",
+          "name": "Контакты",
+          "file": "mobile/contacts.html",
+          "status": "Принят",
+          "doc_md": "mobile/contacts.md"
+        },
+        {
+          "id": "1_08_18",
+          "name": "Профиль",
+          "file": "mobile/profile.html",
+          "status": "Принят",
+          "doc_md": "mobile/profile.md"
+        },
+        {
+          "id": "1_08_19",
+          "name": "Создание группы",
+          "file": "mobile/group-create.html",
+          "status": "Принят",
+          "doc_md": "mobile/group-create.md"
+        },
+        {
+          "id": "1_08_20",
+          "name": "Редактор опроса",
+          "file": "mobile/poll-editor.html",
+          "status": "Принят",
+          "doc_md": "mobile/poll-editor.md"
+        },
+        {
+          "id": "1_08_21",
+          "name": "Пустой чат",
+          "file": "mobile/empty-chat.html",
+          "status": "Просмотрен",
+          "doc_md": "mobile/empty-chat.md"
+        },
+        {
+          "id": "1_08_22",
+          "name": "Полноэкранный просмотрщик медиа",
+          "file": "mobile/media-viewer.html",
+          "status": "Просмотрен",
+          "doc_md": "mobile/media-viewer.md"
+        },
+        {
           "id": "1_08_23",
           "name": "Запись голосового (mobile)",
           "file": "mobile/voice-record.html",
           "status": "Просмотрен",
           "doc_md": "mobile/voice-record.md"
+        },
+        {
+          "id": "1_08_24",
+          "name": "Правое меню шапки (мобильное)",
+          "file": "mobile/right-menu.html",
+          "status": "Новый",
+          "doc_md": "mobile/right-menu.md"
         }
       ]
     },

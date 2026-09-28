@@ -264,14 +264,15 @@
     <p>100% интерактивные HTML-макеты всех экранов всех узлов монорепо</p>
     <div class="mockups-stats">
       <div class="mockups-stat"><strong>12</strong><span> узлов (11 доменов + shared)</span></div>
-      <div class="mockups-stat"><strong>173</strong><span> экранов</span></div>
+      <div class="mockups-stat"><strong>174</strong><span> экранов</span></div>
       <div class="mockups-stat"><strong>3</strong><span> темы оформления</span></div>
-      <div class="mockups-stat mockups-stat--danger"><strong style="color: var(--accent);">✅ 100%</strong><span> готовность</span></div>
+      <div class="mockups-stat mockups-stat--danger"><strong style="color: var(--warning);">не подтверждён 1</strong><span> из 174 экранов</span></div>
     </div>
   </div>
   <div class="readiness-banner" id="readiness-banner" style="background: rgba(45,184,77,0.1); border-color: var(--accent); color: var(--accent);">
-    ✅ Готовность: <strong>100%</strong> — все экраны просмотрены и приняты.
-    Просмотрено экранов: <strong id="viewed-count">173</strong> / 173.
+    Готовность по реестру (<code>index_ecrans.json</code>): из <strong>174</strong> экранов не подтверждён <strong>1</strong> — <strong>1_08_24 «Правое меню шапки (мобильное)»</strong>, статус «Новый».
+    Отметка просмотра в этом браузере: <strong id="viewed-count">—</strong> / 174.
+    <span style="color: var(--text-secondary);">Известное расхождение реестра (сумма по узлам 171 / записей 172 / верхнее поле 174) — отдельная ревизия, тик. 1790596191 п.4.</span>
     <button class="btn btn--sm btn--primary" style="margin-left:12px;" id="confirm-btn" onclick="alert('Готовность подтверждена!')">✅ Подтвердить готовность</button>
   </div>
 
@@ -1345,7 +1346,7 @@
   <div class="node-section">
     <div class="node-header">
       <h2>📱 mobile — Мобильные макеты</h2>
-      <span class="chip">23 экранов</span>
+      <span class="chip">24 экранов</span>
     </div>
     <div class="node-url">
       <span class="node-url__label">Назначение:</span>
@@ -1355,19 +1356,19 @@
       <summary>📋 Метаданные узла</summary>
       <div class="node-meta__body">
         <div class="meta-grid">
-          <div class="meta-item"><span class="meta-item__label">Просмотрен</span><span class="meta-item__value meta-item__value--no" data-field="viewed">👁 20/23</span></div>
-          <div class="meta-item"><span class="meta-item__label">Правок частных</span><span class="meta-item__value" data-field="edits_specific">8</span></div>
+          <div class="meta-item"><span class="meta-item__label">Просмотрен</span><span class="meta-item__value meta-item__value--no" data-field="viewed">👁 20/24</span></div>
+          <div class="meta-item"><span class="meta-item__label">Правок частных</span><span class="meta-item__value" data-field="edits_specific">9</span></div>
           <div class="meta-item"><span class="meta-item__label">Правок глобальных принято</span><span class="meta-item__value" data-field="edits_global_accepted">5</span></div>
           <div class="meta-item"><span class="meta-item__label">Документация</span><span class="meta-item__value meta-item__value--no" data-field="documentation_written">❌ нет</span></div>
-          <div class="meta-item"><span class="meta-item__label">Компоненты частные</span><span class="meta-item__value">23</span></div>
+          <div class="meta-item"><span class="meta-item__label">Компоненты частные</span><span class="meta-item__value">24</span></div>
           <div class="meta-item"><span class="meta-item__label">Компоненты глобальные</span><span class="meta-item__value">5</span></div>
-          <div class="meta-item"><span class="meta-item__label">Функций приложения</span><span class="meta-item__value">13</span></div>
+          <div class="meta-item"><span class="meta-item__label">Функций приложения</span><span class="meta-item__value">14</span></div>
           <div class="meta-item"><span class="meta-item__label">Статус реализации</span><span class="meta-item__value meta-item__value--warn" data-field="implementation_status">запланирован</span></div>
         </div>
         <div class="meta-functions">
-          <div class="meta-functions__title">Функции приложения (13)</div>
+          <div class="meta-functions__title">Функции приложения (14)</div>
           <div class="meta-functions__list">
-            <span class="chip">Мобильный чат</span>            <span class="chip">История звонков</span>            <span class="chip">Мобильные настройки</span>            <span class="chip">Устройства</span>            <span class="chip">QR-привязка</span>            <span class="chip">Донат</span>            <span class="chip">Вложения чата</span>            <span class="chip">Жалобы</span>            <span class="chip">Вход/Регистрация</span>            <span class="chip">Сторис</span>            <span class="chip">Архив</span>            <span class="chip">Контакты</span>            <span class="chip">Профиль</span>
+            <span class="chip">Мобильный чат</span>            <span class="chip">История звонков</span>            <span class="chip">Мобильные настройки</span>            <span class="chip">Устройства</span>            <span class="chip">QR-привязка</span>            <span class="chip">Донат</span>            <span class="chip">Вложения чата</span>            <span class="chip">Жалобы</span>            <span class="chip">Вход/Регистрация</span>            <span class="chip">Сторис</span>            <span class="chip">Архив</span>            <span class="chip">Контакты</span>            <span class="chip">Профиль</span>            <span class="chip">Правое меню шапки</span>
           </div>
         </div>
         <div class="meta-actions">
@@ -1535,6 +1536,12 @@
         <span class="mockup-card__desc">Запись голосового (mobile)</span>
         <div class="mockup-card__tags"><span class="chip">record</span></div>
         
+      </a>
+      <a class="mockup-card" href="mobile/right-menu.html">
+        <span class="mockup-card__num">1_08_24</span>
+        <span class="mockup-card__title">Правое меню шапки (мобильное)</span>
+        <span class="mockup-card__desc">Панель 320px внутри экрана, штора, 5 состояний</span>
+        <div class="mockup-card__tags"><span class="chip">меню</span><span class="chip">P38</span></div>
       </a>
   </div>
 </div>
@@ -1904,14 +1911,16 @@
 <script src="assets/common.js"></script>
 <script>
   // Track viewed nodes via localStorage
-  const TOTAL_SCREENS = 137;
+  // Знаменатель сверяется с docs/strategy/index_ecrans.json (поле total_screens)
+  // и с суммой screens_total по узлам. Меняется вместе с реестром, а не на глаз.
+  const TOTAL_SCREENS = 174;
   // Nodes viewed by default (confirmed by user)
   const DEFAULT_VIEWED_NODES = ['shared', 'download-balloo-su', 'docs-balloo-su', 'mobile', 'desktop', 'blog-balloo-su', 'specifity-balloo-su'];
   // Screen count per node
   const NODE_SCREEN_COUNT = {
     'shared': 8, 'balloo-su': 40, 'admin-balloo-su': 26, 'command-balloo-su': 26,
     'features-balloo-su': 5, 'history-balloo-su': 4, 'download-balloo-su': 2,
-    'docs-balloo-su': 1, 'mobile': 12, 'desktop': 10, 'specifity-balloo-su': 7,
+    'docs-balloo-su': 1, 'mobile': 24, 'desktop': 10, 'specifity-balloo-su': 7,
     'blog-balloo-su': 6
   };
   // Partially viewed nodes (node viewed but only some screens): node -> viewed screen count

@@ -1966,6 +1966,65 @@ img { max-width: 100%; display: block; }
 }
 
 /* ============================================
+   Правое меню ВНУТРИ мобильного макета (тик. 1790596191)
+   common.js монтирует панель и штору в .phone-frame__screen, когда на
+   странице есть рамка телефона. Причина: position:fixed базового правила
+   привязан к viewport браузера, и на десктопном окне панель открывалась у
+   правого края окна — то есть справа от «телефона», вне зоны экрана
+   (замер: панель left:1160 right:1440 при рамке left:540 right:900).
+   Здесь панель абсолютна от экрана и обрезается его overflow:hidden.
+   56px — высота .topbar (строка 174); штора и панель стартуют под шапкой,
+   поэтому триггер остаётся видимым и кликабельным.
+   Десктоп не затронут: селекторы действуют только внутри .phone-frame__screen.
+   ============================================ */
+
+.phone-frame__screen {
+  position: relative;
+}
+
+.phone-frame__screen .right-menu__overlay {
+  position: absolute;
+  top: 56px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 290;
+  background: rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.3s, visibility 0.3s;
+}
+
+.phone-frame__screen .right-menu__overlay--visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* display:flex держим постоянно: при display:none анимация съезда не
+   работает, а скрытие — visibility + transform за пределами экрана. */
+.phone-frame__screen .right-menu {
+  position: absolute;
+  top: 56px;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  width: 320px;
+  max-width: 100%;
+  max-height: none;
+  box-shadow: -12px 0 32px rgba(0, 0, 0, 0.4);
+  transform: translateX(100%);
+  visibility: hidden;
+  transition: transform 0.3s ease, visibility 0.3s;
+}
+
+.phone-frame__screen .right-menu--open {
+  transform: none;
+  visibility: visible;
+}
+
+/* ============================================
    Footer (unified across all nodes)
    Built by common.js
    ============================================ */
