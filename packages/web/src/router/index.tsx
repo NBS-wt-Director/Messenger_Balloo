@@ -194,7 +194,15 @@ export const router = createHashRouter([
     element: (
       <ErrorBoundary>
         <Suspense fallback={<LoadingFallback />}>
-          <LandingScreen />
+          {/* P38-0 (тикет 1790480787-01): гость должен видеть лендинг на '/'.
+              Раньше здесь был голый <LandingScreen/>, а маршрут '/' выигрывала
+              защищённая группа ниже (path '/' + children[{index:true} → /chat]:
+              ветка с index ранжируется выше простой ветки '/'), поэтому у гостя
+              рендерился ProtectedRoute и редирект на /login. Индексный child
+              защищённой группы убран, редирект авторизованного в /chat — тут. */}
+          <GuestRoute>
+            <LandingScreen />
+          </GuestRoute>
         </Suspense>
       </ErrorBoundary>
     ),
@@ -320,10 +328,8 @@ export const router = createHashRouter([
       </ErrorBoundary>
     ),
     children: [
-      {
-        index: true,
-        element: <Navigate to="/chat" replace />,
-      },
+      // P38-0: здесь больше нет { index: true → /chat } — он затенял публичный
+      // лендинг на '/' (см. комментарий у публичного маршрута '/').
       {
         path: 'chat',
         element: <ChatViewScreen />,

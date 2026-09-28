@@ -46,30 +46,36 @@ async function request<T>(
 
   // If 401, try refresh token via httpOnly cookie
   if (response.status === 401) {
-    try {
-      // Сервер берёт refresh token из cookie (body не нужен)
-      const refreshResponse = await fetch(`${API_BASE}/api/auth/refresh-cookie`, {
-        method: 'POST',
-        credentials: 'include',
-      });
+    // Сервер берёт refresh token из cookie (body не нужен). Ответ /refresh-cookie
+    // различает два состояния — раньше оба трактовались как «сессия протухла»,
+    // из-за чего гость на публичных страницах сбрасывался на #/login
+    // (тикет 1790480787-01, P38-0):
+    //   400 — refresh-куки нет вообще, сессии не было. Это гость: URL не
+    //         трогаем, решение о входе принимает ProtectedRoute
+    //         (src/router/index.tsx) — на защищённом маршруте сам отведёт
+    //         на /login, на публичном гость остаётся где был.
+    //   401 — refresh-токен есть, но невалиден/истёк: сессия протухла,
+    //         редирект на вход остаётся.
+    //   сетевая ошибка/5xx — про refresh ничего неизвестно, со страницы не
+    //         выкидываем (API может быть временно недоступен).
+    const refreshResponse = await fetch(`${API_BASE}/api/auth/refresh-cookie`, {
+      method: 'POST',
+      credentials: 'include',
+    }).catch(() => null);
 
-      if (refreshResponse.ok) {
-        // Retry original request with fresh cookies
-        response = await fetch(`${API_BASE}${endpoint}`, {
-          ...rest,
-          credentials: 'include',
-          headers,
-          body: data ? JSON.stringify(data) : undefined,
-        });
-      } else {
-        // Refresh failed — redirect to login
-        window.location.hash = '#/login';
-        throw new Error('Session expired. Please login again.');
-      }
-    } catch {
-      // Refresh failed — redirect to login
+    if (refreshResponse?.ok) {
+      // Retry original request with fresh cookies
+      response = await fetch(`${API_BASE}${endpoint}`, {
+        ...rest,
+        credentials: 'include',
+        headers,
+        body: data ? JSON.stringify(data) : undefined,
+      });
+    } else if (refreshResponse?.status === 401) {
       window.location.hash = '#/login';
       throw new Error('Session expired. Please login again.');
+    } else {
+      throw new Error('Not authenticated.');
     }
   }
 
