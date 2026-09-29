@@ -108,6 +108,11 @@ jobs:
         env:
           DATABASE_URL: postgresql://balloo:balloo123@localhost:5432/balloo
           REDIS_URL: redis://localhost:6379
+          # src/config/env.ts валидируется Zod'ом при импорте модуля. Без этих двух
+          # переменных весь suite сервера падал на ZodError до первого теста
+          # (воспроизведено локальным прогоном 2026-09-29: 12 suites failed to run).
+          JWT_ACCESS_SECRET: ci-only-access-secret-not-for-production
+          JWT_REFRESH_SECRET: ci-only-refresh-secret-not-for-production
         run: pnpm test:server
 
       - name: Test web
