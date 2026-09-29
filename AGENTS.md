@@ -62,6 +62,49 @@
 
 ---
 
+## 🔍 §1. Проверяемые факты: что я подтверждаю прогоном (замер 27.09.2026)
+
+Раздел нужен, чтобы следующая сессия не считала мои прошлые утверждения
+проверенными фактами. Между запусками у меня нет памяти: я вижу файлы и могу
+выполнить команды. Всё, что не получено командой в текущем запуске, здесь не
+приводится.
+
+### Подтверждается локальным прогоном
+
+| Проверка | Команда | Результат 27.09.2026 |
+| --- | --- | --- |
+| Тесты shared | `pnpm --filter @balloo/shared test` | vitest: 4 файла, 76 тестов, зелёные |
+| Тесты web | `pnpm --filter @balloo/web test` | vitest: 15 файлов, 168 тестов, зелёные |
+| Тесты server | `pnpm --filter @balloo/server test` | jest: 20 наборов, 245 тестов, зелёные |
+| Все тесты монорепо | `pnpm test` | код возврата 0 |
+| Тестов нет | `pnpm --filter @balloo/ui test` (также desktop, mobile-android, mobile-ios) | `echo "No tests configured yet"` — заглушки, а не тесты |
+| Типы web | `pnpm --filter @balloo/web build` | `tsc && vite build` (tsc без `--noEmit`), 7.32 с, код 0 |
+| Отдельного typecheck нет | `pnpm typecheck` | `ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL — script not found`. Типы проверяются только внутри `build` |
+| Линтер | `pnpm lint` | в shared скрипта нет; в server/web/ui/desktop — `echo "No linter configured yet"` |
+| e2e | `packages/web/cypress/e2e/` | 6 специков (auth, chat, blog, group, story, admin), 24 блока `it`/`describe`. Прогон `pnpm --filter @balloo/web test:e2e` → `cypress run` — **в этой сессии не запускался** |
+| CI | `ls .github/workflows/` | `ci.yml`, `cd.yml` |
+| Локальный pre-commit | `cat .husky/pre-commit` | `git diff --cached --check` + lint-staged, если установлен; полный набор проверок живёт в CI |
+| Файлов в git | `git ls-files \| wc -l` | 1187 |
+| Незакоммиченного | `git status --porcelain \| wc -l` | 18 записей |
+| Git worktree | `git worktree list \| wc -l` | 1 — только основной каталог |
+| История | `git rev-list --count HEAD` | 102 коммита, первый от 14.08.2026 |
+| Окружение | `node -v` / `pnpm -v` / `git --version` | v22.23.1 / 11.17.0 / 2.43.0 |
+
+### Не подтверждается: этого я физически не вижу
+
+| Область | Почему не подтверждаю | Что видно grep'ом по `docker/prod/.env.production` |
+| --- | --- | --- |
+| Прод-сервер | нет доступа к `balloo.su`: я не выполняю там команд и не читаю systemd/БД/логи | — |
+| Оплата | нет кабинета YooKassa | `YOOKASSA_SHOP_ID=""`, `YOOKASSA_API_KEY=""` — на проде платежи не настроены |
+| Почта | письма не отправлял, почту владельца не читаю | `SMTP_USER`/`SMTP_PASSWORD` в файле отсутствуют как ключи |
+| OAuth-входы | панель провайдера не открывал, реальный вход не проходил | `YANDEX_CLIENT_ID/SECRET`, `VK_CLIENT_ID/SECRET`, `MAILRU_CLIENT_ID/SECRET` заполнены |
+| Push | доставку не проверял | `VAPID_PUBLIC_KEY`/`VAPID_PRIVATE_KEY` заполнены |
+| Метрика | счётчик не открывал | `VITE_YM_METRIKA_ID=112269610` в проде и `91027481` в `packages/web/.env` — **два разных счётчика** |
+| MAX, Яндекс Диск, Slack, YooMoney | ключей нет | `MAX_*`, `YANDEX_DISK_API_KEY`, `DEPLOY_SHA` (Slack) пустые; `YANDEX_DISK_API_KEY` и `DEPLOY_SHA` код бэкенда не читает вообще |
+| Продакшен-сборки, iOS | не собираю под `--mode production`, нет Xcode и симулятора | — |
+
+---
+
 ## 📌 Решения владельца (не переспрашивать)
 
 Записано 2026-09-26. Каждый пункт ниже **уже обсуждён и закрыт**. Спрашивать
