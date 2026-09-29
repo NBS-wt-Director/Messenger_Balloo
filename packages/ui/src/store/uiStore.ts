@@ -7,6 +7,7 @@
 // оно остаётся в локальном store сайта (web: packages/web/src/store/uiStore.ts).
 
 import { create } from 'zustand';
+import { detectLanguage } from '@balloo/shared';
 import {
   getCookie,
   setCookie,
@@ -64,20 +65,28 @@ function getInitialTheme(): Theme {
   return DEFAULT_THEME;
 }
 
+// Язык по умолчанию, если браузер не говорит ни на одном из языков контракта
+const DEFAULT_LANGUAGE: Language = 'en';
+
 // Load saved language from cookie or use default
 function getInitialLanguage(): Language {
   const saved = getCookie(LANGUAGE_COOKIE);
   if (saved && SUPPORTED_LANGUAGES.some((l) => l.code === saved)) {
     return saved as Language;
   }
-  // Detect browser language
-  const browserLang = navigator.language.toLowerCase();
-  if (browserLang.startsWith('ru')) return 'ru';
-  if (browserLang.startsWith('zh')) return 'zh';
-  if (browserLang.startsWith('fr')) return 'fr';
-  if (browserLang.startsWith('be')) return 'be';
-  if (browserLang.startsWith('hi')) return 'hi';
-  return 'en';
+  // Автоопределение по настройкам браузера: navigator.languages (по приоритету),
+  // затем navigator.language. Распознаются все 20 языков контракта
+  // ('uk' → 'ukr', 'tt', 'ce', 'sah', …), а не только ru/zh/fr/be/hi.
+  // SSR и предпросмотр сборки: navigator отсутствует → дефолт.
+  const tags =
+    typeof navigator === 'undefined'
+      ? []
+      : [...(navigator.languages ?? []), navigator.language];
+  const detected = detectLanguage(tags);
+  if (detected && SUPPORTED_LANGUAGES.some((l) => l.code === detected)) {
+    return detected as Language;
+  }
+  return DEFAULT_LANGUAGE;
 }
 
 export const useUIStore = create<UIState>()((set) => {

@@ -4,6 +4,7 @@
 export type TranslationKey =
   | 'app.name'
   | 'app.description'
+  | 'app.tagline'
   | 'auth.register'
   | 'auth.login'
   | 'auth.logout'
@@ -176,6 +177,14 @@ export const translations: Translations = {
     hi: 'संचार, कार्य और व्यवसाय के लिए रूसी मैसेंजर',
     be: 'Расійскі месенджер для зносін, працы і бізнесу',
     fr: 'Messagererie russe pour la communication, le travail et les affaires',
+  },
+  // Заголовок лендинга. Локалей здесь намеренно меньше, чем в контракте:
+  // t() отдаёт currentLocale || en || ru, поэтому остальные языки получают
+  // английскую форму. Свою переводческую строку на язык, который мы не
+  // сверяли, вписывать не стали.
+  'app.tagline': {
+    ru: 'Balloo — российский мессенджер',
+    en: 'Balloo — Russian messenger',
   },
 
   // Auth

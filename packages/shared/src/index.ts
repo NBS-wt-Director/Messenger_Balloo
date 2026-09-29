@@ -18,4 +18,5 @@ export * from './constants/themes';
 
 // i18n
 export * from './i18n/translations';
+export * from './i18n/detectLanguage';
 

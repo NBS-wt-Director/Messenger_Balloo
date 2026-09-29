@@ -1,11 +1,16 @@
 // Landing Screen — стартовая страница (placeholder)
 // Full implementation in later tickets
 // P35: единая шапка/подвал (@balloo/ui)
+// Тексты — через useI18n: язык берётся из настроек браузера (см.
+// getInitialLanguage в @balloo/ui), ручной выбор пользователя важнее.
 
 import { AppTopbar } from '@/components/chrome/AppTopbar';
 import { AppFooter } from '@/components/chrome/AppFooter';
+import { useI18n } from '@/components/providers/I18nProvider';
 
 function LandingScreen() {
+  const { t } = useI18n();
+
   return (
     <div
       style={{
@@ -15,7 +20,7 @@ function LandingScreen() {
       }}
     >
       {/* P35: единая шапка */}
-      <AppTopbar title="Balloo — российский мессенджер" />
+      <AppTopbar title={t('app.tagline')} />
 
       <div
         style={{
@@ -28,9 +33,9 @@ function LandingScreen() {
           padding: '2rem',
         }}
       >
-        <h1 style={{ fontSize: '2rem', marginBottom: '1rem' }}>Balloo</h1>
+        <h1 style={{ fontSize: '2rem', marginBottom: '1rem' }}>{t('app.name')}</h1>
         <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>
-          Российский мессенджер для общения, работы и бизнеса
+          {t('app.description')}
         </p>
         <a
           href="/login"
@@ -42,7 +47,7 @@ function LandingScreen() {
             borderRadius: '0',
           }}
         >
-          Войти
+          {t('auth.login')}
         </a>
       </div>
 
