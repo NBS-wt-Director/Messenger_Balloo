@@ -10,7 +10,7 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
-import { I18nProvider, RightMenu, useUIStore } from '@balloo/ui';
+import { I18nProvider, RightMenu, SUPPORTED_LANGUAGES, useUIStore } from '@balloo/ui';
 
 /** Подписки пунктов авторизованного + ярлык самой секции (settings.account). */
 const ACCOUNT_LABELS = ['Профиль', 'Настройки', 'Аккаунты', 'Аккаунт'];
@@ -102,5 +102,134 @@ describe('RightMenu — подписи секции «Аккаунт»', () => {
 
     fireEvent.click(screen.getByText('Выйти'));
     expect(onLogout).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('RightMenu — поведение панели (эталон common.js:529–562)', () => {
+  it('панель закрыта по умолчанию, открывается и закрывается по триггеру', () => {
+    const { container } = render(
+      <I18nProvider>
+        <RightMenu />
+      </I18nProvider>
+    );
+    const trigger = container.querySelector('#balloo-menu-btn') as HTMLElement;
+    const panel = container.querySelector('#balloo-right-menu') as HTMLElement;
+
+    expect(panel.className).not.toContain('right-menu--open');
+    expect(trigger.getAttribute('aria-expanded')).toBe('false');
+
+    fireEvent.click(trigger);
+    expect(panel.className).toContain('right-menu--open');
+    expect(trigger.getAttribute('aria-expanded')).toBe('true');
+
+    fireEvent.click(trigger);
+    expect(panel.className).not.toContain('right-menu--open');
+    expect(trigger.getAttribute('aria-expanded')).toBe('false');
+  });
+
+  it('закрывается по клику вне панели', () => {
+    const { container } = render(
+      <I18nProvider>
+        <RightMenu />
+      </I18nProvider>
+    );
+    const trigger = container.querySelector('#balloo-menu-btn') as HTMLElement;
+    const panel = container.querySelector('#balloo-right-menu') as HTMLElement;
+
+    fireEvent.click(trigger);
+    expect(panel.className).toContain('right-menu--open');
+
+    // mousedown вне host-узла (common.js:549–553 слушает именно mousedown)
+    fireEvent.mouseDown(document.body);
+    expect(panel.className).not.toContain('right-menu--open');
+  });
+
+  it('закрывается по Escape', () => {
+    const { container } = render(
+      <I18nProvider>
+        <RightMenu />
+      </I18nProvider>
+    );
+    const trigger = container.querySelector('#balloo-menu-btn') as HTMLElement;
+    const panel = container.querySelector('#balloo-right-menu') as HTMLElement;
+
+    fireEvent.click(trigger);
+    expect(panel.className).toContain('right-menu--open');
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(panel.className).not.toContain('right-menu--open');
+  });
+
+  it('подменю языка и темы переключаются по клику (▾/▴)', () => {
+    const { container } = renderMenu({ auth: 'user' });
+    const items = container.querySelectorAll('.right-menu__item');
+    const langItem = items[0] as HTMLElement;
+    const themeItem = items[1] as HTMLElement;
+
+    // Язык: закрыт → открыт → закрыт
+    expect(langItem.getAttribute('aria-expanded')).toBe('false');
+    fireEvent.click(langItem);
+    expect(langItem.getAttribute('aria-expanded')).toBe('true');
+    fireEvent.click(langItem);
+    expect(langItem.getAttribute('aria-expanded')).toBe('false');
+
+    // Тема: открытие языка сброшено, тема открывается независимо
+    fireEvent.click(themeItem);
+    expect(themeItem.getAttribute('aria-expanded')).toBe('true');
+  });
+
+  it('в подменю языка — все контрактные языки (20)', () => {
+    const { container } = renderMenu({ auth: 'user' });
+    const langItem = container.querySelectorAll('.right-menu__item')[0] as HTMLElement;
+    fireEvent.click(langItem);
+
+    const subitems = container.querySelectorAll('.right-menu__submenu--open .right-menu__subitem');
+    expect(subitems.length).toBe(SUPPORTED_LANGUAGES.length);
+    expect(subitems.length).toBe(20);
+  });
+
+  it('выбор языка кликом меняет локаль в сторе', () => {
+    const { container } = renderMenu({ auth: 'user' });
+    const langItem = container.querySelectorAll('.right-menu__item')[0] as HTMLElement;
+    fireEvent.click(langItem);
+
+    const subitems = container.querySelectorAll('.right-menu__submenu--open .right-menu__subitem');
+    // Берём язык, отличный от текущего (ru), чтобы изменение было заметно.
+    const target = Array.from(subitems).find((el) => el.textContent?.includes('English')) as HTMLElement;
+    expect(target).toBeTruthy();
+    fireEvent.click(target);
+
+    expect(useUIStore.getState().language).toBe('en');
+  });
+
+  it('выбор темы кликом меняет тему в сторе', () => {
+    const { container } = renderMenu({ auth: 'user' });
+    const themeItem = container.querySelectorAll('.right-menu__item')[1] as HTMLElement;
+    fireEvent.click(themeItem);
+
+    const subitems = container.querySelectorAll('.right-menu__submenu--open .right-menu__subitem');
+    const light = Array.from(subitems).find((el) => el.textContent?.includes('Светлая')) as HTMLElement;
+    expect(light).toBeTruthy();
+    fireEvent.click(light);
+
+    expect(useUIStore.getState().theme).toBe('light');
+  });
+
+  it('триггер: гость — маскот, авторизованный — инициалы', () => {
+    const guest = render(
+      <I18nProvider>
+        <RightMenu auth="guest" />
+      </I18nProvider>
+    );
+    expect(guest.container.querySelector('.mascot')?.textContent).toBe('🐻');
+    guest.unmount();
+
+    const user = render(
+      <I18nProvider>
+        <RightMenu auth="user" userInitials="АБ" />
+      </I18nProvider>
+    );
+    expect(user.container.querySelector('.mascot')).toBeNull();
+    expect(user.container.querySelector('#balloo-menu-btn .avatar span')?.textContent).toBe('АБ');
   });
 });

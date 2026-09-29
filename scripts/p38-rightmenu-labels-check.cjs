@@ -192,6 +192,73 @@ async function run(state) {
   return { labels, trigger, shot, pageErrors };
 }
 
+/**
+ * Замеры панели в трёх темах. Ширина/позиция — из common.css:1842–1966
+ * (position:fixed; top:56px; right:0; width:280px) и не должны зависеть от темы.
+ */
+async function runThemeMeasure() {
+  const browser = await puppeteer.launch({
+    executablePath: CHROME,
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  });
+  const page = await browser.newPage();
+  await page.setViewport({ width: 1440, height: 900 });
+  await page.setCacheEnabled(false);
+  await page.goto(`${WEB_ORIGIN}/#/`, { waitUntil: 'networkidle2', timeout: 60000 });
+  await page.waitForSelector('#balloo-menu-btn', { timeout: 30000 });
+  await page.click('#balloo-menu-btn');
+  await sleep(300);
+
+  // Открыть подменю «Тема» (второй .right-menu__item)
+  await page.evaluate(() => {
+    const items = document.querySelectorAll('#balloo-right-menu .right-menu__item');
+    if (items[1]) items[1].click();
+  });
+  await sleep(200);
+
+  const out = [];
+  const pick = { dark: 'Тёмная', light: 'Светлая', russian: 'Наша' };
+  for (const theme of ['dark', 'light', 'russian']) {
+    await page.evaluate((label) => {
+      const subs = document.querySelectorAll(
+        '#balloo-right-menu .right-menu__submenu--open .right-menu__subitem'
+      );
+      for (const s of subs) {
+        if ((s.textContent || '').includes(label)) s.click();
+      }
+    }, pick[theme]);
+    await sleep(250);
+
+    const measured = await page.evaluate((name) => {
+      const panel = document.querySelector('#balloo-right-menu');
+      if (!panel) return null;
+      const r = panel.getBoundingClientRect();
+      const cs = getComputedStyle(panel);
+      const themeSubs = panel.querySelectorAll('.right-menu__submenu--open .right-menu__subitem');
+      const activeTheme = [...themeSubs].find((s) =>
+        s.className.includes('right-menu__subitem--active')
+      );
+      return {
+        theme: name,
+        dataTheme: document.documentElement.getAttribute('data-theme'),
+        activeInThemeSubmenu: activeTheme
+          ? (activeTheme.textContent || '').trim().replace(/\s+/g, ' ')
+          : null,
+        position: cs.position,
+        width: Math.round(r.width),
+        top: Math.round(r.top),
+        rightOffset: Math.round(window.innerWidth - r.right),
+        maxHeight: cs.maxHeight,
+        zIndex: cs.zIndex,
+      };
+    }, theme);
+    out.push(measured);
+  }
+
+  await browser.close();
+  return out;
+}
+
 function evaluate(state, res, expected) {
   const problems = [];
   if (!res.labels) {
@@ -239,8 +306,32 @@ function evaluate(state, res, expected) {
     pg.forEach((p) => console.log('  ✗ ' + p));
     guestApi.close();
 
+    // Три темы: замеры панели (пункт 6 тикета — getBoundingClientRect)
+    console.log('\n=== темы: замеры панели ===');
+    const measures = await runThemeMeasure();
+    for (const m of measures) {
+      console.log(
+        `  ${m.theme}: data-theme=${m.dataTheme} active=${JSON.stringify(m.activeInThemeSubmenu)} ` +
+        `position=${m.position} width=${m.width} top=${m.top} right=${m.rightOffset} ` +
+        `maxHeight=${m.maxHeight} z=${m.zIndex}`
+      );
+    }
+    const bad = measures.filter(
+      (m) =>
+        !m ||
+        m.width !== 280 ||
+        m.top !== 56 ||
+        m.rightOffset !== 0 ||
+        m.position !== 'fixed' ||
+        m.dataTheme !== m.theme
+    );
+    if (bad.length) {
+      console.log(`  ✗ расхождение с эталоном в темах: ${bad.map((m) => m && m.theme).join(', ')}`);
+      code = 1;
+    }
+
     if (pa.length || pg.length) code = 1;
-    else console.log('\nOK: сырых ключей нет, ожидаемые подписи на месте (2 состояния)');
+    else console.log('\nOK: сырых ключей нет, ожидаемые подписи на месте (2 состояния), панель 280×top56 в 3 темах');
   } finally {
     web.child.kill('SIGTERM');
     process.exit(code);
