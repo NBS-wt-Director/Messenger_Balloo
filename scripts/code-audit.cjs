@@ -338,7 +338,13 @@ function collectClientCalls() {
       }
 
       // `${expr}` внутри пути → параметр сегмента; запрос и фрагмент отбрасываем.
-      apiPath = apiPath.replace(/\$\{[^}]*\}/g, '*').replace(/\?[^#]*/, '').replace(/#.*$/, '');
+      // Вложенный бэктик (шаблон `${query ? `?${query}` : ''}`) обрывает литерал:
+      // всё после первого ` — уже не путь, а выражение, поэтому хвост режем.
+      apiPath = apiPath.split('`')[0];
+      // Незакрытый `${` — тот же обрезанный хвост (query-выражение), а не сегмент пути.
+      const openTail = apiPath.lastIndexOf('${');
+      if (openTail !== -1 && !apiPath.slice(openTail).includes('}')) apiPath = apiPath.slice(0, openTail);
+      apiPath = apiPath.replace(/\$\{[^}]*\}/g, '*').replace(/[?#].*$/, '');
       if (/^\/api\/(v\d+\/)?(mock|fake|stub)/i.test(apiPath)) continue;
 
       calls.push({ method, path: apiPath, file, line: lineOf(text, m.index), snippet: snippetAt(text, m.index) });
