@@ -10,7 +10,7 @@ export type Theme = 'dark' | 'light' | 'russian';
 export type Language =
   | 'ru' | 'en' | 'zh' | 'fr' | 'be' | 'hi'
   | 'tt' | 'ba' | 'ce' | 'cv' | 'av' | 'dar' | 'udm' | 'lez'
-  | 'kbd' | 'chm' | 'os' | 'sah' | 'bua' | 'ukr';
+  | 'kbd' | 'chm' | 'os' | 'sah' | 'bua' | 'uk';
 
 interface UIState {
   theme: Theme;
@@ -44,7 +44,7 @@ export const SUPPORTED_LANGUAGES: { code: Language; name: string; nativeName: st
   { code: 'os', name: 'Ossetian', nativeName: 'Ирон' },
   { code: 'sah', name: 'Yakut', nativeName: 'Саха' },
   { code: 'bua', name: 'Buryat', nativeName: 'Буряад' },
-  { code: 'ukr', name: 'Ukrainian', nativeName: 'Українська' },
+  { code: 'uk', name: 'Ukrainian', nativeName: 'Українська' },
 ];
 
 const DEFAULT_THEME: Theme = 'dark';
