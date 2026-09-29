@@ -1,0 +1,2684 @@
+{
+  "summary": {
+    "total": 172,
+    "ok": 122,
+    "state": 50,
+    "missing": 0,
+    "codeNoRoute": 0,
+    "unknown": 0,
+    "noHtml": 1
+  },
+  "rows": [
+    {
+      "nodeId": "у_00",
+      "nodeName": "shared",
+      "platform": "web",
+      "id": "1_00_08",
+      "name": "Обжалование бана (оверлей)",
+      "file": "shared/ban-appeal.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_00",
+      "nodeName": "shared",
+      "platform": "web",
+      "id": "1_00_02",
+      "name": "Ошибка 403 (доступ запрещён)",
+      "file": "shared/error-403.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_00",
+      "nodeName": "shared",
+      "platform": "web",
+      "id": "1_00_01",
+      "name": "Ошибка 404 (не найдено)",
+      "file": "shared/error-404.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "NotFoundScreen",
+      "codeFile": "shared/NotFoundScreen.tsx",
+      "routes": [
+        "texts",
+        "departments",
+        "employees",
+        "vacancies",
+        "features",
+        "meetings",
+        "my-department",
+        "departments",
+        "monitoring"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_00",
+      "nodeName": "shared",
+      "platform": "web",
+      "id": "1_00_03",
+      "name": "Ошибка 500 (внутренняя ошибка)",
+      "file": "shared/error-500.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_00",
+      "nodeName": "shared",
+      "platform": "web",
+      "id": "1_00_04",
+      "name": "Ошибка 503 (сервис недоступен)",
+      "file": "shared/error-503.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_00",
+      "nodeName": "shared",
+      "platform": "web",
+      "id": "1_00_07",
+      "name": "Ошибка 555 (аккаунт заблокирован)",
+      "file": "shared/error-555.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_00",
+      "nodeName": "shared",
+      "platform": "web",
+      "id": "1_00_05",
+      "name": "Офлайн (авторизованный)",
+      "file": "shared/offline-authed.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_00",
+      "nodeName": "shared",
+      "platform": "web",
+      "id": "1_00_06",
+      "name": "Офлайн (гость / неавторизованный)",
+      "file": "shared/offline-guest.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_17",
+      "name": "О Balloo",
+      "file": "balloo-su/about-balloo.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_16",
+      "name": "О компании",
+      "file": "balloo-su/about-company.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_22",
+      "name": "Мультиаккаунт",
+      "file": "balloo-su/accounts.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_11",
+      "name": "Активный звонок",
+      "file": "balloo-su/active-call.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_23",
+      "name": "Добавить устройство",
+      "file": "balloo-su/add-device.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "AddDeviceScreen",
+      "codeFile": "auth/AddDeviceScreen.tsx",
+      "routes": [
+        "(в роутере)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_07",
+      "name": "Архив чатов",
+      "file": "balloo-su/archive.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_40",
+      "name": "Панель вложений",
+      "file": "balloo-su/attachment-panel.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_38",
+      "name": "Блокированные пользователи",
+      "file": "balloo-su/blocked-users.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "BlockedUsersScreen",
+      "codeFile": "settings/BlockedUsersScreen.tsx",
+      "routes": [
+        "settings/blocked"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_15",
+      "name": "Боты",
+      "file": "balloo-su/bots.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_10",
+      "name": "Звонки",
+      "file": "balloo-su/calls.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_35",
+      "name": "Создание канала",
+      "file": "balloo-su/channel-create.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "CreateChannelScreen",
+      "codeFile": "channels/CreateChannelScreen.tsx",
+      "routes": [
+        "channel/create"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_25",
+      "name": "Вложения чата",
+      "file": "balloo-su/chat-attachments.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "DesktopChatAttachmentsScreen",
+      "codeFile": "DesktopChatAttachmentsScreen.tsx",
+      "routes": [
+        "(desktop app)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_04",
+      "name": "Список чатов",
+      "file": "balloo-su/chats.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "ChatViewScreen",
+      "codeFile": "chat/ChatViewScreen.tsx",
+      "routes": [
+        "chat",
+        "chat/:chatId"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_05",
+      "name": "Контакты",
+      "file": "balloo-su/contacts.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "ContactsScreen",
+      "codeFile": "contacts/ContactsScreen.tsx",
+      "routes": [
+        "contacts"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_24",
+      "name": "Донат",
+      "file": "balloo-su/donate.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "DonateScreen",
+      "codeFile": "donate/DonateScreen.tsx",
+      "routes": [
+        "(в роутере)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_36",
+      "name": "Пустой чат",
+      "file": "balloo-su/empty-chat.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_33",
+      "name": "Просмотр файла/изображения",
+      "file": "balloo-su/file-viewer.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_18",
+      "name": "Создание группы",
+      "file": "balloo-su/group-create.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "CreateGroupScreen",
+      "codeFile": "groups/CreateGroupScreen.tsx",
+      "routes": [
+        "group/create"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_19",
+      "name": "Настройки группы",
+      "file": "balloo-su/group-settings.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "GroupSettingsScreen",
+      "codeFile": "groups/GroupSettingsScreen.tsx",
+      "routes": [
+        "group/:chatId/settings"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_13",
+      "name": "Приглашения",
+      "file": "balloo-su/invites.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_02",
+      "name": "Вход",
+      "file": "balloo-su/login.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "LoginScreen",
+      "codeFile": "auth/LoginScreen.tsx",
+      "routes": [
+        "(в роутере)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_32",
+      "name": "Редактор сообщения",
+      "file": "balloo-su/message-editor.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_21",
+      "name": "Мои устройства",
+      "file": "balloo-su/my-devices.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_31",
+      "name": "Мои донаты",
+      "file": "balloo-su/my-donates.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "DesktopMyDonatesScreen",
+      "codeFile": "DesktopMyDonatesScreen.tsx",
+      "routes": [
+        "(desktop app)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_34",
+      "name": "Настройки уведомлений",
+      "file": "balloo-su/notification-settings.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "NotificationSettingsScreen",
+      "codeFile": "settings/NotificationSettingsScreen.tsx",
+      "routes": [
+        "settings/notifications"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_01",
+      "name": "Онбординг",
+      "file": "balloo-su/onboarding.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_29",
+      "name": "Восстановление пароля",
+      "file": "balloo-su/password-reset.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "ResetPasswordScreen",
+      "codeFile": "auth/ResetPasswordScreen.tsx",
+      "routes": [
+        "(в роутере)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_28",
+      "name": "Редактор опроса",
+      "file": "balloo-su/poll-editor.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "PollScreen",
+      "codeFile": "polls/PollScreen.tsx",
+      "routes": [
+        "polls",
+        "polls/:pollId",
+        "chat/:chatId/poll"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_37",
+      "name": "Настройки приватности",
+      "file": "balloo-su/privacy-settings.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "PrivacySettingsScreen",
+      "codeFile": "settings/PrivacySettingsScreen.tsx",
+      "routes": [
+        "settings/privacy"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_08",
+      "name": "Профиль",
+      "file": "balloo-su/profile.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "ProfileScreen",
+      "codeFile": "profile/ProfileScreen.tsx",
+      "routes": [
+        "profile"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_09",
+      "name": "Публичный профиль",
+      "file": "balloo-su/public-profile.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "PublicProfileScreen",
+      "codeFile": "profile/PublicProfileScreen.tsx",
+      "routes": [
+        "profile/:username"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_03",
+      "name": "Регистрация",
+      "file": "balloo-su/register.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "RegisterScreen",
+      "codeFile": "auth/RegisterScreen.tsx",
+      "routes": [
+        "(в роутере)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_26",
+      "name": "Жалоба на сообщение",
+      "file": "balloo-su/report-message.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "DesktopReportMessageScreen",
+      "codeFile": "DesktopReportMessageScreen.tsx",
+      "routes": [
+        "(desktop app)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_12",
+      "name": "Правила платформы",
+      "file": "balloo-su/rules.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "RulesScreen",
+      "codeFile": "legal/RulesScreen.tsx",
+      "routes": [
+        "(в роутере)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_06",
+      "name": "Глобальный поиск",
+      "file": "balloo-su/search.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "SearchScreen",
+      "codeFile": "search/SearchScreen.tsx",
+      "routes": [
+        "search"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_20",
+      "name": "Настройки приложения",
+      "file": "balloo-su/settings.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "SettingsScreen",
+      "codeFile": "settings/SettingsScreen.tsx",
+      "routes": [
+        "settings"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_27",
+      "name": "Сторис",
+      "file": "balloo-su/stories.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "StoriesScreen",
+      "codeFile": "stories/StoriesScreen.tsx",
+      "routes": [
+        "stories"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_41",
+      "name": "Создание историй",
+      "file": "balloo-su/story-create.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "StoryCreateScreen",
+      "codeFile": "stories/StoryCreateScreen.tsx",
+      "routes": [
+        "stories/create"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_14",
+      "name": "Техподдержка",
+      "file": "balloo-su/support.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "SupportScreen",
+      "codeFile": "support/SupportScreen.tsx",
+      "routes": [
+        "(в роутере)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_30",
+      "name": "Двухфакторная аутентификация",
+      "file": "balloo-su/two-factor.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "TwoFactorScreen",
+      "codeFile": "auth/TwoFactorScreen.tsx",
+      "routes": [
+        "(в роутере)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_01",
+      "nodeName": "balloo.su",
+      "platform": "web",
+      "id": "1_01_39",
+      "name": "Запись голосового",
+      "file": "balloo-su/voice-message.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_02",
+      "nodeName": "admin.balloo.su",
+      "platform": "web",
+      "id": "1_02_01",
+      "name": "Объявления",
+      "file": "admin-balloo-su/announcements.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "AnnouncementsScreen",
+      "codeFile": "admin/AnnouncementsScreen.tsx",
+      "routes": [
+        "announcements"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_02",
+      "nodeName": "admin.balloo.su",
+      "platform": "web",
+      "id": "1_02_02",
+      "name": "Аудит-лог",
+      "file": "admin-balloo-su/audit-log.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "AuditLogsScreen",
+      "codeFile": "admin/AuditLogsScreen.tsx",
+      "routes": [
+        "audit-logs"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_02",
+      "nodeName": "admin.balloo.su",
+      "platform": "web",
+      "id": "1_02_03",
+      "name": "Бан-лист",
+      "file": "admin-balloo-su/bans.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "BansScreen",
+      "codeFile": "admin/BansScreen.tsx",
+      "routes": [
+        "bans"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_02",
+      "nodeName": "admin.balloo.su",
+      "platform": "web",
+      "id": "1_02_05",
+      "name": "Каналы блога",
+      "file": "admin-balloo-su/blog-channels.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "BlogChannelsScreen",
+      "codeFile": "admin/BlogChannelsScreen.tsx",
+      "routes": [
+        "blog/channels"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_02",
+      "nodeName": "admin.balloo.su",
+      "platform": "web",
+      "id": "1_02_06",
+      "name": "Миграция блога",
+      "file": "admin-balloo-su/blog-migrate.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_02",
+      "nodeName": "admin.balloo.su",
+      "platform": "web",
+      "id": "1_02_07",
+      "name": "Очередь блога",
+      "file": "admin-balloo-su/blog-queue.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "BlogQueueScreen",
+      "codeFile": "admin/BlogQueueScreen.tsx",
+      "routes": [
+        "blog/queue"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_02",
+      "nodeName": "admin.balloo.su",
+      "platform": "web",
+      "id": "1_02_08",
+      "name": "Ревью блога",
+      "file": "admin-balloo-su/blog-review.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_02",
+      "nodeName": "admin.balloo.su",
+      "platform": "web",
+      "id": "1_02_09",
+      "name": "Статистика блога",
+      "file": "admin-balloo-su/blog-stats.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "AnalyticsScreen",
+      "codeFile": "admin/AnalyticsScreen.tsx",
+      "routes": [
+        "analytics"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_02",
+      "nodeName": "admin.balloo.su",
+      "platform": "web",
+      "id": "1_02_10",
+      "name": "Управление ботами",
+      "file": "admin-balloo-su/bots-mgmt.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_02",
+      "nodeName": "admin.balloo.su",
+      "platform": "web",
+      "id": "1_03_02",
+      "name": "Дашборд",
+      "file": "command-balloo-su/dashboard.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "DashboardScreen",
+      "codeFile": "admin/DashboardScreen.tsx",
+      "routes": [
+        "/admin"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_02",
+      "nodeName": "admin.balloo.su",
+      "platform": "web",
+      "id": "1_03_15",
+      "name": "Отделы",
+      "file": "command-balloo-su/departments.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "HRScreen",
+      "codeFile": "command/HRScreen.tsx",
+      "routes": [
+        "hr"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_02",
+      "nodeName": "admin.balloo.su",
+      "platform": "web",
+      "id": "1_02_13",
+      "name": "Донаты",
+      "file": "admin-balloo-su/donations.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "AdminDonationsScreen",
+      "codeFile": "admin/AdminDonationsScreen.tsx",
+      "routes": [
+        "donations"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_02",
+      "nodeName": "admin.balloo.su",
+      "platform": "web",
+      "id": "1_02_14",
+      "name": "Сотрудники",
+      "file": "admin-balloo-su/employees.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_02",
+      "nodeName": "admin.balloo.su",
+      "platform": "web",
+      "id": "1_02_15",
+      "name": "Feature flags",
+      "file": "admin-balloo-su/features-flags.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "FeatureFlagsScreen",
+      "codeFile": "admin/FeatureFlagsScreen.tsx",
+      "routes": [
+        "feature-flags"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_02",
+      "nodeName": "admin.balloo.su",
+      "platform": "web",
+      "id": "1_02_16",
+      "name": "Управление фичами",
+      "file": "admin-balloo-su/features-mgmt.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_02",
+      "nodeName": "admin.balloo.su",
+      "platform": "web",
+      "id": "1_02_17",
+      "name": "Файлы",
+      "file": "admin-balloo-su/files.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "DownloadsScreen",
+      "codeFile": "admin/DownloadsScreen.tsx",
+      "routes": [
+        "downloads"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_02",
+      "nodeName": "admin.balloo.su",
+      "platform": "web",
+      "id": "1_02_18",
+      "name": "Управление группами",
+      "file": "admin-balloo-su/groups-mgmt.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_02",
+      "nodeName": "admin.balloo.su",
+      "platform": "web",
+      "id": "1_01_02",
+      "name": "Вход",
+      "file": "balloo-su/login.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "LoginScreen",
+      "codeFile": "auth/LoginScreen.tsx",
+      "routes": [
+        "(в роутере)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_02",
+      "nodeName": "admin.balloo.su",
+      "platform": "web",
+      "id": "1_02_20",
+      "name": "Метрики",
+      "file": "admin-balloo-su/metrics.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "AnalyticsScreen",
+      "codeFile": "admin/AnalyticsScreen.tsx",
+      "routes": [
+        "analytics"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_02",
+      "nodeName": "admin.balloo.su",
+      "platform": "web",
+      "id": "1_02_21",
+      "name": "Отчёты",
+      "file": "admin-balloo-su/reports.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "ReportsScreen",
+      "codeFile": "admin/ReportsScreen.tsx",
+      "routes": [
+        "reports"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_02",
+      "nodeName": "admin.balloo.su",
+      "platform": "web",
+      "id": "1_02_22",
+      "name": "Статус сервиса",
+      "file": "admin-balloo-su/service-status.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_02",
+      "nodeName": "admin.balloo.su",
+      "platform": "web",
+      "id": "1_02_23",
+      "name": "Тексты",
+      "file": "admin-balloo-su/texts.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "SystemSettingsScreen",
+      "codeFile": "admin/SystemSettingsScreen.tsx",
+      "routes": [
+        "system-settings"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_02",
+      "nodeName": "admin.balloo.su",
+      "platform": "web",
+      "id": "1_02_24",
+      "name": "Пользователи",
+      "file": "admin-balloo-su/users.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "UsersScreen",
+      "codeFile": "admin/UsersScreen.tsx",
+      "routes": [
+        "users"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_02",
+      "nodeName": "admin.balloo.su",
+      "platform": "web",
+      "id": "1_03_07",
+      "name": "Вакансии",
+      "file": "command-balloo-su/vacancies.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "VacanciesScreen",
+      "codeFile": "command/VacanciesScreen.tsx",
+      "routes": [
+        "hiring/vacancies",
+        "hiring/why-us"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_02",
+      "nodeName": "admin.balloo.su",
+      "platform": "web",
+      "id": "1_02_26",
+      "name": "Версии",
+      "file": "admin-balloo-su/versions.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "VersionsScreen",
+      "codeFile": "admin/VersionsScreen.tsx",
+      "routes": [
+        "versions"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_03",
+      "nodeName": "command.balloo.su",
+      "platform": "web",
+      "id": "1_03_09",
+      "name": "Анкета кандидата",
+      "file": "command-balloo-su/application-form.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "ApplicationScreen",
+      "codeFile": "hiring/ApplicationScreen.tsx",
+      "routes": [
+        "hiring/apply/:id"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_03",
+      "nodeName": "command.balloo.su",
+      "platform": "web",
+      "id": "1_03_20",
+      "name": "Настройки канала",
+      "file": "command-balloo-su/blog-channel-settings.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_03",
+      "nodeName": "command.balloo.su",
+      "platform": "web",
+      "id": "1_03_18",
+      "name": "Редактор блога",
+      "file": "command-balloo-su/blog-editor.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_03",
+      "nodeName": "command.balloo.su",
+      "platform": "web",
+      "id": "1_03_19",
+      "name": "Мой канал",
+      "file": "command-balloo-su/blog-my-channel.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_03",
+      "nodeName": "command.balloo.su",
+      "platform": "web",
+      "id": "1_03_17",
+      "name": "Мои публикации",
+      "file": "command-balloo-su/blog-my-posts.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_03",
+      "nodeName": "command.balloo.su",
+      "platform": "web",
+      "id": "1_03_22",
+      "name": "Календарь",
+      "file": "command-balloo-su/calendar.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_03",
+      "nodeName": "command.balloo.su",
+      "platform": "web",
+      "id": "1_03_24",
+      "name": "Карточка кандидата (интервью)",
+      "file": "command-balloo-su/candidate-interview.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "InterviewScreen",
+      "codeFile": "hiring/InterviewScreen.tsx",
+      "routes": [
+        "hiring/application/:id"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_03",
+      "nodeName": "command.balloo.su",
+      "platform": "web",
+      "id": "1_03_23",
+      "name": "Карточка кандидата",
+      "file": "command-balloo-su/candidate.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_03",
+      "nodeName": "command.balloo.su",
+      "platform": "web",
+      "id": "1_03_02",
+      "name": "Дашборд",
+      "file": "command-balloo-su/dashboard.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "DashboardScreen",
+      "codeFile": "admin/DashboardScreen.tsx",
+      "routes": [
+        "/admin"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_03",
+      "nodeName": "command.balloo.su",
+      "platform": "web",
+      "id": "1_03_16",
+      "name": "Управление отделами",
+      "file": "command-balloo-su/department-management.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_03",
+      "nodeName": "command.balloo.su",
+      "platform": "web",
+      "id": "1_03_15",
+      "name": "Отделы",
+      "file": "command-balloo-su/departments.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "HRScreen",
+      "codeFile": "command/HRScreen.tsx",
+      "routes": [
+        "hr"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_03",
+      "nodeName": "command.balloo.su",
+      "platform": "web",
+      "id": "1_03_21",
+      "name": "Профиль сотрудника",
+      "file": "command-balloo-su/employee-profile.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_03",
+      "nodeName": "command.balloo.su",
+      "platform": "web",
+      "id": "1_03_05",
+      "name": "Найм",
+      "file": "command-balloo-su/hiring.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "HireScreen",
+      "codeFile": "command/HireScreen.tsx",
+      "routes": [
+        "/command",
+        "hiring"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_03",
+      "nodeName": "command.balloo.su",
+      "platform": "web",
+      "id": "1_03_03",
+      "name": "HR-модуль",
+      "file": "command-balloo-su/hr.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "HRScreen",
+      "codeFile": "command/HRScreen.tsx",
+      "routes": [
+        "hr"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_03",
+      "nodeName": "command.balloo.su",
+      "platform": "web",
+      "id": "1_03_11",
+      "name": "Внутренний чат",
+      "file": "command-balloo-su/internal-chat.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "InternalChatScreen",
+      "codeFile": "command/InternalChatScreen.tsx",
+      "routes": [
+        "chat"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_03",
+      "nodeName": "command.balloo.su",
+      "platform": "web",
+      "id": "1_03_04",
+      "name": "База знаний",
+      "file": "command-balloo-su/knowledge-base.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "KnowledgeScreen",
+      "codeFile": "command/KnowledgeScreen.tsx",
+      "routes": [
+        "knowledge"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_03",
+      "nodeName": "command.balloo.su",
+      "platform": "web",
+      "id": "1_03_01",
+      "name": "Вход",
+      "file": "command-balloo-su/login.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "LoginScreen",
+      "codeFile": "auth/LoginScreen.tsx",
+      "routes": [
+        "(в роутере)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_03",
+      "nodeName": "command.balloo.su",
+      "platform": "web",
+      "id": "1_03_25",
+      "name": "Дашборд руководителя",
+      "file": "command-balloo-su/manager-dashboard.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_03",
+      "nodeName": "command.balloo.su",
+      "platform": "web",
+      "id": "1_03_12",
+      "name": "Встречи",
+      "file": "command-balloo-su/meetings.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_03",
+      "nodeName": "command.balloo.su",
+      "platform": "web",
+      "id": "1_03_06",
+      "name": "Мониторинг продукта",
+      "file": "command-balloo-su/monitoring.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_03",
+      "nodeName": "command.balloo.su",
+      "platform": "web",
+      "id": "1_03_14",
+      "name": "Мой отдел",
+      "file": "command-balloo-su/my-department.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_03",
+      "nodeName": "command.balloo.su",
+      "platform": "web",
+      "id": "1_03_26",
+      "name": "Отпуска и отсутствие",
+      "file": "command-balloo-su/time-off.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_03",
+      "nodeName": "command.balloo.su",
+      "platform": "web",
+      "id": "1_03_13",
+      "name": "Мои задачи",
+      "file": "command-balloo-su/todo.html",
+      "hasHtml": true,
+      "status": "Реализован",
+      "mapped": "TasksScreen",
+      "codeFile": "command/TasksScreen.tsx",
+      "routes": [
+        "tasks"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_03",
+      "nodeName": "command.balloo.su",
+      "platform": "web",
+      "id": "1_03_07",
+      "name": "Вакансии",
+      "file": "command-balloo-su/vacancies.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "VacanciesScreen",
+      "codeFile": "command/VacanciesScreen.tsx",
+      "routes": [
+        "hiring/vacancies",
+        "hiring/why-us"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_03",
+      "nodeName": "command.balloo.su",
+      "platform": "web",
+      "id": "1_03_08",
+      "name": "Детали вакансии",
+      "file": "command-balloo-su/vacancy-detail.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "VacancyScreen",
+      "codeFile": "hiring/VacancyScreen.tsx",
+      "routes": [
+        "hiring/vacancy/:id"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_03",
+      "nodeName": "command.balloo.su",
+      "platform": "web",
+      "id": "1_03_10",
+      "name": "Почему мы",
+      "file": "command-balloo-su/why-us.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_04",
+      "nodeName": "features.balloo.su",
+      "platform": "web",
+      "id": "1_01_24",
+      "name": "Донат",
+      "file": "balloo-su/donate.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "DonateScreen",
+      "codeFile": "donate/DonateScreen.tsx",
+      "routes": [
+        "(в роутере)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_04",
+      "nodeName": "features.balloo.su",
+      "platform": "web",
+      "id": "1_04_02",
+      "name": "Детали фич-реквеста",
+      "file": "features-balloo-su/feature-detail.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "FeatureDetailScreen",
+      "codeFile": "features/FeatureDetailScreen.tsx",
+      "routes": [
+        "(в роутере)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_04",
+      "nodeName": "features.balloo.su",
+      "platform": "web",
+      "id": "1_04_03",
+      "name": "Список фич-реквестов",
+      "file": "features-balloo-su/list.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "FeaturesListScreen",
+      "codeFile": "features/FeaturesListScreen.tsx",
+      "routes": [
+        "(в роутере)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_04",
+      "nodeName": "features.balloo.su",
+      "platform": "web",
+      "id": "1_01_02",
+      "name": "Вход",
+      "file": "balloo-su/login.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "LoginScreen",
+      "codeFile": "auth/LoginScreen.tsx",
+      "routes": [
+        "(в роутере)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_04",
+      "nodeName": "features.balloo.su",
+      "platform": "web",
+      "id": "1_04_05",
+      "name": "Отправить фич-реквест",
+      "file": "features-balloo-su/submit.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "FeatureCreateScreen",
+      "codeFile": "features/FeatureCreateScreen.tsx",
+      "routes": [
+        "(в роутере)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_04",
+      "nodeName": "features.balloo.su",
+      "platform": "web",
+      "id": "1_04_04",
+      "name": "Голосование по фичам",
+      "file": "features-balloo-su/vote.html",
+      "hasHtml": false,
+      "status": "Просмотрен",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_05",
+      "nodeName": "history.balloo.su",
+      "platform": "web",
+      "id": "1_01_24",
+      "name": "Донат",
+      "file": "balloo-su/donate.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "DonateScreen",
+      "codeFile": "donate/DonateScreen.tsx",
+      "routes": [
+        "(в роутере)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_05",
+      "nodeName": "history.balloo.su",
+      "platform": "web",
+      "id": "1_05_02",
+      "name": "Детали версии",
+      "file": "history-balloo-su/version-detail.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "VersionDetailScreen",
+      "codeFile": "history/VersionDetailScreen.tsx",
+      "routes": [
+        "(в роутере)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_05",
+      "nodeName": "history.balloo.su",
+      "platform": "web",
+      "id": "1_05_03",
+      "name": "Список версий",
+      "file": "history-balloo-su/version-list.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "HistoryScreen",
+      "codeFile": "history/HistoryScreen.tsx",
+      "routes": [
+        "(в роутере)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_06",
+      "nodeName": "download.balloo.su",
+      "platform": "web",
+      "id": "1_01_24",
+      "name": "Донат",
+      "file": "balloo-su/donate.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "DonateScreen",
+      "codeFile": "donate/DonateScreen.tsx",
+      "routes": [
+        "(в роутере)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_06",
+      "nodeName": "download.balloo.su",
+      "platform": "web",
+      "id": "1_06_02",
+      "name": "Загрузки",
+      "file": "download-balloo-su/downloads.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "DownloadScreen",
+      "codeFile": "download/DownloadScreen.tsx",
+      "routes": [
+        "(в роутере)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_07",
+      "nodeName": "docs.balloo.su",
+      "platform": "web",
+      "id": "1_07_01",
+      "name": "Документация API",
+      "file": "docs-balloo-su/api-docs.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "DocsScreen",
+      "codeFile": "docs/DocsScreen.tsx",
+      "routes": [
+        "(в роутере)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_08",
+      "nodeName": "mobile (сборные)",
+      "platform": "android",
+      "id": "1_08_01",
+      "name": "Обзор / Приветствие",
+      "file": "mobile/overview.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "DesktopOverviewScreen",
+      "codeFile": "DesktopOverviewScreen.tsx",
+      "routes": [
+        "(desktop app)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_08",
+      "nodeName": "mobile (сборные)",
+      "platform": "android",
+      "id": "1_08_02",
+      "name": "Чат",
+      "file": "mobile/chat.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "ChatListScreen",
+      "codeFile": "screens/ChatListScreen.tsx",
+      "routes": [
+        "(android app)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_08",
+      "nodeName": "mobile (сборные)",
+      "platform": "android",
+      "id": "1_08_03",
+      "name": "История звонков",
+      "file": "mobile/calls-history.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "DesktopCallsHistoryScreen",
+      "codeFile": "DesktopCallsHistoryScreen.tsx",
+      "routes": [
+        "(desktop app)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_08",
+      "nodeName": "mobile (сборные)",
+      "platform": "android",
+      "id": "1_08_04",
+      "name": "Настройки приложения",
+      "file": "mobile/settings.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "SettingsScreen",
+      "codeFile": "screens/SettingsScreen.tsx",
+      "routes": [
+        "(android app)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_08",
+      "nodeName": "mobile (сборные)",
+      "platform": "android",
+      "id": "1_08_05",
+      "name": "Мои устройства",
+      "file": "mobile/my-devices.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_08",
+      "nodeName": "mobile (сборные)",
+      "platform": "android",
+      "id": "1_08_06",
+      "name": "Добавить устройство",
+      "file": "mobile/add-device.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "AddDeviceScreen",
+      "codeFile": "auth/AddDeviceScreen.tsx",
+      "routes": [
+        "(в роутере)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_08",
+      "nodeName": "mobile (сборные)",
+      "platform": "android",
+      "id": "1_08_07",
+      "name": "Донат",
+      "file": "mobile/donate.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "DonateScreen",
+      "codeFile": "donate/DonateScreen.tsx",
+      "routes": [
+        "(в роутере)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_08",
+      "nodeName": "mobile (сборные)",
+      "platform": "android",
+      "id": "1_08_08",
+      "name": "Вложения чата",
+      "file": "mobile/chat-attachments.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "DesktopChatAttachmentsScreen",
+      "codeFile": "DesktopChatAttachmentsScreen.tsx",
+      "routes": [
+        "(desktop app)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_08",
+      "nodeName": "mobile (сборные)",
+      "platform": "android",
+      "id": "1_08_09",
+      "name": "Жалоба на сообщение",
+      "file": "mobile/report-message.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "DesktopReportMessageScreen",
+      "codeFile": "DesktopReportMessageScreen.tsx",
+      "routes": [
+        "(desktop app)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_08",
+      "nodeName": "mobile (сборные)",
+      "platform": "android",
+      "id": "1_08_10",
+      "name": "Вход",
+      "file": "mobile/login.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "LoginScreen",
+      "codeFile": "screens/auth/LoginScreen.tsx",
+      "routes": [
+        "(android app)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_08",
+      "nodeName": "mobile (сборные)",
+      "platform": "android",
+      "id": "1_08_11",
+      "name": "Регистрация",
+      "file": "mobile/register.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "RegisterScreen",
+      "codeFile": "screens/auth/RegisterScreen.tsx",
+      "routes": [
+        "(android app)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_08",
+      "nodeName": "mobile (сборные)",
+      "platform": "android",
+      "id": "1_08_12",
+      "name": "Восстановление пароля",
+      "file": "mobile/password-reset.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "ResetPasswordScreen",
+      "codeFile": "screens/auth/ResetPasswordScreen.tsx",
+      "routes": [
+        "(android app)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_08",
+      "nodeName": "mobile (сборные)",
+      "platform": "android",
+      "id": "1_08_13",
+      "name": "Двухфакторная аутентификация",
+      "file": "mobile/two-factor.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "TwoFactorScreen",
+      "codeFile": "screens/auth/TwoFactorScreen.tsx",
+      "routes": [
+        "(android app)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_08",
+      "nodeName": "mobile (сборные)",
+      "platform": "android",
+      "id": "1_08_14",
+      "name": "Мои донаты",
+      "file": "mobile/my-donates.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "DesktopMyDonatesScreen",
+      "codeFile": "DesktopMyDonatesScreen.tsx",
+      "routes": [
+        "(desktop app)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_08",
+      "nodeName": "mobile (сборные)",
+      "platform": "android",
+      "id": "1_08_15",
+      "name": "Сторис",
+      "file": "mobile/stories.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "StoriesScreen",
+      "codeFile": "stories/StoriesScreen.tsx",
+      "routes": [
+        "stories"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_08",
+      "nodeName": "mobile (сборные)",
+      "platform": "android",
+      "id": "1_08_16",
+      "name": "Архив чатов",
+      "file": "mobile/archive.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_08",
+      "nodeName": "mobile (сборные)",
+      "platform": "android",
+      "id": "1_08_17",
+      "name": "Контакты",
+      "file": "mobile/contacts.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "ContactsScreen",
+      "codeFile": "screens/ContactsScreen.tsx",
+      "routes": [
+        "(android app)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_08",
+      "nodeName": "mobile (сборные)",
+      "platform": "android",
+      "id": "1_08_18",
+      "name": "Профиль",
+      "file": "mobile/profile.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "ProfileScreen",
+      "codeFile": "screens/ProfileScreen.tsx",
+      "routes": [
+        "(android app)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_08",
+      "nodeName": "mobile (сборные)",
+      "platform": "android",
+      "id": "1_08_19",
+      "name": "Создание группы",
+      "file": "mobile/group-create.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "CreateGroupScreen",
+      "codeFile": "screens/CreateGroupScreen.tsx",
+      "routes": [
+        "(android app)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_08",
+      "nodeName": "mobile (сборные)",
+      "platform": "android",
+      "id": "1_08_20",
+      "name": "Редактор опроса",
+      "file": "mobile/poll-editor.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "PollScreen",
+      "codeFile": "polls/PollScreen.tsx",
+      "routes": [
+        "polls",
+        "polls/:pollId",
+        "chat/:chatId/poll"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_08",
+      "nodeName": "mobile (сборные)",
+      "platform": "android",
+      "id": "1_08_21",
+      "name": "Пустой чат",
+      "file": "mobile/empty-chat.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_08",
+      "nodeName": "mobile (сборные)",
+      "platform": "android",
+      "id": "1_08_22",
+      "name": "Полноэкранный просмотрщик медиа",
+      "file": "mobile/media-viewer.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "DesktopMediaViewerScreen",
+      "codeFile": "DesktopMediaViewerScreen.tsx",
+      "routes": [
+        "(desktop app)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_08",
+      "nodeName": "mobile (сборные)",
+      "platform": "android",
+      "id": "1_08_23",
+      "name": "Запись голосового (mobile)",
+      "file": "mobile/voice-record.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_08",
+      "nodeName": "mobile (сборные)",
+      "platform": "android",
+      "id": "1_08_24",
+      "name": "Правое меню шапки (мобильное)",
+      "file": "mobile/right-menu.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_09",
+      "nodeName": "desktop (генеральный)",
+      "platform": "desktop",
+      "id": "1_09_04",
+      "name": "Добавить устройство",
+      "file": "desktop/add-device.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "DesktopAddDeviceScreen",
+      "codeFile": "DesktopAddDeviceScreen.tsx",
+      "routes": [
+        "(desktop app)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_09",
+      "nodeName": "desktop (генеральный)",
+      "platform": "desktop",
+      "id": "1_09_14",
+      "name": "Архив чатов",
+      "file": "desktop/archive.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "DesktopArchiveScreen",
+      "codeFile": "DesktopArchiveScreen.tsx",
+      "routes": [
+        "(desktop app)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_09",
+      "nodeName": "desktop (генеральный)",
+      "platform": "desktop",
+      "id": "1_09_13",
+      "name": "История звонков",
+      "file": "desktop/calls-history.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "DesktopCallsHistoryScreen",
+      "codeFile": "DesktopCallsHistoryScreen.tsx",
+      "routes": [
+        "(desktop app)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_09",
+      "nodeName": "desktop (генеральный)",
+      "platform": "desktop",
+      "id": "1_09_06",
+      "name": "Вложения чата",
+      "file": "desktop/chat-attachments.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "DesktopChatAttachmentsScreen",
+      "codeFile": "DesktopChatAttachmentsScreen.tsx",
+      "routes": [
+        "(desktop app)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_09",
+      "nodeName": "desktop (генеральный)",
+      "platform": "desktop",
+      "id": "1_09_11",
+      "name": "Чат",
+      "file": "desktop/chat.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "ChatViewScreen",
+      "codeFile": "chat/ChatViewScreen.tsx",
+      "routes": [
+        "chat",
+        "chat/:chatId"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_09",
+      "nodeName": "desktop (генеральный)",
+      "platform": "desktop",
+      "id": "1_09_15",
+      "name": "Контакты",
+      "file": "desktop/contacts.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "ContactsScreen",
+      "codeFile": "contacts/ContactsScreen.tsx",
+      "routes": [
+        "contacts"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_09",
+      "nodeName": "desktop (генеральный)",
+      "platform": "desktop",
+      "id": "1_09_05",
+      "name": "Донат",
+      "file": "desktop/donate.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "DesktopDonateScreen",
+      "codeFile": "DesktopDonateScreen.tsx",
+      "routes": [
+        "(desktop app)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_09",
+      "nodeName": "desktop (генеральный)",
+      "platform": "desktop",
+      "id": "1_09_16",
+      "name": "Создание группы",
+      "file": "desktop/group-create.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "CreateGroupScreen",
+      "codeFile": "groups/CreateGroupScreen.tsx",
+      "routes": [
+        "group/create"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_09",
+      "nodeName": "desktop (генеральный)",
+      "platform": "web",
+      "id": "1_01_02",
+      "name": "Вход",
+      "file": "balloo-su/login.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "LoginScreen",
+      "codeFile": "auth/LoginScreen.tsx",
+      "routes": [
+        "(в роутере)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_09",
+      "nodeName": "desktop (генеральный)",
+      "platform": "desktop",
+      "id": "1_09_21",
+      "name": "Полноэкранный просмотрщик медиа",
+      "file": "desktop/media-viewer.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "DesktopMediaViewerScreen",
+      "codeFile": "DesktopMediaViewerScreen.tsx",
+      "routes": [
+        "(desktop app)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_09",
+      "nodeName": "desktop (генеральный)",
+      "platform": "desktop",
+      "id": "1_09_02",
+      "name": "Modes",
+      "file": "desktop/modes.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "DesktopModesScreen",
+      "codeFile": "DesktopModesScreen.tsx",
+      "routes": [
+        "(desktop app)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_09",
+      "nodeName": "desktop (генеральный)",
+      "platform": "desktop",
+      "id": "1_09_03",
+      "name": "Мои устройства",
+      "file": "desktop/my-devices.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "",
+      "codeFile": "",
+      "routes": [],
+      "verdict": "state"
+    },
+    {
+      "nodeId": "у_09",
+      "nodeName": "desktop (генеральный)",
+      "platform": "desktop",
+      "id": "1_09_10",
+      "name": "Мои донаты",
+      "file": "desktop/my-donates.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "DesktopMyDonatesScreen",
+      "codeFile": "DesktopMyDonatesScreen.tsx",
+      "routes": [
+        "(desktop app)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_09",
+      "nodeName": "desktop (генеральный)",
+      "platform": "desktop",
+      "id": "1_09_20",
+      "name": "Настройки уведомлений",
+      "file": "desktop/notification-settings.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "NotificationSettingsScreen",
+      "codeFile": "settings/NotificationSettingsScreen.tsx",
+      "routes": [
+        "settings/notifications"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_09",
+      "nodeName": "desktop (генеральный)",
+      "platform": "desktop",
+      "id": "1_09_01",
+      "name": "Обзор / Приветствие",
+      "file": "desktop/overview.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "DesktopOverviewScreen",
+      "codeFile": "DesktopOverviewScreen.tsx",
+      "routes": [
+        "(desktop app)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_09",
+      "nodeName": "desktop (генеральный)",
+      "platform": "desktop",
+      "id": "1_09_08",
+      "name": "Восстановление пароля",
+      "file": "desktop/password-reset.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "ResetPasswordScreen",
+      "codeFile": "auth/ResetPasswordScreen.tsx",
+      "routes": [
+        "(web router)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_09",
+      "nodeName": "desktop (генеральный)",
+      "platform": "desktop",
+      "id": "1_09_17",
+      "name": "Редактор опроса",
+      "file": "desktop/poll-editor.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "PollScreen",
+      "codeFile": "polls/PollScreen.tsx",
+      "routes": [
+        "polls",
+        "polls/:pollId",
+        "chat/:chatId/poll"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_09",
+      "nodeName": "desktop (генеральный)",
+      "platform": "desktop",
+      "id": "1_09_19",
+      "name": "Профиль",
+      "file": "desktop/profile.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "ProfileScreen",
+      "codeFile": "profile/ProfileScreen.tsx",
+      "routes": [
+        "profile"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_09",
+      "nodeName": "desktop (генеральный)",
+      "platform": "web",
+      "id": "1_01_03",
+      "name": "Регистрация",
+      "file": "balloo-su/register.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "RegisterScreen",
+      "codeFile": "auth/RegisterScreen.tsx",
+      "routes": [
+        "(в роутере)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_09",
+      "nodeName": "desktop (генеральный)",
+      "platform": "desktop",
+      "id": "1_09_07",
+      "name": "Жалоба на сообщение",
+      "file": "desktop/report-message.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "DesktopReportMessageScreen",
+      "codeFile": "DesktopReportMessageScreen.tsx",
+      "routes": [
+        "(desktop app)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_09",
+      "nodeName": "desktop (генеральный)",
+      "platform": "desktop",
+      "id": "1_09_18",
+      "name": "Настройки приложения",
+      "file": "desktop/settings.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "SettingsScreen",
+      "codeFile": "settings/SettingsScreen.tsx",
+      "routes": [
+        "settings"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_09",
+      "nodeName": "desktop (генеральный)",
+      "platform": "desktop",
+      "id": "1_09_12",
+      "name": "Сторис",
+      "file": "desktop/stories.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "StoriesScreen",
+      "codeFile": "stories/StoriesScreen.tsx",
+      "routes": [
+        "stories"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_09",
+      "nodeName": "desktop (генеральный)",
+      "platform": "desktop",
+      "id": "1_09_09",
+      "name": "Двухфакторная аутентификация",
+      "file": "desktop/two-factor.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "TwoFactorScreen",
+      "codeFile": "auth/TwoFactorScreen.tsx",
+      "routes": [
+        "(web router)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_10",
+      "nodeName": "specifity.balloo.su",
+      "platform": "web",
+      "id": "1_10_01",
+      "name": "Компоненты",
+      "file": "specifity-balloo-su/components.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "SpecifityScreen",
+      "codeFile": "specifity/SpecifityScreen.tsx",
+      "routes": [
+        "(в роутере)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_10",
+      "nodeName": "specifity.balloo.su",
+      "platform": "web",
+      "id": "1_10_02",
+      "name": "Данные",
+      "file": "specifity-balloo-su/data.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "SpecifityScreen",
+      "codeFile": "specifity/SpecifityScreen.tsx",
+      "routes": [
+        "(в роутере)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_10",
+      "nodeName": "specifity.balloo.su",
+      "platform": "web",
+      "id": "1_10_03",
+      "name": "Эндпоинты",
+      "file": "specifity-balloo-su/endpoints.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "SpecifityScreen",
+      "codeFile": "specifity/SpecifityScreen.tsx",
+      "routes": [
+        "(в роутере)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_10",
+      "nodeName": "specifity.balloo.su",
+      "platform": "web",
+      "id": "1_10_04",
+      "name": "Главная спецификации",
+      "file": "specifity-balloo-su/home.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "SpecifityScreen",
+      "codeFile": "specifity/SpecifityScreen.tsx",
+      "routes": [
+        "(в роутере)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_10",
+      "nodeName": "specifity.balloo.su",
+      "platform": "web",
+      "id": "1_01_12",
+      "name": "Правила платформы",
+      "file": "balloo-su/rules.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "RulesScreen",
+      "codeFile": "legal/RulesScreen.tsx",
+      "routes": [
+        "(в роутере)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_10",
+      "nodeName": "specifity.balloo.su",
+      "platform": "web",
+      "id": "1_10_06",
+      "name": "Экраны",
+      "file": "specifity-balloo-su/screens.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "SpecifityScreen",
+      "codeFile": "specifity/SpecifityScreen.tsx",
+      "routes": [
+        "(в роутере)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_10",
+      "nodeName": "specifity.balloo.su",
+      "platform": "web",
+      "id": "1_10_07",
+      "name": "Спецификация",
+      "file": "specifity-balloo-su/specification.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "SpecifityScreen",
+      "codeFile": "specifity/SpecifityScreen.tsx",
+      "routes": [
+        "(в роутере)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_11",
+      "nodeName": "blog.balloo.su",
+      "platform": "web",
+      "id": "1_11_01",
+      "name": "Категория блога",
+      "file": "blog-balloo-su/category.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "BlogCategoryScreen",
+      "codeFile": "blog-landing/BlogCategoryScreen.tsx",
+      "routes": [
+        "(в роутере)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_11",
+      "nodeName": "blog.balloo.su",
+      "platform": "web",
+      "id": "1_11_02",
+      "name": "Канал блога",
+      "file": "blog-balloo-su/channel.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "BlogChannelScreen",
+      "codeFile": "blog-landing/BlogChannelScreen.tsx",
+      "routes": [
+        "(в роутере)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_11",
+      "nodeName": "blog.balloo.su",
+      "platform": "web",
+      "id": "1_11_03",
+      "name": "Лента блога",
+      "file": "blog-balloo-su/feed.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "BlogLandingScreen",
+      "codeFile": "blog-landing/BlogLandingScreen.tsx",
+      "routes": [
+        "(в роутере)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_11",
+      "nodeName": "blog.balloo.su",
+      "platform": "web",
+      "id": "1_11_04",
+      "name": "Персональная лента",
+      "file": "blog-balloo-su/personal-feed.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "BlogLandingScreen",
+      "codeFile": "blog-landing/BlogLandingScreen.tsx",
+      "routes": [
+        "(в роутере)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_11",
+      "nodeName": "blog.balloo.su",
+      "platform": "web",
+      "id": "1_11_05",
+      "name": "Пост блога",
+      "file": "blog-balloo-su/post.html",
+      "hasHtml": true,
+      "status": "Принят",
+      "mapped": "BlogLandingPostScreen",
+      "codeFile": "blog-landing/BlogLandingPostScreen.tsx",
+      "routes": [
+        "(в роутере)"
+      ],
+      "verdict": "ok"
+    },
+    {
+      "nodeId": "у_11",
+      "nodeName": "blog.balloo.su",
+      "platform": "web",
+      "id": "1_01_06",
+      "name": "Глобальный поиск",
+      "file": "balloo-su/search.html",
+      "hasHtml": true,
+      "status": "Просмотрен",
+      "mapped": "SearchScreen",
+      "codeFile": "search/SearchScreen.tsx",
+      "routes": [
+        "search"
+      ],
+      "verdict": "ok"
+    }
+  ]
+}

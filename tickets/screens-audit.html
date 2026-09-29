@@ -1,0 +1,1686 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Balloo — аудит экранов: макет ↔ код ↔ роутер</title>
+<link rel="stylesheet" href="../mockups/assets/common.css">
+<style>
+  body { padding: 24px; }
+  h1 { font-size: 24px; margin-bottom: 6px; }
+  .meta { color: var(--text-secondary); font-size: 14px; margin-bottom: 16px; }
+  .summary { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 16px; font-size: 14px; }
+  .summary b { font-size: 18px; display: block; }
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+  .filters button { background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary); padding: 6px 12px; cursor: pointer; font-family: inherit; font-size: 13px; }
+  .filters button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border-color); vertical-align: top; }
+  th { background: var(--bg-tertiary); position: sticky; top: 0; }
+  .node-row td { background: var(--bg-secondary); font-size: 14px; }
+  .progress { height: 6px; background: var(--bg-tertiary); margin-top: 6px; max-width: 400px; }
+  .progress__bar { height: 100%; background: var(--accent); }
+  .v-ok td:first-child { border-left: 3px solid var(--accent); }
+  .v-state td:first-child { border-left: 3px solid var(--warning); }
+  .v-missing td:first-child { border-left: 3px solid var(--danger); }
+  .v-noroute td:first-child { border-left: 3px solid orange; }
+  code { background: var(--bg-tertiary); padding: 1px 5px; font-size: 12px; }
+</style>
+</head>
+<body>
+<h1>🗂️ Аудит экранов: макет ↔ код ↔ роутер</h1>
+<div class="meta">
+  Тикет <code>1790479490-04</code> · дата 2026-09-29 · правило индексирования <b>А</b>
+  (состояния одного экрана = один экран кода, ответ владельца В-29) ·
+  генератор: <code>scripts/screens-audit.cjs</code>
+</div>
+<div class="summary">
+  <div><b>172</b>всего экранов</div>
+  <div><b>122</b>✅ код + маршрут</div>
+  <div><b>50</b>🟡 состояния</div>
+  <div><b>0</b>🔴 нет кода</div>
+  <div><b>1</b>макетов без HTML</div>
+</div>
+<div class="filters" id="filters">
+  <button class="active" data-f="all">Все</button>
+  <button data-f="ok">✅ код + маршрут (122)</button>
+  <button data-f="state">🟡 состояния (50)</button>
+  <button data-f="missing">🔴 нет кода (0)</button>
+  <button data-f="code-no-route">🟠 без маршрута (0)</button>
+</div>
+<table>
+<thead><tr><th>ID</th><th>Экран</th><th>Макет</th><th>Код</th><th>Маршрут</th><th>Статус макета</th><th>Вердикт</th></tr></thead>
+<tbody>
+    <tr class="node-row">
+      <td colspan="7">
+        <b>у_00 shared</b> — 8 экранов, подключено 1 (13%)
+        <div class="progress"><div class="progress__bar" style="width:13%"></div></div>
+      </td>
+    </tr>
+    <tr data-verdict="state" data-node="у_00" class="v-state">
+      <td><code>1_00_08</code></td>
+      <td>Обжалование бана (оверлей)</td>
+      <td>shared/ban-appeal.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Просмотрен</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_00" class="v-state">
+      <td><code>1_00_02</code></td>
+      <td>Ошибка 403 (доступ запрещён)</td>
+      <td>shared/error-403.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Просмотрен</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_00" class="v-ok">
+      <td><code>1_00_01</code></td>
+      <td>Ошибка 404 (не найдено)</td>
+      <td>shared/error-404.html</td>
+      <td>shared/NotFoundScreen.tsx</td>
+      <td>texts, departments, employees, vacancies, features, meetings, my-department, departments, monitoring</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_00" class="v-state">
+      <td><code>1_00_03</code></td>
+      <td>Ошибка 500 (внутренняя ошибка)</td>
+      <td>shared/error-500.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Просмотрен</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_00" class="v-state">
+      <td><code>1_00_04</code></td>
+      <td>Ошибка 503 (сервис недоступен)</td>
+      <td>shared/error-503.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Просмотрен</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_00" class="v-state">
+      <td><code>1_00_07</code></td>
+      <td>Ошибка 555 (аккаунт заблокирован)</td>
+      <td>shared/error-555.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Просмотрен</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_00" class="v-state">
+      <td><code>1_00_05</code></td>
+      <td>Офлайн (авторизованный)</td>
+      <td>shared/offline-authed.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Просмотрен</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_00" class="v-state">
+      <td><code>1_00_06</code></td>
+      <td>Офлайн (гость / неавторизованный)</td>
+      <td>shared/offline-guest.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Просмотрен</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr class="node-row">
+      <td colspan="7">
+        <b>у_01 balloo.su</b> — 41 экранов, подключено 26 (63%)
+        <div class="progress"><div class="progress__bar" style="width:63%"></div></div>
+      </td>
+    </tr>
+    <tr data-verdict="state" data-node="у_01" class="v-state">
+      <td><code>1_01_17</code></td>
+      <td>О Balloo</td>
+      <td>balloo-su/about-balloo.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Принят</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_01" class="v-state">
+      <td><code>1_01_16</code></td>
+      <td>О компании</td>
+      <td>balloo-su/about-company.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Принят</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_01" class="v-state">
+      <td><code>1_01_22</code></td>
+      <td>Мультиаккаунт</td>
+      <td>balloo-su/accounts.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Просмотрен</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_01" class="v-state">
+      <td><code>1_01_11</code></td>
+      <td>Активный звонок</td>
+      <td>balloo-su/active-call.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Принят</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_01" class="v-ok">
+      <td><code>1_01_23</code></td>
+      <td>Добавить устройство</td>
+      <td>balloo-su/add-device.html</td>
+      <td>auth/AddDeviceScreen.tsx</td>
+      <td>(в роутере)</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_01" class="v-state">
+      <td><code>1_01_07</code></td>
+      <td>Архив чатов</td>
+      <td>balloo-su/archive.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Просмотрен</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_01" class="v-state">
+      <td><code>1_01_40</code></td>
+      <td>Панель вложений</td>
+      <td>balloo-su/attachment-panel.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Просмотрен</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_01" class="v-ok">
+      <td><code>1_01_38</code></td>
+      <td>Блокированные пользователи</td>
+      <td>balloo-su/blocked-users.html</td>
+      <td>settings/BlockedUsersScreen.tsx</td>
+      <td>settings/blocked</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_01" class="v-state">
+      <td><code>1_01_15</code></td>
+      <td>Боты</td>
+      <td>balloo-su/bots.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Принят</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_01" class="v-state">
+      <td><code>1_01_10</code></td>
+      <td>Звонки</td>
+      <td>balloo-su/calls.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Просмотрен</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_01" class="v-ok">
+      <td><code>1_01_35</code></td>
+      <td>Создание канала</td>
+      <td>balloo-su/channel-create.html</td>
+      <td>channels/CreateChannelScreen.tsx</td>
+      <td>channel/create</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_01" class="v-ok">
+      <td><code>1_01_25</code></td>
+      <td>Вложения чата</td>
+      <td>balloo-su/chat-attachments.html</td>
+      <td>DesktopChatAttachmentsScreen.tsx</td>
+      <td>(desktop app)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_01" class="v-ok">
+      <td><code>1_01_04</code></td>
+      <td>Список чатов</td>
+      <td>balloo-su/chats.html</td>
+      <td>chat/ChatViewScreen.tsx</td>
+      <td>chat, chat/:chatId</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_01" class="v-ok">
+      <td><code>1_01_05</code></td>
+      <td>Контакты</td>
+      <td>balloo-su/contacts.html</td>
+      <td>contacts/ContactsScreen.tsx</td>
+      <td>contacts</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_01" class="v-ok">
+      <td><code>1_01_24</code></td>
+      <td>Донат</td>
+      <td>balloo-su/donate.html</td>
+      <td>donate/DonateScreen.tsx</td>
+      <td>(в роутере)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_01" class="v-state">
+      <td><code>1_01_36</code></td>
+      <td>Пустой чат</td>
+      <td>balloo-su/empty-chat.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Просмотрен</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_01" class="v-state">
+      <td><code>1_01_33</code></td>
+      <td>Просмотр файла/изображения</td>
+      <td>balloo-su/file-viewer.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Просмотрен</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_01" class="v-ok">
+      <td><code>1_01_18</code></td>
+      <td>Создание группы</td>
+      <td>balloo-su/group-create.html</td>
+      <td>groups/CreateGroupScreen.tsx</td>
+      <td>group/create</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_01" class="v-ok">
+      <td><code>1_01_19</code></td>
+      <td>Настройки группы</td>
+      <td>balloo-su/group-settings.html</td>
+      <td>groups/GroupSettingsScreen.tsx</td>
+      <td>group/:chatId/settings</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_01" class="v-state">
+      <td><code>1_01_13</code></td>
+      <td>Приглашения</td>
+      <td>balloo-su/invites.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Принят</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_01" class="v-ok">
+      <td><code>1_01_02</code></td>
+      <td>Вход</td>
+      <td>balloo-su/login.html</td>
+      <td>auth/LoginScreen.tsx</td>
+      <td>(в роутере)</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_01" class="v-state">
+      <td><code>1_01_32</code></td>
+      <td>Редактор сообщения</td>
+      <td>balloo-su/message-editor.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Просмотрен</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_01" class="v-state">
+      <td><code>1_01_21</code></td>
+      <td>Мои устройства</td>
+      <td>balloo-su/my-devices.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Просмотрен</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_01" class="v-ok">
+      <td><code>1_01_31</code></td>
+      <td>Мои донаты</td>
+      <td>balloo-su/my-donates.html</td>
+      <td>DesktopMyDonatesScreen.tsx</td>
+      <td>(desktop app)</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_01" class="v-ok">
+      <td><code>1_01_34</code></td>
+      <td>Настройки уведомлений</td>
+      <td>balloo-su/notification-settings.html</td>
+      <td>settings/NotificationSettingsScreen.tsx</td>
+      <td>settings/notifications</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_01" class="v-state">
+      <td><code>1_01_01</code></td>
+      <td>Онбординг</td>
+      <td>balloo-su/onboarding.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Принят</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_01" class="v-ok">
+      <td><code>1_01_29</code></td>
+      <td>Восстановление пароля</td>
+      <td>balloo-su/password-reset.html</td>
+      <td>auth/ResetPasswordScreen.tsx</td>
+      <td>(в роутере)</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_01" class="v-ok">
+      <td><code>1_01_28</code></td>
+      <td>Редактор опроса</td>
+      <td>balloo-su/poll-editor.html</td>
+      <td>polls/PollScreen.tsx</td>
+      <td>polls, polls/:pollId, chat/:chatId/poll</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_01" class="v-ok">
+      <td><code>1_01_37</code></td>
+      <td>Настройки приватности</td>
+      <td>balloo-su/privacy-settings.html</td>
+      <td>settings/PrivacySettingsScreen.tsx</td>
+      <td>settings/privacy</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_01" class="v-ok">
+      <td><code>1_01_08</code></td>
+      <td>Профиль</td>
+      <td>balloo-su/profile.html</td>
+      <td>profile/ProfileScreen.tsx</td>
+      <td>profile</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_01" class="v-ok">
+      <td><code>1_01_09</code></td>
+      <td>Публичный профиль</td>
+      <td>balloo-su/public-profile.html</td>
+      <td>profile/PublicProfileScreen.tsx</td>
+      <td>profile/:username</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_01" class="v-ok">
+      <td><code>1_01_03</code></td>
+      <td>Регистрация</td>
+      <td>balloo-su/register.html</td>
+      <td>auth/RegisterScreen.tsx</td>
+      <td>(в роутере)</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_01" class="v-ok">
+      <td><code>1_01_26</code></td>
+      <td>Жалоба на сообщение</td>
+      <td>balloo-su/report-message.html</td>
+      <td>DesktopReportMessageScreen.tsx</td>
+      <td>(desktop app)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_01" class="v-ok">
+      <td><code>1_01_12</code></td>
+      <td>Правила платформы</td>
+      <td>balloo-su/rules.html</td>
+      <td>legal/RulesScreen.tsx</td>
+      <td>(в роутере)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_01" class="v-ok">
+      <td><code>1_01_06</code></td>
+      <td>Глобальный поиск</td>
+      <td>balloo-su/search.html</td>
+      <td>search/SearchScreen.tsx</td>
+      <td>search</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_01" class="v-ok">
+      <td><code>1_01_20</code></td>
+      <td>Настройки приложения</td>
+      <td>balloo-su/settings.html</td>
+      <td>settings/SettingsScreen.tsx</td>
+      <td>settings</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_01" class="v-ok">
+      <td><code>1_01_27</code></td>
+      <td>Сторис</td>
+      <td>balloo-su/stories.html</td>
+      <td>stories/StoriesScreen.tsx</td>
+      <td>stories</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_01" class="v-ok">
+      <td><code>1_01_41</code></td>
+      <td>Создание историй</td>
+      <td>balloo-su/story-create.html</td>
+      <td>stories/StoryCreateScreen.tsx</td>
+      <td>stories/create</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_01" class="v-ok">
+      <td><code>1_01_14</code></td>
+      <td>Техподдержка</td>
+      <td>balloo-su/support.html</td>
+      <td>support/SupportScreen.tsx</td>
+      <td>(в роутере)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_01" class="v-ok">
+      <td><code>1_01_30</code></td>
+      <td>Двухфакторная аутентификация</td>
+      <td>balloo-su/two-factor.html</td>
+      <td>auth/TwoFactorScreen.tsx</td>
+      <td>(в роутере)</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_01" class="v-state">
+      <td><code>1_01_39</code></td>
+      <td>Запись голосового</td>
+      <td>balloo-su/voice-message.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Просмотрен</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr class="node-row">
+      <td colspan="7">
+        <b>у_02 admin.balloo.su</b> — 25 экранов, подключено 18 (72%)
+        <div class="progress"><div class="progress__bar" style="width:72%"></div></div>
+      </td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_02" class="v-ok">
+      <td><code>1_02_01</code></td>
+      <td>Объявления</td>
+      <td>admin-balloo-su/announcements.html</td>
+      <td>admin/AnnouncementsScreen.tsx</td>
+      <td>announcements</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_02" class="v-ok">
+      <td><code>1_02_02</code></td>
+      <td>Аудит-лог</td>
+      <td>admin-balloo-su/audit-log.html</td>
+      <td>admin/AuditLogsScreen.tsx</td>
+      <td>audit-logs</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_02" class="v-ok">
+      <td><code>1_02_03</code></td>
+      <td>Бан-лист</td>
+      <td>admin-balloo-su/bans.html</td>
+      <td>admin/BansScreen.tsx</td>
+      <td>bans</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_02" class="v-ok">
+      <td><code>1_02_05</code></td>
+      <td>Каналы блога</td>
+      <td>admin-balloo-su/blog-channels.html</td>
+      <td>admin/BlogChannelsScreen.tsx</td>
+      <td>blog/channels</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_02" class="v-state">
+      <td><code>1_02_06</code></td>
+      <td>Миграция блога</td>
+      <td>admin-balloo-su/blog-migrate.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Просмотрен</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_02" class="v-ok">
+      <td><code>1_02_07</code></td>
+      <td>Очередь блога</td>
+      <td>admin-balloo-su/blog-queue.html</td>
+      <td>admin/BlogQueueScreen.tsx</td>
+      <td>blog/queue</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_02" class="v-state">
+      <td><code>1_02_08</code></td>
+      <td>Ревью блога</td>
+      <td>admin-balloo-su/blog-review.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Просмотрен</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_02" class="v-ok">
+      <td><code>1_02_09</code></td>
+      <td>Статистика блога</td>
+      <td>admin-balloo-su/blog-stats.html</td>
+      <td>admin/AnalyticsScreen.tsx</td>
+      <td>analytics</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_02" class="v-state">
+      <td><code>1_02_10</code></td>
+      <td>Управление ботами</td>
+      <td>admin-balloo-su/bots-mgmt.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Просмотрен</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_02" class="v-ok">
+      <td><code>1_03_02</code></td>
+      <td>Дашборд</td>
+      <td>command-balloo-su/dashboard.html</td>
+      <td>admin/DashboardScreen.tsx</td>
+      <td>/admin</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_02" class="v-ok">
+      <td><code>1_03_15</code></td>
+      <td>Отделы</td>
+      <td>command-balloo-su/departments.html</td>
+      <td>command/HRScreen.tsx</td>
+      <td>hr</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_02" class="v-ok">
+      <td><code>1_02_13</code></td>
+      <td>Донаты</td>
+      <td>admin-balloo-su/donations.html</td>
+      <td>admin/AdminDonationsScreen.tsx</td>
+      <td>donations</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_02" class="v-state">
+      <td><code>1_02_14</code></td>
+      <td>Сотрудники</td>
+      <td>admin-balloo-su/employees.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Просмотрен</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_02" class="v-ok">
+      <td><code>1_02_15</code></td>
+      <td>Feature flags</td>
+      <td>admin-balloo-su/features-flags.html</td>
+      <td>admin/FeatureFlagsScreen.tsx</td>
+      <td>feature-flags</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_02" class="v-state">
+      <td><code>1_02_16</code></td>
+      <td>Управление фичами</td>
+      <td>admin-balloo-su/features-mgmt.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Просмотрен</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_02" class="v-ok">
+      <td><code>1_02_17</code></td>
+      <td>Файлы</td>
+      <td>admin-balloo-su/files.html</td>
+      <td>admin/DownloadsScreen.tsx</td>
+      <td>downloads</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_02" class="v-state">
+      <td><code>1_02_18</code></td>
+      <td>Управление группами</td>
+      <td>admin-balloo-su/groups-mgmt.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Просмотрен</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_02" class="v-ok">
+      <td><code>1_01_02</code></td>
+      <td>Вход</td>
+      <td>balloo-su/login.html</td>
+      <td>auth/LoginScreen.tsx</td>
+      <td>(в роутере)</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_02" class="v-ok">
+      <td><code>1_02_20</code></td>
+      <td>Метрики</td>
+      <td>admin-balloo-su/metrics.html</td>
+      <td>admin/AnalyticsScreen.tsx</td>
+      <td>analytics</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_02" class="v-ok">
+      <td><code>1_02_21</code></td>
+      <td>Отчёты</td>
+      <td>admin-balloo-su/reports.html</td>
+      <td>admin/ReportsScreen.tsx</td>
+      <td>reports</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_02" class="v-state">
+      <td><code>1_02_22</code></td>
+      <td>Статус сервиса</td>
+      <td>admin-balloo-su/service-status.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Просмотрен</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_02" class="v-ok">
+      <td><code>1_02_23</code></td>
+      <td>Тексты</td>
+      <td>admin-balloo-su/texts.html</td>
+      <td>admin/SystemSettingsScreen.tsx</td>
+      <td>system-settings</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_02" class="v-ok">
+      <td><code>1_02_24</code></td>
+      <td>Пользователи</td>
+      <td>admin-balloo-su/users.html</td>
+      <td>admin/UsersScreen.tsx</td>
+      <td>users</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_02" class="v-ok">
+      <td><code>1_03_07</code></td>
+      <td>Вакансии</td>
+      <td>command-balloo-su/vacancies.html</td>
+      <td>command/VacanciesScreen.tsx</td>
+      <td>hiring/vacancies, hiring/why-us</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_02" class="v-ok">
+      <td><code>1_02_26</code></td>
+      <td>Версии</td>
+      <td>admin-balloo-su/versions.html</td>
+      <td>admin/VersionsScreen.tsx</td>
+      <td>versions</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr class="node-row">
+      <td colspan="7">
+        <b>у_03 command.balloo.su</b> — 26 экранов, подключено 12 (46%)
+        <div class="progress"><div class="progress__bar" style="width:46%"></div></div>
+      </td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_03" class="v-ok">
+      <td><code>1_03_09</code></td>
+      <td>Анкета кандидата</td>
+      <td>command-balloo-su/application-form.html</td>
+      <td>hiring/ApplicationScreen.tsx</td>
+      <td>hiring/apply/:id</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_03" class="v-state">
+      <td><code>1_03_20</code></td>
+      <td>Настройки канала</td>
+      <td>command-balloo-su/blog-channel-settings.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Принят</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_03" class="v-state">
+      <td><code>1_03_18</code></td>
+      <td>Редактор блога</td>
+      <td>command-balloo-su/blog-editor.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Принят</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_03" class="v-state">
+      <td><code>1_03_19</code></td>
+      <td>Мой канал</td>
+      <td>command-balloo-su/blog-my-channel.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Принят</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_03" class="v-state">
+      <td><code>1_03_17</code></td>
+      <td>Мои публикации</td>
+      <td>command-balloo-su/blog-my-posts.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Принят</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_03" class="v-state">
+      <td><code>1_03_22</code></td>
+      <td>Календарь</td>
+      <td>command-balloo-su/calendar.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Принят</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_03" class="v-ok">
+      <td><code>1_03_24</code></td>
+      <td>Карточка кандидата (интервью)</td>
+      <td>command-balloo-su/candidate-interview.html</td>
+      <td>hiring/InterviewScreen.tsx</td>
+      <td>hiring/application/:id</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_03" class="v-state">
+      <td><code>1_03_23</code></td>
+      <td>Карточка кандидата</td>
+      <td>command-balloo-su/candidate.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Принят</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_03" class="v-ok">
+      <td><code>1_03_02</code></td>
+      <td>Дашборд</td>
+      <td>command-balloo-su/dashboard.html</td>
+      <td>admin/DashboardScreen.tsx</td>
+      <td>/admin</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_03" class="v-state">
+      <td><code>1_03_16</code></td>
+      <td>Управление отделами</td>
+      <td>command-balloo-su/department-management.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Принят</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_03" class="v-ok">
+      <td><code>1_03_15</code></td>
+      <td>Отделы</td>
+      <td>command-balloo-su/departments.html</td>
+      <td>command/HRScreen.tsx</td>
+      <td>hr</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_03" class="v-state">
+      <td><code>1_03_21</code></td>
+      <td>Профиль сотрудника</td>
+      <td>command-balloo-su/employee-profile.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Принят</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_03" class="v-ok">
+      <td><code>1_03_05</code></td>
+      <td>Найм</td>
+      <td>command-balloo-su/hiring.html</td>
+      <td>command/HireScreen.tsx</td>
+      <td>/command, hiring</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_03" class="v-ok">
+      <td><code>1_03_03</code></td>
+      <td>HR-модуль</td>
+      <td>command-balloo-su/hr.html</td>
+      <td>command/HRScreen.tsx</td>
+      <td>hr</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_03" class="v-ok">
+      <td><code>1_03_11</code></td>
+      <td>Внутренний чат</td>
+      <td>command-balloo-su/internal-chat.html</td>
+      <td>command/InternalChatScreen.tsx</td>
+      <td>chat</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_03" class="v-ok">
+      <td><code>1_03_04</code></td>
+      <td>База знаний</td>
+      <td>command-balloo-su/knowledge-base.html</td>
+      <td>command/KnowledgeScreen.tsx</td>
+      <td>knowledge</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_03" class="v-ok">
+      <td><code>1_03_01</code></td>
+      <td>Вход</td>
+      <td>command-balloo-su/login.html</td>
+      <td>auth/LoginScreen.tsx</td>
+      <td>(в роутере)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_03" class="v-state">
+      <td><code>1_03_25</code></td>
+      <td>Дашборд руководителя</td>
+      <td>command-balloo-su/manager-dashboard.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Просмотрен</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_03" class="v-state">
+      <td><code>1_03_12</code></td>
+      <td>Встречи</td>
+      <td>command-balloo-su/meetings.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Принят</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_03" class="v-state">
+      <td><code>1_03_06</code></td>
+      <td>Мониторинг продукта</td>
+      <td>command-balloo-su/monitoring.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Принят</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_03" class="v-state">
+      <td><code>1_03_14</code></td>
+      <td>Мой отдел</td>
+      <td>command-balloo-su/my-department.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Принят</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_03" class="v-state">
+      <td><code>1_03_26</code></td>
+      <td>Отпуска и отсутствие</td>
+      <td>command-balloo-su/time-off.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Просмотрен</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_03" class="v-ok">
+      <td><code>1_03_13</code></td>
+      <td>Мои задачи</td>
+      <td>command-balloo-su/todo.html</td>
+      <td>command/TasksScreen.tsx</td>
+      <td>tasks</td>
+      <td>Реализован</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_03" class="v-ok">
+      <td><code>1_03_07</code></td>
+      <td>Вакансии</td>
+      <td>command-balloo-su/vacancies.html</td>
+      <td>command/VacanciesScreen.tsx</td>
+      <td>hiring/vacancies, hiring/why-us</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_03" class="v-ok">
+      <td><code>1_03_08</code></td>
+      <td>Детали вакансии</td>
+      <td>command-balloo-su/vacancy-detail.html</td>
+      <td>hiring/VacancyScreen.tsx</td>
+      <td>hiring/vacancy/:id</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_03" class="v-state">
+      <td><code>1_03_10</code></td>
+      <td>Почему мы</td>
+      <td>command-balloo-su/why-us.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Принят</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr class="node-row">
+      <td colspan="7">
+        <b>у_04 features.balloo.su</b> — 6 экранов, подключено 5 (83%)
+        <div class="progress"><div class="progress__bar" style="width:83%"></div></div>
+      </td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_04" class="v-ok">
+      <td><code>1_01_24</code></td>
+      <td>Донат</td>
+      <td>balloo-su/donate.html</td>
+      <td>donate/DonateScreen.tsx</td>
+      <td>(в роутере)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_04" class="v-ok">
+      <td><code>1_04_02</code></td>
+      <td>Детали фич-реквеста</td>
+      <td>features-balloo-su/feature-detail.html</td>
+      <td>features/FeatureDetailScreen.tsx</td>
+      <td>(в роутере)</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_04" class="v-ok">
+      <td><code>1_04_03</code></td>
+      <td>Список фич-реквестов</td>
+      <td>features-balloo-su/list.html</td>
+      <td>features/FeaturesListScreen.tsx</td>
+      <td>(в роутере)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_04" class="v-ok">
+      <td><code>1_01_02</code></td>
+      <td>Вход</td>
+      <td>balloo-su/login.html</td>
+      <td>auth/LoginScreen.tsx</td>
+      <td>(в роутере)</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_04" class="v-ok">
+      <td><code>1_04_05</code></td>
+      <td>Отправить фич-реквест</td>
+      <td>features-balloo-su/submit.html</td>
+      <td>features/FeatureCreateScreen.tsx</td>
+      <td>(в роутере)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_04" class="v-state">
+      <td><code>1_04_04</code></td>
+      <td>Голосование по фичам</td>
+      <td>features-balloo-su/vote.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Просмотрен</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr class="node-row">
+      <td colspan="7">
+        <b>у_05 history.balloo.su</b> — 3 экранов, подключено 3 (100%)
+        <div class="progress"><div class="progress__bar" style="width:100%"></div></div>
+      </td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_05" class="v-ok">
+      <td><code>1_01_24</code></td>
+      <td>Донат</td>
+      <td>balloo-su/donate.html</td>
+      <td>donate/DonateScreen.tsx</td>
+      <td>(в роутере)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_05" class="v-ok">
+      <td><code>1_05_02</code></td>
+      <td>Детали версии</td>
+      <td>history-balloo-su/version-detail.html</td>
+      <td>history/VersionDetailScreen.tsx</td>
+      <td>(в роутере)</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_05" class="v-ok">
+      <td><code>1_05_03</code></td>
+      <td>Список версий</td>
+      <td>history-balloo-su/version-list.html</td>
+      <td>history/HistoryScreen.tsx</td>
+      <td>(в роутере)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr class="node-row">
+      <td colspan="7">
+        <b>у_06 download.balloo.su</b> — 2 экранов, подключено 2 (100%)
+        <div class="progress"><div class="progress__bar" style="width:100%"></div></div>
+      </td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_06" class="v-ok">
+      <td><code>1_01_24</code></td>
+      <td>Донат</td>
+      <td>balloo-su/donate.html</td>
+      <td>donate/DonateScreen.tsx</td>
+      <td>(в роутере)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_06" class="v-ok">
+      <td><code>1_06_02</code></td>
+      <td>Загрузки</td>
+      <td>download-balloo-su/downloads.html</td>
+      <td>download/DownloadScreen.tsx</td>
+      <td>(в роутере)</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr class="node-row">
+      <td colspan="7">
+        <b>у_07 docs.balloo.su</b> — 1 экранов, подключено 1 (100%)
+        <div class="progress"><div class="progress__bar" style="width:100%"></div></div>
+      </td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_07" class="v-ok">
+      <td><code>1_07_01</code></td>
+      <td>Документация API</td>
+      <td>docs-balloo-su/api-docs.html</td>
+      <td>docs/DocsScreen.tsx</td>
+      <td>(в роутере)</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr class="node-row">
+      <td colspan="7">
+        <b>у_08 mobile (сборные)</b> — 24 экранов, подключено 19 (79%)
+        <div class="progress"><div class="progress__bar" style="width:79%"></div></div>
+      </td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_08" class="v-ok">
+      <td><code>1_08_01</code></td>
+      <td>Обзор / Приветствие</td>
+      <td>mobile/overview.html</td>
+      <td>DesktopOverviewScreen.tsx</td>
+      <td>(desktop app)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_08" class="v-ok">
+      <td><code>1_08_02</code></td>
+      <td>Чат</td>
+      <td>mobile/chat.html</td>
+      <td>screens/ChatListScreen.tsx</td>
+      <td>(android app)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_08" class="v-ok">
+      <td><code>1_08_03</code></td>
+      <td>История звонков</td>
+      <td>mobile/calls-history.html</td>
+      <td>DesktopCallsHistoryScreen.tsx</td>
+      <td>(desktop app)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_08" class="v-ok">
+      <td><code>1_08_04</code></td>
+      <td>Настройки приложения</td>
+      <td>mobile/settings.html</td>
+      <td>screens/SettingsScreen.tsx</td>
+      <td>(android app)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_08" class="v-state">
+      <td><code>1_08_05</code></td>
+      <td>Мои устройства</td>
+      <td>mobile/my-devices.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Принят</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_08" class="v-ok">
+      <td><code>1_08_06</code></td>
+      <td>Добавить устройство</td>
+      <td>mobile/add-device.html</td>
+      <td>auth/AddDeviceScreen.tsx</td>
+      <td>(в роутере)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_08" class="v-ok">
+      <td><code>1_08_07</code></td>
+      <td>Донат</td>
+      <td>mobile/donate.html</td>
+      <td>donate/DonateScreen.tsx</td>
+      <td>(в роутере)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_08" class="v-ok">
+      <td><code>1_08_08</code></td>
+      <td>Вложения чата</td>
+      <td>mobile/chat-attachments.html</td>
+      <td>DesktopChatAttachmentsScreen.tsx</td>
+      <td>(desktop app)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_08" class="v-ok">
+      <td><code>1_08_09</code></td>
+      <td>Жалоба на сообщение</td>
+      <td>mobile/report-message.html</td>
+      <td>DesktopReportMessageScreen.tsx</td>
+      <td>(desktop app)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_08" class="v-ok">
+      <td><code>1_08_10</code></td>
+      <td>Вход</td>
+      <td>mobile/login.html</td>
+      <td>screens/auth/LoginScreen.tsx</td>
+      <td>(android app)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_08" class="v-ok">
+      <td><code>1_08_11</code></td>
+      <td>Регистрация</td>
+      <td>mobile/register.html</td>
+      <td>screens/auth/RegisterScreen.tsx</td>
+      <td>(android app)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_08" class="v-ok">
+      <td><code>1_08_12</code></td>
+      <td>Восстановление пароля</td>
+      <td>mobile/password-reset.html</td>
+      <td>screens/auth/ResetPasswordScreen.tsx</td>
+      <td>(android app)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_08" class="v-ok">
+      <td><code>1_08_13</code></td>
+      <td>Двухфакторная аутентификация</td>
+      <td>mobile/two-factor.html</td>
+      <td>screens/auth/TwoFactorScreen.tsx</td>
+      <td>(android app)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_08" class="v-ok">
+      <td><code>1_08_14</code></td>
+      <td>Мои донаты</td>
+      <td>mobile/my-donates.html</td>
+      <td>DesktopMyDonatesScreen.tsx</td>
+      <td>(desktop app)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_08" class="v-ok">
+      <td><code>1_08_15</code></td>
+      <td>Сторис</td>
+      <td>mobile/stories.html</td>
+      <td>stories/StoriesScreen.tsx</td>
+      <td>stories</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_08" class="v-state">
+      <td><code>1_08_16</code></td>
+      <td>Архив чатов</td>
+      <td>mobile/archive.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Принят</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_08" class="v-ok">
+      <td><code>1_08_17</code></td>
+      <td>Контакты</td>
+      <td>mobile/contacts.html</td>
+      <td>screens/ContactsScreen.tsx</td>
+      <td>(android app)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_08" class="v-ok">
+      <td><code>1_08_18</code></td>
+      <td>Профиль</td>
+      <td>mobile/profile.html</td>
+      <td>screens/ProfileScreen.tsx</td>
+      <td>(android app)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_08" class="v-ok">
+      <td><code>1_08_19</code></td>
+      <td>Создание группы</td>
+      <td>mobile/group-create.html</td>
+      <td>screens/CreateGroupScreen.tsx</td>
+      <td>(android app)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_08" class="v-ok">
+      <td><code>1_08_20</code></td>
+      <td>Редактор опроса</td>
+      <td>mobile/poll-editor.html</td>
+      <td>polls/PollScreen.tsx</td>
+      <td>polls, polls/:pollId, chat/:chatId/poll</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_08" class="v-state">
+      <td><code>1_08_21</code></td>
+      <td>Пустой чат</td>
+      <td>mobile/empty-chat.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Просмотрен</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_08" class="v-ok">
+      <td><code>1_08_22</code></td>
+      <td>Полноэкранный просмотрщик медиа</td>
+      <td>mobile/media-viewer.html</td>
+      <td>DesktopMediaViewerScreen.tsx</td>
+      <td>(desktop app)</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_08" class="v-state">
+      <td><code>1_08_23</code></td>
+      <td>Запись голосового (mobile)</td>
+      <td>mobile/voice-record.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Просмотрен</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_08" class="v-state">
+      <td><code>1_08_24</code></td>
+      <td>Правое меню шапки (мобильное)</td>
+      <td>mobile/right-menu.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Принят</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr class="node-row">
+      <td colspan="7">
+        <b>у_09 desktop (генеральный)</b> — 23 экранов, подключено 22 (96%)
+        <div class="progress"><div class="progress__bar" style="width:96%"></div></div>
+      </td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_09" class="v-ok">
+      <td><code>1_09_04</code></td>
+      <td>Добавить устройство</td>
+      <td>desktop/add-device.html</td>
+      <td>DesktopAddDeviceScreen.tsx</td>
+      <td>(desktop app)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_09" class="v-ok">
+      <td><code>1_09_14</code></td>
+      <td>Архив чатов</td>
+      <td>desktop/archive.html</td>
+      <td>DesktopArchiveScreen.tsx</td>
+      <td>(desktop app)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_09" class="v-ok">
+      <td><code>1_09_13</code></td>
+      <td>История звонков</td>
+      <td>desktop/calls-history.html</td>
+      <td>DesktopCallsHistoryScreen.tsx</td>
+      <td>(desktop app)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_09" class="v-ok">
+      <td><code>1_09_06</code></td>
+      <td>Вложения чата</td>
+      <td>desktop/chat-attachments.html</td>
+      <td>DesktopChatAttachmentsScreen.tsx</td>
+      <td>(desktop app)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_09" class="v-ok">
+      <td><code>1_09_11</code></td>
+      <td>Чат</td>
+      <td>desktop/chat.html</td>
+      <td>chat/ChatViewScreen.tsx</td>
+      <td>chat, chat/:chatId</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_09" class="v-ok">
+      <td><code>1_09_15</code></td>
+      <td>Контакты</td>
+      <td>desktop/contacts.html</td>
+      <td>contacts/ContactsScreen.tsx</td>
+      <td>contacts</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_09" class="v-ok">
+      <td><code>1_09_05</code></td>
+      <td>Донат</td>
+      <td>desktop/donate.html</td>
+      <td>DesktopDonateScreen.tsx</td>
+      <td>(desktop app)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_09" class="v-ok">
+      <td><code>1_09_16</code></td>
+      <td>Создание группы</td>
+      <td>desktop/group-create.html</td>
+      <td>groups/CreateGroupScreen.tsx</td>
+      <td>group/create</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_09" class="v-ok">
+      <td><code>1_01_02</code></td>
+      <td>Вход</td>
+      <td>balloo-su/login.html</td>
+      <td>auth/LoginScreen.tsx</td>
+      <td>(в роутере)</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_09" class="v-ok">
+      <td><code>1_09_21</code></td>
+      <td>Полноэкранный просмотрщик медиа</td>
+      <td>desktop/media-viewer.html</td>
+      <td>DesktopMediaViewerScreen.tsx</td>
+      <td>(desktop app)</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_09" class="v-ok">
+      <td><code>1_09_02</code></td>
+      <td>Modes</td>
+      <td>desktop/modes.html</td>
+      <td>DesktopModesScreen.tsx</td>
+      <td>(desktop app)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="state" data-node="у_09" class="v-state">
+      <td><code>1_09_03</code></td>
+      <td>Мои устройства</td>
+      <td>desktop/my-devices.html</td>
+      <td>—</td>
+      <td>—</td>
+      <td>Принят</td>
+      <td class="verdict">🟡 состояние экрана</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_09" class="v-ok">
+      <td><code>1_09_10</code></td>
+      <td>Мои донаты</td>
+      <td>desktop/my-donates.html</td>
+      <td>DesktopMyDonatesScreen.tsx</td>
+      <td>(desktop app)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_09" class="v-ok">
+      <td><code>1_09_20</code></td>
+      <td>Настройки уведомлений</td>
+      <td>desktop/notification-settings.html</td>
+      <td>settings/NotificationSettingsScreen.tsx</td>
+      <td>settings/notifications</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_09" class="v-ok">
+      <td><code>1_09_01</code></td>
+      <td>Обзор / Приветствие</td>
+      <td>desktop/overview.html</td>
+      <td>DesktopOverviewScreen.tsx</td>
+      <td>(desktop app)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_09" class="v-ok">
+      <td><code>1_09_08</code></td>
+      <td>Восстановление пароля</td>
+      <td>desktop/password-reset.html</td>
+      <td>auth/ResetPasswordScreen.tsx</td>
+      <td>(web router)</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_09" class="v-ok">
+      <td><code>1_09_17</code></td>
+      <td>Редактор опроса</td>
+      <td>desktop/poll-editor.html</td>
+      <td>polls/PollScreen.tsx</td>
+      <td>polls, polls/:pollId, chat/:chatId/poll</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_09" class="v-ok">
+      <td><code>1_09_19</code></td>
+      <td>Профиль</td>
+      <td>desktop/profile.html</td>
+      <td>profile/ProfileScreen.tsx</td>
+      <td>profile</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_09" class="v-ok">
+      <td><code>1_01_03</code></td>
+      <td>Регистрация</td>
+      <td>balloo-su/register.html</td>
+      <td>auth/RegisterScreen.tsx</td>
+      <td>(в роутере)</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_09" class="v-ok">
+      <td><code>1_09_07</code></td>
+      <td>Жалоба на сообщение</td>
+      <td>desktop/report-message.html</td>
+      <td>DesktopReportMessageScreen.tsx</td>
+      <td>(desktop app)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_09" class="v-ok">
+      <td><code>1_09_18</code></td>
+      <td>Настройки приложения</td>
+      <td>desktop/settings.html</td>
+      <td>settings/SettingsScreen.tsx</td>
+      <td>settings</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_09" class="v-ok">
+      <td><code>1_09_12</code></td>
+      <td>Сторис</td>
+      <td>desktop/stories.html</td>
+      <td>stories/StoriesScreen.tsx</td>
+      <td>stories</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_09" class="v-ok">
+      <td><code>1_09_09</code></td>
+      <td>Двухфакторная аутентификация</td>
+      <td>desktop/two-factor.html</td>
+      <td>auth/TwoFactorScreen.tsx</td>
+      <td>(web router)</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr class="node-row">
+      <td colspan="7">
+        <b>у_10 specifity.balloo.su</b> — 7 экранов, подключено 7 (100%)
+        <div class="progress"><div class="progress__bar" style="width:100%"></div></div>
+      </td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_10" class="v-ok">
+      <td><code>1_10_01</code></td>
+      <td>Компоненты</td>
+      <td>specifity-balloo-su/components.html</td>
+      <td>specifity/SpecifityScreen.tsx</td>
+      <td>(в роутере)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_10" class="v-ok">
+      <td><code>1_10_02</code></td>
+      <td>Данные</td>
+      <td>specifity-balloo-su/data.html</td>
+      <td>specifity/SpecifityScreen.tsx</td>
+      <td>(в роутере)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_10" class="v-ok">
+      <td><code>1_10_03</code></td>
+      <td>Эндпоинты</td>
+      <td>specifity-balloo-su/endpoints.html</td>
+      <td>specifity/SpecifityScreen.tsx</td>
+      <td>(в роутере)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_10" class="v-ok">
+      <td><code>1_10_04</code></td>
+      <td>Главная спецификации</td>
+      <td>specifity-balloo-su/home.html</td>
+      <td>specifity/SpecifityScreen.tsx</td>
+      <td>(в роутере)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_10" class="v-ok">
+      <td><code>1_01_12</code></td>
+      <td>Правила платформы</td>
+      <td>balloo-su/rules.html</td>
+      <td>legal/RulesScreen.tsx</td>
+      <td>(в роутере)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_10" class="v-ok">
+      <td><code>1_10_06</code></td>
+      <td>Экраны</td>
+      <td>specifity-balloo-su/screens.html</td>
+      <td>specifity/SpecifityScreen.tsx</td>
+      <td>(в роутере)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_10" class="v-ok">
+      <td><code>1_10_07</code></td>
+      <td>Спецификация</td>
+      <td>specifity-balloo-su/specification.html</td>
+      <td>specifity/SpecifityScreen.tsx</td>
+      <td>(в роутере)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr class="node-row">
+      <td colspan="7">
+        <b>у_11 blog.balloo.su</b> — 6 экранов, подключено 6 (100%)
+        <div class="progress"><div class="progress__bar" style="width:100%"></div></div>
+      </td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_11" class="v-ok">
+      <td><code>1_11_01</code></td>
+      <td>Категория блога</td>
+      <td>blog-balloo-su/category.html</td>
+      <td>blog-landing/BlogCategoryScreen.tsx</td>
+      <td>(в роутере)</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_11" class="v-ok">
+      <td><code>1_11_02</code></td>
+      <td>Канал блога</td>
+      <td>blog-balloo-su/channel.html</td>
+      <td>blog-landing/BlogChannelScreen.tsx</td>
+      <td>(в роутере)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_11" class="v-ok">
+      <td><code>1_11_03</code></td>
+      <td>Лента блога</td>
+      <td>blog-balloo-su/feed.html</td>
+      <td>blog-landing/BlogLandingScreen.tsx</td>
+      <td>(в роутере)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_11" class="v-ok">
+      <td><code>1_11_04</code></td>
+      <td>Персональная лента</td>
+      <td>blog-balloo-su/personal-feed.html</td>
+      <td>blog-landing/BlogLandingScreen.tsx</td>
+      <td>(в роутере)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_11" class="v-ok">
+      <td><code>1_11_05</code></td>
+      <td>Пост блога</td>
+      <td>blog-balloo-su/post.html</td>
+      <td>blog-landing/BlogLandingPostScreen.tsx</td>
+      <td>(в роутере)</td>
+      <td>Принят</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr>
+    <tr data-verdict="ok" data-node="у_11" class="v-ok">
+      <td><code>1_01_06</code></td>
+      <td>Глобальный поиск</td>
+      <td>balloo-su/search.html</td>
+      <td>search/SearchScreen.tsx</td>
+      <td>search</td>
+      <td>Просмотрен</td>
+      <td class="verdict">✅ код + маршрут</td>
+    </tr></tbody>
+</table>
+<script>
+  const btns = document.querySelectorAll('#filters button');
+  const trs = document.querySelectorAll('tbody tr[data-verdict]');
+  btns.forEach((b) => b.addEventListener('click', () => {
+    btns.forEach((x) => x.classList.remove('active'));
+    b.classList.add('active');
+    const f = b.dataset.f;
+    trs.forEach((tr) => { tr.style.display = (f === 'all' || tr.dataset.verdict === f) ? '' : 'none'; });
+  }));
+</script>
+</body>
+</html>
