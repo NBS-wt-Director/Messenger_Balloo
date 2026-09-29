@@ -17,6 +17,11 @@ import {
   getMetrics,
   listAuditLogs,
 } from '../controllers/adminController';
+import {
+  listTicketsCtrl,
+  getTicketCtrl,
+  replyCtrl,
+} from '../controllers/supportController';
 import { authRequired, adminOnly } from '../middleware/auth';
 
 const router = Router() as import('express').Router;
@@ -104,5 +109,18 @@ router.get('/metrics', authRequired, adminOnly, getMetrics);
 
 // GET /api/admin/audit-logs — логи действий
 router.get('/audit-logs', authRequired, adminOnly, listAuditLogs);
+
+// ----------------------------------------------------------
+// Поддержка (ответ В-33: страница в дашборде админки)
+// ----------------------------------------------------------
+
+// GET /api/admin/support/tickets — список тикетов поддержки
+router.get('/support/tickets', authRequired, adminOnly, listTicketsCtrl);
+
+// GET /api/admin/support/tickets/:id — тикет с перепиской
+router.get('/support/tickets/:id', authRequired, adminOnly, getTicketCtrl);
+
+// POST /api/admin/support/tickets/:id/reply — ответ администратора
+router.post('/support/tickets/:id/reply', authRequired, adminOnly, replyCtrl);
 
 export { router };

@@ -71,6 +71,8 @@ const THEMES: { id: Theme; icon: string; labelKey: TranslationKey }[] = [
 ];
 
 export const DEFAULT_LEGAL_ITEMS: RightMenuItem[] = [
+  // Техподдержка — первым пунктом юр. секции, как в эталоне common.js:496
+  { key: 'menu.support', to: '/support', icon: '🛠️' },
   { key: 'footer.privacy', to: '/privacy', icon: '🔒' },
   { key: 'footer.rules', to: '/rules', icon: '📋' },
 ];

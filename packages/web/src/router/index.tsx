@@ -30,6 +30,7 @@ const NotificationSettingsScreen = lazy(() => import('@/screens/settings/Notific
 const PrivacySettingsScreen = lazy(() => import('@/screens/settings/PrivacySettingsScreen'));
 const BlockedUsersScreen = lazy(() => import('@/screens/settings/BlockedUsersScreen'));
 const SearchScreen = lazy(() => import('@/screens/search/SearchScreen'));
+const SupportScreen = lazy(() => import('@/screens/support/SupportScreen').then((m) => ({ default: m.SupportScreen })));
 const CreateGroupScreen = lazy(() => import('@/screens/groups/CreateGroupScreen'));
 const GroupSettingsScreen = lazy(() => import('@/screens/groups/GroupSettingsScreen'));
 const CreateChannelScreen = lazy(() => import('@/screens/channels/CreateChannelScreen'));
@@ -62,6 +63,7 @@ const AuditLogsScreen = lazy(() => import('@/screens/admin/AuditLogsScreen').the
 const SystemSettingsScreen = lazy(() => import('@/screens/admin/SystemSettingsScreen').then((m) => ({ default: m.SystemSettingsScreen })));
 const InstallScreen = lazy(() => import('@/screens/admin/InstallScreen').then((m) => ({ default: m.InstallScreen })));
 const AdminDonationsScreen = lazy(() => import('@/screens/admin/AdminDonationsScreen').then((m) => ({ default: m.AdminDonationsScreen })));
+const AdminSupportScreen = lazy(() => import('@/screens/admin/AdminSupportScreen').then((m) => ({ default: m.AdminSupportScreen })));
 
 // Landing pages
 const ForKassaScreen = lazy(() => import('@/screens/landing/ForKassaScreen').then((m) => ({ default: m.ForKassaScreen })));
@@ -223,6 +225,20 @@ export const router = createHashRouter([
       <ErrorBoundary>
         <Suspense fallback={<LoadingFallback />}>
           <DonateScreen />
+        </Suspense>
+      </ErrorBoundary>
+    ),
+  },
+
+  // --- Support (protected, однопанельный — по ТЗ «content без sidebar») ---
+  {
+    path: '/support',
+    element: (
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingFallback />}>
+          <ProtectedRoute>
+            <SupportScreen />
+          </ProtectedRoute>
         </Suspense>
       </ErrorBoundary>
     ),
@@ -533,6 +549,10 @@ export const router = createHashRouter([
       {
         path: 'donations',
         element: <AdminDonationsScreen />,
+      },
+      {
+        path: 'support',
+        element: <AdminSupportScreen />,
       },
       // --- Blog moderation ---
       {

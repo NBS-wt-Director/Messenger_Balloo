@@ -856,6 +856,35 @@ export const api = {
   getCallHistory: (filter?: string, page?: number, limit?: number) =>
     request<any>(`/api/calls?filter=${filter || 'all'}&page=${page || 1}&limit=${limit || 50}`),
 
+  // Support — чат с техподдержкой (тикет 1790572800-01)
+  getSupportChat: () =>
+    request<any>('/api/support/chat'),
+
+  sendSupportMessage: (text: string) =>
+    request<any>('/api/support/chat', { method: 'POST', data: { text } }),
+
+  getSupportStatus: () =>
+    request<any>('/api/support/status'),
+
+  // Support — админский контур (ответ В-33: страница в дашборде админки)
+  getSupportTickets: (params?: { status?: string; page?: number; limit?: number }) => {
+    const qs = new URLSearchParams();
+    if (params?.status) qs.set('status', params.status);
+    if (params?.page) qs.set('page', String(params.page));
+    if (params?.limit) qs.set('limit', String(params.limit));
+    const query = qs.toString();
+    return request<any>(`/api/admin/support/tickets${query ? `?${query}` : ''}`);
+  },
+
+  getSupportTicket: (ticketId: string) =>
+    request<any>(`/api/admin/support/tickets/${ticketId}`),
+
+  replySupportTicket: (ticketId: string, text: string, isInternal = false) =>
+    request<any>(`/api/admin/support/tickets/${ticketId}/reply`, {
+      method: 'POST',
+      data: { text, isInternal },
+    }),
+
   // Tasks (command portal)
   getTasks: (params?: { status?: string; assignee?: string; priority?: string; page?: number; limit?: number }) => {
     const qs = new URLSearchParams();

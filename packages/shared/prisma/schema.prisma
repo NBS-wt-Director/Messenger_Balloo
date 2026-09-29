@@ -170,6 +170,9 @@ model User {
   messageReadCounts   MessageReadCount[]
   pushSubscriptions   PushSubscription[]
   verificationTokens  VerificationToken[]
+  supportTickets      SupportTicket[]    @relation("SupportTicketUser")
+  assignedSupportTickets SupportTicket[] @relation("SupportTicketAdmin")
+  supportMessages     SupportMessage[]   @relation("SupportMessageAuthor")
 
   @@map("users")
 }
@@ -1100,4 +1103,50 @@ model PushSubscription {
   @@index([userId])
   @@index([endpoint])
   @@map("push_subscriptions")
+}
+
+// ============================================================
+// Support — чат с техподдержкой (узел у_01)
+// ТЗ: mockups/balloo-su/support.md; docs/03-database-schema.md §Support
+// ============================================================
+
+model SupportTicket {
+  id              String   @id @default(cuid()) @db.VarChar(25)
+  userId          String
+  subject         String   @db.VarChar(255)
+  status          String   @default("open") @db.VarChar(20) // open | in_progress | resolved | closed
+  priority        String   @default("normal") @db.VarChar(20) // low | normal | high | urgent
+  assignedAdminId String?  @db.VarChar(25)
+  createdAt       BigInt   @default(0)
+  updatedAt       BigInt   @default(0)
+
+  // Relations
+  user          User             @relation("SupportTicketUser", fields: [userId], references: [id], onDelete: Cascade)
+  assignedAdmin User?            @relation("SupportTicketAdmin", fields: [assignedAdminId], references: [id], onDelete: SetNull)
+  messages      SupportMessage[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([priority])
+  @@index([createdAt])
+  @@map("support_tickets")
+}
+
+model SupportMessage {
+  id         String   @id @default(cuid()) @db.VarChar(25)
+  ticketId   String
+  authorId   String
+  text       String   @db.Text
+  isInternal Boolean  @default(false) // внутренняя заметка админа (не видна пользователю)
+  readAt     BigInt?
+  createdAt  BigInt   @default(0)
+
+  // Relations
+  ticket SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  author User          @relation("SupportMessageAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId])
+  @@index([authorId])
+  @@index([createdAt])
+  @@map("support_messages")
 }

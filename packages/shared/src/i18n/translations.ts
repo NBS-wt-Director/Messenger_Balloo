@@ -121,6 +121,7 @@ export type TranslationKey =
   | 'menu.profile'
   | 'menu.settings'
   | 'menu.accounts'
+  | 'menu.support'
   | 'footer.rules'
   | 'footer.privacy'
   | 'footer.cookies';
@@ -2643,6 +2644,24 @@ export const translations: Translations = {
     be: 'Акаўнты',
     fr: 'Comptes',
   
+  },
+  'menu.support': {
+    // Техподдержка (тикет 1790572800-01, пункт RightMenu по эталону common.js:496)
+    ru: 'Техподдержка',
+    en: 'Support',
+    tt: 'Ярдәм хезмәте',
+    ba: 'Ярҙам хеҙмәте',
+    udm: 'Юрттэт',
+    kbd: 'ДэӀэпыкъуэгъу',
+    chm: 'Полыш',
+    os: 'Æххуыс',
+    sah: 'Көмө',
+    bua: 'Туһаламжа',
+    uk: 'Підтримка',
+    zh: '技术支持',
+    hi: 'सहायता',
+    be: 'Падтрымка',
+    fr: 'Assistance',
   },
   'footer.rules': {
     ru: 'Правила',

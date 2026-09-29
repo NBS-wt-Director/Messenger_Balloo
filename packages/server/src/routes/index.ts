@@ -21,6 +21,7 @@ import { router as archiveRouter } from './archive';
 import { router as devicesRouter } from './devices';
 import { router as reportsRouter } from './reports';
 import { router as callsRouter } from './calls';
+import { router as supportRouter } from './support';
 
 const router = Router() as import('express').Router;
 
@@ -60,5 +61,6 @@ router.use('/api/archive', archiveRouter);
 router.use('/api/devices', devicesRouter);
 router.use('/api/reports', reportsRouter);
 router.use('/api/calls', callsRouter);
+router.use('/api/support', supportRouter);
 
 export { router };
