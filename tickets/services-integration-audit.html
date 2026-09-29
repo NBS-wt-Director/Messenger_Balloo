@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Balloo — аудит интеграций сторонних сервисов (1790479490-03)</title>
+<link rel="stylesheet" href="../mockups/assets/common.css">
+<style>
+  body { padding: 24px; }
+  .audit-header { margin-bottom: 20px; }
+  .audit-header h1 { font-size: 24px; margin-bottom: 6px; }
+  .audit-header p { color: var(--text-secondary); font-size: 14px; }
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+  .filters button {
+    background: var(--bg-tertiary); border: 1px solid var(--border-color);
+    color: var(--text-primary); padding: 6px 12px; cursor: pointer;
+    font-family: inherit; font-size: 13px;
+  }
+  .filters button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border-color); vertical-align: top; }
+  th { background: var(--bg-tertiary); position: sticky; top: 0; }
+  tr[data-status]:hover { background: var(--bg-secondary); }
+  .status-cell { white-space: nowrap; font-weight: 600; }
+  .s-ok      { color: var(--accent); }
+  .s-warn    { color: var(--warning); }
+  .s-missing { color: var(--danger); }
+  .s-deferred{ color: var(--info, #60a5fa); }
+  code { background: var(--bg-tertiary); padding: 1px 5px; font-size: 12px; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; font-size: 13px; }
+  .legend span::before { content: '● '; }
+  .summary { margin-top: 20px; font-size: 13px; color: var(--text-secondary); }
+  .summary b { color: var(--text-primary); }
+</style>
+</head>
+<body>
+
+<div class="audit-header">
+  <h1>🔌 Аудит интеграций сторонних сервисов</h1>
+  <p>
+    Тикет <code>1790479490-03</code> (группа V2 Prep) · дата 2026-09-29 ·
+    источник истины: <code>api-services-guide.md</code> (8 разрешённых категорий v1) ·
+    подробный отчёт: <code>tickets/services-integration-audit.md</code>
+  </p>
+</div>
+
+<div class="legend">
+  <span class="s-ok">✅ есть в коде, проверено</span>
+  <span class="s-warn">⚠️ частично</span>
+  <span class="s-missing">❌ отсутствует</span>
+  <span class="s-deferred">🔒 отложено владельцем</span>
+</div>
+
+<div class="filters" id="filters">
+  <button class="active" data-filter="all">Все (11)</button>
+  <button data-filter="ok">✅ Готовы</button>
+  <button data-filter="warn">⚠️ Частично</button>
+  <button data-filter="missing">❌ Нет</button>
+  <button data-filter="deferred">🔒 Отложено</button>
+  <button data-filter="auth">Авторизация</button>
+  <button data-filter="pay">Платежи</button>
+  <button data-filter="cdn">Хранение/CDN</button>
+  <button data-filter="push">Push/Realtime</button>
+  <button data-filter="infra">Инфраструктура</button>
+</div>
+
+<table id="matrix">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Сервис</th>
+      <th>Категория</th>
+      <th>Route</th>
+      <th>Controller</th>
+      <th>Service</th>
+      <th>Frontend api.ts</th>
+      <th>UI экран</th>
+      <th>ENV</th>
+      <th>Статус</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr data-status="ok" data-cat="auth">
+      <td>1</td>
+      <td>Yandex ID (OAuth)</td>
+      <td>Авторизация</td>
+      <td><code>auth.ts:79</code></td>
+      <td><code>authController.ts:395</code> yandexCallback</td>
+      <td><code>authService.ts:656</code></td>
+      <td>redirect</td>
+      <td>LoginScreen, OAuthGrid</td>
+      <td>✅</td>
+      <td class="status-cell s-ok">✅</td>
+    </tr>
+    <tr data-status="ok" data-cat="auth">
+      <td>2</td>
+      <td>VK ID (OAuth)</td>
+      <td>Авторизация</td>
+      <td><code>auth.ts:80</code></td>
+      <td><code>authController.ts:440</code> vkCallback</td>
+      <td><code>authService.ts</code> exchangeVkCode</td>
+      <td>redirect</td>
+      <td>LoginScreen, OAuthGrid</td>
+      <td>✅</td>
+      <td class="status-cell s-ok">✅</td>
+    </tr>
+    <tr data-status="ok" data-cat="auth">
+      <td>3</td>
+      <td>Mail.ru ID (OAuth)</td>
+      <td>Авторизация</td>
+      <td><code>auth.ts:81</code></td>
+      <td><code>authController.ts:478</code> mailruCallback</td>
+      <td><code>authService.ts:666</code></td>
+      <td>redirect</td>
+      <td>LoginScreen, OAuthGrid</td>
+      <td>✅</td>
+      <td class="status-cell s-ok">✅</td>
+    </tr>
+    <tr data-status="deferred" data-cat="pay">
+      <td>4</td>
+      <td>ЮKassa (платежи)</td>
+      <td>Платежи</td>
+      <td><code>payments.ts:28</code></td>
+      <td><code>paymentController.ts</code></td>
+      <td><code>paymentService.ts</code></td>
+      <td><code>api.ts:600–639</code> (8 методов)</td>
+      <td>DonateScreen, AdminDonationsScreen</td>
+      <td>пусты</td>
+      <td class="status-cell s-deferred">🔒 код есть, учёток нет</td>
+    </tr>
+    <tr data-status="missing" data-cat="cdn">
+      <td>5</td>
+      <td>Yandex Object Storage</td>
+      <td>Хранение/CDN</td>
+      <td>—</td>
+      <td>—</td>
+      <td>0 совпадений в uploadService</td>
+      <td>—</td>
+      <td>—</td>
+      <td>есть</td>
+      <td class="status-cell s-missing">❌ не используется</td>
+    </tr>
+    <tr data-status="ok" data-cat="cdn">
+      <td>6</td>
+      <td>MinIO (self-hosted)</td>
+      <td>Хранение/CDN</td>
+      <td><code>upload.ts</code></td>
+      <td><code>uploadController.ts</code></td>
+      <td><code>uploadService.ts:73/87/127</code></td>
+      <td>загрузка файлов</td>
+      <td>экраны вложений</td>
+      <td>✅</td>
+      <td class="status-cell s-ok">✅</td>
+    </tr>
+    <tr data-status="warn" data-cat="push">
+      <td>7</td>
+      <td>Web Push (VAPID)</td>
+      <td>Push/Realtime</td>
+      <td>нет endpoint</td>
+      <td>—</td>
+      <td><code>pushService.ts:42/212/240</code></td>
+      <td>функция есть, не вызывается</td>
+      <td>нет вызова из экранов</td>
+      <td>VITE_VAPID_PUBLIC_KEY не в web</td>
+      <td class="status-cell s-warn">⚠️ разрыв цепочки</td>
+    </tr>
+    <tr data-status="warn" data-cat="infra">
+      <td>8</td>
+      <td>Prometheus + Grafana</td>
+      <td>Мониторинг</td>
+      <td><code>admin.ts:99</code> /metrics</td>
+      <td><code>adminController.ts:662</code></td>
+      <td>свой счётчик, не prom-client</td>
+      <td>—</td>
+      <td>AnalyticsScreen</td>
+      <td>✅</td>
+      <td class="status-cell s-warn">⚠️ не Prometheus-формат</td>
+    </tr>
+    <tr data-status="warn" data-cat="infra">
+      <td>9</td>
+      <td>Postfix (Email)</td>
+      <td>Email</td>
+      <td><code>install.ts</code></td>
+      <td><code>installController.ts</code></td>
+      <td><code>emailService.ts:8</code></td>
+      <td>—</td>
+      <td>SettingsScreen (тест)</td>
+      <td>SMTP_USER/PASSWORD нет</td>
+      <td class="status-cell s-warn">⚠️ нет учётных данных</td>
+    </tr>
+    <tr data-status="warn" data-cat="infra">
+      <td>10</td>
+      <td>Яндекс.Метрика</td>
+      <td>Аналитика</td>
+      <td>—</td>
+      <td>—</td>
+      <td><code>yandex-metrika.ts:33</code></td>
+      <td>init в App.tsx</td>
+      <td>CookieBanner (consent)</td>
+      <td>2 разных счётчика</td>
+      <td class="status-cell s-warn">⚠️ расхождение</td>
+    </tr>
+    <tr data-status="missing" data-cat="push">
+      <td>11</td>
+      <td>WebRTC STUN/TURN</td>
+      <td>Push/Realtime</td>
+      <td>—</td>
+      <td>—</td>
+      <td><code>callService.ts</code> — заглушка</td>
+      <td>—</td>
+      <td>экраны звонков</td>
+      <td>есть</td>
+      <td class="status-cell s-missing">❌ звонков нет</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="summary">
+  <b>Итог:</b> 11 сервисов — ✅ 4 · ⚠️ 4 · ❌ 2 · 🔒 1.
+  Не блокируют v1: Yandex Object Storage (не нужен при MinIO), WebRTC (V2),
+  Web Push (V2), Prometheus-формат (V2).
+  Блокируют приёмку входа/почты: отсутствие <code>SMTP_USER</code>/<code>SMTP_PASSWORD</code>
+  (задача владельца, вопрос В-19).
+  ЮKassa — по решению владельца (учётные данные).
+  <br>Подробности и планы — <code>tickets/services-integration-audit.md</code>.
+</div>
+
+<script>
+  const buttons = document.querySelectorAll('#filters button');
+  const rows = document.querySelectorAll('#matrix tbody tr');
+  buttons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      buttons.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      const f = btn.dataset.filter;
+      rows.forEach((row) => {
+        const show = f === 'all' || row.dataset.status === f || row.dataset.cat === f;
+        row.style.display = show ? '' : 'none';
+      });
+    });
+  });
+</script>
+
+</body>
+</html>
