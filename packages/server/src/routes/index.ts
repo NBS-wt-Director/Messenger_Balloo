@@ -39,7 +39,10 @@ router.get('/', (_req, res) => {
 router.use('/api/auth', authRouter);
 router.use('/api/users', usersRouter);
 router.use('/api/chats', chatsRouter);
-router.use('/api/messages', messagesRouter);
+// Пути внутри messagesRouter уже содержат полный REST-путь (/chats/:id/messages,
+// /messages/:id), поэтому монтируем на /api, а не на /api/messages: иначе
+// получалось /api/messages/messages/:id, и клиент не попадал в маршрут.
+router.use('/api', messagesRouter);
 router.use('/api/upload', uploadRouter);
 router.use('/api/stories', storiesRouter);
 router.use('/api/polls', pollsRouter);

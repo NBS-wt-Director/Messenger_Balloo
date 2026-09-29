@@ -10,13 +10,13 @@ async function createChatAndGetId(accessToken: string): Promise<string> {
 }
 
 describe('Messages API', () => {
-  describe('POST /api/messages/chats/:chatId/messages', () => {
+  describe('POST /api/chats/:chatId/messages', () => {
     it('sends a text message', async () => {
       const user = await registerTestUser();
       const chatId = await createChatAndGetId(user.accessToken);
 
       const res = await request(app)
-        .post(`/api/messages/chats/${chatId}/messages`)
+        .post(`/api/chats/${chatId}/messages`)
         .set('Authorization', `Bearer ${user.accessToken}`)
         .send({ type: 'text', content: 'Hello World' });
 
@@ -31,7 +31,7 @@ describe('Messages API', () => {
       const chatId = await createChatAndGetId(user.accessToken);
 
       const res = await request(app)
-        .post(`/api/messages/chats/${chatId}/messages`)
+        .post(`/api/chats/${chatId}/messages`)
         .send({ type: 'text', content: 'Hello' });
 
       expect(res.status).toBe(401);
@@ -42,7 +42,7 @@ describe('Messages API', () => {
       const chatId = await createChatAndGetId(user.accessToken);
 
       const res = await request(app)
-        .post(`/api/messages/chats/${chatId}/messages`)
+        .post(`/api/chats/${chatId}/messages`)
         .set('Authorization', `Bearer ${user.accessToken}`)
         .send({ content: 'Hello' });
 
@@ -54,7 +54,7 @@ describe('Messages API', () => {
       const chatId = await createChatAndGetId(user.accessToken);
 
       const res = await request(app)
-        .post(`/api/messages/chats/${chatId}/messages`)
+        .post(`/api/chats/${chatId}/messages`)
         .set('Authorization', `Bearer ${user.accessToken}`)
         .send({ type: 'invalid', content: 'Hello' });
 
@@ -62,19 +62,19 @@ describe('Messages API', () => {
     });
   });
 
-  describe('GET /api/messages/chats/:chatId/messages', () => {
+  describe('GET /api/chats/:chatId/messages', () => {
     it('returns message history', async () => {
       const user = await registerTestUser();
       const chatId = await createChatAndGetId(user.accessToken);
 
       // Send a message
       await request(app)
-        .post(`/api/messages/chats/${chatId}/messages`)
+        .post(`/api/chats/${chatId}/messages`)
         .set('Authorization', `Bearer ${user.accessToken}`)
         .send({ type: 'text', content: 'Test message' });
 
       const res = await request(app)
-        .get(`/api/messages/chats/${chatId}/messages`)
+        .get(`/api/chats/${chatId}/messages`)
         .set('Authorization', `Bearer ${user.accessToken}`);
 
       expect(res.status).toBe(200);
@@ -89,13 +89,13 @@ describe('Messages API', () => {
       // Send multiple messages
       for (let i = 0; i < 3; i++) {
         await request(app)
-          .post(`/api/messages/chats/${chatId}/messages`)
+          .post(`/api/chats/${chatId}/messages`)
           .set('Authorization', `Bearer ${user.accessToken}`)
           .send({ type: 'text', content: `Message ${i}` });
       }
 
       const res = await request(app)
-        .get(`/api/messages/chats/${chatId}/messages?limit=2`)
+        .get(`/api/chats/${chatId}/messages?limit=2`)
         .set('Authorization', `Bearer ${user.accessToken}`);
 
       expect(res.status).toBe(200);
@@ -103,18 +103,18 @@ describe('Messages API', () => {
     });
   });
 
-  describe('PUT /api/messages/messages/:id', () => {
+  describe('PUT /api/messages/:id', () => {
     it('edits a message', async () => {
       const user = await registerTestUser();
       const chatId = await createChatAndGetId(user.accessToken);
 
       const sendRes = await request(app)
-        .post(`/api/messages/chats/${chatId}/messages`)
+        .post(`/api/chats/${chatId}/messages`)
         .set('Authorization', `Bearer ${user.accessToken}`)
         .send({ type: 'text', content: 'Original' });
 
       const res = await request(app)
-        .put(`/api/messages/messages/${sendRes.body.id}`)
+        .put(`/api/messages/${sendRes.body.id}`)
         .set('Authorization', `Bearer ${user.accessToken}`)
         .send({ content: 'Edited' });
 
@@ -122,36 +122,36 @@ describe('Messages API', () => {
     });
   });
 
-  describe('DELETE /api/messages/messages/:id', () => {
+  describe('DELETE /api/messages/:id', () => {
     it('deletes a message', async () => {
       const user = await registerTestUser();
       const chatId = await createChatAndGetId(user.accessToken);
 
       const sendRes = await request(app)
-        .post(`/api/messages/chats/${chatId}/messages`)
+        .post(`/api/chats/${chatId}/messages`)
         .set('Authorization', `Bearer ${user.accessToken}`)
         .send({ type: 'text', content: 'To delete' });
 
       const res = await request(app)
-        .delete(`/api/messages/messages/${sendRes.body.id}`)
+        .delete(`/api/messages/${sendRes.body.id}`)
         .set('Authorization', `Bearer ${user.accessToken}`);
 
       expect(res.status).toBe(200);
     });
   });
 
-  describe('POST /api/messages/messages/:id/reactions', () => {
+  describe('POST /api/messages/:id/reactions', () => {
     it('adds a reaction', async () => {
       const user = await registerTestUser();
       const chatId = await createChatAndGetId(user.accessToken);
 
       const sendRes = await request(app)
-        .post(`/api/messages/chats/${chatId}/messages`)
+        .post(`/api/chats/${chatId}/messages`)
         .set('Authorization', `Bearer ${user.accessToken}`)
         .send({ type: 'text', content: 'React to me' });
 
       const res = await request(app)
-        .post(`/api/messages/messages/${sendRes.body.id}/reactions`)
+        .post(`/api/messages/${sendRes.body.id}/reactions`)
         .set('Authorization', `Bearer ${user.accessToken}`)
         .send({ emoji: '👍' });
 
@@ -159,44 +159,87 @@ describe('Messages API', () => {
     });
   });
 
-  describe('GET /api/messages/messages/:id/reactions', () => {
+  describe('GET /api/messages/:id/reactions', () => {
     it('returns reactions for a message', async () => {
       const user = await registerTestUser();
       const chatId = await createChatAndGetId(user.accessToken);
 
       const sendRes = await request(app)
-        .post(`/api/messages/chats/${chatId}/messages`)
+        .post(`/api/chats/${chatId}/messages`)
         .set('Authorization', `Bearer ${user.accessToken}`)
         .send({ type: 'text', content: 'React' });
 
       await request(app)
-        .post(`/api/messages/messages/${sendRes.body.id}/reactions`)
+        .post(`/api/messages/${sendRes.body.id}/reactions`)
         .set('Authorization', `Bearer ${user.accessToken}`)
         .send({ emoji: '❤' });
 
       const res = await request(app)
-        .get(`/api/messages/messages/${sendRes.body.id}/reactions`)
+        .get(`/api/messages/${sendRes.body.id}/reactions`)
         .set('Authorization', `Bearer ${user.accessToken}`);
 
       expect(res.status).toBe(200);
     });
   });
 
-  describe('POST /api/messages/messages/:id/pin', () => {
+  describe('POST /api/messages/:id/pin', () => {
     it('pins a message', async () => {
       const user = await registerTestUser();
       const chatId = await createChatAndGetId(user.accessToken);
 
       const sendRes = await request(app)
-        .post(`/api/messages/chats/${chatId}/messages`)
+        .post(`/api/chats/${chatId}/messages`)
         .set('Authorization', `Bearer ${user.accessToken}`)
         .send({ type: 'text', content: 'Pin me' });
 
       const res = await request(app)
-        .post(`/api/messages/messages/${sendRes.body.id}/pin`)
+        .post(`/api/messages/${sendRes.body.id}/pin`)
         .set('Authorization', `Bearer ${user.accessToken}`);
 
       expect(res.status).toBe(200);
+    });
+  });
+
+  // Регрессия: routes/messages.ts объявляет пути уже с сегментом /messages
+  // (/messages/:id/reactions) и с полным /api/chats/:chatId/messages, поэтому
+  // routes/index.ts обязан монтировать его на '/api'. Монтирование на
+  // '/api/messages' удваивало сегмент: сервер слушал /api/messages/messages/*,
+  // а веб-клиент вызывал /api/messages/* — история чата молча уходила в 404.
+  describe('route table matches the paths the web client calls', () => {
+    it('serves the client paths without a doubled /api/messages prefix', async () => {
+      const user = await registerTestUser();
+      const chatId = await createChatAndGetId(user.accessToken);
+
+      const sendRes = await request(app)
+        .post(`/api/chats/${chatId}/messages`)
+        .set('Authorization', `Bearer ${user.accessToken}`)
+        .send({ type: 'text', content: 'guard' });
+
+      const clientPaths: [string, string][] = [
+        ['get', `/api/chats/${chatId}/messages?limit=20`],
+        ['get', `/api/messages/${sendRes.body.id}/reactions`],
+        ['post', `/api/messages/${sendRes.body.id}/read`],
+        ['post', `/api/messages/${sendRes.body.id}/pin`],
+      ];
+
+      for (const [method, path] of clientPaths) {
+        const res = await (request(app) as any)[method](path).set(
+          'Authorization',
+          `Bearer ${user.accessToken}`,
+        );
+        // Маршрут смонтирован: ответ не 404 (валидация/конфликт допустимы).
+        expect([404, 405]).not.toContain(res.status);
+      }
+    });
+
+    it('does not expose the doubled /api/messages/messages prefix', async () => {
+      const user = await registerTestUser();
+
+      const res = await request(app)
+        .get('/api/messages/messages/00000000-0000-4000-8000-000000000000/reactions')
+        .set('Authorization', `Bearer ${user.accessToken}`);
+
+      expect(res.status).toBe(404);
     });
   });
 });
