@@ -45,16 +45,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Порядок важен: pnpm/action-setup ДОЛЖЕН идти до actions/setup-node,
+      # у которого включён cache: 'pnpm'. Иначе setup-node не находит бинарник
+      # pnpm на раннере и шаг падает с «Error: Unable to locate executable
+      # file: pnpm» (actions/setup-node#530, #1357; официальная рекомендация —
+      # устанавливать pnpm первым).
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
