@@ -609,7 +609,14 @@ export const getYandexUser = async (accessToken: string) => {
     providerId: data.id,
     email: data.default_email,
     username: data.login || undefined,
-    avatarUrl: data.default_avatar_id ? `https://avatars.yandex.net/get-yapic/${data.default_avatar_id}/200` : undefined,
+    // Яндекс отдаёт портрет только суффиксом из своей линейки: islands-50 / -150 /
+    // -200 / -300 / -small. Прежний «/200» без префикса islands- отвечал 404,
+    // поэтому аватарка не грузилась (замерено на проде). Линейка неполная:
+    // islands-100 тоже 404 — брать можно только проверенные значения.
+    // ID портрета сам содержит слэш («62162/v5e99…»), суффикс — третий сегмент пути.
+    avatarUrl: data.default_avatar_id
+      ? `https://avatars.yandex.net/get-yapic/${data.default_avatar_id}/islands-200`
+      : undefined,
   };
 };
 

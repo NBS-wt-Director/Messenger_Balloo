@@ -1,5 +1,6 @@
 import request from 'supertest';
 import { app, registerTestUser, loginTestUser } from './helpers';
+import { getYandexUser } from '../services/authService';
 
 // Проверка наличия httpOnly cookie в ответе (после тикета №2 токены не в body)
 function getCookie(res: request.Response, name: string): string {
@@ -306,6 +307,52 @@ describe('Auth API', () => {
 
       expect(res.status).toBe(200);
       expect(res.body.status).toBe('ok');
+    });
+  });
+
+  // Регрессия: avatars.yandex.net отдаёт портрет только с префиксом islands-.
+  // Вариант «/200» без префикса отвечает 404 — аватарка не грузилась на проде.
+  // ID аватара сам содержит слэш, поэтому суффикс — третий сегмент пути.
+  describe('getYandexUser: URL аватара', () => {
+    const realFetch = global.fetch;
+
+    afterEach(() => {
+      global.fetch = realFetch;
+    });
+
+    const stubYandexInfo = (info: Record<string, unknown>) => {
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        json: async () => info,
+      }) as unknown as typeof fetch;
+    };
+
+    it('клеит islands-<размер>, не обрезая слэш внутри default_avatar_id', async () => {
+      stubYandexInfo({
+        id: '123456789',
+        default_email: 'someone@yandex.ru',
+        login: 'someone',
+        default_avatar_id: '62162/v5e99naBhLIWGZCHqy5kTStE-1',
+      });
+
+      const user = await getYandexUser('access-token');
+
+      expect(user.avatarUrl).toBe(
+        'https://avatars.yandex.net/get-yapic/62162/v5e99naBhLIWGZCHqy5kTStE-1/islands-200',
+      );
+    });
+
+    it('не выдумывает аватар, когда default_avatar_id пустой', async () => {
+      stubYandexInfo({
+        id: '123456789',
+        default_email: 'someone@yandex.ru',
+        login: 'someone',
+        default_avatar_id: '',
+      });
+
+      const user = await getYandexUser('access-token');
+
+      expect(user.avatarUrl).toBeUndefined();
     });
   });
 });
