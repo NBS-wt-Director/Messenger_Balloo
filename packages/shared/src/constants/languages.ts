@@ -29,7 +29,7 @@ export const LANGUAGES: Language[] = [
   { code: 'os', name: 'Ossetian', nativeName: 'Ирон ӕвзаг', group: 'russian' },
   { code: 'sah', name: 'Yakut', nativeName: 'Саха тыла', group: 'russian' },
   { code: 'bua', name: 'Buryat', nativeName: 'Хальмг келн', group: 'russian' },
-  { code: 'ukr', name: 'Ukrainian', nativeName: 'Українська', group: 'russian', flag: '🇺🇦' },
+  { code: 'uk', name: 'Ukrainian', nativeName: 'Українська', group: 'russian', flag: '🇺🇦' },
   // Group 2: Friendly languages
   { code: 'zh', name: 'Chinese', nativeName: '中文', group: 'friendly' },
   { code: 'hi', name: 'Hindi', nativeName: 'हिन्दी', group: 'friendly' },

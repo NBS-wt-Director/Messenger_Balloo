@@ -20,9 +20,9 @@ describe('normalizeLanguageTag', () => {
     expect(normalizeLanguageTag('  tt  ')).toBe('tt');
   });
 
-  it('украинский тег браузера (' + 'uk) мапит на код контракта (ukr)', () => {
-    expect(normalizeLanguageTag('uk')).toBe('ukr');
-    expect(normalizeLanguageTag('uk-UA')).toBe('ukr');
+  it('украинский тег браузера (uk) совпадает с кодом контракта (uk)', () => {
+    expect(normalizeLanguageTag('uk')).toBe('uk');
+    expect(normalizeLanguageTag('uk-UA')).toBe('uk');
   });
 
   it('языки народов РФ распознаются сами, а не через «ru»', () => {
@@ -67,8 +67,8 @@ describe('detectLanguage', () => {
 describe('isSupportedLanguageCode', () => {
   it('принимает только коды контракта', () => {
     expect(isSupportedLanguageCode('ru')).toBe(true);
-    expect(isSupportedLanguageCode('ukr')).toBe(true);
-    expect(isSupportedLanguageCode('uk')).toBe(false);
+    expect(isSupportedLanguageCode('uk')).toBe(true);
+    expect(isSupportedLanguageCode('ukr')).toBe(false);
     expect(isSupportedLanguageCode('ru-RU')).toBe(false);
   });
 });

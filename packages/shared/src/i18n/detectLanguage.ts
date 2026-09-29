@@ -10,11 +10,13 @@ import { LANGUAGE_CODES } from '../constants/languages';
 
 /**
  * Теги BCP-47, которые браузеры отдают вместо кодов из LANGUAGES.
- * 'ukr' в LANGUAGES — это ISO 639-2/3, браузер же говорит 'uk'.
+ *
+ * Замечание по украинскому: контракт (mockups/data_schema.json →
+ * conventions.languages) требует код 'uk', он же в LANGUAGES и в словаре,
+ * поэтому алиас для 'uk' больше не нужен. Пустая таблица оставлена намеренно —
+ * через неё добавляются будущие расхождения тега браузера и кода контракта.
  */
-const TAG_ALIASES: Record<string, string> = {
-  uk: 'ukr',
-};
+const TAG_ALIASES: Record<string, string> = {};
 
 /** Поддерживается ли код языком интерфейса. */
 export function isSupportedLanguageCode(code: string): boolean {
@@ -24,7 +26,7 @@ export function isSupportedLanguageCode(code: string): boolean {
 /**
  * Тег → код из LANGUAGE_CODES, либо null.
  *
- * 'ru-RU' → 'ru', 'en-US' → 'en', 'zh-Hans' → 'zh', 'uk' → 'ukr'.
+ * 'ru-RU' → 'ru', 'en-US' → 'en', 'zh-Hans' → 'zh', 'uk-UA' → 'uk'.
  * Регистр и разделитель ('-' / '_') не важны.
  */
 export function normalizeLanguageTag(tag: string): string | null {

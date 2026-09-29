@@ -35,8 +35,8 @@ describe('автоопределение языка (@balloo/ui getInitialLangua
     expect(await languageForBrowser(['tt-RU', 'ru-RU'])).toBe('tt');
   });
 
-  it('украинский тег браузера (uk) мапится на код контракта (ukr)', async () => {
-    expect(await languageForBrowser(['uk-UA'])).toBe('ukr');
+  it('украинский тег браузера (uk) совпадает с кодом контракта (uk)', async () => {
+    expect(await languageForBrowser(['uk-UA'])).toBe('uk');
   });
 
   it('из navigator.languages берётся первый поддерживаемый', async () => {
