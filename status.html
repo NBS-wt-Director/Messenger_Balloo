@@ -600,7 +600,12 @@
 
     // ========== ЗАГРУЗКА ==========
     async function loadData() {
-      const urls = ['tickets/balloo-status.json', './tickets/balloo-status.json'];
+      const urls = [
+        'tickets/Done/balloo-status.json',
+        './tickets/Done/balloo-status.json',
+        'tickets/balloo-status.json',
+        './tickets/balloo-status.json',
+      ];
       for (const url of urls) {
         try {
           const resp = await fetch(url);
