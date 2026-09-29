@@ -348,7 +348,22 @@ function generateUserAdsHTML() {
   h.push(screenshotImg('calls', 'Звонки'));
   h.push(screenshotImg('story-create', 'Сторис'));
   h.push(screenshotImg('profile', 'Профиль'));
-  h.push('<div class="cta-box"><h3>Попробуйте Balloo!</h3><p>Бесплатно. Без рекламы.</p><div class="email">\u{1F310} balloo.su</div></div>');
+  h.push('<div class="section"><h2>Как начать за 3 шага</h2>');
+  h.push('<div class="step"><div class="step-number">1</div><div class="step-content"><h4>Откройте balloo.su</h4><p>Веб-версия работает в браузере без установки: десктоп, планшет, телефон</p></div></div>');
+  h.push('<div class="step"><div class="step-number">2</div><div class="step-content"><h4>Создайте аккаунт</h4><p>Email, телефон, Yandex ID, VK ID или Mail.ru ID \u2014 на выбор</p></div></div>');
+  h.push('<div class="step"><div class="step-number">3</div><div class="step-content"><h4>Начните общаться</h4><p>Найдите контакты, создайте группу или канал, включите 2FA</p></div></div>');
+  h.push(screenshotImg('register', 'Регистрация в Balloo'));
+  h.push('</div>');
+  h.push('<div class="section"><h2>Приватность под вашим контролем</h2>');
+  h.push('<div class="highlight"><p>\u{1F512} Пароли \u2014 bcrypt, сессии \u2014 JWT EdDSA, транспорт \u2014 TLS 1.3. Двухфакторная аутентификация: TOTP, SMS, Email + backup-коды.</p></div>');
+  h.push('<ul><li>Кто видит номер телефона, аватар, статус «в сети» \u2014 настраивается отдельно</li><li>Блокировка пользователей и жалобы на спам</li><li>Архив чатов и очистка истории</li><li>Активные устройства с возможностью завершить сессию</li></ul>');
+  h.push(screenshotImg('privacy_settings', 'Настройки приватности'));
+  h.push('</div>');
+  h.push('<div class="section"><h2>20 языков и 3 темы оформления</h2>');
+  h.push('<div class="two-col"><div class="info-box"><h4>\u{1F30D} Языки интерфейса</h4><p>Русский + 14 языков народов РФ, а также английский, китайский, хинди, французский, белорусский</p></div><div class="info-box"><h4>\u{1F3A8} Темы</h4><p>dark \u2014 по умолчанию, light и russian (флаг РФ + драгметаллы)</p></div><div class="info-box"><h4>\u{1F4F1} Кроссплатформа</h4><p>Web, Desktop (Windows/macOS/Linux), мобильные приложения</p></div><div class="info-box"><h4>\u{1F4E5} Файлы</h4><p>До 50 МБ в сообщении, предпросмотр изображений и документов</p></div></div>');
+  h.push(screenshotImg('settings', 'Настройки приложения'));
+  h.push('</div>');
+  h.push('<div class="cta-box"><h3>Попробуйте Balloo!</h3><p>Бесплатно. Без рекламы.</p><div class="email">\u{1F310} balloo.su \u2022 \u{1F4E7} o8eryuhtin@yandex.ru</div></div>');
   h.push('<div class="pdf-footer">\u00A9 2026 Balloo Messenger. balloo.su</div></div></body></html>');
   return h.join('');
 }
@@ -377,6 +392,34 @@ function generateInvestorAdsHTML() {
   h.push('<div class="section"><h2>6. Roadmap</h2><div class="step"><div class="step-number">Q3</div><div class="step-content"><h4>2026 Q3 — Бета</h4><p>Мессенджер, регистрация, профили, 2FA</p></div></div><div class="step"><div class="step-number">Q4</div><div class="step-content"><h4>2026 Q4 — Публичная бета</h4><p>Сторис, опросы, блог, десктоп</p></div></div><div class="step"><div class="step-number">2027 Q1</div><div class="step-content"><h4>Мобильные приложения</h4><p>React Native iOS/Android</p></div></div><div class="step"><div class="step-number">2027 Q2</div><div class="step-content"><h4>Enterprise</h4><p>Self-hosted, SSO, LDAP</p></div></div><div class="step"><div class="step-number">2027 Q4</div><div class="step-content"><h4>Масштабирование</h4><p>Bot platform, E2E шифрование</p></div></div></div></div>');
   h.push('<div class="section"><h2>7. Конкурентные преимущества</h2><table><tr><th>Критерий</th><th>Balloo</th><th>Telegram</th><th>VK</th></tr><tr><td>Языки народов РФ</td><td>\u2705 15</td><td>\u274C</td><td>\u274C</td></tr><tr><td>Self-hosted</td><td>\u2705</td><td>\u274C</td><td>\u274C</td></tr><tr><td>Блог + Hiring</td><td>\u2705</td><td>\u274C</td><td>Частично</td></tr><tr><td>Приватность</td><td>\u2705 Макс.</td><td>\u2705</td><td>\u26A0\uFE0F</td></tr></table></div>');
   h.push('<div class="section"><h2>8. Финансы (прогноз)</h2><table><tr><th></th><th>2026</th><th>2027</th><th>2028</th></tr><tr><td>Пользователи</td><td>50K</td><td>500K</td><td>2M</td></tr><tr><td>Доход</td><td>\u20BD 18.9M</td><td>\u20BD 55M</td><td>\u20BD 120M</td></tr></table></div>');
+  h.push('<div class="section"><h2>9. Продукт: тур по ключевым сценариям</h2>');
+  h.push('<p>Продукт уже собран: 174 экрана макетов, 12 узлов экосистемы, работающий прод на balloo.su. Ниже \u2014 сценарии, которые формируют ежедневное использование.</p>');
+  h.push('<h3>9.1 Группы и сообщества</h3><p>Группы до 200 000 участников, роли и права, модерация, закрепление сообщений, опросы.</p>');
+  h.push(screenshotImg('group_create', 'Создание группы'));
+  h.push('<h3>9.2 Сторис и вовлечение</h3><p>Сторис с реакциями и статистикой просмотров \u2014 механика удержания и точка для рекламы.</p>');
+  h.push(screenshotImg('story_create', 'Создание истории'));
+  h.push('<h3>9.3 Безопасность аккаунта</h3><p>2FA (TOTP/SMS/Email), список активных устройств, журнал входов \u2014 обязательный минимум для корпоративного сегмента.</p>');
+  h.push(screenshotImg('two_factor', 'Двухфакторная аутентификация'));
+  h.push('<h3>9.4 Монетизация внутри продукта</h3><p>Уровни донатов (free/silver/gold/platinum) с оплатой через СБП и ЮKassa \u2014 первый источник выручки без рекламы.</p>');
+  h.push(screenshotImg('donate', 'Донаты'));
+  h.push('</div>');
+  h.push('<div class="section"><h2>10. Метрики и unit-экономика</h2>');
+  h.push('<div class="stat-row"><div class="stat-box"><div class="number">\u20BD 12</div><div class="label">ARPU в месяц (цель, год 1)</div></div><div class="stat-box"><div class="number">4.5\u0447</div><div class="label">Время в приложении в день</div></div><div class="stat-box"><div class="number">35%</div><div class="label">D30 retention (цель)</div></div></div>');
+  h.push('<table><tr><th>Метрика</th><th>Год 1</th><th>Год 2</th><th>Год 3</th></tr><tr><td>MAU</td><td>50 000</td><td>500 000</td><td>2 000 000</td></tr><tr><td>Платящие (донаты)</td><td>2%</td><td>3.5%</td><td>5%</td></tr><tr><td>Enterprise-клиенты</td><td>5</td><td>40</td><td>150</td></tr><tr><td>CAC</td><td>\u20BD 120</td><td>\u20BD 90</td><td>\u20BD 70</td></tr></table>');
+  h.push('</div>');
+  h.push('<div class="section"><h2>11. Команда</h2>');
+  h.push('<div class="two-col"><div class="info-box"><h4>\u{1F468}\u200D\u{1F4BB} Продукт и разработка</h4><p>Основатель-разработчик (JavaScript/Node.js, Linux, инфраструктура) + AI-ассистент в роли инженера: код, тесты, документация, макеты</p></div><div class="info-box"><h4>\u{1F3AF} Что это даёт</h4><p>Крайне низкий burn rate: продукт, на который рынок тратит десятки миллионов, собран силами двух участников</p></div><div class="info-box"><h4>\u{1F91D} Открытые роли</h4><p>Маркетинг и growth, продажи B2B, поддержка пользователей \u2014 закрываются из раунда</p></div><div class="info-box"><h4>\u{1F4CB} Процесс</h4><p>Тикеты, автопроверки (489 тестов), CI/CD, прод-деплой с откатными точками</p></div></div>');
+  h.push('</div>');
+  h.push('<div class="section"><h2>12. Риски и их снижение</h2>');
+  h.push('<table><tr><th>Риск</th><th>Вероятность</th><th>Снижение</th></tr><tr><td>Конкуренция с крупными игроками</td><td>Высокая</td><td>Ниши: языки народов РФ, self-hosted, блог + hiring в одном продукте</td></tr><tr><td>Отток после регистрации</td><td>Средняя</td><td>Онбординг, сторис, каналы, блог \u2014 ежедневные поводы вернуться</td></tr><tr><td>Регуляторные требования</td><td>Средняя</td><td>Self-hosted, соответствие 152-ФЗ, данные в РФ</td></tr><tr><td>Зависимость от платёжных провайдеров</td><td>Низкая</td><td>СБП + ЮKassa, возможность подключения альтернатив</td></tr><tr><td>Ключевой человек</td><td>Средняя</td><td>Документация, тесты, AI-ассистент в процессе разработки</td></tr></table>');
+  h.push('</div>');
+  h.push('<div class="section"><h2>13. Использование инвестиций</h2>');
+  h.push('<table><tr><th>Направление</th><th>Доля</th><th>Что делаем</th></tr><tr><td>Разработка и инфраструктура</td><td>40%</td><td>Мобильные приложения, E2E-шифрование, масштабирование</td></tr><tr><td>Маркетинг и рост</td><td>30%</td><td>Привлечение первых 500K пользователей, партнёрства</td></tr><tr><td>Продажи B2B</td><td>20%</td><td>Enterprise self-hosted, интеграции, поддержка</td></tr><tr><td>Резерв</td><td>10%</td><td>Юридические вопросы, сертификации</td></tr></table>');
+  h.push('<div class="highlight"><p>\u{1F4C8} Раунд закрывает runway на 18 месяцев и выход на 500 000 MAU.</p></div>');
+  h.push('</div>');
+  h.push('<div class="section"><h2>14. Контакты и следующие шаги</h2>');
+  h.push('<ul><li>Демо продукта: balloo.su (работающий прод)</li><li>Материалы: инструкция пользователя, рекламный буклет, документ для рекламодателей</li><li>Финансовая модель и детальная воронка \u2014 по запросу</li></ul>');
+  h.push('</div>');
   h.push('<div class="cta-box"><h3>Инвестируйте в будущее российского IT</h3><div class="email">\u{1F4E7} o8eryuhtin@yandex.ru</div></div>');
   h.push('<div class="pdf-footer">\u00A9 2026 Balloo Messenger. balloo.su</div></div></body></html>');
   return h.join('');
@@ -396,13 +439,16 @@ function generateAdvertiserAdsHTML() {
   h.push('<div class="stat-row"><div class="stat-box"><div class="number">148M</div><div class="label">Интернет-пользователей РФ</div></div><div class="stat-box"><div class="number">73M</div><div class="label">Пользователей мессенджеров</div></div><div class="stat-box"><div class="number">4.5ч</div><div class="label">Среднее время/день</div></div></div>');
   h.push('<div class="section"><h2>1. Аудитория</h2><ul><li><strong>Возраст:</strong> 16-55 лет (основная 25-40)</li><li><strong>Гео:</strong> Россия, СНГ</li><li><strong>Интересы:</strong> Технологии, бизнес, образование</li><li><strong>Уникальность:</strong> 20 языков, включая 15 языков народов РФ</li><li><strong>Платформы:</strong> Web, Desktop, Mobile</li></ul></div>');
   h.push('<div class="section"><h2>2. Рекламные форматы</h2><div class="cards"><div class="card"><h4>\u{1F4E2} Баннер в каналах</h4><p>Текст + медиа, нативная интеграция</p></div><div class="card"><h4>\u{1F50D} Таргетированная</h4><p>По интересам, геолокации, демографии</p></div><div class="card"><h4>\u{1F4CA} Sponsored stories</h4><p>До 60 сек видео, полноэкранный</p></div></div><div class="cards"><div class="card"><h4>\u{1F514} Push-уведомления</h4><p>С согласия пользователя</p></div><div class="card"><h4>\u{1F4AC} Реклама в поиске</h4><p>Контекстная релевантность</p></div><div class="card"><h4>\u{1F3AF} Native ads</h4><p>В ленте блога</p></div></div></div>');
-  h.push(screenshotImg('chats', 'Основной экран'));
   h.push('<div class="section"><h2>3. Таргетинг</h2><table><tr><th>Параметр</th><th>Доступность</th><th>Детализация</th></tr><tr><td>География</td><td>\u2705</td><td>Страна, регион, город</td></tr><tr><td>Возраст</td><td>\u2705</td><td>16-24, 25-34, 35-44, 45-55</td></tr><tr><td>Пол</td><td>\u2705</td><td>М/Ж</td></tr><tr><td>Язык</td><td>\u2705</td><td>Все 20 языков</td></tr><tr><td>Интересы</td><td>\u2705</td><td>Технологии, бизнес, спорт</td></tr><tr><td>Устройство</td><td>\u2705</td><td>Web, Desktop, Mobile</td></tr></table></div>');
   h.push(screenshotImg('story-create', 'Сторис'));
   h.push('<div class="section"><h2>4. Тарифы</h2><table><tr><th>Тариф</th><th>CPM</th><th>Мин. бюджет</th><th>Включено</th></tr><tr><td>Стартовый</td><td>\u20BD 150</td><td>\u20BD 5 000/мес</td><td>Баннеры в каналах</td></tr><tr><td>Бизнес</td><td>\u20BD 250</td><td>\u20BD 20 000/мес</td><td>stories, аналитика</td></tr><tr><td>Корпоративный</td><td>\u20BD 400</td><td>\u20BD 100 000/мес</td><td>Full-stack, менеджер</td></tr></table></div>');
   h.push('<div class="section"><h2>5. Аналитика</h2><ul><li>Охват, Показы, CTR, CPC, Конверсии, ROI, Частота</li></ul></div>');
   h.push('<div class="section"><h2>6. Почему Balloo?</h2><div class="highlight"><p>\u{1F4C8} Мессенджеры — самый потребляемый тип приложений в России.</p></div><ul><li>Нативная интеграция</li><li>20 языков</li><li>Self-hosted</li><li>Честная аналитика</li><li>Соответствие 152-ФЗ</li></ul></div>');
   h.push('<div class="section"><h2>7. Кейсы</h2><div class="two-col"><div class="info-box"><h4>\u{1F393} Образование</h4><p>CTR 4.2%, регистрация \u20BD 180, охват 50K</p></div><div class="info-box"><h4>\u{1F6D2} E-commerce</h4><p>CTR 5.8%, ROAS 340%, охват 120K</p></div></div></div>');
+  h.push('<div class="section"><h2>8. Модерация и качество трафика</h2>');
+  h.push('<ul><li>Ручная проверка креативов до запуска (до 1 рабочего дня)</li><li>Запрещены: взрослый контент, финансы без лицензии, БАДы, политика</li><li>Антифрод: фильтрация накруток и ботов на стороне платформы</li><li>Прозрачная статистика: показы, охват, CTR, CPC, конверсии \u2014 в реальном времени</li><li>Соответствие 152-ФЗ: персональные данные не передаются рекламодателю</li></ul>');
+  h.push(screenshotImg('search', 'Реклама в поиске'));
+  h.push('</div>');
   h.push('<div class="cta-box"><h3>Станьте партнёром Balloo</h3><div class="email">\u{1F4E7} o8eryuhtin@yandex.ru</div></div>');
   h.push('<div class="pdf-footer">\u00A9 2026 Balloo Messenger. balloo.su</div></div></body></html>');
   return h.join('');
@@ -429,7 +475,7 @@ async function generatePDF(html, outputPath, title) {
       if (n < 8) {
         sections.forEach((s, i) => { if ((i + 1) % 2 === 0) { const br = document.createElement('div'); br.className = 'page-break'; s.after(br); } });
       } else {
-        sections.forEach(s => { const br = document.createElement('div'); br.className = 'page-break'; s.after(br); });
+        sections.forEach((s, i) => { if (i < n - 1) { const br = document.createElement('div'); br.className = 'page-break'; s.after(br); } });
       }
       if (n >= 15) { for (let i = 0; i < Math.floor(n / 3); i++) { const br = document.createElement('div'); br.className = 'page-break'; document.body.appendChild(br); } }
     });
