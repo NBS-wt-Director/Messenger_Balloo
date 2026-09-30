@@ -398,7 +398,7 @@ export const api = {
     }),
 
   deleteBlogPost: (postId: string) =>
-    request<{ success: boolean }>('/api/blog/posts/${postId}', {
+    request<{ success: boolean }>(`/api/blog/posts/${postId}`, {
       method: 'DELETE',
     }),
 
