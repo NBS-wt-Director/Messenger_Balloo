@@ -244,6 +244,13 @@ WebSocket (Socket.IO) — там же (`wss://api.balloo.su/socket.io`).
 
 ## 📚 Документация
 
+**Ответ владельца В-90 (а) от 30.09.2026:** промежуточные документы (отчёты анализа,
+снимки дерева каталога, листы проблем, черновики статусов) перенесены в
+`.old/docs/analysis/` и `.old/docs/drafts/`; индекс с причинами per файл —
+`.old/docs/archive-index.md`. `mockups/` остаётся в корне — он единственный источник
+правды по макетам и сущностям данных (главный принцип `AGENTS.md`), варианты
+«перенести `mockups/`» и «копия `mockups/`» отклонены.
+
 - **Макеты экранов**: [mockups/index.html](mockups/index.html) — интерактивный каталог всех экранов
 - **Метаданные макетов**: [mockups/index_ecrans.json](mockups/index_ecrans.json), [mockups/index_ecrans.md](mockups/index_ecrans.md)
 - **Схема данных**: [mockups/data_schema.json](mockups/data_schema.json), [docs/03-database-schema.md](docs/03-database-schema.md)
