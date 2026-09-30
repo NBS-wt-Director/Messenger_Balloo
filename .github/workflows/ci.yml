@@ -8,7 +8,6 @@ on:
 
 env:
   NODE_VERSION: '22'
-  PNPM_VERSION: 'latest'
 
 jobs:
   ci:
@@ -52,8 +51,9 @@ jobs:
       # устанавливать pnpm первым).
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
+        # version НЕ задаём: в package.json объявлен packageManager: pnpm@11.17.0.
+        # Два источника версии одновременно дают «Error: Multiple versions of
+        # pnpm specified» (аннотация прогона #71, 2026-09-30).
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
