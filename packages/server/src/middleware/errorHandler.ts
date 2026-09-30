@@ -24,13 +24,20 @@ export const errorHandler = (
     console.error(`[ERROR] ${statusCode} - ${message}`);
   }
 
-  // BigInt JSON serializer
-  const jsonBody = JSON.parse(JSON.stringify({
-    error: err.name || 'Error',
-    message,
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
-  }), (key, value) =>
-    typeof value === 'bigint' ? value.toString() : value
+  // BigInt JSON serializer.
+  // Исправлено 30.09.2026 (тикеты 1790479490-08 / В-93): replacer был привязан к
+  // JSON.parse вместо JSON.stringify, поэтому любое bigint-значение (createdAt/
+  // BigInt-ид из Prisma) роняло сам обработчик ошибок с «TypeError: Do not know how
+  // to serialize a BigInt» вместо ответа клиенту.
+  const jsonBody = JSON.parse(
+    JSON.stringify(
+      {
+        error: err.name || 'Error',
+        message,
+        ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
+      },
+      (_key, value) => (typeof value === 'bigint' ? value.toString() : value),
+    ),
   );
 
   // Ответ клиенту
