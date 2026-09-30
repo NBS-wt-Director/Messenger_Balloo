@@ -183,6 +183,44 @@ export const getStoryViews = async (storyId: string) => {
 };
 
 // ============================================================
+// Отметить просмотр истории (POST /api/stories/:id/view) — В-116
+// StoriesScreen.handleView зовёт этот маршрут при открытии истории.
+// Повторный просмотр не дублируется: @@unique([storyId, viewerId]) + upsert
+// (viewedAt обновляется — метрика «последний просмотр» живая).
+// ============================================================
+
+export const viewStory = async (storyId: string, viewerId: string) => {
+  const story = await prisma.story.findUnique({
+    where: { id: storyId },
+    select: { id: true, expiresAt: true },
+  });
+
+  if (!story) {
+    throw new Error('История не найдена');
+  }
+
+  const now = Math.floor(Date.now() / 1000);
+  if (story.expiresAt <= BigInt(now)) {
+    throw new Error('История истекла');
+  }
+
+  const view = await prisma.storyView.upsert({
+    where: { storyId_viewerId: { storyId, viewerId } },
+    create: { storyId, viewerId, viewedAt: now },
+    update: { viewedAt: now },
+  });
+
+  const total = await prisma.storyView.count({ where: { storyId } });
+
+  return {
+    storyId,
+    viewerId,
+    viewedAt: Number(view.viewedAt),
+    totalViews: total,
+  };
+};
+
+// ============================================================
 // Добавить реакцию на историю
 // ============================================================
 

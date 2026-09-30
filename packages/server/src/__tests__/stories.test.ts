@@ -125,4 +125,81 @@ describe('Stories API', () => {
       expect(res.status).toBe(200);
     });
   });
+
+  // В-116 (тикет 1790707718): StoriesScreen.handleView зовёт POST /api/stories/:id/view.
+  // Маршрута не было — счётчик просмотров не рос. Модель StoryView и уникальность
+  // storyId+viewerId в схеме уже существовали.
+  describe('POST /api/stories/:id/view (В-116)', () => {
+    it('records a story view', async () => {
+      const user = await registerTestUser();
+      const storyRes = await createStory(user.accessToken);
+
+      const res = await request(app)
+        .post(`/api/stories/${storyRes.body.id}/view`)
+        .set('Authorization', `Bearer ${user.accessToken}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body.storyId).toBe(storyRes.body.id);
+      expect(res.body.totalViews).toBe(1);
+    });
+
+    it('does not duplicate a repeat view (upsert)', async () => {
+      const user = await registerTestUser();
+      const storyRes = await createStory(user.accessToken);
+
+      await request(app)
+        .post(`/api/stories/${storyRes.body.id}/view`)
+        .set('Authorization', `Bearer ${user.accessToken}`);
+      const res = await request(app)
+        .post(`/api/stories/${storyRes.body.id}/view`)
+        .set('Authorization', `Bearer ${user.accessToken}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body.totalViews).toBe(1);
+    });
+
+    it('rejects without auth', async () => {
+      const user = await registerTestUser();
+      const storyRes = await createStory(user.accessToken);
+
+      const res = await request(app)
+        .post(`/api/stories/${storyRes.body.id}/view`);
+
+      expect(res.status).toBe(401);
+    });
+
+    it('returns 404 for missing story', async () => {
+      const user = await registerTestUser();
+
+      const res = await request(app)
+        .post('/api/stories/nonexistent-id/view')
+        .set('Authorization', `Bearer ${user.accessToken}`);
+
+      expect(res.status).toBe(404);
+    });
+
+    it('returns 410 for expired story', async () => {
+      const user = await registerTestUser();
+      const storyRes = await createStory(user.accessToken);
+
+      // Создать историю с expiresAt в прошлом нельзя (валидация сервиса),
+      // поэтому протухаем уже созданную напрямую в БД.
+      const { PrismaClient } = await import('@prisma/client');
+      const prisma = new PrismaClient();
+      try {
+        await prisma.story.update({
+          where: { id: storyRes.body.id },
+          data: { expiresAt: BigInt(Math.floor(Date.now() / 1000) - 3600) },
+        });
+      } finally {
+        await prisma.$disconnect();
+      }
+
+      const viewRes = await request(app)
+        .post(`/api/stories/${storyRes.body.id}/view`)
+        .set('Authorization', `Bearer ${user.accessToken}`);
+
+      expect(viewRes.status).toBe(410);
+    });
+  });
 });

@@ -3,6 +3,7 @@ import {
   createStory as createStoryService,
   getStories as getStoriesService,
   getStoryViews as getStoryViewsService,
+  viewStory as viewStoryService,
   addStoryReaction as addStoryReactionService,
   deleteStory as deleteStoryService,
 } from '../services/storyService';
@@ -86,6 +87,33 @@ export const getStoryViews = async (req: Request, res: Response, next: NextFunct
   } catch (error: any) {
     if (error.message === 'История не найдена') {
       res.status(404).json({ error: 'Not Found', message: error.message });
+    } else {
+      res.status(500).json({ error: 'Internal Error', message: error.message });
+    }
+  }
+};
+
+// ============================================================
+// Отметить просмотр истории (POST /api/stories/:id/view) — В-116
+// ============================================================
+
+export const viewStory = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const userId = req.user!.id;
+    const { id } = req.params;
+
+    if (!id) {
+      res.status(400).json({ error: 'Bad Request', message: 'Story ID обязателен' });
+      return;
+    }
+
+    const result = await viewStoryService(id, userId);
+    res.json(result);
+  } catch (error: any) {
+    if (error.message === 'История не найдена') {
+      res.status(404).json({ error: 'Not Found', message: error.message });
+    } else if (error.message === 'История истекла') {
+      res.status(410).json({ error: 'Gone', message: error.message });
     } else {
       res.status(500).json({ error: 'Internal Error', message: error.message });
     }

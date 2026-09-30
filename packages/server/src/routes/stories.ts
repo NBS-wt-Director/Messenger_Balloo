@@ -4,6 +4,7 @@ import {
   createStory,
   getStories,
   getStoryViews,
+  viewStory,
   addStoryReaction,
   deleteStory,
 } from '../controllers/storyController';
@@ -21,6 +22,9 @@ router.get('/', getStories);
 
 // GET /api/stories/:id/views — просмотры истории
 router.get('/:id/views', getStoryViews);
+
+// POST /api/stories/:id/view — отметить просмотр (В-116, StoriesScreen.handleView)
+router.post('/:id/view', viewStory);
 
 // POST /api/stories/:id/reactions — реакция на историю
 router.post('/:id/reactions', addStoryReaction);
