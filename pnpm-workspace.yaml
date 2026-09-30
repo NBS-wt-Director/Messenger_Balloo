@@ -9,6 +9,11 @@ allowBuilds:
   electron-winstaller: false
   esbuild: true
   prisma: true
-  react-native-screens: true
+  # react-native-screens@3.31.x: postinstall «bob build && husky install» падает —
+  # bob это devDependency самого upstream-пакета, pnpm не ставит devDeps зависимостей
+  # (воспроизведено локально на чистом store: «bob: not found», ELIFECYCLE, exit 1 —
+  # ровно это роняло шаг Install dependencies в CI). Сборка нативного кода делается
+  # не на этой машине, а gradle-проектом Android.
+  react-native-screens: false
   sharp: true
   unrs-resolver: false
