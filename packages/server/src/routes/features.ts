@@ -13,6 +13,8 @@ import {
   unvoteFeatureController,
   getCategoriesController,
   getFeatureStatsController,
+  addFeatureCommentController,
+  getFeatureCommentsController,
 } from '../controllers/featureController';
 
 const router = Router() as import('express').Router;
@@ -24,6 +26,7 @@ router.get('/', getFeaturesController);
 router.get('/categories', getCategoriesController);
 router.get('/stats', getFeatureStatsController);
 router.get('/:id', getFeatureController);
+router.get('/:id/comments', getFeatureCommentsController);
 
 // --- Маршруты с авторизацией ---
 router.post('/', authRequired, createFeatureController);
@@ -31,5 +34,8 @@ router.put('/:id', authRequired, updateFeatureController);
 router.delete('/:id', authRequired, deleteFeatureController);
 router.post('/:id/vote', authRequired, voteFeatureController);
 router.delete('/:id/vote', authRequired, unvoteFeatureController);
+// В-117: FeatureDetailScreen.handleComment постит {content} — маршрута не было,
+// комментарий не добавлялся (тикет 1790707718)
+router.post('/:id/comments', authRequired, addFeatureCommentController);
 
 export { router };

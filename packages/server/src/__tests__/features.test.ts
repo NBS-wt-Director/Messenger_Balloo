@@ -204,4 +204,111 @@ describe('Features API (фич-реквесты)', () => {
       expect(res.status).toBe(401);
     });
   });
+
+  // В-117 (тикет 1790707718): FeatureDetailScreen.handleComment постит
+  // POST /api/features/:id/comments {content} — маршрута не было, комментарий
+  // не добавлялся. Модель FeatureComment в схеме существовала.
+  describe('feature comments (В-117)', () => {
+    let featureId: string;
+
+    beforeAll(async () => {
+      const res = await request(app)
+        .post('/api/features')
+        .set('Authorization', `Bearer ${user.accessToken}`)
+        .send({ title: 'Commented Feature', description: 'desc', category: 'messenger' });
+      featureId = res.body.id;
+    });
+
+    it('adds a comment with content payload (screen contract)', async () => {
+      const res = await request(app)
+        .post(`/api/features/${featureId}/comments`)
+        .set('Authorization', `Bearer ${user.accessToken}`)
+        .send({ content: 'Нужная фича!' });
+
+      expect(res.status).toBe(201);
+      expect(res.body.text).toBe('Нужная фича!');
+      expect(res.body.author.id).toBe(user.id);
+    });
+
+    it('comment becomes visible in GET /api/features/:id (screen reloads it)', async () => {
+      const res = await request(app).get(`/api/features/${featureId}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body.commentCount).toBe(1);
+      expect(res.body.comments[0].text).toBe('Нужная фича!');
+    });
+
+    it('supports text payload and parentId for replies', async () => {
+      const parentRes = await request(app)
+        .get(`/api/features/${featureId}`);
+      const parentId = parentRes.body.comments[0].id;
+
+      const res = await request(app)
+        .post(`/api/features/${featureId}/comments`)
+        .set('Authorization', `Bearer ${user.accessToken}`)
+        .send({ text: 'Ответ на комментарий', parentId });
+
+      expect(res.status).toBe(201);
+      expect(res.body.parentId).toBe(parentId);
+
+      const listRes = await request(app).get(`/api/features/${featureId}/comments`);
+      expect(listRes.status).toBe(200);
+      expect(listRes.body.total).toBe(2);
+      expect(listRes.body.comments[0]._count.replies).toBe(1);
+    });
+
+    it('rejects empty comment', async () => {
+      const res = await request(app)
+        .post(`/api/features/${featureId}/comments`)
+        .set('Authorization', `Bearer ${user.accessToken}`)
+        .send({ content: '   ' });
+
+      expect(res.status).toBe(400);
+    });
+
+    it('rejects comment longer than 4000 chars', async () => {
+      const res = await request(app)
+        .post(`/api/features/${featureId}/comments`)
+        .set('Authorization', `Bearer ${user.accessToken}`)
+        .send({ content: 'x'.repeat(4001) });
+
+      expect(res.status).toBe(400);
+    });
+
+    it('rejects without auth', async () => {
+      const res = await request(app)
+        .post(`/api/features/${featureId}/comments`)
+        .send({ content: 'anon' });
+
+      expect(res.status).toBe(401);
+    });
+
+    it('returns 404 for non-existent feature', async () => {
+      const res = await request(app)
+        .post('/api/features/nonexistent-id/comments')
+        .set('Authorization', `Bearer ${user.accessToken}`)
+        .send({ content: 'boo' });
+
+      expect(res.status).toBe(404);
+    });
+
+    it('returns 404 for reply to foreign-parent feature', async () => {
+      // Родительский комментарий из другой фичи
+      const otherRes = await request(app)
+        .post('/api/features')
+        .set('Authorization', `Bearer ${user.accessToken}`)
+        .send({ title: 'Other Feature', description: 'd', category: 'messenger' });
+      const otherComment = await request(app)
+        .post(`/api/features/${otherRes.body.id}/comments`)
+        .set('Authorization', `Bearer ${user.accessToken}`)
+        .send({ content: 'parent from other feature' });
+
+      const res = await request(app)
+        .post(`/api/features/${featureId}/comments`)
+        .set('Authorization', `Bearer ${user.accessToken}`)
+        .send({ content: 'reply', parentId: otherComment.body.id });
+
+      expect(res.status).toBe(404);
+    });
+  });
 });

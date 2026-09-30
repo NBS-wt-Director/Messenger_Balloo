@@ -15,12 +15,15 @@ let counter = 0;
 
 function uniqueEmail(): string {
   counter++;
-  return `testuser${Date.now()}_${counter}@test.balloo.ru`;
+  // process.pid: у каждого воркера Jest свой счётчик, стартующий с 1, поэтому
+  // testuser<ms>_<n> коллизирует, когда два воркера стартуют в одну
+  // миллисекунду (Unique constraint failed on email при параллельном прогоне).
+  return `testuser${Date.now()}_${process.pid}_${counter}@test.balloo.ru`;
 }
 
 function uniqueUsername(): string {
   counter++;
-  return `testuser${Date.now()}_${counter}`;
+  return `testuser${Date.now()}_${process.pid}_${counter}`;
 }
 
 export interface TestUser {

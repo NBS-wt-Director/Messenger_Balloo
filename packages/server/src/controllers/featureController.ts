@@ -12,6 +12,8 @@ import {
   unvoteFeature,
   getCategories,
   getFeatureStats,
+  addFeatureComment,
+  getFeatureComments,
 } from '../services/featureService';
 
 // --- Создать фич-реквест ---
@@ -177,5 +179,51 @@ export async function getFeatureStatsController(_req: Request, res: Response): P
     res.json(stats);
   } catch (error: any) {
     res.status(500).json({ error: error.message || 'Ошибка сервера' });
+  }
+}
+
+// --- Добавить комментарий к фиче (POST /api/features/:id/comments) — В-117 ---
+export async function addFeatureCommentController(req: Request, res: Response): Promise<void> {
+  try {
+    const userId = (req as any).user?.id;
+    const { id } = req.params;
+    const { content, text, parentId } = req.body ?? {};
+
+    if (!userId) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    const comment = await addFeatureComment(id, userId, { content, text, parentId });
+    res.status(201).json(comment);
+  } catch (error: any) {
+    if (error.message === 'Фича не найдена' || error.message === 'Родительский комментарий не найден') {
+      res.status(404).json({ error: error.message });
+    } else if (
+      error.message === 'Текст комментария обязателен' ||
+      error.message.includes('4000')
+    ) {
+      res.status(400).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: error.message || 'Ошибка сервера' });
+    }
+  }
+}
+
+// --- Список комментариев фичи (GET /api/features/:id/comments) ---
+export async function getFeatureCommentsController(req: Request, res: Response): Promise<void> {
+  try {
+    const { id } = req.params;
+    const page = parseInt(String(req.query.page ?? '1'), 10) || 1;
+    const limit = Math.min(parseInt(String(req.query.limit ?? '50'), 10) || 50, 100);
+
+    const result = await getFeatureComments(id, page, limit);
+    res.json(result);
+  } catch (error: any) {
+    if (error.message === 'Фича не найдена') {
+      res.status(404).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: error.message || 'Ошибка сервера' });
+    }
   }
 }

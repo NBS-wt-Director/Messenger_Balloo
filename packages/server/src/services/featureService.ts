@@ -293,3 +293,93 @@ export async function getFeatureStats() {
     totalVotes,
   };
 }
+
+// --- Комментарий фич-реквеста (POST /api/features/:id/comments) — В-117 ---
+// FeatureDetailScreen.handleComment постит {content} и перезагружает фичу.
+// Раньше маршрута не было — комментарий не добавлялся (тикет 1790707718).
+// Поле в схеме — text; на входе принимаем content (контракт экрана) и text.
+export async function addFeatureComment(
+  featureId: string,
+  userId: string,
+  input: { content?: string; text?: string; parentId?: string }
+): Promise<any> {
+  const text = (input.content ?? input.text ?? '').trim();
+
+  if (!text) {
+    throw new Error('Текст комментария обязателен');
+  }
+  if (text.length > 4000) {
+    throw new Error('Комментарий не может превышать 4000 символов');
+  }
+
+  const feature = await prisma.featureRequest.findUnique({
+    where: { id: featureId },
+    select: { id: true },
+  });
+
+  if (!feature) {
+    throw new Error('Фича не найдена');
+  }
+
+  if (input.parentId) {
+    const parent = await prisma.featureComment.findUnique({
+      where: { id: input.parentId },
+      select: { id: true, featureId: true },
+    });
+
+    if (!parent || parent.featureId !== featureId) {
+      throw new Error('Родительский комментарий не найден');
+    }
+  }
+
+  const comment = await prisma.featureComment.create({
+    data: {
+      featureId,
+      userId,
+      parentId: input.parentId || null,
+      text,
+      createdAt: Math.floor(Date.now() / 1000),
+    },
+    include: {
+      author: {
+        select: { id: true, username: true, displayName: true, avatarUrl: true },
+      },
+      _count: { select: { replies: true } },
+    },
+  });
+
+  return comment;
+}
+
+// --- Список комментариев фичи (GET /api/features/:id/comments) ---
+export async function getFeatureComments(
+  featureId: string,
+  page = 1,
+  limit = 50
+): Promise<any> {
+  const feature = await prisma.featureRequest.findUnique({
+    where: { id: featureId },
+    select: { id: true },
+  });
+
+  if (!feature) {
+    throw new Error('Фича не найдена');
+  }
+
+  const comments = await prisma.featureComment.findMany({
+    where: { featureId },
+    orderBy: { createdAt: 'desc' },
+    skip: (page - 1) * limit,
+    take: limit,
+    include: {
+      author: {
+        select: { id: true, username: true, displayName: true, avatarUrl: true },
+      },
+      _count: { select: { replies: true } },
+    },
+  });
+
+  const total = await prisma.featureComment.count({ where: { featureId } });
+
+  return { comments, total, page, limit };
+}
