@@ -312,6 +312,16 @@ export const getPollResults = async (input: GetPollResultsInput) => {
 };
 
 // ============================================================
+// Получить опрос по ID (GET /api/polls/:id)
+// В-115: PollScreen.loadPoll зовёт именно этот маршрут. Возвращает тот же
+// формат, что getPollResults (внутренний), — его полей хватает ViewPoll.
+// ============================================================
+
+export const getPollById = async (input: GetPollResultsInput) => {
+  return getPollResults(input);
+};
+
+// ============================================================
 // Удалить опрос
 // ============================================================
 

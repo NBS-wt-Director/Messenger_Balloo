@@ -538,7 +538,7 @@ function ViewPoll({ poll }: { poll: Poll }) {
 
 function PollScreen() {
   const navigate = useNavigate();
-  const { pollId } = useParams<{ pollId: string }>();
+  const { pollId, chatId } = useParams<{ pollId: string; chatId: string }>();
   const [mode, setMode] = useState<'create' | 'view'>('view');
   const [poll, setPoll] = useState<Poll | null>(null);
   const [loading, setLoading] = useState(false);
@@ -560,7 +560,13 @@ function PollScreen() {
   const handleCreate = async (pollData: Partial<Poll>) => {
     setLoading(true);
     try {
-      const created = await api.post<Poll>('/api/polls', pollData);
+      const created = await api.post<Poll>('/api/polls', {
+        ...pollData,
+        // chatId обязателен на сервере: раньше экран рендерил CreatePollView
+        // с chatId={undefined} (тикет 1790707718), и POST уходил без него —
+        // сервер отвечал 400, а UI молча показывал форму дальше.
+        chatId: pollData.chatId ?? chatId,
+      });
       setPoll(created);
       setMode('view');
     } catch (err: unknown) {
@@ -587,7 +593,7 @@ function PollScreen() {
     <div className="poll-screen">
       {mode === 'create' ? (
         <CreatePollView
-          chatId={undefined}
+          chatId={chatId}
           onSubmit={handleCreate}
           onCancel={handleCancel}
         />
