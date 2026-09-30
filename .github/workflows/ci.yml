@@ -91,13 +91,16 @@ jobs:
         run: pnpm build:shared
 
       - name: TypeScript check (server)
-        run: cd packages/server && npx tsc --noEmit
+        # НЕ через npx: пакет-подставка «This is not the tsc command you are
+        # looking for» перехватывает вызов и выходит с кодом 1 в CI (run #74),
+        # хотя реальные типы чисты. tsc — devDep сервера, зовём его напрямую.
+        run: cd packages/server && ./node_modules/.bin/tsc --noEmit
 
       - name: TypeScript check (web)
-        run: cd packages/web && npx tsc --noEmit
+        run: cd packages/web && ./node_modules/.bin/tsc --noEmit
 
       - name: TypeScript check (desktop)
-        run: cd packages/desktop && npx tsc --noEmit || true
+        run: cd packages/desktop && ./node_modules/.bin/tsc --noEmit || true
 
       - name: Lint (shared)
         run: pnpm lint:shared || true
