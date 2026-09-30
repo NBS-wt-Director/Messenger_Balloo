@@ -2,8 +2,8 @@
 
 **Российский мессенджер нового поколения** — чаты, звонки, каналы, истории, блог, админ-панель и портал сотрудников в одном монорепо.
 
-**Версия:** 1.0.0  
-**Статус:** 🟡 Staging-ready (server + web)  
+**Версия:** 1.0.0
+**Статус:** 🟢 Production-ready (deployed to balloo.su)
 **Лицензия:** MIT
 
 ---
@@ -108,10 +108,23 @@ balloo/
 │   ├── 03-database-schema.md          ← Prisma схема БД
 │   ├── 04-api-websocket-spec.md       ← REST API + WebSocket
 │   ├── 05-frontend-spec.md            ← Фронтенд спецификация
-│   └── 06-devops-infrastructure.md    ← DevOps инфраструктура
-│
+│   ├── 06-devops-infrastructure.md    ← DevOps инфраструктура
+│   ├── 10-operations-manual.md        ← Operations Manual
+│   ├── 11-release-process.md          ← Процесс релиза
+│   ├── 12-frontend-architecture.md    ← Frontend архитектура
+│   ├── 13-backend-architecture.md     ← Backend архитектура
+│   ├── 14-business-processes.md       ← Бизнес-процессы
+│   └── 12-security-audit.md           ← Аудит безопасности
+├── CONTRIBUTING.md              ← Правила вклада в проект
 ├── tickets/                   ← Мультитикеты (план реализации)
-│   └── balloo-implementation.md
+│   ├── active/                ← Активные задачи
+│   ├── Done/                  ← Закрытые задачи
+│   ├── archive/               ← Архив
+│   └── deferred/              ← Отложенные
+├── .old/docs/                 ← Архив промежуточных документов
+│   ├── analysis/
+│   ├── drafts/
+│   └── archive-index.md
 │
 └── docker/                    ← Docker-контейнеры
     ├── docker-compose.yml
@@ -244,20 +257,26 @@ WebSocket (Socket.IO) — там же (`wss://api.balloo.su/socket.io`).
 
 ## 📚 Документация
 
-**Ответ владельца В-90 (а) от 30.09.2026:** промежуточные документы (отчёты анализа,
-снимки дерева каталога, листы проблем, черновики статусов) перенесены в
-`.old/docs/analysis/` и `.old/docs/drafts/`; индекс с причинами per файл —
-`.old/docs/archive-index.md`. `mockups/` остаётся в корне — он единственный источник
-правды по макетам и сущностям данных (главный принцип `AGENTS.md`), варианты
-«перенести `mockups/`» и «копия `mockups/`» отклонены.
+- **Сборка и запуск**: [docs/00-master-build-guide.md](docs/00-master-build-guide.md)
+- **Архитектурные решения**: [docs/01-architecture-decisions.md](docs/01-architecture-decisions.md)
+- **Чеклист требований**: [docs/02-requirements-checklist.md](docs/02-requirements-checklist.md)
+- **Схема БД**: [docs/03-database-schema.md](docs/03-database-schema.md)
+- **REST API + WebSocket**: [docs/04-api-websocket-spec.md](docs/04-api-websocket-spec.md)
+- **Фронтенд-спецификация**: [docs/05-frontend-spec.md](docs/05-frontend-spec.md)
+- **DevOps и инфраструктура**: [docs/06-devops-infrastructure.md](docs/06-devops-infrastructure.md)
+- **Operations Manual**: [docs/10-operations-manual.md](docs/10-operations-manual.md)
+- **Процесс релиза**: [docs/11-release-process.md](docs/11-release-process.md)
+- **Frontend Architecture**: [docs/12-frontend-architecture.md](docs/12-frontend-architecture.md)
+- **Backend Architecture**: [docs/13-backend-architecture.md](docs/13-backend-architecture.md)
+- **Бизнес-процессы**: [docs/14-business-processes.md](docs/14-business-processes.md)
+- **Аудит безопасности**: [docs/12-security-audit.md](docs/12-security-audit.md)
+- **CONTRIBUTING**: [CONTRIBUTING.md](CONTRIBUTING.md)
+- **Каталог тикетов**: [tickets/catalog.md](tickets/catalog.md)
+- **Макеты**: [mockups/index.html](mockups/index.html)
 
-- **Макеты экранов**: [mockups/index.html](mockups/index.html) — интерактивный каталог всех экранов
-- **Метаданные макетов**: [mockups/index_ecrans.json](mockups/index_ecrans.json), [mockups/index_ecrans.md](mockups/index_ecrans.md)
-- **Схема данных**: [mockups/data_schema.json](mockups/data_schema.json), [docs/03-database-schema.md](docs/03-database-schema.md)
-- **API спецификация**: [docs/04-api-websocket-spec.md](docs/04-api-websocket-spec.md)
-- **Архитектура**: [docs/01-architecture-decisions.md](docs/01-architecture-decisions.md)
-- **DevOps**: [docs/06-devops-infrastructure.md](docs/06-devops-infrastructure.md)
-- **План реализации**: [tickets/balloo-implementation.md](tickets/balloo-implementation.md)
+### Архив
+
+- [`.old/docs/archive-index.md`](.old/docs/archive-index.md) — указатель архива
 
 ---
 
@@ -266,17 +285,17 @@ WebSocket (Socket.IO) — там же (`wss://api.balloo.su/socket.io`).
 | Компонент | Статус | Примечание |
 |---|---|---|
 | Макеты (все узлы) | ✅ Спроектировано | 173 экрана, 12 узлов |
-| Документация | ✅ Задокументировано | 6 файлов docs/ |
+| Документация | ✅ Задокументировано | 14 файлов docs/ + CONTRIBUTING.md |
 | Shared-пакет | ✅ Реализовано | Типы, утилиты, Prisma, i18n |
 | База данных (Prisma) | ✅ Схема готова | 1059 строк schema.prisma |
-| Server (API + WebSocket) | ✅ ~90% | Основной функционал |
-| Web (React + Vite) | ✅ ~80% | Основной функционал |
-| Desktop (Electron) | ⚠️ Каркас | 25 файлов, доработка нужна |
+| Server (API + WebSocket) | ✅ Реализовано | Express, 200+ маршрутов, WS |
+| Web (React + Vite) | ✅ Реализовано | 119 экранов, hash-роутер |
+| Desktop (Electron) | ✅ Каркас | Обёртка над web, работает |
 | Mobile (Expo) | ⚠️ Частично | Android ~30%, iOS не начат |
-| Docker | ✅ Реализовано | docker-compose.yml |
-| CI/CD | ✅ Реализовано | GitHub Actions (server + web) |
-| Тесты | ⚠️ 19 файлов | ~15% покрытия, нужны E2E |
-| **Деплой staging** | **🟡 Готов** | **server + web, после миграций** |
+| Docker | ✅ Реализовано | docker-compose, прод-образы |
+| CI/CD | ✅ Реализовано | GitHub Actions (5/6 зелёных) |
+| Тесты | ✅ 607 зелёных | shared 76, server 327, web 204 |
+| **Деплой** | **🟢 balloo.su** | **Прод работает, P37 принят** |
 
 ---
 

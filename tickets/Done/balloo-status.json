@@ -1688,7 +1688,7 @@
         "packages/server/src/middleware/security.ts",
         "packages/server/src/app.ts",
         "docker/nginx.conf",
-        "docs/security-audit.md",
+        "docs/12-security-audit.md",
         "docs/02-requirements-checklist.md",
         "packages/server/package.json"
       ],
