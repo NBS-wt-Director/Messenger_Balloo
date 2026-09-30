@@ -171,10 +171,14 @@
 
 | Method | Path | Описание |
 |--------|------|----------|
-| GET | `/polls/:id` | Получить опрос |
-| POST | `/polls/:id/vote` | Проголосовать |
+| POST | `/polls` | Создать опрос (chatId в теле; нормализует объектные варианты `{id,text}`) — В-115 |
+| GET | `/polls/:id` | Получить опрос (формат как у результатов) — В-115 |
+| POST | `/polls/:id/vote` | Проголосовать (`optionIndex` или массив `optionIndices`) |
 | GET | `/polls/:id/results` | Результаты |
 | POST | `/polls/:id/forward` | Переслать опрос в другой чат |
+
+> Создание опроса работает и через `POST /chats/:chatId/polls` (chatId в пути) —
+> оба маршрута смонтированы. Клиент PollScreen использует `POST /polls` (chatId в теле).
 
 ### Calls (`/api/v1/calls`)
 
@@ -206,6 +210,7 @@
 | POST | `/stories` | Создать сторис (через Yandex Disk) |
 | GET | `/stories` | Лента сторис |
 | GET | `/stories/:id/views` | Кто посмотрел (список + количество) |
+| POST | `/stories/:id/view` | Отметить просмотр (upsert по storyId+viewerId, повтор не дублируется) — В-116 |
 | DELETE | `/stories/:id` | Удалить свой сторис досрочно (🔑 JWT) |
 | POST | `/stories/:id/reply` | Ответ на сторис → пересылка в чат (`replyToChatId`) (🔑 JWT) |
 
@@ -311,7 +316,8 @@ ws://balloo.su/ws?token=<JWT>
 | GET | `/features/:id` | Детали фичи (описание, голоса, комментарии) |
 | POST | `/features` | Предложить новую фичу |
 | POST | `/features/:id/vote` | Проголосовать за фичу (гостевой голос — анонимно) |
-| POST | `/features/:id/comment` | Оставить комментарий к фиче |
+| POST | `/features/:id/comments` | Добавить комментарий (`{content}` или `{text, parentId?}`, 4000 макс) — В-117 |
+| GET | `/features/:id/comments` | Список комментариев (пагинация page/limit ≤ 100) — В-117 |
 
 ---
 
