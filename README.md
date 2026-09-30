@@ -153,7 +153,8 @@ cp .env.example .env
 # a) Автоматически: открыть admin.balloo.su/install и пройти мастер настройки
 # b) Вручную (dev):
 cd packages/shared
-npx prisma migrate dev    # создаст миграции если нет
+npx prisma migrate deploy   # применяет существующие миграции (на непустой БД:
+                            # сначала `prisma migrate resolve --applied <id>` для базирования)
 npx prisma db seed
 cd ../../
 
@@ -172,8 +173,13 @@ pnpm dev
 
 # Или каждый отдельно:
 pnpm dev:server     # Server: http://localhost:3100
-pnpm dev:web        # Web:    http://localhost:5173
+pnpm dev:web        # Web:    http://localhost:5173 (прокси /api и /ws → 3100)
 pnpm dev:desktop    # Desktop: Electron app
+
+# Если порт 3100 занят (например, поднят локальный docker-стек balloo-server):
+SERVER_PORT=3200 pnpm dev:server   # сервер на 3200; vite-прокси остаётся на 3100 —
+                                   # тогда API-запросы web будут идти в контейнер.
+                                   # Для полной пары на 3200 правьте vite.config.ts.
 ```
 
 ### Сборка

@@ -48,14 +48,20 @@ async function seedDonateTiers() {
   ]
 
   for (const tier of tiers) {
-    await prisma.donationTier.upsert({
-      where: { id: '' }, // placeholder — slug не используется как PK
-      update: tier,
-      create: {
-        ...tier,
-        id: `tier-${tier.name.toLowerCase().replace(/\s+/g, '-')}-${Date.now().toString(36)}`.slice(0, 25)
-      }
-    })
+    // Идемпотентный seed: ищем по уникальному имени, создаём по slug-подобному
+    // детерминированному id (Date.now() создавал новый id при каждом прогоне,
+    // из-за чего таблица дублировалась, а upsert с where id:'' падал с P2002).
+    const existing = await prisma.donationTier.findFirst({ where: { name: tier.name } })
+    if (existing) {
+      await prisma.donationTier.update({ where: { id: existing.id }, data: tier })
+    } else {
+      await prisma.donationTier.create({
+        data: {
+          ...tier,
+          id: `tier-${tier.name.toLowerCase().replace(/\s+/g, '-')}`.slice(0, 25)
+        }
+      })
+    }
   }
 
   console.log('✅ DonationTier: 3 уровня созданы')
