@@ -83,6 +83,13 @@ jobs:
           cd packages/shared
           npx prisma db seed
 
+      # @balloo/shared резолвится в dist/ (main/types в packages/shared/package.json),
+      # поэтому собрать shared нужно ДО tsc-проверок и тестов server: иначе
+      # «error TS2307: Cannot find module '@balloo/shared'» (CI run #73,
+      # воспроизведено локально в чистом клоне 2026-09-30).
+      - name: Build shared (для typecheck и тестов)
+        run: pnpm build:shared
+
       - name: TypeScript check (server)
         run: cd packages/server && npx tsc --noEmit
 
