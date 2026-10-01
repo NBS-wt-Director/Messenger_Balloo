@@ -1,6 +1,6 @@
 # 🎈 Balloo Messenger
 
-**Российский мессенджер нового поколения** — чаты, звонки, каналы, истории, блог, админ-панель и портал сотрудников в одном монорепо.
+**Российский мессенджер нового поколения** — чаты, каналы, истории, блог, админ-панель и портал сотрудников в одном монорепо.
 
 **Версия:** 1.0.0
 **Статус:** 🟢 Production-ready (deployed to balloo.su)
@@ -13,27 +13,27 @@
 Balloo — это полнофункциональный мессенджер с поддержкой:
 
 - 💬 **Личные и групповые чаты** с реальным временем (WebSocket)
-- 📞 **Голосовые и видеозвонки** (WebRTC)
 - 📢 **Каналы** с подписчиками и админами
 - 📸 **Истории** с просмотрами и реакциями
 - 📊 **Опросы** (5 типов: опрос, квиз, активный/пассивный список, персоналия)
 - 📝 **Корпоративный блог** с каналами и категориями
 - 🛡️ **Админ-панель** с аналитикой, банами, модерацией
 - 🏢 **Портал сотрудников** (HR, вакансии, база знаний, задачи)
-- 💡 **Фич-реквесты** с голосованием пользователей
+- 💡 **Фич-реквесты** с голосованием и комментариями
 - 📜 **История версий** с changelog
 - ⬇️ **Страница загрузок** для всех платформ
+- 🎧 **Экран техподдержки** (`/support`, чат с админами)
 
 ### Ключевые особенности
 
 - **20 языков**: русский + 14 языков народов РФ + китайский, хинди, белорусский, английский, французский
 - **3 темы**: dark (по умолчанию), light, russian (флаг РФ + драгметаллы)
-- **Multi-platform**: Web, Desktop (Electron), Mobile (React Native + Expo), Android, iOS
-- **Безопасность**: 2FA (TOTP), OAuth (Yandex, VK, Mail.ru), JWT tokens
-- **Платежи**: ЮMoney (РФ)
-- **CDN**: Yandex Object Storage / MinIO (self-hosted)
+- **Multi-platform**: Web, Desktop (Electron), Mobile (React Native + Expo)
+- **Безопасность**: 2FA (TOTP), OAuth (Yandex, VK, Mail.ru), JWT (access 15 мин / refresh 30 дней)
+- **Платежи**: донаты через ЮKassa (сейчас в режиме anonymous — ЮKassa-ключи не введены, решение №4)
+- **CDN**: MinIO (self-hosted, S3)
 - **Push**: Self-hosted Web Push (VAPID)
-- **Мониторинг**: Prometheus + Grafana (self-hosted)
+- **Мониторинг**: Prometheus + Grafana (в docker-стеке, профиль monitoring)
 
 ---
 
@@ -48,7 +48,7 @@ Balloo — это полнофункциональный мессенджер с
 | **Мобильное** | Expo, React Native, TypeScript |
 | **Десктоп** | Electron, Vite, TypeScript |
 | **Доставка** | Nginx (reverse proxy) |
-| **CDN** | Yandex Object Storage / MinIO |
+| **CDN** | MinIO (self-hosted, S3) |
 
 ---
 
@@ -234,24 +234,26 @@ pnpm test:all
 
 ## 🌐 Продакшен-домены (мультитикета)
 
-Продакшен использует мультитикета поддоменов: каждый сервис — отдельный origin. API живёт
-только на `api.balloo.su`, веб-клиент обращается к нему по абсолютному URL (`VITE_API_URL`),
-WebSocket (Socket.IO) — там же (`wss://api.balloo.su/socket.io`).
+Продакшен использует схему поддоменов: API живёт только на `api.balloo.su`,
+веб-клиент обращается к нему по абсолютному URL (`VITE_API_URL`), WebSocket —
+`wss://api.balloo.su/ws/`.
 
-| Переменная | Значение | Где задаётся |
+| Переменная | Значение (факт `docker/prod/.env.production`) | Где задаётся |
 |---|---|---|
 | `VITE_API_URL` | `https://api.balloo.su` | build-arg web-образа (запекается в бандль) |
-| `CORS_ORIGIN` | `https://balloo.su,https://app.balloo.su,https://id.balloo.su,https://api.balloo.su,https://cabinet.balloo.su,https://cdn.balloo.su,https://files.balloo.su,https://admin.balloo.su` | env api-контейнера (список через запятую) |
-| `COOKIE_DOMAIN` | `.balloo.su` | env api-контейнера (dot-домен — cookie видны всем поддоменам) |
-| `NEXT_PUBLIC_URL` | `https://app.balloo.su` | env api-контейнера |
-| `INSTALL_REDIRECT_URL` | `https://admin.balloo.su/install` | env api-контейнера |
-| `TELEGRAM_REDIRECT_URL` | `https://id.balloo.su/auth/telegram/complete` | env api-контейнера |
+| `CORS_ORIGIN` | `https://balloo.su,https://admin.balloo.su,https://command.balloo.su,https://features.balloo.su,https://blog.balloo.su,https://history.balloo.su,https://download.balloo.su,https://docs.balloo.su` | env server-контейнера (список через запятую, 8 origin) |
+| `APP_URL` | `https://balloo.su` (один URL, не список — возврат OAuth, ссылки писем, возврат платежей) | env server-контейнера |
+| Cookie | host-only на `api.balloo.su` (`setAuthCookies`, `middleware/auth.ts:176`: access SameSite=Strict 15 мин, refresh SameSite=Lax 30 дней; `domain` не задаётся) | код |
+
+⚠️ Cookie сейчас **host-only** (без `domain=.balloo.su`) — сессия не переносится
+между поддоменами автоматически; перенос входа между поддоменами — задача
+пакетов поддоменов (`1790480787-04…-06`).
 
 Порядок деплоя: **сначала API, затем web** (CSP `connect-src` и CORS отдаёт API; новый web-бандль
 ожидает, что API уже принимает кросс-origin-запросы).
 
-Откат web — предыдущим тегом образа. Откат API — только вместе с web, если менялись
-`COOKIE_DOMAIN`/`CORS_ORIGIN` (смена домена cookie ломает авторизацию у уже выданных сессий).
+Откат web — предыдущим тегом образа (`balloo/web:rollback-<дата>`). Откат API — только вместе с web, если менялись
+cookie-параметры/`CORS_ORIGIN` (смена домена cookie ломает авторизацию у уже выданных сессий).
 
 ---
 
@@ -284,18 +286,18 @@ WebSocket (Socket.IO) — там же (`wss://api.balloo.su/socket.io`).
 
 | Компонент | Статус | Примечание |
 |---|---|---|
-| Макеты (все узлы) | ✅ Спроектировано | 173 экрана, 12 узлов |
+| Макеты (все узлы) | ⚠️ Спроектировано | 172 экрана в реестре (12 узлов); приёмка владельцем — 79 в статусе «Просмотрен» (В-1…В-76) |
 | Документация | ✅ Задокументировано | 14 файлов docs/ + CONTRIBUTING.md |
 | Shared-пакет | ✅ Реализовано | Типы, утилиты, Prisma, i18n |
-| База данных (Prisma) | ✅ Схема готова | 1059 строк schema.prisma |
-| Server (API + WebSocket) | ✅ Реализовано | Express, 200+ маршрутов, WS |
+| База данных (Prisma) | ✅ Схема готова | 1059 строк schema.prisma, 3 миграции |
+| Server (API + WebSocket) | ✅ Реализовано | Express, 205 маршрутов, WS `/ws/` |
 | Web (React + Vite) | ✅ Реализовано | 119 экранов, hash-роутер |
 | Desktop (Electron) | ✅ Каркас | Обёртка над web, работает |
 | Mobile (Expo) | ⚠️ Частично | Android ~30%, iOS не начат |
-| Docker | ✅ Реализовано | docker-compose, прод-образы |
-| CI/CD | ✅ Реализовано | GitHub Actions (5/6 зелёных) |
-| Тесты | ✅ 607 зелёных | shared 76, server 327, web 204 |
-| **Деплой** | **🟢 balloo.su** | **Прод работает, P37 принят** |
+| Docker | ✅ Реализовано | docker-compose (prod: 5 сервисов + мониторинг), прод-образы |
+| CI/CD | ⚠️ Частично | GitHub Actions: локальная репродукция 21/21 наборов зелёная; CI-прогон падает на Test server — нужен лог владельца (`1790479490-07`) |
+| Тесты | ✅ 607 зелёных | shared 76, server 347, web 204 |
+| **Деплой** | **🟢 balloo.su** | **Прод работает (P37-1 принят выводом сервера 25.09); P38+/support — ждёт команды «Деплой» (В-105)** |
 
 ---
 

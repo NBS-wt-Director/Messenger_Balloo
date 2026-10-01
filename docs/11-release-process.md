@@ -1,6 +1,7 @@
 # 🚀 Release Process — Balloo Messenger
 
-> **Версия:** 1.0 | **Дата:** 2026-09-30
+> **Версия:** 1.1 | **Дата:** 2026-10-01 (актуализация: секции 2, 4, 6 сверены с
+> фактическими `.github/workflows/{ci,cd}.yml` и `AGENTS.md`)
 > Порядок релиза, отката и ведения changelog.
 
 ---
@@ -15,7 +16,7 @@
 | `MINOR` | Новая функциональность, обратно совместимая | `1.0.0` → `1.1.0` |
 | `PATCH` | Исправления ошибок, обратно совместимые | `1.0.0` → `1.0.1` |
 
-Версия хранится в `package.json` в корне репозитория.
+Версия хранится в `package.json` в корне репозитория (сейчас `1.0.0`).
 
 ---
 
@@ -25,21 +26,19 @@
 
 ```
 main (production)
- ├── feature/auth-oauth-yandex
- ├── feature/messaging-websocket
- ├── fix/group-member-limit
- └── hotfix/critical-security-patch
+  ├── feature/<имя>
+  ├── fix/<имя>
+  └── hotfix/<имя>
 ```
 
 - `main` — всегда деплоеспособна.
-- `feature/*` — новые фичи.
-- `fix/*` — исправления.
-- `hotfix/*` — срочные исправления прода.
+- CI (`ci.yml`) триггерится на push/PR в `main`, `dev`, `develop`.
 
-### Правила
-- Прямой пуш в `main` запрещён (в CI: `if: github.ref == 'refs/heads/main'`).
-- Каждый PR проходит CI (lint → type-check → tests → build).
-- Мержится только после зелёного CI.
+⚠️ **Факт по практике этого репозитория:** коммиты идут в `main` напрямую
+(`docs(tickets): …`, `feat(server): …` — история 140+ коммитов); правило
+«прямой пуш в `main` запрещён, только через PR» в CI **не реализовано**
+(branch-защиты не настроены) и в работе команды из двух человек не применяется.
+PR-процесс — целевая модель на случай роста команды, не текущая практика.
 
 ---
 
@@ -47,22 +46,27 @@ main (production)
 
 ### Шаг 1 — Подготовка
 
-1. Убедиться, что `main` в `origin/main` зелёная (CI passed).
+1. Убедиться, что `main` зелёная локально: `pnpm build` и `pnpm test` (код 0;
+   `pnpm lint` проверкой не является — в server/web/ui/desktop это заглушки
+   `echo "No linter configured yet"`).
 2. Обновить `package.json` — версия.
 3. Обновить `CHANGELOG.md` — раздел с новой версией.
-4. Создать PR: `chore: release v1.0.0`.
 
 ### Шаг 2 — Сборка
 
-CI собирает Docker-образы при пуше в `main`:
+CI на каждый push в `main` (`.github/workflows/ci.yml`, 22 шага):
+Checkout → Setup pnpm → Setup Node 22 → Install (frozen-lockfile) → Prisma
+generate → migrate deploy → seed → Build shared → TypeScript check (server,
+web, desktop) → Lint (shared, server, web) → Test (shared, server, web) →
+Build (shared, server, …).
 
-```bash
-# Локально (для проверки):
-cd packages/web && npx --yes vite build
-cd packages/server && npx --yes tsc --noEmit
-```
+Сборка образов по тегу: `.github/workflows/cd.yml` собирает и публикует
+`balloo/server` и `balloo/web` в GitHub Container Registry (ghcr).
 
 ### Шаг 3 — Тег
+
+⚠️ Решение владельца 29.09: тег `v1.0.0` ставится **перед деплоем**, по отдельной
+команде (до этого тег не ставится).
 
 ```bash
 git tag v1.0.0
@@ -71,78 +75,66 @@ git push origin v1.0.0
 
 ### Шаг 4 — Деплой
 
-**Деплой — батчи от владельца (см. AGENTS.md «Команда Деплой»).**
+**Деплой — батчи от владельца (см. AGENTS.md «Команда Деплой»), не через CI.**
 
-Базовая команда (на сервере):
+Этапы: `git fetch origin` → `git checkout -B main origin/main` →
+`git merge --ff-only` → тег откатной точки (`docker tag balloo/web:local
+balloo/web:rollback-<дата>`) → `build web` → `up -d --no-deps --force-recreate web`
+(`--force-recreate` обязателен: имя образа не меняется). Порядок: **сначала API
+(`server`), затем `web`** (CSP `connect-src` и CORS отдаёт API).
 
-```bash
-cd /home/cfr_balloo/balloo
-git fetch origin
-git checkout -B main origin/main
-git merge --ff-only origin/main
-
-# Сборка образов (явные сервисы, НЕ голый up -d):
-docker compose -f docker/prod/docker-compose.local.yml \
-  --env-file docker/prod/.env.production build web server
-
-# Запуск (только web и server, БД не трогать):
-docker compose -f docker/prod/docker-compose.local.yml \
-  --env-file docker/prod/.env.production up -d web server
-```
-
-**Порядок:** сначала API (`server`), затем `web` (CSP `connect-src` и CORS отдаёт API).
+Батчи C→G и стоп-условия — в `AGENTS.md` «Команда Деплой» §4; запрещённые
+команды (down/network prune/systemctl restart) — §4 там же.
 
 ### Шаг 5 — Проверка
 
 ```bash
-# Здоровье API:
-curl -s https://api.balloo.su/health -w "\n%{http_code}"
+# Здоровье API (на проде /health закрыт auth_basic — 401 без учёток = норма):
+curl -sI https://api.balloo.su/health | head -3
 
 # Здоровье web:
 curl -sI https://balloo.su | head -5
 
-# Веб-аудит (с рабочей машины):
+# Веб-аудит (с рабочей машины, живой браузер):
 node scripts/p37-prod-check.cjs
 ```
+
+Финальное подтверждение деплоя — вывод сервера (батч G: HEAD, imageid, маркер
+нового кода, хэш бандля) **и** ручной чек-лист владельца (`AGENTS.md` §5.2).
 
 ---
 
 ## 4. Откат
 
-### Откат web (простой)
+### Откат web через откатной тег образа (основной способ)
 
 ```bash
-# На сервере:
+# На сервере (до деплоя тег создаётся — этап E «Команды Деплой»):
+docker tag balloo/web:rollback-20261001 balloo/web:local
+docker compose -f docker/prod/docker-compose.local.yml \
+  --env-file docker/prod/.env.production up -d --no-deps --force-recreate web
+```
+
+### Откат кодом (если образа-тега нет)
+
+```bash
 cd /home/cfr_balloo/balloo
-git checkout v1.0.0  # предыдущий стабильный тег
+git fetch origin
+git checkout <откатной-коммит>          # не переписывать origin/main!
 docker compose -f docker/prod/docker-compose.local.yml \
   --env-file docker/prod/.env.production build web
 docker compose -f docker/prod/docker-compose.local.yml \
-  --env-file docker/prod/.env.production up -d web
+  --env-file docker/prod/.env.production up -d --no-deps --force-recreate web
 ```
+
+⚠️ Никогда не использовать `git reset --hard` / `git clean` / force-push:
+сервер обновляется только `--ff-only`.
 
 ### Откат API (осторожно)
 
-Откат API — **только вместе с web**, если менялись `COOKIE_DOMAIN` / `CORS_ORIGIN` (смена домена cookie ломает авторизацию у уже выданных сессий).
-
-```bash
-# На сервере:
-cd /home/cfr_balloo/balloo
-git checkout v1.0.0
-docker compose -f docker/prod/docker-compose.local.yml \
-  --env-file docker/prod/.env.production build web server
-docker compose -f docker/prod/docker-compose.local.yml \
-  --env-file docker/prod/.env.production up -d web server
-```
-
-### Откатная точка образа
-
-Перед деплоем можно сохранить текущий образ:
-
-```bash
-docker tag balloo/web:latest balloo/web:rollback-$(date +%Y%m%d)
-docker tag balloo/server:latest balloo/server:rollback-$(date +%Y%m%d)
-```
+Откат API — **только вместе с web**, если менялись `COOKIE_DOMAIN` / `CORS_ORIGIN`
+(смена домена cookie ломает авторизацию у уже выданных сессий). При откате API
+сеть, тома, postgres, redis, minio и `.env` не трогать.
 
 ---
 
@@ -171,22 +163,29 @@ docker tag balloo/server:latest balloo/server:rollback-$(date +%Y%m%d)
 
 ## 6. CI/CD
 
-### GitHub Actions (`.github/workflows/ci.yml`)
+### GitHub Actions `.github/workflows/ci.yml` (факт)
 
-При пуше в `main`:
-1. `pnpm install --frozen-lockfile`
-2. `pnpm lint`
-3. `pnpm type-check`
-4. `pnpm test:all`
-5. `pnpm build`
+Триггер: push/PR в `main`, `dev`, `develop`. Один job `test` (Node 22,
+PostgreSQL/Redis-сервисы, timeout 30 мин), шаги:
 
-При теге `v*`:
-- Сборка Docker-образов
-- Публикация в registry (опционально)
+1. Checkout, Setup pnpm, Setup Node (cache pnpm)
+2. Install dependencies (`--frozen-lockfile`)
+3. Prisma generate → migrate deploy → seed
+4. Build shared (до typecheck — иначе TS2307)
+5. TypeScript check ×3 (server, web, desktop)
+6. Lint ×3 (shared, server, web)
+7. Test shared / Test server / Test web
+8. Build shared / Build server / Build web
 
-### GitHub Pages (`.github/workflows/pages.yml`)
+### GitHub Actions `.github/workflows/cd.yml` (факт)
 
-Автопубликация статических сайтов `mockups/` на GitHub Pages.
+Триггер: тег `v*`. Сборка и публикация `balloo/server` и `balloo/web`
+в ghcr (`docker/build-push-action`, Buildx). Деплой на сервер CD **не делает** —
+выкатка всегда руками владельца батчами (§3 Шаг 4).
+
+### GitHub Pages
+
+`.github/workflows/pages.yml` не существует — автопубликации макетов нет.
 
 ---
 
@@ -204,14 +203,15 @@ docker tag balloo/server:latest balloo/server:rollback-$(date +%Y%m%d)
 
 - [ ] `package.json` — версия обновлена
 - [ ] `CHANGELOG.md` — раздел добавлен
-- [ ] CI зелёный
-- [ ] `git tag v<версия>` запушен
-- [ ] Батч деплоя выполнен (батч от владельца)
-- [ ] `/health` API — 200
-- [ ] `/health` web — 200
-- [ ] `scripts/p37-prod-check.cjs` — аудит пройден
-- [ ] Откатная точка образа сохранена
+- [ ] Локально: `pnpm build` exit 0, `pnpm test` зелёные (счётчики записаны)
+- [ ] `git tag v<версия>` запушен (по решению владельца)
+- [ ] Этап A «Деплоя»: незакоммиченных трекаемых файлов нет (`git status --porcelain`)
+- [ ] Батчи C→G выполнены, вывод сервера соответствует ожиданиям (`AGENTS.md` §4)
+- [ ] Батч G: HEAD = хэш пуша, маркер нового кода ≥1, хэш бандля изменился
+- [ ] Ручной чек-лист владельца пройден (`AGENTS.md` §5.2)
+- [ ] Откатная точка образа `balloo/web:rollback-<дата>` существует
+- [ ] Тикет деплоя в `tickets/Done/<дата>/` содержит 8 обязательных артефактов
 
 ---
 
-*Документ создан 2026-09-30.*
+*Документ создан 2026-09-30, актуализирован 2026-10-01.*

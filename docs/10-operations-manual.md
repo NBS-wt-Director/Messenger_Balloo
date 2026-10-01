@@ -1,7 +1,8 @@
 # 📋 Operations Manual — Balloo Messenger
 
-> **Версия:** 1.0 | **Дата:** 2026-09-30
-> Инструкции для владельца сервера. Все команды проверены на хосте `aedgar` (188.76.243.185).
+> **Версия:** 1.1 | **Дата:** 2026-10-01 (актуализация по HEAD `411d69a`)
+> Инструкции для владельца сервера. Факты сверены с `docker/prod/docker-compose.local.yml`
+> и `.env.production`; прод-команды проверены выводом сервера 29.09 (тикеты `1790523936`, `1790700801`).
 
 ---
 
@@ -9,19 +10,35 @@
 
 ### Prometheus + Grafana
 
-В docker-стеке (`docker/prod/docker-compose.local.yml`) сервисы мониторинга включены через профиль `monitoring`:
+В docker-стеке (`docker/prod/docker-compose.local.yml`) сервисы мониторинга:
 
-| Сервис | Порт | Назначение |
+| Сервис | Порт на хосте (127.0.0.1) | Контейнерный порт |
 |---|---|---|
-| Prometheus | 9090 | Сбор метрик |
-| Grafana | 3001 | Дашборды |
-| Alertmanager | 9093 | Алерты |
+| Prometheus | `${PROMETHEUS_HOST_PORT:-9091}` | 9090 |
+| Grafana | `${GRAFANA_HOST_PORT:-3002}` | 3000 |
+| Alertmanager | `${ALERTMANAGER_HOST_PORT:-9094}` | 9093 |
 
-**Сбор метрик:** сервер экспортирует метрики на `/metrics` (порт 3100). Prometheus scrape-конфиг в `docker/prod/prometheus.yml`.
+Все три — `profile: monitoring` (не поднимаются основным `up -d`).
 
-**Дашборды:** провижнены в `docker/prod/grafana/provisioning/dashboards/`. На момент v1.0.0 дашборды базовые — CPU, память, сеть, запросы/сек. Расширение дашбордов — задача v2.
+**Сбор метрик:** prometheus.yml скрейпит `server:3000/metrics` (scrape_interval 10s).
+⚠️ **Фактический статус:** `/metrics` на сервере отдаёт только админ-маршрут
+`GET /api/admin/metrics` (JSON с бизнес-счётчиками, authRequired+adminOnly) —
+**Prometheus-формата метрик (`prom-client`) в коде нет**. Скрейпинг получит 401/JSON
+вместо текстового формата. Дашборды будут пустыми, пока `/metrics` в формате
+Prometheus не реализован (кандидат в v2 / отдельный тикет).
 
-**Алерты:** настроены в `docker/prod/alertmanager.yml`. Каналы уведомлений: Telegram-бот, Email.
+**Дашборды:** провижнены в `docker/prod/grafana/provisioning/dashboards/`
+(`balloo-production.json`); datasource-провижнинг пуст (`datasources/` пусто) —
+Grafana потребует ручного подключения Prometheus после первого старта.
+
+**Алерты:** `docker/prod/alertmanager.yml` — receivers `slack-critical` /
+`slack-notifications` (Slack webhooks); email/telegram receivers закомментированы.
+⚠️ `SLACK_WEBHOOK` в `.env.production` пуст — алерты сейчас никуда не доставляются.
+
+**Service Status (в приложении):** модель `ServiceMetric` (`schema.prisma:1028`)
+есть и заполняется `getMetrics` (admin); health-check воркера на node-cron и
+WebSocket-канала `status.update` **в коде нет** — раздел «Service Status» в
+`docs/06` описывает целевую v1-схему, не факт (см. §7 ниже).
 
 ---
 
@@ -29,17 +46,19 @@
 
 ### PostgreSQL
 
-**Механизм:** `pg_dump` в именованный volume `prod_postgres-backups` (примонтирован в контейнер как `/backups`).
+**Механизм:** `pg_dump` в bind-каталог `/home/cfr_balloo/balloo/docker/prod/backups`
+(примонтирован в контейнер как `/backups` — единственный bind у postgres, остальное —
+named volumes).
 
-**Скрипт бэкапа:**
+**Скрипт бэкапа (внутри контейнера, роль `balloo` — в контейнере нет роли `postgres`):**
 
 ```bash
-# Запуск бэкапа вручную:
 docker exec -i balloo-postgres pg_dump -U balloo -d balloo \
   | gzip > /backups/balloo-backup-$(date +%Y%m%d-%H%M%S).sql.gz
 ```
 
-**Периодичность:** на данный момент **резервных копий нет** (cron у `cfr_balloo` пуст). Необходимо настроить cron:
+**Периодичность:** на данный момент **резервных копий нет** (cron у `cfr_balloo` пуст,
+подтверждено сервером 27.09). Необходимо настроить cron:
 
 ```cron
 # /etc/cron.d/balloo-backup (от пользователя cfr_balloo)
@@ -49,17 +68,23 @@ docker exec -i balloo-postgres pg_dump -U balloo -d balloo \
 **Восстановление:**
 
 ```bash
-# 1. Остановить сервер (чтобы не было записей во время восстановления):
-# (батч от владельца — см. AGENTS.md «Команда Деплой»)
+# 1. Остановить запись в БД (батч от владельца — см. AGENTS.md «Команда Деплой»;
+#    up -d --no-deps server после остановки web)
 
-# 2. Восстановить из бэкапа:
+# 2. Восстановить из бэкапа (роль balloo, не postgres!):
 zcat /backups/balloo-backup-20260930-030000.sql.gz \
   | docker exec -i balloo-postgres psql -U balloo -d balloo
 
-# 3. Пересоздать индексы после восстановления (если были DROP):
+# 3. Поднять server после восстановления:
 cd /home/cfr_balloo/balloo
-docker compose -f docker/prod/docker-compose.local.yml --env-file docker/prod/.env.production up -d --no-deps server
+docker compose -f docker/prod/docker-compose.local.yml \
+  --env-file docker/prod/.env.production up -d --no-deps server
 ```
+
+⚠️ **Ловушка ролей:** `docker exec balloo-postgres psql -U postgres …` падает с
+`FATAL: role "postgres" does not exist` (подтверждено сервером 29.09) — в контейнере
+только роль `balloo`. То же для хостовых `psql`/`redis-cli`: они попадают в
+**хостовые** postgres/redis, не в контейнерные. В контейнер — только через `docker exec`.
 
 **Хранение:** автоматическая чистка старше 7 дней:
 
@@ -69,10 +94,11 @@ docker compose -f docker/prod/docker-compose.local.yml --env-file docker/prod/.e
 
 ### MinIO (S3)
 
-MinIO данные в volume `prod_minio-data`. Ручной бэкап:
+MinIO данные в named volume `prod_minio-data`. Ручной бэкап:
 
 ```bash
-docker run --rm -v prod_minio-data:/data -v /backups:/backup alpine tar czf /backup/minio-backup-$(date +%Y%m%d).tar.gz -C /data .
+docker run --rm -v prod_minio-data:/data -v /backups:/backup alpine \
+  tar czf /backup/minio-backup-$(date +%Y%m%d).tar.gz -C /data .
 ```
 
 ---
@@ -160,13 +186,29 @@ docker builder prune -f
 docker system prune -f
 ```
 
-### Порт 3000 на хосте занят неизвестным процессом
+### Порт 3000 на хосте занят чужим процессом
 
-Порт `*:3000` слушает неизвестный процесс на хосте. Порт приложения (`balloo-server`) опубликован на `127.0.0.1:3100`, поэтому конфликта нет. Для идентификации:
+Порт `*:3000` слушает `next-server` (pid 1646994, опознан 29.09.2026) — это
+чужой Next.js-проект на хосте, **не Balloo**. Порт приложения (`balloo-server`)
+внутренний 3000, но наружу опубликован как `127.0.0.1:3100`, конфликта нет.
+Порт 3000 в ufw не открыт — снаружи недоступен. Для повторной идентификации:
 
 ```bash
-sudo lsof -i :3000
+sudo ss -ltnp | grep ':3000'
 ```
+
+### Ловушка: корректный health-путь
+
+У приложения health — `/health` (и `/health/ready`), не `/api/health`:
+`curl https://api.balloo.su/api/health` даст 404 (подтверждено 29.09).
+На проде оба health-пути закрыты `auth_basic` nginx — **401 без учёток = норма**;
+healthcheck'и контейнеров ходят на `127.0.0.1:3100` напрямую, мимо nginx.
+
+### Ловушка: контракт API — с префиксом /api
+
+Все API-маршруты живут под `/api/...` (`https://api.balloo.su/api/...`).
+Путь без префикса (`https://api.balloo.su/auth/refresh-cookie`) даст 404 от Express
+(подтверждено 29.09: 404 с helmet-заголовками — ответ приложения, не nginx).
 
 ---
 
@@ -175,14 +217,27 @@ sudo lsof -i :3000
 | Компонент | Путь / Порт |
 |---|---|
 | Git-репо | `/home/cfr_balloo/balloo` |
-| Compose | `/home/cfr_balloo/balloo/docker/prod/docker-compose.local.yml` |
-| Env | `/home/cfr_balloo/balloo/docker/prod/.env.production` |
-| Nginx конфиг | `/etc/nginx/sites-enabled/balloo-docker.conf` |
-| Бэкапы БД | `/backups` (volume, примонтирован в контейнер) |
-| Сертификаты | `/etc/letsencrypt/live/` (certbot) |
-| БД | volume `prod_postgres-data` |
-| Медиа | volume `prod_minio-data` |
-| Сессии | volume `prod_redis-data` |
+| Compose (реально запущен) | `/home/cfr_balloo/balloo/docker/prod/docker-compose.local.yml` |
+| Env (единственный источник секретов) | `/home/cfr_balloo/balloo/docker/prod/.env.production` (`chmod 600`) |
+| Nginx vhost | `/etc/nginx/sites-enabled/balloo-docker.conf` |
+| Бэкапы БД | `/home/cfr_balloo/balloo/docker/prod/backups` ↔ `/backups` в контейнере |
+| Сертификаты | `/etc/letsencrypt/live/` (certbot, по поддомену) |
+| БД | named volume `prod_postgres-data` |
+| Медиа | named volume `prod_minio-data` |
+| Сессии | named volume `prod_redis-data` |
+| server наружу | `127.0.0.1:3100` (web-контейнер `127.0.0.1:8090→80`, `WEB_HOST_PORT=8090`) |
+| MinIO console | `127.0.0.1:9001` (S3 9000 наружу не опубликован) |
+
+Контейнеры: `balloo-postgres`, `balloo-redis`, `balloo-minio`, `balloo-server`,
+`balloo-web` (все `restart: always`); мониторинг (`balloo-prometheus`,
+`balloo-grafana`, `balloo-alertmanager`) — профиль `monitoring`.
+
+⚠️ **Сеть `balloo-net` (compose-проект `prod`) — не пересоздавать** (см. §4):
+шлюз `172.19.0.1` = хостовый postfix, `SMTP_HOST` для исходящей почты.
+
+⚠️ **На той же машине другие проекты** (shared-хост): сайт cfrsite
+(`/home/cfr_balloo/sites/`), чужой next-server на `*:3000`, хостовые
+PostgreSQL/Redis (5432/6379), vsc/cockpit/console-вхосты. Их не трогать.
 
 ---
 
@@ -191,10 +246,33 @@ sudo lsof -i :3000
 | Роль | Способ |
 |---|---|
 | SSH | `ssh cfr_balloo@188.76.243.185` (хост `aedgar`) |
-| PostgreSQL | `docker exec -it balloo-postgres psql -U balloo -d balloo` |
-| Redis | `docker exec -it balloo-redis redis-cli` |
+| PostgreSQL (контейнер) | `docker exec -it balloo-postgres psql -U balloo -d balloo` |
+| Redis (контейнер) | `docker exec -it balloo-redis redis-cli` |
 | GitHub | `https://github.com/NBS-wt-Director/Messenger_Balloo` |
+| Канонический вход | хостовый nginx + Let's Encrypt (Cloudflare-туннель для balloo.su не задействован — проверено `cf-ray` отсутствует) |
 
 ---
 
-*Документ создан 2026-09-30. Обновлять при изменении инфраструктуры.*
+## 7. Расхождения docs/06 с фактом (зафиксировано 01.10)
+
+В `docs/06-devops-infrastructure.md` первые таблицы (v1, от 30.07) описывают
+целевую схему и **не соответствуют факту**; фактическая часть начинается с
+заголовка «Доменная схема и env API (Вариант C…)»:
+
+- порты web `8080` / grafana `3001` / prometheus `9090` в таблицах v1 — факт:
+  `8090` (WEB_HOST_PORT), `3002` (GRAFANA_HOST_PORT), `9091` (PROMETHEUS_HOST_PORT);
+- nginx в контейнере (`nginx:1.25-alpine`, порт 80/443) — факт: nginx **хостовый**,
+  контейнера nginx в compose нет;
+- health-check воркер, WS-канал `status.update`, модель `ServiceStatusSnapshot` —
+  в коде отсутствуют (есть только `ServiceMetric`);
+- CI с 10 job'ами (e2e/load/security-tests, автодеплой SSH) — факт: `ci.yml`
+  (install→migrate→seed→typecheck×3→lint×3→test×3→build), `cd.yml` — сборка и
+  публикация образов в ghcr по тегу; автодеплоя SSH в CI нет;
+- «Прямой пуш в main запрещён» — правило процесса, в CI-конфиге не реализовано.
+
+Этот раздел — первоисточник для правки `docs/06` (задача п.6 тикета
+`1790479920-03`); сами таблицы v1 в `docs/06` помечены при сверке.
+
+---
+
+*Документ создан 2026-09-30, актуализирован 2026-10-01. Обновлять при изменении инфраструктуры.*

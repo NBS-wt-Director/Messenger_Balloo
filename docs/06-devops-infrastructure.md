@@ -1,36 +1,55 @@
 # AI-Agent: DevOps & Infrastructure Specification
 
 > Этот документ — спецификация для генерации Docker Compose, CI/CD и инфраструктуры.
-> **Версия:** 1.1 | **Дата:** 2026-07-30
+> **Версия:** 1.2 | **Дата:** 2026-10-01 (сверка с фактическим `docker/prod/`;
+> целевые блоки ниже помечены «(v1, цель)» и фактом не являются)
+> Актуализация выполнена тикетом `1790479920-03` (сверка по HEAD `411d69a`).
 
 ---
 
 ## 🏗️ Production Docker Compose
 
-**Файл:** `docker/prod/docker-compose.yml`
+**Файл (факт):** `docker/prod/docker-compose.local.yml` (+ `.env.production`).
+Файлов `docker-compose.yml`/`docker-compose.prod.yml` в каталоге тоже есть, но
+рабочий стек прода — `docker-compose.local.yml` (подтверждено деплой-батчами P37-1).
 
-### Сервисы
+### Сервисы (факт compose-файла)
 
-| Сервис | Образ | Порты | Реплики | Описание |
-|--------|-------|-------|---------|----------|
-| `postgres` | postgres:16-alpine | 5432 | 1 | Основная БД |
-| `redis` | redis:7-alpine | 6379 | 1 | Кэш и сессии |
-| `minio` | minio/minio:latest | 9000, 9001 | 1 | S3-совместимое хранилище |
-| `server` | balloo-server | 3100 | 2 | Бэкенд (Express + WebSocket) |
-| `web` | balloo-web | 8080 | 2 | Фронтенд (React + Vite) |
-| `nginx` | nginx:1.25-alpine | 80, 443 | 1 | Фронтальный прокси + SSL |
-| `prometheus` | prom/prometheus:latest | 9090 | 1 | Сбор метрик |
-| `grafana` | grafana/grafana:latest | 3001 | 1 | Дашборды |
-| `alertmanager` | prom/alertmanager:latest | 9093 | 1 | Алерты |
+| Сервис | Образ / имя | Публикация на хосте | Примечание |
+|--------|-------|-------|---------|
+| `postgres` | postgres:16-alpine | не публикуется (внутренняя сеть) | Основная БД |
+| `redis` | redis:7-alpine | не публикуется | Кэш и сессии |
+| `minio` | minio/minio | консоль 9001, S3 9000 (127.0.0.1) | S3-хранилище; наружу — только консоль (см. В-99) |
+| `server` | balloo-server | `127.0.0.1:${SERVER_HOST_PORT:-3100}:3000` | Express + WS `/ws/` |
+| `web` | balloo-web | `127.0.0.1:${WEB_HOST_PORT:-8080}:80` | прод: `WEB_HOST_PORT=8090` |
+| `prometheus` ⚠ | prom/prometheus | `127.0.0.1:${PROMETHEUS_HOST_PORT:-9091}:9090` | `profiles: [monitoring]` — не поднимается обычным `up -d` |
+| `grafana` ⚠ | grafana/grafana | `127.0.0.1:${GRAFANA_HOST_PORT:-3002}:3000` | `profiles: [monitoring]` |
+| `alertmanager` ⚠ | prom/alertmanager | `127.0.0.1:${ALERTMANAGER_HOST_PORT:-9094}:9093` | `profiles: [monitoring]` |
 
-### Конфигурационные файлы
+⚠ **Расхождения с целевой v1-спецификацией (проверено 01.10.2026):**
 
-- `docker/prod/docker-compose.yml` — orchestration
-- `docker/prod/nginx.conf` — SSL, rate limiting, reverse proxy
+- **Nginx-контейнера нет** — TLS и роутинг делает **хостовый nginx**
+  (`/etc/nginx/sites-enabled/balloo-docker.conf`, конфиги в `docker/prod/nginx/`).
+  Таблица выше и «Сервисы и поддомены (v1)» ниже описывают цель, не факт.
+- **Реплики не настроены** (`deploy:` в compose отсутствует) — по одному контейнеру.
+- **Prometheus не получает метрик в своём формате**: `prometheus.yml` скрейпит
+  `server:3000/metrics`, но в коде сервера нет `prom-client` — `/metrics`
+  отдаёт только админ-JSON `GET /api/admin/metrics` (401 для Prometheus).
+  Скрейпинг даст 401/JSON; дашборды будут пустыми (детали — `docs/10` §1).
+- **Grafana datasource не провижен** — `provisioning/datasources/` пуст,
+  подключать Prometheus после первого старта вручную.
+- **Alertertmanager доставляет в Slack**, но `SLACK_WEBHOOK=""` в
+  `.env.production` — алерты никуда не уходят (Telegram/Email-приёмники закомментированы).
+
+### Конфигурационные файлы (факт)
+
+- `docker/prod/docker-compose.local.yml` — orchestration прода
+- `docker/prod/nginx/` — vhost'ы хостового nginx (SSL, роутинг поддоменов)
+- `docker/prod/nginx-production.conf` — security-заголовки (HSTS, Permissions-Policy)
 - `docker/prod/prometheus.yml` — scrape configs
 - `docker/prod/alertmanager.yml` — routing и receivers
-- `docker/prod/grafana/provisioning/datasources/` — datasource configs
-- `docker/prod/grafana/provisioning/dashboards/` — dashboard configs
+- `docker/prod/grafana/provisioning/dashboards/` — дашборд `balloo-production.json`
+- `docker/prod/grafana/provisioning/datasources/` — **пусто** (см. ⚠ выше)
 
 ---
 
@@ -176,7 +195,18 @@ server {
 
 ## CI/CD (GitHub Actions)
 
-### Пайплайн (Последовательный запуск)
+> Ниже — **целевая v1-спецификация**. Фактический файл —
+> `.github/workflows/ci.yml` (единый job `ci`): Postgres 16 + Redis 7 как
+> service-контейнеры, шаги: setup pnpm → Node 22 → install → prisma
+> generate/db push/seed → build shared → tsc ×3 (server/web/desktop) → lint ×3
+> (`|| true` — линтеров нет, скрипты-заглушки) → тесты shared/server/web →
+> build ×3. Триггеры: push/PR в `main`, `dev`, `develop`. Деплой из CI
+> **не выполняется** — выкладка на прод только вручную по протоколу
+> «Команда Деплой» из `AGENTS.md`. Состояние на 01.10.2026: все шаги до
+> Test server зелёные, Test server падает (лог требует GitHub-токен,
+> тикет `1790479490-07`).
+
+### Пайплайн (Последовательный запуск) — целевая v1-спецификация
 
 ```yaml
 # .github/workflows/ci.yml
@@ -270,7 +300,7 @@ jobs:
             docker compose up -d --force-recreate
 ```
 
-## Git стратегия: GitHub Flow
+## Git стратегия: GitHub Flow (целевая v1-спецификация)
 
 ```
 main (production)
@@ -280,23 +310,26 @@ main (production)
  └── hotfix/critical-security-patch
 ```
 
-- Прямой пуш в `main` запрещён.
-- Каждый PR проходит CI (lint → type-check → tests → build).
-- Ревью минимум 1 разработчик.
-- После merge → автодеплой через Docker Compose.
+- Прямой пуш в `main` **фактически используется** (команда из двух человек,
+  branch-защиты не настроены — см. пометку в `docs/11-release-process.md` §2).
+- CI проходит на push в `main` без PR.
+- После зелёного CI выкладка на прод — вручную, батчами по протоколу
+  «Команда Деплой» (`AGENTS.md`); автодеплоя из CI нет.
 
-## Алерты
+## Алерты (факт 01.10.2026)
 
-| Канал | Кому | Когда |
-|-------|------|-------|
-| Telegram-бот | Всем админам сервиса | Падение сервера, критическая ошибка |
-| Email | Всем админам сервиса | Падение БД, исчерпание места, сбой бэкапа |
+| Канал | Статус | Когда |
+|-------|--------|-------|
+| Slack (`slack-critical` / `slack-notifications`) | настроен в `alertmanager.yml`, но **не доставляется**: `SLACK_WEBHOOK=""` в `.env.production` | По правилам роутинга |
+| Telegram-бот | целевая v1-спецификация, в `alertmanager.yml` закомментирован | — |
+| Email | целевая v1-спецификация, закомментирован | — |
 
-## Бэкапы
+## Бэкапы (факт 01.10.2026)
 
-| Что | Частота | Хранение | Где |
-|-----|---------|----------|-----|
-| PostgreSQL | Ежедневно | 3 дня | MinIO (`balloo-backups`) |
+| Что | Факт |
+|-----|------|
+| PostgreSQL | **Резервных копий нет**: cron у `cfr_balloo` пуст (подтверждено сервером 27.09, вопрос В-98). Целевая схема: `pg_dump` в bind-каталог `docker/prod/backups` + cron + ротация — команды в `docs/10-operations-manual.md` §2 |
+| MinIO (`balloo-backups`) | целевая v1-спецификация, не реализована |
 
 ## Логи (Retention)
 
@@ -314,7 +347,13 @@ main (production)
 
 ---
 
-## 🆕 Service Status — мониторинг узлов (v1 — дополнение)
+## 🆕 Service Status — мониторинг узлов (v1 — дополнение; **цель, не факт**)
+
+> **Факт на 01.10.2026:** модель `ServiceMetric` в Prisma есть
+> (`schema.prisma`, заполняется `getMetrics` для админки), но health-check
+> воркера на node-cron, таблицы `service_status_snapshots` и WebSocket-канала
+> `status.update` **в коде нет** (`grep node-cron|cron.schedule` по
+> `packages/server/src` — пусто). Раздел ниже описывает целевую v1-схему.
 
 ### Health-check воркеры (cron)
 - Воркер на стороне сервера периодически (каждые 30–60 сек) опрашивает узлы экосистемы (`balloo`, `admin`, `command`, `features`, `history`, `download`, `docs`, `blog`).

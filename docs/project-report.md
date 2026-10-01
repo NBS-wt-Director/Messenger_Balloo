@@ -148,8 +148,9 @@ dist/coverage/release/.expo/android-обёрток):
 | `07-ai-instructions-kodacode.md`, `07-nodes-guide-human.md`, `07-server-setup-guide.md` | Гайды по узлам, инструкции AI, setup сервера |
 | `08-nodes-guide-ai.md`, `08-v2-roadmap.md` | Гайд узлов AI, роадмап v2 |
 | `09-clients-guide.md` + `.pdf` | Гайд клиентов |
-| `10-operations-manual.md`, `11-release-process.md`, `12-security-audit.md` | **создаются тикетом `1790479920-03`** |
-| `security-audit.md` | Аудит безопасности (30.07, переносится под №12) |
+| `10-operations-manual.md`, `11-release-process.md`, `12-security-audit.md` | **созданы тикетом `1790479920-03`** (коммит `b42ed06` 30.09; актуализация 12-го — 01.10) |
+| `12-frontend-architecture.md`, `13-backend-architecture.md`, `14-business-processes.md` | Архитектурные документы (30.09) |
+| `security-audit.md` | ~~старый путь~~ — перенесён в `12-security-audit.md` (`git mv`, `b42ed06`) |
 | `v2-features-catalog.md` | Каталог фич v2 |
 | `api-keys/` | Инструкции по ключам внешних сервисов |
 | `issues/` | Известные проблемы |
