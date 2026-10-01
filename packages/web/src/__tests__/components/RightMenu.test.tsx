@@ -13,8 +13,8 @@ import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import { I18nProvider, RightMenu, SUPPORTED_LANGUAGES, useUIStore } from '@balloo/ui';
 
 /** Подписки пунктов авторизованного + ярлык самой секции (settings.account). */
-const ACCOUNT_LABELS = ['Профиль', 'Настройки', 'Аккаунты', 'Аккаунт'];
-const RAW_KEYS = ['menu.profile', 'menu.settings', 'menu.accounts'];
+const ACCOUNT_LABELS = ['Профиль', 'Контакты', 'Настройки', 'Аккаунты', 'Аккаунт'];
+const RAW_KEYS = ['menu.profile', 'menu.contacts', 'menu.settings', 'menu.accounts'];
 
 function renderMenu(props = {}) {
   const onNavigate = vi.fn();
@@ -55,6 +55,10 @@ describe('RightMenu — подписи секции «Аккаунт»', () => {
     fireEvent.click(screen.getByText('Профиль'));
     expect(onNavigate).toHaveBeenLastCalledWith('/profile');
 
+    // В-12 (тикет 1790847000): «Контакты» добавлены в правое меню → /contacts
+    fireEvent.click(screen.getByText('Контакты'));
+    expect(onNavigate).toHaveBeenLastCalledWith('/contacts');
+
     fireEvent.click(screen.getByText('Настройки'));
     expect(onNavigate).toHaveBeenLastCalledWith('/settings');
 
@@ -80,7 +84,7 @@ describe('RightMenu — подписи секции «Аккаунт»', () => {
     // Ярлык секции общий для гостя и авторизованного, а вот пунктов аккаунта
     // у гостя быть не должно.
     expect(screen.getAllByText('Аккаунт').length).toBeGreaterThan(0);
-    for (const label of ['Профиль', 'Настройки', 'Аккаунты']) {
+    for (const label of ['Профиль', 'Контакты', 'Настройки', 'Аккаунты']) {
       expect(screen.queryByText(label)).toBeNull();
     }
   });

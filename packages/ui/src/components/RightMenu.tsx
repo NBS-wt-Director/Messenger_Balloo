@@ -8,6 +8,9 @@
 //       гость → кнопки Вход + Регистрация; авторизован → Профиль / Настройки /
 //       Мультиаккаунт / Выйти.
 //   поведение: toggle по кнопке, подменю ▾/▴, закрытие по клику вне и Escape.
+//   2026-10-01 (В-12, тикет 1790847000): в авторизованную секцию «Аккаунт»
+//   добавлен пункт «Контакты» → /contacts (решение владельца при приёмке
+//   экрана 1_01_05).
 //
 // Расхождения мокапа с контрактом web (решения зафиксированы в мультитикете §7 P38):
 //   - языков 20 (SUPPORTED_LANGUAGES), а не 6 из мокапа;
@@ -83,6 +86,7 @@ export const DEFAULT_LEGAL_ITEMS: RightMenuItem[] = [
  */
 export const DEFAULT_ACCOUNT_ITEMS: RightMenuItem[] = [
   { key: 'menu.profile', to: '/profile', icon: '👤' },
+  { key: 'menu.contacts', to: '/contacts', icon: '📇' },
   { key: 'menu.settings', to: '/settings', icon: '⚙️' },
   // Мультиаккаунт: секция аккаунтов живёт в профиле (ProfileScreen)
   { key: 'menu.accounts', to: '/profile', icon: '👥' },

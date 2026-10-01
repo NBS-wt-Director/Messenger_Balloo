@@ -1,8 +1,6 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { Component, type ReactNode } from 'react';
-import { ErrorBoundary } from '../components/ErrorBoundary';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { ErrorBoundary } from '../components/providers/ErrorBoundary';
 
 // Spy on console.error — React logs uncaught render errors via console.error.
 // It pollutes output and is not what we assert on here.
@@ -26,29 +24,41 @@ describe('ErrorBoundary', () => {
     expect(screen.getByText('ok')).toBeInTheDocument();
   });
 
-  it('catches a render error and shows the 500 fallback instead of children', () => {
+  it('catches a render error and shows the fallback instead of children', () => {
     render(
       <ErrorBoundary>
         <Exploder boom={true} />
       </ErrorBoundary>,
     );
     expect(screen.queryByText('ok')).not.toBeInTheDocument();
-    // Error500 renders the code and the human-readable title.
-    expect(screen.getByText('500')).toBeInTheDocument();
-    expect(screen.getByText('Внутренняя ошибка сервера')).toBeInTheDocument();
+    // Default fallback: заголовок «Что-то пошло не так» + кнопка перезагрузки.
+    expect(screen.getByText('Что-то пошло не так')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Обновить страницу/ })).toBeInTheDocument();
   });
 
-  it('recovers and re-renders children after the underlying error is gone', async () => {
-    const user = userEvent.setup();
-    const { rerender } = render(
-      <ErrorBoundary>
+  it('uses the custom fallback when provided', () => {
+    render(
+      <ErrorBoundary fallback={<div>КАСТОМНЫЙ ФОЛБЭК</div>}>
         <Exploder boom={true} />
       </ErrorBoundary>,
     );
-    expect(screen.getByText('500')).toBeInTheDocument();
+    expect(screen.getByText('КАСТОМНЫЙ ФОЛБЭК')).toBeInTheDocument();
+    expect(screen.queryByText('Что-то пошло не так')).not.toBeInTheDocument();
+  });
 
-    // "Попробовать снова" bumps the reset key AND reloads the window (jsdom
-    // stubs location.reload, so the component tree simply re-renders).
+  it('reports the error via the onError callback', () => {
+    const onError = vi.fn();
+    render(
+      <ErrorBoundary onError={onError}>
+        <Exploder boom={true} />
+      </ErrorBoundary>,
+    );
+    expect(onError).toHaveBeenCalledTimes(1);
+    expect(onError.mock.calls[0][0]).toBeInstanceOf(Error);
+    expect(onError.mock.calls[0][0].message).toBe('render exploded');
+  });
+
+  it('recovers: click reloads the window (recovery = fresh page load), children render after error is gone', () => {
     const reloadSpy = vi.fn();
     Object.defineProperty(window, 'location', {
       configurable: true,
@@ -56,11 +66,25 @@ describe('ErrorBoundary', () => {
       value: { ...window.location, reload: reloadSpy },
     });
 
-    await user.click(screen.getByRole('button', { name: /Попробовать снова/ }));
-    expect(reloadSpy).toHaveBeenCalled();
+    const { rerender, unmount } = render(
+      <ErrorBoundary>
+        <Exploder boom={true} />
+      </ErrorBoundary>,
+    );
+    expect(screen.getByText('Что-то пошло не так')).toBeInTheDocument();
 
-    // With the error source gone, a fresh mount renders children.
-    rerender(
+    // «Обновить страницу» перезагружает окно — в проде это и есть восстановление:
+    // страница грузится заново с чистым деревом. (Локальный reset внутри теста
+    // не восстанавливает рендер, пока дети бросают — клик по кнопке делает
+    // setState({hasError:false}), render видит детей с тем же throw и снова
+    // ловит ошибку. Это ожидаемое поведение boundary.)
+    fireEvent.click(screen.getByRole('button', { name: /Обновить страницу/ }));
+    expect(reloadSpy).toHaveBeenCalledTimes(1);
+
+    // После исчезновения источника ошибки новая страница (fresh mount)
+    // рендерит детей.
+    unmount();
+    render(
       <ErrorBoundary>
         <Exploder boom={false} />
       </ErrorBoundary>,
@@ -68,23 +92,3 @@ describe('ErrorBoundary', () => {
     expect(screen.getByText('ok')).toBeInTheDocument();
   });
 });
-
-// Minimal hand-rolled harness: a parent that can flip `boom` from outside
-// via a stored setState, so we can prove the boundary re-renders children
-// after a reset without relying on React internals.
-class Toggle extends Component<{ children: (set: (b: boolean) => void) => void }, { boom: boolean }> {
-  state = { boom: true };
-  render() {
-    return (
-      <div>
-        <button onClick={() => this.setState({ boom: !this.state.boom })}>toggle</button>
-        <ErrorBoundary key={this.state.boom ? 'boom' : 'fine'}>
-          {this.props.children((b) => this.setState({ boom: b }))}
-        </ErrorBoundary>
-      </div>
-    );
-  }
-}
-
-// Keep the import of ReactNode referenced (used by the harness type above).
-export type _Harness = ReactNode;

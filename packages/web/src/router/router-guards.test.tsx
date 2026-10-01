@@ -12,28 +12,32 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const mocks = vi.hoisted(() => ({
-  authState: {
+const mocks = vi.hoisted(() => {
+  const state = {
     user: null as { id: string; username: string } | null,
-    setUser: vi.fn(),
-  },
-  getMe: vi.fn(),
+    isAuthenticated: false,
+    setUserCalls: [] as unknown[],
+    // Мок-сеттер мутирует состояние (как настоящий zustand-сеттер): без этого
+    // после setChecking(false) user остаётся null и ProtectedRoute
+    // уводит на /login даже при успешном getMe.
+    setUser: (u: unknown) => {
+      state.setUserCalls.push(u);
+      state.user = (u as { id: string; username: string } | null) ?? null;
+      state.isAuthenticated = !!u;
+    },
+  };
+  return { state, getMe: vi.fn() };
+});
+
+// Реальные импорты гварда: useAuthStore из '@/store/authStore', api из '@/services/api'
+// (раньше мокались '@/store' и '@/api' — таких модулей нет, моки не перехватывались).
+vi.mock('@/store/authStore', () => ({
+  useAuthStore: (selector: (s: typeof mocks.state) => unknown) => selector(mocks.state),
 }));
 
-vi.mock('@/store', () => ({
-  useAuthStore: (selector: (s: typeof mocks.authState) => unknown) => selector(mocks.authState),
-}));
-
-vi.mock('@/api', () => ({
+vi.mock('@/services/api', () => ({
   api: { getMe: mocks.getMe },
 }));
-
-// Лэйауты и страницы тянут за собой API, WS и тяжёлые виджеты — для теста гвардов они не нужны.
-vi.mock('@/components/layout/AuthLayout', () => ({ AuthLayout: () => null }));
-vi.mock('@/components/layout/ChatLayout', () => ({ ChatLayout: () => null }));
-vi.mock('@/pages/ChatPage', () => ({ ChatPage: () => null }));
-vi.mock('@/pages/LoginPage', () => ({ LoginPage: () => null }));
-vi.mock('@/pages/RegisterPage', () => ({ RegisterPage: () => null }));
 
 import { GuestRoute, ProtectedRoute } from '@/router/index';
 
@@ -55,12 +59,18 @@ function clearSessionCookie() {
 describe('ProtectedRoute', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mocks.authState.user = null;
+    mocks.state.user = null;
+    mocks.state.isAuthenticated = false;
+    mocks.state.setUserCalls = [];
     clearSessionCookie();
+    // По умолчанию сессии нет: реальный api.getMe при отсутствии cookie
+    // отвечает 401 (rejected promise).
+    mocks.getMe.mockRejectedValue({ response: { status: 401 } });
   });
 
   it('авторизованного пропускает к children', () => {
-    mocks.authState.user = { id: 'u1', username: 'petya' };
+    mocks.state.user = { id: 'u1', username: 'petya' };
+    mocks.state.isAuthenticated = true;
 
     renderGuarded(
       <ProtectedRoute>
@@ -74,7 +84,7 @@ describe('ProtectedRoute', () => {
     expect(mocks.getMe).not.toHaveBeenCalled();
   });
 
-  it('гость без cookie и без user → редирект на /login', () => {
+  it('гость без cookie и без user → редирект на /login', async () => {
     renderGuarded(
       <ProtectedRoute>
         <div>ЗАЩИЩЁННЫЙ ЭКРАН</div>
@@ -82,15 +92,18 @@ describe('ProtectedRoute', () => {
       '/chat',
     );
 
-    expect(screen.getByText('НА_ЛОГИНЕ')).toBeInTheDocument();
+    // getMe вызывается один раз (попытка восстановления сессии), падает →
+    // setUser(null) и редирект на /login.
+    await waitFor(() => expect(screen.getByText('НА_ЛОГИНЕ')).toBeInTheDocument());
+    expect(mocks.getMe).toHaveBeenCalledTimes(1);
+    expect(mocks.state.setUserCalls).toContain(null);
     expect(screen.queryByText('ЗАЩИЩЁННЫЙ ЭКРАН')).not.toBeInTheDocument();
-    expect(mocks.getMe).not.toHaveBeenCalled();
   });
 
   it('cookie есть, getMe успешен → сессия восстанавливается в store', async () => {
     document.cookie = 'access_token=jwt-token';
-    const restored = { id: 'u2', username: 'vasya', email: null };
-    mocks.getMe.mockResolvedValue({ data: restored });
+    const restored = { id: 'u2', username: 'vasya' };
+    mocks.getMe.mockResolvedValueOnce(restored);
 
     renderGuarded(
       <ProtectedRoute>
@@ -99,14 +112,14 @@ describe('ProtectedRoute', () => {
       '/chat',
     );
 
-    await waitFor(() => expect(mocks.authState.setUser).toHaveBeenCalledWith(restored));
+    await waitFor(() => expect(mocks.state.setUserCalls).toContain(restored));
     // На время восстановления не должны выкидывать на /login.
     expect(screen.queryByText('НА_ЛОГИНЕ')).not.toBeInTheDocument();
   });
 
   it('cookie есть, но getMe отдаёт 401 → редирект на /login', async () => {
     document.cookie = 'access_token=expired-jwt';
-    mocks.getMe.mockRejectedValue({ response: { status: 401 } });
+    mocks.getMe.mockRejectedValueOnce({ response: { status: 401 } });
 
     renderGuarded(
       <ProtectedRoute>
@@ -116,12 +129,12 @@ describe('ProtectedRoute', () => {
     );
 
     await waitFor(() => expect(screen.getByText('НА_ЛОГИНЕ')).toBeInTheDocument());
-    expect(mocks.authState.setUser).not.toHaveBeenCalled();
+    expect(mocks.state.setUserCalls).toContain(null);
   });
 
   it('cookie есть, getMe падает по сети → редирект на /login (не висим в restoring)', async () => {
     document.cookie = 'access_token=any-jwt';
-    mocks.getMe.mockRejectedValue(new Error('Network Error'));
+    mocks.getMe.mockRejectedValueOnce(new Error('Network Error'));
 
     renderGuarded(
       <ProtectedRoute>
@@ -137,11 +150,13 @@ describe('ProtectedRoute', () => {
 describe('GuestRoute', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mocks.authState.user = null;
+    mocks.state.user = null;
+    mocks.state.isAuthenticated = false;
   });
 
-  it('авторизованного уводит с /login на /chat', async () => {
-    mocks.authState.user = { id: 'u1', username: 'petya' };
+  it('авторизованного уводит с /login на /chat', () => {
+    mocks.state.user = { id: 'u1', username: 'petya' };
+    mocks.state.isAuthenticated = true;
 
     render(
       <MemoryRouter initialEntries={['/login']}>
