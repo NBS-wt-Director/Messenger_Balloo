@@ -1,6 +1,8 @@
 // P36: полный обход всех маршрутов × 3 языка. Критерий «коллапса»: контент
 // виден в innerText страницы при наличии topbar. Скриншоты проблемных страниц.
-const { chromium } = require('playwright');
+// 01.10.2026: playwright в окружении нет — прогон переведён на puppeteer
+// (scripts/node_modules/puppeteer, chrome из ~/.cache/puppeteer).
+const puppeteer = require('/home/ivan/Рабочий стол/проекты/balloo/scripts/node_modules/puppeteer');
 const fs = require('fs');
 
 const PORT = 3498;
@@ -24,10 +26,11 @@ const ROUTES = [
 const LOCALES = ['ru', 'en', 'zh'];
 
 async function initLang(browser, lang) {
-  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
-  await page.goto(`http://localhost:${PORT}/#/, { waitUntil: 'networkidle2', timeout: 60000 });
+  const page = await browser.newPage();
+  await page.setViewport({ width: 1440, height: 900 });
+  await page.goto(`http://localhost:${PORT}/#/`, { waitUntil: 'networkidle2', timeout: 60000 });
   await page.waitForSelector('.topbar', { timeout: 20000 });
-  await page.waitForTimeout(1000);
+  await new Promise((r) => setTimeout(r, 1000));
   await page.evaluate((l) => localStorage.setItem('language', l), lang);
   await page.close();
 }
@@ -36,16 +39,19 @@ async function initLang(browser, lang) {
 const reference = {};
 
 (async () => {
-  const browser = await chromium.launch({
+  const browser = await puppeteer.launch({
+    executablePath: '/home/ivan/.cache/puppeteer/chrome/linux-131.0.6778.204/chrome-linux64/chrome',
     headless: 'new',
-    args: ['--lang=ru-RU,ru;q=0.9', '--accept-lang=ru-RU,ru;q=0.9', '--force-device-scale-factor=1'],
+    args: ['--no-sandbox', '--lang=ru-RU,ru;q=0.9', '--force-device-scale-factor=1'],
   });
 
   const problems = [];
   let checked = 0;
 
   for (const lang of LOCALES) {
-    const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+    const page = await browser.newPage();
+    await page.setViewport({ width: 1440, height: 900 });
+    await page.setExtraHTTPHeaders({ 'Accept-Language': 'ru-RU,ru;q=0.9' });
     page.on('pageerror', (e) => {
       const msg = String(e && e.message || e);
       if (/dlopen|avcodec|libav|pipewire|pulse|GL:|Fontconfig|dbus|DBus/i.test(msg)) return;
@@ -58,10 +64,11 @@ const reference = {};
         await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
         await page.waitForSelector('.topbar', { timeout: 20000 });
         await page.evaluate((r) => {
+
           const h = window.location.hash;
           window.location.hash = h === r ? h + '?r=' + Date.now() : r;
         }, route);
-        await page.waitForTimeout(1600);
+        await new Promise((r) => setTimeout(r, 1600));
       } catch (e) {
         problems.push({ lang, route, kind: 'TIMEOUT', detail: String(e.message).slice(0, 100) });
         continue;
@@ -151,6 +158,18 @@ const reference = {};
 
   await browser.close();
   console.log(`checked=${checked}`);
+  // Валидный JSON-отчёт рядом с текстовым выводом (критерий тикета 1790480787-03)
+  const reportPath = '/tmp/p36-sweep-report.json';
+  fs.writeFileSync(reportPath, JSON.stringify({
+    date: new Date().toISOString(),
+    port: PORT,
+    routesCount: ROUTES.length,
+    locales: LOCALES,
+    checked,
+    problemsCount: problems.length,
+    problems,
+  }, null, 2));
+  console.log(`REPORT_JSON=${reportPath}`);
   if (problems.length === 0) {
     console.log('RUSSIAN_SWEEP_OK: все маршруты отрендерились на ru/en/zh');
     process.exit(0);

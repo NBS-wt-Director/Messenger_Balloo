@@ -211,14 +211,14 @@
           "id": "1_01_04",
           "name": "Список чатов",
           "file": "balloo-su/chats.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "balloo-su/chats.md"
         },
         {
           "id": "1_01_05",
           "name": "Контакты",
           "file": "balloo-su/contacts.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "balloo-su/contacts.md"
         },
         {
@@ -267,7 +267,7 @@
           "id": "1_01_02",
           "name": "Вход",
           "file": "balloo-su/login.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "balloo-su/login.md"
         },
         {
@@ -344,7 +344,7 @@
           "id": "1_01_03",
           "name": "Регистрация",
           "file": "balloo-su/register.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "balloo-su/register.md"
         },
         {

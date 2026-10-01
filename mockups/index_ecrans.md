@@ -239,9 +239,9 @@
 
 | `1_01_25` | Вложения чата | `balloo-su/chat-attachments.html` | Принят | `balloo-su/chat-attachments.md` |
 
-| `1_01_04` | Список чатов | `balloo-su/chats.html` | Просмотрен | `balloo-su/chats.md` |
+| `1_01_04` | Список чатов | `balloo-su/chats.html` | Принят | `balloo-su/chats.md` |
 
-| `1_01_05` | Контакты | `balloo-su/contacts.html` | Просмотрен | `balloo-su/contacts.md` |
+| `1_01_05` | Контакты | `balloo-su/contacts.html` | Принят | `balloo-su/contacts.md` |
 
 | `1_01_24` | Донат | `balloo-su/donate.html` | Принят | `balloo-su/donate.md` |
 
@@ -255,7 +255,7 @@
 
 | `1_01_13` | Приглашения | `balloo-su/invites.html` | Принят | `balloo-su/invites.md` |
 
-| `1_01_02` | Вход | `balloo-su/login.html` | Просмотрен | `balloo-su/login.md` |
+| `1_01_02` | Вход | `balloo-su/login.html` | Принят | `balloo-su/login.md` |
 
 > **Правка 2026-09-18 (P20/P21):** экраны `1_01_02` (Вход) и `1_01_03` (Регистрация) — OAuth-провайдеры переработаны в сетку квадратов **2×2** (Яндекс, **VK** (добавлен), Mail.ru, Rambler); при наведении выбранный квадрат растёт на 50% наружу относительно сетки. Обновлены `login.html`, `register.html`, `common.css` (`.auth-oauth-grid`/`.auth-oauth-tile`), `login.md`, `register.md`.
 
@@ -279,7 +279,7 @@
 
 | `1_01_09` | Публичный профиль | `balloo-su/public-profile.html` | Просмотрен | `balloo-su/public-profile.md` |
 
-| `1_01_03` | Регистрация | `balloo-su/register.html` | Просмотрен | `balloo-su/register.md` |
+| `1_01_03` | Регистрация | `balloo-su/register.html` | Принят | `balloo-su/register.md` |
 
 | `1_01_26` | Жалоба на сообщение | `balloo-su/report-message.html` | Принят | `balloo-su/report-message.md` |
 

@@ -139,7 +139,8 @@ function LoadingFallback() {
 // 1. user есть в store (persist) → пропускаем сразу.
 // 2. user нет, но есть httpOnly-cookie (например, после OAuth-callback) →
 //    пробуем getMe(): успех → пропускаем, 401/ошибка → редирект на /login.
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
+// Экспортируется для юнит-тестов гварда (тикет №61).
+export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const user = useAuthStore((s) => s.user);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const setUser = useAuthStore((s) => s.setUser);
@@ -179,7 +180,8 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 }
 
 // Guest route (P24): авторизованный → /chat (не показываем login/register)
-function GuestRoute({ children }: { children: React.ReactNode }) {
+// Экспортируется для юнит-тестов гварда (тикет №61).
+export function GuestRoute({ children }: { children: React.ReactNode }) {
   const user = useAuthStore((s) => s.user);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
