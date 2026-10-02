@@ -6,22 +6,36 @@ const puppeteer = require('/home/ivan/Рабочий стол/проекты/bal
 const fs = require('fs');
 
 const PORT = 3498;
+// 01.10.2026 (тикет 1790480787-03): список маршрутов выверен по реальному
+// packages/web/src/router/index.tsx (106 путей). Старый список содержал 59
+// несуществующих маршрутов (about/help/internal-chat/blog/post-1/…) — они
+// падали бы в NotFoundScreen и давали ложные EMPTY_RENDER.
 const ROUTES = [
-  '/', '/chat', '/history', '/blog', '/about', '/settings', '/help', '/contact',
-  '/donate', '/privacy', '/terms', '/features', '/features/create', '/features/feat-1',
-  '/internal-chat', '/specifity', '/for-kursach', '/kassa', '/not-found',
-  '/blog/post-1', '/blog/post-2', '/blog/post-3', '/blog/post-4', '/blog/post-5',
-  '/blog/tag/Образование', '/blog/tag/Курсы', '/blog/search?q=курсовая', '/blog/new',
-  '/help/faq', '/help/faq/1', '/help/guide', '/help/guide/1', '/help/article/1',
-  '/help/article/99', '/help/category/faq', '/help/search?q=тест', '/help/feedback',
-  '/settings/profile', '/settings/notifications', '/settings/privacy', '/settings/appearance',
-  '/settings/language', '/settings/help', '/settings/test', '/settings/1', '/settings/x',
-  '/donate/alert', '/donate/center', '/donate/faq', '/donate/rates', '/donate/tour',
-  '/internal-chat/room-1', '/internal-chat/room-99', '/internal-chat/1',
-  '/internal-chat/Общая', '/internal-chat/search?q=тест', '/internal-chat/new',
-  '/about/1', '/about/Образование', '/chat/room-1', '/chat/1',
-  '/for-kursach/1', '/for-kursach/Образование', '/history/v1', '/history/1',
-  '/kassa/1', '/kassa/Образование', '/not-found/1', '/privacy/1', '/terms/1',
+  '/', '/for_kassa', '/donat', '/support', '/privacy', '/rules', '/cookies',
+  '/login', '/register', '/two-factor', '/reset-password', '/add-device',
+  '/chat', '/chat/chat-1', '/profile', '/profile/username', '/contacts',
+  '/settings', '/settings/notifications', '/settings/privacy', '/settings/blocked',
+  '/search', '/group/create', '/group/chat-1/settings', '/channel/create',
+  '/channel/chat-1', '/channel/chat-1/settings', '/stories', '/stories/create',
+  '/polls', '/polls/poll-1', '/chat/chat-1/poll', '/knowledge',
+  '/knowledge/page/page-1', '/knowledge/create', '/knowledge/edit/page-1',
+  '/hiring/vacancies', '/hiring/vacancy/1', '/hiring/apply/1', '/hiring/applications',
+  '/hiring/application/1', '/hiring/why-us', '/admin', '/admin/users',
+  '/admin/users/1', '/admin/reports', '/admin/bans', '/admin/analytics',
+  '/admin/feature-flags', '/admin/downloads', '/admin/texts', '/admin/departments',
+  '/admin/employees', '/admin/vacancies', '/admin/versions', '/admin/announcements',
+  '/admin/features', '/admin/donations', '/admin/support', '/admin/blog/queue',
+  '/admin/blog/channels', '/admin/blog/categories', '/admin/audit-logs',
+  '/admin/system-settings', '/command', '/command/hr', '/command/vacancies',
+  '/command/applications', '/command/interviews', '/command/hiring', '/command/chat',
+  '/command/meetings', '/command/tasks', '/command/blog', '/command/my-department',
+  '/command/departments', '/command/knowledge', '/command/knowledge/page-1',
+  '/command/knowledge/create', '/command/settings', '/command/monitoring',
+  '/command/why-us', '/install', '/features', '/features/create', '/features/feat-1',
+  '/history', '/history/version/1', '/history/compare', '/download',
+  '/download/progress', '/download/desktop/android', '/download/android', '/doc',
+  '/doc/endpoint/x', '/doc/ws', '/spec', '/spec/1/1', '/blog', '/blog/post/1',
+  '/blog/category/cat', '/blog/search', '/blog/channel/1', '/blog/subscribe',
 ];
 const LOCALES = ['ru', 'en', 'zh'];
 
