@@ -66,11 +66,23 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.web
+      # Явный target: в Dockerfile две продуктовые стадии (web, features).
+      # Без target собиралась бы ПОСЛЕДНЯЯ стадия (features) — сломало бы web.
+      target: web
     container_name: balloo-web
     restart: unless-stopped
     depends_on:
       server:
         condition: service_healthy
+
+  # Публичная витрина фич (features.balloo.su) — тот же nginx-образ, другой SPA
+  features:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.web
+      target: features
+    container_name: balloo-features
+    restart: unless-stopped
 
 volumes:
   postgres-data:

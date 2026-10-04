@@ -173,44 +173,26 @@ services:
 
   # ─── Frontend Web (из GHCR) ───
   web:
-    image: ghcr.io/${GITHUB_REPOSITORY:-balloo-team/balloo}/web:web-${DEPLOY_SHA:-latest}
+    image: ${REGISTRY}/balloo/web:web-${DEPLOY_SHA}
     container_name: balloo-web
-    restart: always
-    ports:
-      - "8080:80"
-    depends_on:
-      server:
-        condition: service_healthy
+    restart: unless-stopped
+    expose:
+      - "3000"
     networks:
-      - balloo-net
-    deploy:
-      replicas: 2
-      resources:
-        limits:
-          memory: 256m
-          cpus: "0.5"
-
-  # ─── Nginx (фронтальный прокси + SSL) ───
-  nginx:
-    image: nginx:1.25-alpine
-    container_name: balloo-nginx
-    restart: always
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx-production.conf:/etc/nginx/nginx.conf:ro
-      - ./ssl:/etc/nginx/ssl:ro
-      - ./logs/nginx:/var/log/nginx
-      - ./certbot:/var/www/certbot:ro
-    depends_on:
-      - server
-      - web
+      - balloo-network
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
-      interval: 15s
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/"]
+      interval: 30s
       timeout: 5s
       retries: 3
+
+  # Публичная витрина фич (features.balloo.su). Статика за nginx.
+  features:
+    image: ${REGISTRY}/balloo/features:features-${DEPLOY_SHA}
+    container_name: balloo-features
+    restart: unless-stopped
+    expose:
+      - "80"
     networks:
       - balloo-net
     deploy:

@@ -83,6 +83,30 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Extract metadata (features)
+        id: meta-features
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/features
+          tags: |
+            type=semver,pattern={{version}},prefix=features-
+            type=semver,pattern={{major}}.{{minor}},prefix=features-
+            type=semver,pattern={{major}},prefix=features-
+            type=sha,prefix=features-,format=short
+            type=raw,value=latest,prefix=features-
+
+      - name: Build & push features
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/Dockerfile.web
+          target: features
+          push: true
+          tags: ${{ steps.meta-features.outputs.tags }}
+          labels: ${{ steps.meta-features.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
   # ─── GitHub Release ───
   create-release:
     name: Create GitHub Release
