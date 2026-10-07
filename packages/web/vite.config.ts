@@ -46,7 +46,7 @@ export default defineConfig({
     target: 'es2020',
     // CSS code splitting
     cssCodeSplit: true,
-    // Source maps для продакшена (для Sentry в будущем)
+    // Source maps для продакшена
     sourcemap: true,
     // Module preloading policy
     modulePreload: {

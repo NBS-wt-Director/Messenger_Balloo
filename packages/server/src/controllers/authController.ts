@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import crypto from 'crypto';
 import {
   register as registerService,
   login as loginService,
@@ -369,6 +370,21 @@ const oauthErrorRedirect = (res: Response, provider: string, reason: string): vo
   res.redirect(302, url);
 };
 
+/**
+ * Проверяет state-параметр из query против httpOnly cookie.
+ * Вызывается в каждом callback. Возвращает true, если state совпадает.
+ * Удаляет cookie после проверки (одноразовое использование).
+ */
+const verifyOAuthState = (req: Request, res: Response): boolean => {
+  const cookieState = req.cookies['oauth-state'];
+  const queryState = req.query.state as string | undefined;
+  res.clearCookie('oauth-state');
+  if (!cookieState || !queryState || cookieState !== queryState) {
+    return false;
+  }
+  return true;
+};
+
 // GET /api/auth/oauth/:provider — начало OAuth (302 на провайдера)
 export const oauthAuthorize = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -381,7 +397,18 @@ export const oauthAuthorize = async (req: Request, res: Response, next: NextFunc
       return;
     }
 
-    res.redirect(302, authorizeUrl);
+    // CSRF-защита: генерируем state, храним в httpOnly cookie, добавляем в URL
+    const oauthState = crypto.randomBytes(32).toString('hex');
+    res.cookie('oauth-state', oauthState, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+      maxAge: 5 * 60 * 1000, // 5 минут
+    });
+
+    // Добавляем state в URL
+    const separator = authorizeUrl.includes('?') ? '&' : '?';
+    res.redirect(302, `${authorizeUrl}${separator}state=${encodeURIComponent(oauthState)}`);
   } catch (error: any) {
     console.error(`[OAUTH AUTHORIZE] Error:`, error);
     oauthErrorRedirect(res, String(req.params.provider || ''), 'authorize_failed');
@@ -394,10 +421,15 @@ export const oauthAuthorize = async (req: Request, res: Response, next: NextFunc
 
 export const yandexCallback = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { code, state } = req.query;
+    const { code } = req.query;
 
     if (!code) {
       res.status(400).json({ error: 'Bad Request', message: 'Authorization code is required' });
+      return;
+    }
+
+    if (!verifyOAuthState(req, res)) {
+      oauthErrorRedirect(res, 'yandex', 'state_mismatch');
       return;
     }
 
@@ -446,6 +478,11 @@ export const vkCallback = async (req: Request, res: Response, next: NextFunction
       return;
     }
 
+    if (!verifyOAuthState(req, res)) {
+      oauthErrorRedirect(res, 'vk', 'state_mismatch');
+      return;
+    }
+
     // Обмен code на access token (user_id + email при scope=email)
     const tokenData = await exchangeVkCode(code as string);
 
@@ -481,6 +518,11 @@ export const mailruCallback = async (req: Request, res: Response, next: NextFunc
 
     if (!code) {
       oauthErrorRedirect(res, 'mailru', 'no_code');
+      return;
+    }
+
+    if (!verifyOAuthState(req, res)) {
+      oauthErrorRedirect(res, 'mailru', 'state_mismatch');
       return;
     }
 

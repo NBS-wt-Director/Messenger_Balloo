@@ -17,15 +17,17 @@ import {
 } from '../services/featureService';
 
 // --- Создать фич-реквест ---
+// optionalAuth: userId может быть undefined (аноним) — тогда isAnonymous=true обязателен
 export async function createFeatureController(req: Request, res: Response): Promise<void> {
   try {
-    const userId = (req as any).user?.id;
-    if (!userId) {
-      res.status(401).json({ error: 'Необходима авторизация' });
+    const userId: string | undefined = (req as any).user?.id;
+    const { title, description, category, priority, motivation, isAnonymous } = req.body;
+
+    // Анонимная публикация разрешена только с явным флагом isAnonymous=true
+    if (!userId && isAnonymous !== true) {
+      res.status(401).json({ error: 'Необходима авторизация или флаг isAnonymous' });
       return;
     }
-
-    const { title, description, category, priority, motivation } = req.body;
 
     if (!title || !description || !category) {
       res.status(400).json({ error: 'Заполните обязательные поля: название, описание, категория' });
@@ -37,12 +39,13 @@ export async function createFeatureController(req: Request, res: Response): Prom
       return;
     }
 
-    const feature = await createFeature(userId, {
+    const feature = await createFeature(userId ?? null, {
       title,
       description,
       category,
       priority,
       motivation,
+      isAnonymous: isAnonymous === true,
     });
 
     res.status(201).json(feature);

@@ -21,6 +21,21 @@ const ALLOWED_DOCUMENT_TYPES = [
 
 const ALL_ALLOWED_TYPES = [...ALLOWED_IMAGE_TYPES, ...ALLOWED_VIDEO_TYPES, ...ALLOWED_AUDIO_TYPES, ...ALLOWED_DOCUMENT_TYPES];
 
+// Magic bytes: первые байты файла для проверки соответствия MIME-типу
+const MAGIC_BYTES: Record<string, number[][]> = {
+  'image/jpeg': [[0xFF, 0xD8, 0xFF]],
+  'image/png': [[0x89, 0x50, 0x4E, 0x47]],
+  'image/gif': [[0x47, 0x49, 0x46, 0x38]],
+  'image/webp': [[0x52, 0x49, 0x46, 0x46]],
+  'application/pdf': [[0x25, 0x50, 0x44, 0x46]],
+};
+
+function validateMagicBytes(buffer: Buffer, mimeType: string): boolean {
+  const signatures = MAGIC_BYTES[mimeType];
+  if (!signatures) return true; // для типов без подписи — пропускаем
+  return signatures.some((sig) => sig.every((byte, i) => buffer[i] === byte));
+}
+
 const MAX_AVATAR_SIZE = 5 * 1024 * 1024; // 5MB
 const MAX_MESSAGE_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 const MAX_STORY_SIZE = 100 * 1024 * 1024; // 100MB для видео
@@ -48,13 +63,23 @@ const generateFileName = (originalName: string, prefix: string): string => {
 };
 
 /**
- * Проверка допустимого типа файла
+ * Проверка допустимого типа файла (MIME + magic bytes)
  */
-const validateFileType = (mimeType: string, maxSize: number): { valid: boolean; error?: string } => {
+const validateFileType = (
+  mimeType: string,
+  maxSize: number,
+  buffer?: Buffer,
+): { valid: boolean; error?: string } => {
   if (!ALL_ALLOWED_TYPES.includes(mimeType)) {
     return {
       valid: false,
       error: `Недопустимый тип файла: ${mimeType}. Допустимые: ${ALL_ALLOWED_TYPES.join(', ')}`,
+    };
+  }
+  if (buffer && !validateMagicBytes(buffer, mimeType)) {
+    return {
+      valid: false,
+      error: `Содержимое файла не соответствует заявленному типу ${mimeType}`,
     };
   }
   return { valid: true };
@@ -113,6 +138,7 @@ const uploadToMinIO = async (
 
     await minioClient.putObject(bucket, fileName, buffer, buffer.length, {
       'Content-Type': 'application/octet-stream',
+      'Content-Disposition': 'attachment; filename="file"',
     });
 
     return fileName;
@@ -184,8 +210,8 @@ export const uploadAvatar = async (
   file: Express.Multer.File,
   userId: string
 ): Promise<AvatarResult> => {
-  // Валидация
-  const validation = validateFileType(file.mimetype, MAX_AVATAR_SIZE);
+  // Валидация (MIME + magic bytes)
+  const validation = validateFileType(file.mimetype, MAX_AVATAR_SIZE, file.buffer);
   if (!validation.valid) {
     throw new Error(validation.error!);
   }
@@ -241,8 +267,8 @@ export const uploadChatAvatar = async (
   file: Express.Multer.File,
   chatId: string
 ): Promise<AvatarResult> => {
-  // Валидация
-  const validation = validateFileType(file.mimetype, MAX_AVATAR_SIZE);
+  // Валидация (MIME + magic bytes)
+  const validation = validateFileType(file.mimetype, MAX_AVATAR_SIZE, file.buffer);
   if (!validation.valid) {
     throw new Error(validation.error!);
   }
@@ -309,8 +335,8 @@ export const uploadMessageFile = async (
   file: Express.Multer.File,
   _userId: string
 ): Promise<FileAttachmentResult> => {
-  // Валидация
-  const validation = validateFileType(file.mimetype, MAX_ATTACHMENT_SIZE);
+  // Валидация (MIME + magic bytes)
+  const validation = validateFileType(file.mimetype, MAX_ATTACHMENT_SIZE, file.buffer);
   if (!validation.valid) {
     throw new Error(validation.error!);
   }
@@ -364,10 +390,14 @@ export const uploadStoryMedia = async (
   file: Express.Multer.File,
   userId: string
 ): Promise<FileAttachmentResult> => {
-  // Валидация
+  // Валидация (MIME + magic bytes)
   const allowedTypes = [...ALLOWED_IMAGE_TYPES, ...ALLOWED_VIDEO_TYPES];
   if (!allowedTypes.includes(file.mimetype)) {
     throw new Error('Для историй допустимы только изображения и видео');
+  }
+
+  if (!validateMagicBytes(file.buffer, file.mimetype)) {
+    throw new Error('Содержимое файла не соответствует заявленному типу');
   }
 
   const maxSize = ALLOWED_VIDEO_TYPES.includes(file.mimetype) ? MAX_STORY_SIZE : MAX_AVATAR_SIZE;

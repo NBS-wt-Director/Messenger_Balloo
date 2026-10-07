@@ -8,7 +8,6 @@ import {
   securityHeaders,
   hppMiddleware,
   csrfProtection,
-  inputSanitizer,
   rateLimitLogger,
   securityLogger,
 } from './middleware/security';
@@ -41,22 +40,19 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // 5. Cookie parser — для чтения JWT из httpOnly cookie
 app.use(cookieParser());
 
-// 6. Input sanitizer — очистка от XSS в body/query/cookies
-app.use(inputSanitizer);
-
-// 7. Rate limiting — защита от brute-force и DoS
+// 6. Rate limiting — защита от brute-force и DoS
 app.use(applyRateLimit);
 
-// 8. Rate limit logging — логирование нарушений
+// 7. Rate limit logging — логирование нарушений
 app.use(rateLimitLogger);
 
-// 9. Security logging — логирование подозрительных запросов
+// 8. Security logging — логирование подозрительных запросов
 app.use(securityLogger);
 
-// 10. CSRF protection — для stateful endpoints (fallback для JWT)
+// 9. CSRF protection — для stateful endpoints (fallback для JWT)
 app.use(csrfProtection);
 
-// 11. BigInt JSON serializer — ДО router
+// 10. BigInt JSON serializer — ДО router
 app.use((req, res, next) => {
   const originalJson = res.json.bind(res);
   res.json = function (body: any) {

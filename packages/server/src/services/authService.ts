@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
+import Redis from 'ioredis';
 import { env } from '../config/env';
 import { PrismaClient } from '@prisma/client';
 import { setAuthCookies, clearAuthCookies } from '../middleware/auth';
@@ -44,6 +45,9 @@ const verifyTOTP = (secret: string, token: string, window: number = 1): boolean 
     const period = 30;
     const currentStep = Math.floor(now / period);
 
+    // Timing-safe сравнение: оба значения всегда ровно 6 цифр (padStart)
+    const tokenBuf = Buffer.from(String(tokenNum).padStart(6, '0'));
+
     for (let i = -window; i <= window; i++) {
       const step = currentStep + i;
       const stepBuffer = Buffer.from(step.toString());
@@ -58,7 +62,8 @@ const verifyTOTP = (secret: string, token: string, window: number = 1): boolean 
         ((hmac[offset + 2] & 0xff) << 8) |
         (hmac[offset + 3] & 0xff);
       const totpCode = code % 1000000;
-      if (totpCode === tokenNum) return true;
+      const totpBuf = Buffer.from(String(totpCode).padStart(6, '0'));
+      if (crypto.timingSafeEqual(totpBuf, tokenBuf)) return true;
     }
     return false;
   } catch {
@@ -79,7 +84,8 @@ interface TokenPair {
 // устройстве выдаёт новой устройству ту же пару токенов, что и обычный вход
 export const generateTokens = (userId: string, email: string, username?: string, role?: string): TokenPair => {
   const accessPayload: Record<string, unknown> = { userId, email, username, role, type: 'access' };
-  const refreshPayload: Record<string, unknown> = { userId, email, username, role, type: 'refresh' };
+  const jti = crypto.randomUUID();
+  const refreshPayload: Record<string, unknown> = { userId, email, username, role, type: 'refresh', jti };
 
   return {
     accessToken: jwt.sign(accessPayload, env.JWT_ACCESS_SECRET, {
@@ -133,7 +139,12 @@ interface RegisterInput {
 
 export const register = async (input: RegisterInput) => {
   console.log('[REGISTER] Service: starting, email:', input.email);
-  
+
+  // Валидация пароля (серверная — 152-ФЗ / docs/12 §6.2)
+  if (!input.password || input.password.length < 8) {
+    throw new Error('Пароль должен содержать минимум 8 символов');
+  }
+
   // Проверка уникальности email
   const existingUser = await prisma.user.findUnique({
     where: { email: input.email },
@@ -343,11 +354,19 @@ export const verify2FA = async (input: Verify2FAInput) => {
     // TOTP OK
   } else {
     const backupCodes = JSON.parse(twoFA.backupCodes) as string[];
-    const codeIndex = backupCodes.indexOf(input.code);
-    if (codeIndex === -1) {
+    // Timing-safe поиск кода (indexOf может быть уязвим к timing-атаке)
+    let matchedIndex = -1;
+    const inputBuf = Buffer.from(input.code);
+    for (let i = 0; i < backupCodes.length; i++) {
+      const codeBuf = Buffer.from(backupCodes[i]);
+      if (inputBuf.length === codeBuf.length && crypto.timingSafeEqual(inputBuf, codeBuf)) {
+        matchedIndex = i;
+      }
+    }
+    if (matchedIndex === -1) {
       throw new Error('Неверный код подтверждения');
     }
-    backupCodes.splice(codeIndex, 1);
+    backupCodes.splice(matchedIndex, 1);
     await prisma.twoFASecret.update({
       where: { userId: user.id },
       data: { backupCodes: JSON.stringify(backupCodes) },
@@ -400,12 +419,31 @@ export const refreshTokens = async (refreshToken: string) => {
     throw new Error('Недействительный тип токена');
   }
 
+  // Проверяем: не отозван ли токен (ротация)
+  const jti = decoded.jti as string | undefined;
+  if (jti) {
+    const redis = new Redis(env.REDIS_URL);
+    const revoked = await redis.get(`revoked-jti:${jti}`);
+    await redis.quit();
+    if (revoked) {
+      throw new Error('Refresh токен отозван');
+    }
+  }
+
   const user = await prisma.user.findUnique({
     where: { id: decoded.userId as string },
   });
 
   if (!user || user.status !== 'active') {
     throw new Error('Пользователь не найден или неактивен');
+  }
+
+  // Ротация: старый JTI в blacklist (TTL = TTL старого токена)
+  if (jti) {
+    const redis = new Redis(env.REDIS_URL);
+    const ttl = Number(env.JWT_REFRESH_EXPIRES_IN);
+    await redis.setex(`revoked-jti:${jti}`, ttl, '1');
+    await redis.quit();
   }
 
   return generateTokens(user.id, user.email!, user.username || undefined, decoded.role as string | undefined);
@@ -419,6 +457,14 @@ export const logout = async (refreshToken: string): Promise<void> => {
   try {
     const decoded = jwt.verify(refreshToken, env.JWT_REFRESH_SECRET) as Record<string, unknown>;
     if ((decoded.type as string) === 'refresh') {
+      // Blacklist JTI (rotating refresh tokens)
+      const jti = decoded.jti as string | undefined;
+      if (jti) {
+        const redis = new Redis(env.REDIS_URL);
+        const ttl = Number(env.JWT_REFRESH_EXPIRES_IN);
+        await redis.setex(`revoked-jti:${jti}`, ttl, '1');
+        await redis.quit();
+      }
       console.log(`Refresh token revoked for user ${decoded.userId}`);
     }
   } catch {

@@ -852,7 +852,7 @@ model PaymentConfig {
 
 model FeatureRequest {
   id          String            @id @default(cuid()) @db.VarChar(25)
-  userId      String
+  userId      String?
   title       String            @db.VarChar(255)
   description String?           @db.Text
   category    String?           @db.VarChar(100)
@@ -860,11 +860,14 @@ model FeatureRequest {
   motivation  String?           @db.Text
   status      String            @default("idea")
   votesCount  Int               @default(0)
+  // Тикет 1790480787-04: анонимные фич-предложения (features.balloo.su).
+  // isAnonymous=true — автор не показывается в публичном API, userId обнуляется.
+  isAnonymous Boolean           @default(true)
   createdAt   BigInt            @default(0)
   updatedAt   BigInt            @default(0)
 
   // Relations
-  author   User            @relation("FeatureAuthor", fields: [userId], references: [id], onDelete: Cascade)
+  author   User?           @relation("FeatureAuthor", fields: [userId], references: [id], onDelete: SetNull)
   votes    FeatureVote[]
   comments FeatureComment[]
 

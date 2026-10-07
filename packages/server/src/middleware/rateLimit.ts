@@ -68,6 +68,21 @@ export const uploadLimiter: RateLimitRequestHandler = rateLimit({
   keyGenerator: getClientId,
 });
 
+// --- Лимитер для OAuth (GET-редиректы) ---
+// OAuth: 10 req/min на IP (state-параметр + callback могут дать несколько
+// редиректов на один вход, поэтому не 5 как authLimiter)
+export const oauthLimiter: RateLimitRequestHandler = rateLimit({
+  windowMs: 60 * 1000, // 1 минута
+  max: 10, // 10 запросов на минуту
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    error: 'Слишком много OAuth-запросов. Подождите 1 минуту',
+    retryAfter: '1 minute',
+  },
+  keyGenerator: getClientId,
+});
+
 // --- Middleware для применения лимитеров ---
 export const applyRateLimit = (
   req: Request,
@@ -86,9 +101,14 @@ export const applyRateLimit = (
   // срабатывал на приёмке раньше, чем проверялись все 4 провайдера, и браузер
   // показывал сырой JSON 429. Строгий лимит остаётся на POST (ввод данных)
   // и остальных /api/auth/* маршрутах.
+  //
+  // P39 (2026-10-05): OAuth GET-маршруты теперь имеют отдельный oauthLimiter
+  // (10/мин) вместо общего apiLimiter (100/15мин).
   const isOAuthGetRedirect =
     req.method === 'GET' && req.path.startsWith('/api/auth/oauth/');
-  if (req.path.startsWith('/api/auth/') && !isOAuthGetRedirect) {
+  if (isOAuthGetRedirect) {
+    oauthLimiter(req, res, next);
+  } else if (req.path.startsWith('/api/auth/') && !isOAuthGetRedirect) {
     authLimiter(req, res, next);
   } else if (req.path.startsWith('/api/upload/')) {
     uploadLimiter(req, res, next);

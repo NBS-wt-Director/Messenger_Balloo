@@ -71,7 +71,7 @@
 7. Реализовать stories/polls endpoints
 8. Реализовать blog/knowledge/hiring endpoints
 9. Реализовать admin endpoints (users, bans, reports, feature flags, metrics)
-10. Реализовать payments endpoints (ЮMoney, donations)
+10. Реализовать payments endpoints (ЮKassa, donations)
 11. Настроить Swagger/OpenAPI аннотации
 
 ### 2.3. WebSocket Server (ws)

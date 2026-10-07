@@ -112,4 +112,67 @@ describe('Users API', () => {
       expect(res.status).toBe(401);
     });
   });
+
+  describe('GET /api/users/me/export', () => {
+    it('returns user data export with auth', async () => {
+      const user = await registerTestUser();
+
+      const res = await request(app)
+        .get('/api/users/me/export')
+        .set('Authorization', `Bearer ${user.accessToken}`);
+
+      expect(res.status).toBe(200);
+      expect(res.headers['content-type']).toMatch(/application\/json/);
+      expect(res.body).toHaveProperty('exportedAt');
+      expect(res.body).toHaveProperty('user');
+      expect(res.body.user).toHaveProperty('id');
+      expect(res.body.user.email).toBe(user.email);
+      // Проверяем, что есть массивы данных
+      expect(res.body).toHaveProperty('messages');
+      expect(res.body).toHaveProperty('userChats');
+      expect(Array.isArray(res.body.messages)).toBe(true);
+      expect(Array.isArray(res.body.userChats)).toBe(true);
+    });
+
+    it('rejects without auth', async () => {
+      const res = await request(app).get('/api/users/me/export');
+
+      expect(res.status).toBe(401);
+    });
+  });
+
+  describe('DELETE /api/users/me', () => {
+    it('soft-deletes own account', async () => {
+      const user = await registerTestUser();
+
+      const res = await request(app)
+        .delete('/api/users/me')
+        .set('Authorization', `Bearer ${user.accessToken}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty('message');
+    });
+
+    it('rejects GET /me after deletion', async () => {
+      const user = await registerTestUser();
+
+      // Delete
+      await request(app)
+        .delete('/api/users/me')
+        .set('Authorization', `Bearer ${user.accessToken}`);
+
+      // Try to get profile — should fail
+      const res = await request(app)
+        .get('/api/users/me')
+        .set('Authorization', `Bearer ${user.accessToken}`);
+
+      expect(res.status).toBe(401);
+    });
+
+    it('rejects without auth', async () => {
+      const res = await request(app).delete('/api/users/me');
+
+      expect(res.status).toBe(401);
+    });
+  });
 });

@@ -2,12 +2,10 @@
  * Тесты безопасности middleware (security.ts + cors.ts).
  *
  * До этого файла из security.ts был покрыт только cspConnectSrc: csrfProtection,
- * inputSanitizer, rateLimitLogger, securityLogger и dataExport не исполнялись ни в
+ * rateLimitLogger, securityLogger и dataExport не исполнялись ни в
  * одном тесте, cors.ts — тоже. Здесь проверяется фактическое поведение:
  *  - csrfProtection пропускает безопасные методы и JWT, а без JWT и без
  *    X-CSRF-Token пишет предупреждение (и всё равно идёт дальше — это fallback);
- *  - inputSanitizer вырезает <script>/<style>/теги/обработчики из body, query и
- *    cookies, рекурсивно, не трогая числа/boolean/null;
  *  - rateLimitLogger перехватывает res.json и логирует только 429;
  *  - securityLogger детектит подозрительные паттерны в path/query/referer;
  *  - cors: при CORS_ORIGIN='*' origin отражается, при списке — только свои,
@@ -17,7 +15,6 @@ import request from 'supertest';
 import express from 'express';
 import {
   csrfProtection,
-  inputSanitizer,
   rateLimitLogger,
   securityLogger,
   dataExport,
@@ -109,63 +106,6 @@ describe('csrfProtection', () => {
     expect(res.status).toBe(200);
     expect(warn).toHaveBeenCalled();
     warn.mockRestore();
-  });
-});
-
-describe('inputSanitizer', () => {
-  const withBody = (body: Json) =>
-    request(makeApp(inputSanitizer)).post('/api/target').send(body);
-
-  it('вырезает <script>, <style>, теги и on*-обработчики из строк body', async () => {
-    const res = await withBody({
-      title: '<script>alert(1)</script>Привет',
-      style: '<style>body{color:red}</style>текст',
-      bio: '<b>жирный</b> текст',
-      click: 'a onclick=evil()',
-    });
-
-    const body = res.body.body as Json;
-    expect(body.title).toBe('Привет');
-    expect(body.style).toBe('текст');
-    expect(body.bio).toBe('жирный текст');
-    expect(body.click).toBe('a evil()');
-  });
-
-  it('рекурсивен для массивов и вложенных объектов', async () => {
-    const res = await withBody({
-      tags: ['<i>т1</i>', 'обычный', 7, null, true],
-      profile: { name: '<script>x</script>Имя', nested: { deep: '<b>!</b>' } },
-    });
-
-    const body = res.body.body as Json;
-    expect(body.tags).toEqual(['т1', 'обычный', 7, null, true]);
-    expect((body.profile as Json).name).toBe('Имя');
-    expect(((body.profile as Json).nested as Json).deep).toBe('!');
-  });
-
-  it('чистит query и значения cookies, не трогая не-строки', async () => {
-    const app = makeApp(inputSanitizer, (a) => {
-      a.use((req, _res, next) => {
-        (req as any).cookies = { sid: ' <script>bad()</script>value ', num: 42 };
-        next();
-      });
-    });
-
-    const res = await request(app).get('/api/target?q=<script>bad()</script>&page=2');
-
-    // <script>…</script> вырезается целиком (вместе с содержимым), поэтому q === ''
-    expect(res.body.query).toEqual({ q: '', page: '2' });
-    expect(res.body.cookies).toEqual({ sid: 'value', num: 42 });
-  });
-
-  it('проходит мимо, когда body/query/cookies отсутствуют или не объекты', async () => {
-    const app = express();
-    app.use(inputSanitizer);
-    app.get('/api/target', (_req, res) => res.json({ ok: true }));
-
-    const res = await request(app).get('/api/target');
-    expect(res.status).toBe(200);
-    expect(res.body.ok).toBe(true);
   });
 });
 

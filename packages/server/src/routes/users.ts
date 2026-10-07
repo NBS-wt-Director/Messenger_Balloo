@@ -4,6 +4,8 @@ const router = Router() as import('express').Router;
 import {
   getMe,
   updateMe,
+  deleteMe,
+  exportMe,
   getPublicProfile,
   searchUsers,
   blockUser,
@@ -21,6 +23,16 @@ router.get('/me', authRequired, getMe);
 // PUT /api/users/me — обновление профиля
 // ============================================================
 router.put('/me', authRequired, updateMe);
+
+// ============================================================
+// DELETE /api/users/me — мягкое удаление аккаунта (self-service)
+// ============================================================
+router.delete('/me', authRequired, deleteMe);
+
+// ============================================================
+// GET /api/users/me/export — выгрузка данных пользователя
+// ============================================================
+router.get('/me/export', authRequired, exportMe);
 
 // ============================================================
 // GET /api/users/search?q= — поиск пользователей

@@ -2,7 +2,7 @@
 // Тикет №55 — Features: фич-реквесты (узел 04)
 
 import { Router } from 'express';
-import { authRequired } from '../middleware/auth';
+import { authRequired, optionalAuth } from '../middleware/auth';
 import {
   createFeatureController,
   getFeaturesController,
@@ -29,7 +29,9 @@ router.get('/:id', getFeatureController);
 router.get('/:id/comments', getFeatureCommentsController);
 
 // --- Маршруты с авторизацией ---
-router.post('/', authRequired, createFeatureController);
+// POST / — optionalAuth: требует authRequired для сохранения userId,
+// но позволяет isAnonymous=true без токена (тикет 1790480787-04)
+router.post('/', optionalAuth, createFeatureController);
 router.put('/:id', authRequired, updateFeatureController);
 router.delete('/:id', authRequired, deleteFeatureController);
 router.post('/:id/vote', authRequired, voteFeatureController);

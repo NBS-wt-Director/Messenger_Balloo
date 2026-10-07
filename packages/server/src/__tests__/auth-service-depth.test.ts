@@ -743,7 +743,10 @@ describe('Auth service depth (В-93 а)', () => {
 
     it('yandex: сбой обмена → 302 callback_failed', async () => {
       global.fetch = jest.fn(async () => ({ ok: false, status: 500 })) as unknown as typeof fetch;
-      const res = await request(app).get('/api/auth/oauth/yandex-callback?code=abc');
+      const state = 'test_oauth_state_123';
+      const res = await request(app)
+        .get(`/api/auth/oauth/yandex-callback?code=abc&state=${state}`)
+        .set('Cookie', `oauth-state=${state}`);
       expect(res.status).toBe(302);
       expect(res.headers.location).toContain('oauth_error=callback_failed');
     });
@@ -754,14 +757,20 @@ describe('Auth service depth (В-93 а)', () => {
         json: async () => ({ access_token: 'vk_t', user_id: Date.now(), email: `vkc_${Date.now()}@vk.ru` }),
       })) as unknown as typeof fetch;
 
-      const res = await request(app).get('/api/auth/oauth/vk/callback?code=abc');
+      const state = 'test_oauth_state_vk';
+      const res = await request(app)
+        .get(`/api/auth/oauth/vk/callback?code=abc&state=${state}`)
+        .set('Cookie', `oauth-state=${state}`);
       expect(res.status).toBe(302);
       expect(res.headers.location).toContain('/#/chat');
     });
 
     it('vk: сбой → 302 callback_failed', async () => {
       global.fetch = jest.fn(async () => ({ ok: false, status: 500 })) as unknown as typeof fetch;
-      const res = await request(app).get('/api/auth/oauth/vk/callback?code=abc');
+      const state = 'test_oauth_state_vk2';
+      const res = await request(app)
+        .get(`/api/auth/oauth/vk/callback?code=abc&state=${state}`)
+        .set('Cookie', `oauth-state=${state}`);
       expect(res.status).toBe(302);
       expect(res.headers.location).toContain('oauth_error=callback_failed');
     });
@@ -783,14 +792,20 @@ describe('Auth service depth (В-93 а)', () => {
         } as unknown as Response;
       }) as unknown as typeof fetch;
 
-      const res = await request(app).get('/api/auth/oauth/mailru/callback?code=abc');
+      const state = 'test_oauth_state_mailru';
+      const res = await request(app)
+        .get(`/api/auth/oauth/mailru/callback?code=abc&state=${state}`)
+        .set('Cookie', `oauth-state=${state}`);
       expect(res.status).toBe(302);
       expect(res.headers.location).toContain('/#/chat');
     });
 
     it('mailru: сбой → 302 callback_failed', async () => {
       global.fetch = jest.fn(async () => ({ ok: false, status: 500 })) as unknown as typeof fetch;
-      const res = await request(app).get('/api/auth/oauth/mailru/callback?code=abc');
+      const state = 'test_oauth_state_mailru2';
+      const res = await request(app)
+        .get(`/api/auth/oauth/mailru/callback?code=abc&state=${state}`)
+        .set('Cookie', `oauth-state=${state}`);
       expect(res.status).toBe(302);
       expect(res.headers.location).toContain('oauth_error=callback_failed');
     });

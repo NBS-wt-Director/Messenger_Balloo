@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import {
   getMe as getMeService,
   updateMe as updateMeService,
+  deleteMe as deleteMeService,
+  exportUserData as exportUserService,
   getPublicProfile as getPublicProfileService,
   searchUsers as searchUsersService,
   blockUser as blockUserService,
@@ -22,6 +24,9 @@ export const getMe = async (req: AuthenticatedRequest, res: Response, next: Next
   } catch (error: any) {
     if (error.message === 'Пользователь не найден') {
       res.status(404).json({ error: 'Not Found', message: error.message });
+    } else if (error.message === 'Аккаунт удалён') {
+      // 152-ФЗ: удалённый аккаунт не должен возвращать данные
+      res.status(401).json({ error: 'Unauthorized', message: 'Аккаунт удалён' });
     } else {
       res.status(500).json({ error: 'Internal Error', message: error.message });
     }
@@ -174,5 +179,47 @@ export const getBlockedUsers = async (req: AuthenticatedRequest, res: Response, 
     res.json({ blocked });
   } catch (error: any) {
     res.status(500).json({ error: 'Internal Error', message: error.message });
+  }
+};
+
+// ============================================================
+// DELETE /api/users/me — мягкое удаление аккаунта (self-service, 152-ФЗ)
+// ============================================================
+
+export const deleteMe = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const userId = req.user!.id;
+    const data = await deleteMeService(userId);
+    res.json(data);
+  } catch (error: any) {
+    if (error.message === 'Пользователь не найден') {
+      res.status(404).json({ error: 'Not Found', message: error.message });
+    } else if (error.message === 'Аккаунт уже удалён') {
+      res.status(410).json({ error: 'Gone', message: error.message });
+    } else {
+      res.status(500).json({ error: 'Internal Error', message: error.message });
+    }
+  }
+};
+
+// ============================================================
+// GET /api/users/me/export — выгрузка своих данных (152-ФЗ)
+// ============================================================
+
+export const exportMe = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const userId = req.user!.id;
+    const data = await exportUserService(userId);
+
+    // Отдаём файлом, чтобы браузер сохранял выгрузку, а не открывал её
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename="balloo-data-export.json"');
+    res.json(data);
+  } catch (error: any) {
+    if (error.message === 'Пользователь не найден') {
+      res.status(404).json({ error: 'Not Found', message: error.message });
+    } else {
+      res.status(500).json({ error: 'Internal Error', message: error.message });
+    }
   }
 };

@@ -163,6 +163,38 @@ export const adminOnly = (
   next();
 };
 
+// Мягкая авторизация: прикрепляет req.user при валидном access-токене,
+// но не отклоняет запрос без токена (для анонимных фич)
+export const optionalAuth = (
+  req: AuthenticatedRequest,
+  _res: Response,
+  next: NextFunction
+): void => {
+  const token = extractToken(req, ACCESS_COOKIE);
+
+  if (!token) {
+    next();
+    return;
+  }
+
+  try {
+    const decoded = jwt.verify(token, env.JWT_ACCESS_SECRET) as JwtPayload;
+
+    if (decoded.type === 'access') {
+      req.user = {
+        id: decoded.userId,
+        email: decoded.email,
+        username: decoded.username,
+        role: decoded.role,
+      };
+    }
+  } catch {
+    // Невалидный/истёкший токен — продолжаем без пользователя
+  }
+
+  next();
+};
+
 // ============================================================
 // Утилиты для работы с httpOnly cookie
 // ============================================================

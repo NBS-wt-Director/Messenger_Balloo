@@ -107,54 +107,6 @@ export const csrfProtection = (req: Request, res: Response, next: NextFunction) 
   next();
 };
 
-// --- Input sanitization — базовая очистка input от XSS ---
-// Убирает потенциально опасные HTML-теги из строк
-export const inputSanitizer = (req: Request, res: Response, next: NextFunction) => {
-  const sanitize = (value: any): any => {
-    if (typeof value === 'string') {
-      // Убираем HTML-теги, оставляем только текст
-      return value
-        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-        .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
-        .replace(/<[^>]+>/g, '')
-        .replace(/on\w+\s*=/gi, '')
-        .trim();
-    }
-    if (Array.isArray(value)) {
-      return value.map(sanitize);
-    }
-    if (value && typeof value === 'object') {
-      const sanitized: Record<string, any> = {};
-      for (const [key, val] of Object.entries(value)) {
-        sanitized[key] = sanitize(val);
-      }
-      return sanitized;
-    }
-    return value;
-  };
-
-  // Sanitize JSON body
-  if (req.body && typeof req.body === 'object') {
-    req.body = sanitize(req.body);
-  }
-
-  // Sanitize query params
-  if (req.query && typeof req.query === 'object') {
-    req.query = sanitize(req.query);
-  }
-
-  // Sanitize cookies (value only)
-  if (req.cookies && typeof req.cookies === 'object') {
-    for (const [key, val] of Object.entries(req.cookies)) {
-      if (typeof val === 'string') {
-        req.cookies[key] = sanitize(val);
-      }
-    }
-  }
-
-  next();
-};
-
 // --- Rate limit logging — логирование нарушений ---
 export const rateLimitLogger = (req: Request, res: Response, next: NextFunction) => {
   // Сохраняем оригинальный res.json для перехвата 429

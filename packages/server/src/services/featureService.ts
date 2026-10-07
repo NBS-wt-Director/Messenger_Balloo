@@ -11,6 +11,7 @@ export interface CreateFeatureInput {
   category: string;
   priority?: string;
   motivation?: string;
+  isAnonymous?: boolean;
 }
 
 export interface UpdateFeatureInput {
@@ -23,13 +24,14 @@ export interface UpdateFeatureInput {
 }
 
 // --- Создание фич-реквеста ---
+// userId может быть null при анонимной публикации (FeatureRequest.userId nullable)
 export async function createFeature(
-  userId: string,
+  userId: string | null,
   input: CreateFeatureInput
 ): Promise<any> {
   const feature = await prisma.featureRequest.create({
     data: {
-      userId,
+      userId: input.isAnonymous ? null : userId,
       title: input.title.trim(),
       description: input.description.trim(),
       category: input.category,
