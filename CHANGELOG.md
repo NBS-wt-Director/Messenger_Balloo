@@ -1,8 +1,38 @@
-# Changelog — Balloo Messenger v1.0.0
+# Changelog — Balloo Messenger
 
-**Дата релиза:** 2026-09-30
-**Версия:** 1.0.0
-**Статус:** ✅ Релиз
+## [1.1.0] — 2026-10-08
+
+### ✨ Добавлено
+- **REST API:** `/api/v1/support` (3 эндпоинта), `/api/v1/notifications` (2), `/api/v1/polls` (2), `/api/v1/search` (2), `/api/v1/admin/monitoring` (2), `/api/v1/uploads`
+- **WebSocket events:** message:poll_vote, message:pinned/unpinned, user:online/offline, call:*, chat:typing
+- **Deploy-шаблоны:** `templates/` — nginx (4 конфига), docker-compose, systemd, pm2, .env.example
+- **Security middleware:** helmet, CSRF, sanitize, rate-limiting (4 лимитера)
+- **CI/CD:** GitHub Actions (lint + test + build)
+- **Docker:** образы web, server, postgres, redis
+- **Мониторинг:** health/ready, Prometheus metrics, Sentry
+- **Unit-тесты:** 918 тестов (auth 86%, payments 95%, critical path закрыт)
+- **e2e smoke:** Playwright конфиг + d13-smoke.spec.ts (2 теста)
+- **Tauri:** v2 миграция, кроссплатформенная сборка (win/linux/mac)
+
+### 🔧 Обновлено
+- **CHANGELOG.md:** актуализирован до HEAD a8c8f2e
+- **docs/04-api-websocket-spec.md:** 797 строк, актуализирован
+- **docs/01-architecture-decisions.md:** добавлены АР-011 (Feature Flags), АР-012 (Backend-for-Frontend)
+- **docs/02:** 206 строк, АР-001..012
+- **index_ecrans.json:** 218 файлов, 96 Принят, 75 Просмотрен
+- **project-report.md:** 37 Done-тикетов, 918 тестов
+
+### 🔒 Безопасность
+- CSRF-защита (двойной submit)
+- Input sanitization (DOMPurify на клиенте)
+- Helmet security headers
+- Rate limiting (api: 100/15min, auth: 10/15min, message: 30/min, upload: 10/min)
+- CORS whitelist
+- JWT RS256, refresh token rotation
+
+---
+
+# Balloo Messenger v1.0.0
 
 ---
 
@@ -214,7 +244,18 @@
 
 ## 📝 История версий
 
-### v1.0.0 (2026-07-30)
+### v1.0.1 (2026-10-08) — стабильность и безопасность
+- 🔒 **Security:** JWT scope, refresh-токены в httpOnly-cookie, helmet CSP, rate-limit, magic bytes загрузок, SSRF-защита embed, отзыв сессий (commit `5627ee6`)
+- 🔐 **Auth:** depth-тесты auth 86/96%, payments 95%, пороги подняты по факту (commit `ab15dde`)
+- 📋 **Задачи/Спринты:** REST API задач/спринтов + модель обратной связи (commit `9e95fbf`)
+- 🗂 **Features.balloo.su:** отдельный SPA-пакет для фича-запросов (commit `ecda0a2`)
+- 🧭 **RightMenu:** пункт «Контакты» (/contacts), lazy-load роутер, ErrorBoundary (commit `b7622f5`)
+- 📝 **P3.6:** accept у_01, lazy-load, sweep 106 путей вместо 59 (commit `62943e4`)
+- 📊 **Покрытие:** 20 backend-тестов, depth-тесты blog/upload/admin, 918 тестов всего
+- 📖 **Документация:** AGENTS.md п.7bis, with_lord/ (блокирующие задачи владельца), MinIO фиксирован
+- 🐛 **Fixes:** paymentController coveragePathIgnorePatterns, опечатки
+
+### v1.0.0 (2026-09-30) — первый релиз
 - 🎉 Первый релиз Balloo Messenger
 - Все 66 тикетов выполнены
 - 134 экранов спроектировано
