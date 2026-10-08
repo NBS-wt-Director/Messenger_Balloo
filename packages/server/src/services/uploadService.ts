@@ -21,13 +21,22 @@ const ALLOWED_DOCUMENT_TYPES = [
 
 const ALL_ALLOWED_TYPES = [...ALLOWED_IMAGE_TYPES, ...ALLOWED_VIDEO_TYPES, ...ALLOWED_AUDIO_TYPES, ...ALLOWED_DOCUMENT_TYPES];
 
-// Magic bytes: первые байты файла для проверки соответствия MIME-типу
+// Magic bytes: первые байты файла для проверки соответствия MIME-типу.
+// MIME-заголовок присылает клиент, ему доверять нельзя: .exe с
+// Content-Type: application/pdf иначе пройдёт как документ.
 const MAGIC_BYTES: Record<string, number[][]> = {
   'image/jpeg': [[0xFF, 0xD8, 0xFF]],
   'image/png': [[0x89, 0x50, 0x4E, 0x47]],
   'image/gif': [[0x47, 0x49, 0x46, 0x38]],
   'image/webp': [[0x52, 0x49, 0x46, 0x46]],
-  'application/pdf': [[0x25, 0x50, 0x44, 0x46]],
+  // Документы
+  'application/pdf': [[0x25, 0x50, 0x44, 0x46]], // %PDF
+  // OOXML (docx/xlsx) — это ZIP-контейнеры, подпись «PK\x03\x04»
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': [[0x50, 0x4B, 0x03, 0x04]],
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': [[0x50, 0x4B, 0x03, 0x04]],
+  // Аудио-контейнеры
+  'audio/ogg': [[0x4F, 0x67, 0x67, 0x53]], // OggS
+  'audio/wav': [[0x52, 0x49, 0x46, 0x46]], // RIFF
 };
 
 function validateMagicBytes(buffer: Buffer, mimeType: string): boolean {
@@ -107,12 +116,32 @@ const createMinIOClient = () => {
 };
 
 /**
+ * Безопасное имя для заголовка Content-Disposition: убираем кавычки,
+ * обратные слэши и управляющие символы (защита от инъекции заголовка),
+ * ограничиваем длину.
+ */
+const sanitizeDownloadName = (name: string): string => {
+  const backslash = String.fromCharCode(92);
+  const cleaned = name
+    .split('')
+    .map((ch) => (ch.charCodeAt(0) < 32 || ch === '"' || ch === backslash ? '_' : ch))
+    .join('')
+    .trim()
+    .slice(0, 150);
+  return cleaned || 'file';
+};
+
+/**
  * Загрузка файла в MinIO
+ *
+ * originalName — исходное имя файла от клиента: попадает в Content-Disposition,
+ * чтобы при скачивании браузер сохранял файл под понятным именем (а не «file»).
  */
 const uploadToMinIO = async (
   bucket: string,
   fileName: string,
-  buffer: Buffer
+  buffer: Buffer,
+  originalName?: string
 ): Promise<string> => {
   try {
     const minioClient = createMinIOClient();
@@ -136,9 +165,14 @@ const uploadToMinIO = async (
       await minioClient.setBucketPolicy(bucket, JSON.stringify(policy));
     }
 
+    const downloadName = sanitizeDownloadName(originalName || 'file');
+
     await minioClient.putObject(bucket, fileName, buffer, buffer.length, {
       'Content-Type': 'application/octet-stream',
-      'Content-Disposition': 'attachment; filename="file"',
+      // attachment + реальное имя: браузер скачивает, а не рендерит PDF/HTML
+      // inline (иначе возможен XSS через подсунутый файл). filename* — для
+      // не-ASCII имён по RFC 5987.
+      'Content-Disposition': `attachment; filename="${downloadName}"; filename*=UTF-8''${encodeURIComponent(downloadName)}`,
     });
 
     return fileName;
@@ -210,6 +244,13 @@ export const uploadAvatar = async (
   file: Express.Multer.File,
   userId: string
 ): Promise<AvatarResult> => {
+  // Размер проверяем до magic bytes: слишком большой файл — это ошибка
+  // пользователя (400 «превышать»), а не «содержимое не соответствует типу»,
+  // которое уходит в 500 и маскирует настоящую причину.
+  if (file.size > MAX_AVATAR_SIZE) {
+    throw new Error('Размер аватарки не должен превышать 5MB');
+  }
+
   // Валидация (MIME + magic bytes)
   const validation = validateFileType(file.mimetype, MAX_AVATAR_SIZE, file.buffer);
   if (!validation.valid) {
@@ -220,17 +261,13 @@ export const uploadAvatar = async (
     throw new Error('Для аватарки допустимы только изображения');
   }
 
-  if (file.size > MAX_AVATAR_SIZE) {
-    throw new Error('Размер аватарки не должен превышать 5MB');
-  }
-
   const bucket = env.MINIO_BUCKET;
 
   // Генерация имени файла
   const fileName = generateFileName(file.originalname, `avatars/${userId}`);
 
-  // Загрузка оригинала
-  await uploadToMinIO(bucket, fileName, file.buffer);
+  // Загрузка оригинала (имя сохраняем для Content-Disposition)
+  await uploadToMinIO(bucket, fileName, file.buffer, file.originalname);
 
   // Генерация thumbnail для превью
   const thumbnail = await generateThumbnail(file.buffer, 256);
@@ -267,6 +304,11 @@ export const uploadChatAvatar = async (
   file: Express.Multer.File,
   chatId: string
 ): Promise<AvatarResult> => {
+  // Размер проверяем до magic bytes (см. uploadAvatar)
+  if (file.size > MAX_AVATAR_SIZE) {
+    throw new Error('Размер аватарки не должен превышать 5MB');
+  }
+
   // Валидация (MIME + magic bytes)
   const validation = validateFileType(file.mimetype, MAX_AVATAR_SIZE, file.buffer);
   if (!validation.valid) {
@@ -277,17 +319,13 @@ export const uploadChatAvatar = async (
     throw new Error('Для аватарки чата допустимы только изображения');
   }
 
-  if (file.size > MAX_AVATAR_SIZE) {
-    throw new Error('Размер аватарки не должен превышать 5MB');
-  }
-
   const bucket = env.MINIO_BUCKET;
 
   // Генерация имени файла
   const fileName = generateFileName(file.originalname, `chat-avatars/${chatId}`);
 
-  // Загрузка оригинала
-  await uploadToMinIO(bucket, fileName, file.buffer);
+  // Загрузка оригинала (имя сохраняем для Content-Disposition)
+  await uploadToMinIO(bucket, fileName, file.buffer, file.originalname);
 
   // Генерация thumbnail
   const thumbnail = await generateThumbnail(file.buffer, 256);
@@ -335,21 +373,22 @@ export const uploadMessageFile = async (
   file: Express.Multer.File,
   _userId: string
 ): Promise<FileAttachmentResult> => {
+  // Размер проверяем до magic bytes (см. uploadAvatar)
+  if (file.size > MAX_ATTACHMENT_SIZE) {
+    throw new Error('Размер вложения не должен превышать 50MB');
+  }
+
   // Валидация (MIME + magic bytes)
   const validation = validateFileType(file.mimetype, MAX_ATTACHMENT_SIZE, file.buffer);
   if (!validation.valid) {
     throw new Error(validation.error!);
   }
 
-  if (file.size > MAX_ATTACHMENT_SIZE) {
-    throw new Error('Размер вложения не должен превышать 50MB');
-  }
-
   const bucket = env.MINIO_BUCKET;
   const fileName = generateFileName(file.originalname, `attachments`);
 
-  // Загрузка в MinIO
-  await uploadToMinIO(bucket, fileName, file.buffer);
+  // Загрузка в MinIO (имя сохраняем для Content-Disposition)
+  await uploadToMinIO(bucket, fileName, file.buffer, file.originalname);
 
   const result: FileAttachmentResult = {
     url: cdnUrl(fileName),
@@ -390,27 +429,28 @@ export const uploadStoryMedia = async (
   file: Express.Multer.File,
   userId: string
 ): Promise<FileAttachmentResult> => {
-  // Валидация (MIME + magic bytes)
+  // Валидация типа истории (только изображения и видео)
   const allowedTypes = [...ALLOWED_IMAGE_TYPES, ...ALLOWED_VIDEO_TYPES];
   if (!allowedTypes.includes(file.mimetype)) {
     throw new Error('Для историй допустимы только изображения и видео');
+  }
+
+  const maxSize = ALLOWED_VIDEO_TYPES.includes(file.mimetype) ? MAX_STORY_SIZE : MAX_AVATAR_SIZE;
+
+  // Размер проверяем до magic bytes (см. uploadAvatar)
+  if (file.size > maxSize) {
+    throw new Error(`Размер медиа для истории не должен превышать ${maxSize / 1024 / 1024}MB`);
   }
 
   if (!validateMagicBytes(file.buffer, file.mimetype)) {
     throw new Error('Содержимое файла не соответствует заявленному типу');
   }
 
-  const maxSize = ALLOWED_VIDEO_TYPES.includes(file.mimetype) ? MAX_STORY_SIZE : MAX_AVATAR_SIZE;
-
-  if (file.size > maxSize) {
-    throw new Error(`Размер медиа для истории не должен превышать ${maxSize / 1024 / 1024}MB`);
-  }
-
   const bucket = env.MINIO_BUCKET;
   const fileName = generateFileName(file.originalname, `stories/${userId}`);
 
-  // Загрузка в MinIO
-  await uploadToMinIO(bucket, fileName, file.buffer);
+  // Загрузка в MinIO (имя сохраняем для Content-Disposition)
+  await uploadToMinIO(bucket, fileName, file.buffer, file.originalname);
 
   const result: FileAttachmentResult = {
     url: cdnUrl(fileName),

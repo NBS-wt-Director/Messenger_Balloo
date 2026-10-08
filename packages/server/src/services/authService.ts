@@ -5,6 +5,7 @@ import Redis from 'ioredis';
 import { env } from '../config/env';
 import { PrismaClient } from '@prisma/client';
 import { setAuthCookies, clearAuthCookies } from '../middleware/auth';
+import { revokeAllSessions } from './sessionRevocation';
 import { sendWelcomeEmail, sendVerificationEmail, sendResetPasswordEmail } from './emailService';
 
 const prisma = new PrismaClient();
@@ -453,7 +454,7 @@ export const refreshTokens = async (refreshToken: string) => {
 // Logout
 // ============================================================
 
-export const logout = async (refreshToken: string): Promise<void> => {
+export const logout = async (refreshToken: string, allDevices = false): Promise<void> => {
   try {
     const decoded = jwt.verify(refreshToken, env.JWT_REFRESH_SECRET) as Record<string, unknown>;
     if ((decoded.type as string) === 'refresh') {
@@ -464,6 +465,12 @@ export const logout = async (refreshToken: string): Promise<void> => {
         const ttl = Number(env.JWT_REFRESH_EXPIRES_IN);
         await redis.setex(`revoked-jti:${jti}`, ttl, '1');
         await redis.quit();
+      }
+      // allDevices — отзываем и остальные устройства. Блокировка по jti гасит
+      // только этот refresh, а метка revoked-at по userId выбрасывает в том
+      // числе уже выданные access-токены других сессий.
+      if (allDevices && decoded.userId) {
+        await revokeAllSessions(String(decoded.userId));
       }
       console.log(`Refresh token revoked for user ${decoded.userId}`);
     }
@@ -585,6 +592,11 @@ export const resetPassword = async (input: { token: string; newPassword: string 
     where: { id: tokenRecord.userId },
     data: { passwordHash },
   });
+
+  // Сброс пароля обычно делают, когда доступ к аккаунту могли перехватить,
+  // поэтому старые сессии отзываем — иначе украденный токен переживает смену
+  // пароля и у злоумышленника остаётся рабочий вход.
+  await revokeAllSessions(tokenRecord.userId);
 
   // Отмечаем токен как использованный
   await prisma.verificationToken.update({

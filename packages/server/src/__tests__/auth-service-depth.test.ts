@@ -716,7 +716,9 @@ describe('Auth service depth (В-93 а)', () => {
         } as unknown as Response;
       }) as unknown as typeof fetch;
 
-      const res = await request(app).get('/api/auth/oauth/yandex-callback?code=abc');
+      const res = await request(app)
+        .get(`/api/auth/oauth/yandex-callback?code=abc&state=${'st_ycb_1'}`)
+        .set('Cookie', 'oauth-state=st_ycb_1');
       expect(res.status).toBe(302);
       expect(res.headers.location).toContain('/#/chat');
       expect(getCookie(res, 'balloo-access-token')).toBeTruthy();
@@ -736,7 +738,10 @@ describe('Auth service depth (В-93 а)', () => {
         } as unknown as Response;
       }) as unknown as typeof fetch;
 
-      const res = await request(app).get('/api/auth/oauth/yandex-callback?code=abc');
+      const state = 'test_oauth_state_ya_inactive';
+      const res = await request(app)
+        .get(`/api/auth/oauth/yandex-callback?code=abc&state=${state}`)
+        .set('Cookie', `oauth-state=${state}`);
       expect(res.status).toBe(302);
       expect(res.headers.location).toContain('oauth_error=account_inactive');
     });

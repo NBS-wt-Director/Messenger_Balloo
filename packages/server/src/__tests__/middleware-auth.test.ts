@@ -99,7 +99,7 @@ describe('middleware/auth.ts — extractToken + authRequired', () => {
     expect(res.body).toEqual({ error: 'Unauthorized', message: 'Токен авторизации не предоставлен' });
   });
 
-  it('берёт токен из httpOnly cookie и приоритетно, а не из заголовка (строки 33-36)', () => {
+  it('берёт токен из httpOnly cookie и приоритетно, а не из заголовка (строки 33-36)', async () => {
     const req = makeReq({
       cookie: { [ACCESS_COOKIE]: accessToken() },
       header: { authorization: 'Bearer мусор-в-заголовке' },
@@ -107,18 +107,19 @@ describe('middleware/auth.ts — extractToken + authRequired', () => {
     const res = makeRes();
     const next = jest.fn();
 
-    authRequired(req as any, res as any, next as any);
+    // authRequired стал async: перед next() он ждёт проверку отзыва сессии
+    await authRequired(req as any, res as any, next as any);
 
     expect(next).toHaveBeenCalledTimes(1);
     expect(res.statusCode).toBe(0);
     expect(req.user).toEqual({ id: 'user-1', email: 'u@test.balloo.ru', username: 'user1', role: 'user' });
   });
 
-  it('fallback на Authorization: Bearer для API/мобильных (строки 39-42)', () => {
+  it('fallback на Authorization: Bearer для API/мобильных (строки 39-42)', async () => {
     const req = makeReq({ header: { authorization: `Bearer ${accessToken()}` } });
     const next = jest.fn();
 
-    authRequired(req as any, makeRes() as any, next as any);
+    await authRequired(req as any, makeRes() as any, next as any);
 
     expect(next).toHaveBeenCalledTimes(1);
     expect(req.user?.id).toBe('user-1');
@@ -192,14 +193,14 @@ describe('middleware/auth.ts — authRefresh', () => {
     expect(res.body).toEqual({ error: 'Unauthorized', message: 'Refresh токен не предоставлен' });
   });
 
-  it('принимает валидный refresh из cookie и из header (строки 115-132)', () => {
+  it('принимает валидный refresh из cookie и из header (строки 115-132)', async () => {
     const fromCookie = makeReq({ cookie: { [REFRESH_COOKIE]: refreshToken() } });
     const fromHeader = makeReq({ header: { authorization: `Bearer ${refreshToken()}` } });
     const nextCookie = jest.fn();
     const nextHeader = jest.fn();
 
-    authRefresh(fromCookie as any, makeRes() as any, nextCookie as any);
-    authRefresh(fromHeader as any, makeRes() as any, nextHeader as any);
+    await authRefresh(fromCookie as any, makeRes() as any, nextCookie as any);
+    await authRefresh(fromHeader as any, makeRes() as any, nextHeader as any);
 
     expect(nextCookie).toHaveBeenCalledTimes(1);
     expect(nextHeader).toHaveBeenCalledTimes(1);

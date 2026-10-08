@@ -334,6 +334,67 @@ describe('Upload service depth (В-93 а)', () => {
       expect(res.status).toBe(400);
       expect(res.body.message).toContain('50MB');
     });
+
+    it('Content-Disposition: attachment с реальным именем файла (задача 6)', async () => {
+      const user = await registerTestUser();
+      const res = await request(app)
+        .post('/api/upload/file')
+        .set('Authorization', `Bearer ${user.accessToken}`)
+        .field('chatId', 'c1')
+        .attach('file', Buffer.from('hello world'), { filename: 'report.txt', contentType: 'text/plain' });
+      expect(res.status).toBe(200);
+
+      // putObject(bucket, fileName, buffer, size, metadata)
+      const meta = mockClient.putObject.mock.calls[0][4] as Record<string, string>;
+      expect(meta['Content-Disposition']).toContain('attachment');
+      expect(meta['Content-Disposition']).toContain('filename="report.txt"');
+      // RFC 5987-вариант для не-ASCII имён
+      expect(meta['Content-Disposition']).toContain("filename*=UTF-8''report.txt");
+    });
+
+    it('подмена MIME: .exe с contentType application/pdf → 400 (задача 7)', async () => {
+      const user = await registerTestUser();
+      // MZ-заголовок исполняемого файла, а заявлен PDF
+      const exe = Buffer.concat([Buffer.from([0x4d, 0x5a]), Buffer.alloc(100, 0)]);
+      const res = await request(app)
+        .post('/api/upload/file')
+        .set('Authorization', `Bearer ${user.accessToken}`)
+        .field('chatId', 'c1')
+        .attach('file', exe, { filename: 'evil.pdf', contentType: 'application/pdf' });
+      expect(res.status).toBe(400);
+      expect(res.body.message).toContain('не соответствует');
+      expect(mockClient.putObject).not.toHaveBeenCalled();
+    });
+
+    it('docx с корректной ZIP-подписью проходит проверку magic bytes (задача 7)', async () => {
+      const user = await registerTestUser();
+      // OOXML — это ZIP: PK\x03\x04
+      const docx = Buffer.concat([Buffer.from([0x50, 0x4b, 0x03, 0x04]), Buffer.alloc(100, 0)]);
+      const res = await request(app)
+        .post('/api/upload/file')
+        .set('Authorization', `Bearer ${user.accessToken}`)
+        .field('chatId', 'c1')
+        .attach('file', docx, {
+          filename: 'doc.docx',
+          contentType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        });
+      expect(res.status).toBe(200);
+      expect(mockClient.putObject).toHaveBeenCalled();
+    });
+
+    it('docx с содержимым не-ZIP → 400 (задача 7)', async () => {
+      const user = await registerTestUser();
+      const res = await request(app)
+        .post('/api/upload/file')
+        .set('Authorization', `Bearer ${user.accessToken}`)
+        .field('chatId', 'c1')
+        .attach('file', Buffer.from('not a zip archive'), {
+          filename: 'fake.docx',
+          contentType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        });
+      expect(res.status).toBe(400);
+      expect(res.body.message).toContain('не соответствует');
+    });
   });
 
   describe('POST /api/upload/story', () => {

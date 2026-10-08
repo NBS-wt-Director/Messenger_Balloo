@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import crypto from 'crypto';
+import { z } from 'zod';
 import {
   register as registerService,
   login as loginService,
@@ -27,6 +28,7 @@ import {
 import { AuthenticatedRequest } from '../middleware/auth';
 import { setAuthCookies, clearAuthCookies, ACCESS_COOKIE, REFRESH_COOKIE } from '../middleware/auth';
 import { getWsToken } from '../services/authService';
+import { revokeAllSessions } from '../services/sessionRevocation';
 export { wsToken } from './wsTokenController';
 
 // ============================================================
@@ -41,35 +43,34 @@ const isMobileClient = (req: Request): boolean =>
   MOBILE_DEVICE_TYPES.includes(req.body?.deviceInfo?.type);
 
 // ============================================================
-// Helper: извлечение тела запроса с валидацией
-// ============================================================
-
-const getBody = <T>(req: Request, schema: any): T => {
-  const body = req.body;
-  const result = schema.safeParse(body);
-  if (!result.success) {
-    throw new Error(`Validation error: ${result.error.errors.map((e: any) => e.message).join(', ')}`);
-  }
-  return result.data as T;
-};
-
-// ============================================================
 // Регистрация
 // ============================================================
+
+// Серверная валидация регистрации (docs/12 §6.2). Раньше контроллер
+// проверял только непустоту, а минимум 8 символов жил лишь на фронте —
+// пароль из 3 символов проходил через прямой запрос к API.
+const registerSchema = z.object({
+  email: z.string().min(1, 'Email и пароль обязательны').email('Некорректный email'),
+  password: z
+    .string({ required_error: 'Email и пароль обязательны' })
+    .min(8, 'Пароль должен содержать минимум 8 символов'),
+  username: z.string().min(1).max(50).optional(),
+});
 
 export const register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   console.log('[REGISTER] Request received');
   try {
-    const { email, password, username } = req.body;
-    console.log('[REGISTER] Body:', { email, username });
-
-    if (!email || !password) {
+    const parsed = registerSchema.safeParse(req.body);
+    if (!parsed.success) {
       res.status(400).json({
         error: 'Bad Request',
-        message: 'Email и пароль обязательны',
+        message: parsed.error.errors[0].message,
       });
       return;
     }
+
+    const { email, password, username } = parsed.data;
+    console.log('[REGISTER] Body:', { email, username });
 
     const result = await registerService({ email, password, username });
 
@@ -244,9 +245,9 @@ export const clearCookie = async (req: Request, res: Response, next: NextFunctio
     clearAuthCookies(res);
 
     // Также очищаем refresh токен из body, если передан
-    const { refreshToken } = req.body;
+    const { refreshToken, allDevices } = req.body;
     if (refreshToken) {
-      await logoutService(refreshToken);
+      await logoutService(refreshToken, allDevices === true);
     }
 
     res.json({ message: 'Выход выполнен успешно' });
@@ -261,7 +262,7 @@ export const clearCookie = async (req: Request, res: Response, next: NextFunctio
 
 export const logout = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { refreshToken } = req.body;
+    const { refreshToken, allDevices } = req.body;
 
     if (!refreshToken) {
       res.status(400).json({
@@ -271,9 +272,25 @@ export const logout = async (req: Request, res: Response, next: NextFunction): P
       return;
     }
 
-    await logoutService(refreshToken);
+    // allDevices=true — выйти на всех устройствах, а не только на этом
+    await logoutService(refreshToken, allDevices === true);
 
     res.json({ message: 'Выход выполнен успешно' });
+  } catch (error: any) {
+    res.status(500).json({ error: 'Internal Error', message: error.message });
+  }
+};
+
+/**
+ * Выход на всех устройствах (POST /api/auth/logout-all).
+ * Требует аутентификации. Отзывает все refresh-токены пользователя.
+ */
+export const logoutAll = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const userId = req.user!.id;
+    await revokeAllSessions(userId);
+    clearAuthCookies(res);
+    res.json({ message: 'Выход выполнен на всех устройствах' });
   } catch (error: any) {
     res.status(500).json({ error: 'Internal Error', message: error.message });
   }

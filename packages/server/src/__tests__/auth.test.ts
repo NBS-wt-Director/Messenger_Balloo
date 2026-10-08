@@ -50,6 +50,19 @@ describe('Auth API', () => {
       expect(res.status).toBe(400);
     });
 
+    it('rejects too-short password (server-side, min 8) — задача 10', async () => {
+      const res = await request(app)
+        .post('/api/auth/register')
+        .send({
+          email: `short_${Date.now()}@test.balloo.ru`,
+          password: 'abc',
+          username: `short_${Date.now()}`,
+        });
+
+      expect(res.status).toBe(400);
+      expect(res.body.message).toContain('8 символов');
+    });
+
     it('rejects duplicate email', async () => {
       const user = await registerTestUser();
 
@@ -104,6 +117,18 @@ describe('Auth API', () => {
         .send({ email: user.email, password: 'wrongpassword' });
 
       expect(res.status).toBe(401);
+    });
+
+    it('returns tokens in body for mobile clients (deviceInfo.type=android)', async () => {
+      const user = await registerTestUser();
+
+      const res = await request(app)
+        .post('/api/auth/login')
+        .send({ email: user.email, password: user.password, deviceInfo: { type: 'android' } });
+
+      expect(res.status).toBe(200);
+      expect(res.body.tokens).toBeTruthy();
+      expect(res.body.tokens.accessToken).toBeTruthy();
     });
 
     it('rejects login with non-existent email', async () => {

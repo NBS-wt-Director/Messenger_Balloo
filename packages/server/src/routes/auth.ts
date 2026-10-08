@@ -21,7 +21,7 @@ import {
   disable2FA,
   getDevices,
   revokeDeviceController,
-
+  logoutAll,
 } from '../controllers/authController';
 import { authRequired, authRefresh } from '../middleware/auth';
 import { wsToken as wsTokenCtrl } from '../controllers/wsTokenController';
@@ -53,6 +53,12 @@ router.post('/refresh', authRefresh, refreshCookie);
 
 // Выход (старый endpoint, для обратной совместимости)
 router.post('/logout', logout);
+
+// Выход на всех устройствах: отзывает все токены текущего пользователя.
+// Отличие от /logout — /logout гасит только refresh из тела запроса,
+// /logout-all помечает отзывными все сессии, выданные раньше этого момента
+// (нужен валидный access token, поэтому вызывается из действующей сессии).
+router.post('/logout-all', authRequired, logoutAll);
 
 // Верификация email
 router.post('/verify-email', verifyEmail);

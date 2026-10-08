@@ -33,7 +33,12 @@ export const uploadAvatar = async (
       data: result,
     });
   } catch (error: any) {
-    if (error.message.includes('недопустимый тип') || error.message.includes('превышать')) {
+    if (
+      error.message.includes('недопустимый тип') ||
+      error.message.includes('превышать') ||
+      // magic bytes не совпали с заявленным MIME — это ошибка клиента, не 500
+      error.message.includes('не соответствует')
+    ) {
       res.status(400).json({ error: 'Bad Request', message: error.message });
     } else if (error.message.includes('MinIO')) {
       res.status(502).json({ error: 'Bad Gateway', message: 'Ошибка облачного хранилища' });
@@ -77,7 +82,12 @@ export const uploadChatAvatar = async (
       data: result,
     });
   } catch (error: any) {
-    if (error.message.includes('недопустимый тип') || error.message.includes('превышать')) {
+    if (
+      error.message.includes('недопустимый тип') ||
+      error.message.includes('превышать') ||
+      // magic bytes не совпали с заявленным MIME — это ошибка клиента, не 500
+      error.message.includes('не соответствует')
+    ) {
       res.status(400).json({ error: 'Bad Request', message: error.message });
     } else if (error.message.includes('MinIO')) {
       res.status(502).json({ error: 'Bad Gateway', message: 'Ошибка облачного хранилища' });
@@ -128,7 +138,12 @@ export const uploadMessageFile = async (
       },
     });
   } catch (error: any) {
-    if (error.message.includes('недопустимый тип') || error.message.includes('превышать')) {
+    if (
+      error.message.includes('недопустимый тип') ||
+      error.message.includes('превышать') ||
+      // magic bytes не совпали с заявленным MIME — это ошибка клиента, не 500
+      error.message.includes('не соответствует')
+    ) {
       res.status(400).json({ error: 'Bad Request', message: error.message });
     } else if (error.message.includes('MinIO')) {
       res.status(502).json({ error: 'Bad Gateway', message: 'Ошибка облачного хранилища' });
@@ -171,7 +186,12 @@ export const uploadStoryMedia = async (
       },
     });
   } catch (error: any) {
-    if (error.message.includes('недопустимый тип') || error.message.includes('превышать')) {
+    if (
+      error.message.includes('недопустимый тип') ||
+      error.message.includes('превышать') ||
+      // magic bytes не совпали с заявленным MIME — это ошибка клиента, не 500
+      error.message.includes('не соответствует')
+    ) {
       res.status(400).json({ error: 'Bad Request', message: error.message });
     } else if (error.message.includes('MinIO')) {
       res.status(502).json({ error: 'Bad Gateway', message: 'Ошибка облачного хранилища' });

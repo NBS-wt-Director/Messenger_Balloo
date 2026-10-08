@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { env } from '../config/env';
+import { isSessionRevoked } from '../services/sessionRevocation';
 
 // Интерфейс для запроса с аутентифицированным пользователем
 export interface AuthenticatedRequest extends Request {
@@ -45,11 +46,11 @@ const extractToken = (
 };
 
 // Middleware для проверки access token
-export const authRequired = (
+export const authRequired = async (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
-): void => {
+): Promise<void> => {
   const token = extractToken(req, 'balloo-access-token');
 
   if (!token) {
@@ -67,6 +68,18 @@ export const authRequired = (
       res.status(401).json({
         error: 'Unauthorized',
         message: 'Недействительный тип токена',
+      });
+      return;
+    }
+
+    // Проверка: не отозвана ли сессия (logout everywhere, смена пароля).
+    // Middleware становится async, чтобы выполнить асинхронную проверку
+    // в Redis без блокировки каждого запроса на блокирующий код.
+    if (await isSessionRevoked(decoded.userId, decoded.iat)) {
+      res.status(401).json({
+        error: 'Token revoked',
+        code: 'token_revoked',
+        message: 'Сессия завершена. Войдите заново',
       });
       return;
     }
@@ -96,11 +109,11 @@ export const authRequired = (
 };
 
 // Middleware для проверки refresh token (для refresh-cookie эндпоинта)
-export const authRefresh = (
+export const authRefresh = async (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
-): void => {
+): Promise<void> => {
   const token = extractToken(req, 'balloo-refresh-token');
 
   if (!token) {
@@ -118,6 +131,16 @@ export const authRefresh = (
       res.status(401).json({
         error: 'Unauthorized',
         message: 'Недействительный тип токена',
+      });
+      return;
+    }
+
+    // Если сессия отозвана — refresh-токен тоже невалиден
+    if (await isSessionRevoked(decoded.userId, decoded.iat)) {
+      res.status(401).json({
+        error: 'Token revoked',
+        code: 'token_revoked',
+        message: 'Сессия завершена. Войдите заново',
       });
       return;
     }
