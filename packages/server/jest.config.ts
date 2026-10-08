@@ -34,7 +34,7 @@ const config: Config = {
     'src/routes/auth.ts',
     'src/routes/payments.ts',
     'src/controllers/authController.ts',
-    'src/controllers/paymentsController.ts',
+    'src/controllers/paymentController.ts',
     'src/services/paymentService.ts',
     'src/services/authService.ts',
   ],
