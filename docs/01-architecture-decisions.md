@@ -1,7 +1,8 @@
 # Архитектура проекта Balloo Messenger
 
-> **Версия:** 1.0 | **Дата:** 2026-07-30  
-> **Статус:** Документация завершена
+> **Версия:** 1.0 | **Дата:** 2026-10-07
+>
+> **Статус:** Актуализировано по HEAD (c5c3727)
 
 ## 📦 Стек технологий
 - **Монорепо:** pnpm workspaces
@@ -25,7 +26,7 @@
 - **Собственный PostgreSQL 16** (не Supabase) — самостоятельный сервер в Docker
 - **Prisma** для типобезопасного ORM и миграций (Prisma Migrate)
 - **Конвенции:** PK `String @id @default(cuid())`, timestamps `BigInt` (Unix seconds), FK `<refTable>Id`
-- **81 таблица** в схеме, 10 seed-таблиц с предзаполненными данными
+- **55 таблиц** в схеме Prisma (`packages/shared/prisma/schema.prisma`), 10 seed-таблиц с предзаполненными данными
 - **Schema файл:** `mockups/data_schema.json` (источник правды по данным)
 
 ### 2. Аутентификация
@@ -33,14 +34,14 @@
 - **OAuth:** Yandex ID, VK ID, Mail.ru ID
 - **2FA:** TOTP (Google Authenticator) + backup codes
 - HTTP-only cookies, SameSite=Strict, Secure flag
-- argon2 для хэширования паролей
+- bcryptjs для хэширования паролей
 
 ### 3. Realtime-коммуникация
 - **WebSocket (ws package)** для сообщений, presence, typing
 - Подключение с JWT-авторизацией (query param token)
 - Heartbeat (ping/pong каждые 30 сек)
 - Room management по chatId
-- 24 WebSocket-события
+- 20 WebSocket-событий (8 incoming + 12 outgoing)
 
 ### 4. Mobile стратегия
 - **Expo (React Native)** для iOS и Android
@@ -82,10 +83,10 @@
 - **v2:** Kubernetes для оркестрации контейнеров
 
 ### 11. Тестирование
-- **Jest + React Testing Library** — юнит и компоненты
-- **Playwright** — e2e тесты
-- **Supertest** — тестирование API
-- **Turborepo** — параллельный запуск в монорепо
+- **Vitest** — юнит-тесты (`shared`, `web`)
+- **tsd** — тестирование типов в `shared`
+- **Playwright** — e2e тесты (запланировано, пока не в зависимостях)
+- Параллельный запуск — `pnpm -r test`
 
 ### 12. Логирование и мониторинг
 - **Winston** — логирование в приложении
@@ -98,7 +99,7 @@
 - Минимальная зависимость от внешних кэшей на старте
 
 ### 14. Безопасность
-- **JWT** — access token (15 минут TTL) + refresh token (7 дней TTL)
+- **JWT** — access token (15 минут TTL) + refresh token (30 дней TTL)
 - **HTTP-only cookies** для токенов, SameSite=Strict, Secure flag
 - **CORS + CSP** — заголовки безопасности
 - **Helmet.js** — заголовки безопасности
@@ -108,13 +109,13 @@
 - **CSRF protection** — CSRF tokens для форм
 - **DOMPurify** — sanitize input (XSS защита)
 - **Prisma ORM** — параметризованные запросы (SQL injection защита)
-- **argon2** — хэширование паролей
+- **bcryptjs** — хэширование паролей
 - **Собственная капча** (серверная генерация, не reCAPTCHA/hCaptcha)
 - **Шифрование диска (LUKS)** + шифрование чувствительных полей (email, токены)
 
 ### 15. UI Framework и Компоненты
-- **CSS Modules** (локальные стили) + **Styled Components** (CSS-in-JS где локальные не оптимально)
-- **Базовый каталог:** `/home/ivan/Рабочий стол/проекты/general_files/components/` — шаблонные компоненты (DynamicForm, DynamicTable, DynamicPage и др.) используются как основа, адаптируются под Balloo
+- **Plain CSS** — стили в `packages/web/src/` (Tailwind не используется)
+- **Базовый каталог:** `general_files/components/` (внешний репозиторий) — шаблонные компоненты (DynamicForm, DynamicTable, DynamicPage и др.) используются как основа, адаптируются под Balloo
 - **Новые компоненты:** Avatar (октагон), MessageBubble (угловые срезы), ChatList, ChatWindow, MessageInput, EmojiPicker, ReactionPicker, ReplyPanel, FileAttachment, VoiceMessage, PollWidget, CallOverlay, StoryViewer, TabBar, DrawerNav, Sidebar, Topbar, SkeletonLoader, EmptyState, CodeBlock, MarkdownRenderer, QRScanner, FileUpload, Toggle/Switch, Select, TimePicker, RangeSlider
 - Всё созданное и переиспользуемое отдаётся в каталог по правилам каталога
 
@@ -130,7 +131,8 @@
 - **Эталон перечня:** `mockups/data_schema.json` → `conventions.languages`
 
 ### 18. Видео/Аудио звонки
-- **WebRTC + PeerJS / LiveKit**
+- **WebRTC** (нативный API браузера) + **WebSocket** (`ws`) как signaling-канал
+- TURN-сервер: `coturn` (для NAT traversal)
 - Поддержка **групповых звонков** (SFU-подход для стабильности)
 
 ### 19. Push-уведомления
@@ -175,6 +177,22 @@
 - **Feature-based архитектура** — `/features/auth`, `/features/messaging`, `/features/groups` (по фичам, а не по типу)
 - Каждый фич-фолдер содержит: components, hooks, types, api, tests
 - Общая логика выносится в `@balloo/shared`
+- **Фактическая структура монорепо** (обновлено 2026-10-07):
+  ```
+  balloo/
+  ├── packages/
+  │   ├── shared/            # Общие типы, константы, утилиты
+  │   ├── ui/                # UI Kit / Дизайн-система (@balloo/ui)
+  │   ├── web/               # Основной веб-клиент (React + Vite SPA)
+  │   ├── web-features/      # features.balloo.su (каталог фич + обратная связь)
+  │   ├── desktop/           # Electron приложение
+  │   ├── mobile-android/    # Android (React Native)
+  │   ├── mobile-ios/        # iOS (React Native)
+  │   └── server/            # Backend (Express.js + Prisma)
+  ├── mockups/               # 282 макета, data_schema.json, sitemap.json
+  └── tickets/               # 288 тикетов
+  ```
+  > `web-features` — отдельное приложение на `features.balloo.su`, не входит в `web`.
 
 ### 26. Offline Mode
 - **SQLite (Web/IndexedDB)** — локальное хранилище для Web
@@ -197,7 +215,7 @@
 - **balloo.su** — веб-клиент (React + Vite SPA; Next.js — историческое решение, не реализовано)
 - **admin.balloo.su** — админ-панель
 - **command.balloo.su** — внутренний портал для сотрудников и найма
-- **features.balloo.su** — описание функций + запросы фич от пользователей
+- **features.balloo.su** — описание функций + запросы фич от пользователей (SPA, `packages/web-features`)
 - **history.balloo.su** — история версий мессенджера
 - **download.balloo.su** — загрузки (десктоп, мобильные приложения)
 - **docs.balloo.su** — документация API (Swagger/OpenAPI)
@@ -433,7 +451,7 @@
 - **Анти-бот:** Email + собственная капча (серверная генерация) + подтверждение email по коду + лимиты.
 - **2FA:** TOTP (Google Authenticator) + backup codes. Отправка кода подтверждения на email при входе с нового устройства или подозрительной активности.
 - **Политика паролей:** Минимум 8 символов, кириллица или латиница, цифры, строчные и заглавные буквы, спецсимволы: *!№#-_+=, спецсимвол — не первый символ.
-- **Хэширование паролей:** argon2.
+- **Хэширование паролей:** bcryptjs (cost 12).
 
 ### 73. Монетизация и Поддержка
 - **Подписка (v2):** Платные функции определяются в v2 (отложено).
