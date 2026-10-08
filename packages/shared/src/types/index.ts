@@ -4,3 +4,4 @@ export * from './auth';
 export * from './chat';
 export * from './profile';
 export * from './blog';
+export * from './task';

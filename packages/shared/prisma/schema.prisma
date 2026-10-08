@@ -170,11 +170,14 @@ model User {
   messageReadCounts   MessageReadCount[]
   pushSubscriptions   PushSubscription[]
   verificationTokens  VerificationToken[]
-  supportTickets      SupportTicket[]    @relation("SupportTicketUser")
-  assignedSupportTickets SupportTicket[] @relation("SupportTicketAdmin")
-  supportMessages     SupportMessage[]   @relation("SupportMessageAuthor")
+   supportTickets      SupportTicket[]    @relation("SupportTicketUser")
+   assignedSupportTickets SupportTicket[] @relation("SupportTicketAdmin")
+   supportMessages     SupportMessage[]   @relation("SupportMessageAuthor")
+   createdTasks        Task[]              @relation("TaskCreator")
+   assignedTasks       Task[]              @relation("TaskAssignee")
+   feedbacks           Feedback[]
 
-  @@map("users")
+   @@map("users")
 }
 
 // ============================================================
@@ -722,8 +725,10 @@ model Department {
   // Relations
   parent     Department?  @relation("DepartmentHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
   children   Department[] @relation("DepartmentHierarchy")
-  head       User?        @relation("DepartmentHead", fields: [headId], references: [id])
-  vacancies  Vacancy[]
+   head       User?        @relation("DepartmentHead", fields: [headId], references: [id])
+   vacancies  Vacancy[]
+   tasks      Task[]
+   sprints    Sprint[]
 
   @@index([parentId])
   @@map("departments")
@@ -1152,4 +1157,91 @@ model SupportMessage {
   @@index([authorId])
   @@index([createdAt])
   @@map("support_messages")
+}
+
+// ============================================================
+// Тикет В-112: REST-задачи + sprint-планирование (command.balloo.su)
+// ============================================================
+
+// Спринт — отрезок планирования с целью и границами по датам.
+// departmentId null — спринт общий (не привязан к отделу).
+model Sprint {
+  id           String  @id @default(cuid()) @db.VarChar(25)
+  name         String  @db.VarChar(255)
+  goal         String? @db.Text
+  startDate    BigInt? // Unix ms
+  endDate      BigInt? // Unix ms
+  departmentId String?
+  createdAt    BigInt  @default(0)
+  updatedAt    BigInt  @default(0)
+
+  // Relations
+  department Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  tasks      Task[]
+
+  @@index([departmentId])
+  @@index([startDate])
+  @@map("sprints")
+}
+
+// Задача. scope выводится из departmentId: заполнен — задача отдела,
+// пуст — личная задача создателя/исполнителя (docs/03-database-schema.md).
+model Task {
+  id           String  @id @default(cuid()) @db.VarChar(25)
+  title        String  @db.VarChar(255)
+  description  String? @db.Text
+  status       String  @default("todo") // todo | in_progress | review | done
+  priority     String  @default("medium") // low | medium | high | critical
+  // Тип задачи: feature | bug | task | improvement
+  type         String  @default("task") @db.VarChar(20)
+  // Теги — JSON-массив строк (конвенция как у Poll.options)
+  tags         String  @default("[]") @db.Text
+  creatorId    String?
+  assigneeId   String?
+  departmentId String?
+  sprintId     String?
+  dueDate      BigInt? // Unix ms
+  // Порядок карточки внутри колонки канбан-доски
+  order        Int     @default(0)
+  createdAt    BigInt  @default(0)
+  updatedAt    BigInt  @default(0)
+
+  // Relations
+  // Автор и исполнитель могут быть удалены — задача остаётся, ссылка обнуляется.
+  creator    User?       @relation("TaskCreator", fields: [creatorId], references: [id], onDelete: SetNull)
+  assignee   User?       @relation("TaskAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  department Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  sprint     Sprint?     @relation(fields: [sprintId], references: [id], onDelete: SetNull)
+
+  @@index([creatorId])
+  @@index([assigneeId])
+  @@index([departmentId])
+  @@index([sprintId])
+  @@index([status])
+  @@index([status, priority])
+  @@index([dueDate])
+  @@map("tasks")
+}
+
+// ============================================================
+// Обратная связь пользователей (тикет 1790572800-02)
+// ============================================================
+
+model Feedback {
+  id          String   @id @default(cuid()) @db.VarChar(25)
+  userId      String?  // null = анонимное обращение
+  type        String   @db.VarChar(20) // bug | feature | complaint | other
+  message     String   @db.VarChar(5000)
+  status      String   @default("new") @db.VarChar(20) // new | in_progress | resolved | closed
+  adminNote   String?  @db.VarChar(2000)
+  createdAt   BigInt   @default(0)
+  updatedAt   BigInt   @default(0)
+
+  // Relations
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("feedbacks")
 }

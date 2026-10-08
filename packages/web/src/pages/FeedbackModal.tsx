@@ -5,7 +5,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
-import { apiFetch } from '../services/api';
+import { api } from '../services/api';
 
 interface FeedbackModalProps {
   onClose: () => void;
@@ -44,7 +44,7 @@ export default function FeedbackModal({ onClose }: FeedbackModalProps) {
     setSubmitting(true);
     setError('');
     try {
-      await apiFetch('/feedback', {
+      await api.post('/feedback', {
         method: 'POST',
         body: JSON.stringify({
           type,

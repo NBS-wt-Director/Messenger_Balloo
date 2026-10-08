@@ -22,6 +22,7 @@ import { router as devicesRouter } from './devices';
 import { router as reportsRouter } from './reports';
 import { router as callsRouter } from './calls';
 import { router as supportRouter } from './support';
+import { router as tasksRouter } from './tasks';
 
 const router = Router() as import('express').Router;
 
@@ -65,5 +66,6 @@ router.use('/api/devices', devicesRouter);
 router.use('/api/reports', reportsRouter);
 router.use('/api/calls', callsRouter);
 router.use('/api/support', supportRouter);
+router.use('/api/tasks', tasksRouter);
 
 export { router };
