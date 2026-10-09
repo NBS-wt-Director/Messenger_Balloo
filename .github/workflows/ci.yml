@@ -123,6 +123,9 @@ jobs:
           # (воспроизведено локальным прогоном 2026-09-29: 12 suites failed to run).
           JWT_ACCESS_SECRET: ci-only-access-secret-not-for-production
           JWT_REFRESH_SECRET: ci-only-refresh-secret-not-for-production
+          # С тикета 1791489922 CORS_ORIGIN обязателен и не принимает '*':
+          # без него suite снова упал бы на ZodError (тот же механизм, что выше).
+          CORS_ORIGIN: https://balloo.su,http://localhost:5173
         run: pnpm test:server
 
       - name: Test web

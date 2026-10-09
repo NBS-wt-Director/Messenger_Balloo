@@ -5,6 +5,8 @@
 // УДАЛИТЬ, когда вернётся настоящий роут задач.
 import { Router } from 'express';
 
-const router = Router();
+// Явная аннотация нужна, иначе tsc не может назвать тип роутера в декларациях
+// (TS2742) — приём тот же, что в остальных роутах проекта.
+const router: import('express').Router = Router();
 
 export { router };

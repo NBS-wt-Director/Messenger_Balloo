@@ -3,7 +3,9 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const envSchema = z.object({
+// Схема экспортирована отдельно: тесты проверяют отклонение значений (пустой/`*`
+// CORS_ORIGIN) без падения модуля при импорте.
+export const envSchema = z.object({
   // Server
   SERVER_PORT: z.string().regex(/^\d+$/).default('3000'),
   SERVER_HOST: z.string().default('0.0.0.0'),
@@ -24,7 +26,20 @@ const envSchema = z.object({
   // CORS — РАЗРЕШИТЕЛЬНЫЙ СПИСОК origin'ов через запятую (Вариант C: каждый
   // поддомен = отдельный origin). Только для middleware/cors.ts и CSP connectSrc.
   // НЕ использовать как «адрес приложения» — для этого есть APP_URL.
-  CORS_ORIGIN: z.string().default('*'),
+  //
+  // Переменная обязательна (решение владельца 09.10.2026, тикет 1791489922):
+  // раньше был default '*', и middleware/cors.ts при '*' ставил `origin: true`
+  // вместе с `credentials: true` — сервер отвечал ACAO любому origin, а браузер
+  // пропускал запрос с cookie. Отсутствие переменной теперь роняет старт вместо
+  // тихого открытия CORS на весь мир.
+  CORS_ORIGIN: z
+    .string({ required_error: 'CORS_ORIGIN не задан: укажите список origin\'ов через запятую' })
+    .min(1, 'CORS_ORIGIN пустой: укажите список origin\'ов через запятую')
+    .refine(
+      (value) => value !== '*',
+      'CORS_ORIGIN="*" запрещён: вместе с credentials это отдаёт токены любому сайту. ' +
+        'Перечислите origin\'ы явно, например https://balloo.su,https://admin.balloo.su',
+    ),
 
   // APP_URL — публичный origin ФРОНТЕНДА (куда возвращаем пользователя после
   // OAuth, откуда ссылки писем и возврат платежей). Один URL, не список.

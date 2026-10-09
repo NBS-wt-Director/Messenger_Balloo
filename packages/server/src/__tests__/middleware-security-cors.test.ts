@@ -8,8 +8,9 @@
  *    X-CSRF-Token пишет предупреждение (и всё равно идёт дальше — это fallback);
  *  - rateLimitLogger перехватывает res.json и логирует только 429;
  *  - securityLogger детектит подозрительные паттерны в path/query/referer;
- *  - cors: при CORS_ORIGIN='*' origin отражается, при списке — только свои,
- *    preflight получает Allow-Methods/Allow-Headers/Max-Age.
+ *  - cors: origin берётся только из списка CORS_ORIGIN; '*' и пустое значение
+ *    отклоняет схема env (тик. 1791489922), чужой origin не получает
+ *    Access-Control-Allow-Origin, preflight получает Allow-Methods/Allow-Headers/Max-Age.
  */
 import request from 'supertest';
 import express from 'express';
@@ -234,46 +235,87 @@ describe('cors.ts', () => {
     return app;
   };
 
-  it('CORS_ORIGIN="*" (dev): origin отражается, credentials включены', async () => {
-    const { corsMiddleware } = require('../middleware/cors');
-    const app = buildApp(corsMiddleware);
+  // CORS middleware читает env при импорте модуля, поэтому значение ставится
+  // перед каждым require + jest.resetModules(). Так тест не зависит от того,
+  // что лежит в packages/server/.env или в env прогона CI.
+  const loadCors = (corsOrigin: string): express.RequestHandler => {
+    process.env.CORS_ORIGIN = corsOrigin;
+    jest.resetModules();
+    return require('../middleware/cors').corsMiddleware;
+  };
 
-    const res = await request(app).get('/api/ping').set('Origin', 'https://anywhere.test');
+  // Сообщения zod ищутся по пути поля, а не по полному тексту — иначе тест
+  // падает при любой правке формулировки в config/env.ts.
+  const issueFor = (result: { success: boolean; error?: any }, field: string): string => {
+    const issues = (result.error?.issues ?? []).filter((i: any) => i.path[0] === field);
+    return issues.map((i: any) => i.message).join(' | ');
+  };
 
-    expect(res.status).toBe(200);
-    expect(res.headers['access-control-allow-origin']).toBe('https://anywhere.test');
-    expect(res.headers['access-control-allow-credentials']).toBe('true');
-    // exposedHeaders нужны клиенту для чтения лимитов и X-Request-Id
-    expect(res.headers['access-control-expose-headers']).toBe(
-      'X-RateLimit-Limit,X-RateLimit-Remaining,X-RateLimit-Reset',
-    );
-    // X-Request-Id (middleware/requestId.ts) в exposedHeaders не добавлен — браузер его
-    // не читает; для клиентской трассировки заголовок нужно добавлять в middleware/cors.ts
-    expect(res.headers['access-control-expose-headers']).not.toContain('X-Request-Id');
+  const baseEnv = {
+    DATABASE_URL: 'postgresql://localhost:5432/balloo',
+    JWT_ACCESS_SECRET: 'a'.repeat(32),
+    JWT_REFRESH_SECRET: 'b'.repeat(32),
+  };
+
+  it('env: CORS_ORIGIN="*" отклоняется схемой (был бы ACAO любому сайту)', () => {
+    const { envSchema } = require('../config/env');
+    const result = envSchema.safeParse({ ...baseEnv, CORS_ORIGIN: '*' });
+
+    expect(result.success).toBe(false);
+    expect(issueFor(result, 'CORS_ORIGIN')).toContain('*');
+  });
+
+  it('env: без CORS_ORIGIN схема отклоняет (fail-fast вместо дефолта "*")', () => {
+    const { envSchema } = require('../config/env');
+    const result = envSchema.safeParse(baseEnv);
+
+    expect(result.success).toBe(false);
+    expect(issueFor(result, 'CORS_ORIGIN')).not.toBe('');
+  });
+
+  it('env: список origin\'ов принимается', () => {
+    const { envSchema } = require('../config/env');
+    const result = envSchema.safeParse({
+      ...baseEnv,
+      CORS_ORIGIN: 'https://balloo.su,https://admin.balloo.su',
+    });
+
+    expect(result.success).toBe(true);
   });
 
   it('CORS_ORIGIN-список (тик. №0): разрешает только свои origin' + 'ы поддоменов', async () => {
-    const prev = process.env.CORS_ORIGIN;
-    process.env.CORS_ORIGIN = 'https://balloo.su,https://admin.balloo.su';
-    jest.resetModules();
-    let corsMiddleware: express.RequestHandler;
-    try {
-      corsMiddleware = require('../middleware/cors').corsMiddleware;
-    } finally {
-      process.env.CORS_ORIGIN = prev;
-    }
-
+    const corsMiddleware = loadCors('https://balloo.su,https://admin.balloo.su');
     const app = buildApp(corsMiddleware);
 
     const allowed = await request(app).get('/api/ping').set('Origin', 'https://admin.balloo.su');
     expect(allowed.headers['access-control-allow-origin']).toBe('https://admin.balloo.su');
 
     const foreign = await request(app).get('/api/ping').set('Origin', 'https://evil.test');
+    // Решение владельца (тик. 1791489922): чужому origin не выдаётся
+    // Access-Control-Allow-Origin — браузер не отдаст ответ скрипту врага.
     expect(foreign.headers['access-control-allow-origin']).toBeUndefined();
+    // Access-Control-Allow-Credentials cors пишет и при запрещённом origin —
+    // без ACAO он бесполезен (браузеру нужен разрешающий ACAO), поэтому здесь
+    // это не дыра, а шум. Фиксируем поведение, чтобы правка CORS его не меняла.
+    expect(foreign.headers['access-control-allow-credentials']).toBe('true');
+  });
+
+  it('тик. 1791489922: чужой origin не получает ACAO даже на POST с cookie', async () => {
+    const corsMiddleware = loadCors('https://balloo.su');
+    const app = buildApp(corsMiddleware);
+    app.post('/api/transfer', (_req, res) => res.json({ ok: true }));
+
+    const res = await request(app)
+      .post('/api/transfer')
+      .set('Origin', 'https://attacker.example')
+      .set('Cookie', 'balloo-access-token=stealing')
+      .send({});
+
+    expect(res.headers['access-control-allow-origin']).toBeUndefined();
   });
 
   it('preflight: Allow-Methods с PATCH, Allow-Headers с Authorization, Max-Age 600', async () => {
-    const { corsMiddleware } = require('../middleware/cors');
+    const corsMiddleware = loadCors('https://balloo.su,http://localhost:5173');
     const app = buildApp(corsMiddleware);
 
     const res = await request(app)
@@ -290,8 +332,26 @@ describe('cors.ts', () => {
     expect(res.headers['access-control-max-age']).toBe('600');
   });
 
+  it('dev-origin из списка работает, credentials включены, exposedHeaders на месте', async () => {
+    const corsMiddleware = loadCors('http://localhost:5173');
+    const app = buildApp(corsMiddleware);
+
+    const res = await request(app).get('/api/ping').set('Origin', 'http://localhost:5173');
+
+    expect(res.status).toBe(200);
+    expect(res.headers['access-control-allow-origin']).toBe('http://localhost:5173');
+    expect(res.headers['access-control-allow-credentials']).toBe('true');
+    // exposedHeaders нужны клиенту для чтения лимитов
+    expect(res.headers['access-control-expose-headers']).toBe(
+      'X-RateLimit-Limit,X-RateLimit-Remaining,X-RateLimit-Reset',
+    );
+    // X-Request-Id (middleware/requestId.ts) в exposedHeaders не добавлен — браузер его
+    // не читает; для клиентской трассировки заголовок нужно добавлять в middleware/cors.ts
+    expect(res.headers['access-control-expose-headers']).not.toContain('X-Request-Id');
+  });
+
   it('запрос без Origin (curl/сервер-сервер) проходит без CORS-заголовков', async () => {
-    const { corsMiddleware } = require('../middleware/cors');
+    const corsMiddleware = loadCors('https://balloo.su');
     const app = buildApp(corsMiddleware);
 
     const res = await request(app).get('/api/ping');
