@@ -45,13 +45,60 @@ const extractToken = (
   return null;
 };
 
+/**
+ * CSRF-защита для запросов, которые полагаются на access-токен из httpOnly cookie.
+ *
+ * Double-submit (`csrf_token` cookie === `X-CSRF-Token` header) сам по себе не
+ * защищает: он лишь требует, чтобы злоумышленник умел читать cookie своей же
+ * страницы. readSourceTags / deleteSourceTag вызываются из чужого iframe с
+ * `credentials: 'include'` — браузер приложит cookie, а злоумышленник его не
+ * читает. Поэтому проверяем происхождение запроса.
+ *
+ * Пустой Origin (curl, мобильные клиенты) пропускаем: без cookie-авторизации
+ * они всё равно получают 401.
+ */
+export const requireSameOrigin = () => {
+  const allowed = new Set(
+    env.CORS_ORIGIN.split(',').map((s) => s.trim()).filter(Boolean)
+  );
+
+  return (req: Request, res: Response, next: NextFunction): void => {
+    const origin = req.headers.origin;
+    const referer = req.headers.referer;
+
+    let source: string | undefined;
+    if (origin) {
+      source = origin;
+    } else if (referer) {
+      try {
+        source = new URL(referer).origin;
+      } catch {
+        // malformed referer — treat as no origin
+      }
+    }
+
+    if (!source) {
+      // curl, mobile, CLI — без cookie получают 401, безопасно
+      next();
+      return;
+    }
+
+    if (!allowed.has(source)) {
+      res.status(403).json({ error: 'FORGED_ORIGIN' });
+      return;
+    }
+
+    next();
+  };
+};
+
 // Middleware для проверки access token
 export const authRequired = async (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const token = extractToken(req, 'balloo-access-token');
+  const token = extractToken(req, ACCESS_COOKIE);
 
   if (!token) {
     res.status(401).json({
@@ -62,7 +109,9 @@ export const authRequired = async (
   }
 
   try {
-    const decoded = jwt.verify(token, env.JWT_ACCESS_SECRET) as JwtPayload;
+    const decoded = jwt.verify(token, env.JWT_ACCESS_SECRET, {
+      algorithms: ['HS256'],
+    }) as JwtPayload;
 
     if (decoded.type !== 'access') {
       res.status(401).json({
@@ -114,7 +163,7 @@ export const authRefresh = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const token = extractToken(req, 'balloo-refresh-token');
+  const token = extractToken(req, REFRESH_COOKIE);
 
   if (!token) {
     res.status(401).json({
@@ -125,7 +174,9 @@ export const authRefresh = async (
   }
 
   try {
-    const decoded = jwt.verify(token, env.JWT_REFRESH_SECRET) as JwtPayload;
+    const decoded = jwt.verify(token, env.JWT_REFRESH_SECRET, {
+      algorithms: ['HS256'],
+    }) as JwtPayload;
 
     if (decoded.type !== 'refresh') {
       res.status(401).json({
@@ -201,7 +252,9 @@ export const optionalAuth = (
   }
 
   try {
-    const decoded = jwt.verify(token, env.JWT_ACCESS_SECRET) as JwtPayload;
+    const decoded = jwt.verify(token, env.JWT_ACCESS_SECRET, {
+      algorithms: ['HS256'],
+    }) as JwtPayload;
 
     if (decoded.type === 'access') {
       req.user = {
@@ -222,34 +275,41 @@ export const optionalAuth = (
 // Утилиты для работы с httpOnly cookie
 // ============================================================
 
-export const ACCESS_COOKIE = 'balloo-access-token';
-export const REFRESH_COOKIE = 'balloo-refresh-token';
+// Имена cookie: в production — __Secure- префикс (требует Secure flag),
+// в dev/test — старые имена для совместимости с тестами.
+const isProd = env.NODE_ENV === 'production';
 
-// Флаги cookie: Secure только для HTTPS (production)
-const isProduction = env.NODE_ENV === 'production';
+export const ACCESS_COOKIE = isProd ? '__Secure-balloo_at' : 'balloo-access-token';
+export const REFRESH_COOKIE = isProd ? '__Secure-balloo_rt' : 'balloo-refresh-token';
+
+// Domain для cookie: шаринг на все поддомены *.balloo.su (решение владельца 09.10.2026).
+// localhost работает без domain (secure context).
+const cookieDomain = isProd ? (env.COOKIE_DOMAIN || '.balloo.su') : undefined;
 
 export const setAuthCookies = (
   res: Response,
   accessToken: string,
   refreshToken: string
 ): void => {
-  // Access token: HttpOnly; Secure; SameSite=Strict; maxAge=15 минут
+  // Access token: HttpOnly; Secure (prod); SameSite=Strict; maxAge=15 минут
   res.cookie(ACCESS_COOKIE, accessToken, {
     httpOnly: true,
-    secure: isProduction, // Secure только в production
+    secure: isProd,
     sameSite: 'strict' as const,
     maxAge: 15 * 60 * 1000, // 15 минут
     path: '/',
+    domain: cookieDomain,
   });
 
-  // Refresh token: HttpOnly; Secure; SameSite=Lax; maxAge=30 дней
+  // Refresh token: HttpOnly; Secure (prod); SameSite=Lax; maxAge=30 дней
   // Lax для редиректа OAuth
   res.cookie(REFRESH_COOKIE, refreshToken, {
     httpOnly: true,
-    secure: isProduction,
+    secure: isProd,
     sameSite: 'lax' as const,
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 дней
     path: '/',
+    domain: cookieDomain,
   });
 };
 
@@ -257,14 +317,16 @@ export const setAuthCookies = (
 export const clearAuthCookies = (res: Response): void => {
   res.clearCookie(ACCESS_COOKIE, {
     httpOnly: true,
-    secure: isProduction,
+    secure: isProd,
     sameSite: 'strict' as const,
     path: '/',
+    domain: cookieDomain,
   });
   res.clearCookie(REFRESH_COOKIE, {
     httpOnly: true,
-    secure: isProduction,
+    secure: isProd,
     sameSite: 'lax' as const,
     path: '/',
+    domain: cookieDomain,
   });
 };

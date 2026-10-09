@@ -1,11 +1,11 @@
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
-import Redis from 'ioredis';
+import { getRedis } from './cacheService';
 import { env } from '../config/env';
 import { PrismaClient } from '@prisma/client';
 import { setAuthCookies, clearAuthCookies } from '../middleware/auth';
-import { revokeAllSessions } from './sessionRevocation';
+import { revokeAllSessions, isSessionRevoked } from './sessionRevocation';
 import { sendWelcomeEmail, sendVerificationEmail, sendResetPasswordEmail } from './emailService';
 
 const prisma = new PrismaClient();
@@ -90,9 +90,11 @@ export const generateTokens = (userId: string, email: string, username?: string,
 
   return {
     accessToken: jwt.sign(accessPayload, env.JWT_ACCESS_SECRET, {
+      algorithm: 'HS256',
       expiresIn: Number(env.JWT_ACCESS_EXPIRES_IN),
     }),
     refreshToken: jwt.sign(refreshPayload, env.JWT_REFRESH_SECRET, {
+      algorithm: 'HS256',
       expiresIn: Number(env.JWT_REFRESH_EXPIRES_IN),
     }),
   };
@@ -110,6 +112,16 @@ const legacyHash = (password: string): string =>
 
 const isLegacyHash = (hash: string): boolean => /^[a-f0-9]{64}$/i.test(hash);
 
+// Constant-time сравнение hex-хешей одинаковой длины.
+// timingSafeEqual кидает на разной длине, а legacyHash всегда даёт ровно 64 hex-символа,
+// поэтому длина совпадает по построению (isLegacyHash уже проверил форматStored-хеша).
+const safeLegacyCompare = (candidateHex: string, storedHex: string): boolean => {
+  const candidate = Buffer.from(candidateHex, 'hex');
+  const stored = Buffer.from(storedHex, 'hex');
+  if (candidate.length !== stored.length) return false;
+  return crypto.timingSafeEqual(candidate, stored);
+};
+
 // Проверка пароля: поддерживает bcrypt и легаси SHA-256.
 // needsRehash = true → хеш устарел и должен быть перезаписан bcrypt-хешем
 const verifyPassword = async (
@@ -117,7 +129,7 @@ const verifyPassword = async (
   hash: string
 ): Promise<{ valid: boolean; needsRehash: boolean }> => {
   if (isLegacyHash(hash)) {
-    const valid = legacyHash(password) === hash;
+    const valid = safeLegacyCompare(legacyHash(password), hash);
     return { valid, needsRehash: valid };
   }
   try {
@@ -411,7 +423,9 @@ export const verify2FA = async (input: Verify2FAInput) => {
 export const refreshTokens = async (refreshToken: string) => {
   let decoded: Record<string, unknown>;
   try {
-    decoded = jwt.verify(refreshToken, env.JWT_REFRESH_SECRET) as Record<string, unknown>;
+    decoded = jwt.verify(refreshToken, env.JWT_REFRESH_SECRET, {
+      algorithms: ['HS256'],
+    }) as Record<string, unknown>;
   } catch {
     throw new Error('Недействительный refresh токен');
   }
@@ -420,31 +434,47 @@ export const refreshTokens = async (refreshToken: string) => {
     throw new Error('Недействительный тип токена');
   }
 
-  // Проверяем: не отозван ли токен (ротация)
   const jti = decoded.jti as string | undefined;
-  if (jti) {
-    const redis = new Redis(env.REDIS_URL);
+  const userId = decoded.userId as string;
+  const iat = decoded.iat as number | undefined;
+  const redis = getRedis();
+  const ttl = Number(env.JWT_REFRESH_EXPIRES_IN);
+
+  if (!redis && jti) {
+    // Blacklist недоступен → replay-защита ротации не работает. Не молчим.
+    console.warn('[auth] REDIS_URL не задан: blacklist refresh-токенов отключён');
+  }
+
+  // 1. Replay-защита: этот JTI уже был отозван при прошлой ротации
+  if (jti && redis) {
     const revoked = await redis.get(`revoked-jti:${jti}`);
-    await redis.quit();
     if (revoked) {
       throw new Error('Refresh токен отозван');
     }
   }
 
+  // 2. «Выйти на всех устройствах» / смена пароля: отзыв по iat
+  if (iat) {
+    const revokedBySession = await isSessionRevoked(userId, iat);
+    if (revokedBySession) {
+      if (jti && redis) {
+        await redis.setex(`revoked-jti:${jti}`, ttl, '1');
+      }
+      throw new Error('Refresh токен отозван');
+    }
+  }
+
   const user = await prisma.user.findUnique({
-    where: { id: decoded.userId as string },
+    where: { id: userId },
   });
 
   if (!user || user.status !== 'active') {
     throw new Error('Пользователь не найден или неактивен');
   }
 
-  // Ротация: старый JTI в blacklist (TTL = TTL старого токена)
-  if (jti) {
-    const redis = new Redis(env.REDIS_URL);
-    const ttl = Number(env.JWT_REFRESH_EXPIRES_IN);
+  // 3. Ротация: текущий JTI в blacklist (TTL = TTL старого токена)
+  if (jti && redis) {
     await redis.setex(`revoked-jti:${jti}`, ttl, '1');
-    await redis.quit();
   }
 
   return generateTokens(user.id, user.email!, user.username || undefined, decoded.role as string | undefined);
@@ -456,15 +486,18 @@ export const refreshTokens = async (refreshToken: string) => {
 
 export const logout = async (refreshToken: string, allDevices = false): Promise<void> => {
   try {
-    const decoded = jwt.verify(refreshToken, env.JWT_REFRESH_SECRET) as Record<string, unknown>;
+    const decoded = jwt.verify(refreshToken, env.JWT_REFRESH_SECRET, {
+      algorithms: ['HS256'],
+    }) as Record<string, unknown>;
     if ((decoded.type as string) === 'refresh') {
       // Blacklist JTI (rotating refresh tokens)
       const jti = decoded.jti as string | undefined;
       if (jti) {
-        const redis = new Redis(env.REDIS_URL);
-        const ttl = Number(env.JWT_REFRESH_EXPIRES_IN);
-        await redis.setex(`revoked-jti:${jti}`, ttl, '1');
-        await redis.quit();
+        const redis = getRedis();
+        if (redis) {
+          const ttl = Number(env.JWT_REFRESH_EXPIRES_IN);
+          await redis.setex(`revoked-jti:${jti}`, ttl, '1');
+        }
       }
       // allDevices — отзываем и остальные устройства. Блокировка по jti гасит
       // только этот refresh, а метка revoked-at по userId выбрасывает в том
@@ -1121,7 +1154,9 @@ export const revokeDevice = async (userId: string, deviceId: string) => {
 
 export const getWsToken = async (accessToken: string): Promise<string> => {
   try {
-    const decoded = jwt.verify(accessToken, env.JWT_ACCESS_SECRET) as any;
+    const decoded = jwt.verify(accessToken, env.JWT_ACCESS_SECRET, {
+      algorithms: ['HS256'],
+    }) as any;
     if (decoded.type !== 'access') {
       throw new Error('Invalid token type');
     }

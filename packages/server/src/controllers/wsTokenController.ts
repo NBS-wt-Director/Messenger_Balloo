@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { getWsToken } from '../services/authService';
+import { ACCESS_COOKIE } from '../middleware/auth';
 
 // ============================================================
 // WS Token — временный токен для WebSocket
@@ -7,7 +8,7 @@ import { getWsToken } from '../services/authService';
 
 export const wsToken = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const accessToken = req.cookies?.['balloo-access-token'];
+    const accessToken = req.cookies?.[ACCESS_COOKIE];
 
     if (!accessToken) {
       res.status(401).json({ error: 'Unauthorized', message: 'Требуется авторизация' });

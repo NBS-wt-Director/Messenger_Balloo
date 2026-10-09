@@ -97,6 +97,10 @@ export const envSchema = z.object({
 
   // File upload
   MAX_FILE_SIZE: z.string().default('52428800'),
+
+  // Cookie domain для шаринга на поддомены (решение владельца 09.10.2026).
+  // Для боевого домена: .balloo.su. Для localhost: не задавать (cookie привязан к origin).
+  COOKIE_DOMAIN: z.string().optional(),
 });
 
 export const env = envSchema.parse(process.env);

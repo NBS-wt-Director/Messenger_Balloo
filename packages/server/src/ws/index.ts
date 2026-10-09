@@ -151,7 +151,9 @@ function verifyClient(
       return;
     }
 
-    const decoded = jwt.verify(token, env.JWT_ACCESS_SECRET) as any;
+    const decoded = jwt.verify(token, env.JWT_ACCESS_SECRET, {
+      algorithms: ['HS256'],
+    }) as any;
 
     if (decoded.type !== 'access') {
       console.log('[WS] Connection rejected: invalid token type');

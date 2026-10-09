@@ -11,6 +11,7 @@ import {
   rateLimitLogger,
   securityLogger,
 } from './middleware/security';
+import { requireSameOrigin } from './middleware/auth';
 import { router as baseRouter } from './routes';
 import { PrismaClient } from '@prisma/client';
 import Redis from 'ioredis';
@@ -51,6 +52,11 @@ app.use(securityLogger);
 
 // 9. CSRF protection — для stateful endpoints (fallback для JWT)
 app.use(csrfProtection);
+
+// 9b. Same-origin check для cookie-based mutation (POST/PUT/PATCH/DELETE)
+//     Запросы без Origin (curl, mobile, CLI) пропускаем — они без cookie 401.
+//     GET/HEAD/OPTIONS пропускаем (csrfProtection уже пропустил).
+app.use(requireSameOrigin());
 
 // 10. BigInt JSON serializer — ДО router
 app.use((req, res, next) => {
