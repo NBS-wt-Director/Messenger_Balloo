@@ -206,6 +206,30 @@ server {
 > Test server зелёные, Test server падает (лог требует GitHub-токен,
 > тикет `1790479490-07`).
 
+### Первый запуск: схема и сиды
+
+Схема БД и тестовые данные прикладываются **автоматически** при старте
+prod-контейнера сервера (`docker/entrypoint.server.sh`):
+
+1. `prisma migrate deploy` — применяет все миграции из `prisma/migrations/`
+   к базе из `DATABASE_URL` (Prisma CLI установлен глобально в
+   Dockerfile.server: `prisma@5.18.0`, версия зафиксирована под
+   `@prisma/client@5.18.0`).
+2. `node dist/server/src/index.js` — запуск сервера.
+
+Условия и флаги:
+
+- migrate выполняется **только** если в образе есть `prisma/migrations/`
+  (dev-образ их не содержит — шаг пропускается);
+- `RUN_MIGRATIONS=0` в `deploy/.env.production` (или ENV в compose) —
+  отключает migrate для контейнера (для БД, которыми управляет DBA);
+- сиды **не** прикладываются автоматически — только по запросу владельца
+  (`docker exec balloo-server node prisma/seed.js`).
+
+Проверено исполнением (2026-10-20): `prisma migrate deploy` на чистой БД —
+все 6 миграций применены; `node prisma/seed.js` — сид успешен, повторный
+запуск идемпотентен.
+
 ### Пайплайн (Последовательный запуск) — целевая v1-спецификация
 
 ```yaml
@@ -341,9 +365,11 @@ main (production)
 
 ## Сидирование (Seed data)
 
-- Node.js скрипты (`packages/server/src/seed/`)
-- Скрипт: `pnpm seed`
+- Скрипт: `packages/shared/prisma/seed.ts` (TypeScript, компилируется в `prisma/seed.js` через `tsc -p tsconfig.seed.json`)
+- Запуск в dev: `pnpm seed` (ts-node, из корня репозитория)
+- Запуск в prod-контейнере: `node prisma/seed.js` (скрипт `prisma.seed` в `packages/server/package.json`; seed.js компилируется в стадии builder Dockerfile.server)
 - Создаёт: тестовых пользователей, чаты, группы, сообщения
+- Идемпотентен: повторный запуск не дублирует данные
 
 ---
 
