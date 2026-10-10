@@ -1,0 +1,199 @@
+diff --git a/packages/server/src/routes/index.ts b/packages/server/src/routes/index.ts
+index 3cb7ef5..38166b4 100644
+--- a/packages/server/src/routes/index.ts
++++ b/packages/server/src/routes/index.ts
+@@ -22,6 +22,7 @@ import { router as devicesRouter } from './devices';
+ import { router as reportsRouter } from './reports';
+ import { router as callsRouter } from './calls';
+ import { router as supportRouter } from './support';
++import { router as tasksRouter } from './tasks';
+
+ const router = Router() as import('express').Router;
+
+@@ -65,5 +66,6 @@ router.use('/api/devices', devicesRouter);
+ router.use('/api/reports', reportsRouter);
+ router.use('/api/calls', callsRouter);
+ router.use('/api/support', supportRouter);
++router.use('/api/tasks', tasksRouter);
+
+ export { router };
+diff --git a/packages/server/src/routes/tasks.ts b/packages/server/src/routes/tasks.ts
+new file mode 100644
+index 0000000..093d41d
+--- /dev/null
++++ b/packages/server/src/routes/tasks.ts
+@@ -0,0 +1,38 @@
++// tasks.ts — маршруты для задач (command.balloo.su)
++// POST   /api/tasks
++// GET    /api/tasks
++// GET    /api/tasks/:id
++// PUT    /api/tasks/:id
++// DELETE /api/tasks/:id
++
++import { Router } from 'express';
++import { authRequired } from '../middleware/auth';
++import {
++  createTask,
++  getTasks,
++  getTask,
++  updateTask,
++  deleteTask,
++} from '../controllers/taskController';
++
++const router = Router() as import('express').Router;
++
++// Все маршруты требуют авторизации
++router.use(authRequired);
++
++// POST /api/tasks — создать задачу
++router.post('/', createTask);
++
++// GET /api/tasks — список задач
++router.get('/', getTasks);
++
++// GET /api/tasks/:id — одна задача
++router.get('/:id', getTask);
++
++// PUT /api/tasks/:id — обновить задачу
++router.put('/:id', updateTask);
++
++// DELETE /api/tasks/:id — удалить задачу
++router.delete('/:id', deleteTask);
++
++export { router };
+diff --git a/packages/shared/prisma/schema.prisma b/packages/shared/prisma/schema.prisma
+index ab168dd..1107dcf 100644
+--- a/packages/shared/prisma/schema.prisma
++++ b/packages/shared/prisma/schema.prisma
+@@ -170,11 +170,14 @@ model User {
+   messageReadCounts   MessageReadCount[]
+   pushSubscriptions   PushSubscription[]
+   verificationTokens  VerificationToken[]
+-  supportTickets      SupportTicket[]    @relation("SupportTicketUser")
+-  assignedSupportTickets SupportTicket[] @relation("SupportTicketAdmin")
+-  supportMessages     SupportMessage[]   @relation("SupportMessageAuthor")
++   supportTickets      SupportTicket[]    @relation("SupportTicketUser")
++   assignedSupportTickets SupportTicket[] @relation("SupportTicketAdmin")
++   supportMessages     SupportMessage[]   @relation("SupportMessageAuthor")
++   createdTasks        Task[]              @relation("TaskCreator")
++   assignedTasks       Task[]              @relation("TaskAssignee")
++   feedbacks           Feedback[]
+
+-  @@map("users")
++   @@map("users")
+ }
+
+ // ============================================================
+@@ -722,8 +725,10 @@ model Department {
+   // Relations
+   parent     Department?  @relation("DepartmentHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+   children   Department[] @relation("DepartmentHierarchy")
+-  head       User?        @relation("DepartmentHead", fields: [headId], references: [id])
+-  vacancies  Vacancy[]
++   head       User?        @relation("DepartmentHead", fields: [headId], references: [id])
++   vacancies  Vacancy[]
++   tasks      Task[]
++   sprints    Sprint[]
+
+   @@index([parentId])
+   @@map("departments")
+@@ -1153,3 +1158,90 @@ model SupportMessage {
+   @@index([createdAt])
+   @@map("support_messages")
+ }
++
++// ============================================================
++// Тикет В-112: REST-задачи + sprint-планирование (command.balloo.su)
++// ============================================================
++
++// Спринт — отрезок планирования с целью и границами по датам.
++// departmentId null — спринт общий (не привязан к отделу).
++model Sprint {
++  id           String  @id @default(cuid()) @db.VarChar(25)
++  name         String  @db.VarChar(255)
++  goal         String? @db.Text
++  startDate    BigInt? // Unix ms
++  endDate      BigInt? // Unix ms
++  departmentId String?
++  createdAt    BigInt  @default(0)
++  updatedAt    BigInt  @default(0)
++
++  // Relations
++  department Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
++  tasks      Task[]
++
++  @@index([departmentId])
++  @@index([startDate])
++  @@map("sprints")
++}
++
++// Задача. scope выводится из departmentId: заполнен — задача отдела,
++// пуст — личная задача создателя/исполнителя (docs/03-database-schema.md).
++model Task {
++  id           String  @id @default(cuid()) @db.VarChar(25)
++  title        String  @db.VarChar(255)
++  description  String? @db.Text
++  status       String  @default("todo") // todo | in_progress | review | done
++  priority     String  @default("medium") // low | medium | high | critical
++  // Тип задачи: feature | bug | task | improvement
++  type         String  @default("task") @db.VarChar(20)
++  // Теги — JSON-массив строк (конвенция как у Poll.options)
++  tags         String  @default("[]") @db.Text
++  creatorId    String?
++  assigneeId   String?
++  departmentId String?
++  sprintId     String?
++  dueDate      BigInt? // Unix ms
++  // Порядок карточки внутри колонки канбан-доски
++  order        Int     @default(0)
++  createdAt    BigInt  @default(0)
++  updatedAt    BigInt  @default(0)
++
++  // Relations
++  // Автор и исполнитель могут быть удалены — задача остаётся, ссылка обнуляется.
++  creator    User?       @relation("TaskCreator", fields: [creatorId], references: [id], onDelete: SetNull)
++  assignee   User?       @relation("TaskAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
++  department Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
++  sprint     Sprint?     @relation(fields: [sprintId], references: [id], onDelete: SetNull)
++
++  @@index([creatorId])
++  @@index([assigneeId])
++  @@index([departmentId])
++  @@index([sprintId])
++  @@index([status])
++  @@index([status, priority])
++  @@index([dueDate])
++  @@map("tasks")
++}
++
++// ============================================================
++// Обратная связь пользователей (тикет 1790572800-02)
++// ============================================================
++
++model Feedback {
++  id          String   @id @default(cuid()) @db.VarChar(25)
++  userId      String?  // null = анонимное обращение
++  type        String   @db.VarChar(20) // bug | feature | complaint | other
++  message     String   @db.VarChar(5000)
++  status      String   @default("new") @db.VarChar(20) // new | in_progress | resolved | closed
++  adminNote   String?  @db.VarChar(2000)
++  createdAt   BigInt   @default(0)
++  updatedAt   BigInt   @default(0)
++
++  // Relations
++  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
++
++  @@index([userId])
++  @@index([status])
++  @@index([createdAt])
++  @@map("feedbacks")
++}
+diff --git a/packages/shared/src/types/index.ts b/packages/shared/src/types/index.ts
+index 80e1ac1..e9f1f28 100644
+--- a/packages/shared/src/types/index.ts
++++ b/packages/shared/src/types/index.ts
+@@ -4,3 +4,4 @@ export * from './auth';
+ export * from './chat';
+ export * from './profile';
+ export * from './blog';
++export * from './task';

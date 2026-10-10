@@ -153,6 +153,11 @@ services:
       VAPID_SUBJECT: ${VAPID_SUBJECT:-mailto:admin@balloo.su}
       PROMETHEUS_ENABLED: ${PROMETHEUS_ENABLED:-true}
       PROMETHEUS_PORT: ${PROMETHEUS_PORT:-9090}
+      # Миграции и seed применяет entrypoint контейнера перед стартом node
+      # (docker/entrypoint.server.sh). "0" — пропустить, например при ручном
+      # управлении схемой. Тикет 1791623683: без этого чистый прод = пустая БД.
+      RUN_MIGRATIONS: ${RUN_MIGRATIONS:-1}
+      RUN_SEED: ${RUN_SEED:-1}
     depends_on:
       postgres:
         condition: service_healthy
@@ -165,7 +170,9 @@ services:
       interval: 15s
       timeout: 10s
       retries: 5
-      start_period: 30s
+      # 30s было мало: при первом старте entrypoint сначала гоняет migrate deploy
+      # + seed, и web (depends_on service_healthy) не поднимался бы вовсе.
+      start_period: 90s
     networks:
       - balloo-net
 

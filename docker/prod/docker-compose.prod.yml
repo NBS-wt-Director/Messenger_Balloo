@@ -145,6 +145,10 @@ services:
       VAPID_SUBJECT: ${VAPID_SUBJECT:-mailto:admin@balloo.su}
       PROMETHEUS_ENABLED: ${PROMETHEUS_ENABLED:-true}
       PROMETHEUS_PORT: ${PROMETHEUS_PORT:-9090}
+      # Миграции и seed применяет entrypoint контейнера (Dockerfile.server ->
+      # docker/entrypoint.server.sh). "0" — пропустить. Тикет 1791623683.
+      RUN_MIGRATIONS: ${RUN_MIGRATIONS:-1}
+      RUN_SEED: ${RUN_SEED:-1}
     depends_on:
       postgres:
         condition: service_healthy
@@ -157,7 +161,8 @@ services:
       interval: 15s
       timeout: 10s
       retries: 5
-      start_period: 30s
+      # Первый старт: entrypoint сначала migrate deploy + seed (см. local.yml).
+      start_period: 90s
     networks:
       - balloo-net
     deploy:

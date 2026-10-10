@@ -15,3 +15,6 @@ coverage
 .env
 .env.*
 !.env.example
+# prisma/.env содержит локальные dev-креды (balloo123) — в образ не попадает:
+# DATABASE_URL приходит из окружения контейнера (compose), файла ему не нужно.
+**/prisma/.env

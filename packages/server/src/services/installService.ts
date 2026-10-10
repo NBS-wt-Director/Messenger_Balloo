@@ -3,11 +3,27 @@
 
 import { execSync } from 'child_process';
 import { writeFileSync, mkdirSync, existsSync } from 'fs';
-import { join } from 'path';
+import { join, dirname } from 'path';
 import { randomBytes } from 'crypto';
 import bcrypt from 'bcryptjs';
 
-const ROOT_DIR = join(__dirname, '../../..');
+// Root of the monorepo, resolved by walking up to the workspace marker.
+// A fixed depth (`../../..`) is wrong: this file compiles to
+// packages/server/dist/services/installService.js, so three levels up is
+// packages/server, not the repo root (/app in the Docker image).
+function resolveRootDir(): string {
+  let dir = __dirname;
+  for (let i = 0; i < 10; i++) {
+    if (existsSync(join(dir, 'pnpm-workspace.yaml'))) return dir;
+    const parent = dirname(dir);
+    if (parent === dir) break;
+  }
+  // Fallback for layouts without the marker (e.g. flattened container): the
+  // compiled file sits 4 levels below the root.
+  return join(__dirname, '../../../..');
+}
+
+const ROOT_DIR = resolveRootDir();
 const ENV_PATH = join(ROOT_DIR, '.env');
 const INSTALLED_FLAG_PATH = join(ROOT_DIR, '.installed');
 

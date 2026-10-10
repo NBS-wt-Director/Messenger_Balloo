@@ -36,6 +36,10 @@ COPY packages/server/ packages/server/
 RUN cd packages/shared && ./node_modules/.bin/tsc
 RUN cd packages/server && ./node_modules/.bin/tsc
 
+# Compile seed (prisma/seed.ts -> prisma/seed.js). Prod stage has no devDeps
+# (no ts-node), so the entrypoint runs the seed with plain `node`.
+RUN cd packages/shared && ./node_modules/.bin/tsc -p tsconfig.seed.json
+
 # ---------- Production stage ----------
 FROM node:22-slim
 
@@ -71,10 +75,21 @@ RUN --mount=type=cache,id=npx-prod,target=/root/.npm/_npx,sharing=shared \
     --mount=type=cache,id=prisma-engines,target=/root/.cache/prisma,sharing=shared \
     cd packages/shared && npx prisma@5.18.0 generate
 
+# Prisma CLI for `prisma migrate deploy` in the entrypoint. Version pinned to
+# @prisma/client 5.18.0. Global install (postinstall pulls the engines once at
+# build time) so the container needs NO network at startup.
+RUN npm install -g prisma@5.18.0
+
+# Entrypoint: migrate deploy -> seed (node prisma/seed.js) -> CMD.
+# Skip via RUN_MIGRATIONS=0 / RUN_SEED=0 (see docker/entrypoint.server.sh).
+COPY docker/entrypoint.server.sh /usr/local/bin/entrypoint.server.sh
+RUN chmod +x /usr/local/bin/entrypoint.server.sh
+
 # Create non-root user
 RUN groupadd -r app && useradd -r -g app app
 USER app
 
 EXPOSE 3000
 
+ENTRYPOINT ["/usr/local/bin/entrypoint.server.sh"]
 CMD ["node", "packages/server/dist/index.js"]

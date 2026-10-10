@@ -1,0 +1,86 @@
+у_00|shared|8|00
+  1_00_08|Обжалование бана (оверлей)|shared/ban-appeal.html
+  1_00_02|Ошибка 403 (доступ запрещён)|shared/error-403.html
+  1_00_01|Ошибка 404 (не найдено)|shared/error-404.html
+  1_00_03|Ошибка 500 (внутренняя ошибка)|shared/error-500.html
+  1_00_04|Ошибка 503 (сервис недоступен)|shared/error-503.html
+  1_00_07|Ошибка 555 (аккаунт заблокирован)|shared/error-555.html
+  1_00_05|Офлайн (авторизованный)|shared/offline-authed.html
+  1_00_06|Офлайн (гость / неавторизованный)|shared/offline-guest.html
+у_01|balloo.su|25|01
+  1_01_22|Мультиаккаунт|balloo-su/accounts.html
+  1_01_23|Добавить устройство|balloo-su/add-device.html
+  1_01_07|Архив чатов|balloo-su/archive.html
+  1_01_40|Панель вложений|balloo-su/attachment-panel.html
+  1_01_38|Блокированные пользователи|balloo-su/blocked-users.html
+  1_01_10|Звонки|balloo-su/calls.html
+  1_01_35|Создание канала|balloo-su/channel-create.html
+  1_01_36|Пустой чат|balloo-su/empty-chat.html
+  1_01_33|Просмотр файла/изображения|balloo-su/file-viewer.html
+  1_01_18|Создание группы|balloo-su/group-create.html
+  1_01_19|Настройки группы|balloo-su/group-settings.html
+  1_01_32|Редактор сообщения|balloo-su/message-editor.html
+  1_01_21|Мои устройства|balloo-su/my-devices.html
+  1_01_31|Мои донаты|balloo-su/my-donates.html
+  1_01_34|Настройки уведомлений|balloo-su/notification-settings.html
+  1_01_29|Восстановление пароля|balloo-su/password-reset.html
+  1_01_37|Настройки приватности|balloo-su/privacy-settings.html
+  1_01_08|Профиль|balloo-su/profile.html
+  1_01_09|Публичный профиль|balloo-su/public-profile.html
+  1_01_06|Глобальный поиск|balloo-su/search.html
+  1_01_20|Настройки приложения|balloo-su/settings.html
+  1_01_27|Сторис|balloo-su/stories.html
+  1_01_41|Создание историй|balloo-su/story-create.html
+  1_01_30|Двухфакторная аутентификация|balloo-su/two-factor.html
+  1_01_39|Запись голосового|balloo-su/voice-message.html
+у_02|admin.balloo.su|22|02
+  1_02_01|Объявления|admin-balloo-su/announcements.html
+  1_02_02|Аудит-лог|admin-balloo-su/audit-log.html
+  1_02_03|Бан-лист|admin-balloo-su/bans.html
+  1_02_05|Каналы блога|admin-balloo-su/blog-channels.html
+  1_02_06|Миграция блога|admin-balloo-su/blog-migrate.html
+  1_02_07|Очередь блога|admin-balloo-su/blog-queue.html
+  1_02_08|Ревью блога|admin-balloo-su/blog-review.html
+  1_02_09|Статистика блога|admin-balloo-su/blog-stats.html
+  1_02_10|Управление ботами|admin-balloo-su/bots-mgmt.html
+  1_02_13|Донаты|admin-balloo-su/donations.html
+  1_02_14|Сотрудники|admin-balloo-su/employees.html
+  1_02_15|Feature flags|admin-balloo-su/features-flags.html
+  1_02_16|Управление фичами|admin-balloo-su/features-mgmt.html
+  1_02_17|Файлы|admin-balloo-su/files.html
+  1_02_18|Управление группами|admin-balloo-su/groups-mgmt.html
+  1_01_02|Вход|balloo-su/login.html
+  1_02_20|Метрики|admin-balloo-su/metrics.html
+  1_02_21|Отчёты|admin-balloo-su/reports.html
+  1_02_22|Статус сервиса|admin-balloo-su/service-status.html
+  1_02_23|Тексты|admin-balloo-su/texts.html
+  1_02_24|Пользователи|admin-balloo-su/users.html
+  1_02_26|Версии|admin-balloo-su/versions.html
+у_03|command.balloo.su|3|03
+  1_03_24|Карточка кандидата (интервью)|command-balloo-su/candidate-interview.html
+  1_03_25|Дашборд руководителя|command-balloo-su/manager-dashboard.html
+  1_03_26|Отпуска и отсутствие|command-balloo-su/time-off.html
+у_04|features.balloo.su|3|04
+  1_04_02|Детали фич-реквеста|features-balloo-su/feature-detail.html
+  1_01_02|Вход|balloo-su/login.html
+  1_04_04|Голосование по фичам|features-balloo-su/vote.html
+у_05|history.balloo.su|1|05
+  1_05_02|Детали версии|history-balloo-su/version-detail.html
+у_06|download.balloo.su|1|06
+  1_06_02|Загрузки|download-balloo-su/downloads.html
+у_07|docs.balloo.su|1|07
+  1_07_01|Документация API|docs-balloo-su/api-docs.html
+у_08|mobile (сборные)|3|08
+  1_08_21|Пустой чат|mobile/empty-chat.html
+  1_08_22|Полноэкранный просмотрщик медиа|mobile/media-viewer.html
+  1_08_23|Запись голосового (mobile)|mobile/voice-record.html
+у_09|desktop (генеральный)|6|09
+  1_01_02|Вход|balloo-su/login.html
+  1_09_21|Полноэкранный просмотрщик медиа|desktop/media-viewer.html
+  1_09_20|Настройки уведомлений|desktop/notification-settings.html
+  1_09_08|Восстановление пароля|desktop/password-reset.html
+  1_01_03|Регистрация|balloo-su/register.html
+  1_09_09|Двухфакторная аутентификация|desktop/two-factor.html
+у_11|blog.balloo.su|2|11
+  1_11_01|Категория блога|blog-balloo-su/category.html
+  1_01_06|Глобальный поиск|balloo-su/search.html
