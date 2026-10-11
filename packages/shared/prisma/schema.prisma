@@ -158,6 +158,7 @@ model User {
   interviewsConducted Interview[]    @relation("InterviewInterviewer")
   applicationsSubmitted Application[] @relation("ApplicationApplicant")
   donations           Donation[]
+  refreshTokens       RefreshToken[]
   featureRequests     FeatureRequest[]   @relation("FeatureAuthor")
   featureVotes        FeatureVote[]
   featureComments     FeatureComment[]
@@ -1221,6 +1222,27 @@ model Task {
   @@index([status, priority])
   @@index([dueDate])
   @@map("tasks")
+}
+
+// ============================================================
+// Refresh-токены с family (а-02: отзыв по family при reuse)
+// ============================================================
+
+model RefreshToken {
+  id        String   @id @default(cuid()) @db.VarChar(25)
+  jti       String   @unique @db.VarChar(255)
+  userId    String   @db.VarChar(25)
+  familyId  String   @db.VarChar(25)
+  revoked   Boolean  @default(false)
+  createdAt BigInt   @default(0)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([familyId])
+  @@index([jti])
+  @@index([userId, revoked])
+  @@map("refresh_tokens")
 }
 
 // ============================================================

@@ -83,10 +83,20 @@ interface TokenPair {
 
 // Экспортируется для QR pair-flow (deviceService): подтверждение на втором
 // устройстве выдаёт новой устройству ту же пару токенов, что и обычный вход
-export const generateTokens = (userId: string, email: string, username?: string, role?: string): TokenPair => {
+export const generateTokens = async (userId: string, email: string, username?: string, role?: string, familyId?: string): Promise<TokenPair> => {
   const accessPayload: Record<string, unknown> = { userId, email, username, role, type: 'access' };
   const jti = crypto.randomUUID();
-  const refreshPayload: Record<string, unknown> = { userId, email, username, role, type: 'refresh', jti };
+  const fid = familyId || crypto.randomUUID();
+  const refreshPayload: Record<string, unknown> = { userId, email, username, role, type: 'refresh', jti, familyId: fid };
+
+  // А-02: сохраняем refresh-токен в БД для family-revocation
+  try {
+    await prisma.refreshToken.create({
+      data: { jti, userId, familyId: fid, createdAt: BigInt(Date.now()) },
+    });
+  } catch (e) {
+    console.warn('[auth] Failed to persist refresh token to DB:', (e as Error).message);
+  }
 
   return {
     accessToken: jwt.sign(accessPayload, env.JWT_ACCESS_SECRET, {
@@ -245,7 +255,7 @@ export const register = async (input: RegisterInput) => {
     },
   });
 
-  const tokens = generateTokens(user.id, user.email!, user.username || undefined);
+  const tokens = await generateTokens(user.id, user.email!, user.username || undefined);
 
   // Отправка welcome-письма (не блокирует регистрацию)
   const username = input.username || user.email!.split('@')[0];
@@ -368,7 +378,7 @@ export const login = async (input: LoginInput) => {
     });
   }
 
-  const tokens = generateTokens(user.id, user.email!, user.username || undefined);
+  const tokens = await generateTokens(user.id, user.email!, user.username || undefined);
 
   return {
     user: {
@@ -449,7 +459,7 @@ export const verify2FA = async (input: Verify2FAInput) => {
     });
   }
 
-  const tokens = generateTokens(user.id, user.email!, user.username || undefined);
+  const tokens = await generateTokens(user.id, user.email!, user.username || undefined);
 
   return {
     user: {
@@ -498,6 +508,19 @@ export const refreshTokens = async (refreshToken: string) => {
   if (jti && redis) {
     const revoked = await redis.get(`revoked-jti:${jti}`);
     if (revoked) {
+      // Повторное использование отозванного refresh-токена = кража.
+      // Отзываем ВСЕ сессии пользователя — украденный токен переживает
+      // ротацию, пока не будет полностью обезврежен (тик. а-02).
+      console.warn(`[AUTH] Token reuse detected for user ${userId}, revoking all sessions`);
+      // А-02: отзываем всю family токенов в БД
+      const reuseFamilyId = decoded.familyId as string | undefined;
+      if (reuseFamilyId) {
+        await prisma.refreshToken.updateMany({
+          where: { familyId: reuseFamilyId, revoked: false },
+          data: { revoked: true },
+        });
+      }
+      await revokeAllSessions(userId);
       throw new Error('Refresh токен отозван');
     }
   }
@@ -526,7 +549,16 @@ export const refreshTokens = async (refreshToken: string) => {
     await redis.setex(`revoked-jti:${jti}`, ttl, '1');
   }
 
-  return generateTokens(user.id, user.email!, user.username || undefined, decoded.role as string | undefined);
+  // А-02: помечаем старый токен как revoked в БД, новый получает ту же family
+  if (jti) {
+    await prisma.refreshToken.update({
+      where: { jti },
+      data: { revoked: true },
+    }).catch(() => {}); // toke may not exist in DB if persisted before migration
+  }
+
+  const rotFamilyId = decoded.familyId as string | undefined;
+  return generateTokens(user.id, user.email!, user.username || undefined, decoded.role as string | undefined, rotFamilyId);
 };
 
 // ============================================================
@@ -690,6 +722,11 @@ export const resetPassword = async (input: { token: string; newPassword: string 
   // Сброс пароля обычно делают, когда доступ к аккаунту могли перехватить,
   // поэтому старые сессии отзываем — иначе украденный токен переживает смену
   // пароля и у злоумышленника остаётся рабочий вход.
+  // А-02: отзываем все refresh-токены пользователя в БД
+  await prisma.refreshToken.updateMany({
+    where: { userId: tokenRecord.userId, revoked: false },
+    data: { revoked: true },
+  });
   await revokeAllSessions(tokenRecord.userId);
 
   console.log(`[RESET] Password reset for user ${tokenRecord.userId}`);
@@ -1069,7 +1106,7 @@ export const oauthLogin = async (input: OAuthLoginInput) => {
     });
   }
 
-  const tokens = generateTokens(user.id, user.email!, user.username || undefined);
+  const tokens = await generateTokens(user.id, user.email!, user.username || undefined);
 
   return {
     user: {
