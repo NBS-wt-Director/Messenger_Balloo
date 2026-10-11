@@ -237,6 +237,31 @@ export const adminOnly = (
   next();
 };
 
+// Доступ для модераторов и администраторов (command-портал, база знаний)
+export const moderatorOnly = (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): void => {
+  if (!req.user) {
+    res.status(401).json({
+      error: 'Unauthorized',
+      message: 'Требуется авторизация',
+    });
+    return;
+  }
+
+  if (req.user.role !== 'admin' && req.user.role !== 'moderator') {
+    res.status(403).json({
+      error: 'Forbidden',
+      message: 'Доступ разрешён только модераторам и администраторам',
+    });
+    return;
+  }
+
+  next();
+};
+
 // Мягкая авторизация: прикрепляет req.user при валидном access-токене,
 // но не отклоняет запрос без токена (для анонимных фич)
 export const optionalAuth = (

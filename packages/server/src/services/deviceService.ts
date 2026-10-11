@@ -149,7 +149,7 @@ export const confirmPair = async (
     },
   });
 
-  const tokens = generateTokens(user.id, user.email, user.username || undefined, user.role);
+  const tokens = await generateTokens(user.id, user.email, user.username || undefined, user.role);
 
   const confirmed: PairRecord = {
     status: 'confirmed',

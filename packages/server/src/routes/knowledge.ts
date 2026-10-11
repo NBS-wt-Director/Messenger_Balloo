@@ -24,14 +24,14 @@ import {
   getMyApplications,
   updateApplicationStatus,
 } from '../controllers/knowledgeController';
-import { authRequired } from '../middleware/auth';
+import { authRequired, moderatorOnly } from '../middleware/auth';
 
 // ============================================================
 // Knowledge Pages
 // ============================================================
 
 // POST /api/knowledge/pages — создание страницы
-router.post('/pages', authRequired, createPage);
+router.post('/pages', authRequired, moderatorOnly, createPage);
 
 // GET /api/knowledge/pages — список страниц
 router.get('/pages', getPages);
@@ -40,17 +40,17 @@ router.get('/pages', getPages);
 router.get('/pages/:id', getPage);
 
 // PUT /api/knowledge/pages/:id — обновление страницы
-router.put('/pages/:id', authRequired, updatePage);
+router.put('/pages/:id', authRequired, moderatorOnly, updatePage);
 
 // DELETE /api/knowledge/pages/:id — удаление страницы
-router.delete('/pages/:id', authRequired, deletePage);
+router.delete('/pages/:id', authRequired, moderatorOnly, deletePage);
 
 // ============================================================
 // Knowledge Categories
 // ============================================================
 
 // POST /api/knowledge/categories — создание категории
-router.post('/categories', authRequired, createCategory);
+router.post('/categories', authRequired, moderatorOnly, createCategory);
 
 // GET /api/knowledge/categories — список категорий
 router.get('/categories', getCategories);
@@ -63,7 +63,7 @@ router.get('/categories/:slug', getCategory);
 // ============================================================
 
 // POST /api/knowledge/departments — создание отдела
-router.post('/departments', authRequired, createDepartment);
+router.post('/departments', authRequired, moderatorOnly, createDepartment);
 
 // GET /api/knowledge/departments — список отделов
 router.get('/departments', getDepartments);
@@ -72,17 +72,17 @@ router.get('/departments', getDepartments);
 router.get('/departments/:id', getDepartment);
 
 // PUT /api/knowledge/departments/:id — обновление отдела
-router.put('/departments/:id', authRequired, updateDepartment);
+router.put('/departments/:id', authRequired, moderatorOnly, updateDepartment);
 
 // DELETE /api/knowledge/departments/:id — удаление отдела
-router.delete('/departments/:id', authRequired, deleteDepartment);
+router.delete('/departments/:id', authRequired, moderatorOnly, deleteDepartment);
 
 // ============================================================
 // Hiring / Vacancies
 // ============================================================
 
 // POST /api/hiring/vacancies — создание вакансии
-router.post('/vacancies', authRequired, createVacancy);
+router.post('/vacancies', authRequired, moderatorOnly, createVacancy);
 
 // GET /api/hiring/vacancies — список вакансий
 router.get('/vacancies', getVacancies);
@@ -91,10 +91,10 @@ router.get('/vacancies', getVacancies);
 router.get('/vacancies/:id', getVacancy);
 
 // PUT /api/hiring/vacancies/:id — обновление вакансии
-router.put('/vacancies/:id', authRequired, updateVacancy);
+router.put('/vacancies/:id', authRequired, moderatorOnly, updateVacancy);
 
 // DELETE /api/hiring/vacancies/:id — удаление вакансии
-router.delete('/vacancies/:id', authRequired, deleteVacancy);
+router.delete('/vacancies/:id', authRequired, moderatorOnly, deleteVacancy);
 
 // ============================================================
 // Applications
@@ -107,6 +107,6 @@ router.post('/vacancies/:id/apply', authRequired, applyVacancy);
 router.get('/applications/me', authRequired, getMyApplications);
 
 // PUT /api/hiring/applications/:id/status — обновление статуса отклика
-router.put('/applications/:id/status', authRequired, updateApplicationStatus);
+router.put('/applications/:id/status', authRequired, moderatorOnly, updateApplicationStatus);
 
 export { router };
