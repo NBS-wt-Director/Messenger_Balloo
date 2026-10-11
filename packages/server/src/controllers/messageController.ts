@@ -13,6 +13,7 @@ import {
   searchMessages as searchMessagesService,
 } from '../services/messageService';
 import { AuthenticatedRequest } from '../middleware/auth';
+import { internalError } from '../middleware/errorHandler';
 
 // ============================================================
 // POST /api/chats/:chatId/messages — отправка сообщения
@@ -51,7 +52,7 @@ export const sendMessage = async (req: AuthenticatedRequest, res: Response, next
     } else if (error.message.includes('заблокировали уведомления')) {
       res.status(403).json({ error: 'Forbidden', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'messageController.sendMessage');
     }
   }
 };
@@ -87,7 +88,7 @@ export const getMessages = async (req: AuthenticatedRequest, res: Response, next
     } else if (error.message.includes('участником')) {
       res.status(403).json({ error: 'Forbidden', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'messageController.getMessages');
     }
   }
 };
@@ -120,7 +121,7 @@ export const updateMessage = async (req: AuthenticatedRequest, res: Response, ne
     } else if (error.message.includes('Доступ запрещён')) {
       res.status(403).json({ error: 'Forbidden', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'messageController.updateMessage');
     }
   }
 };
@@ -147,7 +148,7 @@ export const deleteMessage = async (req: AuthenticatedRequest, res: Response, ne
     } else if (error.message.includes('Доступ запрещён')) {
       res.status(403).json({ error: 'Forbidden', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'messageController.deleteMessage');
     }
   }
 };
@@ -178,7 +179,7 @@ export const addReaction = async (req: AuthenticatedRequest, res: Response, next
     if (error.message.includes('не найдено')) {
       res.status(404).json({ error: 'Not Found', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'messageController.addReaction');
     }
   }
 };
@@ -209,7 +210,7 @@ export const removeReaction = async (req: AuthenticatedRequest, res: Response, n
     if (error.message.includes('не найдена')) {
       res.status(404).json({ error: 'Not Found', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'messageController.removeReaction');
     }
   }
 };
@@ -235,7 +236,7 @@ export const getReactions = async (req: AuthenticatedRequest, res: Response, nex
     } else if (error.message.includes('участником')) {
       res.status(403).json({ error: 'Forbidden', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'messageController.getReactions');
     }
   }
 };
@@ -260,7 +261,7 @@ export const markAsRead = async (req: AuthenticatedRequest, res: Response, next:
     if (error.message.includes('не найдено')) {
       res.status(404).json({ error: 'Not Found', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'messageController.markAsRead');
     }
   }
 };
@@ -286,7 +287,7 @@ export const getReadStatus = async (req: AuthenticatedRequest, res: Response, ne
     } else if (error.message.includes('участником')) {
       res.status(403).json({ error: 'Forbidden', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'messageController.getReadStatus');
     }
   }
 };
@@ -313,7 +314,7 @@ export const pinMessage = async (req: AuthenticatedRequest, res: Response, next:
     } else if (error.message.includes('Доступ запрещён')) {
       res.status(403).json({ error: 'Forbidden', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'messageController.pinMessage');
     }
   }
 };
@@ -343,7 +344,7 @@ export const searchMessages = async (req: AuthenticatedRequest, res: Response, n
     if (error.message.includes('участником')) {
       res.status(403).json({ error: 'Forbidden', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'messageController.searchMessages');
     }
   }
 };

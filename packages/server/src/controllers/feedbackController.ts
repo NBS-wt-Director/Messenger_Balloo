@@ -8,6 +8,7 @@
 import { Response, NextFunction } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { AuthenticatedRequest } from '../middleware/auth';
+import { internalError } from '../middleware/errorHandler';
 
 const prisma = new PrismaClient();
 
@@ -45,7 +46,7 @@ export const createFeedbackCtrl = async (req: AuthenticatedRequest, res: Respons
 
     res.status(201).json(feedback);
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error?.message ?? 'Ошибка сервера' });
+    internalError(res, error, 'feedbackController.createFeedbackCtrl');
   }
 };
 
@@ -68,7 +69,7 @@ export const listMyFeedbackCtrl = async (req: AuthenticatedRequest, res: Respons
     });
     res.json({ items, total: items.length });
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error?.message ?? 'Ошибка сервера' });
+    internalError(res, error, 'feedbackController.listMyFeedbackCtrl');
   }
 };
 
@@ -108,7 +109,7 @@ export const listFeedbackCtrl = async (req: AuthenticatedRequest, res: Response,
 
     res.json({ items, pagination: { page, limit, total, pages: Math.ceil(total / limit) } });
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error?.message ?? 'Ошибка сервера' });
+    internalError(res, error, 'feedbackController.listFeedbackCtrl');
   }
 };
 
@@ -127,7 +128,7 @@ export const getFeedbackStatsCtrl = async (_req: AuthenticatedRequest, res: Resp
       byType: Object.fromEntries(byType.map((t) => [t.type, t._count._all])),
     });
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error?.message ?? 'Ошибка сервера' });
+    internalError(res, error, 'feedbackController.getFeedbackStatsCtrl');
   }
 };
 
@@ -159,7 +160,7 @@ export const updateFeedbackCtrl = async (req: AuthenticatedRequest, res: Respons
 
     res.json(updated);
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error?.message ?? 'Ошибка сервера' });
+    internalError(res, error, 'feedbackController.updateFeedbackCtrl');
   }
 };
 
@@ -175,6 +176,6 @@ export const deleteFeedbackCtrl = async (req: AuthenticatedRequest, res: Respons
     await prisma.feedback.delete({ where: { id } });
     res.status(204).end();
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error?.message ?? 'Ошибка сервера' });
+    internalError(res, error, 'feedbackController.deleteFeedbackCtrl');
   }
 };

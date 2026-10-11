@@ -13,6 +13,7 @@ import {
   leaveChat as leaveChatService,
 } from '../services/chatService';
 import { AuthenticatedRequest } from '../middleware/auth';
+import { internalError } from '../middleware/errorHandler';
 
 const prisma = new PrismaClient();
 
@@ -37,7 +38,7 @@ export const createChat = async (req: AuthenticatedRequest, res: Response, next:
     });
     res.status(201).json(data);
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'chatController.createChat');
   }
 };
 
@@ -51,7 +52,7 @@ export const getChats = async (req: AuthenticatedRequest, res: Response, next: N
     const result = await getChatsService({ userId, page: pageNum, limit: limitNum, sortBy: validSortBy as any, search: search as string | undefined });
     res.json(result);
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'chatController.getChats');
   }
 };
 
@@ -69,7 +70,7 @@ export const getChatInfo = async (req: AuthenticatedRequest, res: Response, next
     if (error.message === 'Чат не найден') {
       res.status(404).json({ error: 'Not Found', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'chatController.getChatInfo');
     }
   }
 };
@@ -93,7 +94,7 @@ export const updateChat = async (req: AuthenticatedRequest, res: Response, next:
     if (error.message.includes('Доступ запрещён')) {
       res.status(403).json({ error: 'Forbidden', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'chatController.updateChat');
     }
   }
 };
@@ -112,7 +113,7 @@ export const deleteChat = async (req: AuthenticatedRequest, res: Response, next:
     if (error.message.includes('Доступ запрещён')) {
       res.status(403).json({ error: 'Forbidden', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'chatController.deleteChat');
     }
   }
 };
@@ -138,7 +139,7 @@ export const addMember = async (req: AuthenticatedRequest, res: Response, next: 
     } else if (error.message.includes('Доступ запрещён')) {
       res.status(403).json({ error: 'Forbidden', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'chatController.addMember');
     }
   }
 };
@@ -159,7 +160,7 @@ export const removeMember = async (req: AuthenticatedRequest, res: Response, nex
     } else if (error.message.includes('Доступ запрещён')) {
       res.status(403).json({ error: 'Forbidden', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'chatController.removeMember');
     }
   }
 };
@@ -187,7 +188,7 @@ export const joinByInvite = async (req: AuthenticatedRequest, res: Response, nex
     } else if (error.message.includes('заблокированы')) {
       res.status(403).json({ error: 'Forbidden', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'chatController.joinByInvite');
     }
   }
 };
@@ -212,7 +213,7 @@ export const createInviteLink = async (req: AuthenticatedRequest, res: Response,
     } else if (error.message.includes('Доступ запрещён')) {
       res.status(403).json({ error: 'Forbidden', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'chatController.createInviteLink');
     }
   }
 };
@@ -233,7 +234,7 @@ export const leaveChat = async (req: AuthenticatedRequest, res: Response, next: 
     } else if (error.message.includes('Владелец не может выйти')) {
       res.status(400).json({ error: 'Bad Request', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'chatController.leaveChat');
     }
   }
 };

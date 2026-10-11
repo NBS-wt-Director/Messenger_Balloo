@@ -404,7 +404,9 @@ describe('Upload service depth (В-93 а)', () => {
         .post('/api/upload/story')
         .set('Authorization', `Bearer ${user.accessToken}`)
         .attach('file', Buffer.from('id3'), { filename: 'a.mp3', contentType: 'audio/mpeg' });
-      expect(res.status).toBe(500);
+      // 11.10.2026 (тикет исправить-controllers-500-message): валидация типа
+      // истории — ошибка клиента; раньше отдавалась как 500 с текстом сервиса.
+      expect(res.status).toBe(400);
       expect(res.body.message).toContain('изображения и видео');
     });
 

@@ -11,6 +11,7 @@ import {
 } from '../services/paymentService';
 import { AuthenticatedRequest } from '../middleware/auth';
 import { PrismaClient } from '@prisma/client';
+import { internalError } from '../middleware/errorHandler';
 
 const prisma = new PrismaClient();
 
@@ -38,7 +39,7 @@ export const getConfig = async (
         : undefined,
     });
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'paymentController.getConfig');
   }
 };
 
@@ -72,7 +73,7 @@ export const createDonation = async (
 
     res.status(201).json(result);
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'paymentController.createDonation');
   }
 };
 
@@ -89,7 +90,7 @@ export const getTiers = async (
     const tiers = await getDonationTiers();
     res.json({ tiers });
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'paymentController.getTiers');
   }
 };
 
@@ -110,7 +111,7 @@ export const getUserDonations = async (
     const result = await getUserDonationsService(userId, page, limit);
     res.json(result);
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'paymentController.getUserDonations');
   }
 };
 
@@ -147,7 +148,7 @@ export const yookassaWebhook = async (
       message: result.message,
     });
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'paymentController.yookassaWebhook');
   }
 };
 
@@ -178,7 +179,7 @@ export const getAdminConfig = async (
       } : null,
     });
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'paymentController.getAdminConfig');
   }
 };
 
@@ -210,7 +211,7 @@ export const updateAdminConfig = async (
       config,
     });
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'paymentController.updateAdminConfig');
   }
 };
 
@@ -231,7 +232,7 @@ export const getAdminDonations = async (
     const result = await getAllDonations(page, limit, status);
     res.json(result);
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'paymentController.getAdminDonations');
   }
 };
 
@@ -258,6 +259,6 @@ export const confirmDonation = async (
 
     res.json({ message: 'Донат подтверждён' });
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'paymentController.confirmDonation');
   }
 };

@@ -11,6 +11,7 @@ import {
   getBlockedUsers as getBlockedUsersService,
 } from '../services/userService';
 import { AuthenticatedRequest } from '../middleware/auth';
+import { internalError } from '../middleware/errorHandler';
 
 // ============================================================
 // Получить текущего пользователя (/api/users/me)
@@ -28,7 +29,7 @@ export const getMe = async (req: AuthenticatedRequest, res: Response, next: Next
       // 152-ФЗ: удалённый аккаунт не должен возвращать данные
       res.status(401).json({ error: 'Unauthorized', message: 'Аккаунт удалён' });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'userController.getMe');
     }
   }
 };
@@ -58,7 +59,7 @@ export const updateMe = async (req: AuthenticatedRequest, res: Response, next: N
     if (error.message.includes('уже занят')) {
       res.status(409).json({ error: 'Conflict', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'userController.updateMe');
     }
   }
 };
@@ -78,7 +79,7 @@ export const getPublicProfile = async (req: AuthenticatedRequest, res: Response,
     if (error.message === 'Пользователь не найден') {
       res.status(404).json({ error: 'Not Found', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'userController.getPublicProfile');
     }
   }
 };
@@ -110,7 +111,7 @@ export const searchUsers = async (req: Request, res: Response, next: NextFunctio
 
     res.json(result);
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'userController.searchUsers');
   }
 };
 
@@ -138,7 +139,7 @@ export const blockUser = async (req: AuthenticatedRequest, res: Response, next: 
     } else if (error.message.includes('уже заблокирован')) {
       res.status(409).json({ error: 'Conflict', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'userController.blockUser');
     }
   }
 };
@@ -163,7 +164,7 @@ export const unblockUser = async (req: AuthenticatedRequest, res: Response, next
     if (error.message === 'Пользователь не в списке заблокированных') {
       res.status(404).json({ error: 'Not Found', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'userController.unblockUser');
     }
   }
 };
@@ -178,7 +179,7 @@ export const getBlockedUsers = async (req: AuthenticatedRequest, res: Response, 
     const blocked = await getBlockedUsersService(blockerId);
     res.json({ blocked });
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'userController.getBlockedUsers');
   }
 };
 
@@ -197,7 +198,7 @@ export const deleteMe = async (req: AuthenticatedRequest, res: Response, next: N
     } else if (error.message === 'Аккаунт уже удалён') {
       res.status(410).json({ error: 'Gone', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'userController.deleteMe');
     }
   }
 };
@@ -219,7 +220,7 @@ export const exportMe = async (req: AuthenticatedRequest, res: Response, next: N
     if (error.message === 'Пользователь не найден') {
       res.status(404).json({ error: 'Not Found', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'userController.exportMe');
     }
   }
 };

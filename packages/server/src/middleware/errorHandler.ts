@@ -73,3 +73,17 @@ export const asyncHandler = (
     Promise.resolve(fn(req, res, next)).catch(next);
   };
 };
+
+// Ответ для необработанных внутренних ошибок в контроллерах (тикет
+// «исправить-controllers-500-message»). Детали (message/stack) пишутся в лог,
+// клиенту уходит общий текст: сообщения Prisma/драйверов содержат имена таблиц,
+// SQL, пути и версии библиотек. Лог-тег формата «controller.method» помогает
+// найти место в журнале.
+export const internalError = (res: Response, err: unknown, logTag = ''): void => {
+  console.error(
+    `[500]${logTag ? ' ' + logTag : ''}`,
+    (err as Error)?.message,
+    (err as Error)?.stack,
+  );
+  res.status(500).json({ error: 'Internal Error', message: 'Внутренняя ошибка сервера' });
+};

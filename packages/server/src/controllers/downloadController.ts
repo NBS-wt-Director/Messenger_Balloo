@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { AuthenticatedRequest } from '../middleware/auth';
+import { internalError } from '../middleware/errorHandler';
 
 const prisma = new PrismaClient();
 
@@ -88,7 +89,7 @@ export const uploadMobile = async (
       },
     });
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'downloadController.uploadMobile');
   }
 };
 
@@ -125,7 +126,7 @@ export const listAndroidDownloads = async (
 
     res.json({ platform: 'android', packages });
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'downloadController.listAndroidDownloads');
   }
 };
 
@@ -182,7 +183,7 @@ export const getAndroidArchPackage = async (
       createdAt: Number(f.createdAt),
     });
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'downloadController.getAndroidArchPackage');
   }
 };
 
@@ -219,7 +220,7 @@ export const listIosDownloads = async (
 
     res.json({ platform: 'ios', packages });
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'downloadController.listIosDownloads');
   }
 };
 
@@ -285,7 +286,7 @@ export const uploadDesktop = async (
       },
     });
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'downloadController.uploadDesktop');
   }
 };
 
@@ -336,7 +337,7 @@ export const listDesktopDownloads = async (
 
     res.json({ desktop: grouped });
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'downloadController.listDesktopDownloads');
   }
 };
 
@@ -384,7 +385,7 @@ export const getDesktopPlatformPackages = async (
 
     res.json({ platform, packages });
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'downloadController.getDesktopPlatformPackages');
   }
 };
 
@@ -432,7 +433,7 @@ export const getDesktopPlatformFormat = async (
 
     res.json({ platform, format, packages });
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'downloadController.getDesktopPlatformFormat');
   }
 };
 
@@ -475,7 +476,7 @@ export const getDownloads = async (
 
     res.json({ desktop, mobile });
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'downloadController.getDownloads');
   }
 };
 
@@ -518,7 +519,7 @@ export const getPlatformDownloads = async (
 
     res.json({ platform, packages });
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'downloadController.getPlatformDownloads');
   }
 };
 
@@ -552,7 +553,7 @@ export const getDownloadUrl = async (
       size: file.size.toString(),
     });
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'downloadController.getDownloadUrl');
   }
 };
 
@@ -589,6 +590,6 @@ export const recordDownload = async (
 
     res.json({ success: true, id: file.id });
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'downloadController.recordDownload');
   }
 };

@@ -3,6 +3,7 @@
 
 import { Request, Response } from 'express';
 import { SPEC_NODES, SPEC_SCREENS } from '../services/specData';
+import { internalError } from '../middleware/errorHandler';
 
 // --- Список всех спецификаций (по узлам/экранам) ---
 export async function getSpecs(_req: Request, res: Response): Promise<void> {
@@ -26,7 +27,7 @@ export async function getSpecs(_req: Request, res: Response): Promise<void> {
       nodes,
     });
   } catch (error: any) {
-    res.status(500).json({ error: error.message || 'Ошибка сервера' });
+    internalError(res, error, 'specController.getSpecs');
   }
 }
 
@@ -48,6 +49,6 @@ export async function getSpec(req: Request, res: Response): Promise<void> {
 
     res.json(spec);
   } catch (error: any) {
-    res.status(500).json({ error: error.message || 'Ошибка сервера' });
+    internalError(res, error, 'specController.getSpec');
   }
 }

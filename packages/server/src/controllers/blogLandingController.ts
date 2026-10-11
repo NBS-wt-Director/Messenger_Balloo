@@ -3,6 +3,7 @@
 
 import { Request, Response } from 'express';
 import { PrismaClient, BlogPostStatus } from '@prisma/client';
+import { internalError } from '../middleware/errorHandler';
 
 const prisma = new PrismaClient();
 
@@ -31,7 +32,7 @@ export async function getFeaturedPosts(_req: Request, res: Response): Promise<vo
     const formatted = posts.map((p) => formatPost(p));
     res.json({ posts: formatted });
   } catch (error: any) {
-    res.status(500).json({ error: error.message || 'Ошибка сервера' });
+    internalError(res, error, 'blogLandingController.getFeaturedPosts');
   }
 }
 
@@ -79,7 +80,7 @@ export async function getPosts(req: Request, res: Response): Promise<void> {
       hasMore: page * limit < total,
     });
   } catch (error: any) {
-    res.status(500).json({ error: error.message || 'Ошибка сервера' });
+    internalError(res, error, 'blogLandingController.getPosts');
   }
 }
 
@@ -135,7 +136,7 @@ export async function getPost(req: Request, res: Response): Promise<void> {
 
     res.json({ post: formatPost(post), related: related.map((p) => formatPost(p)) });
   } catch (error: any) {
-    res.status(500).json({ error: error.message || 'Ошибка сервера' });
+    internalError(res, error, 'blogLandingController.getPost');
   }
 }
 
@@ -169,7 +170,7 @@ export async function getCategories(_req: Request, res: Response): Promise<void>
 
     res.json({ categories: formatted });
   } catch (error: any) {
-    res.status(500).json({ error: error.message || 'Ошибка сервера' });
+    internalError(res, error, 'blogLandingController.getCategories');
   }
 }
 
@@ -200,7 +201,7 @@ export async function getChannels(_req: Request, res: Response): Promise<void> {
 
     res.json({ channels: formatted });
   } catch (error: any) {
-    res.status(500).json({ error: error.message || 'Ошибка сервера' });
+    internalError(res, error, 'blogLandingController.getChannels');
   }
 }
 
@@ -225,7 +226,7 @@ export async function subscribeToNewsletter(req: Request, res: Response): Promis
     newsletterSubscriptions.add(email);
     res.json({ success: true, message: 'Подписка оформлена успешно' });
   } catch (error: any) {
-    res.status(500).json({ error: error.message || 'Ошибка сервера' });
+    internalError(res, error, 'blogLandingController.subscribeToNewsletter');
   }
 }
 
@@ -278,7 +279,7 @@ export async function searchPosts(req: Request, res: Response): Promise<void> {
       hasMore: page * limit < total,
     });
   } catch (error: any) {
-    res.status(500).json({ error: error.message || 'Ошибка сервера' });
+    internalError(res, error, 'blogLandingController.searchPosts');
   }
 }
 

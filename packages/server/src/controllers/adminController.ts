@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { AuthenticatedRequest } from '../middleware/auth';
 import { nowTimestamp } from '@balloo/shared';
+import { internalError } from '../middleware/errorHandler';
 
 const prisma = new PrismaClient();
 
@@ -83,7 +84,7 @@ export const listUsers = async (req: AuthenticatedRequest, res: Response, next: 
       },
     });
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'adminController.listUsers');
   }
 };
 
@@ -147,7 +148,7 @@ export const banUser = async (req: AuthenticatedRequest, res: Response, next: Ne
     if (error.code === 'P2025') {
       res.status(404).json({ error: 'Not Found', message: 'Пользователь не найден' });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'adminController.banUser');
     }
   }
 };
@@ -211,7 +212,7 @@ export const unbanUser = async (req: AuthenticatedRequest, res: Response, next: 
     if (error.code === 'P2025') {
       res.status(404).json({ error: 'Not Found', message: 'Пользователь не найден' });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'adminController.unbanUser');
     }
   }
 };
@@ -265,7 +266,7 @@ export const suspendUser = async (req: AuthenticatedRequest, res: Response, next
     if (error.code === 'P2025') {
       res.status(404).json({ error: 'Not Found', message: 'Пользователь не найден' });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'adminController.suspendUser');
     }
   }
 };
@@ -307,7 +308,7 @@ export const deleteUser = async (req: AuthenticatedRequest, res: Response, next:
     if (error.code === 'P2025') {
       res.status(404).json({ error: 'Not Found', message: 'Пользователь не найден' });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'adminController.deleteUser');
     }
   }
 };
@@ -359,7 +360,7 @@ export const listReports = async (req: AuthenticatedRequest, res: Response, next
       },
     });
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'adminController.listReports');
   }
 };
 
@@ -422,7 +423,7 @@ export const resolveReport = async (req: AuthenticatedRequest, res: Response, ne
     if (error.code === 'P2025') {
       res.status(404).json({ error: 'Not Found', message: 'Жалоба не найдена' });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'adminController.resolveReport');
     }
   }
 };
@@ -476,7 +477,7 @@ export const listBans = async (req: AuthenticatedRequest, res: Response, next: N
       },
     });
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'adminController.listBans');
   }
 };
 
@@ -518,7 +519,7 @@ export const createAnnouncement = async (req: AuthenticatedRequest, res: Respons
 
     res.status(201).json(announcement);
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'adminController.createAnnouncement');
   }
 };
 
@@ -533,7 +534,7 @@ export const listAnnouncements = async (req: AuthenticatedRequest, res: Response
     });
     res.json({ announcements });
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'adminController.listAnnouncements');
   }
 };
 
@@ -548,7 +549,7 @@ export const listFeatureFlags = async (req: AuthenticatedRequest, res: Response,
     });
     res.json({ flags });
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'adminController.listFeatureFlags');
   }
 };
 
@@ -590,7 +591,7 @@ export const toggleFeatureFlag = async (req: AuthenticatedRequest, res: Response
     if (error.code === 'P2025') {
       res.status(404).json({ error: 'Not Found', message: 'Feature flag не найден' });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'adminController.toggleFeatureFlag');
     }
   }
 };
@@ -607,7 +608,7 @@ export const listVersions = async (req: AuthenticatedRequest, res: Response, nex
     });
     res.json({ versions });
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'adminController.listVersions');
   }
 };
 
@@ -654,7 +655,7 @@ export const publishVersion = async (req: AuthenticatedRequest, res: Response, n
 
     res.status(201).json(newVersion);
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'adminController.publishVersion');
   }
 };
 
@@ -711,7 +712,7 @@ export const getMetrics = async (req: AuthenticatedRequest, res: Response, next:
       recentMetrics,
     });
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'adminController.getMetrics');
   }
 };
 
@@ -764,6 +765,6 @@ export const listAuditLogs = async (req: AuthenticatedRequest, res: Response, ne
       },
     });
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'adminController.listAuditLogs');
   }
 };

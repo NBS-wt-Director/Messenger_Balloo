@@ -7,6 +7,7 @@ import {
   deleteFile as deleteFileService,
 } from '../services/uploadService';
 import { AuthenticatedRequest } from '../middleware/auth';
+import { internalError } from '../middleware/errorHandler';
 
 // ============================================================
 // Загрузить аватарку пользователя (POST /api/upload/avatar)
@@ -43,7 +44,7 @@ export const uploadAvatar = async (
     } else if (error.message.includes('MinIO')) {
       res.status(502).json({ error: 'Bad Gateway', message: 'Ошибка облачного хранилища' });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'uploadController.uploadAvatar');
     }
   }
 };
@@ -92,7 +93,7 @@ export const uploadChatAvatar = async (
     } else if (error.message.includes('MinIO')) {
       res.status(502).json({ error: 'Bad Gateway', message: 'Ошибка облачного хранилища' });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'uploadController.uploadChatAvatar');
     }
   }
 };
@@ -148,7 +149,7 @@ export const uploadMessageFile = async (
     } else if (error.message.includes('MinIO')) {
       res.status(502).json({ error: 'Bad Gateway', message: 'Ошибка облачного хранилища' });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'uploadController.uploadMessageFile');
     }
   }
 };
@@ -190,13 +191,15 @@ export const uploadStoryMedia = async (
       error.message.includes('недопустимый тип') ||
       error.message.includes('превышать') ||
       // magic bytes не совпали с заявленным MIME — это ошибка клиента, не 500
-      error.message.includes('не соответствует')
+      error.message.includes('не соответствует') ||
+      // валидация типа для историй (uploadService) — тоже ошибка клиента
+      error.message.includes('только изображения и видео')
     ) {
       res.status(400).json({ error: 'Bad Request', message: error.message });
     } else if (error.message.includes('MinIO')) {
       res.status(502).json({ error: 'Bad Gateway', message: 'Ошибка облачного хранилища' });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'uploadController.uploadStoryMedia');
     }
   }
 };
@@ -228,9 +231,9 @@ export const deleteFileEndpoint = async (
     });
   } catch (error: any) {
     if (error.message.includes('удаления')) {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'uploadController.deleteFileEndpoint');
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'uploadController.deleteFileEndpoint');
     }
   }
 };

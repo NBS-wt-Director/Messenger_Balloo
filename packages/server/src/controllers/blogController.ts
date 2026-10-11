@@ -13,6 +13,7 @@ import {
   deleteChannel as deleteChannelService,
 } from '../services/blogService';
 import { AuthenticatedRequest } from '../middleware/auth';
+import { internalError } from '../middleware/errorHandler';
 
 // ============================================================
 // POST /api/blog/posts — создание поста
@@ -31,7 +32,7 @@ export const createPost = async (req: AuthenticatedRequest, res: Response, next:
     const post = await createPostService(userId, { title, content, channelId, categoryIds });
     res.status(201).json(post);
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'blogController.createPost');
   }
 };
 
@@ -54,7 +55,7 @@ export const getPosts = async (req: Request, res: Response, next: NextFunction):
 
     res.json(result);
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'blogController.getPosts');
   }
 };
 
@@ -71,7 +72,7 @@ export const getPost = async (req: Request, res: Response, next: NextFunction): 
     if (error.message === 'Пост не найден') {
       res.status(404).json({ error: 'Not Found', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'blogController.getPost');
     }
   }
 };
@@ -92,7 +93,7 @@ export const updatePost = async (req: AuthenticatedRequest, res: Response, next:
     if (error.message === 'Пост не найден') {
       res.status(404).json({ error: 'Not Found', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'blogController.updatePost');
     }
   }
 };
@@ -110,7 +111,7 @@ export const deletePost = async (req: AuthenticatedRequest, res: Response, next:
     if (error.message === 'Пост не найден') {
       res.status(404).json({ error: 'Not Found', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'blogController.deletePost');
     }
   }
 };
@@ -131,7 +132,7 @@ export const publishPost = async (req: AuthenticatedRequest, res: Response, next
     } else if (error.message === 'Только автор может публиковать пост') {
       res.status(403).json({ error: 'Forbidden', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'blogController.publishPost');
     }
   }
 };
@@ -152,7 +153,7 @@ export const getChannels = async (req: Request, res: Response, next: NextFunctio
 
     res.json(result);
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'blogController.getChannels');
   }
 };
 
@@ -169,7 +170,7 @@ export const getChannel = async (req: Request, res: Response, next: NextFunction
     if (error.message === 'Канал не найден') {
       res.status(404).json({ error: 'Not Found', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'blogController.getChannel');
     }
   }
 };
@@ -190,7 +191,7 @@ export const createChannel = async (req: AuthenticatedRequest, res: Response, ne
     const channel = await createChannelService({ name, description });
     res.status(201).json(channel);
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'blogController.createChannel');
   }
 };
 
@@ -209,7 +210,7 @@ export const updateChannel = async (req: AuthenticatedRequest, res: Response, ne
     if (error.message === 'Канал не найден') {
       res.status(404).json({ error: 'Not Found', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'blogController.updateChannel');
     }
   }
 };
@@ -227,7 +228,7 @@ export const deleteChannel = async (req: AuthenticatedRequest, res: Response, ne
     if (error.message === 'Канал не найден') {
       res.status(404).json({ error: 'Not Found', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'blogController.deleteChannel');
     }
   }
 };

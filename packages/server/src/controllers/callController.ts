@@ -2,6 +2,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from '../middleware/auth';
 import { getCallHistory } from '../services/callService';
+import { internalError } from '../middleware/errorHandler';
 
 export const getCallHistoryCtrl = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -13,6 +14,6 @@ export const getCallHistoryCtrl = async (req: AuthenticatedRequest, res: Respons
     const result = await getCallHistory(userId, validFilter as any, pageNum, limitNum);
     res.json(result);
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'callController.getCallHistoryCtrl');
   }
 };

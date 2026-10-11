@@ -29,6 +29,7 @@ import { AuthenticatedRequest } from '../middleware/auth';
 import { setAuthCookies, clearAuthCookies, ACCESS_COOKIE, REFRESH_COOKIE } from '../middleware/auth';
 import { getWsToken } from '../services/authService';
 import { revokeAllSessions } from '../services/sessionRevocation';
+import { internalError } from '../middleware/errorHandler';
 export { wsToken } from './wsTokenController';
 
 // ============================================================
@@ -98,7 +99,7 @@ export const register = async (req: Request, res: Response, next: NextFunction):
     if (error.message.includes('уже') || error.message.includes('занят')) {
       res.status(409).json({ error: 'Conflict', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'authController.register');
     }
   }
 };
@@ -256,7 +257,7 @@ export const clearCookie = async (req: Request, res: Response, next: NextFunctio
 
     res.json({ message: 'Выход выполнен успешно' });
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'authController.clearCookie');
   }
 };
 
@@ -281,7 +282,7 @@ export const logout = async (req: Request, res: Response, next: NextFunction): P
 
     res.json({ message: 'Выход выполнен успешно' });
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'authController.logout');
   }
 };
 
@@ -296,7 +297,7 @@ export const logoutAll = async (req: AuthenticatedRequest, res: Response, next: 
     clearAuthCookies(res);
     res.json({ message: 'Выход выполнен на всех устройствах' });
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'authController.logoutAll');
   }
 };
 
@@ -344,7 +345,7 @@ export const requestReset = async (req: Request, res: Response, next: NextFuncti
 
     res.json(result);
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'authController.requestReset');
   }
 };
 
@@ -634,7 +635,7 @@ export const oauthLogin = async (req: Request, res: Response, next: NextFunction
       res.status(403).json({ error: 'Forbidden', message: error.message });
       return;
     }
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'authController.oauthLogin');
   }
 };
 
@@ -656,7 +657,7 @@ export const enable2FA = async (req: AuthenticatedRequest, res: Response, next: 
       message: 'Отсканируйте QR-код и подтвердите код для включения 2FA',
     });
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'authController.enable2FA');
   }
 };
 
@@ -697,7 +698,7 @@ export const disable2FA = async (req: AuthenticatedRequest, res: Response, next:
 
     res.json({ message: '2FA успешно отключена' });
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'authController.disable2FA');
   }
 };
 
@@ -711,7 +712,7 @@ export const getDevices = async (req: AuthenticatedRequest, res: Response, next:
     const devices = await getUserDevices(userId);
     res.json({ devices });
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'authController.getDevices');
   }
 };
 

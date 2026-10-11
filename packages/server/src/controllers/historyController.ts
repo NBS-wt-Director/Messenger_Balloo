@@ -1,7 +1,8 @@
 // HistoryController — REST API для истории версий
 // Тикет №56 — History: changelog (узел 05)
 
-import { Request, Response } from 'express';
+import { internalError } from '../middleware/errorHandler';
+import {Request, Response } from 'express';
 import {
   getVersions,
   getVersion,
@@ -22,7 +23,7 @@ export async function getVersionsController(req: Request, res: Response): Promis
 
     res.json(result);
   } catch (error: any) {
-    res.status(500).json({ error: error.message || 'Ошибка сервера' });
+    internalError(res, error, 'historyController.getVersionsController');
   }
 }
 
@@ -39,7 +40,7 @@ export async function getVersionController(req: Request, res: Response): Promise
 
     res.json(version);
   } catch (error: any) {
-    res.status(500).json({ error: error.message || 'Ошибка сервера' });
+    internalError(res, error, 'historyController.getVersionController');
   }
 }
 
@@ -56,7 +57,7 @@ export async function getVersionNeighborsController(req: Request, res: Response)
 
     res.json(neighbors);
   } catch (error: any) {
-    res.status(500).json({ error: error.message || 'Ошибка сервера' });
+    internalError(res, error, 'historyController.getVersionNeighborsController');
   }
 }
 
@@ -79,6 +80,6 @@ export async function compareVersionsController(req: Request, res: Response): Pr
 
     res.json(result);
   } catch (error: any) {
-    res.status(500).json({ error: error.message || 'Ошибка сервера' });
+    internalError(res, error, 'historyController.compareVersionsController');
   }
 }

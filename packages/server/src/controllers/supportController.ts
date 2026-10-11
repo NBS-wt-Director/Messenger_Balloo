@@ -1,5 +1,6 @@
 // supportController.ts — Контроллер чата с техподдержкой (тикет 1790572800-01)
-import { Response, NextFunction } from 'express';
+import { internalError } from '../middleware/errorHandler';
+import {Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from '../middleware/auth';
 import {
   getChat,
@@ -22,7 +23,7 @@ function sendError(res: Response, error: any): void {
       res.status(404).json({ error: 'Not Found', message: 'Тикет не найден' });
       return;
     default:
-      res.status(500).json({ error: 'Internal Error', message: error?.message ?? 'Ошибка сервера' });
+      internalError(res, error, 'supportController');
   }
 }
 

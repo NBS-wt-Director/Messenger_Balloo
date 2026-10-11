@@ -1,7 +1,8 @@
 // FeatureController — REST API для фич-реквестов
 // Тикет №55 — Features: фич-реквесты (узел 04)
 
-import { Request, Response } from 'express';
+import { internalError } from '../middleware/errorHandler';
+import {Request, Response } from 'express';
 import {
   createFeature,
   getFeatures,
@@ -50,7 +51,7 @@ export async function createFeatureController(req: Request, res: Response): Prom
 
     res.status(201).json(feature);
   } catch (error: any) {
-    res.status(500).json({ error: error.message || 'Ошибка сервера' });
+    internalError(res, error, 'featureController.createFeatureController');
   }
 }
 
@@ -70,7 +71,7 @@ export async function getFeaturesController(req: Request, res: Response): Promis
 
     res.json(result);
   } catch (error: any) {
-    res.status(500).json({ error: error.message || 'Ошибка сервера' });
+    internalError(res, error, 'featureController.getFeaturesController');
   }
 }
 
@@ -87,7 +88,7 @@ export async function getFeatureController(req: Request, res: Response): Promise
 
     res.json(feature);
   } catch (error: any) {
-    res.status(500).json({ error: error.message || 'Ошибка сервера' });
+    internalError(res, error, 'featureController.getFeatureController');
   }
 }
 
@@ -106,7 +107,7 @@ export async function updateFeatureController(req: Request, res: Response): Prom
       res.status(404).json({ error: 'Фича не найдена' });
       return;
     }
-    res.status(500).json({ error: error.message || 'Ошибка сервера' });
+    internalError(res, error, 'featureController.updateFeatureController');
   }
 }
 
@@ -123,7 +124,7 @@ export async function deleteFeatureController(req: Request, res: Response): Prom
       res.status(404).json({ error: 'Фича не найдена' });
       return;
     }
-    res.status(500).json({ error: error.message || 'Ошибка сервера' });
+    internalError(res, error, 'featureController.deleteFeatureController');
   }
 }
 
@@ -144,7 +145,7 @@ export async function voteFeatureController(req: Request, res: Response): Promis
       res.status(409).json({ error: 'Уже проголосовали' });
       return;
     }
-    res.status(500).json({ error: error.message || 'Ошибка сервера' });
+    internalError(res, error, 'featureController.voteFeatureController');
   }
 }
 
@@ -161,7 +162,7 @@ export async function unvoteFeatureController(req: Request, res: Response): Prom
     await unvoteFeature(id, userId);
     res.json({ success: true });
   } catch (error: any) {
-    res.status(500).json({ error: error.message || 'Ошибка сервера' });
+    internalError(res, error, 'featureController.unvoteFeatureController');
   }
 }
 
@@ -171,7 +172,7 @@ export async function getCategoriesController(_req: Request, res: Response): Pro
     const categories = await getCategories();
     res.json(categories);
   } catch (error: any) {
-    res.status(500).json({ error: error.message || 'Ошибка сервера' });
+    internalError(res, error, 'featureController.getCategoriesController');
   }
 }
 
@@ -181,7 +182,7 @@ export async function getFeatureStatsController(_req: Request, res: Response): P
     const stats = await getFeatureStats();
     res.json(stats);
   } catch (error: any) {
-    res.status(500).json({ error: error.message || 'Ошибка сервера' });
+    internalError(res, error, 'featureController.getFeatureStatsController');
   }
 }
 
@@ -208,7 +209,7 @@ export async function addFeatureCommentController(req: Request, res: Response): 
     ) {
       res.status(400).json({ error: error.message });
     } else {
-      res.status(500).json({ error: error.message || 'Ошибка сервера' });
+      internalError(res, error, 'featureController.addFeatureCommentController');
     }
   }
 }
@@ -226,7 +227,7 @@ export async function getFeatureCommentsController(req: Request, res: Response):
     if (error.message === 'Фича не найдена') {
       res.status(404).json({ error: error.message });
     } else {
-      res.status(500).json({ error: error.message || 'Ошибка сервера' });
+      internalError(res, error, 'featureController.getFeatureCommentsController');
     }
   }
 }

@@ -1,4 +1,5 @@
 // archiveController.ts — Контроллер для архива чатов
+import { internalError } from '../middleware/errorHandler';
 import { Request, Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from '../middleware/auth';
 import {
@@ -14,7 +15,7 @@ export const getArchived = async (req: AuthenticatedRequest, res: Response, next
     const result = await getArchivedChats(userId);
     res.json(result);
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'archiveController.getArchived');
   }
 };
 
@@ -34,7 +35,7 @@ export const restoreArchivedChat = async (req: AuthenticatedRequest, res: Respon
     } else if (error.message === 'Чат не найден') {
       res.status(404).json({ error: 'Not Found', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'archiveController.restoreArchivedChat');
     }
   }
 };
@@ -55,7 +56,7 @@ export const deleteArchivedChat = async (req: AuthenticatedRequest, res: Respons
     } else if (error.message === 'Чат не найден') {
       res.status(404).json({ error: 'Not Found', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'archiveController.deleteArchivedChat');
     }
   }
 };
@@ -74,7 +75,7 @@ export const archiveChatCtrl = async (req: AuthenticatedRequest, res: Response, 
     if (error.message === 'Чат не найден') {
       res.status(404).json({ error: 'Not Found', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'archiveController.archiveChatCtrl');
     }
   }
 };

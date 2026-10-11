@@ -8,6 +8,7 @@ import {
   deleteStory as deleteStoryService,
 } from '../services/storyService';
 import { AuthenticatedRequest } from '../middleware/auth';
+import { internalError } from '../middleware/errorHandler';
 
 // ============================================================
 // Создать историю (POST /api/stories)
@@ -37,7 +38,7 @@ export const createStory = async (req: AuthenticatedRequest, res: Response, next
     } else if (error.message.includes('будущему')) {
       res.status(400).json({ error: 'Bad Request', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'storyController.createStory');
     }
   }
 };
@@ -65,7 +66,7 @@ export const getStories = async (req: AuthenticatedRequest, res: Response, next:
 
     res.json(result);
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'storyController.getStories');
   }
 };
 
@@ -88,7 +89,7 @@ export const getStoryViews = async (req: Request, res: Response, next: NextFunct
     if (error.message === 'История не найдена') {
       res.status(404).json({ error: 'Not Found', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'storyController.getStoryViews');
     }
   }
 };
@@ -115,7 +116,7 @@ export const viewStory = async (req: AuthenticatedRequest, res: Response, next: 
     } else if (error.message === 'История истекла') {
       res.status(410).json({ error: 'Gone', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'storyController.viewStory');
     }
   }
 };
@@ -148,7 +149,7 @@ export const addStoryReaction = async (req: AuthenticatedRequest, res: Response,
     } else if (error.message === 'История истекла') {
       res.status(410).json({ error: 'Gone', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'storyController.addStoryReaction');
     }
   }
 };
@@ -175,7 +176,7 @@ export const deleteStory = async (req: AuthenticatedRequest, res: Response, next
     } else if (error.message === 'Доступ запрещён') {
       res.status(403).json({ error: 'Forbidden', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'storyController.deleteStory');
     }
   }
 };

@@ -7,6 +7,7 @@ import {
   deletePoll as deletePollService,
 } from '../services/pollService';
 import { AuthenticatedRequest } from '../middleware/auth';
+import { internalError } from '../middleware/errorHandler';
 
 // ============================================================
 // Создать опрос (POST /api/chats/:chatId/polls)
@@ -44,7 +45,7 @@ export const createPoll = async (req: AuthenticatedRequest, res: Response, next:
     } else if (error.message.includes('не состоит')) {
       res.status(403).json({ error: 'Forbidden', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'pollController.createPoll');
     }
   }
 };
@@ -97,7 +98,7 @@ export const createPollFromBody = async (req: AuthenticatedRequest, res: Respons
     } else if (error.message.includes('не состоит')) {
       res.status(403).json({ error: 'Forbidden', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'pollController.createPollFromBody');
     }
   }
 };
@@ -137,7 +138,7 @@ export const votePoll = async (req: AuthenticatedRequest, res: Response, next: N
     } else if (error.message.includes('Недопустимый')) {
       res.status(400).json({ error: 'Bad Request', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'pollController.votePoll');
     }
   }
 };
@@ -162,7 +163,7 @@ export const getPollResults = async (req: AuthenticatedRequest, res: Response, n
     if (error.message === 'Опрос не найден') {
       res.status(404).json({ error: 'Not Found', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'pollController.getPollResults');
     }
   }
 };
@@ -187,7 +188,7 @@ export const getPoll = async (req: AuthenticatedRequest, res: Response, next: Ne
     if (error.message === 'Опрос не найден') {
       res.status(404).json({ error: 'Not Found', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'pollController.getPoll');
     }
   }
 };
@@ -214,7 +215,7 @@ export const deletePoll = async (req: AuthenticatedRequest, res: Response, next:
     } else if (error.message === 'Доступ запрещён') {
       res.status(403).json({ error: 'Forbidden', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'pollController.deletePoll');
     }
   }
 };

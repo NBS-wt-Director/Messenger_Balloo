@@ -23,6 +23,7 @@ import {
   updateApplicationStatus as updateApplicationStatusService,
 } from '../services/knowledgeService';
 import { AuthenticatedRequest } from '../middleware/auth';
+import { internalError } from '../middleware/errorHandler';
 
 // ============================================================
 // Knowledge Pages
@@ -42,7 +43,7 @@ export const createPage = async (req: AuthenticatedRequest, res: Response, next:
     const page = await createPageService({ title, content, categoryId, lastEditorId: userId });
     res.status(201).json(page);
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'knowledgeController.createPage');
   }
 };
 
@@ -60,7 +61,7 @@ export const getPages = async (req: Request, res: Response, next: NextFunction):
 
     res.json(result);
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'knowledgeController.getPages');
   }
 };
 
@@ -74,7 +75,7 @@ export const getPage = async (req: Request, res: Response, next: NextFunction): 
     if (error.message === 'Страница не найдена') {
       res.status(404).json({ error: 'Not Found', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'knowledgeController.getPage');
     }
   }
 };
@@ -98,7 +99,7 @@ export const updatePage = async (req: AuthenticatedRequest, res: Response, next:
     if (error.code === 'P2025' || error.message === 'Страница не найдена') {
       res.status(404).json({ error: 'Not Found', message: 'Страница не найдена' });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'knowledgeController.updatePage');
     }
   }
 };
@@ -114,7 +115,7 @@ export const deletePage = async (req: AuthenticatedRequest, res: Response, next:
     if (error.code === 'P2025' || error.message === 'Страница не найдена') {
       res.status(404).json({ error: 'Not Found', message: 'Страница не найдена' });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'knowledgeController.deletePage');
     }
   }
 };
@@ -136,7 +137,7 @@ export const createCategory = async (req: AuthenticatedRequest, res: Response, n
     const category = await createCategoryService({ name, slug });
     res.status(201).json(category);
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'knowledgeController.createCategory');
   }
 };
 
@@ -146,7 +147,7 @@ export const getCategories = async (req: Request, res: Response, next: NextFunct
     const categories = await getCategoriesService();
     res.json(categories);
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'knowledgeController.getCategories');
   }
 };
 
@@ -160,7 +161,7 @@ export const getCategory = async (req: Request, res: Response, next: NextFunctio
     if (error.message === 'Категория не найдена') {
       res.status(404).json({ error: 'Not Found', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'knowledgeController.getCategory');
     }
   }
 };
@@ -182,7 +183,7 @@ export const createDepartment = async (req: AuthenticatedRequest, res: Response,
     const department = await createDepartmentService({ name, description, parentId, headId });
     res.status(201).json(department);
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'knowledgeController.createDepartment');
   }
 };
 
@@ -196,7 +197,7 @@ export const getDepartments = async (req: Request, res: Response, next: NextFunc
     });
     res.json(departments);
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'knowledgeController.getDepartments');
   }
 };
 
@@ -210,7 +211,7 @@ export const getDepartment = async (req: Request, res: Response, next: NextFunct
     if (error.message === 'Отдел не найден') {
       res.status(404).json({ error: 'Not Found', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'knowledgeController.getDepartment');
     }
   }
 };
@@ -227,7 +228,7 @@ export const updateDepartment = async (req: AuthenticatedRequest, res: Response,
     if (error.code === 'P2025' || error.message === 'Отдел не найден') {
       res.status(404).json({ error: 'Not Found', message: 'Отдел не найден' });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'knowledgeController.updateDepartment');
     }
   }
 };
@@ -242,7 +243,7 @@ export const deleteDepartment = async (req: AuthenticatedRequest, res: Response,
     if (error.code === 'P2025' || error.message === 'Отдел не найден') {
       res.status(404).json({ error: 'Not Found', message: 'Отдел не найден' });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'knowledgeController.deleteDepartment');
     }
   }
 };
@@ -264,7 +265,7 @@ export const createVacancy = async (req: AuthenticatedRequest, res: Response, ne
     const vacancy = await createVacancyService({ title, departmentId, description, requirements, salary });
     res.status(201).json(vacancy);
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'knowledgeController.createVacancy');
   }
 };
 
@@ -282,7 +283,7 @@ export const getVacancies = async (req: Request, res: Response, next: NextFuncti
 
     res.json(result);
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'knowledgeController.getVacancies');
   }
 };
 
@@ -296,7 +297,7 @@ export const getVacancy = async (req: Request, res: Response, next: NextFunction
     if (error.message === 'Вакансия не найдена') {
       res.status(404).json({ error: 'Not Found', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'knowledgeController.getVacancy');
     }
   }
 };
@@ -313,7 +314,7 @@ export const updateVacancy = async (req: AuthenticatedRequest, res: Response, ne
     if (error.code === 'P2025' || error.message === 'Вакансия не найдена') {
       res.status(404).json({ error: 'Not Found', message: 'Вакансия не найдена' });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'knowledgeController.updateVacancy');
     }
   }
 };
@@ -328,7 +329,7 @@ export const deleteVacancy = async (req: AuthenticatedRequest, res: Response, ne
     if (error.code === 'P2025' || error.message === 'Вакансия не найдена') {
       res.status(404).json({ error: 'Not Found', message: 'Вакансия не найдена' });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'knowledgeController.deleteVacancy');
     }
   }
 };
@@ -358,7 +359,7 @@ export const applyVacancy = async (req: AuthenticatedRequest, res: Response, nex
     } else if (error.message === 'Вы уже откликались на эту вакансию') {
       res.status(409).json({ error: 'Conflict', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'knowledgeController.applyVacancy');
     }
   }
 };
@@ -370,7 +371,7 @@ export const getMyApplications = async (req: AuthenticatedRequest, res: Response
     const applications = await getMyApplicationsService(userId);
     res.json(applications);
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'knowledgeController.getMyApplications');
   }
 };
 
@@ -391,7 +392,7 @@ export const updateApplicationStatus = async (req: AuthenticatedRequest, res: Re
     if (error.message === 'Заявка не найдена') {
       res.status(404).json({ error: 'Not Found', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'knowledgeController.updateApplicationStatus');
     }
   }
 };

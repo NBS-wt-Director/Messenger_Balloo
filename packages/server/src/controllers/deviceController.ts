@@ -1,4 +1,5 @@
 // deviceController.ts — Контроллер для управления устройствами
+import { internalError } from '../middleware/errorHandler';
 import { Request, Response, NextFunction } from 'express';
 import { AuthenticatedRequest, setAuthCookies } from '../middleware/auth';
 import {
@@ -18,7 +19,7 @@ export const getDevicesCtrl = async (req: AuthenticatedRequest, res: Response, n
     const result = await getDevices(userId);
     res.json(result);
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'deviceController.getDevicesCtrl');
   }
 };
 
@@ -38,7 +39,7 @@ export const endSessionCtrl = async (req: AuthenticatedRequest, res: Response, n
     } else if (error.message === 'Доступ запрещён') {
       res.status(403).json({ error: 'Forbidden', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'deviceController.endSessionCtrl');
     }
   }
 };
@@ -51,7 +52,7 @@ export const endAllSessionsCtrl = async (req: AuthenticatedRequest, res: Respons
     const result = await endAllSessions(userId, currentSessionId);
     res.json(result);
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'deviceController.endAllSessionsCtrl');
   }
 };
 

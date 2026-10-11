@@ -2,6 +2,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from '../middleware/auth';
 import { createReport, getUserReports } from '../services/reportService';
+import { internalError } from '../middleware/errorHandler';
 
 export const createReportCtrl = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -39,7 +40,7 @@ export const createReportCtrl = async (req: AuthenticatedRequest, res: Response,
     if (error.message === 'Неверная причина жалобы') {
       res.status(400).json({ error: 'Bad Request', message: error.message });
     } else {
-      res.status(500).json({ error: 'Internal Error', message: error.message });
+      internalError(res, error, 'reportController.createReportCtrl');
     }
   }
 };
@@ -53,6 +54,6 @@ export const getUserReportsCtrl = async (req: AuthenticatedRequest, res: Respons
     const result = await getUserReports(userId, pageNum, limitNum);
     res.json(result);
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    internalError(res, error, 'reportController.getUserReportsCtrl');
   }
 };

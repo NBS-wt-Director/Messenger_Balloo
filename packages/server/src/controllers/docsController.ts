@@ -1,7 +1,8 @@
 // DocsController — REST API для API документации (api.balloo.su/doc)
 // Тикет №58 — Docs: API документация
 
-import { Request, Response } from 'express';
+import { internalError } from '../middleware/errorHandler';
+import {Request, Response } from 'express';
 import {
   API_MODULES,
   WS_CLIENT_EVENTS,
@@ -45,7 +46,7 @@ export async function getApiSpec(_req: Request, res: Response): Promise<void> {
 
     res.json(spec);
   } catch (error: any) {
-    res.status(500).json({ error: error.message || 'Ошибка сервера' });
+    internalError(res, error, 'docsController.getApiSpec');
   }
 }
 
@@ -74,7 +75,7 @@ export async function getEndpoints(_req: Request, res: Response): Promise<void> 
       totalEndpoints: API_MODULES.reduce((sum, m) => sum + m.endpoints.length, 0),
     });
   } catch (error: any) {
-    res.status(500).json({ error: error.message || 'Ошибка сервера' });
+    internalError(res, error, 'docsController.getEndpoints');
   }
 }
 
@@ -98,7 +99,7 @@ export async function getEndpointDetail(req: Request, res: Response): Promise<vo
 
     res.status(404).json({ error: 'Эндпоинт не найден' });
   } catch (error: any) {
-    res.status(500).json({ error: error.message || 'Ошибка сервера' });
+    internalError(res, error, 'docsController.getEndpointDetail');
   }
 }
 
@@ -111,7 +112,7 @@ export async function getWebSocketEvents(_req: Request, res: Response): Promise<
       serverToClient: WS_SERVER_EVENTS,
     });
   } catch (error: any) {
-    res.status(500).json({ error: error.message || 'Ошибка сервера' });
+    internalError(res, error, 'docsController.getWebSocketEvents');
   }
 }
 
@@ -120,7 +121,7 @@ export async function getErrorCodes(_req: Request, res: Response): Promise<void>
   try {
     res.json(ERROR_CODES);
   } catch (error: any) {
-    res.status(500).json({ error: error.message || 'Ошибка сервера' });
+    internalError(res, error, 'docsController.getErrorCodes');
   }
 }
 
@@ -129,6 +130,6 @@ export async function getQuickStart(_req: Request, res: Response): Promise<void>
   try {
     res.json(QUICK_START);
   } catch (error: any) {
-    res.status(500).json({ error: error.message || 'Ошибка сервера' });
+    internalError(res, error, 'docsController.getQuickStart');
   }
 }
