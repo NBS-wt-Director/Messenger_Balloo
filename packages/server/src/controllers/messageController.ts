@@ -60,7 +60,7 @@ export const sendMessage = async (req: AuthenticatedRequest, res: Response, next
 // GET /api/chats/:chatId/messages — история сообщений
 // ============================================================
 
-export const getMessages = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const getMessages = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { chatId } = req.params;
     const { cursor, limit, before, after, search } = req.query;
@@ -72,6 +72,7 @@ export const getMessages = async (req: Request, res: Response, next: NextFunctio
 
     const data = await getMessagesService({
       chatId,
+      userId: req.user!.id,
       cursor: cursor as string | undefined,
       limit: parseInt(String(limit), 10) || 50,
       before: before ? BigInt(parseInt(String(before), 10)) : undefined,
@@ -83,6 +84,8 @@ export const getMessages = async (req: Request, res: Response, next: NextFunctio
   } catch (error: any) {
     if (error.message.includes('не найден')) {
       res.status(404).json({ error: 'Not Found', message: error.message });
+    } else if (error.message.includes('участником')) {
+      res.status(403).json({ error: 'Forbidden', message: error.message });
     } else {
       res.status(500).json({ error: 'Internal Error', message: error.message });
     }
@@ -215,7 +218,7 @@ export const removeReaction = async (req: AuthenticatedRequest, res: Response, n
 // GET /api/messages/:id/reactions — список реакций
 // ============================================================
 
-export const getReactions = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const getReactions = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { id: messageId } = req.params;
 
@@ -224,11 +227,13 @@ export const getReactions = async (req: Request, res: Response, next: NextFuncti
       return;
     }
 
-    const data = await getReactionsService(messageId);
+    const data = await getReactionsService(messageId, req.user!.id);
     res.json(data);
   } catch (error: any) {
     if (error.message.includes('не найдено')) {
       res.status(404).json({ error: 'Not Found', message: error.message });
+    } else if (error.message.includes('участником')) {
+      res.status(403).json({ error: 'Forbidden', message: error.message });
     } else {
       res.status(500).json({ error: 'Internal Error', message: error.message });
     }
@@ -264,7 +269,7 @@ export const markAsRead = async (req: AuthenticatedRequest, res: Response, next:
 // GET /api/messages/:id/read — статус прочтения
 // ============================================================
 
-export const getReadStatus = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const getReadStatus = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { id: messageId } = req.params;
 
@@ -273,11 +278,13 @@ export const getReadStatus = async (req: Request, res: Response, next: NextFunct
       return;
     }
 
-    const data = await getReadStatusService(messageId);
+    const data = await getReadStatusService(messageId, req.user!.id);
     res.json(data);
   } catch (error: any) {
     if (error.message.includes('не найдено')) {
       res.status(404).json({ error: 'Not Found', message: error.message });
+    } else if (error.message.includes('участником')) {
+      res.status(403).json({ error: 'Forbidden', message: error.message });
     } else {
       res.status(500).json({ error: 'Internal Error', message: error.message });
     }
@@ -315,7 +322,7 @@ export const pinMessage = async (req: AuthenticatedRequest, res: Response, next:
 // GET /api/chats/:chatId/messages/search — поиск по сообщениям
 // ============================================================
 
-export const searchMessages = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const searchMessages = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { chatId } = req.params;
     const { q, limit } = req.query;
@@ -330,9 +337,13 @@ export const searchMessages = async (req: Request, res: Response, next: NextFunc
       return;
     }
 
-    const data = await searchMessagesService(chatId, q, parseInt(String(limit), 10) || 20);
+    const data = await searchMessagesService(chatId, q, req.user!.id, parseInt(String(limit), 10) || 20);
     res.json(data);
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal Error', message: error.message });
+    if (error.message.includes('участником')) {
+      res.status(403).json({ error: 'Forbidden', message: error.message });
+    } else {
+      res.status(500).json({ error: 'Internal Error', message: error.message });
+    }
   }
 };

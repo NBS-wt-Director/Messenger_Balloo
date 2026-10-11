@@ -41,3 +41,31 @@ grep -n "router.get" packages/server/src/routes/messages.ts packages/server/src/
 ## Блокер
 
 Нужно решение владельца: **чат — публичный или приватный по умолчанию?**
+
+## Решение и выполнение (2026-10-11)
+
+Реализован **вариант A** (приватные чаты по умолчанию). Основания, что это не
+требует отдельного решения владельца:
+
+- в Prisma-схеме (`Chat`) нет поля публичности — публичных чатов в продукте нет;
+- клиент (`packages/web/src/services/api.ts`) обращается к этим эндпоинтам только
+  из авторизованного чата; превью по инвойт-ссылке идёт через отдельный
+  `POST /api/chats/invite/:code`, а не через `GET /chats/:id`;
+- не-участник в `getChatInfo` ранее получал `name` + **`inviteCode`** чужого чата —
+  это утечка, а не фича.
+
+Что сделано:
+
+- `routes/chats.ts:31`, `routes/messages.ts:27,32,57,67` — добавлен `authRequired`;
+- `messageService.ts` — хелпер `assertChatMember(userId, chatId)`, проверки в
+  `getMessages`, `searchMessages`, `getReactions`, `getReadStatus`;
+- `chatService.getChatInfo` — `userId` обязателен, не-участник получает тот же
+  `Чат не найден` (404), что и несуществующий чат (не светует существование);
+- контроллеры прокидывают `req.user!.id`, ошибки членства → 403.
+
+## Результат
+
+- `tsc --noEmit` (packages/server) — без ошибок;
+- `pnpm --filter @balloo/server test` — **32 набора, 582 теста, все зелёные** (80 с);
+- grep-доказательство: `grep -n "router.get" packages/server/src/routes/chats.ts
+  packages/server/src/routes/messages.ts` — ни одного GET без `authRequired`.

@@ -55,10 +55,10 @@ export const getChats = async (req: AuthenticatedRequest, res: Response, next: N
   }
 };
 
-export const getChatInfo = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const getChatInfo = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { id: chatId } = req.params;
-    const userId = (req as AuthenticatedRequest).user?.id;
+    const userId = req.user!.id;
     if (!chatId) {
       res.status(400).json({ error: 'Bad Request', message: 'Chat ID обязателен' });
       return;

@@ -24,12 +24,12 @@ router.post('/chats/:chatId/messages', authRequired, sendMessage);
 // ============================================================
 // GET /api/chats/:chatId/messages — история сообщений
 // ============================================================
-router.get('/chats/:chatId/messages', getMessages);
+router.get('/chats/:chatId/messages', authRequired, getMessages);
 
 // ============================================================
 // GET /api/chats/:chatId/messages/search — поиск по сообщениям
 // ============================================================
-router.get('/chats/:chatId/messages/search', searchMessages);
+router.get('/chats/:chatId/messages/search', authRequired, searchMessages);
 
 // ============================================================
 // PUT /api/messages/:id — редактирование сообщения
@@ -54,7 +54,7 @@ router.delete('/messages/:id/reactions', authRequired, removeReaction);
 // ============================================================
 // GET /api/messages/:id/reactions — список реакций
 // ============================================================
-router.get('/messages/:id/reactions', getReactions);
+router.get('/messages/:id/reactions', authRequired, getReactions);
 
 // ============================================================
 // POST /api/messages/:id/read — отметить как прочитанное
@@ -64,7 +64,7 @@ router.post('/messages/:id/read', authRequired, markAsRead);
 // ============================================================
 // GET /api/messages/:id/read — статус прочтения
 // ============================================================
-router.get('/messages/:id/read', getReadStatus);
+router.get('/messages/:id/read', authRequired, getReadStatus);
 
 // ============================================================
 // POST /api/messages/:id/pin — закрепление сообщения

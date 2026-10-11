@@ -29,11 +29,25 @@ export interface UpdateMessageInput {
 
 export interface GetMessagesInput {
   chatId: string;
+  userId: string;
   cursor?: string; // messageId
   limit?: number;
   before?: BigInt; // timestamp
   after?: BigInt; // timestamp
   search?: string;
+}
+
+// Проверка членства в чате (IDOR-защита, тикет «исправить-IDOR-чтение-чатов-без-auth»).
+// Бросает «Сообщение не найдено»/«Чат не найден» для несуществующих id и
+// «Вы не являетесь участником этого чата» для чужих чатов.
+async function assertChatMember(userId: string, chatId: string): Promise<void> {
+  const membership = await prisma.userChat.findUnique({
+    where: { userId_chatId: { userId, chatId } },
+    select: { role: true },
+  });
+  if (!membership) {
+    throw new Error('Вы не являетесь участником этого чата');
+  }
 }
 
 // ============================================================
@@ -184,7 +198,7 @@ export const sendMessage = async (userId: string, input: SendMessageInput) => {
 // Получение истории сообщений (cursor-based pagination)
 // ============================================================
 
-export const getMessages = async ({ chatId, cursor, limit = 50, before, after, search }: GetMessagesInput) => {
+export const getMessages = async ({ chatId, userId, cursor, limit = 50, before, after, search }: GetMessagesInput) => {
   // Проверка существования чата
   const chat = await prisma.chat.findUnique({
     where: { id: chatId },
@@ -193,6 +207,9 @@ export const getMessages = async ({ chatId, cursor, limit = 50, before, after, s
   if (!chat) {
     throw new Error('Чат не найден');
   }
+
+  // IDOR-защита: читать историю может только участник чата
+  await assertChatMember(userId, chatId);
 
   // Фильтры
   const where: Record<string, unknown> = { chatId, deleted: false };
@@ -462,7 +479,17 @@ export const removeReaction = async (userId: string, messageId: string, emoji: s
   return { message: 'Реакция удалена' };
 };
 
-export const getReactions = async (messageId: string) => {
+export const getReactions = async (messageId: string, userId: string) => {
+  // IDOR-защита: реакции видны только участнику чата сообщения
+  const message = await prisma.message.findUnique({
+    where: { id: messageId },
+    select: { chatId: true },
+  });
+  if (!message) {
+    throw new Error('Сообщение не найдено');
+  }
+  await assertChatMember(userId, message.chatId);
+
   const reactions = await prisma.messageReaction.findMany({
     where: { messageId },
     include: {
@@ -525,7 +552,7 @@ export const markAsRead = async (userId: string, messageId: string) => {
   return { message: 'Сообщение отмечено как прочитанное' };
 };
 
-export const getReadStatus = async (messageId: string) => {
+export const getReadStatus = async (messageId: string, userId: string) => {
   const message = await prisma.message.findUnique({
     where: { id: messageId },
     include: {
@@ -550,6 +577,9 @@ export const getReadStatus = async (messageId: string) => {
   if (!message) {
     throw new Error('Сообщение не найдено');
   }
+
+  // IDOR-защита: статус прочтения виден только участнику чата
+  await assertChatMember(userId, message.chatId);
 
   // Считаем уникальных читателей
   const readCount = await prisma.messageReadCount.count({
@@ -614,10 +644,13 @@ export const pinMessage = async (userId: string, messageId: string) => {
 // Поиск по сообщениям
 // ============================================================
 
-export const searchMessages = async (chatId: string, query: string, limit = 20) => {
+export const searchMessages = async (chatId: string, query: string, userId: string, limit = 20) => {
   if (!query || query.trim().length === 0) {
     return { messages: [], total: 0 };
   }
+
+  // IDOR-защита: поиск по сообщениям доступен только участнику чата
+  await assertChatMember(userId, chatId);
 
   const messages = await prisma.message.findMany({
     where: {

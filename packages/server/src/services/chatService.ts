@@ -223,7 +223,7 @@ export const getChats = async ({ userId, page = 1, limit = 20, sortBy = 'lastMes
   };
 };
 
-export const getChatInfo = async (chatId: string, userId?: string) => {
+export const getChatInfo = async (chatId: string, userId: string) => {
   const chat = await prisma.chat.findUnique({
     where: { id: chatId },
     include: {
@@ -249,28 +249,13 @@ export const getChatInfo = async (chatId: string, userId?: string) => {
     throw new Error('Чат не найден');
   }
 
-  const userRole = userId ? await getUserRoleInChat(userId, chatId) : null;
+  // IDOR-защита (тик. «исправить-IDOR-чтение-чатов-без-auth»): чаты приватные
+  // по умолчанию. Неучастнику отдаём то же 404, что и несуществующему чату, —
+  // иначе any logged-in user мог перечислением id получать name/inviteCode чужих чатов.
+  const userRole = await getUserRoleInChat(userId, chatId);
 
   if (!userRole) {
-    return {
-      id: chat.id,
-      type: chat.type,
-      name: chat.name || '',
-      avatarUrl: chat.avatarUrl,
-      inviteCode: chat.inviteCode,
-      memberCount: chat._count.members,
-      settings: chat.settings
-        ? {
-            allowMessages: chat.settings.allowMessages,
-            allowMedia: chat.settings.allowMedia,
-            allowPolls: chat.settings.allowPolls,
-            allowStories: chat.settings.allowStories,
-            requiredApprove: chat.settings.requiredApprove,
-          }
-        : null,
-      isMember: false,
-      role: null,
-    };
+    throw new Error('Чат не найден');
   }
 
   return {
