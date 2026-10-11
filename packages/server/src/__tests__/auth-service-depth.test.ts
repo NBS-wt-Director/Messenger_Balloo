@@ -835,4 +835,54 @@ describe('Auth service depth (В-93 а)', () => {
       await prisma.user.delete({ where: { email } }).catch(() => undefined);
     });
   });
+
+  // Тик. а-08: pre-hash SHA-256 перед bcrypt + принятие старого формата.
+  describe('bcrypt pre-hash (тик. а-08)', () => {
+    it('пароль 100 символов: регистрация и вход проходят', async () => {
+      const email = `long_${Date.now()}@test.balloo.ru`;
+      const password = 'A1'.repeat(50); // 100 символов, > 72-байтового лимита bcrypt
+      const { register: registerService, login: loginService } = await import('../services/authService');
+      await registerService({ email, password });
+      const res = await loginService({ email, password });
+      expect(res.tokens).toBeDefined();
+      await prisma.user.delete({ where: { email } }).catch(() => undefined);
+    });
+
+    it('старый bcrypt-хеш (без pre-hash) принимается и перезаписывается новым форматом', async () => {
+      const bcrypt = require('bcryptjs');
+      const email = `oldfmt_${Date.now()}@test.balloo.ru`;
+      const password = 'Passw0rd123';
+      // хеш старого формата: bcrypt от сырого пароля
+      const oldHash = await bcrypt.hash(password, 12);
+      await prisma.user.create({
+        data: {
+          email,
+          passwordHash: oldHash,
+          language: 'ru',
+          status: 'active',
+          createdAt: now(),
+          updatedAt: now(),
+        },
+      });
+
+      const { login: loginService } = await import('../services/authService');
+      const res = await loginService({ email, password });
+      expect(res.tokens).toBeDefined();
+
+      const u = await prisma.user.findUnique({ where: { email } });
+      expect(u?.passwordHash).not.toBe(oldHash); // перезаписан
+      // новый хеш совпадает с pre-hash-форматом
+      const pre = require('crypto').createHash('sha256').update(password, 'utf8').digest('base64');
+      expect(await bcrypt.compare(pre, u!.passwordHash)).toBe(true);
+      await prisma.user.delete({ where: { email } }).catch(() => undefined);
+    });
+
+    it('регистрация с паролем «…  » (пробел на конце) → 400', async () => {
+      const res = await request(app)
+        .post('/api/auth/register')
+        .send({ email: `ws_${Date.now()}@test.balloo.ru`, password: 'Passw0rd123 ' });
+      expect(res.status).toBe(400);
+      expect(res.body.message).toContain('пробел');
+    });
+  });
 });

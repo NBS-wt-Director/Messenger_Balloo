@@ -115,8 +115,16 @@ const DUMMY_PASSWORD_HASH = '$2a$12$YQOlf8NxXYh58j7kLWejTu9Ejl4L/VGsnCvCC1FJiEW.
 // все вызывающие (контроллеры, OAuth, тесты).
 const normalizeEmail = (email: string): string => email.trim().toLowerCase();
 
+// Pre-hash SHA-256 → base64 перед bcrypt (тик. а-08): bcrypt обрезает вход на
+// 72 байтах, у длинных паролей терялся хвост (два разных длинных пароля давали
+// один хеш). SHA-256 даёт фиксированные 44 байта base64 — обрезки нет никогда.
+// Формат хеша меняется только для новых записей; старые bcrypt-хеши
+// принимаются и перезаписываются при входе (needsRehash).
+const preHashPassword = (password: string): string =>
+  crypto.createHash('sha256').update(password, 'utf8').digest('base64');
+
 const hashPassword = (password: string): Promise<string> =>
-  bcrypt.hash(password, BCRYPT_ROUNDS);
+  bcrypt.hash(preHashPassword(password), BCRYPT_ROUNDS);
 
 // Легаси-хеш (SHA-256 с хардкод-солью) — только для миграции старых паролей
 const legacyHash = (password: string): string =>
@@ -134,8 +142,9 @@ const safeLegacyCompare = (candidateHex: string, storedHex: string): boolean => 
   return crypto.timingSafeEqual(candidate, stored);
 };
 
-// Проверка пароля: поддерживает bcrypt и легаси SHA-256.
-// needsRehash = true → хеш устарел и должен быть перезаписан bcrypt-хешем
+// Проверка пароля: легаси SHA-256, bcrypt старого формата (пароль напрямую) и
+// нового формата (pre-hash SHA-256). needsRehash = true → хеш устарел и при
+// успешном входе должен быть перезаписан актуальным (тик. а-08).
 const verifyPassword = async (
   password: string,
   hash: string
@@ -145,8 +154,13 @@ const verifyPassword = async (
     return { valid, needsRehash: valid };
   }
   try {
-    const valid = await bcrypt.compare(password, hash);
-    return { valid, needsRehash: false };
+    // Новый формат: pre-hash. Формат хеша в строке не различим (оба $2a$12$…),
+    // поэтому пробуем оба входа: сначала актуальный, потом старый сырой.
+    const valid = await bcrypt.compare(preHashPassword(password), hash);
+    if (valid) return { valid: true, needsRehash: false };
+    const legacyBcryptValid = await bcrypt.compare(password, hash);
+    if (legacyBcryptValid) return { valid: true, needsRehash: true };
+    return { valid: false, needsRehash: false };
   } catch {
     return { valid: false, needsRehash: false };
   }
@@ -280,8 +294,9 @@ export const login = async (input: LoginInput) => {
   });
 
   if (!user) {
-    // Тайминг как при неверном пароле: bcrypt выполняется и здесь
-    await bcrypt.compare(input.password, DUMMY_PASSWORD_HASH);
+    // Тайминг как при неверном пароле: тот же verifyPassword, те же два
+    // bcrypt.compare (pre-hash + сырой), что делает проверка реального хеша
+    await verifyPassword(input.password, DUMMY_PASSWORD_HASH);
     throw new Error('Неверный email или пароль');
   }
 
