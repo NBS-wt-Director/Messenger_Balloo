@@ -33,3 +33,9 @@ git rev-parse --short HEAD
 - Если конфликт: записать ошибку в «Проблемы» → перейти к следующей задаче
 
 ## Результат
+
+**Выполнено 11.10.2026.** `git push origin main` → `a2da2cd..09a71ef main -> main`.
+Доказательство: `git ls-remote origin main` → `09a71ef45cbe…refs/heads/main` —
+совпадает с `git rev-parse HEAD` (`09a71ef`); `git log origin/main..HEAD` → пусто.
+В диапазон попали все коммиты сессий 10–11.10: закрытие auth/IDOR/webhook-дыр,
+нормализация email, seed по умолчанию выключен, тикеты.
