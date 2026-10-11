@@ -106,6 +106,39 @@ describe('errorHandler — ответ и логирование', () => {
     spy.mockRestore();
   });
 
+  it('не-операционная 5xx: клиенту общий текст, полный message — только в лог (тик. errorHandler)', () => {
+    const spy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    withNodeEnv('production', () => {
+      const res = makeRes();
+      const err: any = new Error('P2021: table "public.users_secret" does not exist');
+      err.isOperational = false;
+
+      errorHandler(err, makeReq() as any, res as any, (() => undefined) as any);
+
+      expect(res.statusCode).toBe(500);
+      expect(res.body.message).toBe('Внутренняя ошибка сервера');
+    });
+    // в лог ушло исходное сообщение с внутренностями
+    expect(spy.mock.calls[0][0]).toContain('users_secret');
+    spy.mockRestore();
+  });
+
+  it('не-операционная 4xx: сообщение клиенту остаётся (валидационные тексты)', () => {
+    const spy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    withNodeEnv('production', () => {
+      const res = makeRes();
+      const err: any = new Error('Поле обязательно');
+      err.statusCode = 400;
+      err.isOperational = false;
+
+      errorHandler(err, makeReq() as any, res as any, (() => undefined) as any);
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.message).toBe('Поле обязательно');
+    });
+    spy.mockRestore();
+  });
+
   it('сериализует BigInt, не падая (BigInt-поля из Prisma) — регрессия 30.09', () => {
     withNodeEnv('test', () => {
       const err = new Error('bad id') as Error & { statusCode?: number };

@@ -14,14 +14,23 @@ export const errorHandler = (
   _next: NextFunction
 ): void => {
   const statusCode = err.statusCode || 500;
-  const message = err.message || 'Внутренняя ошибка сервера';
+  // Неоперационная ошибка с 5xx → клиенту только общий текст, детали остаются
+  // в логе (тик. «исправить-errorHandler-раскрывает-message-в-проде»): сообщения
+  // упавшего Prisma/драйвера содержат имена таблиц, SQL, пути и версии библиотек.
+  const isOperational = err.isOperational !== false; // по умолчанию считаем операционной
+  const message = isOperational || statusCode < 500
+    ? (err.message || 'Внутренняя ошибка сервера')
+    : 'Внутренняя ошибка сервера';
 
-  // Логирование ошибки (в продакшене — в систему мониторинга)
+  // Логирование ошибки (в продакшене — в систему мониторинга).
+  // В лог всегда идёт исходное сообщение: клиенту оно может не отдаваться
+  // (не-операционные 5xx), но диагностировать проблему надо по полным деталям.
+  const logMessage = err.message || 'Внутренняя ошибка сервера';
   if (process.env.NODE_ENV === 'development') {
-    console.error(`[ERROR] ${statusCode} - ${message}`);
+    console.error(`[ERROR] ${statusCode} - ${logMessage}`);
     console.error(err.stack);
   } else {
-    console.error(`[ERROR] ${statusCode} - ${message}`);
+    console.error(`[ERROR] ${statusCode} - ${logMessage}`);
   }
 
   // BigInt JSON serializer.

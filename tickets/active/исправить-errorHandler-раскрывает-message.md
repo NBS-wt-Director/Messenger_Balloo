@@ -44,3 +44,27 @@ const message = isOperational || statusCode < 500
 
 `curl -s localhost:4000/api/health` → в JSON нет строк с сообщениями драйверов.
 Тест: бросить неоперационную ошибку → в ответе `message: 'Внутренняя ошибка сервера'`.
+
+## Выполнено (2026-10-11)
+
+- `errorHandler.ts`: `isOperational === false` + 5xx → клиенту `Внутренняя ошибка
+  сервера`; 4xx и операционные — без изменений; **в лог всегда уходит исходное
+  `err.message`** (иначе диагностировать нечем).
+- `app.ts` `/health/ready`: из ответа убраны `error: <message драйвера>` у
+  database/redis/minio (в них бывают host/port/SQL), наружу только `{ ok }`;
+  текст ошибки — в `console.error` сервера. Детали только админу не делал:
+  на проде `/health*` уже под nginx `auth_basic`, отдельная auth-связка в
+  app.ts не нужна.
+
+## Результат
+
+- `tsc --noEmit` — чисто;
+- `pnpm --filter @balloo/server test` — **32 набора / 584 теста зелёные**
+  (+2 новых теста: не-операционная 5xx скрыта, не-операционная 4xx показана);
+- регрессии старых тестов (message на 500 по умолчанию) нет: `isOperational`
+  по умолчанию трактуется как операционная, как и предлагал тикет.
+
+⚠️ Остаток дыры вне рамок тикета: многие контроллеры в своих catch-блоках сами
+отдают `res.status(500).json({ message: error.message })`, минуя errorHandler
+(`grep -c "status(500)" packages/server/src/controllers/*.ts`). Вычищать все —
+отдельная задача, заведена: `tickets/active/исправить-controllers-500-message.md`.

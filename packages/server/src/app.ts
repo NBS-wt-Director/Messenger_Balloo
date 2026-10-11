@@ -85,15 +85,18 @@ app.get('/health', (_req, res) => {
 });
 
 // Readiness probe — проверка всех зависимостей (для Kubernetes/Docker)
+// Детали ошибок зависимостей наружу НЕ отдаются (могут содержать host/port/SQL):
+// в ответе только ok-флаги, текст ошибки — в лог сервера.
 app.get('/health/ready', async (_req, res) => {
-  const checks: Record<string, { ok: boolean; error?: string }> = {};
+  const checks: Record<string, { ok: boolean }> = {};
 
   // 1. PostgreSQL
   try {
     await healthPrisma.$queryRaw`SELECT 1`;
     checks.database = { ok: true };
   } catch (e) {
-    checks.database = { ok: false, error: (e as Error).message };
+    console.error('[health/ready] database:', (e as Error).message);
+    checks.database = { ok: false };
   }
 
   // 2. Redis
@@ -101,7 +104,8 @@ app.get('/health/ready', async (_req, res) => {
     await healthRedis.ping();
     checks.redis = { ok: true };
   } catch (e) {
-    checks.redis = { ok: false, error: (e as Error).message };
+    console.error('[health/ready] redis:', (e as Error).message);
+    checks.redis = { ok: false };
   }
 
   // 3. MinIO
@@ -109,7 +113,8 @@ app.get('/health/ready', async (_req, res) => {
     await healthMinio.listBuckets();
     checks.minio = { ok: true };
   } catch (e) {
-    checks.minio = { ok: false, error: (e as Error).message };
+    console.error('[health/ready] minio:', (e as Error).message);
+    checks.minio = { ok: false };
   }
 
   const allOk = Object.values(checks).every(c => c.ok);
