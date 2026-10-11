@@ -109,6 +109,12 @@ const BCRYPT_ROUNDS = 12;
 // Сгенерирован bcrypt.hash('balloo-dummy-password', 12).
 const DUMMY_PASSWORD_HASH = '$2a$12$YQOlf8NxXYh58j7kLWejTu9Ejl4L/VGsnCvCC1FJiEW.MrdAbI0VS';
 
+// Нормализация email: PostgreSQL @unique чувствителен к регистру, из-за чего
+// User@Gmail.com и user@gmail.com стали бы двумя пользователями (тик.
+// «исправить-email-normalization»). Нормализуем на входе в сервисы — покрыты
+// все вызывающие (контроллеры, OAuth, тесты).
+const normalizeEmail = (email: string): string => email.trim().toLowerCase();
+
 const hashPassword = (password: string): Promise<string> =>
   bcrypt.hash(password, BCRYPT_ROUNDS);
 
@@ -157,7 +163,8 @@ interface RegisterInput {
 }
 
 export const register = async (input: RegisterInput) => {
-  console.log('[REGISTER] Service: starting, email:', input.email);
+  const email = normalizeEmail(input.email);
+  console.log('[REGISTER] Service: starting, email:', email);
 
   // Валидация пароля (серверная — 152-ФЗ / docs/12 §6.2)
   if (!input.password || input.password.length < 8) {
@@ -166,7 +173,7 @@ export const register = async (input: RegisterInput) => {
 
   // Проверка уникальности email
   const existingUser = await prisma.user.findUnique({
-    where: { email: input.email },
+    where: { email },
   });
   console.log('[REGISTER] Service: existing user check done');
   
@@ -187,7 +194,7 @@ export const register = async (input: RegisterInput) => {
 
   const user = await prisma.user.create({
     data: {
-      email: input.email,
+      email,
       passwordHash,
       username: input.username || null,
       language: 'ru',
@@ -256,7 +263,7 @@ interface LoginInput {
 
 export const login = async (input: LoginInput) => {
   const user = await prisma.user.findUnique({
-    where: { email: input.email },
+    where: { email: normalizeEmail(input.email) },
     include: { twoFASecrets: true },
   });
 
@@ -360,7 +367,7 @@ interface Verify2FAInput {
 
 export const verify2FA = async (input: Verify2FAInput) => {
   const user = await prisma.user.findUnique({
-    where: { email: input.email },
+    where: { email: normalizeEmail(input.email) },
     include: { twoFASecrets: true },
   });
 
@@ -562,7 +569,7 @@ export const verifyEmail = async (input: { token: string }): Promise<{ success: 
 
 export const requestPasswordReset = async (input: { email: string }) => {
   const user = await prisma.user.findUnique({
-    where: { email: input.email },
+    where: { email: normalizeEmail(input.email) },
   });
 
   if (!user) {
@@ -913,7 +920,7 @@ export const oauthLogin = async (input: OAuthLoginInput) => {
     // @unique email). Email от провайдера верифицирован им самим — привязка
     // по email стандартна для OAuth.
     const existing = await prisma.user.findUnique({
-      where: { email: input.email },
+      where: { email: normalizeEmail(input.email!) },
       include: { twoFASecrets: true },
     });
 
@@ -957,7 +964,7 @@ export const oauthLogin = async (input: OAuthLoginInput) => {
 
     user = await prisma.user.create({
       data: {
-        email: input.email || null,
+        email: input.email ? normalizeEmail(input.email) : null,
         username,
         passwordHash,
         avatarUrl: input.avatarUrl || null,
