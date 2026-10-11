@@ -1,8 +1,8 @@
 # Архитектура проекта Balloo Messenger
 
-> **Версия:** 1.0 | **Дата:** 2026-10-07
+> **Версия:** 1.0 | **Дата:** 2026-10-11
 >
-> **Статус:** Актуализировано по HEAD (c5c3727)
+> **Статус:** Актуализировано по HEAD (7284403), тикет 1791375458
 
 ## 📦 Стек технологий
 - **Монорепо:** pnpm workspaces
@@ -14,9 +14,10 @@
 - **ORM:** Prisma
 - **Realtime:** WebSocket (ws package)
 - **CI/CD:** GitHub Actions + Docker Compose
-- **Тесты:** Jest + RTL, Playwright, Supertest
+- **Тесты:** Jest + Supertest (server), Vitest + RTL (web, shared), Cypress e2e (web) — фактические раннеры по `test`-скриптам пакетов (2026-10-11)
 - **Мониторинг:** Winston + Prometheus / Grafana
-- **Админ-панель:** Отдельный сайт в монорепо (`admin.balloo.su`)
+- **Пакеты монорепо (факт, `ls packages/`):** shared, ui, web, web-features, desktop, mobile-android, mobile-ios, server — 8 шт.; `web-admin/web-command/web-download/web-history/web-docs/web-blog` — план (тикеты 1790480787-05/-06)
+- **Админ-панель:** план — отдельный сайт в монорепо (`admin.balloo.su`), пока раздел внутри `packages/web`
 
 ---
 
@@ -229,6 +230,14 @@
 
 **v2:** Kubernetes с несколькими репликами, sticky sessions, auto-scaling
 
+> **Факт на 2026-10-11 (сверено с `docker/prod/docker-compose.local.yml`):**
+> из перечисленных поддоменов как сервисы композа определены только `web`
+> (`balloo-web`) и `features` (`balloo-features`). `admin`/`command`/`download`/
+> `history`/`docs`/`blog` — отдельными контейнерами **не развёрнуты** (их экраны
+> пока внутри `packages/web`, см. ADR-30 и тикеты 1790480787-05/-06).
+> Инфраструктурные сервисы композа: postgres, redis, minio, server, prometheus,
+> grafana, alertmanager, сеть `balloo-net`.
+
 ### 30. Поддомены (Вариант C — гибрид, решение пользователя 2026-09-12/18)
 
 > План-документ: `tickets/Мультитикет_поддомены_C.md` (тикеты №0–№6).
@@ -237,17 +246,25 @@
 > на `api.balloo.su`** (REST + WS + OAuth-колбэки; клиентский origin
 > `VITE_API_URL=https://api.balloo.su`, маршруты сервера остаются с префиксом `/api/...`).
 
-| Поддомен | Узел | Тип | Код |
+| Поддомен | Узел | Тип | Код (факт на 2026-10-11) |
 |---|---|---|---|
-| `balloo.su` | 01 мессенджер + 10 авторизация + 11 лендинг | SPA с auth | `packages/web` |
-| `admin.balloo.su` | 08 админ-панель | SPA, роль `admin` | `packages/web-admin` (выделить из web) |
-| `command.balloo.su` | 09 персонал | SPA, роль `command` | `packages/web-command` (выделить из web) |
-| `features.balloo.su` | 04 предложения | SPA, вход возможен | `packages/web-features` (выделить из web) |
-| `download.balloo.su` | 03 загрузка | статический сайт | `packages/web-download` |
-| `history.balloo.su` | 02 история | статический сайт | `packages/web-history` |
-| `docs.balloo.su` | 05 документация | статический (OpenAPI/Swagger) | `packages/web-docs` |
-| `blog.balloo.su` | 07 блог | статический сайт | `packages/web-blog` |
-| `api.balloo.su` | API + WS | Express | `packages/server` — единая точка API всех сайтов |
+| `balloo.su` | 01 мессенджер + 10 авторизация + 11 лендинг | SPA с auth | `packages/web` ✅ существует |
+| `admin.balloo.su` | 08 админ-панель | SPA, роль `admin` | ⏳ ещё `packages/web/src/screens/admin` (вынос в пакет — тикет 1790480787-05) |
+| `command.balloo.su` | 09 персонал | SPA, роль `command` | ⏳ ещё `packages/web/src/screens/command` (вынос — тикет 1790480787-05) |
+| `features.balloo.su` | 04 предложения | SPA, вход возможен | `packages/web-features` ✅ выделен (коммит ecda0a2) |
+| `download.balloo.su` | 03 загрузка | статический сайт | ⏳ ещё `packages/web` (`DownloadScreen`) — тикет 1790480787-06 |
+| `history.balloo.su` | 02 история | статический сайт | ⏳ ещё `packages/web` (`HistoryScreen`) — тикет 1790480787-06 |
+| `docs.balloo.su` | 05 документация | статический (OpenAPI/Swagger) | ⏳ ещё `packages/web` (`DocsScreen`) — тикет 1790480787-06 |
+| `blog.balloo.su` | 07 блог | статический сайт | ⏳ ещё `packages/web/src/screens/blog-landing` — тикет 1790480787-06 |
+| `api.balloo.su` | API + WS | Express | `packages/server` ✅ — единая точка API всех сайтов |
+
+> Из перечисленных отдельных пакетов реально существует только `packages/web-features`
+> (`ls packages/` → desktop, mobile-android, mobile-ios, server, shared, ui, web,
+> web-features). Остальные `web-admin/web-command/web-download/web-history/web-docs/web-blog`
+> — план; экраны пока живут внутри `packages/web` (создание пакетов — тикеты
+> 1790480787-05 и -06, они же = P2 в очереди active). Ни один поддомен, кроме
+> api/balloo, не развёрнут на проде (`docker/prod/` содержит только
+> `nginx-production.conf` и `certbot.conf`, каталога `templates/` нет).
 
 **Обязательные контракты всех сайтов:**
 - **`@balloo/ui`** (`packages/ui`, создан тикетом №1) — единые Topbar (лого-меню разделов), Footer, ThemeProvider (3 темы: dark/light/russian), I18nProvider (20 языков), дизайн-токены, cookie-persist темы/языка на `.balloo.su`
@@ -600,6 +617,8 @@
 
 ## 🗺️ Дорожная карта (v1 → v2)
 - **v1:** Web (React + Vite) + Desktop (Electron) + Mobile (Expo), базовые 1:1 чаты и группы, авторизация Email/Яндекс/VK/Mail.ru, 2FA (TOTP + backup codes), админка, портал сотрудников, мультиязычность (20 языков), очереди сообщений, уникальная геометрическая дизайн-система, интерактивы (опросы/квизы/списки/персонали), режим обучения, Docker Compose, own PostgreSQL, WebSocket (ws), ЮKassa (донаты; ЮMoney — вне MVP, см. `docs/decisions/2026-10-05-yoomoney-not-in-mvp.md`), MinIO (CDN)
+- **v1 — сделано сверх исходного плана (2026-10):** `features.balloo.su` отдельным SPA-пакетом `packages/web-features` (ADR-30), feedback modal + `/api/support` (ADR-Feedback), lazy-load маршрутов + ErrorBoundary (ADR-LazyRouter), раунд безопасности октября (ADR-Security-2026-10)
+- **v1 — статус поддоменов (факт 2026-10-11):** на прод развёрнуты только `balloo.su` + `api.balloo.su` (+ `features` собран в образе); `admin/command/download/history/docs/blog` — пакеты не созданы, см. ADR-30 и тикеты 1790480787-05/-06
 - **v2:** Redis Pub/Sub, Kubernetes, авторизация через Госуслуги, E2EE, анимированные стикеры, предпросмотр ссылок, подписка (Premium), отдельные сервера под файлы, Redis для кэширования
 
 ## 🆕 Новые архитектурные решения (v1 — дополнение)
@@ -632,8 +651,29 @@
 - **Яндекс Карты (Map API)** — для отображения и передачи геолокации (ключ предоставляется отдельно).
 - **Собственная капча** — серверная генерация, не reCAPTCHA/hCaptcha (вопрос 5.1.11 вопросника).
 
+### ADR-Feedback: Модальное окно обратной связи
+- **FeedbackModal** (`packages/web/src/pages/FeedbackModal.tsx`, коммит `c5c3727`) — модальное окно отправки обратной связи из авторизованной шапки; обращения уходят на `/api/support/*` (`routes/support.ts`: `GET /chat`, `POST /chat`, `GET /status`).
+- Раздел приёмки обращений в админ-дашборде — решение владельца В-114 (без Telegram/Slack-алертов и внешних сервисов).
+
+### ADR-LazyRouter: Ленивая загрузка маршрутов + ErrorBoundary
+- Все экраны web подключаются через `React.lazy` (`packages/web/src/router/index.tsx:17+`, коммит `93b3133`) — один бандль на весь SPA больше не требуется.
+- Оборачивание маршрутов в `ErrorBoundary` (`components/providers/ErrorBoundary`) + `ErrorShell` для фолбэк-отрисовки; падение одного экрана не роняет приложение.
+
+### ADR-Security-2026-10: Раунд безопасности октября (аудит-очередь а-NN)
+Зафиксированные решения (каждое — коммит + тесты, тикеты `Done/2026-10-09/`, `Done/2026-10-11/`):
+- **CORS fail-fast:** `CORS_ORIGIN` обязателен, `'*'` и пустое значение отклоняются zod-схемой (`config/env.ts`), origin — только явный список (`middleware/cors.ts`); тикет 1791489922.
+- **bcrypt pre-hash:** пароль перед хэшированием нормализуется SHA-256 (обход 72-байтового лимита bcrypt), вход с валидацией формата; тикет а-08 (коммит `dd37f3a`).
+- **Отзыв refresh-токенов:** JTI-чёрный список в Redis при ротации/logout (`authService.ts`, `sessionRevocation.ts`).
+- **Cookie-атрибуты:** `__Secure-` + `domain=.balloo.su` + `secure` + SameSite lax на refresh (решение владельца 09.10 о шаринге на поддомены); тикет а-05.
+- **Сброс пароля:** ссылка отдаёт hash, срок 15 минут, одноразовость до смены пароля, SMTP fire-and-forget, токены в БД как SHA-256 (коммит `cf9ba74`).
+- **Вебхук ЮKassa** проверяется вызовом API платежей, а не только подписью (коммит `4e93a17`).
+
 ---
 
 ## 📊 Статус документации: 100%  
-> **Обновлено:** 2026-07-30 — Актуализирован стек (Express, Electron, TOTP, MinIO, 81 таблица)
+> **Обновлено:** 2026-10-11 — таблица поддоменов (ADR-30) и ADR-29 приведены к
+> факту: из отдельных пакетов существует только `web-features`; прод-композ поднимает
+> фронтенды `web`+`features`; `admin/command/download/history/docs/blog` — план
+> (тикеты 1790480787-05/-06). Ранее: 2026-10-07 (структура монорепо, web-features);
+> 2026-07-30 (стек: Express, Electron, TOTP, MinIO, 81 таблица).
  

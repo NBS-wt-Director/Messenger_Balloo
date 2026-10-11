@@ -7,6 +7,14 @@
 - Обратная совместимость на соседние версии и через одну.
 - **Единое API для всех узлов** — все узлы экосистемы (balloo.su, admin.balloo.su, command.balloo.su, features.balloo.su, history.balloo.su, download.balloo.su, docs.balloo.su, blog.balloo.su) используют одно и то же API. Различия только в правах доступа (RBAC) и контексте узла.
 
+> **Факт на 2026-10-11 (тикет 1791375458):** реальные маршруты сервера смонтированы
+> **без** сегмента `/v1` — `packages/server/src/routes/index.ts` монтирует всё как
+> `/api/...` (`/api/auth`, `/api/support`, `/api/tasks`, …). Префикс `/api/v1` в
+> заголовках разделов этого документа — историческая спека, не факт кода; полный
+> список фактических маршрутов: `node scripts/list-server-routes.cjs` (**208** на
+> HEAD `7284403`). Ревизия каждого раздела спеки против 208 маршрутов — отдельная
+> задача, здесь добавлен только раздел Support.
+
 ### Origin API (Вариант C, тикет №0 мультитикета поддоменов, 2026-09-20)
 
 - **Единая точка API — `https://api.balloo.su`** (REST + WS + OAuth-колбэки). Маршруты
@@ -586,6 +594,22 @@ ws://balloo.su/ws?token=<JWT>
 | GET | `/specifity/components` | Каталог UI-компонентов (глобальные + частные по узлам) |
 
 Узел `specifity.balloo.su` — 7 экранов: Главная (`1_10_02`), Правила (`1_10_03`), Экраны (`1_10_04`), Эндпоинты (`1_10_05`), Данные (`1_10_06`), Компоненты (`1_10_07`) + split-view спецификация экрана (`1_10_01`). В продакшене (Next.js) метаданные генерируются SSG из `index_ecrans.json`.
+
+---
+
+## Support — чат с техподдержкой (`/api/support`)
+
+> Реализация: `packages/server/src/routes/support.ts`, `controllers/supportController.ts`,
+> `services/supportService.ts` (тикет 1790572800-01). Раздел приёмки в админке — решение В-114.
+
+| Method | Path | Доступ | Описание |
+|--------|------|--------|----------|
+| GET | `/api/support/chat` | 🔑 JWT | История чата поддержки; создаёт тикет при первом обращении |
+| POST | `/api/support/chat` | 🔑 JWT | Отправить сообщение (`{ text }`, макс. 5000; 400 `EMPTY_MESSAGE`/`MESSAGE_TOO_LONG`) |
+| GET | `/api/support/status` | 🔑 JWT | Статус обращения |
+| GET | `/api/admin/support/tickets` | 🔑 JWT + admin | Список тикетов (`status`, `page`, `limit`) |
+| GET | `/api/admin/support/tickets/:id` | 🔑 JWT + admin | Тикет с перепиской (404 `TICKET_NOT_FOUND`) |
+| POST | `/api/admin/support/tickets/:id/reply` | 🔑 JWT + admin | Ответ администратора |
 
 ---
 
