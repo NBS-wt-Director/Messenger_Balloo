@@ -33,7 +33,26 @@ if (!user) {
 
 Dummy-хеш: `bcrypt.hash('dummy', 12)` — один раз сгенерировать, хранить как константу.
 
-## Доказательство
+## Факт
 
 Факт: `grep -rn "dummy" packages/server/src/services/authService.ts` → 0 совпадений.
 Факт: `bcrypt.compare` вызывается только на строке 124.
+
+## Выполнено (2026-10-11)
+
+- `authService.ts` — константа `DUMMY_PASSWORD_HASH` (bcrypt cost 12,
+  сгенерирован `bcrypt.hash('balloo-dummy-password', 12)`);
+- в ветке `if (!user)` функции `login` добавлен
+  `await bcrypt.compare(input.password, DUMMY_PASSWORD_HASH)` перед throw —
+  время ответа unknown email теперь включает bcrypt и совпадает с неверным паролем.
+
+## Доказательство
+
+- `grep -n "DUMMY_PASSWORD_HASH" packages/server/src/services/authService.ts` → 2 совпадения
+  (объявление + использование);
+- `tsc --noEmit` — чисто;
+- `jest auth.test.ts auth-service-depth.test.ts` — 93 теста зелёные.
+
+Замечание вне рамок тикета: различимые сообщения для banned/deleted/suspended
+(«Аккаунт заблокирован» и т.п.) тоже светуют существование email — оставлено
+как есть, это продуктовое поведение, решение за владельцем.

@@ -103,6 +103,12 @@ export const generateTokens = (userId: string, email: string, username?: string,
 // Хеширование пароля — bcrypt (cost factor 12)
 const BCRYPT_ROUNDS = 12;
 
+// Dummy-хеш для тайминг-безопасности (тик. «исправить-timing-unknown-email-login»):
+// при неизвестном email bcrypt.compare выполняется на этом хеше, чтобы ответ
+// «пользователя нет» не приходил заметно быстрее ответа «неверный пароль».
+// Сгенерирован bcrypt.hash('balloo-dummy-password', 12).
+const DUMMY_PASSWORD_HASH = '$2a$12$YQOlf8NxXYh58j7kLWejTu9Ejl4L/VGsnCvCC1FJiEW.MrdAbI0VS';
+
 const hashPassword = (password: string): Promise<string> =>
   bcrypt.hash(password, BCRYPT_ROUNDS);
 
@@ -255,6 +261,8 @@ export const login = async (input: LoginInput) => {
   });
 
   if (!user) {
+    // Тайминг как при неверном пароле: bcrypt выполняется и здесь
+    await bcrypt.compare(input.password, DUMMY_PASSWORD_HASH);
     throw new Error('Неверный email или пароль');
   }
 
