@@ -160,7 +160,10 @@ const getVerificationEmailHtml = (token: string): string => {
 };
 
 const getResetPasswordEmailHtml = (token: string): string => {
-  const resetUrl = `${env.APP_URL}/reset-password?token=${token}`;
+  // hash-роутер SPA (createHashRouter): путь без #/ не открывает экран сброса,
+  // а токен в path-query светится в логах nginx и Referer. Ссылка — в hash:
+  // серверу hash не отправляется (тик. а-02).
+  const resetUrl = `${env.APP_URL}/#/reset-password?token=${token}`;
   return `
     <!DOCTYPE html>
     <html>
@@ -193,7 +196,7 @@ const getResetPasswordEmailHtml = (token: string): string => {
               или перейдите по ссылке: ${resetUrl}
             </p>
             <p style="font-size: 14px; color: #888;">
-              Эта ссылка действительна в течение 1 часа.<br>
+              Эта ссылка действительна в течение 15 минут.<br>
               Если вы не запрашивали сброс пароля, проигнорируйте это письмо.
             </p>
           </td>
@@ -247,7 +250,7 @@ export const sendResetPasswordEmail = async (email: string, token: string): Prom
     to: email,
     subject: 'Сброс пароля — Balloo Messenger',
     html: getResetPasswordEmailHtml(token),
-    text: `Сбросьте пароль, перейдя по ссылке: ${env.APP_URL}/reset-password?token=${token}\n\nЭта ссылка действительна в течение 1 часа.`,
+    text: `Сбросьте пароль, перейдя по ссылке: ${env.APP_URL}/#/reset-password?token=${token}\n\nЭта ссылка действительна в течение 15 минут.`,
   });
   return result.success;
 };

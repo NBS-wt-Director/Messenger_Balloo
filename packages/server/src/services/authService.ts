@@ -586,7 +586,7 @@ export const requestPasswordReset = async (input: { email: string }) => {
   });
 
   const resetToken = randomString(32);
-  const expiresAt = BigInt(Math.floor(Date.now() / 1000)) + 3600n; // 1 час
+  const expiresAt = BigInt(Math.floor(Date.now() / 1000)) + 900n; // 15 минут (тик. а-02)
 
   // Сохраняем токен в БД
   await prisma.verificationToken.create({
@@ -634,6 +634,15 @@ export const resetPassword = async (input: { token: string; newPassword: string 
     throw new Error('Неверный тип токена');
   }
 
+  // Одноразовость раньше смены пароля (тик. а-02, п.2): если процесс упадёт
+  // между операциями, токен уже помечен использованным и переиспользован не
+  // будет; пользователь запросит новый. Обратный порядок оставлял токен живым
+  // после успешной смены пароля.
+  await prisma.verificationToken.update({
+    where: { id: tokenRecord.id },
+    data: { used: true },
+  });
+
   // Обновляем пароль
   const passwordHash = await hashPassword(input.newPassword);
   await prisma.user.update({
@@ -645,12 +654,6 @@ export const resetPassword = async (input: { token: string; newPassword: string 
   // поэтому старые сессии отзываем — иначе украденный токен переживает смену
   // пароля и у злоумышленника остаётся рабочий вход.
   await revokeAllSessions(tokenRecord.userId);
-
-  // Отмечаем токен как использованный
-  await prisma.verificationToken.update({
-    where: { id: tokenRecord.id },
-    data: { used: true },
-  });
 
   console.log(`[RESET] Password reset for user ${tokenRecord.userId}`);
   return { success: true, message: 'Пароль успешно сброшен' };
