@@ -115,6 +115,13 @@ const DUMMY_PASSWORD_HASH = '$2a$12$YQOlf8NxXYh58j7kLWejTu9Ejl4L/VGsnCvCC1FJiEW.
 // все вызывающие (контроллеры, OAuth, тесты).
 const normalizeEmail = (email: string): string => email.trim().toLowerCase();
 
+// Одноразовые токены (сброс пароля, верификация email) храним хешем SHA-256, а
+// не открытым текстом (тик. исправить-forgot-password-timing-i-token): утечка БД
+// больше не отдаёт живые ссылки смены пароля. Сырой токен уходит только в письме.
+// Колонка VerificationToken.token — VarChar(255), hex(64) влезает без миграции.
+const tokenHash = (token: string): string =>
+  crypto.createHash('sha256').update(token, 'utf8').digest('hex');
+
 // Pre-hash SHA-256 → base64 перед bcrypt (тик. а-08): bcrypt обрезает вход на
 // 72 байтах, у длинных паролей терялся хвост (два разных длинных пароля давали
 // один хеш). SHA-256 даёт фиксированные 44 байта base64 — обрезки нет никогда.
@@ -255,7 +262,7 @@ export const register = async (input: RegisterInput) => {
       data: {
         userId: user.id,
         type: 'email_verification',
-        token: verificationToken,
+        token: tokenHash(verificationToken),
         expiresAt,
         createdAt: BigInt(Math.floor(Date.now() / 1000)),
       },
@@ -559,9 +566,9 @@ export const logout = async (refreshToken: string, allDevices = false): Promise<
 // ============================================================
 
 export const verifyEmail = async (input: { token: string }): Promise<{ success: boolean; message: string }> => {
+  // Только по хешу (см. resetPassword): сырой фолбэк принял бы хеш из БД за токен.
   const tokenRecord = await prisma.verificationToken.findUnique({
-    where: { token: input.token },
-    include: { user: true },
+    where: { token: tokenHash(input.token) },
   });
 
   if (!tokenRecord) {
@@ -615,23 +622,23 @@ export const requestPasswordReset = async (input: { email: string }) => {
   const resetToken = randomString(32);
   const expiresAt = BigInt(Math.floor(Date.now() / 1000)) + 900n; // 15 минут (тик. а-02)
 
-  // Сохраняем токен в БД
+  // Сохраняем токен в БД хешем (тик. исправить-forgot-password-timing-i-token)
   await prisma.verificationToken.create({
     data: {
       userId: user.id,
       type: 'password_reset',
-      token: resetToken,
+      token: tokenHash(resetToken),
       expiresAt,
       createdAt: BigInt(Math.floor(Date.now() / 1000)),
     },
   });
 
-  // Отправляем email (не блокируем, не падаем если SMTP недоступен)
-  try {
-    await sendResetPasswordEmail(user.email!, resetToken);
-  } catch {
-    // Email не отправлен — не блокируем запрос
-  }
+  // Отправка НЕ блокирует ответ (тик. исправить-forgot-password-timing-i-token):
+  // `await sendResetPasswordEmail` делал ветку «email есть» на сотни мс медленнее
+  // ветки «email нет» — timing-оракул существования аккаунта. Как welcome/verification.
+  sendResetPasswordEmail(user.email!, resetToken).catch((err: unknown) => {
+    console.error('[RESET] Failed to send reset email:', err);
+  });
 
   return {
     success: true,
@@ -640,9 +647,12 @@ export const requestPasswordReset = async (input: { email: string }) => {
 };
 
 export const resetPassword = async (input: { token: string; newPassword: string }) => {
+  // Токен хранится хешем SHA-256 (тик. исправить-forgot-password-timing-i-token).
+  // Сырого фолбэка НЕТ намеренно: поиск по сырому значению принял бы украденный
+  // из БД хеш как валидный токен. Незавершённые ссылки сброса на момент деплоя
+  // (живут 15 минут) просто протухают — пользователь запросит новую.
   const tokenRecord = await prisma.verificationToken.findUnique({
-    where: { token: input.token },
-    include: { user: true },
+    where: { token: tokenHash(input.token) },
   });
 
   if (!tokenRecord) {

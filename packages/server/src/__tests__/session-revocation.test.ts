@@ -304,7 +304,8 @@ describe('resetPassword отзывает старые сессии', () => {  it
       data: {
         userId: user.id,
         type: 'password_reset',
-        token,
+        // сервис ищет по SHA-256 токена (тик. исправить-forgot-password-timing-i-token)
+        token: require('crypto').createHash('sha256').update(token, 'utf8').digest('hex'),
         expiresAt: BigInt(Math.floor(Date.now() / 1000) + 3600),
         createdAt: BigInt(Math.floor(Date.now() / 1000)),
       },

@@ -22,6 +22,18 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 const now = () => BigInt(Math.floor(Date.now() / 1000));
 
+// Идемпотентная установка payment_config для тестов вебхука БЕЗ опустошения
+// таблицы (deleteMany оставлял «окно пустоты», в котором параллельные наборы,
+// читающие конфиг, видели другое состояние). findFirst→update или create.
+async function upsertTestConfig(data: { shopId: string; secretKey: string; mode?: string }) {
+  const existing = await prisma.paymentConfig.findFirst();
+  if (existing) {
+    await prisma.paymentConfig.update({ where: { id: existing.id }, data });
+  } else {
+    await prisma.paymentConfig.create({ data });
+  }
+}
+
 async function createAdmin() {
   const user = await registerTestUser();
   await prisma.user.update({ where: { id: user.id }, data: { role: 'admin' } });
@@ -98,10 +110,7 @@ describe('Payment service depth (В-93 а)', () => {
         .send({ amount: 900 });
       donationId = res.body.donationId;
       // Ключи обязательны: без них вебхук отклоняется (усиление 11.10.2026)
-      await prisma.paymentConfig.deleteMany({});
-      await prisma.paymentConfig.create({
-        data: { shopId: 'shop-test', secretKey: 'key-test', mode: 'anonymous' },
-      });
+      await upsertTestConfig({ shopId: 'shop-test', secretKey: 'key-test', mode: 'anonymous' });
     });
 
     afterEach(() => {
@@ -175,7 +184,7 @@ describe('Payment service depth (В-93 а)', () => {
     // --- усиление 11.10.2026: поддельные уведомления отклоняются ---
 
     it('подделка: без ключей ЮKassa → 400, статус не меняется', async () => {
-      await prisma.paymentConfig.deleteMany({});
+      await upsertTestConfig({ shopId: '', secretKey: '', mode: 'anonymous' });
       const res = await request(app)
         .post('/api/payments/webhook/yookassa')
         .send({ type: 'notification', event: 'payment.succeeded', object: { id: 'fake', status: 'succeeded', metadata: { donationId } } });
@@ -394,10 +403,7 @@ describe('Payment service depth (В-93 а)', () => {
       .send({ amount: 300 });
     const id = res.body.donationId;
 
-    await prisma.paymentConfig.deleteMany({});
-    await prisma.paymentConfig.create({
-      data: { shopId: 'shop-test', secretKey: 'key-test', mode: 'anonymous' },
-    });
+    await upsertTestConfig({ shopId: 'shop-test', secretKey: 'key-test', mode: 'anonymous' });
 
     // Неверная подпись — отклоняется, статус не меняется
     const res2 = await request(app)

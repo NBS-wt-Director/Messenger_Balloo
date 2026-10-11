@@ -121,7 +121,8 @@ describe('Auth service depth (В-93 а)', () => {
         data: {
           userId,
           type,
-          token,
+          // хранится хешем, как в сервисе (тик. исправить-forgot-password-timing-i-token)
+          token: require('crypto').createHash('sha256').update(token, 'utf8').digest('hex'),
           expiresAt: expired ? now() - 10n : now() + 3600n,
           used,
           createdAt: now(),
@@ -161,7 +162,9 @@ describe('Auth service depth (В-93 а)', () => {
       const t = await makeToken('email_verification');
       const r = await verifyEmailService({ token: t });
       expect(r.success).toBe(true);
-      const rec = await prisma.verificationToken.findUnique({ where: { token: t } });
+      const rec = await prisma.verificationToken.findUnique({
+        where: { token: require('crypto').createHash('sha256').update(t, 'utf8').digest('hex') },
+      });
       expect(rec?.used).toBe(true);
     });
   });
@@ -192,7 +195,7 @@ describe('Auth service depth (В-93 а)', () => {
       const user = await registerTestUser();
       const token = `wrong_${Date.now()}`;
       await prisma.verificationToken.create({
-        data: { userId: user.id, type: 'email_verification', token, expiresAt: now() + 3600n, createdAt: now() },
+        data: { userId: user.id, type: 'email_verification', token: require('crypto').createHash('sha256').update(token, 'utf8').digest('hex'), expiresAt: now() + 3600n, createdAt: now() },
       });
       await expect(resetPassword({ token, newPassword: 'NewPass123' })).rejects.toThrow('Неверный тип токена');
     });
@@ -201,7 +204,7 @@ describe('Auth service depth (В-93 а)', () => {
       const user = await registerTestUser();
       const token = `exp_${Date.now()}`;
       await prisma.verificationToken.create({
-        data: { userId: user.id, type: 'password_reset', token, expiresAt: now() - 10n, createdAt: now() },
+        data: { userId: user.id, type: 'password_reset', token: require('crypto').createHash('sha256').update(token, 'utf8').digest('hex'), expiresAt: now() - 10n, createdAt: now() },
       });
       await expect(resetPassword({ token, newPassword: 'NewPass123' })).rejects.toThrow('истёк');
     });
@@ -210,22 +213,38 @@ describe('Auth service depth (В-93 а)', () => {
       const user = await registerTestUser();
       const token = `used_${Date.now()}`;
       await prisma.verificationToken.create({
-        data: { userId: user.id, type: 'password_reset', token, expiresAt: now() + 3600n, used: true, createdAt: now() },
+        data: { userId: user.id, type: 'password_reset', token: require('crypto').createHash('sha256').update(token, 'utf8').digest('hex'), expiresAt: now() + 3600n, used: true, createdAt: now() },
       });
       await expect(resetPassword({ token, newPassword: 'NewPass123' })).rejects.toThrow('уже был использован');
     });
 
     it('успешный сброс: пароль меняется, вход по новому паролю работает', async () => {
       const user = await registerTestUser();
-      const r = await requestPasswordReset({ email: user.email });
-      expect(r.success).toBe(true);
-      const rec = await prisma.verificationToken.findFirst({
-        where: { userId: user.id, type: 'password_reset', used: false },
-      });
-      expect(rec).toBeTruthy();
-      await resetPassword({ token: rec!.token, newPassword: 'BrandNew123' });
-      const login = await loginTestUser(user.email, 'BrandNew123');
-      expect(login.userId).toBe(user.id);
+      // Токен в БД теперь хеш; сырой уходит только в письмо — перехватываем его там.
+      const emailService = await import('../services/emailService');
+      let emailedToken = '';
+      const spy = jest
+        .spyOn(emailService, 'sendResetPasswordEmail')
+        .mockImplementation(async (_email: string, token: string) => {
+          emailedToken = token;
+          return true;
+        });
+      try {
+        const r = await requestPasswordReset({ email: user.email });
+        expect(r.success).toBe(true);
+        // сырой токен НЕ должен лежать в БД (только его SHA-256)
+        const rawInDb = await prisma.verificationToken.findFirst({
+          where: { userId: user.id, type: 'password_reset' },
+        });
+        expect(rawInDb?.token).not.toBe(emailedToken);
+        expect(emailedToken).toBeTruthy();
+
+        await resetPassword({ token: emailedToken, newPassword: 'BrandNew123' });
+        const login = await loginTestUser(user.email, 'BrandNew123');
+        expect(login.userId).toBe(user.id);
+      } finally {
+        spy.mockRestore();
+      }
     });
   });
 
