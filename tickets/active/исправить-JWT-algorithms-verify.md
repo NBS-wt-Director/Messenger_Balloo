@@ -12,7 +12,25 @@
 ## Где смотреть
 
 ```bash
+```bash
 grep -n "jwt.verify" packages/server/src/services/authService.ts
+```
+
+## Результат (проверено 11.10.2026)
+
+**Уже исправлено** — коммит 05f2480 «fix(server): закрыть дыры в auth…».
+Все три `jwt.verify` в `authService.ts` вызываются с явным списком алгоритмов:
+
+```
+426:    decoded = jwt.verify(refreshToken, env.JWT_REFRESH_SECRET, {
+427:      algorithms: ['HS256'],
+489:    const decoded = jwt.verify(refreshToken, env.JWT_REFRESH_SECRET, {
+490:      algorithms: ['HS256'],
+1157:    const decoded = jwt.verify(accessToken, env.JWT_ACCESS_SECRET, {
+1158:      algorithms: ['HS256'],
+```
+
+`jwt.sign` тоже HS256 по умолчанию (secret-пара). Тикет закрыт без правок кода.
 ```
 
 ## Решение

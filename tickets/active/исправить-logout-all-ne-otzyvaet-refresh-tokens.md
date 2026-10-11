@@ -56,3 +56,18 @@ if (iat) {
 ```
 
 Также: в `refreshTokens()` создаётся **новый Redis-клиент** (`new Redis(env.REDIS_URL)`) 3 раза на один refresh (проверка, blacklist, logout). Это утечка соединений — нужно использовать shared client из `cacheService` или `try/finally`.
+
+## Результат (проверено 11.10.2026)
+
+**Оба пункта уже исправлены** — коммит 05f2480:
+
+1. `refreshTokens()` проверяет `isSessionRevoked(userId, iat)` сразу после
+   JTI-блоклиста (`authService.ts:457-466`): отозванная сессия → JTI в blacklist
+   + `throw 'Refresh токен отозван'`;
+2. `new Redis(env.REDIS_URL)` в authService.ts отсутствует полностью —
+   используется shared-клиент `getRedis()` из `cacheService`
+   (`grep -n "new Redis(\|getRedis" authService.ts` → только импорт и 2 вызова
+   `getRedis()`).
+
+Регрессия покрыта: `src/__tests__/session-revocation.test.ts` (зелёный в общем
+прогоне 11.10.2026: 32 набора / 584 теста). Тикет закрыт без правок кода.
