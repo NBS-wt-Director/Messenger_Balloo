@@ -396,10 +396,15 @@ const verifyOAuthState = (req: Request, res: Response): boolean => {
   const cookieState = req.cookies['oauth-state'];
   const queryState = req.query.state as string | undefined;
   res.clearCookie('oauth-state');
-  if (!cookieState || !queryState || cookieState !== queryState) {
+  if (!cookieState || !queryState) {
     return false;
   }
-  return true;
+  // constant-time сравнение (тик. а-16): state — CSRF-секрет, `!==` short-circuit
+  // по первому различному байру теоретически помогает побайтовый подбор.
+  const a = Buffer.from(String(cookieState), 'utf8');
+  const b = Buffer.from(String(queryState), 'utf8');
+  if (a.length !== b.length) return false;
+  return crypto.timingSafeEqual(a, b);
 };
 
 // GET /api/auth/oauth/:provider — начало OAuth (302 на провайдера)

@@ -259,6 +259,31 @@ interface YooKassaWebhookBody {
   };
 }
 
+// Ответ GET /payments/{id} — единственный достоверный источник о платеже
+// (тело уведомления ЮKassa подделывается кем угодно, подпись v2 не шлёт).
+interface YooKassaPaymentResponse {
+  id: string;
+  status: string;
+  amount: { value: string; currency: string };
+  metadata?: Record<string, string>;
+}
+
+const getYooKassaPayment = async (
+  paymentId: string,
+  shopId: string,
+  apiKey: string
+): Promise<YooKassaPaymentResponse | null> => {
+  const auth = Buffer.from(`${shopId}:${apiKey}`).toString('base64');
+  const response = await fetch(`https://api.yookassa.ru/v3/payments/${encodeURIComponent(paymentId)}`, {
+    headers: { 'Authorization': `Basic ${auth}` },
+  });
+  if (response.status === 404) return null;
+  if (!response.ok) {
+    throw new Error(`ЮKassa API error ${response.status}`);
+  }
+  return response.json() as unknown as YooKassaPaymentResponse;
+};
+
 const processYookassaWebhook = async (
   body: string,
   headers: Record<string, string>
@@ -270,20 +295,26 @@ const processYookassaWebhook = async (
     return { status: 'error', message: 'Invalid JSON body' };
   }
 
-  // Верификация подписи ЮKassa (HMAC-SHA256 в заголовке Authorization)
   const config = await prisma.paymentConfig.findFirst();
   const shopId = config?.shopId || env.YOOKASSA_SHOP_ID || '';
   const apiKey = config?.secretKey || env.YOOKASSA_API_KEY || '';
 
-  // ЮKassa присылает подпись в заголовке Authorization как Bearer <signature>
+  // Без ключей проверять подлинность нечем — вебхук отклоняем, а не доверяем
+  // на слово (тик. исправить-yookassa-webhook-forgery).
+  if (!shopId || !apiKey) {
+    return { status: 'error', message: 'ЮKassa не настроена — вебхук отклонён' };
+  }
+
+  // ЮKassa v2 не присылает HMAC в Authorization, но если пришёл — сверяем
+  // строго и constant-time: слабее, чем было раньше, нельзя никогда.
   const authHeader = headers['authorization'] || '';
   if (authHeader.startsWith('Bearer ')) {
     const signature = authHeader.slice(7);
     const expected = crypto.createHmac('sha256', apiKey).update(body).digest('hex');
-    if (signature !== expected) {
-      // В вебхуках ЮKassa v2 подпись — это HMAC-SHA256 от тела запроса
-      // Проверяем иначе: если shopId+apiKey совпадают — доверяем
-      // (в production требуется более строгая проверка)
+    const sigBuf = Buffer.from(signature, 'utf8');
+    const expBuf = Buffer.from(expected, 'utf8');
+    if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
+      return { status: 'error', message: 'Bad webhook signature' };
     }
   }
 
@@ -293,9 +324,35 @@ const processYookassaWebhook = async (
     return { status: 'error', message: 'No donationId in metadata' };
   }
 
-  // Определяем новый статус
+  // Доверие только ответу API: платёж должен существовать у ЮKassa, принадлежать
+  // этому донату (metadata) и совпадать по сумме. Тело уведомления — подсказка,
+  // по какому id идти смотреть, не более.
+  let payment: YooKassaPaymentResponse | null;
+  try {
+    payment = await getYooKassaPayment(parsed.object?.id || '', shopId, apiKey);
+  } catch {
+    return { status: 'error', message: 'ЮKassa verification failed' };
+  }
+  if (!payment) {
+    return { status: 'error', message: 'Payment not found in ЮKassa' };
+  }
+
+  const donation = await prisma.donation.findUnique({ where: { id: donationId } });
+  if (!donation) {
+    return { status: 'error', message: 'Donation not found' };
+  }
+  if (payment.metadata?.donationId !== donationId) {
+    return { status: 'error', message: 'donationId mismatch' };
+  }
+  // amount.value — рубли строкой ("150.00"); Donation.amount — мин. единицы (Int)
+  const amountMinor = Math.round(parseFloat(payment.amount.value) * 100);
+  if (!Number.isFinite(amountMinor) || amountMinor !== donation.amount) {
+    return { status: 'error', message: 'Payment amount mismatch' };
+  }
+
+  // Статус — из ответа API, не из тела уведомления
   let newStatus: DonationStatus;
-  switch (parsed.object?.status) {
+  switch (payment.status) {
     case 'succeeded':
       newStatus = 'completed';
       break;
@@ -304,7 +361,7 @@ const processYookassaWebhook = async (
       break;
     case 'waiting_for_capture':
       // Автоматически захватываем платёж
-      await captureYooKassaPayment(parsed.object.id, shopId, apiKey);
+      await captureYooKassaPayment(payment.id, shopId, apiKey);
       newStatus = 'completed';
       break;
     default:

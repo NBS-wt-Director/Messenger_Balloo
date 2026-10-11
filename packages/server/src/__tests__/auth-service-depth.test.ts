@@ -815,4 +815,24 @@ describe('Auth service depth (В-93 а)', () => {
       expect(res.headers.location).toContain('oauth_error=callback_failed');
     });
   });
+
+  // Тик. а-04 п.1: гонка двух параллельных регистраций одного email. Проигравший
+  // должен получить штатный «Email уже зарегистрирован» (через findUnique-ветку
+  // ИЛИ через P2002 от @unique-индекса), но не 500.
+  describe('register: параллельная регистрация одного email (P2002, тик. а-04)', () => {
+    it('из двух параллельных успешна ровно одна, вторая — штатный конфликт', async () => {
+      const email = `race_${Date.now()}@test.balloo.ru`;
+      const { register: registerService } = await import('../services/authService');
+      const results = await Promise.allSettled([
+        registerService({ email, password: 'Passw0rd123' }),
+        registerService({ email, password: 'Passw0rd123' }),
+      ]);
+      const ok = results.filter((r) => r.status === 'fulfilled');
+      const failed = results.filter((r) => r.status === 'rejected') as PromiseRejectedResult[];
+      expect(ok).toHaveLength(1);
+      expect(failed).toHaveLength(1);
+      expect((failed[0].reason as Error).message).toBe('Email уже зарегистрирован');
+      await prisma.user.delete({ where: { email } }).catch(() => undefined);
+    });
+  });
 });

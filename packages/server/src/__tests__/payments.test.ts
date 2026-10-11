@@ -95,6 +95,39 @@ describe('Payments API', () => {
       // Webhook without valid metadata returns error, but endpoint is reachable
       expect([200, 400]).toContain(res.status);
     });
+
+    // Тикет исправить-yookassa-webhook-forgery: раньше тело уведомления
+    // принималось на веру и донат становился completed без оплаты.
+    it('поддельный вебхук не переводит донат в completed', async () => {
+      const { PrismaClient } = require('@prisma/client');
+      const prisma = new PrismaClient();
+
+      const user = await registerTestUser();
+      const created = await request(app)
+        .post('/api/payments/donate')
+        .set('Authorization', `Bearer ${user.accessToken}`)
+        .send({ amount: 700, currency: 'RUB' });
+      expect(created.status).toBe(201);
+      const donationId = created.body.donationId;
+
+      // Если в тест-окружении настроены ключи — запрос к API ЮKassa мокнем в 404
+      // (платежа не существует); если ключей нет — вебхук отклоняется до fetch.
+      const realFetch = global.fetch;
+      global.fetch = jest.fn(async () => ({ ok: false, status: 404 })) as unknown as typeof fetch;
+      const res = await request(app)
+        .post('/api/payments/webhook/yookassa')
+        .send({
+          type: 'notification',
+          event: 'payment.succeeded',
+          object: { id: 'fake-payment-id', status: 'succeeded', metadata: { donationId } },
+        });
+      global.fetch = realFetch;
+
+      expect(res.status).toBe(400);
+      const d = await prisma.donation.findUnique({ where: { id: donationId } });
+      expect(d?.status).not.toBe('completed');
+      await prisma.$disconnect();
+    });
   });
 
   describe('Admin endpoints', () => {

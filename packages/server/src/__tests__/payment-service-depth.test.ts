@@ -15,6 +15,7 @@
  *    GET /admin/donations с фильтром, POST /admin/confirm (успех/400).
  */
 import request from 'supertest';
+import crypto from 'crypto';
 import { app, registerTestUser, generateToken } from './helpers';
 import { PrismaClient } from '@prisma/client';
 
@@ -69,8 +70,25 @@ describe('Payment service depth (В-93 а)', () => {
     });
   });
 
-  describe('webhook: статусы ЮKassa', () => {
+  describe('webhook: статусы ЮKassa (подлинность через API, тик. исправить-yookassa-webhook-forgery)', () => {
     let donationId: string;
+    const realFetch = global.fetch;
+
+    // Мок GET /payments/{id}: платёж, принадлежащий этому донату, сумма 900
+    // мин. единиц = "9.00" руб.
+    const mockPayment = (status: string, overrides: Record<string, unknown> = {}) => {
+      global.fetch = jest.fn(async () => ({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          id: 'y',
+          status,
+          amount: { value: '9.00', currency: 'RUB' },
+          metadata: { donationId },
+          ...overrides,
+        }),
+      })) as unknown as typeof fetch;
+    };
 
     beforeEach(async () => {
       const user = await registerTestUser();
@@ -79,6 +97,15 @@ describe('Payment service depth (В-93 а)', () => {
         .set('Authorization', `Bearer ${user.accessToken}`)
         .send({ amount: 900 });
       donationId = res.body.donationId;
+      // Ключи обязательны: без них вебхук отклоняется (усиление 11.10.2026)
+      await prisma.paymentConfig.deleteMany({});
+      await prisma.paymentConfig.create({
+        data: { shopId: 'shop-test', secretKey: 'key-test', mode: 'anonymous' },
+      });
+    });
+
+    afterEach(() => {
+      global.fetch = realFetch;
     });
 
     it('invalid JSON → 400 Invalid JSON body', async () => {
@@ -104,6 +131,7 @@ describe('Payment service depth (В-93 а)', () => {
     });
 
     it('succeeded → donation completed', async () => {
+      mockPayment('succeeded');
       const res = await request(app)
         .post('/api/payments/webhook/yookassa')
         .send({ type: 'notification', event: 'payment.succeeded', object: { id: 'y1', status: 'succeeded', metadata: { donationId } } });
@@ -113,6 +141,7 @@ describe('Payment service depth (В-93 а)', () => {
     });
 
     it('canceled → donation failed', async () => {
+      mockPayment('canceled');
       const res = await request(app)
         .post('/api/payments/webhook/yookassa')
         .send({ type: 'notification', event: 'payment.canceled', object: { id: 'y2', status: 'canceled', metadata: { donationId } } });
@@ -122,6 +151,7 @@ describe('Payment service depth (В-93 а)', () => {
     });
 
     it('неизвестный статус → failed (default-ветка)', async () => {
+      mockPayment('weird');
       const res = await request(app)
         .post('/api/payments/webhook/yookassa')
         .send({ type: 'notification', event: 'payment.x', object: { id: 'y3', status: 'weird', metadata: { donationId } } });
@@ -131,9 +161,7 @@ describe('Payment service depth (В-93 а)', () => {
     });
 
     it('waiting_for_capture → вызывается capture → completed (мок fetch)', async () => {
-      // ставим ключи, чтобы capture прошёл в мок
-      await prisma.paymentConfig.updateMany({ data: { shopId: 'shop-test', secretKey: 'key-test', mode: 'anonymous' } });
-      global.fetch = jest.fn(async () => ({ ok: true, json: async () => ({ id: 'p1', status: 'succeeded' }) })) as unknown as typeof fetch;
+      mockPayment('waiting_for_capture');
 
       const res = await request(app)
         .post('/api/payments/webhook/yookassa')
@@ -142,6 +170,58 @@ describe('Payment service depth (В-93 а)', () => {
       expect(global.fetch).toHaveBeenCalled();
       const d = await prisma.donation.findUnique({ where: { id: donationId } });
       expect(d?.status).toBe('completed');
+    });
+
+    // --- усиление 11.10.2026: поддельные уведомления отклоняются ---
+
+    it('подделка: без ключей ЮKassa → 400, статус не меняется', async () => {
+      await prisma.paymentConfig.deleteMany({});
+      const res = await request(app)
+        .post('/api/payments/webhook/yookassa')
+        .send({ type: 'notification', event: 'payment.succeeded', object: { id: 'fake', status: 'succeeded', metadata: { donationId } } });
+      expect(res.status).toBe(400);
+      const d = await prisma.donation.findUnique({ where: { id: donationId } });
+      expect(d?.status).not.toBe('completed');
+    });
+
+    it('подделка: платежа нет в ЮKassa (404) → 400, статус не меняется', async () => {
+      global.fetch = jest.fn(async () => ({ ok: false, status: 404 })) as unknown as typeof fetch;
+      const res = await request(app)
+        .post('/api/payments/webhook/yookassa')
+        .send({ type: 'notification', event: 'payment.succeeded', object: { id: 'fake', status: 'succeeded', metadata: { donationId } } });
+      expect(res.status).toBe(400);
+      const d = await prisma.donation.findUnique({ where: { id: donationId } });
+      expect(d?.status).not.toBe('completed');
+    });
+
+    it('подделка: metadata чужого доната → 400', async () => {
+      mockPayment('succeeded', { metadata: { donationId: 'chuzhoy-donat' } });
+      const res = await request(app)
+        .post('/api/payments/webhook/yookassa')
+        .send({ type: 'notification', event: 'payment.succeeded', object: { id: 'y5', status: 'succeeded', metadata: { donationId } } });
+      expect(res.status).toBe(400);
+      const d = await prisma.donation.findUnique({ where: { id: donationId } });
+      expect(d?.status).not.toBe('completed');
+    });
+
+    it('подделка: сумма платежа не совпадает с донатом → 400', async () => {
+      mockPayment('succeeded', { amount: { value: '1.00', currency: 'RUB' } });
+      const res = await request(app)
+        .post('/api/payments/webhook/yookassa')
+        .send({ type: 'notification', event: 'payment.succeeded', object: { id: 'y6', status: 'succeeded', metadata: { donationId } } });
+      expect(res.status).toBe(400);
+      const d = await prisma.donation.findUnique({ where: { id: donationId } });
+      expect(d?.status).not.toBe('completed');
+    });
+
+    it('Bearer-подпись не совпадает → 400 Bad webhook signature', async () => {
+      mockPayment('succeeded');
+      const res = await request(app)
+        .post('/api/payments/webhook/yookassa')
+        .set('Authorization', 'Bearer ne-nastoyashaya-podpis')
+        .send({ type: 'notification', event: 'payment.succeeded', object: { id: 'y7', status: 'succeeded', metadata: { donationId } } });
+      expect(res.status).toBe(400);
+      expect(res.body.message).toContain('signature');
     });
   });
 
@@ -306,7 +386,7 @@ describe('Payment service depth (В-93 а)', () => {
     });
   });
 
-  it('webhook с Bearer-подписью (ветка проверки подписи не ломает обработку)', async () => {
+  it('webhook с Bearer-подписью: неверная → 400; верная + подтверждение API → 200 (тик. webhook-forgery)', async () => {
     const user = await registerTestUser();
     const res = await request(app)
       .post('/api/payments/donate')
@@ -314,12 +394,38 @@ describe('Payment service depth (В-93 а)', () => {
       .send({ amount: 300 });
     const id = res.body.donationId;
 
+    await prisma.paymentConfig.deleteMany({});
+    await prisma.paymentConfig.create({
+      data: { shopId: 'shop-test', secretKey: 'key-test', mode: 'anonymous' },
+    });
+
+    // Неверная подпись — отклоняется, статус не меняется
     const res2 = await request(app)
       .post('/api/payments/webhook/yookassa')
       .set('Authorization', 'Bearer deadbeef')
       .send({ type: 'notification', event: 'payment.succeeded', object: { id: 'z', status: 'succeeded', metadata: { donationId: id } } });
-    expect(res2.status).toBe(200);
-    const d = await prisma.donation.findUnique({ where: { id } });
+    expect(res2.status).toBe(400);
+    expect(res2.body.message).toContain('signature');
+    let d = await prisma.donation.findUnique({ where: { id } });
+    expect(d?.status).not.toBe('completed');
+
+    // Верная HMAC-подпись + платёж подтверждён API — обрабатывается
+    const body = JSON.stringify({ type: 'notification', event: 'payment.succeeded', object: { id: 'z', status: 'succeeded', metadata: { donationId: id } } });
+    const signature = crypto.createHmac('sha256', 'key-test').update(body).digest('hex');
+    const realFetch = global.fetch;
+    global.fetch = jest.fn(async () => ({
+      ok: true,
+      status: 200,
+      json: async () => ({ id: 'z', status: 'succeeded', amount: { value: '3.00', currency: 'RUB' }, metadata: { donationId: id } }),
+    })) as unknown as typeof fetch;
+    const res3 = await request(app)
+      .post('/api/payments/webhook/yookassa')
+      .set('Content-Type', 'application/json')
+      .set('Authorization', `Bearer ${signature}`)
+      .send(body);
+    global.fetch = realFetch;
+    expect(res3.status).toBe(200);
+    d = await prisma.donation.findUnique({ where: { id } });
     expect(d?.status).toBe('completed');
   });
 });

@@ -192,17 +192,29 @@ export const register = async (input: RegisterInput) => {
 
   const passwordHash = await hashPassword(input.password);
 
-  const user = await prisma.user.create({
-    data: {
-      email,
-      passwordHash,
-      username: input.username || null,
-      language: 'ru',
-      status: 'active',
-      createdAt: BigInt(Math.floor(Date.now() / 1000)),
-      updatedAt: BigInt(Math.floor(Date.now() / 1000)),
-    },
-  });
+  // Гонка между findUnique и create (параллельная регистрация одного email)
+  // спасает только БД-индекс @unique: P2002 превращаем в штатный конфликт,
+  // а не в 500 (тик. а-04, п.1).
+  let user;
+  try {
+    user = await prisma.user.create({
+      data: {
+        email,
+        passwordHash,
+        username: input.username || null,
+        language: 'ru',
+        status: 'active',
+        createdAt: BigInt(Math.floor(Date.now() / 1000)),
+        updatedAt: BigInt(Math.floor(Date.now() / 1000)),
+      },
+    });
+  } catch (e: any) {
+    if (e?.code === 'P2002') {
+      const target = JSON.stringify(e?.meta?.target ?? '');
+      throw new Error(target.includes('username') ? 'Username уже занят' : 'Email уже зарегистрирован');
+    }
+    throw e;
+  }
 
   await prisma.publicProfile.create({
     data: {
