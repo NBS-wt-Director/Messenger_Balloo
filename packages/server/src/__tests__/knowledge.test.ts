@@ -1,14 +1,28 @@
 import request from 'supertest';
-import { app, registerTestUser } from './helpers';
+import { app, registerTestUser, generateToken } from './helpers';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 describe('Knowledge & Hiring API (база знаний + вакансии)', () => {
-  let user: { id: string; accessToken: string };
+  // Мутации knowledge/hiring закрыты moderatorOnly (коммит 06fc6ac):
+  // нужен токен с ролью admin|moderator, обычный пользователь получает 403.
+  let user: { id: string; email: string; username: string; accessToken: string };
+  let moderatorToken: string;
 
   beforeAll(async () => {
     user = await registerTestUser();
+    await prisma.user.update({ where: { id: user.id }, data: { role: 'moderator' } });
+    // authRequired берёт роль из JWT-клеима (middleware/auth.ts:137-142),
+    // поэтому роль подставляется в токене.
+    moderatorToken = generateToken(user.id, user.email, user.username, 'moderator');
   });
 
-  const auth = () => ['Authorization', `Bearer ${user.accessToken}`] as const;
+  afterAll(async () => {
+    await prisma.$disconnect();
+  });
+
+  const auth = () => ['Authorization', `Bearer ${moderatorToken}`] as const;
 
   // ============================================================
   // Categories
@@ -41,6 +55,17 @@ describe('Knowledge & Hiring API (база знаний + вакансии)', ()
         .send({ name: 'X', slug: 'x' });
 
       expect(res.status).toBe(401);
+    });
+
+    it('POST /api/knowledge/categories rejects non-moderator (moderatorOnly)', async () => {
+      // Обычный пользователь (роль из регистрации, без повышения) — 403.
+      const plain = await registerTestUser();
+      const res = await request(app)
+        .post('/api/knowledge/categories')
+        .set('Authorization', `Bearer ${plain.accessToken}`)
+        .send({ name: `Plain Cat ${Date.now()}`, slug: `plain-cat-${Date.now()}` });
+
+      expect(res.status).toBe(403);
     });
 
     it('GET /api/knowledge/categories returns list', async () => {
