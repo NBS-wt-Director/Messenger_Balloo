@@ -22,11 +22,13 @@ interface AuthState {
   user: AuthUser | null;
   accessToken: string | null;
   refreshToken: string | null;
+  deviceId: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
 
   setUser: (user: AuthUser | null) => void;
   setTokens: (accessToken: string, refreshToken: string) => void;
+  setDeviceId: (deviceId: string | null) => void;
   setAuthenticated: (isAuthenticated: boolean) => void;
   setLoading: (isLoading: boolean) => void;
   logout: () => void;
@@ -41,6 +43,7 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       accessToken: null,
       refreshToken: null,
+      deviceId: null,
       isAuthenticated: false,
       isLoading: false,
 
@@ -48,6 +51,8 @@ export const useAuthStore = create<AuthState>()(
 
       setTokens: (accessToken, refreshToken) =>
         set({ accessToken, refreshToken }),
+
+      setDeviceId: (deviceId) => set({ deviceId }),
 
       setAuthenticated: (isAuthenticated) => set({ isAuthenticated }),
 
@@ -58,6 +63,7 @@ export const useAuthStore = create<AuthState>()(
           user: null,
           accessToken: null,
           refreshToken: null,
+          deviceId: null,
           isAuthenticated: false,
         });
       },
@@ -88,6 +94,7 @@ export const useAuthStore = create<AuthState>()(
         user: state.user,
         accessToken: state.accessToken,
         refreshToken: state.refreshToken,
+        deviceId: state.deviceId,
         isAuthenticated: state.isAuthenticated,
       }),
     }

@@ -2,7 +2,7 @@
 
 ---
 
-## 17. Оценка готовности MVP (2026-10-08)
+## 17. Оценка готовности MVP (2026-10-13)
 
 ### MVP scope (web + win/linux + android, без iOS + MacOS)
 
@@ -12,29 +12,29 @@
 
 | Компонент | Файлов кода | Готовность | % |
 |-----------|-------------|------------|---|
-| **API** (api.balloo.su) | 126 | ✅ Собрano, 208 endpoints, 918 тестов | **100%** |
-| **Web** (balloo.su) | 227 | ✅ Собрano, 119 screens, 208 routes | **100%** |
+| **API** (api.balloo.su) | 126 | ✅ Собрano, 208 endpoints, 918 тестов, push-token endpoint | **100%** |
+| **Web** (balloo.su) | 227 | ✅ Собрano, 119 screens, 208 routes, history/download в SPA | **100%** |
 | **Shared** | 18 | ✅ Типы, константы | **100%** |
-| **Desktop** (win/linux) | 23 | 🟡 Electron, 18 screens, dist-electron | **60%** |
-| **Mobile Android** | 31 | 🟡 Expo, 19 screens, 31 файлов | **30%** |
-| **History** (история чатов) | 2 screens | 🟡 Экраны в web, нет отдельного пакета | **40%** |
-| **Download** (загрузки) | 3 screens | 🟡 Экраны в web, нет отдельного пакета | **40%** |
+| **Desktop** (win/linux) | 23 | 🟡 Linux: deb/AppImage/tar.gz (x64+arm64) собраны из HEAD, latest-linux.yml; Windows: нет wine/CI | **80%** |
+| **Mobile Android** | 31 | 🟡 Expo, 19 screens, push-сервис (expo-notifications), WS→notify, auth→registerPushToken; APK/AAB: нет SDK | **55%** |
+| **History** (история версий) | 5 screens | ✅ Роуты `/history`, `/history/version/:id`, `/history/compare`; API `/api/history/versions` → 200; chunks в бандле; TLS — блокировка владельца | **90%** |
+| **Download** (загрузки) | 3 screens | ✅ Роуты `/download`, `/download/progress`, `/download/:platform`; API `/api/downloads` → 200; chunks в бандле; TLS — блокировка владельца | **90%** |
 
 ### Итоговая оценка
 
 | Метрика | Значение |
 |---------|----------|
-| **MVP выполнен на** | **~75%** |
-| **Осталось сделать** | **~25%** (desktop polish, Android, history/download sub-apps) |
-| **Осталось по времени** | **~2–3 недели** при 1 разработчике |
+| **MVP выполнен на** | **~90%** |
+| **Осталось** | **~10%** — всё блокировки владельца (см. `with_lord/СДЕЛАТ_ВЛАДЕЛЬЦУ.md` п.21–24) |
+| **Осталось по времени** | **~2–4 часа** кода + действия владельца |
 
 ### Что осталось
 
-1. **Desktop (win/linux)** — доделать 40%: упаковка Electron, авто-обновления, иконки, инсталляторы `.exe` и `.AppImage`/`.deb`.
-2. **Mobile Android** — доделать 70%: Expo build, пуш-уведомления (FCM), иконки/сплэш, `.aab` для Play Market.
-3. **history.balloo.su** — вынести из web в отдельный пакет (сборка, роутинг, домен).
-4. **download.balloo.su** — вынести из web в отдельный пакет.
-5. **Инфраструктура** — CI/CD для автодеплоя, мониторинг, бэкапы.
+1. **Desktop Windows** — `.exe`/`.msi`: wine или CI windows-latest (п.21).
+2. **Mobile Android** — APK/AAB: Android SDK или EXPO_TOKEN (п.23); FCM-креденшалы для device push.
+3. **history/download** — TLS-сертификат с SAN `history.balloo.su`, `download.balloo.su` (п.24).
+4. **Cypress e2e** — разрешить бинарник в `~/.cache/Cypress` (п.22).
+5. **Инфраструктура** — CI/CD для автодеплоя, мониторинг, бэкапы (вне MVP-кода, инфраструктурные задачи).
 
 ### Не входит в MVP (отложено)
 
@@ -45,4 +45,4 @@
 
 ---
 
-*Документация обновлена: 2026-10-08*
+*Документация обновлена: 2026-10-13*

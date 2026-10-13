@@ -45,8 +45,9 @@ linux:
   target:
     - target: deb
       arch: [x64, arm64]
-    - target: rpm
-      arch: [x64]
+    # rpm requires rpmbuild (not available in dev env); re-enable when CI adds it
+    # - target: rpm
+    #   arch: [x64]
     - target: AppImage
       arch: [x64, arm64]
     - target: tar.gz

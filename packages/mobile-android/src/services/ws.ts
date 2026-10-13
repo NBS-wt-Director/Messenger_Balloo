@@ -1,7 +1,9 @@
 // WebSocket Service — Mobile
 // Real-time messaging, presence, typing indicators
+// Push-уведомления: при получении message.type='push' — локальное уведомление
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { showMessageNotification } from './notifications';
 
 const WS_URL = process.env.EXPO_PUBLIC_WS_URL || 'ws://localhost:3100/ws';
 
@@ -158,6 +160,15 @@ class WebSocketService {
    * Dispatch message to handlers
    */
   private dispatch(type: string, payload: any): void {
+    // Show local notification for push messages (background/foreground)
+    if (type === 'push' && payload?.title) {
+      showMessageNotification(
+        payload.title,
+        payload.body || '',
+        payload.data
+      ).catch(() => {});
+    }
+
     const handlers = this.handlers.get(type);
     if (handlers) {
       handlers.forEach((handler) => handler(payload));

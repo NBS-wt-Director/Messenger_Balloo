@@ -512,4 +512,7 @@ export const api = {
   getDonationTiers: () => request<any[]>('/api/payments/tiers'),
 
   getUserDonations: () => request<any[]>('/api/users/me/donations'),
+
+  registerPushToken: (data: { deviceId: string; platform: 'android' | 'ios'; token: string }) =>
+    request<{ message: string }>('/api/devices/push-token', { method: 'POST', data }),
 };

@@ -20,6 +20,7 @@ import ThemedBackground from '../../components/ThemedBackground';
 import { useUIStore } from '../../store/uiStore';
 import { useAuthStore } from '../../store/authStore';
 import { api, saveAuthTokens } from '../../services/api';
+import { requestNotificationPermission, registerPushTokenOnServer } from '../../services/notifications';
 
 interface LoginScreenProps {
   navigation: any;
@@ -32,6 +33,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
   const theme = useUIStore((s) => s.theme);
   const colors = getThemeColors(theme);
   const { setUser, setAuthenticated } = useAuthStore();
+  const setDeviceId = useAuthStore((s) => s.setDeviceId);
 
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
@@ -54,6 +56,14 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
       }
       setUser(response.user);
       setAuthenticated(true);
+
+      // Register push notifications (graceful degradation if FCM not configured)
+      const deviceId = (response as any).deviceId;
+      if (deviceId) setDeviceId(deviceId);
+      const granted = await requestNotificationPermission();
+      if (granted && deviceId) {
+        registerPushTokenOnServer(deviceId).catch(() => {});
+      }
     } catch (error: any) {
       Alert.alert('Ошибка входа', error.message || 'Проверьте email и пароль');
     } finally {

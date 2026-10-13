@@ -40,7 +40,7 @@
 ## Подзадачи
 
 - [ ] 1. Прочитать эталоны `mockups/balloo-su/about-balloo.html` и `about-company.html` (структура, карточки, тексты).
-- [ ] 2. `packages/web/src/screens/about/AboutBallooScreen.tsx` — по эталону, AppTopbar+AppFooter.
+- [ ] 2. `packages/web/src/screens/about/AboutBallooScreen.tsx` — по эталону, AppTopbar+AppFooter. Маскот — картинка `/assets/logos/mascot.png` (медведь Борис), не эмодзи (правка владельца 13.10.2026, `docs/08-v2-roadmap.md` §9; ассет подключается тикетом 1791864003).
 - [ ] 3. `packages/web/src/screens/about/AboutCompanyScreen.tsx` — по эталону; ИНН/ОГРН — пометка «данные уточняются» до ответа владельца.
 - [ ] 4. Роуты `/about-balloo`, `/about-company` в `App.tsx` (паттерн `/privacy`).
 - [ ] 5. `MainLayout.tsx:130` — copyright → `/about-balloo`.

@@ -364,8 +364,9 @@ export const login = async (input: LoginInput) => {
     data: { status: 'active', updatedAt: BigInt(Math.floor(Date.now() / 1000)) },
   });
 
+  let createdDeviceId: string | undefined;
   if (input.deviceInfo) {
-    await prisma.device.create({
+    const device = await prisma.device.create({
       data: {
         userId: user.id,
         type: input.deviceInfo.type as any,
@@ -376,6 +377,7 @@ export const login = async (input: LoginInput) => {
         createdAt: BigInt(Math.floor(Date.now() / 1000)),
       },
     });
+    createdDeviceId = device.id;
   }
 
   const tokens = await generateTokens(user.id, user.email!, user.username || undefined);
@@ -391,6 +393,7 @@ export const login = async (input: LoginInput) => {
       needs2FA: false,
     },
     tokens,
+    deviceId: createdDeviceId,
   };
 };
 
@@ -445,8 +448,9 @@ export const verify2FA = async (input: Verify2FAInput) => {
     });
   }
 
+  let createdDeviceId: string | undefined;
   if (input.deviceInfo) {
-    await prisma.device.create({
+    const device = await prisma.device.create({
       data: {
         userId: user.id,
         type: input.deviceInfo.type as any,
@@ -457,6 +461,7 @@ export const verify2FA = async (input: Verify2FAInput) => {
         createdAt: BigInt(Math.floor(Date.now() / 1000)),
       },
     });
+    createdDeviceId = device.id;
   }
 
   const tokens = await generateTokens(user.id, user.email!, user.username || undefined);
@@ -472,6 +477,7 @@ export const verify2FA = async (input: Verify2FAInput) => {
       needs2FA: false,
     },
     tokens,
+    deviceId: createdDeviceId,
   };
 };
 

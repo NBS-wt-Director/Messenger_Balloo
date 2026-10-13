@@ -156,7 +156,7 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
         needs2FA: false,
       },
       // Токены в cookie, не в body (для мобильных клиентов — в body, см. isMobileClient)
-      ...(isMobileClient(req) ? { tokens: result.tokens } : {}),
+      ...(isMobileClient(req) ? { tokens: result.tokens, deviceId: (result as any).deviceId } : {}),
     });
   } catch (error: any) {
     res.status(401).json({ error: 'Unauthorized', message: error.message });
@@ -198,7 +198,7 @@ export const verify2FA = async (req: Request, res: Response, next: NextFunction)
         avatarUrl: result.user.avatarUrl,
         needs2FA: false,
       },
-      ...(isMobileClient(req) ? { tokens: result.tokens } : {}),
+      ...(isMobileClient(req) ? { tokens: result.tokens, deviceId: (result as any).deviceId } : {}),
     });
   } catch (error: any) {
     res.status(401).json({ error: 'Unauthorized', message: error.message });

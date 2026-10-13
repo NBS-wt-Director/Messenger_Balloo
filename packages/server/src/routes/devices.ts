@@ -8,6 +8,7 @@ import {
   createPairTokenCtrl,
   getPairStatusCtrl,
   confirmPairCtrl,
+  registerPushTokenCtrl,
 } from '../controllers/deviceController';
 import { authRequired } from '../middleware/auth';
 
@@ -43,5 +44,10 @@ router.delete('/:id', authRequired, endSessionCtrl);
 // POST /api/devices/end-all — завершить все сессии кроме текущей
 // ============================================================
 router.post('/end-all', authRequired, endAllSessionsCtrl);
+
+// ============================================================
+// POST /api/devices/push-token — регистрация mobile push-токена
+// ============================================================
+router.post('/push-token', authRequired, registerPushTokenCtrl);
 
 export { router };

@@ -12,6 +12,7 @@ import {
   confirmPair,
   PairError,
 } from '../services/deviceService';
+import { registerPushToken } from '../services/pushService';
 
 export const getDevicesCtrl = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -143,5 +144,42 @@ export const confirmPairCtrl = async (req: AuthenticatedRequest, res: Response, 
       return;
     }
     next(error);
+  }
+};
+
+// ============================================================
+// POST /api/devices/push-token — регистрация mobile push-токена
+// ============================================================
+// Тело: { deviceId, platform: "android"|"ios", token: string }
+export const registerPushTokenCtrl = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const userId = req.user!.id;
+    const { deviceId, platform, token } = req.body || {};
+
+    if (!deviceId || typeof deviceId !== 'string') {
+      res.status(400).json({ error: 'Bad Request', message: 'deviceId обязателен' });
+      return;
+    }
+    if (!platform || !['android', 'ios'].includes(platform)) {
+      res.status(400).json({ error: 'Bad Request', message: 'platform: android или ios' });
+      return;
+    }
+    if (!token || typeof token !== 'string') {
+      res.status(400).json({ error: 'Bad Request', message: 'token обязателен' });
+      return;
+    }
+
+    await registerPushToken(userId, deviceId, platform, token);
+    res.json({ message: 'Push token registered' });
+  } catch (error: any) {
+    if (error.code === 'P2025') {
+      res.status(404).json({ error: 'Not Found', message: 'Устройство не найдено' });
+      return;
+    }
+    internalError(res, error, 'deviceController.registerPushTokenCtrl');
   }
 };

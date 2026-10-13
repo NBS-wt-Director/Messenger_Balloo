@@ -18,6 +18,7 @@ import { getThemeColors } from '../../styles/theme';
 import { useUIStore } from '../../store/uiStore';
 import { useAuthStore } from '../../store/authStore';
 import { api, saveAuthTokens } from '../../services/api';
+import { requestNotificationPermission, registerPushTokenOnServer } from '../../services/notifications';
 
 interface TwoFactorScreenProps {
   navigation: any;
@@ -68,6 +69,14 @@ export default function TwoFactorScreen({ navigation, initialEmail }: TwoFactorS
       }
       setUser(response.user);
       setAuthenticated(true);
+
+      // Register push notifications (graceful degradation if FCM not configured)
+      const deviceId = (response as any).deviceId;
+      if (deviceId) useAuthStore.getState().setDeviceId(deviceId);
+      requestNotificationPermission().then((granted) => {
+        if (granted && deviceId) registerPushTokenOnServer(deviceId).catch(() => {});
+      });
+
       navigation.navigate('Main');
     } catch (error: any) {
       Alert.alert('Ошибка', error.message || 'Неверный код');
