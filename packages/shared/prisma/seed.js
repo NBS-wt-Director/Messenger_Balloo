@@ -139,161 +139,173 @@ async function seedKnowledgePages() {
 }
 // ============================================
 // 4. ServiceVersion — история версий (узел 05)
-// Тикет №56
+// Даты и хэши — реальные, из git log и CHANGELOG.md (тикет 1791912132-3).
+// Дата = полночь UTC указанного дня; publishedAt=0 — планируемые версии.
 // ============================================
 async function seedServiceVersions() {
-    const now = Math.floor(Date.now() / 1000);
-    const day = 86400;
     const versions = [
         {
             version: 'v0.1.0',
-            publishedAt: now - day * 59, // ~1 июня 2026
+            date: '2026-08-14',
             isLatest: false,
-            createdAt: now - day * 59,
+            commits: ['ccb6f1e', '35eb799', '084d3bf'],
             changelog: JSON.stringify({
                 title: 'Начало проекта',
                 icon: '🌱',
                 type: 'patch',
                 status: 'released',
-                summary: 'Репозиторий создан · ТЗ · Стек выбран',
+                summary: 'Монорепо · git + CI/CD · ТЗ · Стек выбран',
                 sections: {
-                    new: ['Репозиторий создан', 'Техническое задание', 'Стек технологий выбран'],
+                    new: [
+                        'Монорепо Balloo Messenger создан (14.08.2026, ccb6f1e)',
+                        'ticket #1: git init, .gitignore, шаблон API-ключей',
+                        'CI/CD готов (084d3bf, 15.08.2026)',
+                    ],
                 },
             }),
         },
         {
             version: 'v0.5.0',
-            publishedAt: now - day * 45, // ~15 июня 2026
+            date: '2026-09-06',
             isLatest: false,
-            createdAt: now - day * 45,
+            commits: ['2544936'],
             changelog: JSON.stringify({
-                title: 'Архитектура и инфраструктура',
+                title: 'Backend-контур и инфраструктура',
                 icon: '🏗️',
                 type: 'minor',
                 status: 'released',
-                summary: 'Монорепо · pnpm workspaces · Docker · Документация',
+                summary: 'Auth (httpOnly+bcrypt) · Email · Docker-инфраструктура · API для desktop/Android',
                 sections: {
-                    new: ['Монорепо структура', 'pnpm workspaces', 'Docker-окружение', 'Документация проекта'],
+                    new: [
+                        'CI/CD, httpOnly cookies, bcrypt, email (2544936)',
+                        'Docker-инфраструктура: web, server, postgres, redis',
+                        'API для desktop и Android',
+                    ],
                 },
             }),
         },
         {
             version: 'v0.9.0',
-            publishedAt: now - day * 29, // ~1 июля 2026
+            date: '2026-09-19',
             isLatest: false,
-            createdAt: now - day * 29,
+            commits: ['b04f9bc', '2bd2f63', '14243f6', '7c1439e', '57abfd4'],
             changelog: JSON.stringify({
-                title: 'Pre-beta: макеты и дизайн-система',
-                icon: '🎨',
+                title: 'Прод-запуск: SMTP, OAuth, первые приёмки',
+                icon: '🚀',
                 type: 'minor',
                 status: 'released',
-                summary: 'CSS дизайн-система · JS интерактивность · Макеты всех узлов',
+                summary: 'SMTP через postfix (16.09) · OAuth 2×2 Яндекс/VK/Mail.ru (P20–P26) · P27–P31 на проде (19.09) · smoke PASS=8 (20.09)',
                 sections: {
-                    new: ['CSS дизайн-система (common.css)', 'JS интерактивность (common.js)', 'Макеты всех узлов экосистемы'],
+                    new: [
+                        'SMTP-релей postfix, письма проходят проверку (16.09)',
+                        'OAuth: Яндекс/VK/Mail.ru, сетка 2×2, i18n экранов входа (P20–P26)',
+                        'Деплой P27–P31: тема russian, QR-привязка устройства, Rambler 429 фикс',
+                        'Приёмка на проде: smoke PASS=8 FAIL=0 (20.09)',
+                    ],
                 },
             }),
         },
         {
-            version: 'v1.0.0-beta',
-            publishedAt: now - day * 14, // ~16 июля 2026
-            isLatest: true,
-            createdAt: now - day * 14,
+            version: 'v1.0.0',
+            date: '2026-09-30',
+            isLatest: false,
+            commits: ['41f3e96', 'a79aacc', '6977776', 'b42ed06'],
             changelog: JSON.stringify({
-                title: 'Первый бета-релиз Balloo Messenger',
-                icon: '🚀',
+                title: 'Первый релиз Balloo Messenger',
+                icon: '🎉',
                 type: 'major',
                 status: 'released',
-                summary: 'Онбординг · Чаты · Звонки · Группы · 3 темы · 6 языков · Bot API · 77 макетов экранов',
+                summary: 'P37 (единый подвал, 6+5 экранов) · P38 (правое меню, 3 темы) · экран /support + админ-раздел · release engineering (CHANGELOG, docs/10–13)',
                 sections: {
                     new: [
-                        'Онбординг с 3 экранами приветствия',
-                        'Аутентификация: Email + OAuth (Яндекс, Mail.ru, Rambler)',
-                        'Текстовые сообщения с Markdown, реакции (до 5), вложения',
-                        '1:1 и групповые чаты (4 типа групп)',
-                        'Голосовые и видеозвонки 1:1 (WebRTC)',
-                        'Восьмигранные аватарки с двойной рамкой (контекст + статус)',
-                        '3 темы оформления: тёмная, светлая, «Наша»',
-                        '6 языков: RU, EN, ZH, FR, BE, HI',
-                        'Глобальный поиск по чатам, людям, файлам, медиа',
-                        'Архивация чатов',
-                        'Публичные профили по ссылке',
-                        'Bot API с документацией',
-                        'Чат с техподдержкой',
-                        'Приглашения пользователей',
-                        'Мультиаккаунт (неограниченное количество)',
-                        'QR-привязка устройств',
-                        'Донат-страница для поддержки проекта',
-                        'Портал сотрудников (командный портал)',
-                        'Портал фич-реквестов',
-                    ],
-                    improved: [
-                        'Glassmorphism дизайн-система с blur-эффектами',
-                        'WebSocket на Hono + uWebSockets.js',
-                        'Хранение файлов: MinIO + Yandex Disk',
-                        'Единое API для всех узлов экосистемы',
-                    ],
-                    known_issues: [
-                        'Групповые видеозвонки пока не поддерживаются (запланировано v1.1)',
-                        'P2G threading в планах v2',
+                        'Единый подвал на blog-экранах и публичных страницах (P37-1…5)',
+                        'Правое меню шапки: аккаунт, темы, уведомления (P38)',
+                        'Экран /support + раздел обращений в админке (6977776)',
+                        'Release engineering: CHANGELOG, docs/11-release-process, README (b42ed06)',
                     ],
                 },
-                stats: { screens: 77, nodes: 9, platforms: 5, languages: 6 },
+                stats: { screens: 174, nodes: 12, platforms: 5, languages: 20 },
             }),
         },
         {
             version: 'v1.1.0',
-            publishedAt: 0, // planned
-            isLatest: false,
-            createdAt: now - day,
+            date: '2026-10-08',
+            isLatest: true,
+            commits: ['ecda0a2', '9d59bdf'],
             changelog: JSON.stringify({
-                title: 'Групповые видеозвонки',
-                icon: '🔮',
+                title: 'REST API v1, безопасность, features-SPA',
+                icon: '🛡️',
                 type: 'minor',
-                status: 'planned',
-                summary: 'Видео-конференции до 12 человек · Шумоподавление · Low bandwidth mode',
-                expectedAt: 'сентябрь 2026',
+                status: 'released',
+                summary: 'REST /api/v1/* (support, notifications, polls, search, monitoring) · helmet/CSRF/rate-limit · features.balloo.su отдельным пакетом · 918 тестов · WebSocket events',
                 sections: {
-                    new: ['Видео-конференции до 12 человек', 'Шумоподавление', 'Low bandwidth mode'],
+                    new: [
+                        'REST API /api/v1/*: support, notifications, polls, search, admin monitoring, uploads',
+                        'Security middleware: helmet, CSRF, sanitize, 4 rate-лимтера',
+                        'features.balloo.su — отдельный SPA-пакет web-features (ecda0a2, 04.10)',
+                        'WebSocket: poll_vote, pinned, online/offline, call:*, typing',
+                        '918 unit-тестов, критический контур auth/payments покрыт',
+                    ],
+                    improved: [
+                        'GitHub Actions: lint + test + build',
+                        'Docker-образы: web, server, postgres, redis',
+                    ],
                 },
             }),
         },
         {
             version: 'v2.0.0',
-            publishedAt: 0, // planned
+            date: null, // planned
             isLatest: false,
-            createdAt: now,
+            commits: [],
             changelog: JSON.stringify({
                 title: 'Balloo v2 — масштабное обновление',
                 icon: '🔮',
                 type: 'major',
                 status: 'planned',
-                summary: 'P2G threading · Истории · Бот-маркетплейс · Групповые звонки 12+ · Реакции на сообщения',
-                expectedAt: 'Q4 2026',
+                summary: 'P2G threading · Бот-маркетплейс · Групповые звонки 12+ · Языки народов РФ (18) · вынос admin/command/info-поддоменов в отдельные пакеты',
                 sections: {
-                    new: ['P2G threading', 'Бот-маркетплейс', 'Групповые звонки 12+', 'Реакции на сообщения'],
+                    new: [
+                        'P2G threading',
+                        'Бот-маркетплейс',
+                        'Групповые видеозвонки 12+',
+                        'Переводы на 18 языков народов РФ (отложено, триггер — носители)',
+                        'Отдельные пакеты admin/command + info-поддомены (отложено, решение владельца)',
+                    ],
                 },
             }),
         },
     ];
     for (const v of versions) {
+        // Реальная дата вехи (полночь UTC) либо 0 для планируемых версий.
+        const ts = v.date ? Math.floor(new Date(`${v.date}T00:00:00Z`).getTime() / 1000) : 0;
+        const changelog = JSON.stringify({ ...JSON.parse(v.changelog), commits: v.commits });
         await prisma.serviceVersion.upsert({
             where: { version: v.version },
             update: {
-                changelog: v.changelog,
-                publishedAt: v.publishedAt,
+                changelog,
+                publishedAt: ts,
                 isLatest: v.isLatest,
             },
             create: {
                 id: `sv-${v.version.replace(/[^a-zA-Z0-9]/g, '')}`.slice(0, 25),
                 version: v.version,
-                changelog: v.changelog,
-                publishedAt: v.publishedAt,
+                changelog,
+                publishedAt: ts,
                 isLatest: v.isLatest,
-                createdAt: v.createdAt,
+                createdAt: ts,
             },
         });
     }
-    console.log('✅ ServiceVersion: 6 версий созданы (4 релиза + 2 планируемых)');
+    // Устаревшие записи прежнего seed (v1.0.0-beta заменена на v1.0.0 с реальной датой).
+    const removed = await prisma.serviceVersion.deleteMany({
+        where: { version: { in: ['v1.0.0-beta'] } },
+    });
+    if (removed.count > 0) {
+        console.log(`🧹 ServiceVersion: удалено устаревших записей: ${removed.count} (v1.0.0-beta)`);
+    }
+    const released = versions.filter((v) => v.date).length;
+    console.log(`✅ ServiceVersion: ${versions.length} версий (${released} релиза с реальными датами из git log, ${versions.length - released} планируемая)`);
 }
 // ============================================
 // 5. OnboardingStep + translations
