@@ -25,15 +25,15 @@
 | Метрика | Значение |
 |---------|----------|
 | **MVP выполнен на** | **~90%** |
-| **Осталось** | **~10%** — всё блокировки владельца (см. `with_lord/СДЕЛАТЬ_ВЛАДЕЛЬЦУ.md` п.21–24) |
+| **Осталось** | **~10%** — всё блокировки владельца (см. `with_lord/СДЕЛАТЬ_ВЛАДЕЛЬЦУ.md` Блок 1) |
 | **Осталось по времени** | **~2–4 часа** кода + действия владельца |
 
 ### Что осталось
 
-1. **Desktop Windows** — `.exe`/`.msi`: wine или CI windows-latest (п.21).
-2. **Mobile Android** — APK/AAB: Android SDK или EXPO_TOKEN (п.23); FCM-креденшалы для device push.
-3. **history/download** — TLS-сертификат с SAN `history.balloo.su`, `download.balloo.su` (п.24).
-4. **Cypress e2e** — разрешить бинарник в `~/.cache/Cypress` (п.22).
+1. **Desktop Windows** — `.exe`/`.msi`: wine или CI windows-latest (Блок 1.3).
+2. **Mobile Android** — APK/AAB: Android SDK или EXPO_TOKEN (Блок 1.2); FCM-креденшалы для device push.
+3. **history/download** — TLS-сертификат с SAN `history.balloo.su`, `download.balloo.su` (Блок 1.4).
+4. **Cypress e2e** — разрешить бинарник в `~/.cache/Cypress` (Блок 1.1).
 5. **Инфраструктура** — CI/CD для автодеплоя, мониторинг, бэкапы (вне MVP-кода, инфраструктурные задачи).
 
 ### Не входит в MVP (отложено)

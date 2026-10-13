@@ -32,7 +32,7 @@
 - [x] 1. `tsc --noEmit` → exit 0 (прогон 13.10.2026).
 - [!] 2. `npx expo prebuild --platform android --no-install` — не выполнен: `npm view expo-template-bare-minimum@sdk-51` → exit 1 (сеть до npm-реестра Expo ограничена). Нативный проект не пересобран.
 - [x] 3. Манифест: `applicationId = "su.balloo.messenger"` ✓, `versionCode 1` ✓. `app.json` → `minSdkVersion: 24` ✓, `targetSdkVersion: 34` ✓. **Расхождение:** `android/build.gradle` содержит `minSdkVersion = 23` (старый prebuild до добавления expo-build-properties). После пересборки нативного проекта (когда будет SDK/сеть) — синхронизируется.
-- [x] 4. Выбор пути сборки записан в `with_lord/СДЕЛАТЬ_ВЛАДЕЛЬЦУ.md` (п.23): (А) Android SDK, (Б) EXPO_TOKEN + eas build.
+- [x] 4. Выбор пути сборки записан в `with_lord/СДЕЛАТЬ_ВЛАДЕЛЬЦУ.md` (Блок 1.2): (А) Android SDK, (Б) EXPO_TOKEN + eas build.
 - [ ] 5. После выбора владельцем — собрать APK и AAB.
 
 ## Проблемы и решения
