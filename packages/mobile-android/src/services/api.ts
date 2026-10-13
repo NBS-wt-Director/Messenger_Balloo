@@ -515,4 +515,51 @@ export const api = {
 
   registerPushToken: (data: { deviceId: string; platform: 'android' | 'ios'; token: string }) =>
     request<{ message: string }>('/api/devices/push-token', { method: 'POST', data }),
+
+  // ============================================================
+  // Channels (мессенджер-каналы)
+  // ============================================================
+
+  getChannel: (channelId: string) =>
+    request<any>(`/api/channels/${channelId}`, { method: 'GET' }),
+
+  subscribeToChannel: (channelId: string) =>
+    request<any>(`/api/channels/${channelId}/subscribe`, {
+      method: 'POST',
+    }),
+
+  unsubscribeFromChannel: (channelId: string) =>
+    request<any>(`/api/channels/${channelId}/unsubscribe`, {
+      method: 'POST',
+    }),
+
+  // ============================================================
+  // Search (глобальный поиск)
+  // ============================================================
+
+  globalSearch: (query: string, filters?: {
+    chats?: boolean;
+    contacts?: boolean;
+    messages?: boolean;
+    channels?: boolean;
+  }) =>
+    request<any>('/api/search', {
+      method: 'GET',
+      data: { q: query, ...filters },
+    }),
+
+  // ============================================================
+  // Stories (расширенная лента)
+  // ============================================================
+
+  getStoriesFeed: () =>
+    request<any[]>('/api/stories/feed', { method: 'GET' }),
+
+  getStoryDetail: (storyId: string) =>
+    request<any>(`/api/stories/${storyId}`, { method: 'GET' }),
+
+  markStoryViewed: (storyId: string) =>
+    request<{ success: boolean }>(`/api/stories/${storyId}/view`, {
+      method: 'POST',
+    }),
 };

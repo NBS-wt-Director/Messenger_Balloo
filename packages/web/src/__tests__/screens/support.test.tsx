@@ -68,7 +68,7 @@ describe('SupportScreen', () => {
 
     expect(screen.getByText('Чат с поддержкой')).toBeTruthy();
     expect(screen.getByText('Техподдержка Balloo')).toBeTruthy();
-    expect(container.querySelector('.avatar--ctx-new')?.textContent).toContain('🦊');
+    expect(container.querySelector('.support-mascot')).not.toBeNull();
 
     await waitFor(() => {
       expect(container.textContent).toContain('Среднее время ответа: 5 мин');

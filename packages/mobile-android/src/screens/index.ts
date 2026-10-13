@@ -12,3 +12,6 @@ export { default as CreateGroupScreen } from './CreateGroupScreen';
 export { default as BlogScreen } from './BlogScreen';
 export { default as KnowledgeScreen } from './KnowledgeScreen';
 export { default as HiringScreen } from './HiringScreen';
+export { default as ChannelViewScreen } from './ChannelViewScreen';
+export { default as SearchScreen } from './SearchScreen';
+export { default as StoriesScreen } from './StoriesScreen';

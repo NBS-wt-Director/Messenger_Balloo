@@ -10,6 +10,8 @@ import { PageChrome } from '@/components/chrome/PageChrome';
 import { PrivacyScreen } from '@/screens/legal/PrivacyScreen';
 import { RulesScreen } from '@/screens/legal/RulesScreen';
 import { CookiesScreen } from '@/screens/legal/CookiesScreen';
+import { AboutBallooScreen } from '@/screens/about/AboutBallooScreen';
+import { AboutCompanyScreen } from '@/screens/about/AboutCompanyScreen';
 import { useAuthStore } from '@/store/authStore';
 import { api } from '@/services/api';
 
@@ -211,6 +213,28 @@ export const router = createHashRouter([
       </ErrorBoundary>
     ),
   },
+
+  // --- About pages (public, no auth required)
+  {
+    path: '/about-balloo',
+    element: (
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingFallback />}>
+          <AboutBallooScreen />
+        </Suspense>
+      </ErrorBoundary>
+    ),
+  },
+  {
+    path: '/about-company',
+    element: (
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingFallback />}>
+          <AboutCompanyScreen />
+        </Suspense>
+      </ErrorBoundary>
+    ),
+  },
   {
     path: '/for_kassa',
     element: (
@@ -273,6 +297,28 @@ export const router = createHashRouter([
       <ErrorBoundary>
         <Suspense fallback={<LoadingFallback />}>
           <CookiesScreen />
+        </Suspense>
+      </ErrorBoundary>
+    ),
+  },
+
+  // --- About pages (public, no auth required)
+  {
+    path: '/about-balloo',
+    element: (
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingFallback />}>
+          <AboutBallooScreen />
+        </Suspense>
+      </ErrorBoundary>
+    ),
+  },
+  {
+    path: '/about-company',
+    element: (
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingFallback />}>
+          <AboutCompanyScreen />
         </Suspense>
       </ErrorBoundary>
     ),

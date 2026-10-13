@@ -160,7 +160,7 @@ function TwoFactorScreen({ mode = 'login' }: TwoFactorScreenProps) {
     // P35: единая шапка/подвал (@balloo/ui) — как на всех страницах входа
     return (
       <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflowY: 'auto' }}>
-        <AppTopbar title="Двухфакторная аутентификация" right={<div className="mascot">🦊</div>} />
+        <AppTopbar title="Двухфакторная аутентификация" right={<img className="mascot" src="/assets/logos/mascot.png" alt="Маскот Balloo — медведь Борис" />} />
         <div className="auth-container">
         <div className="auth-card">
           {/* Title */}

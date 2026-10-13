@@ -86,7 +86,7 @@ function ResetPasswordScreen() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflowY: 'auto' }}>
       {/* P35: единая шапка/подвал (@balloo/ui) */}
-      <AppTopbar title="Восстановление пароля" right={<div className="mascot">🦊</div>} />
+      <AppTopbar title="Восстановление пароля" right={<img className="mascot" src="/assets/logos/mascot.png" alt="Маскот Balloo — медведь Борис" />} />
       <div className="auth-container">
       <div className="auth-card">
         <div style={{ width: '80px', height: '80px', fontSize: '36px', margin: '0 auto 16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>🔑</div>

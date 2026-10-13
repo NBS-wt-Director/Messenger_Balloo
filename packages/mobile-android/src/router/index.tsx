@@ -1,6 +1,6 @@
 // Expo Router — mobile navigation
 // Stack-based navigation with auth guard + bottom tabs (Chats, Contacts, Blog, Settings)
-// Stack navigator for detail screens (ChatView, CreateGroup, BlogPost, KnowledgePage, etc.)
+// Stack navigator for detail screens (ChatView, ChannelView, CreateGroup, BlogPost, KnowledgePage, Stories, Search)
 
 import React from 'react';
 import { useAuthStore } from '../store/authStore';
@@ -19,6 +19,9 @@ import ResetPasswordScreen from '../screens/auth/ResetPasswordScreen';
 // Main screens
 import ChatListScreen from '../screens/ChatListScreen';
 import ChatViewScreen from '../screens/ChatViewScreen';
+import ChannelViewScreen from '../screens/ChannelViewScreen';
+import SearchScreen from '../screens/SearchScreen';
+import StoriesScreen from '../screens/StoriesScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import ContactsScreen from '../screens/ContactsScreen';
@@ -37,6 +40,9 @@ export type AuthStackParamList = {
 export type MainStackParamList = {
   MainTabs: undefined;
   ChatView: { chatId: string; chatName: string };
+  ChannelView: { channelId: string; channelName: string };
+  Search: undefined;
+  Stories: undefined;
   CreateGroup: undefined;
   BlogPost: { postId: string; postTitle: string };
   KnowledgePage: { pageId: string; pageTitle: string };
@@ -115,6 +121,9 @@ function MainNavigator() {
     <MainStack.Navigator screenOptions={{ headerShown: false }}>
       <MainStack.Screen name="MainTabs" component={MainTabNavigator} />
       <MainStack.Screen name="ChatView" component={ChatViewScreen} />
+      <MainStack.Screen name="ChannelView" component={ChannelViewScreen} />
+      <MainStack.Screen name="Search" component={SearchScreen} />
+      <MainStack.Screen name="Stories" component={StoriesScreen} />
       <MainStack.Screen name="CreateGroup" component={CreateGroupScreen} />
       <MainStack.Screen name="BlogPost" component={BlogScreen} />
       <MainStack.Screen name="KnowledgePage" component={KnowledgeScreen} />

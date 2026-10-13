@@ -862,6 +862,7 @@ model FeatureRequest {
   title       String            @db.VarChar(255)
   description String?           @db.Text
   category    String?           @db.VarChar(100)
+  categoryId  String?
   priority    String?           @db.VarChar(50)
   motivation  String?           @db.Text
   status      String            @default("idea")
@@ -873,7 +874,9 @@ model FeatureRequest {
   updatedAt   BigInt            @default(0)
 
   // Relations
-  author   User?           @relation("FeatureAuthor", fields: [userId], references: [id], onDelete: SetNull)
+  author          User?             @relation("FeatureAuthor", fields: [userId], references: [id], onDelete: SetNull)
+  featureCategory FeatureCategory?  @relation("FeatureCategoryFeatures", fields: [categoryId], references: [id], onDelete: SetNull)
+
   votes    FeatureVote[]
   comments FeatureComment[]
 
@@ -1266,4 +1269,130 @@ model Feedback {
   @@index([status])
   @@index([createdAt])
   @@map("feedbacks")
+}
+
+// ============================================================
+// Onboarding (seed: pre_filled_data.json → onboarding_steps)
+// ============================================================
+
+model OnboardingStep {
+  id              String   @id @default(cuid()) @db.VarChar(25)
+  order           Int
+  illustrationUrl String   @db.VarChar(500)
+  isActive        Boolean  @default(true)
+  createdAt       BigInt   @default(0)
+  updatedAt       BigInt   @default(0)
+
+  translations OnboardingStepTranslation[]
+
+  @@index([order])
+  @@map("onboarding_steps")
+}
+
+model OnboardingStepTranslation {
+  id               String  @id @default(cuid()) @db.VarChar(25)
+  onboardingStepId String
+  language         String  @db.VarChar(10)
+  title            String  @db.VarChar(200)
+  description      String  @db.VarChar(2000)
+
+  onboardingStep OnboardingStep @relation(fields: [onboardingStepId], references: [id], onDelete: Cascade)
+
+  @@unique([onboardingStepId, language])
+  @@map("onboarding_step_translations")
+}
+
+// ============================================================
+// Text pages (seed: pre_filled_data.json → text_pages)
+// ============================================================
+
+model TextPage {
+  id          String   @id @default(cuid()) @db.VarChar(25)
+  slug        String   @unique @db.VarChar(100)
+  isPublished Boolean  @default(true)
+  createdAt   BigInt   @default(0)
+  updatedAt   BigInt   @default(0)
+
+  translations TextPageTranslation[]
+
+  @@index([slug])
+  @@map("text_pages")
+}
+
+model TextPageTranslation {
+  id         String  @id @default(cuid()) @db.VarChar(25)
+  textPageId String
+  language   String  @db.VarChar(10)
+  title      String  @db.VarChar(200)
+  content    String  @db.VarChar(20000)
+
+  textPage TextPage @relation(fields: [textPageId], references: [id], onDelete: Cascade)
+
+  @@unique([textPageId, language])
+  @@map("text_page_translations")
+}
+
+// ============================================================
+// Knowledge categories (seed: pre_filled_data.json → knowledge_categories)
+// ============================================================
+
+model KnowledgeCategory {
+  id       String  @id @default(cuid()) @db.VarChar(25)
+  slug     String  @unique @db.VarChar(100)
+  name     String  @db.VarChar(200)
+  order    Int     @default(0)
+  parentId String?
+
+  parent   KnowledgeCategory?  @relation("KnowledgeCategoryTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children KnowledgeCategory[] @relation("KnowledgeCategoryTree")
+
+  @@index([slug])
+  @@map("knowledge_categories")
+}
+
+// ============================================================
+// Application stages (seed: pre_filled_data.json → application_stages)
+// ============================================================
+
+model ApplicationStage {
+  id         String  @id @default(cuid()) @db.VarChar(25)
+  slug       String  @unique @db.VarChar(100)
+  name       String  @db.VarChar(200)
+  order      Int     @default(0)
+  isTerminal Boolean @default(false)
+
+  @@index([slug])
+  @@map("application_stages")
+}
+
+// ============================================================
+// Interview criteria (seed: pre_filled_data.json → interview_criteria)
+// ============================================================
+
+model InterviewCriterion {
+  id          String  @id @default(cuid()) @db.VarChar(25)
+  name        String  @db.VarChar(200)
+  description String  @db.VarChar(2000)
+  order       Int     @default(0)
+  isActive    Boolean @default(true)
+
+  @@index([order])
+  @@map("interview_criteria")
+}
+
+// ============================================================
+// Feature categories (seed: pre_filled_data.json → feature_categories)
+// ============================================================
+
+model FeatureCategory {
+  id          String  @id @default(cuid()) @db.VarChar(25)
+  slug        String  @unique @db.VarChar(100)
+  name        String  @db.VarChar(200)
+  icon        String  @db.VarChar(50)
+  order       Int     @default(0)
+
+  featureRequests FeatureRequest[] @relation("FeatureCategoryFeatures")
+
+  @@index([slug])
+  @@map("feature_categories")
 }

@@ -111,7 +111,7 @@ export function SupportScreen() {
       >
         <div className="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-new">
           <div className="avatar__inner">
-            <span>🦊</span>
+            <img className="support-mascot" src="/assets/logos/mascot.png" alt="Маскот Balloo — медведь Борис" />
           </div>
         </div>
         <div className="flex-1">

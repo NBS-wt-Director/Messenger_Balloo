@@ -23,7 +23,7 @@ import {
   revokeDeviceController,
   logoutAll,
 } from '../controllers/authController';
-import { authRequired, authRefresh } from '../middleware/auth';
+import { authRequired, authRefresh, checkRefreshOrigin } from '../middleware/auth';
 import { wsToken as wsTokenCtrl } from '../controllers/wsTokenController';
 
 // ============================================================
@@ -43,13 +43,13 @@ router.post('/2fa/verify', verify2FA);
 
 // Временный токен для WebSocket
 router.get('/ws-token', wsTokenCtrl);
-router.post('/refresh-cookie', refreshCookie);
+router.post('/refresh-cookie', checkRefreshOrigin, refreshCookie);
 
 // Удаление cookie (logout для web)
 router.post('/clear-cookie', clearCookie);
 
 // Обновление токена (старый endpoint, для обратной совместимости)
-router.post('/refresh', authRefresh, refreshCookie);
+router.post('/refresh', authRefresh, checkRefreshOrigin, refreshCookie);
 
 // Выход (старый endpoint, для обратной совместимости)
 router.post('/logout', logout);

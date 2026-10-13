@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Раздел 4 «Приёмка макетов» в with_lord/СДЕЛАТ_ВЛАДЕЛЬЦУ.md.
+"""Раздел 4 «Приёмка макетов» в with_lord/СДЕЛАТЬ_ВЛАДЕЛЬЦУ.md.
 
 Источник строк — tickets/active/with_lord/_screens_data.txt (эталон, 75 экранов).
 MVP1-узлы (00,01,05,06,08,09) — первой таблицей по одной строке на макет,
@@ -11,7 +11,7 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 DATA = ROOT / "tickets/active/with_lord/_screens_data.txt"
-TARGET = ROOT / "tickets/active/with_lord/СДЕЛАТ_ВЛАДЕЛЬЦУ.md"
+TARGET = ROOT / "tickets/active/with_lord/СДЕЛАТЬ_ВЛАДЕЛЬЦУ.md"
 
 MVP1_NODES = {"00", "01", "05", "06", "08", "09"}
 

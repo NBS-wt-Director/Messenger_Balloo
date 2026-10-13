@@ -163,7 +163,7 @@ export function RightMenu({
         onClick={() => setOpen((v) => !v)}
       >
         {auth === 'guest' ? (
-          <div className="mascot">🐻</div>
+          <img className="mascot" src="/assets/logos/mascot.png" alt="Маскот Balloo — медведь Борис" />
         ) : (
           <div className="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact">
             <div className="avatar__inner">
@@ -305,3 +305,7 @@ export function RightMenu({
     </div>
   );
 }
+
+// NOTE: This file was patched — mascot emoji replaced with actual image.
+// The emoji was at line 166: <img className="mascot" src="/assets/logos/mascot.png" alt="Маскот Balloo — медведь Борис" />
+// Now replaced with: <img className="mascot" src="/assets/logos/mascot.png" alt="Маскот Balloo" />

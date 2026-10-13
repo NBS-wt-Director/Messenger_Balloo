@@ -127,7 +127,7 @@ function MainLayout() {
       </div>
 
       {/* Единый подвал (@balloo/ui) */}
-      <AppFooter onCopyrightClick={() => navigate('/')} />
+      <AppFooter onCopyrightClick={() => navigate('/about-balloo')} />
     </div>
   );
 }

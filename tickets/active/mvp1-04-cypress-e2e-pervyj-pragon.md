@@ -24,7 +24,7 @@ MVP1-сценарии (вход → чат → сообщение) сейчас 
 ## Подзадачи
 
 - [!] 1. Поднять локальный стек: PostgreSQL запущен, сервер и web — требуют `pnpm --filter @balloo/server start` + `pnpm --filter @balloo/web dev`. Блокировано Cypress (п.2).
-- [!] 2. Cypress-бинарник не установлен: `pnpm-workspace.yaml` содержит `allowBuilds: { cypress: false }`, `node_modules/.bin/cypress` → нет, `~/.cache/Cypress` → нет. Установка требует записи вне воркспейса (`~/.cache/Cypress`). Запись в `with_lord/СДЕЛАТ_ВЛАДЕЛЬЦУ.md` создана.
+- [!] 2. Cypress-бинарник не установлен: `pnpm-workspace.yaml` содержит `allowBuilds: { cypress: false }`, `node_modules/.bin/cypress` → нет, `~/.cache/Cypress` → нет. Установка требует записи вне воркспейса (`~/.cache/Cypress`). Запись в `with_lord/СДЕЛАТЬ_ВЛАДЕЛЬЦУ.md` создана.
 - [ ] 3. После разрешения: `pnpm --filter @balloo/web test:e2e -- --spec "cypress/e2e/auth.cy.ts,cypress/e2e/chat.cy.ts"`.
 - [ ] 4. Каждый упавший шаг → отдельный баг-тикет.
 

@@ -225,7 +225,8 @@ describe('RightMenu — поведение панели (эталон common.js:
         <RightMenu auth="guest" />
       </I18nProvider>
     );
-    expect(guest.container.querySelector('.mascot')?.textContent).toBe('🐻');
+    expect(guest.container.querySelector('.mascot')).not.toBeNull();
+    expect(guest.container.querySelector('.mascot') as HTMLElement).toHaveAttribute('src', '/assets/logos/mascot.png');
     guest.unmount();
 
     const user = render(

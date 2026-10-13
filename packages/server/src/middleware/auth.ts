@@ -355,3 +355,31 @@ export const clearAuthCookies = (res: Response): void => {
     domain: cookieDomain,
   });
 };
+// ============================================================
+// Origin check for refresh endpoints (тикет 1791915264-2)
+// Проверяет Origin/Sec-Fetch-Site на refresh-эндпоинтах
+// ============================================================
+
+const allowedOrigins = env.CORS_ORIGIN.split(',').map((s) => s.trim());
+
+export const checkRefreshOrigin = (req: Request, res: Response, next: NextFunction): void => {
+  const origin = req.headers.origin;
+
+  // Если Origin заголовка нет — разрешаем (небраузерные клиенты, мобильные)
+  if (!origin) {
+    next();
+    return;
+  }
+
+  // Разрешённые origins из CORS_ORIGIN
+  if (allowedOrigins.includes(origin)) {
+    next();
+    return;
+  }
+
+  res.status(403).json({
+    error: 'Forbidden',
+    code: 'origin_not_allowed',
+    message: 'Origin не разрешён для refresh',
+  });
+};
