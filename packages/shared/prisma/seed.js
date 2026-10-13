@@ -296,6 +296,285 @@ async function seedServiceVersions() {
     console.log('✅ ServiceVersion: 6 версий созданы (4 релиза + 2 планируемых)');
 }
 // ============================================
+// 5. OnboardingStep + translations
+// Источник: mockups/pre_filled_data.json → onboarding_steps
+// ============================================
+async function seedOnboardingSteps() {
+    const steps = [
+        {
+            id: 'ob-step-1',
+            order: 1,
+            illustrationUrl: '/img/onboarding/welcome.svg',
+            translations: [
+                { language: 'ru', title: 'Добро пожаловать в Balloo', description: 'Российский мессенджер с фокусом на приватность и безопасность.' },
+                { language: 'en', title: 'Welcome to Balloo', description: 'A Russian messenger focused on privacy and security.' },
+                { language: 'zh', title: '欢迎来到 Balloo', description: '一款注重隐私和安全的俄罗斯即时通讯应用。' },
+                { language: 'fr', title: 'Bienvenue sur Balloo', description: 'Une messagerie russe axée sur la confidentialité et la sécurité.' },
+                { language: 'be', title: 'Сардэчна запрашаем у Balloo', description: 'Расійскі месенджар з акцэнтам на прыватнасць і бяспеку.' },
+                { language: 'hi', title: 'Balloo में आपका स्वागत है', description: 'गोपनीयता और सुरक्षा पर केंद्रित एक रूसी मैसेंजर।' },
+            ],
+        },
+        {
+            id: 'ob-step-2',
+            order: 2,
+            illustrationUrl: '/img/onboarding/chats.svg',
+            translations: [
+                { language: 'ru', title: 'Чаты и группы', description: 'Общайтесь один на один или создавайте группы до 30 участников.' },
+                { language: 'en', title: 'Chats and Groups', description: 'Chat one-on-one or create groups of up to 30 participants.' },
+                { language: 'zh', title: '聊天和群组', description: '一对一聊天或创建最多30人的群组。' },
+                { language: 'fr', title: 'Discussions et groupes', description: 'Discutez en privé ou créez des groupes jusqu\'à 30 participants.' },
+                { language: 'be', title: 'Чаты і групы', description: 'Гутарце адзін на адзін або стварайце групы да 30 удзельнікаў.' },
+                { language: 'hi', title: 'चैट और समूह', description: 'एक-से-एक चैट करें या 30 सदस्यों तक के समूह बनाएँ।' },
+            ],
+        },
+        {
+            id: 'ob-step-3',
+            order: 3,
+            illustrationUrl: '/img/onboarding/security.svg',
+            translations: [
+                { language: 'ru', title: 'Безопасность', description: 'Сквозное шифрование, 2FA и контроль устройств.' },
+                { language: 'en', title: 'Security', description: 'End-to-end encryption, 2FA and device control.' },
+                { language: 'zh', title: '安全', description: '端到端加密、双因素认证和设备控制。' },
+                { language: 'fr', title: 'Sécurité', description: 'Chiffrement de bout en bout, 2FA et contrôle des appareils.' },
+                { language: 'be', title: 'Бяспека', description: 'Скразное шыфраванне, 2FA і кантроль прылад.' },
+                { language: 'hi', title: 'सुरक्षा', description: 'एंड-टू-एंड एन्क्रिप्शन, 2FA और डिवाइस नियंत्रण।' },
+            ],
+        },
+        {
+            id: 'ob-step-4',
+            order: 4,
+            illustrationUrl: '/img/onboarding/devices.svg',
+            translations: [
+                { language: 'ru', title: 'Мультиаккаунт и устройства', description: 'Привязывайте любое число устройств и переключайтесь между аккаунтами.' },
+                { language: 'en', title: 'Multi-account and Devices', description: 'Link any number of devices and switch between accounts.' },
+                { language: 'zh', title: '多账户和设备', description: '绑定任意数量的设备并在账户之间切换。' },
+                { language: 'fr', title: 'Multi-comptes et appareils', description: 'Liez autant d\'appareils que souhaité et basculez entre les comptes.' },
+                { language: 'be', title: 'Мультыаккаунт і прылады', description: 'Прывязвайце любую колькасць прылад і пераключайцеся паміж акаўтамі.' },
+                { language: 'hi', title: 'बहु-खाता और डिवाइस', description: 'कितने भी डिवाइस जोड़ें और खातों के बीच स्विच करें।' },
+            ],
+        },
+    ];
+    const now = Math.floor(Date.now() / 1000);
+    let translationsCount = 0;
+    for (const step of steps) {
+        const { translations, ...data } = step;
+        await prisma.onboardingStep.upsert({
+            where: { id: step.id },
+            update: { order: data.order, illustrationUrl: data.illustrationUrl, isActive: true, updatedAt: now },
+            create: { ...data, isActive: true, createdAt: now, updatedAt: now },
+        });
+        for (const tr of translations) {
+            await prisma.onboardingStepTranslation.upsert({
+                where: {
+                    onboardingStepId_language: { onboardingStepId: step.id, language: tr.language },
+                },
+                update: { title: tr.title, description: tr.description },
+                create: {
+                    id: `obt-${step.id.slice(-1)}-${tr.language}`.slice(0, 25),
+                    onboardingStepId: step.id,
+                    language: tr.language,
+                    title: tr.title,
+                    description: tr.description,
+                },
+            });
+            translationsCount++;
+        }
+    }
+    console.log(`✅ OnboardingStep: ${steps.length} шага + ${translationsCount} переводов`);
+}
+// ============================================
+// 6. TextPage + translations
+// Источник: mockups/pre_filled_data.json → text_pages
+// ============================================
+async function seedTextPages() {
+    const pages = [
+        {
+            slug: 'rules',
+            translations: [
+                { language: 'ru', title: 'Правила Balloo', content: '# Правила Balloo\n\n1. Уважайте других пользователей.\n2. Запрещён спам и массовые рассылки.\n3. Запрещён контент, нарушающий законодательство РФ.\n4. Не используйте боты для накруток.\n5. Соблюдайте приватность третьих лиц.' },
+                { language: 'en', title: 'Balloo Rules', content: '# Balloo Rules\n\n1. Respect other users.\n2. Spam and mass mailings are prohibited.\n3. Content violating Russian law is prohibited.\n4. Do not use bots for fraud.\n5. Respect the privacy of third parties.' },
+                { language: 'zh', title: 'Balloo 规则', content: '# Balloo 规则\n\n1. 尊重其他用户。\n2. 禁止垃圾信息和群发。\n3. 禁止违反俄罗斯法律的内容。\n4. 不得使用机器人作弊。\n5. 尊重第三方隐私。' },
+                { language: 'fr', title: 'Règles de Balloo', content: '# Règles de Balloo\n\n1. Respectez les autres utilisateurs.\n2. Le spam et les envois massifs sont interdits.\n3. Le contenu contraire à la loi russe est interdit.\n4. N\'utilisez pas de bots pour fraude.\n5. Respectez la vie privée des tiers.' },
+                { language: 'be', title: 'Правілы Balloo', content: '# Правілы Balloo\n\n1. Паважайце іншых карыстальнікаў.\n2. Забаронены спам і масавыя рассылкі.\n3. Забаронены кантэнт, што парушае заканадаўства РФ.\n4. Не выкарыстоўвайце боты для накрутак.\n5. Захоўвайце прыватнасць трэціх асоб.' },
+                { language: 'hi', title: 'Balloo नियम', content: '# Balloo नियम\n\n1. अन्य उपयोगकर्ताओं का सम्मान करें।\n2. स्पैम और बल्क मेलिंग प्रतिबंधित है।\n3. रूसी कानून का उल्लंघन करने वाली सामग्री प्रतिबंधित है।\n4. धोखाधड़ी के लिए बॉट का उपयोग न करें।\n5. तीसरे पक्ष की गोपनीयता का सम्मान करें।' },
+            ],
+        },
+        {
+            slug: 'about-company',
+            translations: [
+                { language: 'ru', title: 'О компании', content: '# О компании\n\nРазработчик мессенджера Balloo. Российская технологическая команда.' },
+                { language: 'en', title: 'About the Company', content: '# About the Company\n\nDeveloper of the Balloo messenger. A Russian tech team.' },
+                { language: 'zh', title: '关于公司', content: '# 关于公司\n\nBalloo 即时通讯的开发者。一支俄罗斯技术团队。' },
+                { language: 'fr', title: "À propos de l'entreprise", content: "# À propos de l'entreprise\n\nDéveloppeur de la messagerie Balloo. Une équipe technologique russe." },
+                { language: 'be', title: 'Аб кампаніі', content: '# Аб кампаніі\n\nРаспрацоўшчык месенджара Balloo. Расійская тэхналагічная каманда.' },
+                { language: 'hi', title: 'कंपनी के बारे में', content: '# कंपनी के बारे में\n\nBalloo मैसेंजर का डेवलपर। एक रूसी तकनीकी टीम।' },
+            ],
+        },
+        {
+            slug: 'about-balloo',
+            translations: [
+                { language: 'ru', title: 'О Balloo', content: '# О Balloo\n\nВерсия приложения, лицензии сторонних компонентов, ссылки и история изменений.' },
+                { language: 'en', title: 'About Balloo', content: '# About Balloo\n\nApplication version, third-party licenses, links and changelog.' },
+                { language: 'zh', title: '关于 Balloo', content: '# 关于 Balloo\n\n应用版本、第三方许可证、链接和更新日志。' },
+                { language: 'fr', title: 'À propos de Balloo', content: "# À propos de Balloo\n\nVersion de l'application, licences tierces, liens et journal des modifications." },
+                { language: 'be', title: 'Аб Balloo', content: '# Аб Balloo\n\nВерсія прыкладання, ліцэнзіі старонніх кампанентаў, спасылкі і гісторыя змен.' },
+                { language: 'hi', title: 'Balloo के बारे में', content: '# Balloo के बारे में\n\nऐप संस्करण, तीसरे पक्ष के लाइसेंस, लिंक और बदलाव का लॉग।' },
+            ],
+        },
+    ];
+    const now = Math.floor(Date.now() / 1000);
+    let translationsCount = 0;
+    for (const page of pages) {
+        const tp = await prisma.textPage.upsert({
+            where: { slug: page.slug },
+            update: { isPublished: true, updatedAt: now },
+            create: {
+                id: `tp-${page.slug}`.slice(0, 25),
+                slug: page.slug,
+                isPublished: true,
+                createdAt: now,
+                updatedAt: now,
+            },
+        });
+        for (const tr of page.translations) {
+            await prisma.textPageTranslation.upsert({
+                where: {
+                    textPageId_language: { textPageId: tp.id, language: tr.language },
+                },
+                update: { title: tr.title, content: tr.content },
+                create: {
+                    id: `tpt-${page.slug}-${tr.language}`.slice(0, 25),
+                    textPageId: tp.id,
+                    language: tr.language,
+                    title: tr.title,
+                    content: tr.content,
+                },
+            });
+            translationsCount++;
+        }
+    }
+    console.log(`✅ TextPage: ${pages.length} страницы + ${translationsCount} переводов`);
+}
+// ============================================
+// 7. KnowledgeCategory
+// Источник: mockups/pre_filled_data.json → knowledge_categories
+// ============================================
+async function seedKnowledgeCategories() {
+    const categories = [
+        { slug: 'getting-started', name: 'Начало работы', order: 1 },
+        { slug: 'messaging', name: 'Сообщения', order: 2 },
+        { slug: 'groups', name: 'Группы', order: 3 },
+        { slug: 'security', name: 'Безопасность', order: 4 },
+        { slug: 'bots-api', name: 'Боты и API', order: 5 },
+        { slug: 'admin', name: 'Администрирование', order: 6 },
+    ];
+    for (const cat of categories) {
+        await prisma.knowledgeCategory.upsert({
+            where: { slug: cat.slug },
+            update: { name: cat.name, order: cat.order },
+            create: {
+                id: `kc-${cat.slug}`.slice(0, 25),
+                slug: cat.slug,
+                name: cat.name,
+                order: cat.order,
+            },
+        });
+    }
+    console.log(`✅ KnowledgeCategory: ${categories.length} категорий`);
+}
+// ============================================
+// 8. ApplicationStage
+// Источник: mockups/pre_filled_data.json → application_stages
+// ============================================
+async function seedApplicationStages() {
+    const stages = [
+        { slug: 'screening', name: 'Скрининг', order: 1, isTerminal: false },
+        { slug: 'interview', name: 'Интервью', order: 2, isTerminal: false },
+        { slug: 'offer', name: 'Оффер', order: 3, isTerminal: false },
+        { slug: 'hired', name: 'Нанят', order: 4, isTerminal: true },
+        { slug: 'rejected', name: 'Отклонён', order: 5, isTerminal: true },
+    ];
+    for (const stage of stages) {
+        await prisma.applicationStage.upsert({
+            where: { slug: stage.slug },
+            update: { name: stage.name, order: stage.order, isTerminal: stage.isTerminal },
+            create: {
+                id: `as-${stage.slug}`.slice(0, 25),
+                slug: stage.slug,
+                name: stage.name,
+                order: stage.order,
+                isTerminal: stage.isTerminal,
+            },
+        });
+    }
+    console.log(`✅ ApplicationStage: ${stages.length} этапов`);
+}
+// ============================================
+// 9. InterviewCriterion
+// Источник: mockups/pre_filled_data.json → interview_criteria
+// Идемпотентность по name (у модели нет уникального slug)
+// ============================================
+async function seedInterviewCriteria() {
+    const criteria = [
+        { name: 'Технические навыки', description: 'Оценка профессиональных навыков: знание языков программирования, фреймворков, архитектурных паттернов', order: 1 },
+        { name: 'Коммуникация', description: 'Способность ясно излагать мысли, слушать, задавать вопросы, работать в команде', order: 2 },
+        { name: 'Решение задач', description: 'Анализ проблемы, генерация гипотез, структурированный подход к решению', order: 3 },
+        { name: 'Командный дух', description: 'Готовность помогать коллегам, обмен знаниями, конструктивная обратная связь', order: 4 },
+        { name: 'Опыт', description: 'Релевантный опыт работы, соответствие требованиям вакансии', order: 5 },
+        { name: 'Качество кода', description: 'Читаемость, тестируемость, масштабируемость, соблюдение стандартов', order: 6 },
+    ];
+    for (const c of criteria) {
+        const existing = await prisma.interviewCriterion.findFirst({ where: { name: c.name } });
+        if (existing) {
+            await prisma.interviewCriterion.update({
+                where: { id: existing.id },
+                data: { description: c.description, order: c.order, isActive: true },
+            });
+        }
+        else {
+            await prisma.interviewCriterion.create({
+                data: {
+                    id: `ic-${c.order}`.slice(0, 25),
+                    name: c.name,
+                    description: c.description,
+                    order: c.order,
+                    isActive: true,
+                },
+            });
+        }
+    }
+    console.log(`✅ InterviewCriterion: ${criteria.length} критериев`);
+}
+// ============================================
+// 10. FeatureCategory
+// Источник: mockups/pre_filled_data.json → feature_categories
+// ============================================
+async function seedFeatureCategories() {
+    const categories = [
+        { slug: 'messaging', name: 'Сообщения', icon: 'chat', order: 1 },
+        { slug: 'calls', name: 'Звонки', icon: 'phone', order: 2 },
+        { slug: 'groups', name: 'Группы', icon: 'users', order: 3 },
+        { slug: 'privacy', name: 'Приватность', icon: 'shield', order: 4 },
+        { slug: 'ui', name: 'Интерфейс', icon: 'layout', order: 5 },
+        { slug: 'bots', name: 'Боты', icon: 'bot', order: 6 },
+        { slug: 'other', name: 'Другое', icon: 'more', order: 7 },
+    ];
+    for (const cat of categories) {
+        await prisma.featureCategory.upsert({
+            where: { slug: cat.slug },
+            update: { name: cat.name, icon: cat.icon, order: cat.order },
+            create: {
+                id: `fc-${cat.slug}`.slice(0, 25),
+                slug: cat.slug,
+                name: cat.name,
+                icon: cat.icon,
+                order: cat.order,
+            },
+        });
+    }
+    console.log(`✅ FeatureCategory: ${categories.length} категорий`);
+}
+// ============================================
 // Main seed function
 // ============================================
 async function main() {
@@ -306,6 +585,12 @@ async function main() {
     await seedBlogCategories();
     await seedKnowledgePages();
     await seedServiceVersions();
+    await seedOnboardingSteps();
+    await seedTextPages();
+    await seedKnowledgeCategories();
+    await seedApplicationStages();
+    await seedInterviewCriteria();
+    await seedFeatureCategories();
     console.log();
     console.log('🎉 Seed completed successfully!');
 }
