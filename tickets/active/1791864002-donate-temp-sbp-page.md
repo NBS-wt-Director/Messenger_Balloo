@@ -10,52 +10,55 @@
 
 Настроить экран донатов на приём без реальных платежей ЮKassa: режим **СБП QR-код + перевод по номеру телефона**. Код интеграции уже написан (`paymentService.ts`, режим `sbp_manual`), нужен только ввод реквизитов от владельца.
 
-## Факты (сняты 13.10.2026)
+## Факты (пересняты 13.10.2026, повторная ревизия по документации)
 
-1. `packages/server/src/services/paymentService.ts` (519 строк) — два провайдера: `yookassa` и `sbp_manual`.
-2. Режим `sbp_manual` включается автоматически, если `YOOKASSA_SHOP_ID`/`API_KEY` пусты → `yookassaConnected: false`.
-3. `packages/web/src/screens/donate/DonateScreen.tsx` — экран донатов (P38.11), использует тарифы из `DonationTier`.
-4. `packages/server/src/services/paymentService.ts` — `paymentConfig.sbpQrUrl`, `paymentConfig.sbpPhoneNumber`, `paymentConfig.sbpPhoneName` — реквизиты СБП.
-5. Массив `paymentConfig` в БД — пуст (нужен seed или первая запись через админку).
-6. `assets/logos/qr_helpus.jpg` — файл QR-кода для донатов существует (65 КБ).
-7. `packages/web/public/qr.webp` — QR-код в public (18 КБ).
+### Что УЖЕ есть (картина точнее, чем в первой версии тикета)
+
+1. **Экран существует**: `packages/web/src/screens/donate/DonateScreen.tsx` (114 строк), маршрут `/donat` (`App.tsx:225`). Показывает: QR (`<img src="/qr.webp">`, строка 45), телефон `+7 912 202-30-35` (захардкожен, строка 75), имя «Оберюхттин Иван» (захардкожено, строка 78), блок-заглушку «Подключение ЮKassa».
+2. **QR работает**: `packages/web/public/qr.webp` существует (18 КБ) → `/qr.webp` = 200.
+3. **Сервер сам создаёт PaymentConfig**: `paymentService.ts:59-75` `getOrCreatePaymentConfig()` — при пустой таблице создаёт запись с дефолтами (`mode: 'anonymous'`, `sbpQrUrl: '/assets/logos/qr_helpus.jpg'`, `sbpPhoneNumber: '89122023035'`, `sbpPhoneName: 'Оберюхттин Иван, Сбербанк'`). **Seed не нужен.**
+4. **Публичный эндпоинт есть**: `GET /api/payments/config` (`routes/payments.ts:22`, без auth) — отдаёт конфигурацию.
+5. **Ручное подтверждение есть**: `AdminDonationsScreen.tsx:88-97` → `POST /api/payments/admin/confirm/:id` (`routes/payments.ts:54`, `authRequired + adminOnly`).
+6. **Донат регистрируется**: `POST /api/payments/donate` (`routes/payments.ts:35`, `authRequired`).
+
+### Дефекты (что чинить)
+
+| # | Дефект | Доказательство |
+|---|---|---|
+| Д1 | `DonateScreen` **не читает** `GET /api/payments/config` — QR и телефон захардкожены. Смена реквизитов в админке не отразится на экране | `DonateScreen.tsx` — нет ни одного fetch/api-вызова |
+| Д2 | Дефолтный `sbpQrUrl: '/assets/logos/qr_helpus.jpg'` — **404 на проде** (файл не в web public) | `paymentService.ts:67,432`; `ls packages/web/public/assets/` → НЕТ. Чинится в тикете **1791864003** |
+| Д3 | Телефон в экране `+7 912 202-30-35` и в дефолте `89122023035` — совпадают, но этоpersonal данные, зашитые в бандль; после Д1 источник — БД | `DonateScreen.tsx:75` vs `paymentService.ts:68` |
 
 ## Что нужно сделать
 
-1. **Seed-запись `PaymentConfig`:** добавить в `prisma/seed` или выполнить `prisma db execute` с записью:
-   - `mode: 'sbp_manual'` (режим по умолчанию)
-   - `sbpQrUrl: "<URL_или_путь_к_файлу_QR>"` — можно `assets/logos/qr_helpus.jpg` или `qr.webp`
-   - `sbpPhoneNumber: "<Номер_телефона_для_перевода>"` — номер от владельца
-   - `sbpPhoneName: "<Имя_получателя>"` — имя от владельца
-2. **Проверить `DonateScreen.tsx`:** правильно ли показывает QR-код и номер телефона в режиме `sbp_manual`. Если QR-код — статический файл из public, убедиться, что путь корректен.
-3. **Проверить `AdminDonationsScreen.tsx`:** можно ли вручную подтверждать донаты в режиме `sbp_manual`.
-4. **Прогон `pnpm build`** — зелёный.
+1. **Д1:** `DonateScreen` — читать `GET /api/payments/config` (qr url, телефон, имя, режим); дефолты оставить fallback на случай недоступности API.
+2. **Д2:** не здесь — закрыт тикетом `1791864003` (копия файлов в public).
+3. **Д3:** после Д1 захардкоженный телефон остаётся только fallback-ом — приемлемо.
+4. Прогон `pnpm build` + тесты — зелёные.
 
 ## Подзадачи
 
-- [ ] 1. Снять фактическое состояние PaymentConfig: `docker compose -f docker/prod/docker-compose.local.yml exec server npx prisma db execute --file -` (локально) или `pnpm --filter @balloo/server prisma db seed`.
-- [ ] 2. Добавить seed-данные PaymentConfig (sbp_manual, номер, имя, QR-путь).
-- [ ] 3. Проверить `DonateScreen.tsx` — режим `sbp_manual`: показывает QR + номер.
-- [ ] 4. Проверить `AdminDonationsScreen.tsx` — ручное подтверждение донатов.
-- [ ] 5. `pnpm build` — зелёный.
-- [ ] 6. **Прогон в браузере** — [!] ждёт владельца: открыть `/donate` (гость), убедиться, что показан QR/номер, не ЮKassa.
+- [ ] 1. `DonateScreen.tsx`: загрузка `GET /api/payments/config` при монтировании; состояние QR/телефона/имени из ответа; fallback — текущие захардкоженные значения.
+- [ ] 2. Проверить формат телефона: API отдаёт `89122023035`, экран показывает `+7 912 202-30-35` — нормализовать отображение (или принимать как есть из админки).
+- [ ] 3. `pnpm --filter @balloo/web build` → exit 0 (вывод).
+- [ ] 4. `pnpm --filter @balloo/web test` — зелёные (вывод).
+- [ ] 5. **Прогон в браузере** — [!] ждёт владельца: открыть `/#/donat` (гость), убедиться, что показан QR/номер из конфига, не ЮKassa; сменить номер в админке → экран обновился.
 
 ## Критерии готовности
 
-- PaymentConfig с `mode: 'sbp_manual'` существует в БД.
-- `DonateScreen.tsx` в режиме `sbp_manual` показывает QR-код и номер телефона.
-- `AdminDonationsScreen.tsx` позволяет вручную подтвердить донат.
-- `pnpm build` → exit 0.
+- `/#/donat` показывает QR + телефон + имя из `PaymentConfig` (не из бандля); при недоступном API — fallback.
+- Смена реквизитов в админке видна на экране после перезагрузки.
+- `/assets/logos/qr_helpus.jpg` отдаёт 200 (после 1791864003).
+- `pnpm build`/`pnpm test` → exit 0 (выводы).
 - [!] Браузерная проверка — ждёт владельца.
 
-## Что ждёт владельца (записано в `with_lord/СДЕЛАТ_ВЛАДЕЛЬЦУ.md`)
+## Что ждёт владельца (записано в `with_lord/СДЕЛАТ_ВЛАДЕЛЬЦУ.md` п.25)
 
 | № | Что нужно | Сделано | Решение |
 |---|---|---|---|
-| D.1 | Номер телефона для СБП-перевода | | |
-| D.2 | Имя получателя (для отображения) | | |
-| D.3 | Подтвердить: QR-код `qr.webp` в public/ или загрузить новый | | |
-| D.4 | Проверить в браузере: `/donate` → показывает QR/номер, не ЮKassa | | |
+| D.1 | Подтвердить номер `+7 912 202-30-35` (Сбер) как боевой для донатов | | |
+| D.2 | Подтвердить QR: `/qr.webp` (в бандле) или `qr_helpus.jpg` (дефолт админки) — какой боевой | | |
+| D.3 | Проверить в браузере: `/#/donat` → показывает QR/номер из конфига | | |
 
 ## Проблемы и решения
 
