@@ -29,29 +29,24 @@
 
 ## Подзадачи
 
-- [ ] 1. `node_modules/.bin/tsc --noEmit` (already exit 0) зафиксировать в «Результат».
-- [ ] 2. `npx expo prebuild --platform android --no-install` — пересобрать
-      нативный проект из `app.json`/`app.config.js` (SDK не нужен). Проверка:
-      `git status --porcelain packages/mobile-android/android` +
-      `grep -n "su.balloo.messenger" packages/mobile-android/android/app/build.gradle`.
-- [ ] 3. Проверить манифест на соответствие MVP1: package `su.balloo.messenger`,
-      `versionCode`, `minSdkVersion 24` (`app.json` plugins expo-build-properties).
-- [ ] 4. Выбор пути сборки — записать в `with_lord/СДЕЛАТ_ВЛАДЕЛЬЦУ.md`:
-      - **А:** установить Android SDK (off-workspace, `sdkmanager` + лицензии) —
-        тогда `./gradlew assembleRelease` выполняется здесь;
-      - **Б:** `EXPO_TOKEN` от аккаунта владельца → `eas build --platform android`
-        (сборка в облаке, артефакт приходит ссылкой).
-      Молча ничего не устанавливать.
-- [ ] 5. После выбора: собрать APK и AAB, положить пути/размеры в «Результат»,
-      сверить с `scripts/upload-android-to-download.sh` (куда выкладывает).
+- [x] 1. `tsc --noEmit` → exit 0 (прогон 13.10.2026).
+- [!] 2. `npx expo prebuild --platform android --no-install` — не выполнен: `npm view expo-template-bare-minimum@sdk-51` → exit 1 (сеть до npm-реестра Expo ограничена). Нативный проект не пересобран.
+- [x] 3. Манифест: `applicationId = "su.balloo.messenger"` ✓, `versionCode 1` ✓. `app.json` → `minSdkVersion: 24` ✓, `targetSdkVersion: 34` ✓. **Расхождение:** `android/build.gradle` содержит `minSdkVersion = 23` (старый prebuild до добавления expo-build-properties). После пересборки нативного проекта (когда будет SDK/сеть) — синхронизируется.
+- [x] 4. Выбор пути сборки записан в `with_lord/СДЕЛАТ_ВЛАДЕЛЬЦУ.md` (п.23): (А) Android SDK, (Б) EXPO_TOKEN + eas build.
+- [ ] 5. После выбора владельцем — собрать APK и AAB.
 
-## Критерии готовности
+## Проблемы и решения
 
-- В «Результат»: вывод `tsc --noEmit`, вывод `expo prebuild`, вывод `git status`
-  по `android/`.
-- Артефакт (APK/AAB) — путь + размер, ЛИБО честный `[!]` с указанием отсутствующего
-  инструмента и двумя вариантами решения.
+**Блокировка:** Android SDK (`ANDROID_HOME`/`ANDROID_SDK_ROOT`) не задан, `~/Android` нет. Без SDK `./gradlew assembleRelease` невозможен. Expo cloud (`eas build`) требует `EXPO_TOKEN`. `expo prebuild` требует сеть до npm (в данной сессии недоступна).
 
 ## Результат
 
-(по ходу)
+```
+$ node_modules/.bin/tsc --noEmit → exit 0
+$ grep applicationId android/app/build.gradle → "su.balloo.messenger"
+$ grep versionCode android/app/build.gradle → 1
+$ grep minSdkVersion app.json → 24
+$ grep minSdkVersion android/build.gradle → 23 (расхождение, нужен prebuild)
+```
+
+[!] Заблокирован: нет Android SDK и EXPO_TOKEN. Ожидание выбора варианта владельцем.

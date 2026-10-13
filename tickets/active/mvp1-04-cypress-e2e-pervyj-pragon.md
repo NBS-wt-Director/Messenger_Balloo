@@ -23,26 +23,15 @@ MVP1-сценарии (вход → чат → сообщение) сейчас 
 
 ## Подзадачи
 
-- [ ] 1. Поднять локальный стек: PostgreSQL (`AGENTS.md` §Системные данные),
-      сервер (`pnpm --filter @balloo/server start` или dev), web
-      (`pnpm --filter @balloo/web dev`). Проверка: `curl -s -o /dev/null -w "%{http_code}"
-      http://localhost:3100/health`, `curl -s -o /dev/null -w "%{http_code}"
-      http://localhost:5173`.
-- [ ] 2. Спросить владельца на установку бинарника Cypress (п.3) — запись в
-      `with_lord/СДЕЛАТ_ВЛАДЕЛЬЦУ.md` с точной командой. До разрешения тикет
-      остаётся в `active/` с `[!]`, молча не скачивать.
-- [ ] 3. После разрешения: `pnpm --filter @balloo/web test:e2e -- --spec
-      "cypress/e2e/auth.cy.ts,cypress/e2e/chat.cy.ts"` (MVP1-ядро сначала).
-- [ ] 4. Каждый упавший шаг → отдельный баг-тикет `mvp1-04-bN-<кратко>.md`,
-      правка в коде, повторный прогон. Не править ожидаение под факт без
-      разбора причины.
+- [!] 1. Поднять локальный стек: PostgreSQL запущен, сервер и web — требуют `pnpm --filter @balloo/server start` + `pnpm --filter @balloo/web dev`. Блокировано Cypress (п.2).
+- [!] 2. Cypress-бинарник не установлен: `pnpm-workspace.yaml` содержит `allowBuilds: { cypress: false }`, `node_modules/.bin/cypress` → нет, `~/.cache/Cypress` → нет. Установка требует записи вне воркспейса (`~/.cache/Cypress`). Запись в `with_lord/СДЕЛАТ_ВЛАДЕЛЬЦУ.md` создана.
+- [ ] 3. После разрешения: `pnpm --filter @balloo/web test:e2e -- --spec "cypress/e2e/auth.cy.ts,cypress/e2e/chat.cy.ts"`.
+- [ ] 4. Каждый упавший шаг → отдельный баг-тикет.
 
-## Критерии готовности
+## Проблемы и решения
 
-- В «Результат»: полный вывод `cypress run` по auth+chat (pass/fail по каждому
-  `it`), список заведённых баг-тикетов.
-- Если бинарник не установлен — статус `[!]` с цитатой вывода `ls node_modules/.bin/cypress`.
+**Блокировка:** Cypress postinstall (`cypress install`) скачивает бинарник в `~/.cache/Cypress/` — запись вне воркспейса. По AGENTS «КРИТИЧЕСКОЕ ПРАВИЛО: Границы воркспейса» п.2 — не выполняю без явного разрешения владельца. Точная команда: `CYPRESS_INSTALL_BINARY=0` убрать из allowBuilds и выполнить `pnpm install` или `npx cypress install`.
 
 ## Результат
 
-(по ходу)
+[!] Заблокирован. Cypress-бинарник не установлен (запись вне воркспейса). Ожидание разрешения владельца.
