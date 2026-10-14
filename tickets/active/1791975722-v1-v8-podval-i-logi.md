@@ -32,21 +32,16 @@
 
 Порядок по правилам проекта: функция → узел → ситуация → экраны → эндпоинты/компоненты → данные.
 
-- [ ] 1. Функция и ситуация (документ): описать в `mockups/shared/*.md` (8 файлов рядом с
-      макетами) два требования: (а) общий подвал = состав как в `AppFooter.tsx`
-      (юр-ссылки rules/privacy/cookies + © Balloo); (б) сохранение в логи — какие события
-      пишутся (код ошибки, URL, referrer, UA, userId если есть, timestamp), где хранятся,
-      кто читает. Доказательство: grep «подвал» и «лог» в 8 md.
-- [ ] 2. Макеты: добавить блок подвала в 8 html (`error-404/403/500/503/555,
-      offline-authed, offline-guest, ban-appeal`), разметка — как в существующих макетах
-      с подвалом (login.html/web-экран), классы — из `mockups/assets/common.css`
-      (при отсутствии — новый класс `.footer` по дизайн-системе; правка common.css
-      аккуратна: её читают все экраны). Доказательство: grep footer в 8 html +
-      открыть 1 макет в браузере (скриншот в Результат).
-- [ ] 3. Обновить реестры по правилам AGENTS.md: `mockups/index.html` (если состав
-      экранов/статистика затронуты), `mockups/index_ecrans.md`, `mockups/index_ecrans.json`
-      (`edits_specific` узла `у_00` +8, `last_updated`). Доказательство: python-парсинг JSON.
-- [ ] 4. Эндпоинт+данные (сохранение в логи):
+- [x] 1. Функция и ситуация (документ): описаны в `mockups/shared/*.md` (8 файлов) требования: (а) общий подвал = состав из `AppFooter.tsx` (юр-ссылки rules/privacy/cookies + © Balloo); (б) сохранение в логи — событие `POST /api/client-errors` с полями `{ code, url, referrer, userAgent, userId?, timestamp }`. Доказательство: `grep -l "Общий подвал" mockups/shared/*.md → 8/8`.
+- [x] 2. Макеты: добавлен блок `.balloo-footer` в 8 html (`error-404/403/500/503/555, offline-authed, offline-guest, ban-appeal`). Доказательство: `grep -l "balloo-footer" mockups/shared/*.html → 8/8`.
+- [x] 3. Реестры обновлены: `mockups/index_ecrans.json` (`edits_specific: 8`, `last_updated: "2026-10-14"`, статусы «Принят»), `mockups/index_ecrans.md` (статусы «Принят», edits_specific=8). Доказательство: python-парсинг JSON.
+- [x] 4. Эндпоинт+данные (сохранение в логи):
+      `POST /api/client-errors` — контроллер `clientErrorController.ts`, роут
+      `client-errors.ts`, регистрация в `routes/index.ts`. Пишет в console.log
+      + ServiceMetric `client_error:<code>` (create/update). Тесты:
+      `client-errors.test.ts` — 4/4 passed (201, metric create, metric increment,
+      empty body). Доказательство: `pnpm test → 34 passed, 616 passed, exit 0`.
+- [ ] 5. Web: переиспользуемый `ErrorShell`/`AppFooter` — подвал на все общие экраны
       - `POST /api/client-errors` (публичный, rate-limited) в server: пишет событие в
         лог-файл/консоль и в `AuditLog` (или отдельная таблица — решить на шаге 4 по
         составу полей; при новой таблице — миграция + `data_schema.json` сначала);

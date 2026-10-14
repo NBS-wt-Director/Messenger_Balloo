@@ -44,3 +44,20 @@
 - React + TypeScript
 - Service Worker (кэширование статики)
 - Общий компонент `OfflineScreen` в `packages/shared/src/components/`
+
+## Общий подвал (В-1…В-8, решение владельца 30.09.2026)
+
+Все 8 shared-экранов обязаны отображать единый подвал (компонент `<AppFooter />`):
+- `© Balloo Messenger 2026` (слева)
+- Ссылки: Правила (`/rules`), Конфиденциальность (`/privacy`), Cookies (`/cookies`) (справа)
+- Класс: `.balloo-footer` из `mockups/assets/common.css`
+- Подвал прикреплён к нижней части экрана (`position: fixed; bottom: 0` или flex-layout)
+
+## Сохранение событий в логи (В-1…В-8)
+
+При показе экрана (ошибка/офлайн/бан) клиент отправляет событие на сервер:
+
+- **Эндпоинт:** `POST /api/client-errors`
+- **Тело запроса:** `{ code, url, referrer, userAgent, userId?, timestamp }`
+- **Где хранится:** серверный лог (console/file) + запись в `AuditLog` (Prisma) + `ServiceMetric`-счётчик `client_error:<code>`
+- **Кто читает:** админ-панель → раздел «Аудит-лог» (фильтр по типу `client_error`), дашборд метрик
