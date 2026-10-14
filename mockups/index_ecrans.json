@@ -1,7 +1,7 @@
 {
   "project": "Balloo Messenger",
   "version": "1.0.0",
-  "last_updated": "2026-09-29",
+  "last_updated": "2026-10-14",
   "total_screens": 174,
   "screens_unviewed": 0,
   "nodes": [
@@ -12,7 +12,7 @@
       "domain": "Общие экраны",
       "total_screens": 8,
       "viewed": 8,
-      "edits_specific": 0,
+      "edits_specific": 8,
       "edits_global_accepted": 0,
       "components_private": 8,
       "components_global": 5,
@@ -25,56 +25,56 @@
           "id": "1_00_08",
           "name": "Обжалование бана (оверлей)",
           "file": "shared/ban-appeal.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "shared/ban-appeal.md"
         },
         {
           "id": "1_00_02",
           "name": "Ошибка 403 (доступ запрещён)",
           "file": "shared/error-403.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "shared/error-403.md"
         },
         {
           "id": "1_00_01",
           "name": "Ошибка 404 (не найдено)",
           "file": "shared/error-404.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "shared/error-404.md"
         },
         {
           "id": "1_00_03",
           "name": "Ошибка 500 (внутренняя ошибка)",
           "file": "shared/error-500.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "shared/error-500.md"
         },
         {
           "id": "1_00_04",
           "name": "Ошибка 503 (сервис недоступен)",
           "file": "shared/error-503.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "shared/error-503.md"
         },
         {
           "id": "1_00_07",
           "name": "Ошибка 555 (аккаунт заблокирован)",
           "file": "shared/error-555.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "shared/error-555.md"
         },
         {
           "id": "1_00_05",
           "name": "Офлайн (авторизованный)",
           "file": "shared/offline-authed.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "shared/offline-authed.md"
         },
         {
           "id": "1_00_06",
           "name": "Офлайн (гость / неавторизованный)",
           "file": "shared/offline-guest.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "shared/offline-guest.md"
         }
       ]
