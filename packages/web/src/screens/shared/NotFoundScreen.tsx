@@ -4,11 +4,28 @@
 // P37-2 (решение владельца 2026-09-23): единый подвал добавлен на 404,
 // несмотря на его отсутствие в макете — требование «шапка и подвал одни
 // на всех страницах» приоритетнее.
+// В-1 (30.09.2026): при монтировании отправляем событие на /api/client-errors.
 
+import { useEffect } from 'react';
 import { AppTopbar } from '@/components/chrome/AppTopbar';
 import { AppFooter } from '@/components/chrome/AppFooter';
 
 function NotFoundScreen() {
+  useEffect(() => {
+    // Отправляем событие клиентской ошибки на сервер (тик. 1791975722)
+    fetch('/api/client-errors', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        code: 'not_found',
+        url: window.location.href,
+        referrer: document.referrer,
+        userAgent: navigator.userAgent,
+      }),
+    }).catch(() => {
+      // Не блокируем рендер — если сервер недоступен, молчим
+    });
+  }, []);
   return (
     <div
       style={{
