@@ -39,6 +39,15 @@
 
 **Блокировка:** Android SDK (`ANDROID_HOME`/`ANDROID_SDK_ROOT`) не задан, `~/Android` нет. Без SDK `./gradlew assembleRelease` невозможен. Expo cloud (`eas build`) требует `EXPO_TOKEN`. `expo prebuild` требует сеть до npm (в данной сессии недоступна).
 
+**Обновлено 14.10.2026 (тикеты 1791927977):** путь доставки APK выбран владельцем —
+self-update с download.balloo.su (без Play/EAS). Серверная часть готова и проверена
+живым прогоном: `POST /api/downloads/upload-mobile-file` (multipart → DOWNLOADS_DIR +
+sha256 + запись БД), `GET /api/downloads/android/latest`, статика `/downloads/`.
+Скрипт `scripts/upload-android-to-download.sh` переписан: теперь реально отправляет
+файл и проверяет latest. Приложение проверяет обновления при входе и по кнопке
+в Настройках (src/services/updateService.ts). Как только здесь появится APK из
+подзадачи 5 — публикация по блоку 1.2bis в `with_lord/СДЕЛАТЬ_ВЛАДЕЛЬЦУ.md`.
+
 ## Результат
 
 ```

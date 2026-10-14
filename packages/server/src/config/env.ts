@@ -98,6 +98,15 @@ export const envSchema = z.object({
   // File upload
   MAX_FILE_SIZE: z.string().default('52428800'),
 
+  // Раздача сборок (тикеты 1791927977, APK self-update):
+  // DOWNLOADS_DIR — каталог артефактов, раздаётся статикой на /downloads
+  // (nginx проксирует download.balloo.su/downloads/ сюда).
+  // Пусто = <projectRoot>/downloads (см. config/paths.ts).
+  // В контейнере: /app/downloads (том docker-compose).
+  DOWNLOADS_DIR: z.string().default(''),
+  // Публичный base URL артефактов — канонический URL в DownloadFile.url
+  DOWNLOAD_BASE_URL: z.string().default('https://download.balloo.su'),
+
   // Cookie domain для шаринга на поддомены (решение владельца 09.10.2026).
   // Для боевого домена: .balloo.su. Для localhost: не задавать (cookie привязан к origin).
   COOKIE_DOMAIN: z.string().optional(),

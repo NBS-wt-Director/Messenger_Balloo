@@ -1,7 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import { PrismaClient } from '@prisma/client';
+import fs from 'fs';
+import path from 'path';
+import crypto from 'crypto';
 import { AuthenticatedRequest } from '../middleware/auth';
 import { internalError } from '../middleware/errorHandler';
+import { env } from '../config/env';
+import { paths } from '../config/paths';
 
 const prisma = new PrismaClient();
 
@@ -591,5 +596,201 @@ export const recordDownload = async (
     res.json({ success: true, id: file.id });
   } catch (error: any) {
     internalError(res, error, 'downloadController.recordDownload');
+  }
+};
+
+// ============================================================
+// APK self-update (тикеты 1791927977)
+// ============================================================
+
+// Разрешённые архитектуры Android (совпадают с getAndroidArchPackage)
+const ANDROID_ARCHES = ['universal', 'arm64-v8a', 'armeabi-v7a', 'x86_64'];
+
+// SHA-256 файла потоковым чтением (APK до 200 МБ в память не грузим)
+function sha256OfFile(filePath: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const hash = crypto.createHash('sha256');
+    fs.createReadStream(filePath)
+      .on('error', reject)
+      .on('data', (chunk) => hash.update(chunk))
+      .on('end', () => resolve(hash.digest('hex')));
+  });
+}
+
+// ============================================================
+// Загрузить файл мобильной сборки (POST /api/downloads/upload-mobile-file)
+// ============================================================
+// Admin-only, multipart/form-data (поле file — сам APK/AAB).
+// Поля: version (semver, обязательно), versionCode (int, обязательно),
+//       arch (по умолчанию universal), format (apk|aab, по умолчанию apk).
+// Файл сохраняется в DOWNLOADS_DIR/android/balloo-v<version>-<arch>.<ext>,
+// sha256 и размер считаются по факту записи, запись — в DownloadFile.
+
+export const uploadMobileFile = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  const tmpPath = req.file?.path;
+  // Удаляет временный файл multer на ЛЮБОЙ ветке отказа (400/500).
+  // Без этого неудачные попытки забивают DOWNLOADS_DIR мусором.
+  const cleanupTmp = () => {
+    try {
+      if (tmpPath && fs.existsSync(tmpPath)) fs.unlinkSync(tmpPath);
+    } catch {
+      /* best-effort */
+    }
+  };
+  try {
+    const { version, versionCode, arch = 'universal', format = 'apk' } = req.body;
+
+    if (!req.file) {
+      res.status(400).json({
+        error: 'Bad Request',
+        message: 'Поле file (APK/AAB) обязательно — multipart/form-data',
+      });
+      return;
+    }
+
+    if (!version || !/^\d+\.\d+\.\d+([-+][0-9A-Za-z.-]+)?$/.test(version)) {
+      cleanupTmp();
+      res.status(400).json({
+        error: 'Bad Request',
+        message: 'version обязателен и должен быть semver (например, 1.0.0)',
+      });
+      return;
+    }
+
+    const versionCodeNum = Number(versionCode);
+    if (!Number.isInteger(versionCodeNum) || versionCodeNum < 1) {
+      cleanupTmp();
+      res.status(400).json({
+        error: 'Bad Request',
+        message: 'versionCode обязателен и должен быть целым числом >= 1',
+      });
+      return;
+    }
+
+    if (!ANDROID_ARCHES.includes(arch)) {
+      cleanupTmp();
+      res.status(400).json({
+        error: 'Bad Request',
+        message: `arch должен быть одним из: ${ANDROID_ARCHES.join(', ')}`,
+      });
+      return;
+    }
+
+    if (!['apk', 'aab'].includes(format)) {
+      cleanupTmp();
+      res.status(400).json({
+        error: 'Bad Request',
+        message: 'format должен быть "apk" или "aab"',
+      });
+      return;
+    }
+
+    // Каноническое имя: баллоо-версия-архитектура. Перезагрузка той же версии
+    // перезаписывает файл (rename поверх) — запись в БД остаётся новой.
+    const fileName = `balloo-v${version}-${arch}.${format}`;
+    const dir = path.join(paths.downloads, 'android');
+    fs.mkdirSync(dir, { recursive: true });
+    const finalPath = path.join(dir, fileName);
+    fs.renameSync(tmpPath!, finalPath);
+
+    const checksum = await sha256OfFile(finalPath);
+    const size = fs.statSync(finalPath).size;
+    const url = `${env.DOWNLOAD_BASE_URL.replace(/\/+$/, '')}/downloads/android/${fileName}`;
+
+    const downloadFile = await prisma.downloadFile.create({
+      data: {
+        platform: `android-${format}-${arch}`,
+        version,
+        versionCode: versionCodeNum,
+        url,
+        size: BigInt(size),
+        checksum,
+        createdAt: BigInt(Math.floor(Date.now() / 1000)),
+      },
+    });
+
+    res.status(201).json({
+      success: true,
+      data: {
+        id: downloadFile.id,
+        platform: downloadFile.platform,
+        version: downloadFile.version,
+        versionCode: downloadFile.versionCode,
+        url: downloadFile.url,
+        size: downloadFile.size.toString(),
+        checksum: downloadFile.checksum,
+      },
+    });
+  } catch (error: any) {
+    // Не оставляем осиротевший временный файл при ошибке
+    cleanupTmp();
+    internalError(res, error, 'downloadController.uploadMobileFile');
+  }
+};
+
+// ============================================================
+// Последняя Android-сборка для self-update (GET /api/downloads/android/latest)
+// ============================================================
+// Публичный. Query: arch (по умолчанию universal).
+// Сортировка: versionCode desc (NULLs last), затем createdAt desc.
+// 404 — пакетов ещё нет (приложение молча продолжает работать).
+
+export const getAndroidLatest = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const arch = String(req.query.arch ?? 'universal');
+    if (!ANDROID_ARCHES.includes(arch)) {
+      res.status(400).json({
+        error: 'Bad Request',
+        message: `arch должен быть одним из: ${ANDROID_ARCHES.join(', ')}`,
+      });
+      return;
+    }
+
+    const orderBy = [
+      { versionCode: { sort: 'desc' as const, nulls: 'last' as const } },
+      { createdAt: 'desc' as const },
+    ];
+
+    let f = await prisma.downloadFile.findFirst({
+      where: { platform: `android-apk-${arch}` },
+      orderBy,
+    });
+
+    // Legacy-записи без архива в имени (uploadMobile без arch) — только для universal
+    if (!f && arch === 'universal') {
+      f = await prisma.downloadFile.findFirst({
+        where: { platform: 'android-apk' },
+        orderBy,
+      });
+    }
+
+    if (!f) {
+      res.status(404).json({
+        error: 'Not Found',
+        message: `APK для архитектуры "${arch}" ещё не опубликован`,
+      });
+      return;
+    }
+
+    res.json({
+      platform: f.platform,
+      version: f.version,
+      versionCode: f.versionCode,
+      url: f.url,
+      size: f.size.toString(),
+      checksum: f.checksum,
+      arch,
+      createdAt: Number(f.createdAt),
+    });
+  } catch (error: any) {
+    internalError(res, error, 'downloadController.getAndroidLatest');
   }
 };

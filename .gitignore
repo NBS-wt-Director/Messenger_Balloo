@@ -87,3 +87,8 @@ coverage/
 # Архив тикетов — только локально, на сервер (git) не попадает
 # (решение владельца 26.09.2026; содержимое перенесено в tickets/catalog.md)
 tickets/archive/
+
+# Каталог раздаваемых сборок (тикеты 1791927977): локальный dev-путь и
+# bind-mount docker/prod/downloads — артефакты (APK) в git не попадают
+packages/downloads/
+docker/prod/downloads/

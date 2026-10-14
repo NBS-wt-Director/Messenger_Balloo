@@ -1065,13 +1065,14 @@ model Announcement {
 }
 
 model DownloadFile {
-  id        String   @id @default(cuid()) @db.VarChar(25)
-  platform  String   @db.VarChar(20) // windows, macos, linux, android, ios, web
-  version   String   @db.VarChar(20)
-  url       String   @db.VarChar(500)
-  size      BigInt   @default(0) // bytes
-  checksum  String?  @db.VarChar(64) // SHA-256
-  createdAt BigInt   @default(0)
+  id          String   @id @default(cuid()) @db.VarChar(25)
+  platform    String   @db.VarChar(32) // windows, macos, linux, android, ios, web (32 — канон. имена android-apk-<arch>, тикеты 1791927977)
+  version     String   @db.VarChar(20)
+  versionCode Int?     // Android versionCode — монотонный номер сборки (APK self-update, тикет 1791927977)
+  url         String   @db.VarChar(500)
+  size        BigInt   @default(0) // bytes
+  checksum    String?  @db.VarChar(64) // SHA-256
+  createdAt   BigInt   @default(0)
 
   @@index([platform])
   @@index([version])

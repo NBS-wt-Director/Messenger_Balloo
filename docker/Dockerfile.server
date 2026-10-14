@@ -87,6 +87,12 @@ RUN chmod +x /usr/local/bin/entrypoint.server.sh
 
 # Create non-root user
 RUN groupadd -r app && useradd -r -g app app
+
+# Каталог раздаваемых сборок (тикет 1791927977). При bind-mount с хоста
+# права берутся с хостового каталога (см. комментарий в docker-compose),
+# при named volume — наследуются отсюда.
+RUN mkdir -p /app/downloads && chown app:app /app/downloads
+
 USER app
 
 EXPOSE 3000

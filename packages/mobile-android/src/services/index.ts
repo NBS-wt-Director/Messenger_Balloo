@@ -6,3 +6,4 @@ export {
   registerPushTokenOnServer,
   showMessageNotification,
 } from './notifications';
+export { checkForUpdates, getLocalVersion } from './updateService';

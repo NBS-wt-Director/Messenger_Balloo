@@ -17,6 +17,7 @@ import { PrismaClient } from '@prisma/client';
 import Redis from 'ioredis';
 import * as Minio from 'minio';
 import { env } from './config/env';
+import { paths } from './config/paths';
 
 const app: Application = express();
 
@@ -123,6 +124,30 @@ app.get('/health/ready', async (_req, res) => {
 
   res.status(httpStatus).json({ status, checks, timestamp: Date.now() });
 });
+
+// ============================================================
+// Статика раздаваемых сборок (тикет 1791927977):
+// GET /downloads/<platform>/<file> — APK/AAB/desktop артефакты.
+// nginx проксирует download.balloo.su/downloads/ на этот сервер.
+// Листинг каталога выключен (index:false), неизвестный файл → 404.
+// ============================================================
+app.use(
+  '/downloads',
+  express.static(paths.downloads, {
+    index: false,
+    fallthrough: true,
+    setHeaders: (res, filePath) => {
+      if (filePath.endsWith('.apk')) {
+        res.setHeader('Content-Type', 'application/vnd.android.package-archive');
+      } else if (filePath.endsWith('.aab')) {
+        res.setHeader('Content-Type', 'application/octet-stream');
+      }
+      // Имя файла при скачивании из браузера (APK → диалог установки Android)
+      const name = filePath.split('/').pop();
+      if (name) res.setHeader('Content-Disposition', `attachment; filename="${name}"`);
+    },
+  }),
+);
 
 // Базовый роутер
 app.use('/', baseRouter);

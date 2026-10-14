@@ -12,6 +12,13 @@ export const paths = {
   uploads: path.join(path.resolve(__dirname, '../../..'), 'uploads'),
   logs: path.join(path.resolve(__dirname, '../../..'), 'logs'),
 
+  // Каталог раздаваемых сборок (APK/AAB, тикет 1791927977).
+  // В контейнере DOWNLOADS_DIR=/app/downloads (том docker-compose),
+  // локально по умолчанию — packages/downloads.
+  downloads: process.env.DOWNLOADS_DIR
+    ? path.resolve(process.env.DOWNLOADS_DIR)
+    : path.join(path.resolve(__dirname, '../../..'), 'downloads'),
+
   // CDN / медиа (Yandex Object Storage или MinIO)
   cdn: {
     baseUrl: process.env.CDN_BASE_URL || 'http://localhost:9000/balloo-media',

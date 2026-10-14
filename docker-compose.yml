@@ -50,6 +50,12 @@ services:
       SERVER_HOST: 0.0.0.0
       CORS_ORIGIN: ${CORS_ORIGIN:-https://app.balloo.su}
       MAX_FILE_SIZE: ${MAX_FILE_SIZE:-52428800}
+      # Раздача сборок APK/AAB (тикет 1791927977). Каталог на хосте должен быть
+      # записываемым из контейнера (USER app, не root): mkdir -p downloads && chmod 777 downloads
+      DOWNLOADS_DIR: /app/downloads
+      DOWNLOAD_BASE_URL: ${DOWNLOAD_BASE_URL:-https://download.balloo.su}
+    volumes:
+      - ./downloads:/app/downloads
     depends_on:
       postgres:
         condition: service_healthy

@@ -12,9 +12,11 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Constants from 'expo-constants';
 import { getThemeColors } from '../styles/theme';
 import { useUIStore, SUPPORTED_LANGUAGES, Theme as ThemeType } from '../store/uiStore';
 import { useAuthStore } from '../store/authStore';
+import { checkForUpdates } from '../services/updateService';
 
 interface SettingsScreenProps {
   navigation: any;
@@ -184,10 +186,18 @@ export default function SettingsScreen({ navigation }: SettingsScreenProps) {
               <View style={styles.aboutLogo}>
                 <Text style={styles.aboutLogoIcon}>🎈</Text>
                 <Text style={[styles.aboutName, { color: colors.textPrimary }]}>Balloo Messenger</Text>
-                <Text style={[styles.aboutVersion, { color: colors.textSecondary }]}>Версия 1.0.0 (сборка 2026.07.18)</Text>
+                <Text style={[styles.aboutVersion, { color: colors.textSecondary }]}>
+                  Версия {Constants.expoConfig?.version ?? '1.0.0'} (сборка {Constants.expoConfig?.android?.versionCode ?? 1})
+                </Text>
               </View>
               <SettingsRow label="Поддержка" right={<Text style={[styles.linkText, { color: colors.accent }]}>help@balloo.su</Text>} />
               <SettingsRow label="Лицензия" right={<Text style={[styles.linkText, { color: colors.accent }]}>MIT</Text>} />
+              <TouchableOpacity
+                style={[styles.supportBtn, { backgroundColor: colors.accent }]}
+                onPress={() => { void checkForUpdates({ interactive: true }); }}
+              >
+                <Text style={styles.supportBtnText}>🔄 Проверить обновления</Text>
+              </TouchableOpacity>
             </View>
           </View>
         );

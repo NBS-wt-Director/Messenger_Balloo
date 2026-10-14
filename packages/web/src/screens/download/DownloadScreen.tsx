@@ -59,11 +59,11 @@ const DEFAULT_MAC: PackageData[] = [
 ];
 
 const DEFAULT_ANDROID: PackageData[] = [
-  { format: 'apk', arch: 'universal', label: 'Balloo Universal.apk', icon: '🌍', recommended: true, url: 'https://download.balloo.su/android/balloo-universal.apk', size: 50000000, version: '1.0.0' },
-  { format: 'apk', arch: 'arm64-v8a', label: 'Balloo ARM64.apk', icon: '📱', url: 'https://download.balloo.su/android/balloo-arm64.apk', size: 35000000, version: '1.0.0' },
-  { format: 'apk', arch: 'armeabi-v7a', label: 'Balloo ARM32.apk', icon: '📲', url: 'https://download.balloo.su/android/balloo-arm32.apk', size: 30000000, version: '1.0.0' },
-  { format: 'apk', arch: 'x86_64', label: 'Balloo x86_64.apk', icon: '💻', url: 'https://download.balloo.su/android/balloo-x86_64.apk', size: 38000000, version: '1.0.0' },
-  { format: 'aab', arch: 'universal', label: 'Balloo.aab (Google Play)', icon: '📦', url: 'https://download.balloo.su/android/balloo.aab', size: 45000000, version: '1.0.0' },
+  { format: 'apk', arch: 'universal', label: 'Balloo Universal.apk', icon: '🌍', recommended: true, url: 'https://download.balloo.su/downloads/android/balloo-v1.0.0-universal.apk', size: 50000000, version: '1.0.0' },
+  { format: 'apk', arch: 'arm64-v8a', label: 'Balloo ARM64.apk', icon: '📱', url: 'https://download.balloo.su/downloads/android/balloo-v1.0.0-arm64-v8a.apk', size: 35000000, version: '1.0.0' },
+  { format: 'apk', arch: 'armeabi-v7a', label: 'Balloo ARM32.apk', icon: '📲', url: 'https://download.balloo.su/downloads/android/balloo-v1.0.0-armeabi-v7a.apk', size: 30000000, version: '1.0.0' },
+  { format: 'apk', arch: 'x86_64', label: 'Balloo x86_64.apk', icon: '💻', url: 'https://download.balloo.su/downloads/android/balloo-v1.0.0-x86_64.apk', size: 38000000, version: '1.0.0' },
+  { format: 'aab', arch: 'universal', label: 'Balloo.aab (Google Play)', icon: '📦', url: 'https://download.balloo.su/downloads/android/balloo-v1.0.0-universal.aab', size: 45000000, version: '1.0.0' },
 ];
 
 const SYSTEM_REQUIREMENTS: SystemRequirement[] = [
@@ -108,6 +108,14 @@ export function DownloadScreen() {
           return defaults.map((d) => {
             // Ищем совпадение по платформе-формату (platform: "win-exe", "linux-appimage" и т.д.)
             const match = apiPkgs.find((a) => {
+              const plat = (a.platform || '').toLowerCase();
+              // Android: точное совпадение "android-<format>-<arch>" — как пишет
+              // upload-mobile-file (тикеты 1791927977). Иначе все APK матчились
+              // бы на первую запись со 'apk' в имени.
+              if (d.arch) return plat === `android-${d.format}-${d.arch}`;
+              return plat.includes(d.format);
+            }) || apiPkgs.find((a) => {
+              // Legacy-записи без arch в platform (uploadMobile) — прежнее правило
               const plat = (a.platform || '').toLowerCase();
               return plat.includes(d.format) || plat.includes(d.arch || '');
             });

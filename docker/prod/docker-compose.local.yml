@@ -158,6 +158,14 @@ services:
       # управлении схемой. Тикет 1791623683: без этого чистый прод = пустая БД.
       RUN_MIGRATIONS: ${RUN_MIGRATIONS:-1}
       RUN_SEED: ${RUN_SEED:-1}
+      # Раздача сборок APK/AAB (тикет 1791927977): express раздаёт DOWNLOADS_DIR
+      # на /downloads, nginx проксирует download.balloo.su/downloads/ на server.
+      # КАТАЛОГ НА ХОСТЕ ДОЛЖЕН БЫТЬ ЗАПИСЫВАЕМЫМ из контейнера (USER app, не root):
+      #   mkdir -p downloads && chmod 777 downloads
+      DOWNLOADS_DIR: /app/downloads
+      DOWNLOAD_BASE_URL: ${DOWNLOAD_BASE_URL:-https://download.balloo.su}
+    volumes:
+      - ./downloads:/app/downloads
     depends_on:
       postgres:
         condition: service_healthy
