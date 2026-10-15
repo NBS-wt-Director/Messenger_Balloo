@@ -89,6 +89,10 @@ services:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-balloo-minio}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     ports:
+      # API MinIO на loopback: нужен хостовому nginx для cdn.balloo.su
+      # (proxy_pass http://127.0.0.1:9000/balloo-media/). Без этой публикации
+      # CDN отдаёт 502 — порт на хосте слушает только консоль 9001.
+      - "127.0.0.1:${MINIO_API_PORT:-9000}:9000"
       - "127.0.0.1:${MINIO_CONSOLE_PORT:-9001}:9001"
     volumes:
       - minio-data:/data
