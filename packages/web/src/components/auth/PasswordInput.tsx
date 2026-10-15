@@ -9,6 +9,8 @@ interface PasswordInputProps {
   label?: string;
   error?: string;
   hint?: string;
+  /** Стабильный селектор для e2e (Cypress) */
+  'data-testid'?: string;
 }
 
 export function PasswordInput({
@@ -18,6 +20,7 @@ export function PasswordInput({
   label,
   error,
   hint,
+  ...rest
 }: PasswordInputProps) {
   const [showPassword, setShowPassword] = useState(false);
   const inputId = React.useId();
@@ -36,6 +39,7 @@ export function PasswordInput({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           style={{ flex: 1 }}
+          {...rest}
         />
         <button
           type="button"

@@ -106,6 +106,7 @@ function LoginScreen() {
               <label className="form-label" htmlFor="login-email">{t('auth.email')}</label>
               <input
                 id="login-email"
+                data-testid="login-email"
                 type="email"
                 className="form-input"
                 placeholder="ivan@example.com"
@@ -120,6 +121,7 @@ function LoginScreen() {
                 label={t('auth.password')}
                 value={password}
                 onChange={setPassword}
+                data-testid="login-password"
               />
               <div style={{ textAlign: 'right', marginTop: '4px' }}>
                 <Link
@@ -134,6 +136,7 @@ function LoginScreen() {
             {error && (
               <p
                 className="text-sm text-danger"
+                data-testid="login-error"
                 style={{ marginBottom: '12px', textAlign: 'center' }}
               >
                 {error}
@@ -158,6 +161,7 @@ function LoginScreen() {
 
             <button
               type="submit"
+              data-testid="login-submit"
               className="btn btn--primary btn--block mb-4"
               disabled={loading}
               style={{ opacity: loading ? 0.6 : 1 }}

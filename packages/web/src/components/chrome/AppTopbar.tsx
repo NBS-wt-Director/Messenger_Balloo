@@ -30,7 +30,9 @@ function initialsOf(user: { displayName?: string; username: string } | null): st
   if (!user) return 'ИИ';
   const parts = (user.displayName || user.username || '').trim().split(/\s+/).slice(0, 2);
   const letters = parts.map((p) => p[0]?.toUpperCase() ?? '').join('');
-  return letters || (user.username[0]?.toUpperCase() ?? 'ИИ');
+  // username может быть null (регистрация без username) — fallback на 'ИИ',
+  // иначе падение всего топа (e2e mvp1-04, TypeError Cannot read properties of null)
+  return letters || (user.username?.[0]?.toUpperCase() ?? 'ИИ');
 }
 
 export function AppTopbar({ title, onTitleClick, right, showSwitchers = true, auth }: AppTopbarProps) {

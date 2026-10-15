@@ -1,7 +1,7 @@
 // E2E: Создание группы → добавление участников → invite link
 describe('Group Flow', () => {
   beforeEach(() => {
-    cy.visit('/login');
+    cy.visit('/#/login');
     cy.get('input[type="email"], input[name="email"]').type('e2e@test.balloo.ru');
     cy.get('input[type="password"], input[name="password"]').type('Test1234');
     cy.get('button[type="submit"]').click();

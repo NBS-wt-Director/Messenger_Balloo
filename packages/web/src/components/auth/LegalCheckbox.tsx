@@ -10,6 +10,8 @@ interface LegalCheckboxProps {
   // P22: перевод с inline-ссылками передаётся как ReactNode из RegisterScreen
   label?: React.ReactNode;
   error?: string;
+  /** Стабильный селектор для e2e (Cypress) */
+  'data-testid'?: string;
 }
 
 export function LegalCheckbox({
@@ -19,6 +21,7 @@ export function LegalCheckbox({
   privacyUrl = '/privacy',
   label,
   error,
+  'data-testid': testId,
 }: LegalCheckboxProps) {
   const defaultLabel = (
     <>
@@ -42,6 +45,7 @@ export function LegalCheckbox({
           onChange={(e) => onChange(e.target.checked)}
           className="form-checkbox"
           style={{ width: '18px', height: '18px', marginTop: '2px', flexShrink: 0 }}
+          data-testid={testId}
         />
         <span className="text-sm text-secondary" style={{ flex: 1 }}>
           {label || defaultLabel}

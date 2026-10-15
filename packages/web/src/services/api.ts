@@ -45,7 +45,11 @@ async function request<T>(
   let response = await fetch(`${API_BASE}${endpoint}`, config);
 
   // If 401, try refresh token via httpOnly cookie
-  if (response.status === 401) {
+  // Для auth-эндпоинтов (login/register/refresh) 401 — штатный ответ «неверные
+  // учётные данные», а не «сессия истекла»: попытка refresh здесь подменяла
+  // «Неверный email или пароль» на «Session expired» (e2e mvp1-04).
+  const isAuthEndpoint = endpoint.startsWith('/api/auth/');
+  if (response.status === 401 && !isAuthEndpoint) {
     // Сервер берёт refresh token из cookie (body не нужен). Ответ /refresh-cookie
     // различает два состояния — раньше оба трактовались как «сессия протухла»,
     // из-за чего гость на публичных страницах сбрасывался на #/login

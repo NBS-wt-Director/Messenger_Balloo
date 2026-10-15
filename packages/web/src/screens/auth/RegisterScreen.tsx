@@ -229,6 +229,7 @@ function RegisterScreen() {
                 <label className="form-label">{t('auth.name')}</label>
                 <input
                   type="text"
+                  data-testid="register-name"
                   className="form-input"
                   placeholder={t('auth.namePlaceholder')}
                   value={displayName}
@@ -300,6 +301,7 @@ function RegisterScreen() {
                 <label className="form-label">{t('auth.email')}</label>
                 <input
                   type="email"
+                  data-testid="register-email"
                   className="form-input"
                   placeholder="ivan@example.com"
                   value={email}
@@ -312,6 +314,7 @@ function RegisterScreen() {
                 <label className="form-label">{t('auth.password')}</label>
                 <input
                   type="password"
+                  data-testid="register-password"
                   className="form-input"
                   placeholder={t('auth.passwordPlaceholder')}
                   value={password}
@@ -325,6 +328,7 @@ function RegisterScreen() {
                 <label className="form-label">{t('auth.confirmPassword')}</label>
                 <input
                   type="password"
+                  data-testid="register-confirm"
                   className="form-input"
                   placeholder="••••••••"
                   value={confirmPassword}
@@ -337,12 +341,14 @@ function RegisterScreen() {
                 checked={agreed}
                 onChange={setAgreed}
                 label={agreeLabel}
+                data-testid="register-agree"
               />
 
               {/* Captcha */}
               <div className="card mb-4" style={{ padding: '12px' }}>
                 <div className="flex items-center gap-3 mb-2">
                   <div
+                    data-testid="register-captcha-text"
                     style={{
                       width: '120px',
                       height: '40px',
@@ -371,6 +377,7 @@ function RegisterScreen() {
                 </div>
                 <input
                   type="text"
+                  data-testid="register-captcha"
                   className="form-input"
                   placeholder={t('auth.captchaPlaceholder')}
                   value={captchaCode}
@@ -380,7 +387,11 @@ function RegisterScreen() {
 
               {/* Error */}
               {error && (
-                <p className="text-sm" style={{ color: 'var(--danger)', marginBottom: '12px', textAlign: 'center' }}>
+                <p
+                  className="text-sm"
+                  data-testid="register-error"
+                  style={{ color: 'var(--danger)', marginBottom: '12px', textAlign: 'center' }}
+                >
                   {error}
                 </p>
               )}
@@ -388,6 +399,7 @@ function RegisterScreen() {
               {/* Submit */}
               <button
                 type="submit"
+                data-testid="register-submit"
                 className="btn btn--primary btn--block mb-4"
                 disabled={loading}
                 style={{ opacity: loading ? 0.6 : 1 }}
@@ -397,7 +409,7 @@ function RegisterScreen() {
             </form>
           ) : (
             /* Email verification code step */
-            <div>
+            <div data-testid="register-code-step">
               <div className="card mb-4" style={{ padding: '16px', borderLeft: '4px solid var(--accent)' }}>
                 <p className="text-sm text-secondary mb-3">
                   📨 {t('auth.codeSent')}
