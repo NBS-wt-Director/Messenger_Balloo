@@ -17,7 +17,6 @@ import StoriesScreen from '../../screens/stories/StoriesScreen';
 import PollScreen from '../../screens/polls/PollScreen';
 import TwoFactorScreen from '../../screens/auth/TwoFactorScreen';
 import GroupSettingsScreen from '../../screens/groups/GroupSettingsScreen';
-import { TasksScreen } from '../../screens/command/TasksScreen';
 import { CommandBlogScreen } from '../../screens/command/CommandBlogScreen';
 import { CommandSettingsScreen } from '../../screens/command/CommandSettingsScreen';
 import { AuditLogsScreen } from '../../screens/admin/AuditLogsScreen';
@@ -34,7 +33,6 @@ describe('Settings, profile, stories, polls, command screens (smoke)', () => {
     ['PollScreen', <PollScreen />],
     ['TwoFactorScreen', <TwoFactorScreen />],
     ['GroupSettingsScreen', <GroupSettingsScreen />],
-    ['TasksScreen', <TasksScreen />],
     ['CommandBlogScreen', <CommandBlogScreen />],
     ['CommandSettingsScreen', <CommandSettingsScreen />],
     ['AuditLogsScreen', <AuditLogsScreen />],

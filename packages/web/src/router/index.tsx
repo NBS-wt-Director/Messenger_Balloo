@@ -82,7 +82,6 @@ const CommandKnowledgeScreen = lazy(() => import('@/screens/command/KnowledgeScr
 const CommandKnowledgePageScreen = lazy(() => import('@/screens/command/KnowledgePageScreen').then((m) => ({ default: m.KnowledgePageScreen })));
 const CommandCreatePageScreen = lazy(() => import('@/screens/command/CreatePageScreen').then((m) => ({ default: m.CreatePageScreen })));
 const InternalChatScreen = lazy(() => import('@/screens/command/InternalChatScreen').then((m) => ({ default: m.InternalChatScreen })));
-const TasksScreen = lazy(() => import('@/screens/command/TasksScreen').then((m) => ({ default: m.TasksScreen })));
 const CommandBlogScreen = lazy(() => import('@/screens/command/CommandBlogScreen').then((m) => ({ default: m.CommandBlogScreen })));
 const CommandSettingsScreen = lazy(() => import('@/screens/command/CommandSettingsScreen').then((m) => ({ default: m.CommandSettingsScreen })));
 
@@ -672,7 +671,7 @@ export const router = createHashRouter([
       },
       {
         path: 'tasks',
-        element: <TasksScreen />,
+        element: <NotFoundScreen />,
       },
       // Command blog — тикет №52
       {
