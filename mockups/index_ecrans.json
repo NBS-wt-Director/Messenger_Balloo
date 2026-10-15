@@ -1,7 +1,7 @@
 {
   "project": "Balloo Messenger",
   "version": "1.0.0",
-  "last_updated": "2026-10-14",
+  "last_updated": "2026-10-15",
   "total_screens": 174,
   "screens_unviewed": 0,
   "nodes": [
@@ -1032,7 +1032,7 @@
       "domain": "Мобильные макеты",
       "total_screens": 24,
       "viewed": 24,
-      "edits_specific": 9,
+      "edits_specific": 10,
       "edits_global_accepted": 5,
       "components_private": 24,
       "components_global": 5,
@@ -1207,7 +1207,7 @@
           "id": "1_08_22",
           "name": "Полноэкранный просмотрщик медиа",
           "file": "mobile/media-viewer.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "mobile/media-viewer.md"
         },
         {

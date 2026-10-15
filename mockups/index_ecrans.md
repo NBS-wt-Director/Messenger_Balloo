@@ -809,7 +809,7 @@
 
 | `1_08_10` | Вход | `mobile/login.html` | Принят | `mobile/login.md` |
 
-| `1_08_22` | Полноэкранный просмотрщик медиа | `mobile/media-viewer.html` | Просмотрен | `mobile/media-viewer.md` |
+| `1_08_22` | Полноэкранный просмотрщик медиа | `mobile/media-viewer.html` | Принят | `mobile/media-viewer.md` |
 
 | `1_08_05` | Мои устройства | `mobile/my-devices.html` | Принят | `mobile/my-devices.md` |
 
