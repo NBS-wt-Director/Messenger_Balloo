@@ -1,6 +1,6 @@
 {
   "name": "@balloo/shared",
-  "version": "1.0.0",
+  "version": "0.0.5",
   "private": true,
   "description": "Balloo Messenger — shared types, utilities, i18n, Prisma schema",
   "main": "dist/index.js",

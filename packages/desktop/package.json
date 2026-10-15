@@ -1,6 +1,6 @@
 {
   "name": "@balloo/desktop",
-  "version": "1.0.0",
+  "version": "0.0.5",
   "private": true,
   "description": "Balloo Messenger — Electron desktop app",
   "author": "Balloo Team <team@balloo.su>",

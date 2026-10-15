@@ -1,6 +1,6 @@
 {
   "name": "balloo-messenger",
-  "version": "1.0.0",
+  "version": "0.0.5",
   "private": true,
   "description": "Balloon Messenger — мессенджер + админ + портал сотрудников + блог",
   "workspaces": [

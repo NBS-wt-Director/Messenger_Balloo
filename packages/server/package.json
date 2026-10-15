@@ -1,6 +1,6 @@
 {
   "name": "@balloo/server",
-  "version": "1.0.0",
+  "version": "0.0.5",
   "private": true,
   "description": "Balloo Messenger — Express + WebSocket server",
   "main": "dist/index.js",
