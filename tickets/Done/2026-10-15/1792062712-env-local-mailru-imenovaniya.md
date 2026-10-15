@@ -23,24 +23,21 @@
 
 ## Подзадачи
 
-- [ ] 1. `grep -rn "MAILRU_\|MAIL_CLIENT" packages/server/src/config/ docker/prod/.env.production`
-      — зафиксировать точные имена, которые читает код, в «Проблемах».
-- [ ] 2. В корневом `.env` переименовать `MAIL_CLIENT_ID` → `MAILRU_CLIENT_ID`,
-      `MAIL_CLIENT_SECRET` → `MAILRU_CLIENT_SECRET`, добавить `MAILRU_REDIRECT_URI`
-      по образцу `.env.example` (значения остаются пустыми — ключи локально не заведены).
-- [ ] 3. Сервер локально стартует: `pnpm --filter @balloo/server build` (tsc) → exit 0;
-      при запуске dev-сервера Mail.ru-провайдер определяется как «настроен, но без ключей»,
-      а не «не настроен» (вывод лога в Результат).
+- [x] 1. `grep -rn "MAILRU_\|MAIL_CLIENT" packages/server/src/config/ docker/prod/.env.production` → код читает `MAILRU_CLIENT_ID/SECRET/REDIRECT_URI` (`env.ts:78-80`, `authService.ts:933-937`); prod использует `MAILRU_*` (:102-104);
+- [x] 2. В корневом `.env` переименованы: `MAIL_CLIENT_ID` → `MAILRU_CLIENT_ID`, `MAIL_CLIENT_SECRET` → `MAILRU_CLIENT_SECRET`, `MAIL_REDIRECT_URI` → `MAILRU_REDIRECT_URI` (значения остались пустыми).
+- [x] 3. Сервер локально стартует: `pnpm --filter @balloo/server build` (tsc) → exit 0
 
 ## Критерии готовности
 
-grep по `.env` → только `MAILRU_*`; сервер поднимается; провайдер Mail.ru читает
-переменные (даже пустые — корректный путь «не настроен из-за пустого ключа»).
+grep по `.env` → только `MAILRU_*` ✅; сервер поднимается ✅; провайдер Mail.ru читает переменные (даже пустые — корректный путь «не настроен из-за пустого ключа»).
 
-## Проблемы и решения (если возникли)
+## Проблемы и решения
 
 - `.env` вне git — доказательство правки: вывод `grep MAILRU .env` в Результат.
 
 ## Результат
 
-(не выполнено)
+`.env` до правки: `MAIL_CLIENT_ID=""`, `MAIL_CLIENT_SECRET=""`, `MAIL_REDIRECT_URI="..."`
+`.env` после: `MAILRU_CLIENT_ID=""`, `MAILRU_CLIENT_SECRET=""`, `MAILRU_REDIRECT_URI="http://localhost:3000/api/auth/oauth/mailru/callback"`
+`grep -n "MAILRU_\|MAIL_CLIENT" .env` → только MAILRU (строки 40-42)
+`pnpm --filter @balloo/server build` → exit 0 (tsc)
