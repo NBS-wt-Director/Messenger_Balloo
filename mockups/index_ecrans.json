@@ -386,7 +386,7 @@
           "id": "1_01_41",
           "name": "Создание историй",
           "file": "balloo-su/story-create.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "balloo-su/story-create.md"
         },
         {
@@ -400,14 +400,14 @@
           "id": "1_01_30",
           "name": "Двухфакторная аутентификация",
           "file": "balloo-su/two-factor.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "balloo-su/two-factor.md"
         },
         {
           "id": "1_01_39",
           "name": "Запись голосового",
           "file": "balloo-su/voice-message.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "balloo-su/voice-message.md"
         }
       ]
@@ -951,7 +951,7 @@
           "id": "1_05_02",
           "name": "Детали версии",
           "file": "history-balloo-su/version-detail.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "history-balloo-su/version-detail.md"
         },
         {
@@ -1200,7 +1200,7 @@
           "id": "1_08_21",
           "name": "Пустой чат",
           "file": "mobile/empty-chat.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "mobile/empty-chat.md"
         },
         {

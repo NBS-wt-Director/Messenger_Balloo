@@ -291,13 +291,13 @@
 
 | `1_01_27` | Сторис | `balloo-su/stories.html` | Просмотрен | `balloo-su/stories.md` |
 
-| `1_01_41` | Создание историй | `balloo-su/story-create.html` | Просмотрен | `balloo-su/story-create.md` |
+| `1_01_41` | Создание историй | `balloo-su/story-create.html` | Принят | `balloo-su/story-create.md` |
 
 | `1_01_14` | Техподдержка | `balloo-su/support.html` | Принят | `balloo-su/support.md` |
 
-| `1_01_30` | Двухфакторная аутентификация | `balloo-su/two-factor.html` | Просмотрен | `balloo-su/two-factor.md` |
+| `1_01_30` | Двухфакторная аутентификация | `balloo-su/two-factor.html` | Принят | `balloo-su/two-factor.md` |
 
-| `1_01_39` | Запись голосового | `balloo-su/voice-message.html` | Просмотрен | `balloo-su/voice-message.md` |
+| `1_01_39` | Запись голосового | `balloo-su/voice-message.html` | Принят | `balloo-su/voice-message.md` |
 
 
 ---
@@ -651,7 +651,7 @@
 
 | `1_01_24` | Донат | `balloo-su/donate.html` | Принят | `history-balloo-su/donate.md` |
 
-| `1_05_02` | Детали версии | `history-balloo-su/version-detail.html` | Просмотрен | `history-balloo-su/version-detail.md` |
+| `1_05_02` | Детали версии | `history-balloo-su/version-detail.html` | Принят | `history-balloo-su/version-detail.md` |
 
 | `1_05_03` | Список версий | `history-balloo-su/version-list.html` | Принят | `history-balloo-su/version-list.md` |
 
@@ -803,7 +803,7 @@
 
 | `1_08_07` | Донат | `mobile/donate.html` | Принят | `mobile/donate.md` |
 
-| `1_08_21` | Пустой чат | `mobile/empty-chat.html` | Просмотрен | `mobile/empty-chat.md` |
+| `1_08_21` | Пустой чат | `mobile/empty-chat.html` | Принят | `mobile/empty-chat.md` |
 
 | `1_08_19` | Создание группы | `mobile/group-create.html` | Принят | `mobile/group-create.md` |
 
