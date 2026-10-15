@@ -139,3 +139,51 @@ jobs:
 
       - name: Build web
         run: pnpm build:web
+
+  # Windows-сборка desktop-инсталляторов (тикет 1791983037, with_lord 1.3 Б):
+  # на рабочей машине cross-build .exe невозможен (wine не установлен), поэтому
+  # сборка идёт на GitHub-раннере windows-latest. Артефакты (.exe/.msi/portable)
+  # загружаются как build artifacts этого джоба.
+  desktop-windows:
+    name: Desktop — Windows (.exe/.msi/portable)
+    runs-on: windows-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # @balloo/shared резолвится в dist/ (main/types в packages/shared/package.json),
+      # tsc внутри build:win требует его. Прогон без БД: только prisma generate.
+      - name: Generate Prisma client
+        run: cd packages/shared && npx prisma generate
+
+      - name: Build shared
+        run: pnpm build:shared
+
+      # electron/electron-winstaller отключены в allowBuilds (pnpm-workspace.yaml) —
+      # electron-builder скачивает win32-дистрибутив Electron самостоятельно.
+      - name: Build Windows installers
+        run: pnpm --filter @balloo/desktop build:win
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: balloo-desktop-windows
+          path: |
+            packages/desktop/release/*.exe
+            packages/desktop/release/*.msi
+            packages/desktop/release/latest.yml
+          if-no-files-found: error
