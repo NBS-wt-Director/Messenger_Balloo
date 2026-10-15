@@ -1,4 +1,4 @@
-package com.helloworld
+package su.balloo.messenger
 
 import android.app.Application
 import android.content.res.Configuration

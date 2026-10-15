@@ -1,4 +1,4 @@
-package com.helloworld
+package su.balloo.messenger
 
 import android.os.Build
 import android.os.Bundle

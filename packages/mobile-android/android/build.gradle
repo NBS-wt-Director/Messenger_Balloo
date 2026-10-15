@@ -12,7 +12,10 @@ buildscript {
     }
     repositories {
         google()
-        mavenCentral()
+        // GCS-зеркало Maven Central вместо mavenCentral(): репозиторий
+        // repo.maven.apache.org с этой сети деградирует до ~300 Б/с и навешивает
+        // сборку на Read timed out (mvp1-05, прогоны 2–4 15.10.2026).
+        maven { url 'https://maven-central.storage-download.googleapis.com/maven2/' }
     }
     dependencies {
         classpath('com.android.tools.build:gradle')
@@ -35,7 +38,8 @@ allprojects {
         }
 
         google()
-        mavenCentral()
+        // GCS-зеркало Maven Central вместо mavenCentral() (см. buildscript выше, mvp1-05)
+        maven { url 'https://maven-central.storage-download.googleapis.com/maven2/' }
         maven { url 'https://www.jitpack.io' }
     }
 }

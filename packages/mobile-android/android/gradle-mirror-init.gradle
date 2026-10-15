@@ -1,0 +1,55 @@
+// gradle-mirror-init.gradle — обход деградации repo.maven.apache.org (mvp1-05)
+//
+// Причина: с этой сети repo.maven.apache.org (Cloudflare CDN) деградирует до
+// ~300 Б/с и навешивает TCP-соединения (ответ не приходит: Read timed out /
+// вечный wait на HTTP-заголовок). Крупные AAR (react-android, hermes-android,
+// ~130 МБ) через него не докачиваются: прогоны 2–6 от 15.10.2026.
+//
+// Что делает init-скрипт (запускается gradlew -I <этот файл>; применяется ко
+// ВСЕМ билдам композита, включая included builds @react-native/gradle-plugin и
+// react-settings-plugin, у которых mavenCentral() объявлена в их собственных
+// build.gradle.kts/settings.gradle.kts — правкой одного корневого build.gradle
+// они не перекрываются):
+//   1. изымает из всех контейнеров репозиториев Maven Central
+//      (repo.maven.apache.org / repo1.maven.org / repo.maven.org);
+//   2. ставит вместо него официальное GCS-зеркало Maven Central
+//      (maven-central.storage-download.googleapis.com, замер 15.10.2026: 4–5 МБ/с).
+//
+// Примечание по времени вызова:
+//   - allprojects/projectsLoaded срабатывают ДО оценки build.gradle модулей
+//     (контейнеры репозиториев ещё пусты). Поэтому используется afterProject.
+//
+// Запуск: см. packages/mobile-android/package.json build:android:apk.
+
+def MIRROR_URL = 'https://maven-central.storage-download.googleapis.com/maven2/'
+def CENTRAL_HOSTS = ['repo.maven.apache.org', 'repo1.maven.org', 'repo.maven.org', 'central.maven.org']
+
+def isCentral = { repo ->
+    repo instanceof org.gradle.api.artifacts.repositories.MavenArtifactRepository &&
+        repo.url != null && CENTRAL_HOSTS.contains(repo.url.host)
+}
+
+def patchRepos = { repos ->
+    def central = repos.findAll { isCentral(it) }
+    if (central) {
+        repos.removeAll(central)
+        repos.maven { m -> m.name = 'gcsMavenCentralMirror'; m.url = MIRROR_URL }
+    }
+}
+
+// Патчинг pluginManagement (для included builds их settingsEvaluated тоже
+// вызывается: init-скрипты применяются к каждому билду композита)
+gradle.settingsEvaluated { settings ->
+    patchRepos(settings.pluginManagement.repositories)
+}
+
+// Патчинг project- и buildscript-репозиториев ПОСЛЕ оценки build.gradle
+// каждого проекта. afterProject, а не projectsLoaded/allprojects: контейнеры
+// наполняются оценкой build.gradle автолинкуемых RN-модулей
+// (react-native-gesture-handler, reanimated, screens, safe-area-context,
+// webview — в каждом свой repositories { ... mavenCentral() }); разрешение
+// зависимостей стартует только после конфигурации, так что afterProject успевает.
+gradle.afterProject { p ->
+    patchRepos(p.buildscript.repositories)
+    patchRepos(p.repositories)
+}

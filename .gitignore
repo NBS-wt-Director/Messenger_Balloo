@@ -92,3 +92,13 @@ tickets/archive/
 # bind-mount docker/prod/downloads — артефакты (APK) в git не попадают
 packages/downloads/
 docker/prod/downloads/
+
+# mvp1-04/mvp1-05: локальные кэши инструментов и логи dev-процессов (воркспейс,
+# вне ~/.cache): Cypress-бинарник ~800 МБ, Android SDK ~1.5 ГБ, логи, NODE_PATH-шимы
+.cypress-cache/
+.android-sdk/
+.dev-logs/
+.node-path-shims/
+
+# машинно-специфичный путь к SDK (sdk.dir), стандартно игнорируется шаблоном Expo
+packages/mobile-android/android/local.properties
