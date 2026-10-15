@@ -446,6 +446,8 @@ tickets/active/with_lord/
 | Предмет | Значение | Источник |
 |---|---|---|
 | Хост / пользователь | `aedgar` / `cfr_balloo` | `ТЗ_деплой_P37-1_на_прод.md` §0 |
+| Публичный IP сервера | `188.73.176.34` (подтверждено 15.10.2026, `curl ifconfig.me`) | `hostname -I` = `192.168.1.85` (LAN); `curl ifconfig.me` = `188.73.176.34` |
+| DNS всех поддоменов | Все A-записи → `188.73.176.34` | `dig +short balloo.su api.balloo.su history.balloo.su download.balloo.su cdn.balloo.su` → `188.73.176.34` |
 | Репозиторий на сервере | `/home/cfr_balloo/balloo` | там же (путь `/home/aedgar192/balloo` в старых тикетах — ошибка) |
 | Compose | `cd /home/cfr_balloo/balloo/docker/prod`; `docker compose -f docker-compose.local.yml --env-file .env.production` | §5 |
 | Фронт | контейнер `balloo-web`, `127.0.0.1:8090 -> 80`, образ `balloo/web:local` | §0 |

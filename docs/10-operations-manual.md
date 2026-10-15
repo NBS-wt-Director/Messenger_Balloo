@@ -245,7 +245,7 @@ PostgreSQL/Redis (5432/6379), vsc/cockpit/console-вхосты. Их не тро
 
 | Роль | Способ |
 |---|---|
-| SSH | `ssh cfr_balloo@188.76.243.185` (хост `aedgar`) |
+| SSH | `ssh cfr_balloo@188.73.176.34` (хост `aedgar`) |
 | PostgreSQL (контейнер) | `docker exec -it balloo-postgres psql -U balloo -d balloo` |
 | Redis (контейнер) | `docker exec -it balloo-redis redis-cli` |
 | GitHub | `https://github.com/NBS-wt-Director/Messenger_Balloo` |

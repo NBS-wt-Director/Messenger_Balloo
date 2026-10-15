@@ -101,12 +101,12 @@ DNS-записи зоны `balloo.su` приложит владелец (зап�
 
 | Домен | A-запись | Статус |
 |---|---|---|
-| `balloo.su` | 188.76.243.185 | ✅ (предположительно, из with_lord 2.2) |
+| `balloo.su` | 188.73.176.34 | ✅ (подтверждено 15.10.2026, `curl ifconfig.me`) |
 | `features.balloo.su` | — | ❌ не настроена (with_lord 2.2.1) |
 | `cdn.balloo.su` | — | ❌ nginx-блок отсутствует (with_lord 2.3) |
 | `history.balloo.su` | — | ⚠️ TLS не покрывает (with_lord 1.4) |
 | `download.balloo.su` | — | ⚠️ TLS не покрывает (with_lord 1.4) |
-| остальные поддомены | 188.76.243.185 | ✅ (в nginx-production.conf) |
+| остальные поддомены | 188.73.176.34 | ✅ (DNS A-записи → IP сервера aedgar) |
 
 ---
 
