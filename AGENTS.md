@@ -99,7 +99,7 @@
 | Почта | письма не отправлял, почту владельца не читаю | `SMTP_USER`/`SMTP_PASSWORD` в файле отсутствуют как ключи |
 | OAuth-входы | панель провайдера не открывал, реальный вход не проходил | `YANDEX_CLIENT_ID/SECRET`, `VK_CLIENT_ID/SECRET`, `MAILRU_CLIENT_ID/SECRET` заполнены |
 | Push | доставку не проверял | `VAPID_PUBLIC_KEY`/`VAPID_PRIVATE_KEY` заполнены |
-| Метрика | счётчик не открывал | `VITE_YM_METRIKA_ID=112269610` в проде и `91027481` в `packages/web/.env` — **два разных счётчика** |
+| Метрика | боевой счётчик подтверждён 15.10.2026 | `VITE_YM_METRIKA_ID=112269610` в проде; `packages/web/.env` отсутствует на диске (gitignored) |
 | MAX, Яндекс Диск, Slack, YooMoney | ключей нет | `MAX_*`, `YANDEX_DISK_API_KEY`, `DEPLOY_SHA` (Slack) пустые; `YANDEX_DISK_API_KEY` и `DEPLOY_SHA` код бэкенда не читает вообще |
 | Продакшен-сборки, iOS | не собираю под `--mode production`, нет Xcode и симулятора | — |
 

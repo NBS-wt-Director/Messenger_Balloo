@@ -29,7 +29,7 @@ balloo использует или может использовать. Анке
 | Yandex OAuth | `04_yandex_oauth.md` | `YANDEX_CLIENT_ID/SECRET/REDIRECT_URI` | заполнено (секрет замаскирован `***`) | 6 файлов | готово |
 | VK ID OAuth | `05_vkontakte_oauth.md` | `VK_CLIENT_ID/SECRET/REDIRECT_URI` | заполнено | 5 файлов | готово |
 | Mail.ru OAuth | `06_mailru_oauth.md` | `MAILRU_CLIENT_ID/SECRET/REDIRECT_URI` | заполнено | 5 файлов | готово |
-| Яндекс Метрика | `07_yandex_metrika.md` | `VITE_YM_METRIKA_ID` | `91027481` | 1 файл | готово |
+| Яндекс Метрика | `07_yandex_metrika.md` | `VITE_YM_METRIKA_ID` | боевой `112269610` | 1 файл | готово |
 | S3 / MinIO | `08_s3_minio.md` | `MINIO_ENDPOINT/PORT/BUCKET/USE_SSL`, `MINIO_ROOT_USER/PASSWORD` | заполнено | 8 файлов | готово (свой MinIO в docker) |
 | Grafana / Prometheus | `09_grafana_monitoring.md` | `PROMETHEUS_ENABLED/PORT`, `GRAFANA_ADMIN_PASSWORD` | enabled=true, порт 9090 | 2 файла | свой Prometheus, Grafana не поднята |
 | MAX OAuth | `10_max.md` | `MAX_CLIENT_ID/SECRET/REDIRECT_URI` | **пусто** | **0 файлов** | **нельзя получить**: публичного OAuth у MAX нет; код не интегрирован |

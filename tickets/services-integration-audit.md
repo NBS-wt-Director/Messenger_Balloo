@@ -25,7 +25,7 @@
 | 7 | Web Push (VAPID) | **нет endpoint** — `pushService.ts` не подключён ни к одному роуту | — | `services/pushService.ts:28 web-push`, `:42 setVapidDetails` (инициализация), `:212 saveBrowserPushSubscription`, `:240 sendVapidPush`, `:268 sendVapidPushToUsers` | `service-worker-registration.ts:188 subscribeToPushNotifications` (не вызывается ниоткуда), `:202 applicationServerKey: VITE_VAPID_PUBLIC_KEY` | — | `VAPID_*` заполнены на сервере, `VITE_VAPID_PUBLIC_KEY` **отсутствует** в `packages/web/.env` (только `.env.example`) | ⚠️ **разрыв цепочки:** фронт-функция подписки не вызывается ни из одного экрана; бэкенд-функции `saveBrowserPushSubscription`/`sendVapidPush` не вызываются ни из одного роута/контроллера (`grep` по `packages/server/src` вне `pushService.ts` → 0); в web-сборку публичный ключ не передаётся (`docker-compose.local.yml` пробрасывает только `VITE_API_URL`). Модель `PushSubscription` и сервис готовы — нет соединяющих звеньев |
 | 8 | Prometheus + Grafana (мониторинг) | `routes/admin.ts:99 GET /metrics` | `controllers/adminController.ts:662 getMetrics` | собственный счётчик в контроллере (без `prom-client`) | — | `AnalyticsScreen` | `PROMETHEUS_PORT=9090`, `GRAFANA_PORT=3001` | ⚠️ endpoint `/api/admin/metrics` есть, но **не Prometheus**-протокол, а собственный JSON-снимок; сами `prometheus`/`grafana` поднимаются через `docker/prod/docker-compose*.yml` — конфиги `docker/prod/prometheus.yml`, `docker/prod/grafana/provisioning/dashboards/dashboards.yml` есть |
 | 9 | Postfix (Email, self-hosted) | `routes/install.ts` (тест `test-domain`) | `controllers/installController.ts` | `services/emailService.ts:1 nodemailer, :8 createTransport(env.SMTP_HOST)` | — | `SettingsScreen` (тестовая отправка) | `SMTP_USER`/`SMTP_PASSWORD` **отсутствуют как ключи** в `api-services-guide.md:223–227` (только `HOST`/`PORT`), в `.env.production` нет | ⚠️ код есть, но без `SMTP_USER`/`SMTP_PASSWORD` отправка не работает; mail relay в конфиге — отдельная задача |
-| 10 | Яндекс.Метрика (аналитика) | — | — | — | `utils/yandex-metrika.ts:33 VITE_YM_METRIKA_ID`, `:62 ym(...)`, init в `App.tsx:8` + `CookieBanner` (consent) | `CookieBanner` | `VITE_YM_METRIKA_ID` в `.env` (91027481) **и** в проде (112269610) — **два разных счётчика** | ⚠️ код есть, счётчики расходятся (см. п.4) |
+| 10 | Яндекс.Метрика (аналитика) | — | — | — | `utils/yandex-metrika.ts:33 VITE_YM_METRIKA_ID`, `:62 ym(...)`, init в `App.tsx:8` + `CookieBanner` (consent) | `CookieBanner` | боевой `VITE_YM_METRIKA_ID=112269610` в `.env.production:158` (п.4: `packages/web/.env` отсутствует) | ✅ код есть, счётчик один — `112269610` (подтверждён 15.10.2026) |
 | 11 | WebRTC STUN/TURN | — | — | `services/callService.ts` — **заглушка** (`getCallHistory` возвращает пустой массив, `CallRecord` интерфейс есть), **`RTCPeerConnection`/`iceServers` в коде нет** | — | экраны звонков | `WEBRTC_STUN_SERVERS`/`TURN_*` заполнены | ❌ звонков в работающем коде нет — есть только UI-экраны и интерфейс истории |
 
 ### OAuth VK — детализация
@@ -79,7 +79,7 @@
 | Yandex Storage | `grep -n "yandex\|YANDEX\|S3" packages/server/src/services/uploadService.ts` | 0 совпадений |
 | Метрика | `grep -n "metrics\|prometheus" packages/server/src/routes/admin.ts` | `99:router.get('/metrics', ..., getMetrics)` (не Prometheus-формат) |
 | RTCPeerConnection | `grep -rln "RTCPeerConnection" packages/*/src` | 0 файлов |
-| Счётчики Метрики | `grep -E "VITE_YM_METRIKA_ID\|METRIKA_COUNTER" packages/web/.env docker/prod/.env.production` | 2 разных значения (91027481 и 112269610) |
+| Счётчики Метрики | `grep -E "VITE_YM_METRIKA_ID" docker/prod/.env.production packages/web/.env` | боевой `112269610` (`.env.production:158`); `packages/web/.env` отсутствует на диске (проверено 15.10.2026) |
 
 ## Проблемы и решения
 
@@ -101,7 +101,7 @@
      `VITE_VAPID_PUBLIC_KEY` в web не попадает (есть лишь в `.env.example`).
    Вывод: модели и сервисы готовы, соединяющих звеньев нет. Не блокер v1
    (push — V2 Prep); зафиксировано как задача для v2.
-4. **Два счётчика Метрики** (`packages/web/.env`: 91027481, `docker/prod/.env.production`: 112269610) — фронт и прод собираются с разных окружений, статистика расходится. Это зафиксировано в `AGENTS.md` §1 как «не подтверждается».
+4. **Счётчик Метрики один** — боевой `112269610` в `docker/prod/.env.production:158` (решение владельца 1.2.4 от 15.10.2026). `packages/web/.env` отсутствует на диске (gitignored), прежний локальный счётчик не применим. Подтверждено репро-сборкой: `VITE_YM_METRIKA_ID=112269610 pnpm --filter @balloo/web build` → `grep -o "112269610" packages/web/dist/assets/*.js` → совпадение.
 5. **WebRTC не реализован в коде** — `RTCPeerConnection` отсутствует, `callService.ts` — заглушка истории. UI экраны звонков (`calls.html`, `active-call.html`) есть, макеты живые, но работающего звонка нет. **Не блокирует v1** (это V2 Prep — звонки запланированы позже), но в отчёте помечено.
 
 ## Результат
