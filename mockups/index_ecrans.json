@@ -970,7 +970,7 @@
       "domain": "Загрузки",
       "total_screens": 2,
       "viewed": 2,
-      "edits_specific": 0,
+      "edits_specific": 1,
       "edits_global_accepted": 2,
       "components_private": 2,
       "components_global": 5,
@@ -991,9 +991,9 @@
         },
         {
           "id": "1_06_02",
-          "name": "Загрузки",
+          "name": "Загрузки (download)",
           "file": "download-balloo-su/downloads.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "download-balloo-su/downloads.md"
         }
       ]

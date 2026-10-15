@@ -5,6 +5,151 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Download — Загрузки</title>
   <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    /* Platform detection banner */
+    .platform-detector {
+      background: var(--surface);
+      border: 2px solid var(--accent);
+      border-radius: 12px;
+      padding: 16px 24px;
+      margin-bottom: 24px;
+      text-align: center;
+      font-size: 16px;
+    }
+    .platform-detector strong {
+      color: var(--accent);
+      font-size: 18px;
+    }
+
+    /* Main platform layout */
+    .platforms-main-layout {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+    }
+    .platform-main-card {
+      flex: 2;
+      min-width: 300px;
+      border: 3px solid var(--accent);
+      background: linear-gradient(135deg, var(--surface) 0%, color-mix(in srgb, var(--accent) 10%, var(--surface)) 100%);
+      position: relative;
+    }
+    .platform-main-card::before {
+      content: '✓ Ваша платформа';
+      position: absolute;
+      top: -12px;
+      left: 16px;
+      background: var(--accent);
+      color: var(--bg);
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .platform-main-card .card__icon {
+      font-size: 64px;
+    }
+    .platform-main-card .card__title {
+      font-size: 24px;
+    }
+
+    /* Side platforms column */
+    .platforms-side {
+      flex: 1;
+      min-width: 200px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .platform-side-card {
+      border: 2px solid var(--border);
+      padding: 16px;
+      text-align: center;
+    }
+    .platform-side-card .card__icon {
+      font-size: 32px;
+    }
+    .platform-side-card .card__title {
+      font-size: 16px;
+    }
+
+    /* Sad platform card */
+    .platform-sad-card {
+      border: 2px dashed var(--warning);
+      background: linear-gradient(135deg, var(--surface) 0%, color-mix(in srgb, var(--warning) 5%, var(--surface)) 100%);
+      opacity: 0.85;
+    }
+    .platform-sad-card .card__icon {
+      font-size: 48px;
+      filter: grayscale(0.5);
+    }
+    .platform-sad-card .sad-message {
+      font-size: 13px;
+      color: var(--secondary);
+      line-height: 1.5;
+      margin-top: 8px;
+    }
+    .platform-sad-card .sad-message strong {
+      color: var(--warning);
+    }
+
+    /* Apple sad card */
+    .platform-apple-sad {
+      border: 2px solid var(--error);
+      background: linear-gradient(135deg, var(--surface) 0%, color-mix(in srgb, var(--error) 5%, var(--surface)) 100%);
+    }
+    .platform-apple-sad .sad-message {
+      font-size: 12px;
+      color: var(--secondary);
+      line-height: 1.6;
+      margin-top: 8px;
+      font-style: italic;
+    }
+    .platform-apple-sad .sad-message strong {
+      color: var(--error);
+      font-style: normal;
+    }
+
+    /* Install instructions */
+    .install-instructions {
+      margin-top: 12px;
+      padding: 12px;
+      background: var(--bg);
+      border-radius: 8px;
+      font-size: 13px;
+    }
+    .install-instructions ol {
+      margin: 8px 0 0 0;
+      padding-left: 20px;
+    }
+    .install-instructions li {
+      margin-bottom: 4px;
+    }
+
+    /* PWA tile */
+    .platform-pwa-card {
+      border: 2px solid var(--info);
+    }
+    .platform-pwa-card .card__icon {
+      font-size: 48px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .platforms-main-layout {
+        flex-direction: column;
+      }
+      .platforms-side {
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+      .platform-side-card {
+        flex: 1;
+        min-width: 150px;
+      }
+    }
+  </style>
 </head>
 <body>
 <div class="topbar">
@@ -23,59 +168,98 @@
       <h1 class="page-title">⬇️ Скачать Balloo</h1>
       <p class="page-subtitle">Версия 1.0.0-beta · 16 июля 2026</p>
 
+      <!-- Platform Detection -->
+      <div class="platform-detector" id="platformDetector">
+        Вы используете: <strong id="platformName">определяем...</strong>
+      </div>
+
       <!-- Desktop -->
       <div class="section-title">💻 Для компьютера</div>
-      <div class="flex gap-4 mb-6" style="flex-wrap:wrap;">
-        <div class="card flex-1 card--hover" style="min-width:240px;text-align:center;">
-          <div style="font-size:48px;">🪟</div>
+      <div class="platforms-main-layout">
+        <!-- Main platform card (detected) -->
+        <div class="card platform-main-card" id="desktopMainCard">
+          <div class="card__icon">🪟</div>
           <h3 class="card__title mt-2">Windows</h3>
           <div class="card__body text-sm">Windows 10/11 (x64)<br>MSI-установщик · 82 МБ</div>
           <button class="btn btn--primary btn--block mt-4">Скачать .msi</button>
           <div class="text-xs text-muted mt-2">SHA256: a3f8...e91c</div>
-        </div>
-        <div class="card flex-1 card--hover" style="min-width:240px;text-align:center;">
-          <div style="font-size:48px;">🐧</div>
-          <h3 class="card__title mt-2">Linux</h3>
-          <div class="card__body text-sm">AppImage / Deb / RPM<br>Universal · 76 МБ</div>
-          <div class="flex gap-2 mt-4">
-            <button class="btn btn--primary flex-1">AppImage</button>
-            <button class="btn btn--secondary flex-1">.deb</button>
-            <button class="btn btn--secondary flex-1">.rpm</button>
+          <div class="install-instructions">
+            <strong>Установка:</strong>
+            <ol>
+              <li>Распакуйте архив</li>
+              <li>Запустите установщик</li>
+              <li>Добавьте в избранное для быстрого доступа</li>
+            </ol>
           </div>
         </div>
-        <div class="card flex-1 card--hover" style="min-width:240px;text-align:center;">
-          <div style="font-size:48px;">🍎</div>
-          <h3 class="card__title mt-2">macOS</h3>
-          <div class="card__body text-sm">macOS 12+ (Universal)<br>.dmg · 85 МБ</div>
-          <button class="btn btn--primary btn--block mt-4">Скачать .dmg</button>
-          <div class="text-xs text-muted mt-2">Поддержка Apple Silicon</div>
+
+        <!-- Side column -->
+        <div class="platforms-side">
+          <!-- Linux -->
+          <div class="card platform-side-card">
+            <div class="card__icon">🐧</div>
+            <h4 class="card__title mt-1">Linux</h4>
+            <div class="text-sm">AppImage / Deb / RPM</div>
+            <button class="btn btn--secondary btn--block mt-2">Скачать</button>
+          </div>
+          <!-- macOS -->
+          <div class="card platform-side-card">
+            <div class="card__icon">🍎</div>
+            <h4 class="card__title mt-1">macOS</h4>
+            <div class="text-sm">macOS 12+ · .dmg</div>
+            <button class="btn btn--secondary btn--block mt-2">Скачать</button>
+          </div>
+          <!-- PWA -->
+          <div class="card platform-pwa-card">
+            <div class="card__icon">🌐</div>
+            <h4 class="card__title mt-1">PWA</h4>
+            <div class="text-sm">Progressive Web App<br>Установка из браузера</div>
+            <a href="https://balloo.su" class="btn btn--primary btn--block mt-2">Открыть PWA</a>
+          </div>
         </div>
       </div>
 
       <!-- Mobile -->
       <div class="section-title">📱 Для телефона</div>
-      <div class="flex gap-4 mb-6" style="flex-wrap:wrap;">
-        <div class="card flex-1 card--hover" style="min-width:240px;text-align:center;">
-          <div style="font-size:48px;">🤖</div>
+      <div class="platforms-main-layout">
+        <!-- Main platform card (detected) -->
+        <div class="card platform-main-card" id="mobileMainCard">
+          <div class="card__icon">🤖</div>
           <h3 class="card__title mt-2">Android</h3>
           <div class="card__body text-sm">Android 8.0+<br>APK · 48 МБ</div>
           <button class="btn btn--primary btn--block mt-4">Скачать APK</button>
           <a href="#" class="text-xs text-accent mt-2" style="display:block;">Google Play →</a>
           <a href="#" class="text-xs text-accent" style="display:block;">RuStore →</a>
+          <div class="install-instructions">
+            <strong>Установка:</strong>
+            <ol>
+              <li>Скачайте APK-файл</li>
+              <li>Разрешите установку из неизвестных источников</li>
+              <li>Откройте файл и следуйте инструкциям</li>
+            </ol>
+          </div>
         </div>
-        <div class="card flex-1 card--hover" style="min-width:240px;text-align:center;">
-          <div style="font-size:48px;">🍎</div>
-          <h3 class="card__title mt-2">iOS</h3>
-          <div class="card__body text-sm">iOS 14+<br>App Store</div>
-          <a href="#" class="btn btn--primary btn--block mt-4">App Store →</a>
-          <div class="text-xs text-muted mt-2">TestFlight доступен</div>
-        </div>
-        <div class="card flex-1 card--hover" style="min-width:240px;text-align:center;">
-          <div style="font-size:48px;">🌐</div>
-          <h3 class="card__title mt-2">PWA</h3>
-          <div class="card__body text-sm">Progressive Web App<br>Установка из браузера</div>
-          <a href="https://balloo.su" class="btn btn--primary btn--block mt-4">Открыть PWA</a>
-          <div class="text-xs text-muted mt-2">Офлайн-режим поддерживается</div>
+
+        <!-- Side column -->
+        <div class="platforms-side">
+          <!-- iOS - SAD (no native app) -->
+          <div class="card platform-side-card platform-apple-sad">
+            <div class="card__icon">🍎</div>
+            <h4 class="card__title mt-1">iOS</h4>
+            <div class="sad-message">
+              <strong>Мы — российская компания</strong> и осознанно выбрали путь <strong>только PWA</strong> на продукции корпорации Apple до тех пор, пока они не прекратят несправедливо баннить российское ПО и не возместят экономике РФ потерянные из-за их политики деньги.<br><br>
+              Мы приносим наши <strong>искренние извинения</strong> за эти неудобства. PWA имеет точно такие же функции, как нативное приложение. А когда мы введём внутриприложение транзакции, наш пользователь получит <strong>извинительный бонус</strong> за неудобства и за то, что ему приходится страдать на этой платформе.
+            </div>
+            <a href="https://balloo.su" class="btn btn--secondary btn--block mt-2">Открыть PWA</a>
+          </div>
+          <!-- PWA -->
+          <div class="card platform-pwa-card">
+            <div class="card__icon">🌐</div>
+            <h4 class="card__title mt-1">PWA</h4>
+            <div class="text-sm">Progressive Web App<br>Установка из браузера</div>
+            <a href="https://balloo.su" class="btn btn--primary btn--block mt-2">Открыть PWA</a>
+            <div class="text-xs text-muted mt-2">Офлайн-режим поддерживается</div>
+          </div>
         </div>
       </div>
 
@@ -122,5 +306,49 @@
   </div>
 </div>
 <script src="../assets/common.js"></script>
+<script>
+  // Platform detection based on User-Agent
+  (function() {
+    const ua = navigator.userAgent || navigator.vendor || window.opera;
+    const platformName = document.getElementById('platformName');
+    const desktopMain = document.getElementById('desktopMainCard');
+    const mobileMain = document.getElementById('mobileMainCard');
+
+    let detectedPlatform = 'браузер (PWA-совместим)';
+    let isDesktop = true;
+
+    if (/Windows NT/i.test(ua)) {
+      detectedPlatform = 'Windows';
+      isDesktop = true;
+    } else if (/Macintosh|Mac OS X/i.test(ua)) {
+      detectedPlatform = 'macOS';
+      isDesktop = true;
+    } else if (/Linux/i.test(ua)) {
+      detectedPlatform = 'Linux';
+      isDesktop = true;
+    } else if (/Android/i.test(ua)) {
+      detectedPlatform = 'Android';
+      isDesktop = false;
+    } else if (/iPhone|iPad|iPod/i.test(ua)) {
+      detectedPlatform = 'iOS';
+      isDesktop = false;
+    } else if (/Edge|CrEdge|Edg/i.test(ua)) {
+      detectedPlatform = 'Edge (Windows)';
+      isDesktop = true;
+    }
+
+    platformName.textContent = detectedPlatform;
+
+    // Swap cards based on platform
+    if (isDesktop) {
+      // Desktop section: main = detected, mobile section: main = Android (or iOS sad)
+      // Keep default layout (Windows main for desktop, Android main for mobile)
+      // Could add logic to swap if macOS/Linux detected
+    } else {
+      // Mobile section: main = detected (Android or iOS)
+      // iOS gets sad card, Android gets main card
+    }
+  })();
+</script>
 </body>
 </html>

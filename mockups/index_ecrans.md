@@ -693,7 +693,7 @@
 
 | `1_01_24` | Донат | `balloo-su/donate.html` | Принят | `download-balloo-su/donate.md` |
 
-| `1_06_02` | Загрузки | `download-balloo-su/downloads.html` | Просмотрен | `download-balloo-su/downloads.md` |
+| `1_06_02` | Загрузки | `download-balloo-su/downloads.html` | Принят | `download-balloo-su/downloads.md` |
 
 
 ---
