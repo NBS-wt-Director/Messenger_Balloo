@@ -28,9 +28,39 @@
         <div class="flex items-center justify-center gap-2 mb-4">
           <span class="status-dot status-dot--online"></span><span class="text-sm text-muted">В сети</span>
           <span class="chip">Дата рег.: 1 янв 2026</span>
+          <span class="chip">🎂 20 мая 1990</span>
         </div>
-        <button class="btn btn--primary">💬 Написать</button>
-        <button class="btn btn--secondary">➕ В контакты</button>
+
+        <!-- Action buttons -->
+        <div class="flex items-center justify-center gap-2 mb-4" style="flex-wrap:wrap;">
+          <button class="btn btn--primary">💬 Написать</button>
+          <button class="btn btn--secondary">📞 Позвонить</button>
+          <button class="btn btn--secondary" id="btn-contact" onclick="toggleContact()">
+            <span id="contact-add">➕ В контакты</span>
+            <span id="contact-added" style="display:none;">✅ В контактах</span>
+          </button>
+          <button class="btn btn--danger btn--sm" onclick="banUser()">🚫 В бан</button>
+        </div>
+      </div>
+
+      <!-- Общие чаты и группы -->
+      <div class="card mb-4">
+        <h3 class="card__title">👥 Общие чаты и группы (3)</h3>
+        <div class="list__item" style="border:none;">
+          <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-new"><div class="avatar__inner"><span>КР</span></div></div>
+          <div class="list__item-body"><div class="list__item-title">Команда разработки</div><div class="list__item-subtitle">Группа • 234 участника</div></div>
+          <span class="chip chip--accent">Общая</span>
+        </div>
+        <div class="list__item" style="border:none;">
+          <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИИ</span></div></div>
+          <div class="list__item-body"><div class="list__item-title">Иван Иванов</div><div class="list__item-subtitle">Личный чат • Последний: 14:30</div></div>
+          <span class="chip chip--accent">Общий</span>
+        </div>
+        <div class="list__item" style="border:none;">
+          <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-new"><div class="avatar__inner"><span>ТГ</span></div></div>
+          <div class="list__item-body"><div class="list__item-title">Технологии будущего</div><div class="list__item-subtitle">Корпоративная • 1 234 участника</div></div>
+          <span class="chip chip--accent">Общая</span>
+        </div>
       </div>
 
       <div class="card mb-4">
@@ -44,5 +74,23 @@
   </div>
 </div>
 <script src="../assets/common.js"></script>
+<script>
+function toggleContact() {
+  var add = document.getElementById('contact-add');
+  var added = document.getElementById('contact-added');
+  if (add.style.display !== 'none') {
+    add.style.display = 'none';
+    added.style.display = 'inline';
+  } else {
+    add.style.display = 'inline';
+    added.style.display = 'none';
+  }
+}
+function banUser() {
+  if (confirm('Заблокировать пользователя?')) {
+    alert('Пользователь заблокирован');
+  }
+}
+</script>
 </body>
 </html>
