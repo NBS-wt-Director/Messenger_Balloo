@@ -95,7 +95,7 @@
 
 Финальные прогоны 16.10.2026 (после всех правок):
 
-```
+```text
 pnpm --filter @balloo/shared test → Test Files 4 passed (4), Tests 76 passed (76)
 pnpm --filter @balloo/web test    → Test Files 24 passed (24), Tests 219 passed (219)
 pnpm --filter @balloo/web build   → exit 0 (tsc && vite build, 6.97s)
@@ -114,4 +114,4 @@ isOAuthConfigured), `packages/web/src/screens/auth/LoginScreen.tsx` +
 Код провайдера Rambler — НЕ написан осознанно: нет ключей, flow непроверяем запуском
 (AGENTS §0); после 1.6.4 пишется за один проход.
 
-Хэш коммита: (заполняется ниже)
+Хэш коммита: `70b778b` (push `55fa57c..70b778b main -> main`, HEAD = origin/main = 70b778b).
