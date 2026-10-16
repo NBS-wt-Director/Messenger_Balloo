@@ -4,7 +4,7 @@
   "title": "Balloo Messenger — Схема данных (PostgreSQL 16)",
   "description": "Единый источник правды по сущностям данных монорепо. Сгенерировано из mockups/index.html (секция «Данные»). Все createdAt/updatedAt — BIGINT (Unix timestamp в секундах). ORM: Prisma. Миграции: Flyway (SQL). Инфраструктура: Supabase + PostgREST.",
   "version": "1.0.0",
-  "last_updated": "2026-07-22",
+  "last_updated": "2026-10-16",
   "conventions": {
     "primary_key": {
       "type": "String",
@@ -1342,7 +1342,7 @@
           "table": "group_media_requests",
           "model": "GroupMediaRequest",
           "fill_type": "runtime",
-          "description": "Заявки на СМИ-группу: документы, статус (pending/approved/rejected), reviewedByAdminId",
+          "description": "Заявки на СМИ-группу: свидетельство о регистрации СМИ (реквизиты cert* + скан в documents), статус (pending/approved/rejected), reviewedByAdminId. Решение 1.1.18 (16.10.2026).",
           "fields": [
             {
               "name": "id",
@@ -1371,7 +1371,7 @@
             {
               "name": "documents",
               "type": "Json",
-              "description": "массив ссылок на документы"
+              "description": "Массив ссылок на сканы документов (MinIO): [{type,url,name,uploadedAt}]"
             },
             {
               "name": "status",
@@ -1398,6 +1398,48 @@
               "name": "updatedAt",
               "type": "BigInt",
               "default": 0
+            },
+            {
+              "name": "certNumber",
+              "type": "String",
+              "nullable": true,
+              "description": "Серия/номер свидетельства о регистрации СМИ (ст. 9 Закона РФ «О СМИ»), напр. ФС77-XXXXX"
+            },
+            {
+              "name": "certIssuedAt",
+              "type": "BigInt",
+              "nullable": true,
+              "description": "Дата выдачи свидетельства (Unix timestamp)"
+            },
+            {
+              "name": "certIssuer",
+              "type": "String",
+              "nullable": true,
+              "description": "Кем выдан (Роскомнадзор)"
+            },
+            {
+              "name": "certMediaName",
+              "type": "String",
+              "nullable": true,
+              "description": "Название СМИ в свидетельстве"
+            },
+            {
+              "name": "certFounder",
+              "type": "String",
+              "nullable": true,
+              "description": "Учредитель СМИ"
+            },
+            {
+              "name": "certInn",
+              "type": "String",
+              "nullable": true,
+              "description": "ИНН учредителя/редакции"
+            },
+            {
+              "name": "certOgrn",
+              "type": "String",
+              "nullable": true,
+              "description": "ОГРН учредителя/редакции"
             }
           ]
         },

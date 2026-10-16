@@ -1323,11 +1323,25 @@ model User2FASecret {
 }
 
 // Заявка на получение/подтверждение СМИ-статуса группы
+// Решение 1.1.18 (16.10.2026): тип группы «СМИ» — обязательная загрузка
+// свидетельства о регистрации СМИ (скан/PDF) + реквизиты по ст. 9 Закона РФ «О СМИ».
+// Название документа: «Свидетельство о регистрации средства массовой информации»
+// (выдаётся Роскомнадзором — ФСФТУ/РКН).
 model GroupMediaRequest {
   id              String   @id @default(cuid())
   groupId         String
   submittedById   String   // → User (создатель/админ группы)
-  documents       Json     // массив ссылок на документы (MinIO)
+  // Свидетельство о регистрации СМИ (ст. 9 Закона РФ «О СМИ»)
+  certNumber      String?  // серия/номер свидетельства, например «ФС77-XXXXX»
+  certIssuedAt    BigInt?  @map("cert_issued_at") // Unix timestamp — дата выдачи
+  certIssuer      String?  // кем выдан (Роскомнадзор, ФСФТУ и т.д.)
+  certMediaName   String?  // название СМИ в свидетельстве
+  certFounder     String?  // учредитель СМИ
+  certInn         String?  // ИНН
+  certOgrn        String?  // ОГРН
+  // Документы (скан-файлы)
+  documents       Json     // массив ссылок на документы (MinIO): [{type, url, name, uploadedAt}]
+  // Статус
   status          String   @default("pending") // "pending" | "approved" | "rejected"
   reviewedByAdminId String? // → User (админ)
   reviewComment   String?

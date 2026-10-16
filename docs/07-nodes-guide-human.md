@@ -181,7 +181,7 @@ balloo/
 | `1_01_07` | Архив чатов | `balloo-su/archive.html` | Просмотрен |
 | `1_01_08` | Профиль | `balloo-su/profile.html` | Просмотрен |
 | `1_01_09` | Публичный профиль | `balloo-su/public-profile.html` | Просмотрен |
-| `1_01_10` | Звонки | `balloo-su/calls.html` | Просмотрен |
+| `1_01_10` | Звонки | `balloo-su/calls.html` | Принят |
 | `1_01_11` | Активный звонок | `balloo-su/active-call.html` | Принят |
 | `1_01_12` | Правила платформы | `balloo-su/rules.html` | Принят |
 | `1_01_13` | Приглашения | `balloo-su/invites.html` | Принят |
@@ -189,7 +189,7 @@ balloo/
 | `1_01_15` | Боты | `balloo-su/bots.html` | Принят |
 | `1_01_16` | О компании | `balloo-su/about-company.html` | Принят |
 | `1_01_17` | О Balloo | `balloo-su/about-balloo.html` | Принят |
-| `1_01_18` | Создание группы | `balloo-su/group-create.html` | Просмотрен |
+| `1_01_18` | Создание группы | `balloo-su/group-create.html` | Принят |
 | `1_01_19` | Настройки группы | `balloo-su/group-settings.html` | Просмотрен |
 | `1_01_20` | Настройки приложения | `balloo-su/settings.html` | Просмотрен |
 | `1_01_21` | Мои устройства | `balloo-su/my-devices.html` | Просмотрен |
@@ -204,10 +204,10 @@ balloo/
 | `1_01_30` | Двухфакторная аутентификация | `balloo-su/two-factor.html` | Просмотрен |
 | `1_01_31` | Мои донаты | `balloo-su/my-donates.html` | Просмотрен |
 | `1_01_32` | Редактор сообщения | `balloo-su/message-editor.html` | Просмотрен |
-| `1_01_33` | Просмотр файла/изображения | `balloo-su/file-viewer.html` | Просмотрен |
+| `1_01_33` | Просмотр файла/изображения | `balloo-su/file-viewer.html` | Принят |
 | `1_01_34` | Настройки уведомлений | `balloo-su/notification-settings.html` | Просмотрен |
-| `1_01_35` | Создание канала | `balloo-su/channel-create.html` | Просмотрен |
-| `1_01_36` | Пустой чат | `balloo-su/empty-chat.html` | Просмотрен |
+| `1_01_35` | Создание канала | `balloo-su/channel-create.html` | Принят |
+| `1_01_36` | Пустой чат | `balloo-su/empty-chat.html` | Принят |
 | `1_01_37` | Настройки приватности | `balloo-su/privacy-settings.html` | Просмотрен |
 | `1_01_38` | Блокированные пользователи | `balloo-su/blocked-users.html` | Просмотрен |
 | `1_01_39` | Запись голосового | `balloo-su/voice-message.html` | Просмотрен |

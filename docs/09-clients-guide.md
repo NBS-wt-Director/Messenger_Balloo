@@ -122,7 +122,7 @@ balloo/
 | 1_01_07 | Архив чатов | `mockups/balloo-su/archive.html` | Просмотрен |
 | 1_01_08 | Профиль | `mockups/balloo-su/profile.html` | Просмотрен |
 | 1_01_09 | Публичный профиль | `mockups/balloo-su/public-profile.html` | Просмотрен |
-| 1_01_10 | Звонки | `mockups/balloo-su/calls.html` | Просмотрен |
+| 1_01_10 | Звонки | `mockups/balloo-su/calls.html` | Принят |
 | 1_01_11 | Активный звонок | `mockups/balloo-su/active-call.html` | Принят |
 | 1_01_12 | Правила платформы | `mockups/balloo-su/rules.html` | Принят |
 | 1_01_13 | Приглашения | `mockups/balloo-su/invites.html` | Принят |
@@ -130,7 +130,7 @@ balloo/
 | 1_01_15 | Боты | `mockups/balloo-su/bots.html` | Принят |
 | 1_01_16 | О компании | `mockups/balloo-su/about-company.html` | Принят |
 | 1_01_17 | О Balloo | `mockups/balloo-su/about-balloo.html` | Принят |
-| 1_01_18 | Создание группы | `mockups/balloo-su/group-create.html` | Просмотрен |
+| 1_01_18 | Создание группы | `mockups/balloo-su/group-create.html` | Принят |
 | 1_01_19 | Настройки группы | `mockups/balloo-su/group-settings.html` | Просмотрен |
 | 1_01_20 | Настройки приложения | `mockups/balloo-su/settings.html` | Просмотрен |
 | 1_01_21 | Мои устройства | `mockups/balloo-su/my-devices.html` | Просмотрен |
@@ -145,10 +145,10 @@ balloo/
 | 1_01_30 | Двухфакторная аутентификация | `mockups/balloo-su/two-factor.html` | Просмотрен |
 | 1_01_31 | Мои донаты | `mockups/balloo-su/my-donates.html` | Просмотрен |
 | 1_01_32 | Редактор сообщения | `mockups/balloo-su/message-editor.html` | Просмотрен |
-| 1_01_33 | Просмотр файла/изображения | `mockups/balloo-su/file-viewer.html` | Просмотрен |
+| 1_01_33 | Просмотр файла/изображения | `mockups/balloo-su/file-viewer.html` | Принят |
 | 1_01_34 | Настройки уведомлений | `mockups/balloo-su/notification-settings.html` | Просмотрен |
-| 1_01_35 | Создание канала | `mockups/balloo-su/channel-create.html` | Просмотрен |
-| 1_01_36 | Пустой чат | `mockups/balloo-su/empty-chat.html` | Просмотрен |
+| 1_01_35 | Создание канала | `mockups/balloo-su/channel-create.html` | Принят |
+| 1_01_36 | Пустой чат | `mockups/balloo-su/empty-chat.html` | Принят |
 | 1_01_37 | Настройки приватности | `mockups/balloo-su/privacy-settings.html` | Просмотрен |
 | 1_01_38 | Заблокированные пользователи | `mockups/balloo-su/blocked-users.html` | Просмотрен |
 | 1_01_39 | Запись голосового | `mockups/balloo-su/voice-message.html` | Просмотрен |

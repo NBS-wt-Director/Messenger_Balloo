@@ -369,7 +369,7 @@ path: mockups/blog-balloo-su/
 | 1_01_07 | Архив чатов | mockups/balloo-su/archive.html | mockups/balloo-su/archive.md | Просмотрен |
 | 1_01_08 | Профиль | mockups/balloo-su/profile.html | mockups/balloo-su/profile.md | Просмотрен |
 | 1_01_09 | Публичный профиль | mockups/balloo-su/public-profile.html | mockups/balloo-su/public-profile.md | Просмотрен |
-| 1_01_10 | Звонки | mockups/balloo-su/calls.html | mockups/balloo-su/calls.md | Просмотрен |
+| 1_01_10 | Звонки | mockups/balloo-su/calls.html | mockups/balloo-su/calls.md | Принят |
 | 1_01_11 | Активный звонок | mockups/balloo-su/active-call.html | mockups/balloo-su/active-call.md | Принят |
 | 1_01_12 | Правила платформы | mockups/balloo-su/rules.html | mockups/balloo-su/rules.md | Принят |
 | 1_01_13 | Приглашения | mockups/balloo-su/invites.html | mockups/balloo-su/invites.md | Принят |
@@ -377,7 +377,7 @@ path: mockups/blog-balloo-su/
 | 1_01_15 | Боты | mockups/balloo-su/bots.html | mockups/balloo-su/bots.md | Принят |
 | 1_01_16 | О компании | mockups/balloo-su/about-company.html | mockups/balloo-su/about-company.md | Принят |
 | 1_01_17 | О Balloo | mockups/balloo-su/about-balloo.html | mockups/balloo-su/about-balloo.md | Принят |
-| 1_01_18 | Создание группы | mockups/balloo-su/group-create.html | mockups/balloo-su/group-create.md | Просмотрен |
+| 1_01_18 | Создание группы | mockups/balloo-su/group-create.html | mockups/balloo-su/group-create.md | Принят |
 | 1_01_19 | Настройки группы | mockups/balloo-su/group-settings.html | mockups/balloo-su/group-settings.md | Просмотрен |
 | 1_01_20 | Настройки приложения | mockups/balloo-su/settings.html | mockups/balloo-su/settings.md | Просмотрен |
 | 1_01_21 | Мои устройства | mockups/balloo-su/my-devices.html | mockups/balloo-su/my-devices.md | Просмотрен |
@@ -392,10 +392,10 @@ path: mockups/blog-balloo-su/
 | 1_01_30 | Двухфакторная аутентификация | mockups/balloo-su/two-factor.html | mockups/balloo-su/two-factor.md | Просмотрен |
 | 1_01_31 | Мои донаты | mockups/balloo-su/my-donates.html | mockups/balloo-su/my-donates.md | Просмотрен |
 | 1_01_32 | Редактор сообщения | mockups/balloo-su/message-editor.html | mockups/balloo-su/message-editor.md | Просмотрен |
-| 1_01_33 | Просмотр файла/изображения | mockups/balloo-su/file-viewer.html | mockups/balloo-su/file-viewer.md | Просмотрен |
+| 1_01_33 | Просмотр файла/изображения | mockups/balloo-su/file-viewer.html | mockups/balloo-su/file-viewer.md | Принят |
 | 1_01_34 | Настройки уведомлений | mockups/balloo-su/notification-settings.html | mockups/balloo-su/notification-settings.md | Просмотрен |
-| 1_01_35 | Создание канала | mockups/balloo-su/channel-create.html | mockups/balloo-su/channel-create.md | Просмотрен |
-| 1_01_36 | Пустой чат | mockups/balloo-su/empty-chat.html | mockups/balloo-su/empty-chat.md | Просмотрен |
+| 1_01_35 | Создание канала | mockups/balloo-su/channel-create.html | mockups/balloo-su/channel-create.md | Принят |
+| 1_01_36 | Пустой чат | mockups/balloo-su/empty-chat.html | mockups/balloo-su/empty-chat.md | Принят |
 | 1_01_37 | Настройки приватности | mockups/balloo-su/privacy-settings.html | mockups/balloo-su/privacy-settings.md | Просмотрен |
 | 1_01_38 | Блокированные пользователи | mockups/balloo-su/blocked-users.html | mockups/balloo-su/blocked-users.md | Просмотрен |
 | 1_01_39 | Запись голосового | mockups/balloo-su/voice-message.html | mockups/balloo-su/voice-message.md | Просмотрен |

@@ -161,7 +161,7 @@
 |--------|------|----------|
 | GET | `/groups` | Список групп пользователя |
 | POST | `/groups` | Создать группу (private/public/topic/corporate) |
-| POST | `/groups/media` | Создать СМИ-группу (требует подтверждения документами) |
+| POST | `/groups/media` | Создать СМИ-группу (обязательно: `certNumber`, `certIssuedAt`, `certIssuer`, `certMediaName`, `certFounder`, `certInn?`, `certOgrn?` + файл свидетельства в `documents[]`; решение 1.1.18) |
 | GET | `/groups/:id` | Информация о группе |
 | PATCH | `/groups/:id` | Редактировать группу |
 | DELETE | `/groups/:id` | Удалить (только пустую) |
