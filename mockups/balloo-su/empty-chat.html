@@ -55,14 +55,64 @@
       <!-- Mascot animation -->
       <div class="empty-state__animation">
         <div style="width:120px;height:120px;clip-path:var(--octagon-clip);background:linear-gradient(135deg,var(--accent),var(--accent-hover));display:flex;align-items:center;justify-content:center;">
-          <span style="font-size:56px;">🎈</span>
+          <span style="font-size:56px;" title="Балунишка — медведь Борис, маскот Balloo">🐻</span>
         </div>
       </div>
       
       <h2 class="empty-state__title">Balloo Messenger</h2>
       <p class="empty-state__subtitle" style="max-width:400px;margin-bottom:32px;">
         Выберите чат из списка слева или начните новый разговор. Общайтесь, делитесь файлами и создавайте группы.
+        <br><br>
+        <span style="color:var(--accent);font-weight:700;">🐻 Балунишка здесь — поможет найти кого-то, с кем можно пообщаться!</span>
       </p>
+
+      <!-- Quick actions -->
+      <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
+        <button class="btn btn--primary" onclick="openModal('modal-new-chat')">
+          ✏️ Новый чат
+        </button>
+        <button class="btn btn--secondary" onclick="window.location.href='group-create.html'">
+          👥 Создать группу
+        </button>
+        <button class="btn btn--secondary" onclick="window.location.href='channel-create.html'">
+          📢 Создать канал
+        </button>
+      </div>
+
+      <!-- Contacts without chats -->
+      <div style="margin-top:40px;max-width:500px;width:100%;">
+        <div class="text-sm font-bold mb-2" style="color:var(--text-primary);">🐻 Балунишка предлагает пообщаться</div>
+        <div class="form-group mb-3">
+          <input type="text" class="form-input" placeholder="🔍 Поиск человека..." id="contacts-search">
+        </div>
+        <div class="text-xs text-muted mb-2">Контакты, с которыми ещё нет чатов:</div>
+        <div class="list" style="max-height:280px;overflow-y:auto;">
+          <div class="list__item" style="border:none;padding:8px 0;cursor:pointer;" onclick="openModal('modal-new-chat')">
+            <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ЕВ</span></div></div>
+            <div class="list__item-body"><div class="list__item-title">Елена Волкова</div><div class="list__item-subtitle">в сети</div></div>
+          </div>
+          <div class="list__item" style="border:none;padding:8px 0;cursor:pointer;" onclick="openModal('modal-new-chat')">
+            <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ИП</span></div></div>
+            <div class="list__item-body"><div class="list__item-title">Игорь Попов</div><div class="list__item-subtitle">в сети</div></div>
+          </div>
+          <div class="list__item" style="border:none;padding:8px 0;cursor:pointer;" onclick="openModal('modal-new-chat')">
+            <div class="avatar avatar--sm avatar--bordered avatar--status-offline avatar--ctx-contact"><div class="avatar__inner"><span>НК</span></div></div>
+            <div class="list__item-body"><div class="list__item-title">Наталья Кузнецова</div><div class="list__item-subtitle">была вчера</div></div>
+          </div>
+          <div class="list__item" style="border:none;padding:8px 0;cursor:pointer;" onclick="openModal('modal-new-chat')">
+            <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>СМ</span></div></div>
+            <div class="list__item-body"><div class="list__item-title">Сергей Морозов</div><div class="list__item-subtitle">в сети</div></div>
+          </div>
+          <div class="list__item" style="border:none;padding:8px 0;cursor:pointer;" onclick="openModal('modal-new-chat')">
+            <div class="avatar avatar--sm avatar--bordered avatar--status-offline avatar--ctx-contact"><div class="avatar__inner"><span>АБ</span></div></div>
+            <div class="list__item-body"><div class="list__item-title">Анна Белова</div><div class="list__item-subtitle">была 3 дня назад</div></div>
+          </div>
+          <div class="list__item" style="border:none;padding:8px 0;cursor:pointer;" onclick="openModal('modal-new-chat')">
+            <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ВЛ</span></div></div>
+            <div class="list__item-body"><div class="list__item-title">Виктор Лебедев</div><div class="list__item-subtitle">в сети</div></div>
+          </div>
+        </div>
+      </div>
 
       <!-- Quick actions -->
       <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">

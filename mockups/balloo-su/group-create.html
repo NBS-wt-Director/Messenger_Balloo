@@ -67,8 +67,8 @@
     <!-- Cover upload -->
     <div class="form-group">
       <label class="form-label">Обложка группы</label>
-      <button class="btn btn--tertiary btn--sm" onclick="document.getElementById('cover-upload').click()">📁 Загрузить обложку</button>
-      <input type="file" id="cover-upload" style="display:none;" accept="image/*">
+      <button class="btn btn--tertiary btn--sm" onclick="document.getElementById('cover-upload-2').click()">📁 Загрузить обложку</button>
+      <input type="file" id="cover-upload-2" style="display:none;" accept="image/*">
       <div class="text-xs text-muted mt-1">Рекомендуемый размер: 1500×500px</div>
     </div>
   </div>
@@ -84,7 +84,7 @@
       <h3 class="card__title mb-3">Тип группы *</h3>
           <div class="form-group">
             <label class="form-label">Тип группы</label>
-            <select class="form-select" id="group-type-select">
+            <select class="form-select" id="group-type-select" onchange="onGroupTypeChange()">
               <option value="">— Выберите тип —</option>
               <option value="ordinary">👥 Обычная — закрытая группа для общения, только участники могут писать</option>
               <option value="public">📢 Публичная — открытая группа, может писать любой, подписка вместо вступления</option>
@@ -112,14 +112,95 @@
   <!-- Settings (no link expiration) -->
   <div class="card mb-4">
     <h3 class="card__title mb-3">Настройки приватности</h3>
-    <div class="list__item" style="border:none;"><span class="flex-1">Обязательное ознакомление с правилами</span><label class="switch"><input type="checkbox"><span class="switch__slider"></span></label></div>
+    <div class="list__item" style="border:none;"><span class="flex-1">Обязательное ознакомление с правилами</span><label class="switch"><input type="checkbox" id="rules-required-toggle" onchange="document.getElementById('rules-field').style.display=this.checked?'block':'none'"><span class="switch__slider"></span></label></div>
+    <!-- Поле правил: обязательно при включённом переключателе (решение 1.1.18) -->
+    <div class="form-group" id="rules-field" style="display:none;">
+      <label class="form-label">Правила группы * <span class="text-xs text-muted">(обязательно для заполнения)</span></label>
+      <textarea class="form-textarea" id="group-rules" placeholder="Введите правила группы. Новые участники должны ознакомиться с ними до вступления..." maxlength="5000" style="min-height:120px;"></textarea>
+      <div class="form-hint"><span id="rules-count">0</span>/5000 символов · участники увидят эти правила при вступлении</div>
+    </div>
     <div class="list__item" style="border:none;"><span class="flex-1">История для новых участников</span><select class="form-select" style="width:auto;"><option>Вся история</option><option>Последние 100</option><option>С момента вступления</option></select></div>
     <div class="list__item" style="border:none;"><span class="flex-1">Разрешить вложения</span><label class="switch"><input type="checkbox" checked><span class="switch__slider"></span></label></div>
     <div class="text-xs text-muted mt-2">📌 Ссылки-приглашения настраиваются из раздела <a href="settings.html" style="color:var(--accent);">Настройки → Приглашения</a></div>
   </div>
 
-  <button class="btn btn--secondary btn--block mb-2" onclick="window.location.href='invites.html'">📨 Пригласить участников</button>
-  <button class="btn btn--primary btn--block btn--lg" onclick="window.location.href='chats.html'">Создать группу</button>
+  <!-- СМИ: правовые документы (решение 1.1.18, появляется при типе «СМИ») -->
+  <div class="card mb-4" id="media-docs-card" style="display:none;border-color:var(--danger);">
+    <h3 class="card__title mb-3">📰 Правовые документы СМИ *</h3>
+    <p class="text-sm text-secondary mb-3">Для типа «СМИ» обязательно: свидетельство о регистрации средства массовой информации (выдаётся Роскомнадзором согласно ст. 9 Закона РФ «О средствах массовой информации») и его реквизиты.</p>
+    <div class="form-group">
+      <label class="form-label">Свидетельство о регистрации СМИ * (скан: JPG, PNG, PDF)</label>
+      <input type="file" id="media-cert-file" accept="image/*,application/pdf" style="width:100%;padding:10px;background:var(--bg-tertiary);border:2px dashed var(--border-color);color:var(--text-primary);font-size:13px;">
+      <div class="form-hint">Картинка-скан или PDF, соответствующий закону РФ. До загрузки документа группа типа «СМИ» не создаётся.</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Серия и номер свидетельства *</label>
+      <input type="text" class="form-input" placeholder="Например: ФС77-12345">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Дата выдачи *</label>
+      <input type="date" class="form-input">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Кем выдан *</label>
+      <input type="text" class="form-input" value="Федеральная служба по надзору в сфере связи, информационных технологий и массовых коммуникаций (Роскомнадзор)">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Название СМИ, указанное в свидетельстве *</label>
+      <input type="text" class="form-input" placeholder="Например: Информационное агентство «Баллоо»">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Учредитель СМИ *</label>
+      <input type="text" class="form-input" placeholder="ФИО или наименование организации">
+    </div>
+    <div class="flex gap-3">
+      <div class="form-group flex-1"><label class="form-label">ИНН</label><input type="text" class="form-input" placeholder="10 или 12 цифр"></div>
+      <div class="form-group flex-1"><label class="form-label">ОГРН</label><input type="text" class="form-input" placeholder="13 или 15 цифр"></div>
+    </div>
+  </div>
+
+  <!-- Приглашение пользователей сразу по созданию (решение 1.1.18) -->
+  <div class="card mb-4">
+    <h3 class="card__title mb-3">📨 Пригласить участников сейчас</h3>
+    <p class="text-sm text-secondary mb-3">Выберите пользователей — они получат приглашение в группу сразу после её создания</p>
+    <div class="form-group">
+      <input type="text" class="form-input mb-3" placeholder="🔍 Поиск контактов..." id="invite-search">
+      <div class="list" id="invite-list" style="max-height:200px;overflow-y:auto;">
+        <div class="list__item" style="border:none;padding:8px 0;">
+          <label class="flex items-center gap-3" style="cursor:pointer;width:100%;">
+            <input type="checkbox" style="width:18px;height:18px;cursor:pointer;">
+            <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>МА</span></div></div>
+            <div class="flex-1"><div class="text-sm font-bold">Мария Андреева</div><div class="text-xs text-muted">в сети</div></div>
+          </label>
+        </div>
+        <div class="list__item" style="border:none;padding:8px 0;">
+          <label class="flex items-center gap-3" style="cursor:pointer;width:100%;">
+            <input type="checkbox" style="width:18px;height:18px;cursor:pointer;">
+            <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>АК</span></div></div>
+            <div class="flex-1"><div class="text-sm font-bold">Алексей Козлов</div><div class="text-xs text-muted">в сети</div></div>
+          </label>
+        </div>
+        <div class="list__item" style="border:none;padding:8px 0;">
+          <label class="flex items-center gap-3" style="cursor:pointer;width:100%;">
+            <input type="checkbox" style="width:18px;height:18px;cursor:pointer;">
+            <div class="avatar avatar--sm avatar--bordered avatar--status-offline avatar--ctx-contact"><div class="avatar__inner"><span>ОС</span></div></div>
+            <div class="flex-1"><div class="text-sm font-bold">Ольга Смирнова</div><div class="text-xs text-muted">была 2 часа назад</div></div>
+          </label>
+        </div>
+        <div class="list__item" style="border:none;padding:8px 0;">
+          <label class="flex items-center gap-3" style="cursor:pointer;width:100%;">
+            <input type="checkbox" style="width:18px;height:18px;cursor:pointer;">
+            <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>ДП</span></div></div>
+            <div class="flex-1"><div class="text-sm font-bold">Дмитрий Петров</div><div class="text-xs text-muted">был 5 часов назад</div></div>
+          </label>
+        </div>
+      </div>
+      <div class="text-xs text-muted mt-2">Выбрано: <span id="invite-count">0</span></div>
+    </div>
+    <div class="text-xs text-muted mt-2">📌 Ссылки-приглашения — <a href="invites.html" style="color:var(--accent);">Настройки → Приглашения</a></div>
+  </div>
+
+  <button class="btn btn--primary btn--block btn--lg" onclick="createGroup()">Создать группу</button>
 </div></div></div>
 
 <script src="../assets/common.js"></script>
@@ -151,6 +232,10 @@ function onGroupTypeChange() {
   const corpNote = document.getElementById('corp-note');
   const typeSpecific = document.getElementById('type-specific');
   const typeContent = document.getElementById('type-specific-content');
+  const mediaDocs = document.getElementById('media-docs-card');
+
+  // СМИ — обязательные правовые документы (решение 1.1.18)
+  mediaDocs.style.display = val === 'media' ? 'block' : 'none';
   
   if (val === 'corporate') {
     corpNote.style.display = 'block';
@@ -190,6 +275,43 @@ function onGroupTypeChange() {
 
 // Init random avatar
 regenerateAvatar();
+
+// Счётчик символов правил (решение 1.1.18)
+const rulesField = document.getElementById('group-rules');
+if (rulesField) {
+  rulesField.addEventListener('input', function() {
+    document.getElementById('rules-count').textContent = this.value.length;
+  });
+}
+
+// Счётчик выбранных приглашаемых (решение 1.1.18)
+document.querySelectorAll('#invite-list input[type="checkbox"]').forEach(function(cb) {
+  cb.addEventListener('change', function() {
+    const n = document.querySelectorAll('#invite-list input[type="checkbox"]:checked').length;
+    document.getElementById('invite-count').textContent = n;
+  });
+});
+
+// Создание группы: проверка обязательных полей (решение 1.1.18)
+function createGroup() {
+  const type = document.getElementById('group-type-select').value;
+  const rulesToggle = document.getElementById('rules-required-toggle');
+  const rules = document.getElementById('group-rules');
+  if (rulesToggle.checked && !rules.value.trim()) {
+    alert('Включено обязательное ознакомление с правилами — заполните поле «Правила группы».');
+    rules.focus();
+    return;
+  }
+  if (type === 'media') {
+    const cert = document.getElementById('media-cert-file');
+    if (!cert.files.length) {
+      alert('Для типа «СМИ» обязательно свидетельство о регистрации СМИ (скан/PDF).');
+      cert.focus();
+      return;
+    }
+  }
+  window.location.href = 'chats.html';
+}
 </script>
 </body>
 </html>

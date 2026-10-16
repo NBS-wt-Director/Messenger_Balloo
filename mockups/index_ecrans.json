@@ -86,7 +86,7 @@
       "domain": "Основной мессенджер",
       "total_screens": 41,
       "viewed": 41,
-      "edits_specific": 13,
+      "edits_specific": 14,
       "edits_global_accepted": 3,
       "components_private": 41,
       "components_global": 5,
@@ -190,14 +190,14 @@
           "id": "1_01_10",
           "name": "Звонки",
           "file": "balloo-su/calls.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "balloo-su/calls.md"
         },
         {
           "id": "1_01_35",
           "name": "Создание канала",
           "file": "balloo-su/channel-create.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "balloo-su/channel-create.md"
         },
         {
@@ -232,21 +232,21 @@
           "id": "1_01_36",
           "name": "Пустой чат",
           "file": "balloo-su/empty-chat.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "balloo-su/empty-chat.md"
         },
         {
           "id": "1_01_33",
           "name": "Просмотр файла/изображения",
           "file": "balloo-su/file-viewer.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "balloo-su/file-viewer.md"
         },
         {
           "id": "1_01_18",
           "name": "Создание группы",
           "file": "balloo-su/group-create.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "balloo-su/group-create.md"
         },
         {

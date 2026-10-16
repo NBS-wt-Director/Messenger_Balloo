@@ -97,3 +97,7 @@
 - HTML5 + CSS3 (common.css)
 - Vanilla JS (inline)
 - Keyboard events (Escape, ArrowLeft, ArrowRight)
+
+---
+### Обновление 16.10.2026 (приёмка 1.1.17)
+Убран clip-path из полноэкранного вьюера: изображение при просмотре не обрезается.

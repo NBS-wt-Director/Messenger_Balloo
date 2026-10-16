@@ -233,9 +233,9 @@
 
 | `1_01_15` | Боты | `balloo-su/bots.html` | Просмотрен | `balloo-su/bots.md` |
 
-| `1_01_10` | Звонки | `balloo-su/calls.html` | Просмотрен | `balloo-su/calls.md` |
+| `1_01_10` | Звонки | `balloo-su/calls.html` | Принят | `balloo-su/calls.md` |
 
-| `1_01_35` | Создание канала | `balloo-su/channel-create.html` | Просмотрен | `balloo-su/channel-create.md` |
+| `1_01_35` | Создание канала | `balloo-su/channel-create.html` | Принят | `balloo-su/channel-create.md` |
 
 | `1_01_25` | Вложения чата | `balloo-su/chat-attachments.html` | Принят | `balloo-su/chat-attachments.md` |
 
@@ -245,11 +245,11 @@
 
 | `1_01_24` | Донат | `balloo-su/donate.html` | Принят | `balloo-su/donate.md` |
 
-| `1_01_36` | Пустой чат | `balloo-su/empty-chat.html` | Просмотрен | `balloo-su/empty-chat.md` |
+| `1_01_36` | Пустой чат | `balloo-su/empty-chat.html` | Принят | `balloo-su/empty-chat.md` |
 
-| `1_01_33` | Просмотр файла/изображения | `balloo-su/file-viewer.html` | Просмотрен | `balloo-su/file-viewer.md` |
+| `1_01_33` | Просмотр файла/изображения | `balloo-su/file-viewer.html` | Принят | `balloo-su/file-viewer.md` |
 
-| `1_01_18` | Создание группы | `balloo-su/group-create.html` | Просмотрен | `balloo-su/group-create.md` |
+| `1_01_18` | Создание группы | `balloo-su/group-create.html` | Принят | `balloo-su/group-create.md` |
 
 | `1_01_19` | Настройки группы | `balloo-su/group-settings.html` | Просмотрен | `balloo-su/group-settings.md` |
 
