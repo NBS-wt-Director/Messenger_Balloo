@@ -76,7 +76,7 @@ const verifyTOTP = (secret: string, token: string, window: number = 1): boolean 
 // JWT токены
 // ============================================================
 
-interface TokenPair {
+export interface TokenPair {
   accessToken: string;
   refreshToken: string;
 }

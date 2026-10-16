@@ -2,6 +2,7 @@
 // Макет: mockups/balloo-su/profile.html
 
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { api } from '@/services/api';
 import { useAuthStore } from '@/store/authStore';
 
@@ -26,21 +27,19 @@ interface Account {
 
 export default function ProfileScreen() {
   const { user, updateUser, setTheme, setLanguage, logout } = useAuthStore();
+  const navigate = useNavigate();
   const [displayName, setDisplayName] = useState(user?.displayName || '');
   const [bio, setBio] = useState('');
   const [statusText, setStatusText] = useState('');
   const [birthDate, setBirthDate] = useState('');
   const [website, setWebsite] = useState('');
   const [devices, setDevices] = useState<Device[]>([]);
-  const [accounts] = useState<Account[]>([
-    { id: '1', username: 'ivan', displayName: 'Иван Иванов', email: 'ivan@balloo.su', isActive: true },
-    { id: '2', username: 'maria', displayName: 'Мария Андреева', email: 'maria@balloo.su', isActive: false },
-    { id: '3', username: 'work', displayName: 'Рабочий аккаунт', email: 'work@balloo.su', isActive: false },
-  ]);
+  // Мультиаккаунт (тик. 1792124252): список с реального API устройства
+  // (account_device_links), раньше — захардкоженные моки в компоненте.
+  const [accounts, setAccounts] = useState<Account[]>([]);
   const [privacyLastSeen, setPrivacyLastSeen] = useState('everyone');
   const [privacyPreview, setPrivacyPreview] = useState('20');
   const [showAvatarPanel, setShowAvatarPanel] = useState(false);
-  const [showAccountsPanel, setShowAccountsPanel] = useState(false);
   const [showBlockedPanel, setShowBlockedPanel] = useState(false);
   const [blockedUsers, setBlockedUsers] = useState<any[]>([]);
   const [saving, setSaving] = useState(false);
@@ -52,6 +51,7 @@ export default function ProfileScreen() {
     loadProfile();
     loadDevices();
     loadBlocked();
+    loadAccounts();
   }, []);
 
   const loadProfile = async () => {
@@ -85,9 +85,28 @@ export default function ProfileScreen() {
   const loadBlocked = async () => {
     try {
       const data = await api.getBlockedUsers();
-      setBlockedUsers(data || []);
+      setBlockedUsers(data?.blocked ?? []);
     } catch {
       setBlockedUsers([]);
+    }
+  };
+
+  const loadAccounts = async () => {
+    try {
+      const res = await api.getAccounts();
+      setAccounts(
+        (res.accounts ?? []).map((a: any) => ({
+          id: a.userId,
+          username: a.username ?? '',
+          displayName: a.displayName,
+          email: a.email ?? '',
+          avatarUrl: a.avatarUrl ?? undefined,
+          isActive: a.isActive,
+        }))
+      );
+    } catch {
+      // устройство ещё не подключено (первый вход без X-Device-Id) — карточка
+      // покажет только ссылку управления, молча без моков
     }
   };
 
@@ -194,7 +213,7 @@ export default function ProfileScreen() {
       <div className="card mb-4" style={{ padding: '16px' }}>
         <div className="flex items-center justify-between mb-4">
           <h3 className="card__title">👥 Аккаунты</h3>
-          <button className="btn btn--tertiary btn--sm" onClick={() => setShowAccountsPanel(true)}>
+          <button className="btn btn--tertiary btn--sm" onClick={() => navigate('/accounts')}>
             Управлять →
           </button>
         </div>
@@ -211,7 +230,7 @@ export default function ProfileScreen() {
                 background: 'var(--bg-tertiary)',
                 border: acc.isActive ? '1px solid var(--accent)' : '1px solid var(--border-color)',
               }}
-              onClick={() => setShowAccountsPanel(true)}
+              onClick={() => navigate('/accounts')}
             >
               <div
                 style={{
@@ -246,7 +265,7 @@ export default function ProfileScreen() {
               border: '1px dashed var(--accent)',
               cursor: 'pointer',
             }}
-            onClick={() => setShowAccountsPanel(true)}
+            onClick={() => navigate('/login')}
             title="Добавить аккаунт"
           >
             +
@@ -254,7 +273,7 @@ export default function ProfileScreen() {
         </div>
         <p className="text-xs text-muted mt-3">
           {accounts.length} аккаунта · Уведомления для всех ·{' '}
-          <a href="#" onClick={(e) => { e.preventDefault(); setShowAccountsPanel(true); }} style={{ color: 'var(--accent)' }}>
+          <a href="#" onClick={(e) => { e.preventDefault(); navigate('/accounts'); }} style={{ color: 'var(--accent)' }}>
             управление
           </a>
         </p>
@@ -547,33 +566,8 @@ export default function ProfileScreen() {
         </div>
       </div>
 
-      {/* Accounts Panel */}
-      <div className={`slide-panel ${showAccountsPanel ? 'slide-panel--visible' : ''}`} onClick={e => { if (e.target === e.currentTarget) setShowAccountsPanel(false); }}>
-        <div className="slide-panel__header">
-          <span className="slide-panel__title">👥 Управление аккаунтами</span>
-          <div className="slide-panel__close" onClick={() => setShowAccountsPanel(false)}>✕</div>
-        </div>
-        <div className="slide-panel__body">
-          {accounts.map(acc => (
-            <div key={acc.id} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 0', borderBottom: '1px solid var(--border-color)' }}>
-              <div style={{ width: '40px', height: '40px', clipPath: 'var(--octagon-clip)', background: acc.isActive ? 'var(--accent)' : 'var(--bg-active)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', fontWeight: 700, color: acc.isActive ? '#fff' : 'var(--text-secondary)' }}>
-                {getInitials(acc.displayName)}
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>{acc.displayName}</div>
-                <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{acc.isActive ? 'Активный · @' : '@'}{acc.username}</div>
-              </div>
-              {acc.isActive ? (
-                <span className="chip chip--accent">Активен</span>
-              ) : (
-                <button className="btn btn--tertiary btn--sm">Войти</button>
-              )}
-            </div>
-          ))}
-          <div className="divider" style={{ borderTop: '1px solid var(--border-color)', margin: '16px 0' }} />
-          <button className="btn btn--primary btn--block" onClick={() => setShowAccountsPanel(false)}>➕ Добавить аккаунт</button>
-        </div>
-      </div>
+      {/* Accounts Panel удалён (тик. 1792124252): управление мультиаккаунтом —
+          на отдельном экране /accounts по принятому макету accounts.html */}
 
       {/* Blocked Panel */}
       <div className={`slide-panel ${showBlockedPanel ? 'slide-panel--visible' : ''}`} onClick={e => { if (e.target === e.currentTarget) setShowBlockedPanel(false); }}>

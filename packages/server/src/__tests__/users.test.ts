@@ -106,6 +106,30 @@ describe('Users API', () => {
       expect(res.status).toBe(200);
     });
 
+    it('list содержит заблокированного с числовым blockedAt (тик. 1792124254)', async () => {
+      const blocker = await registerTestUser();
+      const victim = await registerTestUser();
+
+      const blockRes = await request(app)
+        .post(`/api/users/${victim.id}/block`)
+        .set('Authorization', `Bearer ${blocker.accessToken}`);
+      expect(blockRes.status).toBeLessThan(300);
+
+      const res = await request(app)
+        .get('/api/users/me/blocked')
+        .set('Authorization', `Bearer ${blocker.accessToken}`);
+
+      expect(res.status).toBe(200);
+      const item = res.body.blocked.find((b: any) => b.id === victim.id);
+      expect(item).toBeDefined();
+      expect(typeof item.blockedAt).toBe('number');
+
+      const unblockRes = await request(app)
+        .delete(`/api/users/${victim.id}/block`)
+        .set('Authorization', `Bearer ${blocker.accessToken}`);
+      expect(unblockRes.status).toBeLessThan(300);
+    });
+
     it('rejects without auth', async () => {
       const res = await request(app).get('/api/users/me/blocked');
 

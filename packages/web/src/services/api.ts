@@ -2,6 +2,8 @@
 // JWT tokens stored in httpOnly cookies (not localStorage)
 // Browser automatically sends httpOnly cookies with requests
 
+import { getDeviceId } from '../utils/deviceId';
+
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3100';
 
 interface ApiOptions extends RequestInit {
@@ -29,6 +31,9 @@ async function request<T>(
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
+    // Мультиаккаунт (тик. 1792124252): сервер связывает вход/операции
+    // аккаунтов со стабильным id устройства.
+    'X-Device-Id': getDeviceId(),
     ...(customHeaders as Record<string, string>),
   };
 
@@ -205,8 +210,10 @@ export const api = {
       method: 'DELETE',
     }),
 
+  // Сервер отдаёт { blocked: [...] } с маршрута /me/blocked
+  // (routes/users.ts:60; раньше клиент звал несуществующий /users/blocked)
   getBlockedUsers: () =>
-    request<any[]>('/api/users/blocked'),
+    request<{ blocked: any[] }>('/api/users/me/blocked'),
 
   // Chats
   getChats: (cursor?: string, limit = 50) =>
@@ -269,7 +276,24 @@ export const api = {
       data: undefined,
     }),
 
-  sendMessage: (chatId: string, data: { type: string; content: string; replyToId?: string }) =>
+  sendMessage: (
+    chatId: string,
+    data: {
+      type: string;
+      content: string;
+      replyToId?: string;
+      attachments?: Array<{
+        type: string;
+        url: string;
+        thumbnail?: string;
+        size?: number;
+        name?: string;
+        width?: number;
+        height?: number;
+        duration?: number;
+      }>;
+    }
+  ) =>
     request<any>(`/api/chats/${chatId}/messages`, {
       method: 'POST',
       data,
@@ -306,9 +330,12 @@ export const api = {
     });
   },
 
-  uploadFile: (file: File) => {
+  // Сервер (uploadController.uploadMessageFile) требует chatId в body —
+  // без него 400 (тик. 1792124253)
+  uploadFile: (file: File, chatId: string) => {
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('chatId', chatId);
     return request<any>('/api/upload/file', {
       method: 'POST',
       body: formData,
@@ -841,6 +868,16 @@ export const api = {
     request<any>(`/api/archive/${chatId}`, { method: 'DELETE' }),
   archiveChat: (chatId: string) =>
     request<any>(`/api/archive/${chatId}`, { method: 'POST' }),
+
+  // Accounts — мультиаккаунт (тик. 1792124252, макет accounts.html)
+  getAccounts: () =>
+    request<{ accounts: any[] }>('/api/accounts'),
+  switchAccount: (userId: string) =>
+    request<{ message: string; user: any }>('/api/accounts/switch', { method: 'POST', data: { userId } }),
+  unlinkAccount: (userId: string) =>
+    request<{ message: string }>(`/api/accounts/${userId}`, { method: 'DELETE' }),
+  setAccountNotifications: (userId: string, enabled: boolean) =>
+    request<{ pushEnabled: boolean }>(`/api/accounts/${userId}/notifications`, { method: 'PATCH', data: { enabled } }),
 
   // Devices
   getDevices: () =>

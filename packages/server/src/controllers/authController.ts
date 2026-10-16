@@ -27,6 +27,21 @@ import {
 } from '../services/authService';
 import { AuthenticatedRequest } from '../middleware/auth';
 import { setAuthCookies, clearAuthCookies, ACCESS_COOKIE, REFRESH_COOKIE } from '../middleware/auth';
+import { linkAccountToDevice } from '../services/accountsService';
+
+// Мультиаккаунт (тик. 1792124252): если клиент прислал X-Device-Id
+// (web хранит стабильный UUID в localStorage), подключаем аккаунт к
+// устройству — он становится активным в account_device_links. Ошибка
+// привязки не должна ломать успешный вход.
+const linkIfDeviceHeader = async (req: Request, userId: string): Promise<void> => {
+  const deviceId = req.header('x-device-id');
+  if (!deviceId || !/^[A-Za-z0-9_-]{8,64}$/.test(deviceId)) return;
+  try {
+    await linkAccountToDevice(userId, deviceId);
+  } catch (e) {
+    console.warn('[auth] account_device_links upsert failed:', (e as Error).message);
+  }
+};
 import { getWsToken } from '../services/authService';
 import { revokeAllSessions } from '../services/sessionRevocation';
 import { internalError } from '../middleware/errorHandler';
@@ -81,6 +96,7 @@ export const register = async (req: Request, res: Response, next: NextFunction):
 
     // Устанавливаем httpOnly cookie вместо возврата токенов в body
     setAuthCookies(res, result.tokens!.accessToken, result.tokens!.refreshToken);
+    await linkIfDeviceHeader(req, result.user.id);
 
     res.status(201).json({
       message: 'Регистрация успешна',
@@ -144,6 +160,7 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
 
     // Устанавливаем httpOnly cookie
     setAuthCookies(res, result.tokens!.accessToken, result.tokens!.refreshToken);
+    await linkIfDeviceHeader(req, result.user.id);
 
     res.json({
       user: {
@@ -187,6 +204,7 @@ export const verify2FA = async (req: Request, res: Response, next: NextFunction)
 
     // Устанавливаем httpOnly cookie
     setAuthCookies(res, result.tokens!.accessToken, result.tokens!.refreshToken);
+    await linkIfDeviceHeader(req, result.user.id);
 
     res.json({
       user: {
@@ -479,6 +497,7 @@ export const yandexCallback = async (req: Request, res: Response, next: NextFunc
 
     // Редирект на фронтенд — токены в httpOnly cookie (P21: hash-роутер → /#/chat)
     setAuthCookies(res, result.tokens!.accessToken, result.tokens!.refreshToken);
+    await linkIfDeviceHeader(req, result.user.id);
     res.redirect(302, `${oauthFrontendUrl()}/#/chat`);
   } catch (error: any) {
     console.error('[YANDEX CALLBACK] Error:', error);
@@ -523,6 +542,7 @@ export const vkCallback = async (req: Request, res: Response, next: NextFunction
     });
 
     setAuthCookies(res, result.tokens!.accessToken, result.tokens!.refreshToken);
+    await linkIfDeviceHeader(req, result.user.id);
     res.redirect(302, `${oauthFrontendUrl()}/#/chat`);
   } catch (error: any) {
     console.error('[VK CALLBACK] Error:', error);
@@ -573,6 +593,7 @@ export const mailruCallback = async (req: Request, res: Response, next: NextFunc
     });
 
     setAuthCookies(res, result.tokens!.accessToken, result.tokens!.refreshToken);
+    await linkIfDeviceHeader(req, result.user.id);
     res.redirect(302, `${oauthFrontendUrl()}/#/chat`);
   } catch (error: any) {
     console.error('[MAILRU CALLBACK] Error:', error);
@@ -615,6 +636,7 @@ export const oauthLogin = async (req: Request, res: Response, next: NextFunction
 
     // Устанавливаем httpOnly cookie
     setAuthCookies(res, result.tokens!.accessToken, result.tokens!.refreshToken);
+    await linkIfDeviceHeader(req, result.user.id);
 
     res.json({
       user: {

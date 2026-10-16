@@ -135,6 +135,7 @@ model User {
   twoFASecrets       TwoFASecret[]
   oAuthAccounts      OAuthAccount[]
   devices            Device[]
+  accountDeviceLinks AccountDeviceLink[]
   bansGiven          UserBan[]    @relation("UserBanAdmin")
   bansReceived       UserBan[]    @relation("UserBanUser")
   userChats          UserChat[]
@@ -163,7 +164,6 @@ model User {
   featureVotes        FeatureVote[]
   featureComments     FeatureComment[]
   reportsGiven        Report[]         @relation("ReportReporter")
-  reportsTargeted     Report[]         @relation("ReportTarget")
   resolvedReports     Report[]         @relation("ReportResolver")
   bots                Bot[]            @relation("BotCreator")
   auditLogs           AuditLog[]
@@ -255,6 +255,28 @@ model Device {
 
   @@index([userId])
   @@map("devices")
+}
+
+// ============================================================
+// Мультиаккаунт: связь аккаунт → устройство (mockups/data_schema.json
+// → account_device_links). Приёмка макета 1.1.9 → 6.33, тикет 1792124252.
+// ============================================================
+
+model AccountDeviceLink {
+  id          String  @id @default(cuid()) @db.VarChar(25)
+  userId      String  @db.VarChar(25)
+  deviceId    String  @db.VarChar(64) // стабильный id браузера/устройства (web: localStorage)
+  isActive    Boolean @default(false) // текущий активный аккаунт на устройстве
+  pushEnabled Boolean @default(true)
+  createdAt   BigInt  @default(0)
+  updatedAt   BigInt  @default(0)
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, deviceId])
+  @@index([deviceId])
+  @@map("account_device_links")
 }
 
 model UserBan {
@@ -942,7 +964,10 @@ model Report {
 
   // Relations
   reporter User @relation("ReportReporter", fields: [reporterId], references: [id])
-  target   User? @relation("ReportTarget", fields: [targetId], references: [id])
+  // target User? @relation удалён (тик. 1792124252): targetId полиморфный
+  // (user | message | chat | post), FK на users делал репорты на сообщения и
+  // чаты невозможными (500 в POST /api/reports). Связь проверяется на уровне
+  // сервиса по targetType.
   resolver User? @relation("ReportResolver", fields: [resolvedBy], references: [id])
 
   @@index([reporterId])

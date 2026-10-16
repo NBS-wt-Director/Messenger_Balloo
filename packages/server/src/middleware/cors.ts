@@ -30,6 +30,7 @@ export const corsMiddleware = cors({
     'X-Requested-With',
     'Accept',
     'Origin',
+    'X-Device-Id', // мультиаккаунт: id устройства (тик. 1792124252)
   ],
   exposedHeaders: ['X-RateLimit-Limit', 'X-RateLimit-Remaining', 'X-RateLimit-Reset'],
   maxAge: 600, // preflight cache 10 минут

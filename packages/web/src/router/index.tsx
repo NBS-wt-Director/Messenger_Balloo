@@ -24,6 +24,8 @@ const ResetPasswordScreen = lazy(() => import('@/screens/auth/ResetPasswordScree
 const AddDeviceScreen = lazy(() => import('@/screens/auth/AddDeviceScreen'));
 const MainLayout = lazy(() => import('@/layouts/MainLayout'));
 const ChatViewScreen = lazy(() => import('@/screens/chat/ChatViewScreen'));
+const ArchiveScreen = lazy(() => import('@/screens/chat/ArchiveScreen'));
+const AccountsScreen = lazy(() => import('@/screens/profile/AccountsScreen'));
 const ProfileScreen = lazy(() => import('@/screens/profile/ProfileScreen'));
 const PublicProfileScreen = lazy(() => import('@/screens/profile/PublicProfileScreen'));
 const ContactsScreen = lazy(() => import('@/screens/contacts/ContactsScreen'));
@@ -402,8 +404,16 @@ export const router = createHashRouter([
         element: <ChatViewScreen />,
       },
       {
+        path: 'archive',
+        element: <ArchiveScreen />,
+      },
+      {
         path: 'profile',
         element: <ProfileScreen />,
+      },
+      {
+        path: 'accounts',
+        element: <AccountsScreen />,
       },
       {
         path: 'profile/:username',

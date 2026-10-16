@@ -6,12 +6,15 @@ import React, { useState, useRef, useEffect } from 'react';
 
 interface MessageInputProps {
   onSend: (content: string, type: string) => void;
+  /** открытие панели вложений (тик. 1792124253); без него — прежнее поведение */
+  onAttachClick?: () => void;
   onCancelReply?: () => void;
   isTyping?: boolean;
 }
 
 export const MessageInput: React.FC<MessageInputProps> = ({
   onSend,
+  onAttachClick,
   isTyping = false,
 }) => {
   const [content, setContent] = useState('');
@@ -121,6 +124,12 @@ export const MessageInput: React.FC<MessageInputProps> = ({
           className="input-area__btn"
           title="Прикрепить файл"
           onClick={() => {
+            // Панель вложений (тик. 1792124253): при переданном обработчике
+            // открывает её; прежний одноразовый input остаётся как fallback.
+            if (onAttachClick) {
+              onAttachClick();
+              return;
+            }
             const input = document.createElement('input');
             input.type = 'file';
             input.onchange = () => {

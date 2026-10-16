@@ -407,6 +407,7 @@ export const getBlockedUsers = async (blockerId: string) => {
           id: true,
           email: true,
           username: true,
+          displayName: true,
           avatarUrl: true,
           status: true,
         },
@@ -421,7 +422,9 @@ export const getBlockedUsers = async (blockerId: string) => {
     username: b.blocked.username,
     avatarUrl: b.blocked.avatarUrl,
     status: b.blocked.status,
-    blockedAt: b.createdAt,
+    // BigInt не сериализуется JSON.stringify (res.json упал бы с 500 на
+    // непустом списке) — отдаём число секунд (тик. 1792124254)
+    blockedAt: Number(b.createdAt),
   }));
 };
 

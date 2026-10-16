@@ -1,65 +1,60 @@
 // Blocked Users Screen — полный экран блокированных пользователей
-// Макет: mockups/balloo-su/blocked-users.html
+// Макет: mockups/balloo-su/blocked-users.html (принят владельцем 16.10.2026,
+// 1.1.13 → 6.37), тикет 1792124254.
+//
+// Реальные данные: GET /api/users/me/blocked, POST/DELETE /api/users/:id/block,
+// поиск для блокировки — GET /api/users/search.
+// Секции «Заблокированные каналы» и счётчика «Попыток написать» нет: в
+// mockups/data_schema.json и Prisma отсутствуют соответствующие сущности
+// (blocked_users только user↔user); выдуманные числа не выводятся.
 
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { api } from '@/services/api';
-import { useAuthStore } from '@/store/authStore';
 
 interface BlockedUser {
   id: string;
-  username: string;
-  displayName: string;
-  phone?: string;
-  avatarUrl?: string;
-  blockedDate: string;
-  messageAttempts: number;
+  email: string | null;
+  username: string | null;
+  displayName: string | null;
+  avatarUrl: string | null;
+  status: string;
+  blockedAt: number;
 }
 
-interface BlockedChannel {
+interface SearchUser {
   id: string;
-  name: string;
+  username?: string;
+  displayName?: string;
   avatarUrl?: string;
-  blockedDate: string;
+}
+
+function formatBlockedDate(unixSeconds: number): string {
+  return new Date(unixSeconds * 1000).toLocaleDateString('ru-RU');
 }
 
 export default function BlockedUsersScreen() {
-  const [blockedUsers, setBlockedUsers] = useState<BlockedUser[]>([
-    {
-      id: '1',
-      username: 'blocked1',
-      displayName: 'Блокированный пользователь 1',
-      phone: '+7 (999) ***-**-01',
-      blockedDate: '10.07.2026 14:30',
-      messageAttempts: 5,
-    },
-    {
-      id: '2',
-      username: 'blocked2',
-      displayName: 'Блокированный пользователь 2',
-      phone: '+7 (999) ***-**-02',
-      blockedDate: '05.07.2026 09:15',
-      messageAttempts: 4,
-    },
-    {
-      id: '3',
-      username: 'blocked3',
-      displayName: 'Блокированный пользователь 3',
-      phone: '+7 (999) ***-**-03',
-      blockedDate: '01.07.2026 18:45',
-      messageAttempts: 3,
-    },
-  ]);
-
-  const [blockedChannels, setBlockedChannels] = useState<BlockedChannel[]>([
-    {
-      id: '1',
-      name: 'Спам-канал',
-      blockedDate: '12.07.2026',
-    },
-  ]);
-
+  const [blockedUsers, setBlockedUsers] = useState<BlockedUser[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [showBlockModal, setShowBlockModal] = useState(false);
+
+  const load = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await api.getBlockedUsers();
+      setBlockedUsers(res?.blocked ?? []);
+    } catch (e: any) {
+      setError(e?.message || 'Не удалось загрузить список блокировок');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const handleUnblockUser = async (userId: string) => {
     if (!confirm('Разблокировать этого пользователя? Он снова сможет видеть ваш профиль и писать вам.')) {
@@ -67,75 +62,55 @@ export default function BlockedUsersScreen() {
     }
     try {
       await api.unblockUser(userId);
-      setBlockedUsers(prev => prev.filter(u => u.id !== userId));
+      setBlockedUsers((prev) => prev.filter((u) => u.id !== userId));
     } catch {
       // error toast
     }
   };
 
-  const handleUnblockChannel = async (channelId: string) => {
-    try {
-      await api.unblockChannel(channelId);
-      setBlockedChannels(prev => prev.filter(c => c.id !== channelId));
-    } catch {
-      // error toast
-    }
-  };
+  const nameOf = (u: BlockedUser) => u.displayName || u.username || u.email || 'Без имени';
 
-  const filteredUsers = blockedUsers.filter(u =>
-    u.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    u.username.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredUsers = blockedUsers.filter(
+    (u) =>
+      nameOf(u).toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (u.username ?? '').toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  const totalAttempts = blockedUsers.reduce((sum, u) => sum + u.messageAttempts, 0);
 
   return (
     <div style={{ height: '100%', overflowY: 'auto', padding: 24 }}>
       <div style={{ maxWidth: 720, margin: '0 auto' }}>
         {/* Header */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          marginBottom: 24,
-          flexWrap: 'wrap',
-          gap: 16,
-        }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: 24,
+            flexWrap: 'wrap',
+            gap: 16,
+          }}
+        >
           <div>
             <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 4 }}>
               🚫 Блокированные пользователи
             </h1>
             <p className="text-sm text-secondary">
-              Пользователи, которых вы заблокировали. Они не видят ваш профиль и не могут вам написать.
+              Пользователи, которых вы заблокировали. Они не видят ваш профиль и не могут вам
+              написать.
             </p>
           </div>
-          <button
-            className="btn btn--primary"
-            onClick={() => setShowBlockModal(true)}
-          >
+          <button className="btn btn--primary" onClick={() => setShowBlockModal(true)}>
             ➕ Заблокировать
           </button>
         </div>
 
         {/* Stats */}
-        <div style={{
-          display: 'flex',
-          gap: 12,
-          marginBottom: 24,
-          flexWrap: 'wrap',
-        }}>
+        <div style={{ display: 'flex', gap: 12, marginBottom: 24, flexWrap: 'wrap' }}>
           <div className="card flex-1" style={{ minWidth: 140 }}>
             <div className="text-xs text-muted">Всего заблокировано</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--danger)' }}>
-              {blockedUsers.length + blockedChannels.length}
+              {blockedUsers.length}
             </div>
-          </div>
-          <div className="card flex-1" style={{ minWidth: 140 }}>
-            <div className="text-xs text-muted">Попыток написать</div>
-            <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--warning)' }}>
-              {totalAttempts}
-            </div>
-            <div className="text-xs text-muted">за последние 7 дней</div>
           </div>
         </div>
 
@@ -146,60 +121,31 @@ export default function BlockedUsersScreen() {
             className="form-input"
             placeholder="🔍 Поиск по блокированным..."
             value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
 
+        {loading && (
+          <div className="text-sm text-secondary" style={{ padding: 24, textAlign: 'center' }}>
+            Загрузка…
+          </div>
+        )}
+
+        {error && !loading && (
+          <div className="text-sm text-danger" style={{ padding: 24, textAlign: 'center' }}>
+            {error}{' '}
+            <button className="btn btn--tertiary btn--sm" onClick={load}>
+              Повторить
+            </button>
+          </div>
+        )}
+
         {/* Blocked users */}
-        <div className="card" style={{ marginBottom: 16 }}>
-          {filteredUsers.map(user => (
-            <div
-              key={user.id}
-              style={{
-                padding: 12,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 12,
-                borderBottom: '1px solid var(--border-color)',
-              }}
-            >
-              <div className="avatar avatar--md avatar--bordered avatar--status-offline avatar--ctx-blocked">
-                <div className="avatar__inner">
-                  <span>{user.displayName.charAt(0)}{user.displayName.charAt(1)}</span>
-                </div>
-              </div>
-              <div className="flex-1">
-                <div className="text-sm font-bold">{user.displayName}</div>
-                <div className="text-xs text-muted">
-                  📞 {user.phone} · Заблокирован: {user.blockedDate}
-                </div>
-                <div className="text-xs text-muted" style={{ marginTop: 2 }}>
-                  Попыток написать: {user.messageAttempts}
-                </div>
-              </div>
-              <button
-                className="btn btn--secondary btn--sm"
-                onClick={() => handleUnblockUser(user.id)}
-              >
-                Разблокировать
-              </button>
-            </div>
-          ))}
-
-          {filteredUsers.length === 0 && (
-            <div className="text-sm text-secondary" style={{ padding: 24, textAlign: 'center' }}>
-              {searchQuery ? 'Ничего не найдено' : 'Нет заблокированных пользователей'}
-            </div>
-          )}
-        </div>
-
-        {/* Blocked channels */}
-        {blockedChannels.length > 0 && (
+        {!loading && !error && (
           <div className="card" style={{ marginBottom: 16 }}>
-            <h3 className="card__title" style={{ marginBottom: 16 }}>🚫 Заблокированные каналы</h3>
-            {blockedChannels.map(ch => (
+            {filteredUsers.map((user) => (
               <div
-                key={ch.id}
+                key={user.id}
                 style={{
                   padding: 12,
                   display: 'flex',
@@ -208,27 +154,42 @@ export default function BlockedUsersScreen() {
                   borderBottom: '1px solid var(--border-color)',
                 }}
               >
-                <div className="avatar avatar--md avatar--bordered avatar--status-offline avatar--ctx-blocked" style={{ background: 'var(--bg-tertiary)' }}>
-                  <div className="avatar__inner"><span>📢</span></div>
+                <div className="avatar avatar--md avatar--bordered avatar--status-offline avatar--ctx-blocked">
+                  <div className="avatar__inner">
+                    <span>{nameOf(user).slice(0, 2).toUpperCase()}</span>
+                  </div>
                 </div>
                 <div className="flex-1">
-                  <div className="text-sm font-bold">{ch.name}</div>
-                  <div className="text-xs text-muted">Заблокирован: {ch.blockedDate}</div>
+                  <div className="text-sm font-bold">{nameOf(user)}</div>
+                  <div className="text-xs text-muted">
+                    {[user.email, user.username ? `@${user.username}` : null]
+                      .filter(Boolean)
+                      .join(' · ')}{' '}
+                    · Заблокирован: {formatBlockedDate(user.blockedAt)}
+                  </div>
                 </div>
                 <button
                   className="btn btn--secondary btn--sm"
-                  onClick={() => handleUnblockChannel(ch.id)}
+                  onClick={() => handleUnblockUser(user.id)}
                 >
                   Разблокировать
                 </button>
               </div>
             ))}
+
+            {filteredUsers.length === 0 && (
+              <div className="text-sm text-secondary" style={{ padding: 24, textAlign: 'center' }}>
+                {searchQuery ? 'Ничего не найдено' : 'Нет заблокированных пользователей'}
+              </div>
+            )}
           </div>
         )}
 
         {/* Info */}
         <div className="card">
-          <h3 className="card__title" style={{ marginBottom: 16 }}>ℹ️ О блокировке</h3>
+          <h3 className="card__title" style={{ marginBottom: 16 }}>
+            ℹ️ О блокировке
+          </h3>
           <ul className="text-sm text-secondary" style={{ paddingLeft: 20 }}>
             <li>Заблокированный пользователь не видит ваш профиль</li>
             <li>Не видит ваш статус «в сети»</li>
@@ -244,9 +205,9 @@ export default function BlockedUsersScreen() {
       {showBlockModal && (
         <BlockUserModal
           onClose={() => setShowBlockModal(false)}
-          onBlock={(user) => {
-            // add user to blocked list
+          onBlocked={() => {
             setShowBlockModal(false);
+            load();
           }}
         />
       )}
@@ -254,25 +215,44 @@ export default function BlockedUsersScreen() {
   );
 }
 
-// --- Block User Modal ---
+// --- Block User Modal: реальный поиск GET /api/users/search ---
 function BlockUserModal({
   onClose,
-  onBlock,
+  onBlocked,
 }: {
   onClose: () => void;
-  onBlock: (userId: string) => void;
+  onBlocked: () => void;
 }) {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState<SearchUser[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [blockError, setBlockError] = useState<string | null>(null);
 
-  const suggestedContacts = [
-    { id: '1', name: 'Андрей Новиков', username: '@novikov', online: true },
-    { id: '2', name: 'Елена Козлова', username: '@kozlova', online: false },
-  ];
+  const doSearch = async (q: string) => {
+    if (!q.trim()) {
+      setResults([]);
+      return;
+    }
+    try {
+      setSearching(true);
+      const data = await api.searchUsers(q.trim());
+      setResults(Array.isArray(data) ? data : []);
+    } catch {
+      setResults([]);
+    } finally {
+      setSearching(false);
+    }
+  };
 
-  const filtered = suggestedContacts.filter(c =>
-    c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    c.username.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const handleBlock = async (userId: string) => {
+    try {
+      setBlockError(null);
+      await api.blockUser(userId);
+      onBlocked();
+    } catch (e: any) {
+      setBlockError(e?.message || 'Не удалось заблокировать');
+    }
+  };
 
   return (
     <>
@@ -289,26 +269,29 @@ function BlockUserModal({
       />
 
       {/* Modal */}
-      <div style={{
-        position: 'fixed',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        background: 'var(--bg-primary)',
-        border: '1px solid var(--border-color)',
-        borderRadius: 12,
-        padding: 24,
-        width: '90%',
-        maxWidth: 420,
-        zIndex: 1001,
-        boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
-      }}>
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          marginBottom: 16,
-        }}>
+      <div
+        style={{
+          position: 'fixed',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          background: 'var(--bg-primary)',
+          border: '1px solid var(--border-color)',
+          padding: 24,
+          width: '90%',
+          maxWidth: 420,
+          zIndex: 1001,
+          boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: 16,
+          }}
+        >
           <span className="modal__title">🚫 Заблокировать пользователя</span>
           <button
             onClick={onClose}
@@ -330,8 +313,11 @@ function BlockUserModal({
             type="text"
             className="form-input"
             placeholder="🔍 Поиск по имени, номеру или @username..."
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              doSearch(e.target.value);
+            }}
           />
         </div>
 
@@ -340,14 +326,15 @@ function BlockUserModal({
         </p>
 
         {/* Search results */}
-        <div style={{
-          maxHeight: 200,
-          overflowY: 'auto',
-          border: '1px solid var(--border-color)',
-          borderRadius: 6,
-          marginBottom: 12,
-        }}>
-          {filtered.map(contact => (
+        <div
+          style={{
+            maxHeight: 200,
+            overflowY: 'auto',
+            border: '1px solid var(--border-color)',
+            marginBottom: 12,
+          }}
+        >
+          {results.map((contact) => (
             <div
               key={contact.id}
               style={{
@@ -358,52 +345,55 @@ function BlockUserModal({
                 borderBottom: '1px solid var(--border-color)',
                 cursor: 'pointer',
               }}
-              onClick={() => onBlock(contact.id)}
-              onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-secondary)')}
-              onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+              onClick={() => handleBlock(contact.id)}
             >
-              <div className={`avatar avatar--sm avatar--bordered ${contact.online ? 'avatar--status-online' : 'avatar--status-offline'} avatar--ctx-contact`}>
-                <div className="avatar__inner"><span>{contact.name.charAt(0)}{contact.name.charAt(1)}</span></div>
+              <div className="avatar avatar--sm avatar--bordered avatar--ctx-contact">
+                <div className="avatar__inner">
+                  <span>
+                    {(contact.displayName || contact.username || '?')
+                      .slice(0, 2)
+                      .toUpperCase()}
+                  </span>
+                </div>
               </div>
               <div>
-                <div className="text-sm font-bold">{contact.name}</div>
+                <div className="text-sm font-bold">
+                  {contact.displayName || contact.username || 'Без имени'}
+                </div>
                 <div className="text-xs text-muted">
-                  {contact.username} · {contact.online ? 'в сети' : 'была 1 час назад'}
+                  {contact.username ? `@${contact.username}` : ''}
                 </div>
               </div>
             </div>
           ))}
-          {filtered.length === 0 && (
+          {searching && (
+            <div className="text-sm text-secondary" style={{ padding: 16, textAlign: 'center' }}>
+              Ищем…
+            </div>
+          )}
+          {!searching && query.trim() && results.length === 0 && (
             <div className="text-sm text-secondary" style={{ padding: 16, textAlign: 'center' }}>
               Ничего не найдено
             </div>
           )}
         </div>
 
-        <div className="form-group">
-          <label className="form-checkbox">
-            <input type="checkbox" defaultChecked />
-            Заблокировать и предотвратить повторное вступление в группы
-          </label>
-        </div>
+        {blockError && (
+          <div className="text-sm text-danger" style={{ marginBottom: 8 }}>
+            {blockError}
+          </div>
+        )}
 
-        <div style={{
-          display: 'flex',
-          gap: 8,
-          justifyContent: 'flex-end',
-          marginTop: 16,
-        }}>
+        <div
+          style={{
+            display: 'flex',
+            gap: 8,
+            justifyContent: 'flex-end',
+            marginTop: 16,
+          }}
+        >
           <button className="btn btn--tertiary" onClick={onClose}>
             Отмена
-          </button>
-          <button
-            className="btn btn--danger"
-            onClick={() => {
-              onBlock('selected');
-              onClose();
-            }}
-          >
-            🚫 Заблокировать
           </button>
         </div>
       </div>

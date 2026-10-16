@@ -19,6 +19,7 @@ import { router as specRouter } from './spec';
 import { router as blogLandingRouter } from './blog-landing';
 import { router as archiveRouter } from './archive';
 import { router as devicesRouter } from './devices';
+import { router as accountsRouter } from './accounts';
 import { router as reportsRouter } from './reports';
 import { router as callsRouter } from './calls';
 import { router as supportRouter } from './support';
@@ -64,6 +65,7 @@ router.use('/api/blog-landing', blogLandingRouter);
 // Desktop-specific routes
 router.use('/api/archive', archiveRouter);
 router.use('/api/devices', devicesRouter);
+router.use('/api/accounts', accountsRouter);
 router.use('/api/reports', reportsRouter);
 router.use('/api/calls', callsRouter);
 router.use('/api/support', supportRouter);

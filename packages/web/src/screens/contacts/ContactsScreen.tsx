@@ -40,7 +40,7 @@ export default function ContactsScreen() {
   const fetchBlocked = useCallback(async () => {
     try {
       const data = await api.getBlockedUsers();
-      setBlockedUsers(data || []);
+      setBlockedUsers(data?.blocked ?? []);
     } catch {
       setBlockedUsers([]);
     }

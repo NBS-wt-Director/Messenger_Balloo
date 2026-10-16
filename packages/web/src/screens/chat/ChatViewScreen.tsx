@@ -7,6 +7,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useChatStore, type MessageWithSender } from '@/store/chatStore';
 import { MessageList } from '@/components/chat/MessageList';
 import { MessageInput } from '@/components/chat/MessageInput';
+import { AttachmentPanel } from '@/components/chat/AttachmentPanel';
 import { ChatHeader } from '@/components/chat/ChatHeader';
 import { ChatInfoPanel } from '@/components/chat/ChatInfoPanel';
 import { ReplyPreview } from '@/components/chat/ReplyPreview';
@@ -34,6 +35,8 @@ export const ChatViewScreen: React.FC = () => {
   const [showReactionPicker, setShowReactionPicker] = useState(false);
   const [reactionAnchor, setReactionAnchor] = useState<HTMLElement | null>(null);
   const [typingTimeout, setTypingTimeout] = useState<ReturnType<typeof setTimeout> | null>(null);
+  // Панель вложений (тик. 1792124253, макет attachment-panel.html)
+  const [attachmentPanelOpen, setAttachmentPanelOpen] = useState(false);
 
   // Load chat and messages
   useEffect(() => {
@@ -212,6 +215,27 @@ export const ChatViewScreen: React.FC = () => {
     [chatId, replyTo, addMessage]
   );
 
+  // Перезагрузка сообщений чата — после отправки вложений из панели
+  // (тик. 1792124253): сервер нормализует attachments, берём канонический список.
+  const refreshMessages = useCallback(async () => {
+    if (!chatId) return;
+    try {
+      const messagesData = await api.getMessages(chatId);
+      const messagesWithSender: MessageWithSender[] = messagesData.map((m: any) => ({
+        ...m,
+        sender: {
+          id: m.senderId,
+          username: m.sender?.username || '',
+          displayName: m.sender?.displayName,
+          avatarUrl: m.sender?.avatarUrl,
+        },
+      }));
+      setMessages(chatId, messagesWithSender);
+    } catch {
+      // сообщения останутся в store до следующей успешной загрузки
+    }
+  }, [chatId, setMessages]);
+
   // React to message
   const handleReact = useCallback(async (messageId: string, emoji: string) => {
     try {
@@ -294,7 +318,7 @@ export const ChatViewScreen: React.FC = () => {
           chat={activeChat}
           onlineStatus="в сети"
           onCall={handleCall}
-          onAttachments={() => {}}
+          onAttachments={() => setAttachmentPanelOpen((v) => !v)}
           onMenu={() => setShowInfo(!showInfo)}
           onPin={() => useChatStore.getState().pinChat(activeChat.id)}
           onMute={() => useChatStore.getState().muteChat(activeChat.id)}
@@ -327,8 +351,18 @@ export const ChatViewScreen: React.FC = () => {
           />
 
           {/* Message input */}
-          <MessageInput onSend={handleSend} />
+          <MessageInput onSend={handleSend} onAttachClick={() => setAttachmentPanelOpen(true)} />
         </div>
+
+        {/* Панель вложений (тик. 1792124253) */}
+        {chatId && (
+          <AttachmentPanel
+            open={attachmentPanelOpen}
+            chatId={chatId}
+            onClose={() => setAttachmentPanelOpen(false)}
+            onSent={refreshMessages}
+          />
+        )}
 
         {/* Chat info panel (right sidebar) */}
         <ChatInfoPanel
