@@ -340,11 +340,13 @@
   background: var(--bg-hover);
 }
 
-/* OAuth-сетка квадратов (P20/P21): 4 провайдера сеткой 2×2,
-   при наведении выбранный квадрат растёт на 50% наружу (scale 1.5) */
+/* OAuth-сетка квадратов (P20/P21): 6 провайдеров сеткой 3×2 — Яндекс, VK, Mail.ru,
+   Rambler, Max, Госуслуги. При наведении выбранный рабочий квадрат растёт на 50%
+   наружу (scale 1.5). 16.10.2026: 2×2 → 3×2, добавлены неактивные плитки
+   (решение владельца 1.2.6: Rambler ждёт OAuth-приложение, Max/Госуслуг нет). */
 .auth-oauth-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 12px;
   margin-bottom: 20px;
 }
@@ -384,6 +386,56 @@
 .auth-oauth-tile:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+
+/* Неактивный провайдер (Rambler/Max/Госуслуги): серая плитка, без увеличения,
+   подсказка про валидацию при наведении и фокусе с клавиатуры */
+.auth-oauth-tile--disabled {
+  cursor: not-allowed;
+  color: var(--text-muted);
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+  opacity: 0.55;
+  filter: grayscale(1);
+}
+
+.auth-oauth-tile--disabled:hover,
+.auth-oauth-tile--disabled:focus-visible {
+  /* не растёт: увеличение подсказки читалось бы как «провайдер активен» */
+  transform: none;
+  border-color: var(--border-color);
+  box-shadow: none;
+}
+
+/* Подсказка: «Проходим валидацию. Извините за неудобства» (oauth.validationNotice) */
+.auth-oauth-tile--disabled::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 220px;
+  padding: 8px 10px;
+  background: var(--bg-elevated, var(--bg-tertiary));
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.35;
+  text-align: center;
+  white-space: normal;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+  z-index: 20;
+}
+
+.auth-oauth-tile--disabled:hover::after,
+.auth-oauth-tile--disabled:focus-visible::after {
+  opacity: 1;
+  visibility: visible;
 }
 
 .auth-divider {

@@ -37,15 +37,31 @@ describe('LoginScreen (сценарий авторизации)', () => {
     ).toBeInTheDocument();
   });
 
-  it('renders OAuth tiles grid (Яндекс, VK, Mail.ru, Rambler) — P20/P21', () => {
+  it('renders OAuth tiles grid (6 провайдеров, 3 неактивных) — P20/P21 + 16.10.2026', () => {
     renderLogin();
     expect(screen.getByRole('button', { name: /яндекс/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /vk/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /mail\.ru/i })).toBeInTheDocument();
+    // Rambler/Max/Госуслуги — место в сетке есть, кнопки неактивны
     expect(screen.getByRole('button', { name: /rambler/i })).toBeInTheDocument();
-    // Сетка квадратов: 4 тайла в контейнере .auth-oauth-grid
+    expect(screen.getByRole('button', { name: /max/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /госуслуги/i })).toBeInTheDocument();
+    // Сетка квадратов: 6 тайлов в контейнере .auth-oauth-grid
     expect(document.querySelector('.auth-oauth-grid')).toBeInTheDocument();
-    expect(document.querySelectorAll('.auth-oauth-tile')).toHaveLength(4);
+    expect(document.querySelectorAll('.auth-oauth-tile')).toHaveLength(6);
+    const disabled = document.querySelectorAll('.auth-oauth-tile--disabled');
+    expect(disabled).toHaveLength(3);
+    expect(disabled[0]).toHaveAttribute('aria-disabled', 'true');
+  });
+
+  it('неактивный провайдер показывает подсказку про валидацию и не редиректит', () => {
+    renderLogin();
+    const rambler = screen.getByRole('button', { name: /rambler/i });
+    expect(rambler).toHaveAttribute(
+      'data-tooltip',
+      'Проходим валидацию. Извините за неудобства.'
+    );
+    expect(rambler.getAttribute('aria-label')).toMatch(/валидац/i);
   });
 
   it('renders topbar menu dropdown (левое меню — меню, не кнопка на главную) — P23', () => {

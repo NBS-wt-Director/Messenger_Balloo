@@ -9,7 +9,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
 import { api } from '@/services/api';
-import { OAuthGrid, type OAuthProvider } from '@/components/auth/OAuthGrid';
+import { OAuthGrid, isOAuthConfigured, type OAuthProvider } from '@/components/auth/OAuthGrid';
 import { PasswordInput } from '@/components/auth/PasswordInput';
 import { AppTopbar } from '@/components/chrome/AppTopbar';
 import { AppFooter } from '@/components/chrome/AppFooter';
@@ -67,6 +67,8 @@ function LoginScreen() {
   };
 
   const handleOAuth = (provider: OAuthProvider) => {
+    // Неактивный провайдер (Rambler/Max/Госуслуги) не порождает запрос на сервер
+    if (!isOAuthConfigured(provider)) return;
     const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:3100';
     // GET-редирект на сервер: 302 на authorize URL провайдера (P21)
     window.location.href = `${apiBase}/api/auth/oauth/${provider}`;

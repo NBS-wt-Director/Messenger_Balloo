@@ -8,7 +8,7 @@ import React, { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
 import { api } from '@/services/api';
-import { OAuthGrid, type OAuthProvider } from '@/components/auth/OAuthGrid';
+import { OAuthGrid, isOAuthConfigured, type OAuthProvider } from '@/components/auth/OAuthGrid';
 import { LegalCheckbox } from '@/components/auth/LegalCheckbox';
 import { AppTopbar } from '@/components/chrome/AppTopbar';
 import { AppFooter } from '@/components/chrome/AppFooter';
@@ -173,6 +173,8 @@ function RegisterScreen() {
 
   // OAuth handler: GET-редирект на сервер (302 на authorize URL, P21)
   const handleOAuth = (provider: OAuthProvider) => {
+    // Неактивный провайдер (Rambler/Max/Госуслуги) не порождает запрос на сервер
+    if (!isOAuthConfigured(provider)) return;
     const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:3100';
     window.location.href = `${apiBase}/api/auth/oauth/${provider}`;
   };
