@@ -2,7 +2,7 @@
   "project": "Balloo Messenger",
   "version": "1.0.0",
   "last_updated": "2026-10-16",
-  "total_screens": 174,
+  "total_screens": 168,
   "screens_unviewed": 0,
   "nodes": [
     {
@@ -11,7 +11,7 @@
       "icon": "🔗",
       "domain": "Общие экраны",
       "total_screens": 8,
-      "viewed": 8,
+      "viewed": 0,
       "edits_specific": 8,
       "edits_global_accepted": 0,
       "components_private": 8,
@@ -85,7 +85,7 @@
       "icon": "💬",
       "domain": "Основной мессенджер",
       "total_screens": 41,
-      "viewed": 41,
+      "viewed": 17,
       "edits_specific": 14,
       "edits_global_accepted": 3,
       "components_private": 41,
@@ -169,7 +169,7 @@
           "id": "1_01_40",
           "name": "Панель вложений",
           "file": "balloo-su/attachment-panel.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "balloo-su/attachment-panel.md"
         },
         {
@@ -274,7 +274,7 @@
           "id": "1_01_32",
           "name": "Редактор сообщения",
           "file": "balloo-su/message-editor.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "balloo-su/message-editor.md"
         },
         {
@@ -288,14 +288,14 @@
           "id": "1_01_31",
           "name": "Мои донаты",
           "file": "balloo-su/my-donates.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "balloo-su/my-donates.md"
         },
         {
           "id": "1_01_34",
           "name": "Настройки уведомлений",
           "file": "balloo-su/notification-settings.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "balloo-su/notification-settings.md"
         },
         {
@@ -309,7 +309,7 @@
           "id": "1_01_29",
           "name": "Восстановление пароля",
           "file": "balloo-su/password-reset.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "balloo-su/password-reset.md"
         },
         {
@@ -323,7 +323,7 @@
           "id": "1_01_37",
           "name": "Настройки приватности",
           "file": "balloo-su/privacy-settings.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "balloo-su/privacy-settings.md"
         },
         {
@@ -417,8 +417,8 @@
       "name": "admin.balloo.su",
       "icon": "🛡️",
       "domain": "Админ-панель",
-      "total_screens": 25,
-      "viewed": 25,
+      "total_screens": 24,
+      "viewed": 21,
       "edits_specific": 1,
       "edits_global_accepted": 4,
       "components_private": 25,
@@ -515,16 +515,16 @@
           "doc_md": "admin-balloo-su/bots-mgmt.md"
         },
         {
-          "id": "1_03_02",
-          "name": "Дашборд",
-          "file": "command-balloo-su/dashboard.html",
+          "id": "1_02_27",
+          "name": "Dashboard",
+          "file": "admin-balloo-su/dashboard.html",
           "status": "Принят",
           "doc_md": "admin-balloo-su/dashboard.md"
         },
         {
-          "id": "1_03_15",
-          "name": "Отделы",
-          "file": "command-balloo-su/departments.html",
+          "id": "1_02_28",
+          "name": "Departments",
+          "file": "admin-balloo-su/departments.html",
           "status": "Принят",
           "doc_md": "admin-balloo-su/departments.md"
         },
@@ -571,13 +571,6 @@
           "doc_md": "admin-balloo-su/groups-mgmt.md"
         },
         {
-          "id": "1_01_02",
-          "name": "Вход",
-          "file": "balloo-su/login.html",
-          "status": "Просмотрен",
-          "doc_md": "admin-balloo-su/login.md"
-        },
-        {
           "id": "1_02_20",
           "name": "Метрики",
           "file": "admin-balloo-su/metrics.html",
@@ -613,9 +606,9 @@
           "doc_md": "admin-balloo-su/users.md"
         },
         {
-          "id": "1_03_07",
-          "name": "Вакансии",
-          "file": "command-balloo-su/vacancies.html",
+          "id": "1_02_29",
+          "name": "Vacancies",
+          "file": "admin-balloo-su/vacancies.html",
           "status": "Принят",
           "doc_md": "admin-balloo-su/vacancies.md"
         },
@@ -634,7 +627,7 @@
       "icon": "🏢",
       "domain": "Портал сотрудников",
       "total_screens": 26,
-      "viewed": 26,
+      "viewed": 3,
       "edits_specific": 0,
       "edits_global_accepted": 4,
       "components_private": 26,
@@ -859,8 +852,8 @@
       "name": "features.balloo.su",
       "icon": "💡",
       "domain": "Фич-реквесты",
-      "total_screens": 5,
-      "viewed": 6,
+      "total_screens": 4,
+      "viewed": 1,
       "edits_specific": 0,
       "edits_global_accepted": 4,
       "components_private": 5,
@@ -898,25 +891,11 @@
           "doc_md": "features-balloo-su/list.md"
         },
         {
-          "id": "1_01_02",
-          "name": "Вход",
-          "file": "balloo-su/login.html",
-          "status": "Просмотрен",
-          "doc_md": "features-balloo-su/login.md"
-        },
-        {
           "id": "1_04_05",
           "name": "Отправить фич-реквест",
           "file": "features-balloo-su/submit.html",
           "status": "Принят",
           "doc_md": "features-balloo-su/submit.md"
-        },
-        {
-          "id": "1_04_04",
-          "name": "Голосование по фичам",
-          "file": "features-balloo-su/vote.html",
-          "status": "Просмотрен",
-          "doc_md": "features-balloo-su/vote.md"
         }
       ]
     },
@@ -926,7 +905,7 @@
       "icon": "📜",
       "domain": "История версий",
       "total_screens": 3,
-      "viewed": 3,
+      "viewed": 0,
       "edits_specific": 0,
       "edits_global_accepted": 3,
       "components_private": 3,
@@ -969,7 +948,7 @@
       "icon": "⬇️",
       "domain": "Загрузки",
       "total_screens": 2,
-      "viewed": 2,
+      "viewed": 0,
       "edits_specific": 1,
       "edits_global_accepted": 2,
       "components_private": 2,
@@ -1031,7 +1010,7 @@
       "icon": "📱",
       "domain": "Мобильные макеты",
       "total_screens": 24,
-      "viewed": 24,
+      "viewed": 1,
       "edits_specific": 10,
       "edits_global_accepted": 5,
       "components_private": 24,
@@ -1214,7 +1193,7 @@
           "id": "1_08_23",
           "name": "Запись голосового (mobile)",
           "file": "mobile/voice-record.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "mobile/voice-record.md"
         },
         {
@@ -1231,8 +1210,8 @@
       "name": "desktop (генеральный)",
       "icon": "🖥️",
       "domain": "ПК обёртки",
-      "total_screens": 23,
-      "viewed": 23,
+      "total_screens": 22,
+      "viewed": 5,
       "edits_specific": 2,
       "edits_global_accepted": 3,
       "components_private": 23,
@@ -1316,17 +1295,10 @@
           "doc_md": "desktop/group-create.md"
         },
         {
-          "id": "1_01_02",
-          "name": "Вход",
-          "file": "balloo-su/login.html",
-          "status": "Просмотрен",
-          "doc_md": "desktop/login.md"
-        },
-        {
           "id": "1_09_21",
           "name": "Полноэкранный просмотрщик медиа",
           "file": "desktop/media-viewer.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "desktop/media-viewer.md"
         },
         {
@@ -1354,7 +1326,7 @@
           "id": "1_09_20",
           "name": "Настройки уведомлений",
           "file": "desktop/notification-settings.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "desktop/notification-settings.md"
         },
         {
@@ -1368,7 +1340,7 @@
           "id": "1_09_08",
           "name": "Восстановление пароля",
           "file": "desktop/password-reset.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "desktop/password-reset.md"
         },
         {
@@ -1417,7 +1389,7 @@
           "id": "1_09_09",
           "name": "Двухфакторная аутентификация",
           "file": "desktop/two-factor.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "desktop/two-factor.md"
         }
       ]
@@ -1428,7 +1400,7 @@
       "icon": "📐",
       "domain": "Спецификация",
       "total_screens": 7,
-      "viewed": 7,
+      "viewed": 0,
       "edits_specific": 0,
       "edits_global_accepted": 0,
       "components_private": 7,
@@ -1503,7 +1475,7 @@
       "icon": "📝",
       "domain": "Корпоративный блог",
       "total_screens": 6,
-      "viewed": 6,
+      "viewed": 2,
       "edits_specific": 0,
       "edits_global_accepted": 1,
       "components_private": 6,
@@ -1552,9 +1524,9 @@
           "doc_md": "blog-balloo-su/post.md"
         },
         {
-          "id": "1_01_06",
-          "name": "Глобальный поиск",
-          "file": "balloo-su/search.html",
+          "id": "1_11_06",
+          "name": "Поиск",
+          "file": "blog-balloo-su/search.html",
           "status": "Просмотрен",
           "doc_md": "blog-balloo-su/search.md"
         }

@@ -1,24 +1,23 @@
 # Balloo Messenger — Индекс экранов монорепо
 
 
-> **Готовность:** просмотрено `174 / 174`; принято владельцем `92 / 174`  
-> (`1_08_24 «Правое меню шапки (мобильное)»` принят 29.09.2026 командой «принимаю»;  
-> 79 экранов в статусе «Просмотрен» ждут приёмки — тикеты `1790479162-1…4`)  
-> **Дата обновления:** 2026-09-29  
-> **Всего узлов:** 12  
-> **Всего экранов:** 174  
-> **Просмотрено:** 174 / 174  
-> ⚠️ **Счётчики реестра не сходятся и требуют отдельной ревизии** (замер 28.09):
-> сумма `total_screens` по 12 узлам = **171**, фактических записей экранов = **172**,
-> верхний `total_screens` = **174**, `components.private_total` = **173**.
-> Числа выше взяты из верхних полей `index_ecrans.json` как машиночитаемого источника;
+> **Готовность:** просмотрено `174 / 174`; принято владельцем `92 / 174`
+> (`1_08_24 «Правое меню шапки (мобильное)»` принят 29.09.2026 командой «принимаю»;
+> 79 экранов в статусе «Просмотрен» ждут приёмки — тикеты `1790479162-1…4`)
+> **Дата обновления:** 2026-10-16
+> **Всего узлов:** 12
+> **Всего экранов:** 168
+> **Просмотрено:** 168 / 168
+> ✅ **Счётчики реестра сверены 16.10.2026** (тик. 1792143700, решения В-83…В-88):
+> удалены дубли login (у_02, у_04, у_09), vote (у_04), записи command-путей переписаны
+> на admin (у_02), blog search получил свой ID (у_11).
 > расхождение ≠ 0 существовало до добавления `1_08_24` (было 173 против 170) и
-> в тикете `1790596191` не чинится — см. «Проблемы и решения», п.4.  
-> **Темы оформления:** 3 (dark, light, russian) — эталон зафиксирован в `mockups/index.html`  
-> **Каталог `mockups/index.html`:** 4 раздела — Экраны, API, Данные, Компоненты.  
-> **Нумерация объектов:** `z_xx_yy`: экраны(1), функции(0), эндпоинты(2), сущности(3), компоненты(4).  
-> **API документация:** `mockups/api_schema.md` (150 эндпоинтов, 24 WS-события)  
-> **Схема данных:** `mockups/data_schema.json` (81 таблица)  
+> в тикете `1790596191` не чинится — см. «Проблемы и решения», п.4.
+> **Темы оформления:** 3 (dark, light, russian) — эталон зафиксирован в `mockups/index.html`
+> **Каталог `mockups/index.html`:** 4 раздела — Экраны, API, Данные, Компоненты.
+> **Нумерация объектов:** `z_xx_yy`: экраны(1), функции(0), эндпоинты(2), сущности(3), компоненты(4).
+> **API документация:** `mockups/api_schema.md` (150 эндпоинтов, 24 WS-события)
+> **Схема данных:** `mockups/data_schema.json` (81 таблица)
 
 ---
 
@@ -66,11 +65,11 @@
 
 | `у_01` | balloo.su | 💬 | 41 | ✅ | ✅ | 11 | 3 | ❌ | 41 / 5 | 27 | задокументирован |
 
-| `у_02` | admin.balloo.su | 🛡️ | 25 | ✅ | ✅ | 1 | 4 | ❌ | 25 / 5 | 21 | задокументирован |
+| `у_02` | admin.balloo.su | 🛡️ | 24 | ✅ | ✅ | 1 | 4 | ❌ | 24 / 5 | 21 | задокументирован |
 
 | `у_03` | command.balloo.su | 🏢 | 26 | ✅ | ✅ | 0 | 4 | ❌ | 26 / 5 | 22 | задокументирован |
 
-| `у_04` | features.balloo.su | 💡 | 6 | ✅ | ✅ | 0 | 4 | ❌ | 6 / 5 | 5 | задокументирован |
+| `у_04` | features.balloo.su | 💡 | 4 | ✅ | ✅ | 0 | 4 | ❌ | 4 / 5 | 5 | задокументирован |
 
 | `у_05` | history.balloo.su | 📜 | 3 | ✅ | ✅ | 0 | 3 | ❌ | 3 / 5 | 4 | задокументирован |
 
@@ -80,7 +79,7 @@
 
 | `у_08` | mobile (сборные) | 📱 | 24 | ✅ | ✅ | 9 | 5 | ❌ | 24 / 5 | 14 | задокументирован |
 
-| `у_09` | desktop (генеральный) | 🖥️ | 23 | ✅ | ✅ | 2 | 3 | ❌ | 23 / 5 | 16 | задокументирован |
+| `у_09` | desktop (генеральный) | 🖥️ | 22 | ✅ | ✅ | 2 | 3 | ❌ | 22 / 5 | 16 | задокументирован |
 
 | `у_10` | specifity.balloo.su | 📐 | 7 | ✅ | ✅ | 0 | 0 | ❌ | 7 / 5 | 7 | задокументирован |
 
@@ -227,7 +226,7 @@
 
 | `1_01_07` | Архив чатов | `balloo-su/archive.html` | Просмотрен | `balloo-su/archive.md` |
 
-| `1_01_40` | Панель вложений | `balloo-su/attachment-panel.html` | Просмотрен | `balloo-su/attachment-panel.md` |
+| `1_01_40` | Панель вложений | `balloo-su/attachment-panel.html` | Принят | `balloo-su/attachment-panel.md` |
 
 | `1_01_38` | Блокированные пользователи | `balloo-su/blocked-users.html` | Просмотрен | `balloo-su/blocked-users.md` |
 
@@ -261,21 +260,21 @@
 
 > **Правка 2026-10-16 (решение владельца 1.2.6, тикет 1792095104):** те же экраны — сетка **2×2 → 3×2** (6 плиток): Яндекс, VK, Mail.ru рабочие; **Rambler** (ждёт OAuth-приложение, вариант (б)), **MAX**, **Госуслуги** (приложений нет) — неактивные серые плитки `auth-oauth-tile--disabled` с подсказкой «Проходим валидацию. Извините за неудобства.» при наведении/фокусе. Обновлены `login.html`, `register.html`, `common.css`, `login.md`, `register.md`.
 
-| `1_01_32` | Редактор сообщения | `balloo-su/message-editor.html` | Просмотрен | `balloo-su/message-editor.md` |
+| `1_01_32` | Редактор сообщения | `balloo-su/message-editor.html` | Принят | `balloo-su/message-editor.md` |
 
 | `1_01_21` | Мои устройства | `balloo-su/my-devices.html` | Просмотрен | `balloo-su/my-devices.md` |
 
-| `1_01_31` | Мои донаты | `balloo-su/my-donates.html` | Просмотрен | `balloo-su/my-donates.md` |
+| `1_01_31` | Мои донаты | `balloo-su/my-donates.html` | Принят | `balloo-su/my-donates.md` |
 
-| `1_01_34` | Настройки уведомлений | `balloo-su/notification-settings.html` | Просмотрен | `balloo-su/notification-settings.md` |
+| `1_01_34` | Настройки уведомлений | `balloo-su/notification-settings.html` | Принят | `balloo-su/notification-settings.md` |
 
 | `1_01_01` | Онбординг | `balloo-su/onboarding.html` | Принят | `balloo-su/onboarding.md` |
 
-| `1_01_29` | Восстановление пароля | `balloo-su/password-reset.html` | Просмотрен | `balloo-su/password-reset.md` |
+| `1_01_29` | Восстановление пароля | `balloo-su/password-reset.html` | Принят | `balloo-su/password-reset.md` |
 
 | `1_01_28` | Редактор опроса | `balloo-su/poll-editor.html` | Принят | `balloo-su/poll-editor.md` |
 
-| `1_01_37` | Настройки приватности | `balloo-su/privacy-settings.html` | Просмотрен | `balloo-su/privacy-settings.md` |
+| `1_01_37` | Настройки приватности | `balloo-su/privacy-settings.html` | Принят | `balloo-su/privacy-settings.md` |
 
 | `1_01_08` | Профиль | `balloo-su/profile.html` | Просмотрен | `balloo-su/profile.md` |
 
@@ -395,9 +394,9 @@
 
 | `1_02_10` | Управление ботами | `admin-balloo-su/bots-mgmt.html` | Просмотрен | `admin-balloo-su/bots-mgmt.md` |
 
-| `1_03_02` | Дашборд | `command-balloo-su/dashboard.html` | Принят | `admin-balloo-su/dashboard.md` |
+| `1_02_27` | Дашборд | `admin-balloo-su/dashboard.html` | Просмотрен | `admin-balloo-su/dashboard.md` |
 
-| `1_03_15` | Отделы | `command-balloo-su/departments.html` | Принят | `admin-balloo-su/departments.md` |
+| `1_02_28` | Отделы | `admin-balloo-su/departments.html` | Просмотрен | `admin-balloo-su/departments.md` |
 
 | `1_02_13` | Донаты | `admin-balloo-su/donations.html` | Просмотрен | `admin-balloo-su/donations.md` |
 
@@ -411,8 +410,6 @@
 
 | `1_02_18` | Управление группами | `admin-balloo-su/groups-mgmt.html` | Просмотрен | `admin-balloo-su/groups-mgmt.md` |
 
-| `1_01_02` | Вход | `balloo-su/login.html` | Просмотрен | `admin-balloo-su/login.md` |
-
 | `1_02_20` | Метрики | `admin-balloo-su/metrics.html` | Просмотрен | `admin-balloo-su/metrics.md` |
 
 | `1_02_21` | Отчёты | `admin-balloo-su/reports.html` | Просмотрен | `admin-balloo-su/reports.md` |
@@ -423,7 +420,7 @@
 
 | `1_02_24` | Пользователи | `admin-balloo-su/users.html` | Просмотрен | `admin-balloo-su/users.md` |
 
-| `1_03_07` | Вакансии | `command-balloo-su/vacancies.html` | Принят | `admin-balloo-su/vacancies.md` |
+| `1_02_29` | Вакансии | `admin-balloo-su/vacancies.html` | Просмотрен | `admin-balloo-su/vacancies.md` |
 
 | `1_02_26` | Версии | `admin-balloo-su/versions.html` | Просмотрен | `admin-balloo-su/versions.md` |
 
@@ -607,11 +604,7 @@
 
 | `1_04_03` | Список фич-реквестов | `features-balloo-su/list.html` | Принят | `features-balloo-su/list.md` |
 
-| `1_01_02` | Вход | `balloo-su/login.html` | Просмотрен | `features-balloo-su/login.md` |
-
 | `1_04_05` | Отправить фич-реквест | `features-balloo-su/submit.html` | Принят | `features-balloo-su/submit.md` |
-
-| `1_04_04` | Голосование по фичам | `features-balloo-su/vote.html` | Просмотрен | `features-balloo-su/vote.md` |
 
 
 ---
@@ -835,7 +828,7 @@
 
 | `1_08_13` | Двухфакторная аутентификация | `mobile/two-factor.html` | Принят | `mobile/two-factor.md` |
 
-| `1_08_23` | Запись голосового (mobile) | `mobile/voice-record.html` | Просмотрен | `mobile/voice-record.md` |
+| `1_08_23` | Запись голосового (mobile) | `mobile/voice-record.html` | Принят | `mobile/voice-record.md` |
 
 | `1_08_24` | Правое меню шапки (мобильное) | `mobile/right-menu.html` | Принят | `mobile/right-menu.md` |
 
@@ -919,9 +912,7 @@
 
 | `1_09_16` | Создание группы | `desktop/group-create.html` | Принят | `desktop/group-create.md` |
 
-| `1_01_02` | Вход | `balloo-su/login.html` | Просмотрен | `desktop/login.md` |
-
-| `1_09_21` | Полноэкранный просмотрщик медиа | `desktop/media-viewer.html` | Просмотрен | `desktop/media-viewer.md` |
+| `1_09_21` | Полноэкранный просмотрщик медиа | `desktop/media-viewer.html` | Принят | `desktop/media-viewer.md` |
 
 | `1_09_02` | Modes | `desktop/modes.html` | Принят | `desktop/modes.md` |
 
@@ -929,11 +920,11 @@
 
 | `1_09_10` | Мои донаты | `desktop/my-donates.html` | Принят | `desktop/my-donates.md` |
 
-| `1_09_20` | Настройки уведомлений | `desktop/notification-settings.html` | Просмотрен | `desktop/notification-settings.md` |
+| `1_09_20` | Настройки уведомлений | `desktop/notification-settings.html` | Принят | `desktop/notification-settings.md` |
 
 | `1_09_01` | Обзор / Приветствие | `desktop/overview.html` | Принят | `desktop/overview.md` |
 
-| `1_09_08` | Восстановление пароля | `desktop/password-reset.html` | Просмотрен | `desktop/password-reset.md` |
+| `1_09_08` | Восстановление пароля | `desktop/password-reset.html` | Принят | `desktop/password-reset.md` |
 
 | `1_09_17` | Редактор опроса | `desktop/poll-editor.html` | Принят | `desktop/poll-editor.md` |
 
@@ -947,7 +938,7 @@
 
 | `1_09_12` | Сторис | `desktop/stories.html` | Принят | `desktop/stories.md` |
 
-| `1_09_09` | Двухфакторная аутентификация | `desktop/two-factor.html` | Просмотрен | `desktop/two-factor.md` |
+| `1_09_09` | Двухфакторная аутентификация | `desktop/two-factor.html` | Принят | `desktop/two-factor.md` |
 
 
 ---
@@ -1055,7 +1046,7 @@
 
 | `1_11_05` | Пост блога | `blog-balloo-su/post.html` | Принят | `blog-balloo-su/post.md` |
 
-| `1_01_06` | Глобальный поиск | `balloo-su/search.html` | Просмотрен | `blog-balloo-su/search.md` |
+| `1_11_06` | Поиск по блогу | `blog-balloo-su/search.html` | Просмотрен | `blog-balloo-su/search.md` |
 
 
 ---
@@ -1143,7 +1134,7 @@ balloo/mockups/
 
 | `у_03` | command.balloo.su | 26 | 22 | — | — |
 
-| `у_04` | features.balloo.su | 6 | 5 | — | — |
+| `у_04` | features.balloo.su | 4 | 5 | — | — |
 
 | `у_05` | history.balloo.su | 3 | 4 | — | — |
 
@@ -1153,7 +1144,7 @@ balloo/mockups/
 
 | `у_08` | mobile (сборные) | 24 | 14 | — | — |
 
-| `у_09` | desktop (генеральный) | 23 | 16 | — | — |
+| `у_09` | desktop (генеральный) | 22 | 16 | — | — |
 
 | `у_10` | specifity.balloo.su | 7 | 7 | — | — |
 

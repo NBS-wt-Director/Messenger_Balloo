@@ -71,7 +71,7 @@
     </div>
     <div class="input-area">
       <button class="input-area__btn" title="Прикрепить файл" onclick="toggleAttachmentPanel()" style="color:var(--accent);">📎</button>
-      <button class="input-area__btn" title="Фото/видео">🖼</button>
+      <button class="input-area__btn" title="Камера" onclick="openCamera()">📷</button>
       <button class="input-area__btn" title="Голосовое">🎤</button>
       <textarea class="input-area__field" placeholder="Напишите сообщение..." rows="1"></textarea>
       <button class="input-area__btn input-area__btn--send" onclick="sendMessage()" title="Отправить">➤</button>
@@ -133,6 +133,7 @@
         <div style="font-size:24px;margin-bottom:6px;">📦</div>
         <div class="text-xs font-bold" style="color:var(--text-primary);">Файл</div>
       </div>
+      <div class="card card--hover" style="text-align:center;padding:14px 8px;background:rgba(45,184,77,0.08);border-color:var(--accent);" onclick="openCamera()"><div style="font-size:24px;margin-bottom:6px;">📷</div><div class="text-xs font-bold" style="color:var(--text-primary);">С камеры</div></div>
     </div>
 
     <!-- Recent files -->
