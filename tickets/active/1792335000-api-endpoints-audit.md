@@ -118,9 +118,12 @@ python3 scripts/api-endpoints-check.py
 - [x] 3. Группа A (9 шт.): привести пути/методы клиентов к существующим маршрутам
       сервера. Проверка: скрипт сверки — строки A исчезают; web build зелёный
 - [x] 4. Убрать дубль метода донатов в `mobile/services/api.ts` (`getUserDonations`)
-- [ ] 5. Группа B: вынести на решение владельца — какие 29 эндпоинтов создавать,
+- [x] 5. Группа B: вынести на решение владельца — какие 29 эндпоинтов создавать,
       какие админ-экраны переключить на `/api/hiring/*` и `/api/knowledge/*`
-- [ ] 6. После решения: создать недостающие контроллеры + роуты + тесты (B1–B6)
+- [~] 6. После решения: создать недостающие контроллеры + роуты + тесты (B1–B6)
+      — **11 из 29 создано** (B1 боты, B3 роли чата, B4 истории, B6 история сообщений,
+      переименование устройства, onboarding steps). Осталось 18 (B2 admin, B5 channels,
+      B6 прочие) — ждут решения владельца в `with_lord/`
 - [ ] 7. Финальный прогон: тесты сервера, web build, desktop build, сверка = 0
 
 ## Критерии готовности
@@ -206,3 +209,37 @@ python3 scripts/api-endpoints-check.py
 - `pnpm --filter @balloo/web build`: зелёный ✓
 - `pnpm --filter @balloo/desktop build`: зелёный ✓
 - `python3 scripts/api-endpoints-check.py`: `НЕ СОВПАДАЕТ: 29` (только группа B) ✓
+
+### Прогон 19.10.2026 (после создания 11 эндпоинтов группы B)
+
+```
+Клиентских путей (уник. метод+путь): 183
+Серверных маршрутов: 250
+НЕ СОВПАДАЕТ: 18
+```
+
+**Создано 11 эндпоинтов:**
+
+| Группа | Эндпоинты | Файлы | Тесты |
+|---|---|---|---|
+| B1 боты (3) | `GET/POST/DELETE /api/bots[/:id]` | botService.ts + botController.ts + routes/bots.ts | bot.test.ts: 7 тестов |
+| B3 роли чата (3) | `PUT .../members/:userId/role`, `DELETE/PUT .../admins/:adminId[/role]` | chatController.ts (updateMemberRole, removeAdmin, updateAdminRole) + routes/chats.ts | chats.test.ts: 7 тестов |
+| B4 истории (2) | `GET /api/stories/feed`, `GET /api/stories/:id` | storyService.ts (getStory, getStoriesFeed) + storyController.ts + routes/stories.ts | stories.test.ts: 4 теста |
+| B6 (3) | `GET /api/messages/:id/history`, `PATCH /api/devices/:id`, `GET /api/onboarding/steps` | messageService.ts (getMessageHistory) + deviceService.ts (renameDevice) + routes/onboarding.ts | messages.test.ts + desktop.test.ts |
+
+**Осталось 18 — ждут решения владельца** (`with_lord/`):
+
+| № | Категория | Тикет | Кол-во |
+|---|---|---|---|
+| 5.5.1 | B2 админ-экраны | `1792353171` | 6 |
+| 5.5.2 | B5 каналы (подписка) | `1792353172` | 6 |
+| 5.5.3 | B6-1 глобальный поиск | `1792353173` | 1 |
+| 5.5.4 | B6-2 экспорт чата | `1792353174` | 1 |
+| 5.5.5 | B6-3 онбординг PATCH | `1792353175` | 1 |
+| 5.5.6 | B6-4 подписки/инвайты/уведомления | `1792353176` | 3 |
+
+**Проверки:**
+- `pnpm --filter @balloo/server test`: 651/654 passed (3 — предсущ. `ws.test.ts`) ✓
+- `pnpm --filter @balloo/web build`: зелёный ✓
+- `pnpm --filter @balloo/desktop build`: зелёный ✓
+- `python3 scripts/api-endpoints-check.py`: `НЕ СОВПАДАЕТ: 18` ✓
