@@ -130,7 +130,8 @@ export function UserDetailScreen() {
     const fetchDevices = async () => {
       try {
         const deviceData = await api.getMyDevices();
-        setDevices(Array.isArray(deviceData) ? deviceData.slice(0, 5) : []);
+        const list = Array.isArray(deviceData) ? deviceData : deviceData?.devices ?? [];
+        setDevices(list.slice(0, 5));
       } catch {
         setDevices([
           { id: 'd1', type: 'web', name: 'Chrome на Windows', platform: 'Windows', lastIp: '192.168.1.1', lastActive: 1722000000 },

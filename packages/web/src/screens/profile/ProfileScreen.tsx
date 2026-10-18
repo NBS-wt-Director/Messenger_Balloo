@@ -72,7 +72,7 @@ export default function ProfileScreen() {
   const loadDevices = async () => {
     try {
       const data = await api.getMyDevices();
-      setDevices(data || []);
+      setDevices(data?.devices ?? []);
     } catch {
       setDevices([
         { id: '1', type: 'desktop', name: 'Windows Desktop', platform: 'win32', lastIp: 'Москва', lastActive: 'Сейчас активно', isCurrent: true },

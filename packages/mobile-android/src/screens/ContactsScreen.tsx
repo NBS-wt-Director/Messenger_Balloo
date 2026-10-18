@@ -63,7 +63,7 @@ export default function ContactsScreen({ navigation }: ContactsScreenProps) {
   const fetchBlocked = useCallback(async () => {
     try {
       const data = await api.getBlockedUsers();
-      setBlockedUsers(data || []);
+      setBlockedUsers(data?.blocked ?? []);
     } catch {
       // Silent fail
     }

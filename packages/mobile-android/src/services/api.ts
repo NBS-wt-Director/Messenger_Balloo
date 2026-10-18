@@ -203,7 +203,7 @@ export const api = {
       method: 'DELETE',
     }),
 
-  getBlockedUsers: () => request<any[]>('/api/users/blocked'),
+  getBlockedUsers: () => request<{ blocked: any[] }>('/api/users/me/blocked'),
 
   // Chats
   // Сервер возвращает { chats: [...], pagination } — тип any, маппинг на клиенте
@@ -337,7 +337,7 @@ export const api = {
       expiresAt?: string;
     }
   ) =>
-    request<any>(`/api/chats/${chatId}/polls`, { method: 'POST', data }),
+    request<any>(`/api/polls/chats/${chatId}`, { method: 'POST', data }),
 
   votePoll: (pollId: string, optionIndex: number | number[]) =>
     request<any>(`/api/polls/${pollId}/vote`, {
@@ -499,10 +499,10 @@ export const api = {
   getUserPublicProfile: (username: string) =>
     request<any>(`/api/users/${username}`, { method: 'GET' }),
 
-  getMyDevices: () => request<any[]>('/api/users/me/devices'),
+  getMyDevices: () => request<any[]>('/api/devices'),
 
   removeDevice: (deviceId: string) =>
-    request<{ success: boolean }>(`/api/users/me/devices/${deviceId}`, {
+    request<{ success: boolean }>(`/api/devices/${deviceId}`, {
       method: 'DELETE',
     }),
 
@@ -510,8 +510,6 @@ export const api = {
     request<any>('/api/payments/donate', { method: 'POST', data }),
 
   getDonationTiers: () => request<any[]>('/api/payments/tiers'),
-
-  getUserDonations: () => request<any[]>('/api/users/me/donations'),
 
   registerPushToken: (data: { deviceId: string; platform: 'android' | 'ios'; token: string }) =>
     request<{ message: string }>('/api/devices/push-token', { method: 'POST', data }),
@@ -562,4 +560,70 @@ export const api = {
     request<{ success: boolean }>(`/api/stories/${storyId}/view`, {
       method: 'POST',
     }),
+
+  // ============================================================
+  // Calls (история звонков)
+  // ============================================================
+
+  getCallHistory: (filter?: string, page?: number, limit?: number) =>
+    request<any>(`/api/calls?filter=${filter || 'all'}&page=${page || 1}&limit=${limit || 50}`, {
+      method: 'GET',
+    }),
+
+  // ============================================================
+  // Device pairing (QR / код)
+  // ============================================================
+
+  createPairToken: () =>
+    request<{ token: string; code: string; expiresIn: number }>('/api/devices/pair-token', {
+      method: 'POST',
+      data: {},
+    }),
+
+  getPairStatus: (token: string) =>
+    request<{
+      status: 'pending' | 'confirmed' | 'expired';
+      user?: { username: string | null; avatarUrl: string | null };
+    }>(`/api/devices/pair/${token}/status`),
+
+  // ============================================================
+  // Payments / Donations
+  // ============================================================
+
+  getPaymentConfig: () =>
+    request<any>('/api/payments/config'),
+
+  createDonation: (data: { tierId?: string; amount: number; currency?: string }) =>
+    request<any>('/api/payments/donate', {
+      method: 'POST',
+      data,
+    }),
+
+  // ============================================================
+  // Chat Attachments (вложения чата)
+  // ============================================================
+
+  getChatAttachments: (chatId: string, type: string, query?: string) =>
+    request<any[]>(`/api/chats/${chatId}/attachments?type=${type}${query ? `&q=${encodeURIComponent(query)}` : ''}`),
+
+  // ============================================================
+  // Archive (архив чатов)
+  // ============================================================
+
+  getArchived: (page?: number, limit?: number) =>
+    request<any>(`/api/archive?page=${page || 1}&limit=${limit || 20}`),
+
+  // ============================================================
+  // Reports (жалобы)
+  // ============================================================
+
+  createReport: (data: { messageId?: string; reportedUserId?: string; reason: string; comment?: string; chatId?: string }) =>
+    request<any>('/api/reports', { method: 'POST', data }),
+
+  // ============================================================
+  // My Donations (история донатов)
+  // ============================================================
+
+  getMyDonations: () =>
+    request<any[]>('/api/payments/me/donations'),
 };

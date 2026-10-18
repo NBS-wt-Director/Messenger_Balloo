@@ -36,7 +36,7 @@ export default function MyDevicesScreen() {
     try {
       setLoading(true);
       const data = await api.getDevices();
-      setDevices(data || []);
+      setDevices(data?.devices ?? []);
     } catch {
       setDevices([]);
     } finally {

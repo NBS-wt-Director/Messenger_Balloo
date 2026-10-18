@@ -145,10 +145,10 @@ export const api = {
       data: { email },
     }),
 
-  resetPassword: (token: string, password: string) =>
+  resetPassword: (token: string, newPassword: string) =>
     request<{ success: boolean }>('/api/auth/reset-password', {
       method: 'POST',
-      data: { token, password },
+      data: { token, newPassword },
     }),
 
   logout: () => clearAuthCookies(),
@@ -382,7 +382,7 @@ export const api = {
     allowsMultiple: boolean;
     expiresAt?: string;
   }) =>
-    request<any>(`/api/chats/${chatId}/polls`, {
+    request<any>(`/api/polls/chats/${chatId}`, {
       method: 'POST',
       data,
     }),
@@ -536,8 +536,8 @@ export const api = {
     }),
 
   deleteUser: (userId: string) =>
-    request<any>(`/api/admin/users/${userId}`, {
-      method: 'DELETE',
+    request<any>(`/api/admin/users/${userId}/delete`, {
+      method: 'POST',
     }),
 
   getReports: (status?: string) =>
@@ -616,13 +616,13 @@ export const api = {
 
   // Devices
   getMyDevices: () =>
-    request<any[]>('/api/users/me/devices', {
+    request<{ devices: any[] }>('/api/devices', {
       method: 'GET',
       data: undefined,
     }),
 
   removeDevice: (deviceId: string) =>
-    request<{ success: boolean }>(`/api/users/me/devices/${deviceId}`, {
+    request<{ success: boolean }>(`/api/devices/${deviceId}`, {
       method: 'DELETE',
     }),
 
@@ -962,10 +962,10 @@ export const api = {
     request<any>(`/api/devices/${deviceId}`, { method: 'PATCH', data: { name } }),
 
   stopSession: (sessionId: string) =>
-    request<any>(`/api/sessions/${sessionId}`, { method: 'DELETE' }),
+    request<any>(`/api/devices/${sessionId}`, { method: 'DELETE' }),
 
   stopAllOtherSessions: () =>
-    request<any>('/api/sessions', { method: 'DELETE' }),
+    request<any>('/api/devices/end-all', { method: 'POST' }),
 
   // Вложения чата (тик. 1792160019)
   getChatAttachments: (chatId: string, type: string, query?: string) =>
@@ -975,7 +975,7 @@ export const api = {
 
   // Донаты (тик. 1792160021)
   getMyDonations: () =>
-    request<any[]>('/api/me/donations'),
+    request<any[]>('/api/payments/me/donations'),
 
   getMySubscriptions: () =>
     request<any[]>('/api/me/subscriptions'),
