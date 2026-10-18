@@ -6,6 +6,7 @@ import {
   getDevices,
   endSession,
   endAllSessions,
+  renameDevice,
   createPairToken,
   getPairRecord,
   deletePairRecord,
@@ -181,5 +182,36 @@ export const registerPushTokenCtrl = async (
       return;
     }
     internalError(res, error, 'deviceController.registerPushTokenCtrl');
+  }
+};
+
+// ============================================================
+// PATCH /api/devices/:id — переименовать устройство
+// ============================================================
+
+export const renameDeviceCtrl = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const userId = req.user!.id;
+    const { id: deviceId } = req.params;
+    const { name } = req.body;
+
+    if (!deviceId) {
+      res.status(400).json({ error: 'Bad Request', message: 'Device ID обязателен' });
+      return;
+    }
+
+    if (!name || typeof name !== 'string') {
+      res.status(400).json({ error: 'Bad Request', message: 'Поле name обязательно' });
+      return;
+    }
+
+    const device = await renameDevice(deviceId, userId, name);
+    res.json(device);
+  } catch (error: any) {
+    if (error.message === 'Устройство не найдено') {
+      res.status(404).json({ error: 'Not Found', message: error.message });
+    } else {
+      internalError(res, error, 'deviceController.renameDeviceCtrl');
+    }
   }
 };

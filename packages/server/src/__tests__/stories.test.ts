@@ -202,4 +202,57 @@ describe('Stories API', () => {
       expect(viewRes.status).toBe(410);
     });
   });
+
+  // ============================================================
+  // B4: GET /api/stories/feed, GET /api/stories/:id
+  // ============================================================
+
+  describe('GET /api/stories/feed', () => {
+    it('возвращает ленту историй', async () => {
+      const user = await registerTestUser();
+
+      // Создаём историю
+      await createStory(user.accessToken);
+
+      const res = await request(app)
+        .get('/api/stories/feed')
+        .set('Authorization', `Bearer ${user.accessToken}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty('stories');
+      expect(Array.isArray(res.body.stories)).toBe(true);
+    });
+
+    it('требует авторизации', async () => {
+      const res = await request(app).get('/api/stories/feed');
+      expect(res.status).toBe(401);
+    });
+  });
+
+  describe('GET /api/stories/:id', () => {
+    it('возвращает историю по ID', async () => {
+      const user = await registerTestUser();
+
+      const storyRes = await createStory(user.accessToken);
+      expect(storyRes.status).toBe(201);
+
+      const res = await request(app)
+        .get(`/api/stories/${storyRes.body.id}`)
+        .set('Authorization', `Bearer ${user.accessToken}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty('id', storyRes.body.id);
+      expect(res.body).toHaveProperty('type', 'image');
+    });
+
+    it('404 для несуществующей истории', async () => {
+      const user = await registerTestUser();
+
+      const res = await request(app)
+        .get('/api/stories/nonexistent')
+        .set('Authorization', `Bearer ${user.accessToken}`);
+
+      expect(res.status).toBe(404);
+    });
+  });
 });

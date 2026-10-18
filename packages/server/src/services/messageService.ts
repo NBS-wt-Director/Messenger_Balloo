@@ -712,3 +712,75 @@ export const searchMessages = async (chatId: string, query: string, userId: stri
     total: messages.length,
   };
 };
+
+// ============================================================
+// Вложения чата (GET /api/chats/:id/attachments) — тик. 1792335000
+// ============================================================
+
+// Маппинг вкладок клиента на типы вложений MessageAttachment.type
+const ATTACHMENT_TAB_TYPES: Record<string, string[]> = {
+  media: ['image', 'video'],
+  images: ['image'],
+  videos: ['video'],
+  audio: ['voice'],
+  files: ['file'],
+  links: [], // ссылки хранятся в content сообщений, не в таблице вложений
+  polls: [], // опросы — тип сообщения, не вложение
+};
+
+export const getChatAttachments = async (
+  chatId: string,
+  userId: string,
+  type: string,
+  query?: string,
+): Promise<any[]> => {
+  // IDOR-защита: вложения может смотреть только участник чата
+  await assertChatMember(userId, chatId);
+
+  const typeFilter = ATTACHMENT_TAB_TYPES[type];
+  // Неизвестная вкладка или вкладка без вложений (links/polls) — пустой список
+  if (typeFilter === undefined || typeFilter.length === 0) {
+    return [];
+  }
+
+  const where: Record<string, unknown> = {
+    message: { chatId, deleted: false },
+    type: { in: typeFilter },
+  };
+
+  if (query && query.trim().length > 0) {
+    where.name = { contains: query.trim(), mode: 'insensitive' };
+  }
+
+  const attachments = await prisma.messageAttachment.findMany({
+    where,
+    include: {
+      message: {
+        select: {
+          sender: {
+            include: { publicProfile: { select: { displayName: true } } },
+          },
+        },
+      },
+    },
+    orderBy: { createdAt: 'desc' },
+    take: 200,
+  });
+
+  return attachments.map((att) => ({
+    id: att.id,
+    type: att.type,
+    url: att.url,
+    thumbnail: att.thumbnail,
+    name: att.name,
+    size: Number(att.size),
+    width: att.width,
+    height: att.height,
+    duration: att.duration,
+    senderName:
+      att.message.sender.publicProfile?.displayName ||
+      att.message.sender.username ||
+      '',
+    createdAt: Number(att.createdAt),
+  }));
+};

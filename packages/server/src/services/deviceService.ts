@@ -44,6 +44,30 @@ export const endAllSessions = async (userId: string, currentDeviceId?: string) =
   return { message: 'Все остальные сессии завершены' };
 };
 
+// Переименовать устройство (PATCH /api/devices/:id)
+export const renameDevice = async (deviceId: string, userId: string, name: string) => {
+  const device = await prisma.device.findFirst({
+    where: { id: deviceId, userId },
+  });
+
+  if (!device) {
+    throw new Error('Устройство не найдено');
+  }
+
+  const updated = await prisma.device.update({
+    where: { id: deviceId },
+    data: { name },
+    select: { id: true, name: true, type: true, lastActive: true },
+  });
+
+  return {
+    id: updated.id,
+    name: updated.name,
+    type: updated.type,
+    lastActive: Number(updated.lastActive),
+  };
+};
+
 // ============================================================
 // QR pair-token — вход/привязка устройства по QR-коду
 // (docs/04-api-websocket-spec.md, макет mockups/balloo-su/add-device.md)

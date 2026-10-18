@@ -11,6 +11,7 @@ import {
   getReadStatus as getReadStatusService,
   pinMessage as pinMessageService,
   searchMessages as searchMessagesService,
+  getMessageHistory as getMessageHistoryService,
 } from '../services/messageService';
 import { AuthenticatedRequest } from '../middleware/auth';
 import { internalError } from '../middleware/errorHandler';
@@ -345,6 +346,33 @@ export const searchMessages = async (req: AuthenticatedRequest, res: Response, n
       res.status(403).json({ error: 'Forbidden', message: error.message });
     } else {
       internalError(res, error, 'messageController.searchMessages');
+    }
+  }
+};
+
+// ============================================================
+// GET /api/messages/:id/history — история редактирования
+// ============================================================
+
+export const getMessageHistory = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { id: messageId } = req.params;
+    const userId = req.user!.id;
+
+    if (!messageId) {
+      res.status(400).json({ error: 'Bad Request', message: 'Message ID обязателен' });
+      return;
+    }
+
+    const history = await getMessageHistoryService(messageId, userId);
+    res.json(history);
+  } catch (error: any) {
+    if (error.message === 'Сообщение не найдено') {
+      res.status(404).json({ error: 'Not Found', message: error.message });
+    } else if (error.message.includes('участником')) {
+      res.status(403).json({ error: 'Forbidden', message: error.message });
+    } else {
+      internalError(res, error, 'messageController.getMessageHistory');
     }
   }
 };

@@ -3,7 +3,9 @@ DELETE /api/archive/:id
 DELETE /api/auth/devices/:deviceId
 DELETE /api/blog/channels/:id
 DELETE /api/blog/posts/:id
+DELETE /api/bots/:id
 DELETE /api/chats/:id
+DELETE /api/chats/:id/admins/:adminId
 DELETE /api/chats/:id/members/:userId
 DELETE /api/devices/:id
 DELETE /api/features/:id
@@ -53,6 +55,7 @@ GET /api/blog/channels
 GET /api/blog/channels/:id
 GET /api/blog/posts
 GET /api/blog/posts/:id
+GET /api/bots
 GET /api/calls
 GET /api/chats
 GET /api/chats/:chatId/messages
@@ -106,8 +109,10 @@ GET /api/knowledge/pages
 GET /api/knowledge/pages/:id
 GET /api/knowledge/vacancies
 GET /api/knowledge/vacancies/:id
+GET /api/messages/:id/history
 GET /api/messages/:id/reactions
 GET /api/messages/:id/read
+GET /api/onboarding/steps
 GET /api/payments/admin/config
 GET /api/payments/admin/donations
 GET /api/payments/config
@@ -119,7 +124,9 @@ GET /api/reports
 GET /api/specs
 GET /api/specs/:nodeId/:screenId
 GET /api/stories
+GET /api/stories/:id
 GET /api/stories/:id/views
+GET /api/stories/feed
 GET /api/support/chat
 GET /api/support/status
 GET /api/users/:username
@@ -131,6 +138,7 @@ GET /api/users/search
 GET /health
 GET /health/ready
 PATCH /api/accounts/:userId/notifications
+PATCH /api/devices/:id
 POST /api/accounts/switch
 POST /api/admin/announcements
 POST /api/admin/feature-flags/:id/toggle
@@ -162,6 +170,7 @@ POST /api/blog-landing/subscribe
 POST /api/blog/channels
 POST /api/blog/posts
 POST /api/blog/posts/:id/publish
+POST /api/bots
 POST /api/calls
 POST /api/calls/:id/end
 POST /api/chats
@@ -225,6 +234,8 @@ PUT /api/admin/groups/media-requests/:id
 PUT /api/blog/channels/:id
 PUT /api/blog/posts/:id
 PUT /api/chats/:id
+PUT /api/chats/:id/admins/:adminId/role
+PUT /api/chats/:id/members/:userId/role
 PUT /api/features/:id
 PUT /api/hiring/applications/:id/status
 PUT /api/hiring/departments/:id

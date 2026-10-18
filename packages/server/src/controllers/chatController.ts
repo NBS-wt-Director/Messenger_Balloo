@@ -12,6 +12,7 @@ import {
   createInviteLink as createInviteLinkService,
   leaveChat as leaveChatService,
 } from '../services/chatService';
+import { getChatAttachments as getChatAttachmentsService } from '../services/messageService';
 import { AuthenticatedRequest } from '../middleware/auth';
 import { internalError } from '../middleware/errorHandler';
 
@@ -292,5 +293,199 @@ export const leaveChat = async (req: AuthenticatedRequest, res: Response, next: 
     } else {
       internalError(res, error, 'chatController.leaveChat');
     }
+  }
+};
+
+// ============================================================
+// GET /api/chats/:id/attachments — вложения чата
+// ============================================================
+
+export const getChatAttachments = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const userId = req.user!.id;
+    const { id: chatId } = req.params;
+    const type = req.query.type as string;
+    const query = req.query.q as string | undefined;
+
+    if (!chatId) {
+      res.status(400).json({ error: 'Bad Request', message: 'Chat ID обязателен' });
+      return;
+    }
+
+    if (!type || typeof type !== 'string') {
+      res.status(400).json({ error: 'Bad Request', message: 'Query параметр type обязателен' });
+      return;
+    }
+
+    const attachments = await getChatAttachmentsService(chatId, userId, type, query);
+    res.json(attachments);
+  } catch (error: any) {
+    if (error.message.includes('не являетесь участником') || error.message.includes('не найден')) {
+      res.status(404).json({ error: 'Not Found', message: error.message });
+    } else {
+      internalError(res, error, 'chatController.getChatAttachments');
+    }
+  }
+};
+
+// ============================================================
+// PUT /api/chats/:id/members/:userId/role — изменить роль участника
+// ============================================================
+
+export const updateMemberRole = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const userId = req.user!.id;
+    const { id: chatId, userId: memberUserId } = req.params;
+    const { role } = req.body;
+
+    const validRoles = ['owner', 'admin', 'moderator', 'member'];
+    if (!role || !validRoles.includes(role)) {
+      res.status(400).json({ error: 'Bad Request', message: 'role должен быть: owner, admin, moderator, member' });
+      return;
+    }
+
+    // Проверяем, что пользователь — участник чата
+    const member = await prisma.userChat.findUnique({
+      where: { userId_chatId: { userId: memberUserId, chatId } },
+    });
+
+    if (!member) {
+      res.status(404).json({ error: 'Not Found', message: 'Пользователь не является участником чата' });
+      return;
+    }
+
+    // Проверяем права текущего пользователя (userId) в этом чате
+    const currentMember = await prisma.userChat.findUnique({
+      where: { userId_chatId: { userId, chatId } },
+    });
+
+    if (!currentMember) {
+      res.status(404).json({ error: 'Not Found', message: 'Вы не являетесь участником этого чата' });
+      return;
+    }
+
+    if (!['owner', 'admin'].includes(currentMember.role)) {
+      res.status(403).json({ error: 'Forbidden', message: 'Только владелец или админ может менять роли' });
+      return;
+    }
+
+    // Owner нельзя понизить (если только сам owner не меняет)
+    if (memberUserId === req.user!.id && role !== 'owner') {
+      res.status(400).json({ error: 'Bad Request', message: 'Нельзя снять роль owner с себя' });
+      return;
+    }
+
+    await prisma.userChat.update({
+      where: { userId_chatId: { userId: memberUserId, chatId } },
+      data: { role },
+    });
+
+    res.json({ message: `Роль участника изменена на ${role}` });
+  } catch (error: any) {
+    internalError(res, error, 'chatController.updateMemberRole');
+  }
+};
+
+// ============================================================
+// DELETE /api/chats/:id/admins/:adminId — удалить админа
+// ============================================================
+
+export const removeAdmin = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const userId = req.user!.id;
+    const { id: chatId, adminId } = req.params;
+
+    // Проверяем права
+    const currentMember = await prisma.userChat.findUnique({
+      where: { userId_chatId: { userId, chatId } },
+    });
+
+    if (!currentMember || !['owner', 'admin'].includes(currentMember.role)) {
+      res.status(403).json({ error: 'Forbidden', message: 'Только владелец или админ может удалять админов' });
+      return;
+    }
+
+    // Проверяем, что админ существует
+    const admin = await prisma.userChat.findUnique({
+      where: { userId_chatId: { userId: adminId, chatId } },
+    });
+
+    if (!admin) {
+      res.status(404).json({ error: 'Not Found', message: 'Админ не найден в этом чате' });
+      return;
+    }
+
+    // Нельзя удалить себя
+    if (adminId === userId) {
+      res.status(400).json({ error: 'Bad Request', message: 'Нельзя удалить себя из админов через этот эндпоинт' });
+      return;
+    }
+
+    // Если это owner — меняем на admin, иначе удаляем запись
+    if (admin.role === 'owner') {
+      await prisma.userChat.update({
+        where: { userId_chatId: { userId: adminId, chatId } },
+        data: { role: 'admin' },
+      });
+      res.json({ message: 'Роль owner изменена на admin' });
+    } else {
+      await prisma.userChat.delete({
+        where: { userId_chatId: { userId: adminId, chatId } },
+      });
+      res.json({ message: 'Админ удалён из чата' });
+    }
+  } catch (error: any) {
+    internalError(res, error, 'chatController.removeAdmin');
+  }
+};
+
+// ============================================================
+// PUT /api/chats/:id/admins/:adminId/role — изменить роль админа
+// ============================================================
+
+export const updateAdminRole = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const userId = req.user!.id;
+    const { id: chatId, adminId } = req.params;
+    const { role } = req.body;
+
+    const validRoles = ['owner', 'admin', 'moderator'];
+    if (!role || !validRoles.includes(role)) {
+      res.status(400).json({ error: 'Bad Request', message: 'role должен быть: owner, admin, moderator' });
+      return;
+    }
+
+    // Проверяем права
+    const currentMember = await prisma.userChat.findUnique({
+      where: { userId_chatId: { userId, chatId } },
+    });
+
+    if (!currentMember || !['owner', 'admin'].includes(currentMember.role)) {
+      res.status(403).json({ error: 'Forbidden', message: 'Только владелец или админ может менять роли админов' });
+      return;
+    }
+
+    // Проверка, что админ существует
+    const admin = await prisma.userChat.findUnique({
+      where: { userId_chatId: { userId: adminId, chatId } },
+    });
+
+    if (!admin) {
+      res.status(404).json({ error: 'Not Found', message: 'Пользователь не найден в этом чате' });
+      return;
+    }
+
+    await prisma.userChat.update({
+      where: { userId_chatId: { userId: adminId, chatId } },
+      data: { role },
+    });
+
+    res.json({ message: `Роль админа изменена на ${role}` });
+  } catch (error: any) {
+    internalError(res, error, 'chatController.updateAdminRole');
   }
 };

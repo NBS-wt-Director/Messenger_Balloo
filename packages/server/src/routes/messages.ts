@@ -13,6 +13,7 @@ import {
   getReadStatus,
   pinMessage,
   searchMessages,
+  getMessageHistory,
 } from '../controllers/messageController';
 import { authRequired } from '../middleware/auth';
 
@@ -70,5 +71,10 @@ router.get('/messages/:id/read', authRequired, getReadStatus);
 // POST /api/messages/:id/pin — закрепление сообщения
 // ============================================================
 router.post('/messages/:id/pin', authRequired, pinMessage);
+
+// ============================================================
+// GET /api/messages/:id/history — история редактирования (тик. 1792335000)
+// ============================================================
+router.get('/messages/:id/history', authRequired, getMessageHistory);
 
 export { router };

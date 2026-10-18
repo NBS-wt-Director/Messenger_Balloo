@@ -26,6 +26,8 @@ import { router as invitesRouter } from './invites';
 import { router as supportRouter } from './support';
 import { router as tasksRouter } from './tasks';
 import { router as clientErrorsRouter } from './client-errors';
+import { router as botsRouter } from './bots';
+import { router as onboardingRouter } from './onboarding';
 
 const router = Router() as import('express').Router;
 
@@ -72,6 +74,8 @@ router.use('/api/calls', callsRouter);
 router.use('/api/invites', invitesRouter);
 router.use('/api/support', supportRouter);
 router.use('/api/tasks', tasksRouter);
+router.use('/api/bots', botsRouter);
+router.use('/api/onboarding', onboardingRouter);
 router.use('/api', clientErrorsRouter);
 
 export { router };

@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import {
   createStory as createStoryService,
   getStories as getStoriesService,
+  getStory as getStoryService,
+  getStoriesFeed as getStoriesFeedService,
   getStoryViews as getStoryViewsService,
   viewStory as viewStoryService,
   addStoryReaction as addStoryReactionService,
@@ -178,5 +180,53 @@ export const deleteStory = async (req: AuthenticatedRequest, res: Response, next
     } else {
       internalError(res, error, 'storyController.deleteStory');
     }
+  }
+};
+
+// ============================================================
+// GET /api/stories/:id — одна история
+// ============================================================
+
+export const getStory = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const userId = req.user!.id;
+
+    if (!id) {
+      res.status(400).json({ error: 'Bad Request', message: 'Story ID обязателен' });
+      return;
+    }
+
+    const story = await getStoryService(id, userId);
+    res.json(story);
+  } catch (error: any) {
+    if (error.message === 'История не найдена') {
+      res.status(404).json({ error: 'Not Found', message: error.message });
+    } else if (error.message === 'История истекла') {
+      res.status(410).json({ error: 'Gone', message: error.message });
+    } else {
+      internalError(res, error, 'storyController.getStory');
+    }
+  }
+};
+
+// ============================================================
+// GET /api/stories/feed — лента историй
+// ============================================================
+
+export const getStoriesFeed = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const userId = req.user!.id;
+    const { limit, before } = req.query;
+
+    const result = await getStoriesFeedService(
+      userId,
+      parseInt(String(limit), 10) || 50,
+      parseInt(String(before), 10) || undefined
+    );
+
+    res.json(result);
+  } catch (error: any) {
+    internalError(res, error, 'storyController.getStoriesFeed');
   }
 };

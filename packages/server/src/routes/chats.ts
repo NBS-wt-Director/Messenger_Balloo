@@ -12,6 +12,10 @@ import {
   joinByInvite,
   createInviteLink,
   leaveChat,
+  getChatAttachments,
+  updateMemberRole,
+  removeAdmin,
+  updateAdminRole,
 } from '../controllers/chatController';
 import { authRequired } from '../middleware/auth';
 
@@ -64,5 +68,25 @@ router.post('/invite/:code', authRequired, joinByInvite);
 // POST /api/chats/:id/leave — выйти из чата
 // ============================================================
 router.post('/:id/leave', authRequired, leaveChat);
+
+// ============================================================
+// GET /api/chats/:id/attachments — вложения чата (тик. 1792335000)
+// ============================================================
+router.get('/:id/attachments', authRequired, getChatAttachments);
+
+// ============================================================
+// PUT /api/chats/:id/members/:userId/role — изменить роль участника
+// ============================================================
+router.put('/:id/members/:userId/role', authRequired, updateMemberRole);
+
+// ============================================================
+// DELETE /api/chats/:id/admins/:adminId — удалить админа
+// ============================================================
+router.delete('/:id/admins/:adminId', authRequired, removeAdmin);
+
+// ============================================================
+// PUT /api/chats/:id/admins/:adminId/role — изменить роль админа
+// ============================================================
+router.put('/:id/admins/:adminId/role', authRequired, updateAdminRole);
 
 export { router };

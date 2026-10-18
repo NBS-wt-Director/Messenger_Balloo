@@ -152,6 +152,74 @@ export const getStories = async (input: GetStoriesInput, viewerId?: string) => {
 };
 
 // ============================================================
+// Получить одну историю (GET /api/stories/:id)
+// ============================================================
+
+export const getStory = async (storyId: string, viewerId?: string) => {
+  const now = Math.floor(Date.now() / 1000);
+
+  const story = await prisma.story.findUnique({
+    where: { id: storyId },
+    include: {
+      user: {
+        include: {
+          publicProfile: true,
+        },
+      },
+      views: viewerId
+        ? { where: { viewerId }, select: { viewerId: true } }
+        : false,
+      _count: {
+        select: { views: true, reactions: true },
+      },
+    },
+  });
+
+  if (!story) {
+    throw new Error('История не найдена');
+  }
+
+  if (story.expiresAt <= BigInt(now)) {
+    throw new Error('История истекла');
+  }
+
+  const hasViewed = viewerId
+    ? story.views && story.views.some((v) => v.viewerId === viewerId)
+    : false;
+
+  const pp = story.user.publicProfile;
+
+  return {
+    id: story.id,
+    userId: story.userId,
+    type: story.type,
+    mediaUrl: story.mediaUrl,
+    thumbnail: story.thumbnail,
+    expiresAt: Number(story.expiresAt),
+    createdAt: Number(story.createdAt),
+    viewCount: story._count.views,
+    reactionCount: story._count.reactions,
+    hasViewed,
+    user: {
+      id: story.user.id,
+      username: pp?.username ?? story.user.username,
+      displayName: pp?.displayName,
+      avatarUrl: pp?.avatarUrl ?? story.user.avatarUrl,
+      isPrivate: pp?.isPrivate ?? false,
+    },
+  };
+};
+
+// ============================================================
+// Лента историй (GET /api/stories/feed) — все активные истории
+// ============================================================
+
+export const getStoriesFeed = async (viewerId: string, limit = 50, before?: number) => {
+  // Лента = все истории без фильтра по userIds (все пользователи)
+  return getStories({ limit, before }, viewerId);
+};
+
+// ============================================================
 // Получить просмотры истории
 // ============================================================
 

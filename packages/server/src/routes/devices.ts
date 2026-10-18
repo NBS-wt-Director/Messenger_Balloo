@@ -5,6 +5,7 @@ import {
   getDevicesCtrl,
   endSessionCtrl,
   endAllSessionsCtrl,
+  renameDeviceCtrl,
   createPairTokenCtrl,
   getPairStatusCtrl,
   confirmPairCtrl,
@@ -34,6 +35,11 @@ router.get('/pair/:token/status', getPairStatusCtrl);
 // (с авторизованного устройства, отсканировавшего QR)
 // ============================================================
 router.post('/pair/confirm', authRequired, confirmPairCtrl);
+
+// ============================================================
+// PATCH /api/devices/:id — переименовать устройство (тик. 1792335000)
+// ============================================================
+router.patch('/:id', authRequired, renameDeviceCtrl);
 
 // ============================================================
 // DELETE /api/devices/:id — завершить сессию устройства

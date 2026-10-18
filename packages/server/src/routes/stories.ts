@@ -3,6 +3,8 @@ import { authRequired } from '../middleware/auth';
 import {
   createStory,
   getStories,
+  getStory,
+  getStoriesFeed,
   getStoryViews,
   viewStory,
   addStoryReaction,
@@ -31,5 +33,11 @@ router.post('/:id/reactions', addStoryReaction);
 
 // DELETE /api/stories/:id — удалить историю
 router.delete('/:id', deleteStory);
+
+// GET /api/stories/feed — лента историй
+router.get('/feed', getStoriesFeed);
+
+// GET /api/stories/:id — одна история
+router.get('/:id', getStory);
 
 export default router;
