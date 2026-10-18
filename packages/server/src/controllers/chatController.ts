@@ -20,7 +20,7 @@ const prisma = new PrismaClient();
 export const createChat = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const userId = req.user!.id;
-    const { type, name, description, avatarUrl, memberIds } = req.body;
+    const { type, name, description, avatarUrl, memberIds, groupType, settings, mediaCert } = req.body;
     if (!type || !['group', 'channel'].includes(type)) {
       res.status(400).json({ error: 'Bad Request', message: 'Поле type обязательно' });
       return;
@@ -29,6 +29,16 @@ export const createChat = async (req: AuthenticatedRequest, res: Response, next:
       res.status(400).json({ error: 'Bad Request', message: 'Поле name обязательно' });
       return;
     }
+
+    // Validate media group: media type requires media certificate
+    if (groupType === 'media' && !mediaCert) {
+      res.status(400).json({
+        error: 'Bad Request',
+        message: 'Для группы типа «СМИ» обязательна заявка с свидетельством о регистрации (ст. 9 Закона РФ «О СМИ»)',
+      });
+      return;
+    }
+
     const data = await createChatService(userId, {
       type: type as 'group' | 'channel',
       name: name.trim(),
@@ -36,6 +46,52 @@ export const createChat = async (req: AuthenticatedRequest, res: Response, next:
       avatarUrl: avatarUrl || undefined,
       memberIds: memberIds || undefined,
     });
+
+    // Update chat with groupType if provided
+    if (groupType) {
+      await prisma.chat.update({
+        where: { id: data.id },
+        data: { groupType },
+      });
+    }
+
+    // Update settings with rules if provided
+    if (settings?.requireRules || settings?.rules) {
+      await prisma.chatSettings.upsert({
+        where: { chatId: data.id },
+        update: {
+          requireRules: !!settings.requireRules,
+          rulesText: settings.rules || null,
+        },
+        create: {
+          chatId: data.id,
+          requireRules: !!settings.requireRules,
+          rulesText: settings.rules || null,
+        },
+      });
+    }
+
+    // Create GroupMediaRequest for media groups
+    if (groupType === 'media' && mediaCert) {
+      await prisma.groupMediaRequest.create({
+        data: {
+          groupId: data.id,
+          submittedById: userId,
+          certNumber: mediaCert.certNumber || null,
+          certIssuedAt: mediaCert.certIssuedAt ? BigInt(mediaCert.certIssuedAt) : null,
+          certIssuer: mediaCert.certIssuer || null,
+          certMediaName: mediaCert.certMediaName || null,
+          certFounder: mediaCert.certFounder || null,
+          certInn: mediaCert.certInn || null,
+          certOgrn: mediaCert.certOgrn || null,
+          documents: mediaCert.documents || [],
+          status: 'pending',
+          createdAt: BigInt(Math.floor(Date.now() / 1000)),
+          updatedAt: BigInt(Math.floor(Date.now() / 1000)),
+        },
+      });
+    }
+
     res.status(201).json(data);
   } catch (error: any) {
     internalError(res, error, 'chatController.createChat');

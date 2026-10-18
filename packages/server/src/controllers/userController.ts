@@ -9,6 +9,9 @@ import {
   blockUser as blockUserService,
   unblockUser as unblockUserService,
   getBlockedUsers as getBlockedUsersService,
+  getContacts as getContactsService,
+  addContact as addContactService,
+  removeContact as removeContactService,
 } from '../services/userService';
 import { AuthenticatedRequest } from '../middleware/auth';
 import { internalError } from '../middleware/errorHandler';
@@ -221,6 +224,74 @@ export const exportMe = async (req: AuthenticatedRequest, res: Response, next: N
       res.status(404).json({ error: 'Not Found', message: error.message });
     } else {
       internalError(res, error, 'userController.exportMe');
+    }
+  }
+};
+
+// ============================================================
+// Список контактов (GET /api/users/contacts)
+// ============================================================
+
+export const getContacts = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const userId = req.user!.id;
+    const contacts = await getContactsService(userId);
+    res.json(contacts);
+  } catch (error: any) {
+    internalError(res, error, 'userController.getContacts');
+  }
+};
+
+// ============================================================
+// Добавить контакт (POST /api/users/contacts/:userId)
+// ============================================================
+
+export const addContact = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const userId = req.user!.id;
+    const { userId: contactId } = req.params;
+
+    if (!contactId) {
+      res.status(400).json({ error: 'Bad Request', message: 'userId обязателен' });
+      return;
+    }
+
+    const result = await addContactService(userId, contactId);
+    res.json(result);
+  } catch (error: any) {
+    if (error.message === 'Пользователь не найден') {
+      res.status(404).json({ error: 'Not Found', message: error.message });
+    } else if (error.message === 'Нельзя добавить себя в контакты') {
+      res.status(400).json({ error: 'Bad Request', message: error.message });
+    } else if (error.message === 'Пользователь уже в контактах') {
+      res.status(409).json({ error: 'Conflict', message: error.message });
+    } else {
+      internalError(res, error, 'userController.addContact');
+    }
+  }
+};
+
+// ============================================================
+// Удалить контакт (DELETE /api/users/contacts/:userId)
+// ============================================================
+
+export const removeContact = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const userId = req.user!.id;
+    const { userId: contactId } = req.params;
+
+    if (!contactId) {
+      res.status(400).json({ error: 'Bad Request', message: 'userId обязателен' });
+      return;
+    }
+
+    const result = await removeContactService(userId, contactId);
+    res.json(result);
+  } catch (error: any) {
+    if (error.message === 'Пользователь не в контактах') {
+      res.status(404).json({ error: 'Not Found', message: error.message });
+    } else {
+      internalError(res, error, 'userController.removeContact');
     }
   }
 };

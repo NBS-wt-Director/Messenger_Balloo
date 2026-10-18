@@ -177,6 +177,14 @@ model User {
    createdTasks        Task[]              @relation("TaskCreator")
    assignedTasks       Task[]              @relation("TaskAssignee")
    feedbacks           Feedback[]
+   contactsAsOwner     Contact[]           @relation("ContactOwner")
+   contactsAsPerson    Contact[]           @relation("ContactPerson")
+   notifications       Notification[]
+   drafts              Draft[]
+   sessions            Session[]
+   pairTokens          PairToken[]
+   callParticipants    CallParticipant[]
+   banAppeals          BanAppeal[]
 
    @@map("users")
 }
@@ -280,19 +288,25 @@ model AccountDeviceLink {
 }
 
 model UserBan {
-  id          String   @id @default(cuid()) @db.VarChar(25)
-  userId      String
-  adminId     String
-  reason      String   @db.Text
-  global      Boolean  @default(false)
-  expiresAt   BigInt?  // Unix seconds, null = permanent
-  createdAt   BigInt   @default(0)
+  id              String   @id @default(cuid()) @db.VarChar(25)
+  userId          String
+  adminId         String
+  type            String   @default("temporary") // temporary | permanent
+  reason          String   @db.Text
+  confirmations   Int      @default(0) // 0/4 подтверждения админов
+  reportCount     Int      @default(0) // 5 жалоб для авто-бана
+  appealDeadline  BigInt?  // 72ч на обжалование
+  global          Boolean  @default(false)
+  expiresAt       BigInt?  // Unix seconds, null = permanent
+  createdAt       BigInt   @default(0)
 
   // Relations
   user  User  @relation("UserBanUser", fields: [userId], references: [id], onDelete: Cascade)
   admin User  @relation("UserBanAdmin", fields: [adminId], references: [id])
+  appeals BanAppeal[]
 
   @@index([userId])
+  @@index([global])
   @@map("user_bans")
 }
 
@@ -306,6 +320,12 @@ model Chat {
   name         String?     @db.VarChar(255)
   avatarUrl    String?     @db.VarChar(500)
   inviteCode   String?     @unique @db.VarChar(20)
+  groupType    String?     @db.VarChar(20) // ordinary | public | media | corporate
+  // Поля группы (data_schema → Group, тик. 1792160006): группа = Chat c groupType
+  slug         String?     @unique @db.VarChar(100)
+  description  String?     @db.Text
+  memberLimit  Int?
+  isVerified   Boolean     @default(false)
   createdAt    BigInt      @default(0)
   updatedAt    BigInt      @default(0)
 
@@ -316,6 +336,10 @@ model Chat {
   inviteLinks  InviteLink[]
   polls        Poll[]
   chatBans     ChatBan[]    @relation("ChatBanChat")
+  mediaRequests GroupMediaRequest[]
+  pinnedMessages PinnedMessage[]
+  drafts       Draft[]
+  calls        Call[]
 
   @@index([createdAt])
   @@map("chats")
@@ -351,6 +375,15 @@ model ChatSettings {
   allowPolls        Boolean @default(true)
   allowStories      Boolean @default(false)
   requiredApprove   Boolean @default(false)
+  requireRules      Boolean @default(false)
+  rulesText         String? @db.Text
+  // Настройки канала (покрывает data_schema → ChannelSettings, тик. 1792160006):
+  // имена совпадают с payload CreateChannelScreen — round-trip без маппинга.
+  whoCanWrite       String? @db.VarChar(20) // admin | admin_moderators | all
+  editPosts         String? @db.VarChar(10) // 24h | forever | never
+  allowForward      Boolean @default(true)
+  hideSubscribers   Boolean @default(false)
+  enableDiscussion  Boolean @default(false)
 
   // Relations
   chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
@@ -380,6 +413,7 @@ model Message {
   attachments MessageAttachment[]
   reactions  MessageReaction[]
   readCounts MessageReadCount[]
+  edits      MessageEdit[]
 
   @@index([chatId, createdAt])
   @@index([senderId])
@@ -399,6 +433,10 @@ model MessageAttachment {
   width     Int?
   height    Int?
   duration  Int?     // seconds
+  // Поля Attachment (data_schema, тик. 1792160009):
+  storage   String?  @db.VarChar(20) // minio | yandex_disk
+  meta      Json?    // размер, длительность, координаты и т.д.
+  createdAt BigInt   @default(0)
 
   // Relations
   message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
@@ -447,7 +485,11 @@ model InviteLink {
   maxUses    Int?     // null = unlimited
   usedCount  Int      @default(0)
   expiresAt  BigInt?  // Unix seconds, null = never expires
+  status     String   @default("pending") // pending | accepted | expired
+  ttlType    String   @default("permanent") // permanent | timed | onetime
+  groupIds   Json?    // массив id групп (тик. 1792160011)
   createdAt  BigInt   @default(0)
+  updatedAt  BigInt   @default(0)
 
   // Relations
   chat    Chat    @relation(fields: [chatId], references: [id], onDelete: Cascade)
@@ -455,6 +497,7 @@ model InviteLink {
 
   @@unique([chatId, code])
   @@index([chatId])
+  @@index([status])
   @@map("invite_links")
 }
 
@@ -1421,4 +1464,219 @@ model FeatureCategory {
 
   @@index([slug])
   @@map("feature_categories")
+}
+
+// Заявка на подтверждение СМИ-статуса группы (тик. 1792137292)
+// Ст. 9 Закона РФ «О СМИ» — свидетельство о регистрации СМИ
+model GroupMediaRequest {
+  id                String   @id @default(cuid()) @db.VarChar(25)
+  groupId           String
+  submittedById     String
+  certNumber        String?  @db.VarChar(100)
+  certIssuedAt      BigInt?  @map("cert_issued_at")
+  certIssuer        String?  @db.VarChar(255)
+  certMediaName     String?  @db.VarChar(255)
+  certFounder       String?  @db.VarChar(255)
+  certInn           String?  @db.VarChar(20)
+  certOgrn          String?  @db.VarChar(20)
+  documents         Json     // [{type, url, name, uploadedAt}]
+  status            String   @default("pending") // pending | approved | rejected
+  reviewedByAdminId String?
+  reviewComment     String?
+  reviewedAt        BigInt?
+  createdAt         BigInt   @default(0)
+  updatedAt         BigInt   @default(0)
+
+  chat Chat @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@index([groupId])
+  @@index([status])
+  @@map("group_media_requests")
+}
+
+// ============================================================
+// Модели — тикеты 1792160002–1792160011 (инвентаризация 1792160001).
+// Имена — из mockups/data_schema.json; стиль — как в существующих
+// моделях Prisma (cuid + VarChar(25), BigInt timestamps, @@map snake_case).
+// Синонимы в Prisma НЕ плодим: Group→Chat, GroupMember→UserChat,
+// GroupRole→UserChat.role, ChannelSettings→ChatSettings,
+// Attachment→MessageAttachment, Ban→UserBan, Invite→InviteLink,
+// EmailVerificationToken/PasswordResetToken→VerificationToken,
+// PollOption→Poll.options (см. prisma_alias в data_schema.json).
+// ============================================================
+
+// Контакты пользователя (тик. 1792160002, экран 1_01_05)
+model Contact {
+  id        String  @id @default(cuid()) @db.VarChar(25)
+  userId    String  @db.VarChar(25)
+  contactId String  @db.VarChar(25)
+  createdAt BigInt  @default(0)
+
+  user       User @relation("ContactOwner", fields: [userId], references: [id], onDelete: Cascade)
+  contact    User @relation("ContactPerson", fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, contactId])
+  @@index([userId])
+  @@map("contacts")
+}
+
+// Уведомление пользователя (тик. 1792160003)
+model Notification {
+  id        String  @id @default(cuid()) @db.VarChar(25)
+  userId    String  @db.VarChar(25)
+  type      String  @db.VarChar(50)
+  preview   String  @db.VarChar(500)
+  isRead    Boolean @default(false)
+  payload   Json?
+  createdAt BigInt  @default(0)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@index([userId, createdAt])
+  @@map("notifications")
+}
+
+// История редактирования сообщения (тик. 1792160004, экран 1_01_32)
+model MessageEdit {
+  id        String  @id @default(cuid()) @db.VarChar(25)
+  messageId String  @db.VarChar(25)
+  oldText   String  @db.Text
+  newText   String  @db.Text
+  editedAt  BigInt  @default(0)
+
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@index([messageId])
+  @@map("message_edits")
+}
+
+// Закреплённое сообщение в чате (тик. 1792160004)
+model PinnedMessage {
+  id        String  @id @default(cuid()) @db.VarChar(25)
+  chatId    String  @db.VarChar(25)
+  messageId String  @db.VarChar(25)
+  pinnedBy  String  @db.VarChar(25)
+  createdAt BigInt  @default(0)
+
+  chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+
+  @@unique([chatId, messageId])
+  @@index([chatId])
+  @@map("pinned_messages")
+}
+
+// Черновик сообщения (тик. 1792160005)
+model Draft {
+  id        String  @id @default(cuid()) @db.VarChar(25)
+  chatId    String  @db.VarChar(25)
+  userId    String  @db.VarChar(25)
+  text      String  @db.Text
+  updatedAt BigInt  @default(0)
+
+  chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([chatId, userId])
+  @@index([userId])
+  @@map("drafts")
+}
+
+// Сессия пользователя на устройстве (тик. 1792160005)
+// Отличается от Device (железо) и RefreshToken (JWT jti): тут активная
+// сессия с токенами, IP и User-Agent для экрана «Мои устройства».
+model Session {
+  id           String  @id @default(cuid()) @db.VarChar(25)
+  userId       String  @db.VarChar(25)
+  deviceId     String? @db.VarChar(25)
+  sessionToken String  @unique @db.VarChar(255)
+  accessToken  String? @db.Text
+  refreshToken String? @db.Text
+  ipAddress    String? @db.VarChar(45)
+  userAgent    String? @db.VarChar(500)
+  expires      BigInt  @default(0)
+  isActive     Boolean @default(true)
+  createdAt    BigInt  @default(0)
+  updatedAt    BigInt  @default(0)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isActive])
+  @@index([expires])
+  @@map("sessions")
+}
+
+// Одноразовый токен привязки устройства по QR (тик. 1792160005, экран 1_01_29)
+model PairToken {
+  id        String  @id @default(cuid()) @db.VarChar(25)
+  token     String  @unique @db.VarChar(255)
+  userId    String  @db.VarChar(25)
+  deviceId  String? @db.VarChar(25)
+  expiresAt BigInt  @default(0)
+  isUsed    Boolean @default(false)
+  createdAt BigInt  @default(0)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("pair_tokens")
+}
+
+// Звонок (тик. 1792160007, экран 1_01_10)
+model Call {
+  id        String  @id @default(cuid()) @db.VarChar(25)
+  chatId    String  @db.VarChar(25)
+  type      String  @db.VarChar(10) // audio | video
+  status    String  @db.VarChar(20) // ongoing | ended | missed | declined
+  isGroup   Boolean @default(false)
+  startedAt BigInt?
+  endedAt   BigInt?
+  createdAt BigInt  @default(0)
+
+  chat        Chat              @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  participants CallParticipant[]
+
+  @@index([chatId])
+  @@index([createdAt])
+  @@map("calls")
+}
+
+// Участник звонка (тик. 1792160007)
+model CallParticipant {
+  id              String  @id @default(cuid()) @db.VarChar(25)
+  callId          String  @db.VarChar(25)
+  userId          String  @db.VarChar(25)
+  isMuted         Boolean @default(false)
+  videoOn         Boolean @default(false)
+  isScreenSharing Boolean @default(false)
+  joinedAt        BigInt  @default(0)
+  leftAt          BigInt?
+
+  call Call @relation(fields: [callId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([callId])
+  @@index([userId])
+  @@map("call_participants")
+}
+
+// Апелляция на бан (тик. 1792160008, экраны 1_00_07/1_00_08)
+model BanAppeal {
+  id            String  @id @default(cuid()) @db.VarChar(25)
+  banId         String  @db.VarChar(25)
+  userId        String  @db.VarChar(25)
+  text          String  @db.Text
+  confirmations Int     @default(0)
+  decision      String? @db.VarChar(20) // pending | approved | rejected
+  createdAt     BigInt  @default(0)
+  updatedAt     BigInt  @default(0)
+
+  ban  UserBan @relation(fields: [banId], references: [id], onDelete: Cascade)
+  user User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([banId])
+  @@index([userId])
+  @@index([decision])
+  @@map("ban_appeals")
 }

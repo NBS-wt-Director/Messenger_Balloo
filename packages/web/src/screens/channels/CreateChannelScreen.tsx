@@ -2,10 +2,17 @@
 // Макет: mockups/balloo-su/channel-create.html
 // Функция: 0_01_06 — Создание каналов и групп
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '@/services/api';
 import { useChatStore } from '@/store/chatStore';
+
+interface Contact {
+  id: string;
+  username: string;
+  displayName: string;
+  avatarUrl: string | null;
+}
 
 type ChannelVisibility = 'public' | 'private';
 type WhoCanWrite = 'admin' | 'admin_moderators' | 'all';
@@ -43,6 +50,12 @@ function CreateChannelScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Invite contacts state
+  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [selectedContactIds, setSelectedContactIds] = useState<Set<string>>(new Set());
+  const [contactSearch, setContactSearch] = useState('');
+  const [loadingContacts, setLoadingContacts] = useState(false);
+
   // Auto-generate link from name
   useEffect(() => {
     if (name.trim()) {
@@ -57,6 +70,25 @@ function CreateChannelScreen() {
       setInviteLink('');
     }
   }, [name]);
+
+  // Load contacts for invite section
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setLoadingContacts(true);
+      try {
+        const data = await api.get<any[]>('/api/users/contacts');
+        if (!cancelled) {
+          setContacts(data || []);
+        }
+      } catch {
+        // ignore
+      } finally {
+        if (!cancelled) setLoadingContacts(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   const handleAvatarClick = () => {
     fileInputRef.current?.click();
@@ -90,6 +122,24 @@ function CreateChannelScreen() {
     navigator.clipboard.writeText(inviteLink);
     alert('Ссылка скопирована');
   };
+
+  const toggleContact = (id: string) => {
+    setSelectedContactIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const filteredContacts = contacts.filter((c) => {
+    if (!contactSearch.trim()) return true;
+    const q = contactSearch.toLowerCase();
+    return (
+      c.displayName.toLowerCase().includes(q) ||
+      c.username.toLowerCase().includes(q)
+    );
+  });
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -139,6 +189,15 @@ function CreateChannelScreen() {
         createdAt: Date.now(),
         updatedAt: Date.now(),
       });
+
+      // Invite selected contacts
+      const invitePromises = Array.from(selectedContactIds).map(
+        (userId) =>
+          api.addMember(created.id, userId).catch((err) => {
+            console.warn(`Failed to invite ${userId}:`, err);
+          })
+      );
+      await Promise.allSettled(invitePromises);
 
       navigate('/chat', { replace: true });
     } catch (err: any) {
@@ -481,10 +540,118 @@ function CreateChannelScreen() {
           </div>
         </div>
 
-        {/* Step 6: Бот-команды */}
+        {/* Step 6: Приглашение подписчиков */}
         <div className="card mb-6">
           <h3 className="text-lg font-semibold mb-4">
             <span className="chip chip--accent" style={{ marginRight: '8px' }}>6</span>
+            👥 Пригласить подписчиков
+          </h3>
+          <p className="text-sm text-muted mb-4">
+            Выберите контакты, которых нужно пригласить в канал.
+          </p>
+
+          {/* Search */}
+          <div className="form-group">
+            <input
+              type="text"
+              className="form-input"
+              placeholder="🔍 Поиск контактов..."
+              value={contactSearch}
+              onChange={(e) => setContactSearch(e.target.value)}
+            />
+          </div>
+
+          {/* Counter */}
+          <div className="text-sm text-muted mb-3">
+            Выбрано: <strong>{selectedContactIds.size}</strong>
+          </div>
+
+          {/* Contact list */}
+          {loadingContacts ? (
+            <div className="text-muted" style={{ padding: 16, textAlign: 'center' }}>
+              Загрузка контактов...
+            </div>
+          ) : filteredContacts.length === 0 ? (
+            <div className="text-muted" style={{ padding: 16, textAlign: 'center' }}>
+              {contacts.length === 0
+                ? 'У вас пока нет контактов'
+                : 'Контакты не найдены'}
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {filteredContacts.map((contact) => {
+                const isSelected = selectedContactIds.has(contact.id);
+                return (
+                  <div
+                    key={contact.id}
+                    className="card"
+                    style={{
+                      background: isSelected ? 'var(--accent)' : 'var(--surface)',
+                      color: isSelected ? 'white' : 'inherit',
+                      opacity: 0.8,
+                      cursor: 'pointer',
+                      transition: 'all 0.15s',
+                      padding: '8px 12px',
+                    }}
+                    onClick={() => toggleContact(contact.id)}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="avatar avatar--sm avatar--bordered"
+                          style={{
+                            clipPath: 'var(--octagon-clip)',
+                            flexShrink: 0,
+                          }}
+                        >
+                          {contact.avatarUrl ? (
+                            <img
+                              src={contact.avatarUrl}
+                              alt={contact.displayName}
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            />
+                          ) : (
+                            <div className="avatar__inner">
+                              <span>
+                                {contact.displayName
+                                  .split(' ')
+                                  .map((n) => n[0])
+                                  .join('')
+                                  .toUpperCase()
+                                  .slice(0, 2)}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                        <div>
+                          <div className="font-semibold" style={{ fontSize: 13 }}>
+                            {contact.displayName}
+                          </div>
+                          <div className="text-xs" style={{ opacity: 0.7 }}>
+                            @{contact.username}
+                          </div>
+                        </div>
+                      </div>
+                      <span
+                        style={{
+                          fontSize: 18,
+                          flexShrink: 0,
+                        }}
+                      >
+                        {isSelected ? '✅' : '⬜'}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Step 7: Бот-команды */}
+        <div className="card mb-6">
+          <h3 className="text-lg font-semibold mb-4">
+            <span className="chip chip--accent" style={{ marginRight: '8px' }}>7</span>
             Бот-команды
           </h3>
           <p className="text-sm text-muted mb-4">

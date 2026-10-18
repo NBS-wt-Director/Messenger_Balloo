@@ -345,18 +345,30 @@ export const updateMessage = async (userId: string, messageId: string, input: Up
 
   const now = BigInt(Math.floor(Date.now() / 1000));
 
+  const newContent = input.content ?? message.content ?? '';
+
   await prisma.message.update({
     where: { id: messageId },
     data: {
-      content: input.content ?? message.content,
+      content: newContent,
       editCount: { increment: 1 },
       updatedAt: now,
     },
   });
 
+  // Сохраняем историю изменений (тик. 1792160004)
+  await prisma.messageEdit.create({
+    data: {
+      messageId,
+      oldText: message.content ?? '',
+      newText: newContent,
+      editedAt: now,
+    },
+  });
+
   return {
     id: messageId,
-    content: input.content ?? message.content,
+    content: newContent,
     editCount: message.editCount + 1,
     updatedAt: now,
   };
@@ -630,6 +642,21 @@ export const pinMessage = async (userId: string, messageId: string) => {
   const pinned = await prisma.message.update({
     where: { id: messageId },
     data: { pinned: true, updatedAt: now },
+  });
+
+  // Записываем в PinnedMessage (тик. 1792160004)
+  await prisma.pinnedMessage.upsert({
+    where: { chatId_messageId: { chatId: message.chatId, messageId } },
+    create: {
+      chatId: message.chatId,
+      messageId,
+      pinnedBy: userId,
+      createdAt: now,
+    },
+    update: {
+      pinnedBy: userId,
+      createdAt: now,
+    },
   });
 
   return {

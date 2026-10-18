@@ -11,6 +11,9 @@ import {
   blockUser,
   unblockUser,
   getBlockedUsers,
+  getContacts,
+  addContact,
+  removeContact,
 } from '../controllers/userController';
 import { authRequired } from '../middleware/auth';
 
@@ -60,3 +63,17 @@ router.delete('/:id/block', authRequired, unblockUser);
 router.get('/me/blocked', authRequired, getBlockedUsers);
 
 export { router };
+// ============================================================
+// GET /api/users/contacts - список контактов
+// ============================================================
+router.get('/contacts', authRequired, getContacts);
+
+// ============================================================
+// POST /api/users/contacts/:userId - добавить контакт
+// ============================================================
+router.post('/contacts/:userId', authRequired, addContact);
+
+// ============================================================
+// DELETE /api/users/contacts/:userId - удалить контакт
+// ============================================================
+router.delete('/contacts/:userId', authRequired, removeContact);

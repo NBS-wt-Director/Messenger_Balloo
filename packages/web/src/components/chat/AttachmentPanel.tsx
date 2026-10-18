@@ -38,13 +38,21 @@ function attachmentType(mime: string): string {
   return 'file';
 }
 
-const QUICK_ACTIONS: Array<{ icon: string; label: string; accept: string | null; hint?: string }> = [
+const QUICK_ACTIONS: Array<{ icon: string; label: string; accept: string | null; hint?: string; capture?: string }> = [
   { icon: '🖼', label: 'Фото', accept: 'image/*' },
   { icon: '🎥', label: 'Видео', accept: 'video/*' },
   { icon: '📄', label: 'Документ', accept: '.pdf,.doc,.docx,.txt,.xls,.xlsx' },
   { icon: '📸', label: 'Скриншот', accept: null, hint: 'Вставьте скриншот из буфера: Ctrl+V' },
   { icon: '🎵', label: 'Аудио', accept: 'audio/*' },
   { icon: '📦', label: 'Файл', accept: null },
+  { icon: '📷', label: 'С камеры', accept: 'image/*', capture: 'environment' },
+];
+
+// Не-файловые вложения (замечание 1.1.18): опросы, геолокация, контакты
+const NON_FILE_ACTIONS: Array<{ icon: string; label: string; route?: string }> = [
+  { icon: '📊', label: 'Опрос', route: 'poll' },
+  { icon: '📍', label: 'Геолокация' },
+  { icon: '👤', label: 'Контакт' },
 ];
 
 export function AttachmentPanel({ open, chatId, onClose, onSent }: AttachmentPanelProps) {
@@ -54,6 +62,7 @@ export function AttachmentPanel({ open, chatId, onClose, onSent }: AttachmentPan
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const quickInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   const addFiles = useCallback((files: FileList | File[]) => {
     const picked = Array.from(files).map((file) => ({
@@ -234,12 +243,22 @@ export function AttachmentPanel({ open, chatId, onClose, onSent }: AttachmentPan
                 role="button"
                 tabIndex={0}
                 title={qa.hint ?? `Выберите: ${qa.label}`}
-                onClick={() => qa.accept !== null && openQuickPicker(qa.accept)}
-                onKeyDown={(e) => e.key === 'Enter' && qa.accept !== null && openQuickPicker(qa.accept)}
+                onClick={() => {
+                  if (qa.capture) {
+                    cameraInputRef.current?.click();
+                  } else if (qa.accept !== null) {
+                    openQuickPicker(qa.accept);
+                  }
+                }}
+                onKeyDown={(e) => e.key === 'Enter' && (() => {
+                  if (qa.capture) cameraInputRef.current?.click();
+                  else if (qa.accept !== null) openQuickPicker(qa.accept);
+                })()}
                 style={{
                   textAlign: 'center',
                   padding: '14px 8px',
-                  cursor: qa.accept !== null ? 'pointer' : 'default',
+                  cursor: (qa.accept !== null || qa.capture) ? 'pointer' : 'default',
+                  ...(qa.capture ? { background: 'rgba(45,184,77,0.08)', borderColor: 'var(--accent)' } : {}),
                 }}
                 className="card card--hover"
               >
@@ -264,6 +283,57 @@ export function AttachmentPanel({ open, chatId, onClose, onSent }: AttachmentPan
                 e.target.value = '';
               }}
             />
+            <input
+              ref={cameraInputRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              style={{ display: 'none' }}
+              onChange={(e) => {
+                if (e.target.files) addFiles(e.target.files);
+                e.target.value = '';
+              }}
+            />
+          </div>
+
+          {/* Не-файловые вложения (замечание 1.1.18) */}
+          <div className="text-xs font-bold text-muted" style={{ marginBottom: 8 }}>
+            ➕ Добавить
+          </div>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: 8,
+              marginBottom: 16,
+            }}
+          >
+            {NON_FILE_ACTIONS.map((na) => (
+              <div
+                key={na.label}
+                role="button"
+                tabIndex={0}
+                title={na.label}
+                onClick={() => {
+                  if (na.route === 'poll') {
+                    onClose();
+                    window.location.hash = `/chat/${chatId}/poll`;
+                  }
+                }}
+                onKeyDown={(e) => e.key === 'Enter' && na.route === 'poll' && (onClose(), (window.location.hash = `/chat/${chatId}/poll`))}
+                style={{
+                  textAlign: 'center',
+                  padding: '14px 8px',
+                  cursor: 'pointer',
+                }}
+                className="card card--hover"
+              >
+                <div style={{ fontSize: 24, marginBottom: 6 }}>{na.icon}</div>
+                <div className="text-xs font-bold" style={{ color: 'var(--text-primary)' }}>
+                  {na.label}
+                </div>
+              </div>
+            ))}
           </div>
 
           {error && (

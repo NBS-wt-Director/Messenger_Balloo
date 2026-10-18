@@ -18,6 +18,7 @@ interface MessageBubbleProps {
   onEdit?: (messageId: string, content: string) => void;
   onDelete?: (messageId: string) => void;
   onForward?: (message: MessageWithSender) => void;
+  onFileView?: (attachment: { url?: string; name?: string; size?: number; thumbnail?: string; width?: number; height?: number; duration?: number }) => void;
 }
 
 // Memoized — не перерисовывать при изменениях в других сообщениях
@@ -29,6 +30,7 @@ export const MessageBubble = React.memo<MessageBubbleProps>(({
   onEdit,
   onDelete,
   onForward,
+  onFileView,
 }) => {
   const [showActions, setShowActions] = useState(false);
   const [showEditHistory, setShowEditHistory] = useState(false);
@@ -119,7 +121,14 @@ export const MessageBubble = React.memo<MessageBubbleProps>(({
   );
 
   const renderFileMessage = () => (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '8px', background: 'var(--bg-tertiary)' }}>
+    <div
+      style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '8px', background: 'var(--bg-tertiary)', cursor: 'pointer' }}
+      onClick={() => {
+        if (message.attachment?.url) {
+          onFileView?.(message.attachment);
+        }
+      }}
+    >
       <span style={{ fontSize: '24px' }}>📄</span>
       <div>
         <div style={{ fontSize: '13px', fontWeight: 600 }}>{message.attachment?.name || 'Файл'}</div>

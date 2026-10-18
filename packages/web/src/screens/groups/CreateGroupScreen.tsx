@@ -2,10 +2,17 @@
 // Макет: mockups/balloo-su/group-create.html
 // Функция: 0_01_05 — Создание групп
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '@/services/api';
 import { useChatStore } from '@/store/chatStore';
+
+interface Contact {
+  id: string;
+  username: string;
+  displayName: string;
+  avatarUrl: string | null;
+}
 
 type GroupType = 'private' | 'public' | 'topic' | 'media' | 'corporate';
 
@@ -93,7 +100,53 @@ function CreateGroupScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Invite contacts
+  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [selectedContactIds, setSelectedContactIds] = useState<Set<string>>(new Set());
+  const [contactSearch, setContactSearch] = useState('');
+  const [loadingContacts, setLoadingContacts] = useState(false);
+
+  // Rules
+  const [rulesText, setRulesText] = useState('');
+
+  // Media (СМИ)
+  const [mediaCert, setMediaCert] = useState({
+    certNumber: '', certIssuedAt: '', certIssuer: '',
+    certMediaName: '', certFounder: '', certInn: '', certOgrn: '',
+  });
+  const [mediaFile, setMediaFile] = useState<File | null>(null);
+  const mediaFileRef = useRef<HTMLInputElement>(null);
+
   const selectedGroupType = GROUP_TYPES.find((t) => t.id === selectedType)!;
+
+  // Load contacts
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setLoadingContacts(true);
+      try {
+        const data = await api.get<any[]>('/api/users/contacts');
+        if (!cancelled) setContacts(data || []);
+      } catch { /* ignore */ } finally {
+        if (!cancelled) setLoadingContacts(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  const toggleContact = (id: string) => {
+    setSelectedContactIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const filteredContacts = contacts.filter((c) => {
+    if (!contactSearch.trim()) return true;
+    const q = contactSearch.toLowerCase();
+    return c.displayName.toLowerCase().includes(q) || c.username.toLowerCase().includes(q);
+  });
 
   const handleAvatarClick = () => {
     fileInputRef.current?.click();
@@ -134,20 +187,60 @@ function CreateGroupScreen() {
       return;
     }
 
+    // Validate rules
+    if (requireRules && !rulesText.trim()) {
+      setError('Введите текст правил группы');
+      return;
+    }
+
+    // Validate media docs
+    if (selectedType === 'media' && !mediaCert.certNumber && !mediaFile) {
+      setError('Для группы типа «СМИ» обязательны свидетельство и реквизиты (ст. 9 Закона РФ «О СМИ»)');
+      return;
+    }
+
     setLoading(true);
     try {
-      const groupData = {
+      // Upload media cert file if present
+      let mediaCertDocuments: any[] = [];
+      if (mediaFile) {
+        try {
+          const fd = new FormData();
+          fd.append('file', mediaFile);
+          const uploadResult: any = await api.request('/api/upload/file', {
+            method: 'POST',
+            body: fd,
+            headers: {},
+          });
+          mediaCertDocuments = [{ type: 'certificate', url: uploadResult.url, name: mediaFile.name }];
+        } catch {
+          // continue without file
+        }
+      }
+
+      const groupData: any = {
         name: name.trim(),
         description: description.trim(),
         type: selectedType === 'private' ? 'group' : selectedType === 'public' ? 'group' : 'channel',
         groupType: selectedType,
         avatarUrl,
+        memberIds: Array.from(selectedContactIds),
         settings: {
           requireRules,
+          rules: rulesText.trim(),
           historyForNewMembers: historyOption,
           inviteLinkExpiry: linkExpiry,
         },
       };
+
+      // Attach media certificate for media groups
+      if (selectedType === 'media') {
+        groupData.mediaCert = {
+          ...mediaCert,
+          certIssuedAt: mediaCert.certIssuedAt ? Math.floor(new Date(mediaCert.certIssuedAt).getTime() / 1000) : undefined,
+          documents: mediaCertDocuments,
+        };
+      }
 
       const created = await api.createGroup(groupData);
       addChat({
@@ -364,6 +457,129 @@ function CreateGroupScreen() {
             </select>
           </div>
         </div>
+
+        {/* Правила группы — при включённом переключателе */}
+        {requireRules && (
+          <div className="card mb-6">
+            <div className="form-group">
+              <label className="form-label">Правила группы *</label>
+              <textarea
+                className="form-input form-input--textarea"
+                placeholder="Опишите правила группы..."
+                value={rulesText}
+                onChange={(e) => setRulesText(e.target.value)}
+                rows={4}
+                maxLength={2000}
+              />
+              <span className="text-xs text-muted">{rulesText.length}/2000</span>
+            </div>
+          </div>
+        )}
+
+        {/* Приглашение участников */}
+        <div className="card mb-6">
+          <h3 className="text-lg font-semibold mb-4">📨 Пригласить участников сейчас</h3>
+          <div className="form-group">
+            <input
+              type="text"
+              className="form-input"
+              placeholder="🔍 Поиск контактов..."
+              value={contactSearch}
+              onChange={(e) => setContactSearch(e.target.value)}
+            />
+          </div>
+          <div className="text-sm text-muted mb-3">
+            Выбрано: <strong>{selectedContactIds.size}</strong>
+          </div>
+          {loadingContacts ? (
+            <div className="text-muted" style={{ padding: 16, textAlign: 'center' }}>Загрузка...</div>
+          ) : filteredContacts.length === 0 ? (
+            <div className="text-muted" style={{ padding: 16, textAlign: 'center' }}>
+              {contacts.length === 0 ? 'Нет контактов' : 'Не найдено'}
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, maxHeight: 200, overflowY: 'auto' }}>
+              {filteredContacts.map((c) => {
+                const sel = selectedContactIds.has(c.id);
+                return (
+                  <div key={c.id} className="card" style={{
+                    background: sel ? 'var(--accent)' : 'var(--surface)',
+                    color: sel ? 'white' : 'inherit', opacity: 0.8, cursor: 'pointer', padding: '8px 12px',
+                  }} onClick={() => toggleContact(c.id)}>
+                    <div className="flex items-center gap-3">
+                      <div className="avatar avatar--sm avatar--bordered" style={{ clipPath: 'var(--octagon-clip)', flexShrink: 0 }}>
+                        {c.avatarUrl ? <img src={c.avatarUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : (
+                          <div className="avatar__inner"><span>{c.displayName.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)}</span></div>
+                        )}
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div className="font-semibold" style={{ fontSize: 13 }}>{c.displayName}</div>
+                        <div className="text-xs" style={{ opacity: 0.7 }}>@{c.username}</div>
+                      </div>
+                      <span style={{ fontSize: 18 }}>{sel ? '✅' : '⬜'}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Правовые документы СМИ */}
+        {selectedType === 'media' && (
+          <div className="card mb-6">
+            <h3 className="text-lg font-semibold mb-4">📰 Правовые документы СМИ *</h3>
+            <p className="text-sm text-muted mb-4">
+              Свидетельство о регистрации СМИ (ст. 9 Закона РФ «О СМИ»).
+            </p>
+
+            <div className="form-group">
+              <label className="form-label">Свидетельство (скан/PDF) *</label>
+              <input
+                ref={mediaFileRef}
+                type="file"
+                accept="image/*,application/pdf"
+                style={{ display: 'none' }}
+                onChange={(e) => setMediaFile(e.target.files?.[0] || null)}
+              />
+              <div className="flex gap-2 items-center">
+                <button type="button" className="btn btn--secondary btn--sm" onClick={() => mediaFileRef.current?.click()}>
+                  📎 Выбрать файл
+                </button>
+                {mediaFile && <span className="text-sm">{mediaFile.name}</span>}
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Серия/номер свидетельства</label>
+              <input type="text" className="form-input" placeholder="ФС77-XXXXX" value={mediaCert.certNumber} onChange={(e) => setMediaCert({ ...mediaCert, certNumber: e.target.value })} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Дата выдачи</label>
+              <input type="date" className="form-input" value={mediaCert.certIssuedAt} onChange={(e) => setMediaCert({ ...mediaCert, certIssuedAt: e.target.value })} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Кем выдан</label>
+              <input type="text" className="form-input" placeholder="Роскомнадзор" value={mediaCert.certIssuer} onChange={(e) => setMediaCert({ ...mediaCert, certIssuer: e.target.value })} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Название СМИ</label>
+              <input type="text" className="form-input" value={mediaCert.certMediaName} onChange={(e) => setMediaCert({ ...mediaCert, certMediaName: e.target.value })} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Учредитель</label>
+              <input type="text" className="form-input" value={mediaCert.certFounder} onChange={(e) => setMediaCert({ ...mediaCert, certFounder: e.target.value })} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">ИНН</label>
+              <input type="text" className="form-input" placeholder="7701234567" value={mediaCert.certInn} onChange={(e) => setMediaCert({ ...mediaCert, certInn: e.target.value })} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">ОГРН</label>
+              <input type="text" className="form-input" placeholder="1027701234567" value={mediaCert.certOgrn} onChange={(e) => setMediaCert({ ...mediaCert, certOgrn: e.target.value })} />
+            </div>
+          </div>
+        )}
 
         {/* Error */}
         {error && (

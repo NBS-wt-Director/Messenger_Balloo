@@ -2,7 +2,7 @@
   "project": "Balloo Messenger",
   "version": "1.0.0",
   "last_updated": "2026-10-16",
-  "total_screens": 168,
+  "total_screens": 163,
   "screens_unviewed": 0,
   "nodes": [
     {
@@ -820,7 +820,7 @@
           "id": "1_03_13",
           "name": "Мои задачи",
           "file": "command-balloo-su/todo.html",
-          "status": "Реализован",
+          "status": "Принят",
           "doc_md": "command-balloo-su/todo.md",
           "component": "packages/web/src/screens/command/TasksScreen.tsx"
         },
@@ -870,13 +870,6 @@
       "doc_md": null,
       "screens": [
         {
-          "id": "1_01_24",
-          "name": "Донат",
-          "file": "balloo-su/donate.html",
-          "status": "Принят",
-          "doc_md": "features-balloo-su/donate.md"
-        },
-        {
           "id": "1_04_02",
           "name": "Детали фич-реквеста",
           "file": "features-balloo-su/feature-detail.html",
@@ -920,13 +913,6 @@
       "doc_md": null,
       "screens": [
         {
-          "id": "1_01_24",
-          "name": "Донат",
-          "file": "balloo-su/donate.html",
-          "status": "Принят",
-          "doc_md": "history-balloo-su/donate.md"
-        },
-        {
           "id": "1_05_02",
           "name": "Детали версии",
           "file": "history-balloo-su/version-detail.html",
@@ -961,13 +947,6 @@
       "status": "задокументирован",
       "doc_md": null,
       "screens": [
-        {
-          "id": "1_01_24",
-          "name": "Донат",
-          "file": "balloo-su/donate.html",
-          "status": "Принят",
-          "doc_md": "download-balloo-su/donate.md"
-        },
         {
           "id": "1_06_02",
           "name": "Загрузки (download)",
@@ -1358,13 +1337,6 @@
           "doc_md": "desktop/profile.md"
         },
         {
-          "id": "1_01_03",
-          "name": "Регистрация",
-          "file": "balloo-su/register.html",
-          "status": "Просмотрен",
-          "doc_md": "desktop/register.md"
-        },
-        {
           "id": "1_09_07",
           "name": "Жалоба на сообщение",
           "file": "desktop/report-message.html",
@@ -1445,13 +1417,6 @@
           "file": "specifity-balloo-su/home.html",
           "status": "Принят",
           "doc_md": "specifity-balloo-su/home.md"
-        },
-        {
-          "id": "1_01_12",
-          "name": "Правила платформы",
-          "file": "balloo-su/rules.html",
-          "status": "Принят",
-          "doc_md": "specifity-balloo-su/rules.md"
         },
         {
           "id": "1_10_06",

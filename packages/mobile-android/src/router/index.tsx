@@ -30,6 +30,21 @@ import BlogScreen from '../screens/BlogScreen';
 import KnowledgeScreen from '../screens/KnowledgeScreen';
 import HiringScreen from '../screens/HiringScreen';
 
+// New screens (тик. 1792160026)
+import CallHistoryScreen from '../screens/CallHistoryScreen';
+import MyDevicesScreen from '../screens/MyDevicesScreen';
+import AddDeviceScreen from '../screens/AddDeviceScreen';
+import DonateScreen from '../screens/DonateScreen';
+import ChatAttachmentsScreen from '../screens/ChatAttachmentsScreen';
+import ReportMessageScreen from '../screens/ReportMessageScreen';
+import MyDonatesScreen from '../screens/MyDonatesScreen';
+import ArchiveScreen from '../screens/ArchiveScreen';
+import PollEditorScreen from '../screens/PollEditorScreen';
+import EmptyChatScreen from '../screens/EmptyChatScreen';
+import MediaViewerScreen from '../screens/MediaViewerScreen';
+import VoiceRecordScreen from '../screens/VoiceRecordScreen';
+import HeaderMenuScreen from '../screens/HeaderMenuScreen';
+
 export type AuthStackParamList = {
   Login: undefined;
   Register: undefined;
@@ -49,6 +64,16 @@ export type MainStackParamList = {
   Donate: undefined;
   MyDonates: undefined;
   Devices: undefined;
+  CallHistory: undefined;
+  AddDevice: undefined;
+  ChatAttachments: { chatId: string };
+  ReportMessage: { messageId: string };
+  Archive: undefined;
+  PollEditor: { chatId: string };
+  EmptyChat: undefined;
+  MediaViewer: { items: any[]; index: number };
+  VoiceRecord: { chatId: string };
+  HeaderMenu: undefined;
 };
 
 export type TabParamList = {
@@ -127,9 +152,19 @@ function MainNavigator() {
       <MainStack.Screen name="CreateGroup" component={CreateGroupScreen} />
       <MainStack.Screen name="BlogPost" component={BlogScreen} />
       <MainStack.Screen name="KnowledgePage" component={KnowledgeScreen} />
-      <MainStack.Screen name="Donate" component={ProfileScreen} />
-      <MainStack.Screen name="MyDonates" component={ProfileScreen} />
-      <MainStack.Screen name="Devices" component={ProfileScreen} />
+      <MainStack.Screen name="Donate" component={DonateScreen} />
+      <MainStack.Screen name="MyDonates" component={MyDonatesScreen} />
+      <MainStack.Screen name="Devices" component={MyDevicesScreen} />
+      <MainStack.Screen name="CallHistory" component={CallHistoryScreen} />
+      <MainStack.Screen name="AddDevice" component={AddDeviceScreen} />
+      <MainStack.Screen name="ChatAttachments" component={ChatAttachmentsScreen} />
+      <MainStack.Screen name="ReportMessage" component={ReportMessageScreen} />
+      <MainStack.Screen name="Archive" component={ArchiveScreen} />
+      <MainStack.Screen name="PollEditor" component={PollEditorScreen} />
+      <MainStack.Screen name="EmptyChat" component={EmptyChatScreen} />
+      <MainStack.Screen name="MediaViewer" component={MediaViewerScreen} />
+      <MainStack.Screen name="VoiceRecord" component={VoiceRecordScreen} />
+      <MainStack.Screen name="HeaderMenu" component={HeaderMenuScreen} />
     </MainStack.Navigator>
   );
 }

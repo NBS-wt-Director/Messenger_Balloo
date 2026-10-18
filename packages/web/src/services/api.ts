@@ -925,4 +925,62 @@ export const api = {
       method: 'POST',
       data: { text, isInternal },
     }),
+
+  // Онбординг (тик. 1792160014)
+  getOnboardingSteps: () =>
+    request<any[]>('/api/onboarding/steps'),
+
+  completeOnboarding: () =>
+    request<any>('/api/users/me/onboarding', { method: 'PATCH' }),
+
+  // Звонки (тик. 1792160015)
+  endCall: (callId: string) =>
+    request<any>(`/api/calls/${callId}/end`, { method: 'POST' }),
+
+  // Приглашения (тик. 1792160016)
+  getInvites: () =>
+    request<any[]>('/api/invites'),
+
+  createInvite: (data: { email: string; durationType: string; durationDays?: number }) =>
+    request<any>('/api/invites', { method: 'POST', data }),
+
+  deleteInvite: (inviteId: string) =>
+    request<any>(`/api/invites/${inviteId}`, { method: 'DELETE' }),
+
+  // Боты (тик. 1792160017)
+  getBots: () =>
+    request<any[]>('/api/bots'),
+
+  createBot: (data: { name: string; description?: string; webhookUrl?: string }) =>
+    request<any>('/api/bots', { method: 'POST', data }),
+
+  deleteBot: (botId: string) =>
+    request<any>(`/api/bots/${botId}`, { method: 'DELETE' }),
+
+  // Устройства (тик. 1792160018) — getDevices уже есть выше
+  renameDevice: (deviceId: string, name: string) =>
+    request<any>(`/api/devices/${deviceId}`, { method: 'PATCH', data: { name } }),
+
+  stopSession: (sessionId: string) =>
+    request<any>(`/api/sessions/${sessionId}`, { method: 'DELETE' }),
+
+  stopAllOtherSessions: () =>
+    request<any>('/api/sessions', { method: 'DELETE' }),
+
+  // Вложения чата (тик. 1792160019)
+  getChatAttachments: (chatId: string, type: string, query?: string) =>
+    request<any[]>(`/api/chats/${chatId}/attachments?type=${type}${query ? `&q=${encodeURIComponent(query)}` : ''}`),
+
+  // Жалобы (тик. 1792160020) — createReport уже есть выше
+
+  // Донаты (тик. 1792160021)
+  getMyDonations: () =>
+    request<any[]>('/api/me/donations'),
+
+  getMySubscriptions: () =>
+    request<any[]>('/api/me/subscriptions'),
+
+  // Редактор сообщения (тик. 1792160022) — updateMessage/deleteMessage уже есть выше
+  getMessageHistory: (messageId: string) =>
+    request<any[]>(`/api/messages/${messageId}/history`),
 };

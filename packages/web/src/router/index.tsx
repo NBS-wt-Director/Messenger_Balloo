@@ -21,6 +21,15 @@ const LoginScreen = lazy(() => import('@/screens/auth/LoginScreen'));
 const RegisterScreen = lazy(() => import('@/screens/auth/RegisterScreen'));
 const TwoFactorScreen = lazy(() => import('@/screens/auth/TwoFactorScreen'));
 const ResetPasswordScreen = lazy(() => import('@/screens/auth/ResetPasswordScreen'));
+const OnboardingScreen = lazy(() => import('@/screens/onboarding/OnboardingScreen'));
+const ActiveCallScreen = lazy(() => import('@/screens/active-call/ActiveCallScreen'));
+const InvitesScreen = lazy(() => import('@/screens/invites/InvitesScreen'));
+const BotsScreen = lazy(() => import('@/screens/bots/BotsScreen'));
+const MyDevicesScreen = lazy(() => import('@/screens/my-devices/MyDevicesScreen'));
+const ChatAttachmentsScreen = lazy(() => import('@/screens/chat-attachments/ChatAttachmentsScreen'));
+const ReportMessageScreen = lazy(() => import('@/screens/report-message/ReportMessageScreen'));
+const MyDonatesScreen = lazy(() => import('@/screens/my-donates/MyDonatesScreen'));
+const MessageEditorScreen = lazy(() => import('@/screens/message-editor/MessageEditorScreen'));
 const AddDeviceScreen = lazy(() => import('@/screens/auth/AddDeviceScreen'));
 const MainLayout = lazy(() => import('@/layouts/MainLayout'));
 const ChatViewScreen = lazy(() => import('@/screens/chat/ChatViewScreen'));
@@ -68,6 +77,11 @@ const SystemSettingsScreen = lazy(() => import('@/screens/admin/SystemSettingsSc
 const InstallScreen = lazy(() => import('@/screens/admin/InstallScreen').then((m) => ({ default: m.InstallScreen })));
 const AdminDonationsScreen = lazy(() => import('@/screens/admin/AdminDonationsScreen').then((m) => ({ default: m.AdminDonationsScreen })));
 const AdminSupportScreen = lazy(() => import('@/screens/admin/AdminSupportScreen').then((m) => ({ default: m.AdminSupportScreen })));
+const DepartmentsScreen = lazy(() => import('@/screens/admin/DepartmentsScreen').then((m) => ({ default: m.DepartmentsScreen })));
+const EmployeesScreen = lazy(() => import('@/screens/admin/EmployeesScreen').then((m) => ({ default: m.EmployeesScreen })));
+const VacanciesAdminScreen = lazy(() => import('@/screens/admin/VacanciesScreen').then((m) => ({ default: m.VacanciesScreen })));
+const TextsScreen = lazy(() => import('@/screens/admin/TextsScreen').then((m) => ({ default: m.TextsScreen })));
+const FeaturesMgmtScreen = lazy(() => import('@/screens/admin/FeaturesMgmtScreen').then((m) => ({ default: m.FeaturesMgmtScreen })));
 
 // Landing pages
 const ForKassaScreen = lazy(() => import('@/screens/landing/ForKassaScreen').then((m) => ({ default: m.ForKassaScreen })));
@@ -113,6 +127,9 @@ const DocsScreen = lazy(() => import('@/screens/docs/DocsScreen').then((m) => ({
 
 // Specifity screens — тикет №59
 const SpecifityScreen = lazy(() => import('@/screens/specifity/SpecifityScreen').then((m) => ({ default: m.SpecifityScreen })));
+
+// Calls — тикет 1792137287
+const CallsScreen = lazy(() => import('@/screens/calls/CallsScreen'));
 
 // Blog Landing screens (узел 11) — тикет №60
 const BlogLandingScreen = lazy(() => import('@/screens/blog-landing/BlogLandingScreen'));
@@ -370,11 +387,102 @@ export const router = createHashRouter([
     ),
   },
   {
+    path: '/onboarding',
+    element: (
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingFallback />}>
+          <OnboardingScreen />
+        </Suspense>
+      </ErrorBoundary>
+    ),
+  },
+  {
+    path: '/active-call',
+    element: (
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingFallback />}>
+          <ActiveCallScreen />
+        </Suspense>
+      </ErrorBoundary>
+    ),
+  },
+  {
+    path: '/invites',
+    element: (
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingFallback />}>
+          <InvitesScreen />
+        </Suspense>
+      </ErrorBoundary>
+    ),
+  },
+  {
+    path: '/bots',
+    element: (
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingFallback />}>
+          <BotsScreen />
+        </Suspense>
+      </ErrorBoundary>
+    ),
+  },
+  {
+    path: '/my-devices',
+    element: (
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingFallback />}>
+          <MyDevicesScreen />
+        </Suspense>
+      </ErrorBoundary>
+    ),
+  },
+  {
     path: '/add-device',
     element: (
       <ErrorBoundary>
         <Suspense fallback={<LoadingFallback />}>
           <AddDeviceScreen />
+        </Suspense>
+      </ErrorBoundary>
+    ),
+  },
+
+  {
+    path: '/chats/:chatId/attachments',
+    element: (
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingFallback />}>
+          <ChatAttachmentsScreen />
+        </Suspense>
+      </ErrorBoundary>
+    ),
+  },
+  {
+    path: '/messages/:messageId/report',
+    element: (
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingFallback />}>
+          <ReportMessageScreen />
+        </Suspense>
+      </ErrorBoundary>
+    ),
+  },
+  {
+    path: '/my-donates',
+    element: (
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingFallback />}>
+          <MyDonatesScreen />
+        </Suspense>
+      </ErrorBoundary>
+    ),
+  },
+  {
+    path: '/messages/:messageId/edit',
+    element: (
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingFallback />}>
+          <MessageEditorScreen />
         </Suspense>
       </ErrorBoundary>
     ),
@@ -486,6 +594,11 @@ export const router = createHashRouter([
         path: 'chat/:chatId/poll',
         element: <PollScreen />,
       },
+      // Calls — тикет 1792137287
+      {
+        path: 'calls',
+        element: <CallsScreen />,
+      },
       // Blog (internal) — moved to blog-landing (public, тикет №60)
       // Knowledge
       {
@@ -577,19 +690,19 @@ export const router = createHashRouter([
       },
       {
         path: 'texts',
-        element: <NotFoundScreen />,
+        element: <TextsScreen />,
       },
       {
         path: 'departments',
-        element: <NotFoundScreen />,
+        element: <DepartmentsScreen />,
       },
       {
         path: 'employees',
-        element: <NotFoundScreen />,
+        element: <EmployeesScreen />,
       },
       {
         path: 'vacancies',
-        element: <NotFoundScreen />,
+        element: <VacanciesAdminScreen />,
       },
       {
         path: 'versions',
@@ -601,7 +714,7 @@ export const router = createHashRouter([
       },
       {
         path: 'features',
-        element: <NotFoundScreen />,
+        element: <FeaturesMgmtScreen />,
       },
       {
         path: 'donations',

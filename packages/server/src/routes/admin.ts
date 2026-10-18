@@ -123,4 +123,63 @@ router.get('/support/tickets/:id', authRequired, adminOnly, getTicketCtrl);
 // POST /api/admin/support/tickets/:id/reply — ответ администратора
 router.post('/support/tickets/:id/reply', authRequired, adminOnly, replyCtrl);
 
+// ----------------------------------------------------------
+// Заявки СМИ (тик. 1792137292)
+// ----------------------------------------------------------
+
+// GET /api/admin/groups/media-requests?status=pending — очередь заявок
+router.get('/groups/media-requests', authRequired, adminOnly, async (req: any, res: any) => {
+  try {
+    const { PrismaClient } = await import('@prisma/client');
+    const prisma = new PrismaClient();
+    const { status, page, limit } = req.query;
+    const where = status ? { status: String(status) } : {};
+    const pageNum = parseInt(String(page), 10) || 1;
+    const limitNum = Math.min(parseInt(String(limit), 10) || 50, 100);
+    const [requests, total] = await Promise.all([
+      prisma.groupMediaRequest.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip: (pageNum - 1) * limitNum,
+        take: limitNum,
+      }),
+      prisma.groupMediaRequest.count({ where }),
+    ]);
+    res.json({ requests, total, page: pageNum, limit: limitNum });
+  } catch (error: any) {
+    res.status(500).json({ error: 'Internal Server Error', message: error.message });
+  }
+});
+
+// PUT /api/admin/groups/media-requests/:id — модерация заявки
+router.put('/groups/media-requests/:id', authRequired, adminOnly, async (req: any, res: any) => {
+  try {
+    const { PrismaClient } = await import('@prisma/client');
+    const prisma = new PrismaClient();
+    const { id } = req.params;
+    const { status, reviewComment } = req.body;
+    if (!status || !['approved', 'rejected'].includes(status)) {
+      res.status(400).json({ error: 'Bad Request', message: 'status: approved | rejected' });
+      return;
+    }
+    const updated = await prisma.groupMediaRequest.update({
+      where: { id },
+      data: {
+        status,
+        reviewComment: reviewComment || null,
+        reviewedByAdminId: req.user!.id,
+        reviewedAt: BigInt(Math.floor(Date.now() / 1000)),
+        updatedAt: BigInt(Math.floor(Date.now() / 1000)),
+      },
+    });
+    res.json(updated);
+  } catch (error: any) {
+    if (error.code === 'P2025') {
+      res.status(404).json({ error: 'Not Found', message: 'Заявка не найдена' });
+    } else {
+      res.status(500).json({ error: 'Internal Server Error', message: error.message });
+    }
+  }
+});
+
 export { router };

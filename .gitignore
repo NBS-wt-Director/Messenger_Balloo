@@ -102,3 +102,4 @@ docker/prod/downloads/
 
 # машинно-специфичный путь к SDK (sdk.dir), стандартно игнорируется шаблоном Expo
 packages/mobile-android/android/local.properties
+trash/

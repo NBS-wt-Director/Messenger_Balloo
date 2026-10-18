@@ -8,6 +8,8 @@ interface MessageInputProps {
   onSend: (content: string, type: string) => void;
   /** открытие панели вложений (тик. 1792124253); без него — прежнее поведение */
   onAttachClick?: () => void;
+  /** открытие модалки записи голосового (тик. 1792160023) */
+  onVoiceClick?: () => void;
   onCancelReply?: () => void;
   isTyping?: boolean;
 }
@@ -15,6 +17,7 @@ interface MessageInputProps {
 export const MessageInput: React.FC<MessageInputProps> = ({
   onSend,
   onAttachClick,
+  onVoiceClick,
   isTyping = false,
 }) => {
   const [content, setContent] = useState('');
@@ -144,7 +147,12 @@ export const MessageInput: React.FC<MessageInputProps> = ({
           📎
         </button>
         <button className="input-area__btn" title="Фото/видео">🖼</button>
-        <button className="input-area__btn" title="Голосовое">🎤</button>
+        <button
+          className="input-area__btn"
+          title="Голосовое"
+          style={onVoiceClick ? { color: 'var(--accent)' } : undefined}
+          onClick={onVoiceClick}
+        >🎤</button>
 
         <textarea
           ref={textareaRef}

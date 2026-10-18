@@ -8,10 +8,12 @@ import { useChatStore, type MessageWithSender } from '@/store/chatStore';
 import { MessageList } from '@/components/chat/MessageList';
 import { MessageInput } from '@/components/chat/MessageInput';
 import { AttachmentPanel } from '@/components/chat/AttachmentPanel';
+import { VoiceMessageModal } from '@/components/chat/VoiceMessageModal';
 import { ChatHeader } from '@/components/chat/ChatHeader';
 import { ChatInfoPanel } from '@/components/chat/ChatInfoPanel';
 import { ReplyPreview } from '@/components/chat/ReplyPreview';
 import { ReactionPicker } from '@/components/chat/ReactionPicker';
+import { EmptyChatState } from '@/components/chat/EmptyChatState';
 import { api } from '@/services/api';
 
 export const ChatViewScreen: React.FC = () => {
@@ -37,6 +39,8 @@ export const ChatViewScreen: React.FC = () => {
   const [typingTimeout, setTypingTimeout] = useState<ReturnType<typeof setTimeout> | null>(null);
   // Панель вложений (тик. 1792124253, макет attachment-panel.html)
   const [attachmentPanelOpen, setAttachmentPanelOpen] = useState(false);
+  // Модалка записи голосового (тик. 1792160023, макет voice-message.html)
+  const [voiceModalOpen, setVoiceModalOpen] = useState(false);
 
   // Load chat and messages
   useEffect(() => {
@@ -312,73 +316,92 @@ export const ChatViewScreen: React.FC = () => {
       className="content"
       style={{ overflow: 'hidden', height: '100%' }} /* скролл внутри .messages */
     >
-      {/* Chat Header */}
-      {activeChat && (
-        <ChatHeader
-          chat={activeChat}
-          onlineStatus="в сети"
-          onCall={handleCall}
-          onAttachments={() => setAttachmentPanelOpen((v) => !v)}
-          onMenu={() => setShowInfo(!showInfo)}
-          onPin={() => useChatStore.getState().pinChat(activeChat.id)}
-          onMute={() => useChatStore.getState().muteChat(activeChat.id)}
-          onArchive={() => api.archiveChat(activeChat.id).catch(() => {})}
-          onExport={() => console.log('Export PDF:', activeChat.id)}
-          onBlock={() => console.log('Block chat:', activeChat.id)}
-        />
-      )}
-
-      {/* Main area: messages + info panel */}
-      <div style={{ display: 'flex', flex: 1, overflow: 'hidden', minHeight: 0 }}>
-        {/* Messages column */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minWidth: 0 }}>
-          {/* Reply preview (панель ответа — inline над полем ввода) */}
-          {replyTo && (
-            <ReplyPreview
-              message={replyTo}
-              onCancel={() => setReplyTo(null)}
+      {chatId ? (
+        <>
+          {/* Chat Header */}
+          {activeChat && (
+            <ChatHeader
+              chat={activeChat}
+              onlineStatus="в сети"
+              onCall={handleCall}
+              onAttachments={() => setAttachmentPanelOpen((v) => !v)}
+              onMenu={() => setShowInfo(!showInfo)}
+              onPin={() => useChatStore.getState().pinChat(activeChat.id)}
+              onMute={() => useChatStore.getState().muteChat(activeChat.id)}
+              onArchive={() => api.archiveChat(activeChat.id).catch(() => {})}
+              onExport={() => console.log('Export PDF:', activeChat.id)}
+              onBlock={() => console.log('Block chat:', activeChat.id)}
             />
           )}
 
-          {/* Message list */}
-          <MessageList
-            chatId={chatId || ''}
-            onReact={handleReact}
-            onReply={handleReply}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            onForward={handleForward}
-          />
+          {/* Main area: messages + info panel */}
+          <div style={{ display: 'flex', flex: 1, overflow: 'hidden', minHeight: 0 }}>
+            {/* Messages column */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minWidth: 0 }}>
+              {/* Reply preview (панель ответа — inline над полем ввода) */}
+              {replyTo && (
+                <ReplyPreview
+                  message={replyTo}
+                  onCancel={() => setReplyTo(null)}
+                />
+              )}
 
-          {/* Message input */}
-          <MessageInput onSend={handleSend} onAttachClick={() => setAttachmentPanelOpen(true)} />
-        </div>
+              {/* Message list */}
+              <MessageList
+                chatId={chatId}
+                onReact={handleReact}
+                onReply={handleReply}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                onForward={handleForward}
+              />
 
-        {/* Панель вложений (тик. 1792124253) */}
-        {chatId && (
-          <AttachmentPanel
-            open={attachmentPanelOpen}
-            chatId={chatId}
-            onClose={() => setAttachmentPanelOpen(false)}
-            onSent={refreshMessages}
-          />
-        )}
+              {/* Message input */}
+              <MessageInput onSend={handleSend} onAttachClick={() => setAttachmentPanelOpen(true)} onVoiceClick={() => setVoiceModalOpen(true)} />
+            </div>
 
-        {/* Chat info panel (right sidebar) */}
-        <ChatInfoPanel
-          chat={activeChat || { id: '', type: 'direct', name: '', joinedAt: 0, pinned: false, muted: false, unreadCount: 0, createdAt: 0, updatedAt: 0 }}
-          isOpen={showInfo}
-          onClose={() => setShowInfo(false)}
-        />
-      </div>
+            {/* Панель вложений (тик. 1792124253) */}
+            {chatId && (
+              <AttachmentPanel
+                open={attachmentPanelOpen}
+                chatId={chatId}
+                onClose={() => setAttachmentPanelOpen(false)}
+                onSent={refreshMessages}
+              />
+            )}
 
-      {/* Reaction picker */}
-      {showReactionPicker && (
-        <ReactionPicker
-          messageId={chatId || ''}
-          onSelect={handleReact}
-          anchorElement={reactionAnchor}
-          onClose={() => setShowReactionPicker(false)}
+            {/* Модалка записи голосового (тик. 1792160023) */}
+            {chatId && (
+              <VoiceMessageModal
+                open={voiceModalOpen}
+                chatId={chatId}
+                onClose={() => setVoiceModalOpen(false)}
+                onSent={refreshMessages}
+              />
+            )}
+
+            {/* Chat info panel (right sidebar) */}
+            <ChatInfoPanel
+              chat={activeChat || { id: '', type: 'direct', name: '', joinedAt: 0, pinned: false, muted: false, unreadCount: 0, createdAt: 0, updatedAt: 0 }}
+              isOpen={showInfo}
+              onClose={() => setShowInfo(false)}
+            />
+          </div>
+
+          {/* Reaction picker */}
+          {showReactionPicker && (
+            <ReactionPicker
+              messageId={chatId}
+              onSelect={handleReact}
+              anchorElement={reactionAnchor}
+              onClose={() => setShowReactionPicker(false)}
+            />
+          )}
+        </>
+      ) : (
+        /* Empty state when no chat is selected */
+        <EmptyChatState
+          onNewChat={() => navigate('/chat')}
         />
       )}
     </div>

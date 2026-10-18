@@ -916,3 +916,79 @@ export const deleteMe = async (userId: string): Promise<{ message: string }> => 
 
   return { message: 'Аккаунт удалён' };
 };
+
+// ============================================================
+// Контакты пользователя
+// ============================================================
+
+export const getContacts = async (userId: string) => {
+  const contacts = await prisma.contact.findMany({
+    where: { userId },
+    select: {
+      contact: {
+        select: {
+          id: true,
+          username: true,
+          displayName: true,
+          avatarUrl: true,
+          status: true,
+        },
+      },
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  return contacts.map((c) => ({
+    id: c.contact.id,
+    username: c.contact.username,
+    displayName: c.contact.displayName,
+    avatarUrl: c.contact.avatarUrl,
+    status: c.contact.status,
+    mutualChats: 0,
+  }));
+};
+
+export const addContact = async (userId: string, contactId: string) => {
+  if (userId === contactId) {
+    throw new Error('Нельзя добавить себя в контакты');
+  }
+
+  const target = await prisma.user.findUnique({
+    where: { id: contactId },
+  });
+  if (!target) {
+    throw new Error('Пользователь не найден');
+  }
+
+  const existing = await prisma.contact.findFirst({
+    where: { userId, contactId },
+  });
+  if (existing) {
+    throw new Error('Пользователь уже в контактах');
+  }
+
+  await prisma.contact.create({
+    data: {
+      userId,
+      contactId,
+      createdAt: BigInt(Math.floor(Date.now() / 1000)),
+    },
+  });
+
+  return { message: 'Контакт добавлен' };
+};
+
+export const removeContact = async (userId: string, contactId: string) => {
+  const existing = await prisma.contact.findFirst({
+    where: { userId, contactId },
+  });
+  if (!existing) {
+    throw new Error('Пользователь не в контактах');
+  }
+
+  await prisma.contact.deleteMany({
+    where: { userId, contactId },
+  });
+
+  return { message: 'Контакт удалён' };
+};
