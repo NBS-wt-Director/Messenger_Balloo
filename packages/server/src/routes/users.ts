@@ -1,5 +1,7 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
+import { PrismaClient } from '@prisma/client';
 
+const prisma = new PrismaClient();
 const router = Router() as import('express').Router;
 import {
   getMe,
@@ -77,3 +79,32 @@ router.post('/contacts/:userId', authRequired, addContact);
 // DELETE /api/users/contacts/:userId - удалить контакт
 // ============================================================
 router.delete('/contacts/:userId', authRequired, removeContact);
+
+// ============================================================
+// PATCH /api/users/me/onboarding — обновить статус онбординга
+// ============================================================
+router.patch('/me/onboarding', authRequired, async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user.id;
+    const { completed } = req.body;
+
+    if (typeof completed !== 'boolean') {
+      return res.status(400).json({ error: 'Bad Request', message: 'completed должен быть boolean' });
+    }
+
+    const user = await prisma.user.update({
+      where: { id: userId },
+      data: { onboardingCompleted: completed },
+      select: {
+        id: true, username: true, email: true, displayName: true,
+        avatarUrl: true, role: true, status: true, language: true,
+        onboardingCompleted: true, createdAt: true, updatedAt: true,
+      },
+    });
+
+    res.json({ user });
+  } catch (error: any) {
+    console.error('[users] PATCH /me/onboarding error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
