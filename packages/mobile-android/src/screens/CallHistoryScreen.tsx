@@ -39,7 +39,24 @@ export default function CallHistoryScreen() {
 
   useEffect(() => { load(); }, [load]);
 
-  const icon = (c: Call) => `${c.video ? '📹' : '📞'} ${c.type === 'missed' ? '❗' : c.type === 'incoming' ? '⬇️' : '⬆️'}`;
+  const callStatus = (type: string): { status: 'accepted' | 'missed'; label: string } => {
+    if (type === 'missed') return { status: 'missed', label: 'Пропущенный' };
+    return { status: 'accepted', label: type === 'incoming' ? 'Принятый' : 'Исходящий' };
+  };
+
+  const statusPictogram = (type: string) => {
+    const { status } = callStatus(type);
+    const isAccepted = status === 'accepted';
+    return {
+      backgroundColor: isAccepted ? colors.accent : '#e53e3e',
+      borderRadius: 10,
+      width: 20,
+      height: 20,
+      alignItems: 'center' as const,
+      justifyContent: 'center' as const,
+    };
+  };
+
   const fmt = (ts: number) => new Date(ts * 1000).toLocaleDateString('ru');
 
   return (
@@ -54,10 +71,14 @@ export default function CallHistoryScreen() {
         <FlatList data={calls} keyExtractor={(i) => i.id} ListEmptyComponent={<Text style={[s.empty, { color: colors.textSecondary }]}>Нет звонков</Text>}
           renderItem={({ item }) => (
             <View style={[s.row, { borderBottomColor: colors.border }]}>
-              <Text style={{ fontSize: 20 }}>{icon(item)}</Text>
+              <View style={statusPictogram(item.type)}>
+                <Text style={{ color: '#fff', fontSize: 12, fontWeight: '900' }}>
+                  {callStatus(item.type).status === 'accepted' ? '✓' : '✕'}
+                </Text>
+              </View>
               <View style={{ flex: 1 }}>
                 <Text style={{ color: colors.textPrimary, fontWeight: '600' }}>{item.peerName}</Text>
-                <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{fmt(item.timestamp)}{item.duration ? ` · ${Math.floor(item.duration / 60)}:${(item.duration % 60).toString().padStart(2, '0')}` : ''}</Text>
+                <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{callStatus(item.type).label}{item.duration ? ` · ${Math.floor(item.duration / 60)}:${(item.duration % 60).toString().padStart(2, '0')}` : ''} · {fmt(item.timestamp)}</Text>
               </View>
             </View>
           )} />

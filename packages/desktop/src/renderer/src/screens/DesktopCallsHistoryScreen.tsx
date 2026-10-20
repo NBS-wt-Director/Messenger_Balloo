@@ -77,6 +77,26 @@ export function DesktopCallsHistoryScreen() {
     cursor: 'pointer',
   };
 
+  const callStatus = (type: string): { status: 'accepted' | 'missed'; label: string } => {
+    if (type === 'missed') return { status: 'missed', label: 'Пропущенный' };
+    return { status: 'accepted', label: type === 'incoming' ? 'Принятый' : 'Исходящий' };
+  };
+
+  const StatusPictogram = ({ status }: { status: 'accepted' | 'missed' }) => ({
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 20,
+    height: 20,
+    backgroundColor: status === 'accepted' ? 'var(--accent, #2db84d)' : '#e74c3c',
+    borderRadius: '50%',
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 900,
+    flexShrink: 0,
+    marginLeft: 4,
+  } as React.CSSProperties);
+
   return (
     <div style={containerStyle}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
@@ -134,9 +154,12 @@ export function DesktopCallsHistoryScreen() {
                 <div style={{ fontWeight: 600, color: 'var(--text-primary, #fff)', fontSize: '14px' }}>
                   {call.contactName}
                 </div>
-                <div style={{ fontSize: '12px', color: 'var(--text-secondary, #8a8aa0)', marginTop: '2px' }}>
-                  {call.type === 'incoming' ? '📞 Входящий' : call.type === 'outgoing' ? '📞 Исходящий' : '📞 Пропущенный'}
-                  {call.duration > 0 && ` — ${formatDuration(call.duration)}`}
+                <div style={{ fontSize: '12px', color: 'var(--text-secondary, #8a8aa0)', marginTop: '2px', display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <span style={StatusPictogram({ status: callStatus(call.type).status })}>
+                    {callStatus(call.type).status === 'accepted' ? '✓' : '✕'}
+                  </span>
+                  <span>{callStatus(call.type).label}</span>
+                  {call.duration > 0 && <span> — {formatDuration(call.duration)}</span>}
                 </div>
               </div>
               <div style={{ fontSize: '12px', color: 'var(--text-secondary, #8a8aa0)', flexShrink: 0 }}>
