@@ -880,6 +880,20 @@ model Interview {
   @@map("interviews")
 }
 
+model Employee {
+  id         String  @id @default(cuid()) @db.VarChar(25)
+  name       String  @db.VarChar(255)
+  email      String? @db.VarChar(255)
+  department String? @db.VarChar(255)
+  role       String  @db.VarChar(100)
+  status     String  @default("active")
+  createdAt  BigInt  @default(0)
+  updatedAt  BigInt  @default(0)
+
+  @@index([status])
+  @@map("employees")
+}
+
 // --- Тикет #10: Donations + Features + Reports + Bots ---
 
 model DonationTier {

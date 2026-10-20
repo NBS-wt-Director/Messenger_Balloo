@@ -74,6 +74,22 @@ export const handleWsMessage = async (
         await handleReactionRemove(ws, parsed);
         break;
 
+      case 'call.start':
+        await handleCallStart(ws, parsed);
+        break;
+
+      case 'call.answer':
+        await handleCallAnswer(ws, parsed);
+        break;
+
+      case 'call.decline':
+        await handleCallDecline(ws, parsed);
+        break;
+
+      case 'call.end':
+        await handleCallEnd(ws, parsed);
+        break;
+
       default:
         sendError(ws, 'UNKNOWN_TYPE', `Неизвестный тип сообщения: ${(parsed as any).type}`);
     }
@@ -405,6 +421,137 @@ const handleReactionRemove = async (
 
   if (message) {
     roomManager.broadcastToRoom(message.chatId, serializeWsMessage(broadcast));
+  }
+};
+
+// ============================================================
+// Call signaling handlers
+// ============================================================
+
+const handleCallStart = async (ws: AuthenticatedWebSocket, msg: any): Promise<void> => {
+  const { callId, calleeId, type } = msg;
+  if (!callId || !calleeId) {
+    sendError(ws, 'INVALID_CALL', 'callId и calleeId обязательны');
+    return;
+  }
+
+  const caller = await prisma.user.findUnique({
+    where: { id: ws.userId },
+    select: { username: true },
+  });
+
+  const outgoing: WsOutgoingMessage & { type: 'call.incoming' } = {
+    type: 'call.incoming',
+    callId,
+    callerId: ws.userId,
+    callerName: caller?.username || ws.userId,
+    callType: type === 'video' ? 'video' : 'audio',
+    timestamp: Date.now(),
+  };
+
+  roomManager.sendToUser(calleeId, serializeWsMessage(outgoing));
+};
+
+const handleCallAnswer = async (ws: AuthenticatedWebSocket, msg: any): Promise<void> => {
+  const { callId } = msg;
+  if (!callId) {
+    sendError(ws, 'INVALID_CALL', 'callId обязателен');
+    return;
+  }
+
+  const call = await prisma.call.findUnique({
+    where: { id: callId },
+    include: { participants: { select: { userId: true } } },
+  });
+
+  if (!call) {
+    sendError(ws, 'CALL_NOT_FOUND', 'Звонок не найден');
+    return;
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: ws.userId },
+    select: { username: true },
+  });
+
+  const otherParticipants = call.participants
+    .filter(p => p.userId !== ws.userId)
+    .map(p => p.userId);
+
+  for (const userId of otherParticipants) {
+    const outgoing: WsOutgoingMessage & { type: 'call.answered' } = {
+      type: 'call.answered',
+      callId,
+      answeredBy: ws.userId,
+      answeredByName: user?.username || ws.userId,
+      timestamp: Date.now(),
+    };
+    roomManager.sendToUser(userId, serializeWsMessage(outgoing));
+  }
+};
+
+const handleCallDecline = async (ws: AuthenticatedWebSocket, msg: any): Promise<void> => {
+  const { callId } = msg;
+  if (!callId) {
+    sendError(ws, 'INVALID_CALL', 'callId обязателен');
+    return;
+  }
+
+  const call = await prisma.call.findUnique({
+    where: { id: callId },
+    include: { participants: { select: { userId: true } } },
+  });
+
+  if (!call) {
+    sendError(ws, 'CALL_NOT_FOUND', 'Звонок не найден');
+    return;
+  }
+
+  const otherParticipants = call.participants
+    .filter(p => p.userId !== ws.userId)
+    .map(p => p.userId);
+
+  for (const userId of otherParticipants) {
+    const outgoing: WsOutgoingMessage & { type: 'call.declined' } = {
+      type: 'call.declined',
+      callId,
+      declinedBy: ws.userId,
+      timestamp: Date.now(),
+    };
+    roomManager.sendToUser(userId, serializeWsMessage(outgoing));
+  }
+};
+
+const handleCallEnd = async (ws: AuthenticatedWebSocket, msg: any): Promise<void> => {
+  const { callId } = msg;
+  if (!callId) {
+    sendError(ws, 'INVALID_CALL', 'callId обязателен');
+    return;
+  }
+
+  const call = await prisma.call.findUnique({
+    where: { id: callId },
+    include: { participants: { select: { userId: true } } },
+  });
+
+  if (!call) {
+    sendError(ws, 'CALL_NOT_FOUND', 'Звонок не найден');
+    return;
+  }
+
+  const otherParticipants = call.participants
+    .filter(p => p.userId !== ws.userId)
+    .map(p => p.userId);
+
+  for (const userId of otherParticipants) {
+    const outgoing: WsOutgoingMessage & { type: 'call.ended' } = {
+      type: 'call.ended',
+      callId,
+      endedBy: ws.userId,
+      duration: 0,
+      timestamp: Date.now(),
+    };
+    roomManager.sendToUser(userId, serializeWsMessage(outgoing));
   }
 };
 

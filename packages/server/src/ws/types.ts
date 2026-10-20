@@ -53,7 +53,11 @@ export type WsMessageType =
   | 'presence.update'
   | 'story.view'
   | 'reaction.add'
-  | 'reaction.remove';
+  | 'reaction.remove'
+  | 'call.start'
+  | 'call.answer'
+  | 'call.decline'
+  | 'call.end';
 
 // ============================================================
 // Входящие сообщения от клиента
@@ -114,6 +118,38 @@ export interface WsReactionRemove {
   emoji: string;
 }
 
+export interface WsCallStart {
+  type: 'call.start';
+  callId: string;
+  callerId: string;
+  callerName: string;
+  calleeId: string;
+  callType: 'audio' | 'video';
+  timestamp: number;
+}
+
+export interface WsCallAnswer {
+  type: 'call.answer';
+  callId: string;
+  answeredBy: string;
+  timestamp: number;
+}
+
+export interface WsCallDecline {
+  type: 'call.decline';
+  callId: string;
+  declinedBy: string;
+  timestamp: number;
+}
+
+export interface WsCallEnd {
+  type: 'call.end';
+  callId: string;
+  endedBy: string;
+  duration: number;
+  timestamp: number;
+}
+
 // Union type всех входящих сообщений
 export type WsIncomingMessage =
   | WsMessageSend
@@ -123,7 +159,11 @@ export type WsIncomingMessage =
   | WsPresenceUpdate
   | WsStoryView
   | WsReactionAdd
-  | WsReactionRemove;
+  | WsReactionRemove
+  | WsCallStart
+  | WsCallAnswer
+  | WsCallDecline
+  | WsCallEnd;
 
 // ============================================================
 // Исходящие сообщения от сервера (server→client)
@@ -201,6 +241,38 @@ export interface WsChatNotification {
   timestamp: number;
 }
 
+export interface WsCallIncoming {
+  type: 'call.incoming';
+  callId: string;
+  callerId: string;
+  callerName: string;
+  callType: 'audio' | 'video';
+  timestamp: number;
+}
+
+export interface WsCallAnswered {
+  type: 'call.answered';
+  callId: string;
+  answeredBy: string;
+  answeredByName?: string;
+  timestamp: number;
+}
+
+export interface WsCallDeclined {
+  type: 'call.declined';
+  callId: string;
+  declinedBy: string;
+  timestamp: number;
+}
+
+export interface WsCallEnded {
+  type: 'call.ended';
+  callId: string;
+  endedBy: string;
+  duration: number;
+  timestamp: number;
+}
+
 export interface WsError {
   type: 'error';
   code: string;
@@ -233,6 +305,10 @@ export type WsOutgoingMessage =
   | WsStoryViewBroadcast
   | WsReactionUpdate
   | WsChatNotification
+  | WsCallIncoming
+  | WsCallAnswered
+  | WsCallDeclined
+  | WsCallEnded
   | WsError
   | WsPing
   | WsPong

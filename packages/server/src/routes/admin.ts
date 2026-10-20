@@ -16,6 +16,7 @@ import {
   publishVersion,
   getMetrics,
   listAuditLogs,
+  listEmployees,
 } from '../controllers/adminController';
 import {
   listTicketsCtrl,
@@ -109,6 +110,7 @@ router.get('/metrics', authRequired, adminOnly, getMetrics);
 
 // GET /api/admin/audit-logs — логи действий
 router.get('/audit-logs', authRequired, adminOnly, listAuditLogs);
+router.get('/employees', authRequired, adminOnly, listEmployees);
 
 // ----------------------------------------------------------
 // Поддержка (ответ В-33: страница в дашборде админки)

@@ -768,3 +768,33 @@ export const listAuditLogs = async (req: AuthenticatedRequest, res: Response, ne
     internalError(res, error, 'adminController.listAuditLogs');
   }
 };
+
+// ============================================================
+// Получить список сотрудников (GET /api/admin/employees)
+// ============================================================
+
+export const listEmployees = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const employees = await prisma.employee.findMany({
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        department: true,
+        role: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    res.json(employees);
+  } catch (error: any) {
+    internalError(res, error, 'adminController.listEmployees');
+  }
+};

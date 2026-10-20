@@ -270,6 +270,13 @@ export class RoomManager {
   // Утилиты
   // ============================================================
 
+  public sendToUser(userId: string, message: string): void {
+    const conn = this.connections.get(userId);
+    if (conn && conn.ws.readyState === 1) {
+      conn.ws.send(message);
+    }
+  }
+
   public getConnectionsCount(): number {
     return this.connections.size;
   }
