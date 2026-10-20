@@ -371,12 +371,137 @@ function AccountsSettingsScreen() {
   );
 }
 
+function PasswordChangeCard() {
+  const [visible, setVisible] = useState(false);
+  const [code, setCode] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [sending, setSending] = useState(false);
+  const [changing, setChanging] = useState(false);
+  const [codeSent, setCodeSent] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+
+  const handleSendCode = async () => {
+    setSending(true);
+    setError(null);
+    try {
+      const { api } = await import('../../services/api');
+      await api.sendPasswordChangeCode();
+      setCodeSent(true);
+    } catch (err: any) {
+      setError(err.message || 'Ошибка отправки кода');
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const handleChange = async () => {
+    setError(null);
+    if (newPassword !== confirmPassword) {
+      setError('Пароли не совпадают');
+      return;
+    }
+    if (newPassword.length < 8) {
+      setError('Пароль должен быть не менее 8 символов');
+      return;
+    }
+    setChanging(true);
+    try {
+      const { api } = await import('../../services/api');
+      await api.changePassword(code, newPassword);
+      setSuccess(true);
+    } catch (err: any) {
+      setError(err.message || 'Ошибка смены пароля');
+    } finally {
+      setChanging(false);
+    }
+  };
+
+  if (success) {
+    return (
+      <div className="card" style={{ marginBottom: 16, textAlign: 'center', padding: 24 }}>
+        <div style={{ fontSize: 32, marginBottom: 8 }}>✅</div>
+        <div className="text-sm" style={{ fontWeight: 700, color: 'var(--accent)' }}>Пароль изменён</div>
+        <div className="text-xs text-secondary" style={{ marginTop: 4 }}>Все прочие сессии завершены</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="card" style={{ marginBottom: 16 }}>
+      <h3 className="card__title" style={{ marginBottom: 16 }}>Смена пароля</h3>
+
+      {!visible ? (
+        <button className="btn btn--secondary btn--block" onClick={() => setVisible(true)}>
+          Сменить пароль
+        </button>
+      ) : (
+        <>
+          {!codeSent ? (
+            <div style={{ marginBottom: 12 }}>
+              <p className="text-sm text-secondary" style={{ marginBottom: 12 }}>
+                Код подтверждения будет отправлен на вашу почту
+              </p>
+              <button className="btn btn--primary btn--block" onClick={handleSendCode} disabled={sending}>
+                {sending ? 'Отправка…' : '📧 Отправить код на email'}
+              </button>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div className="form-group">
+                <label className="form-label">Код из письма</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="6-значный код"
+                  value={code}
+                  onChange={e => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  style={{ textAlign: 'center', letterSpacing: 6, fontFamily: "'JetBrains Mono', monospace" }}
+                  maxLength={6}
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Новый пароль</label>
+                <input
+                  type="password"
+                  className="form-input"
+                  placeholder="Минимум 8 символов"
+                  value={newPassword}
+                  onChange={e => setNewPassword(e.target.value)}
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Подтверждение пароля</label>
+                <input
+                  type="password"
+                  className="form-input"
+                  placeholder="Повторите пароль"
+                  value={confirmPassword}
+                  onChange={e => setConfirmPassword(e.target.value)}
+                />
+              </div>
+              {error && <div className="text-sm" style={{ color: 'var(--danger, #e53e3e)' }}>{error}</div>}
+              <button className="btn btn--primary btn--block" onClick={handleChange} disabled={changing || code.length !== 6}>
+                {changing ? 'Смена…' : 'Сменить пароль'}
+              </button>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
 function SecuritySettingsScreen() {
   const [totpEnabled, setTotpEnabled] = useState(true);
 
   return (
     <div style={{ padding: 24, maxWidth: 720, margin: '0 auto' }}>
       <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 24 }}>🔐 Безопасность</h1>
+
+      {/* Password Change */}
+      <PasswordChangeCard />
 
       {/* 2FA Status */}
       <div className="card" style={{ marginBottom: 16 }}>

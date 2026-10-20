@@ -3,6 +3,7 @@ jest.mock('../services/emailService', () => ({
   sendWelcomeEmail: jest.fn().mockResolvedValue(true),
   sendVerificationEmail: jest.fn().mockResolvedValue(true),
   sendResetPasswordEmail: jest.fn().mockResolvedValue(true),
+  sendEmail: jest.fn().mockResolvedValue({ success: true }),
 }));
 
 // Test helpers — register a user and get auth token

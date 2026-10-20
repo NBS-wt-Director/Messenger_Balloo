@@ -151,6 +151,18 @@ export const api = {
       data: { token, newPassword },
     }),
 
+  // Смена пароля из настроек (авторизованный пользователь)
+  sendPasswordChangeCode: () =>
+    request<{ ok: boolean }>('/api/users/me/password/send-code', {
+      method: 'POST',
+    }),
+
+  changePassword: (code: string, newPassword: string) =>
+    request<{ ok: boolean }>('/api/users/me/password', {
+      method: 'POST',
+      data: { code, newPassword },
+    }),
+
   logout: () => clearAuthCookies(),
 
   getMe: () =>
@@ -979,8 +991,10 @@ export const api = {
   getMyDonations: () =>
     request<{ donations: any[]; total: number; page: number; limit: number }>('/api/payments/me/donations'),
 
+  // Сервер: packages/server/src/routes/users.ts:86 — путь /api/users/me/subscriptions,
+  // ответ обёрнут в { subscriptions: [...] }
   getMySubscriptions: () =>
-    request<any[]>('/api/me/subscriptions'),
+    request<{ subscriptions: any[] }>('/api/users/me/subscriptions'),
 
   // Редактор сообщения (тик. 1792160022) — updateMessage/deleteMessage уже есть выше
   getMessageHistory: (messageId: string) =>

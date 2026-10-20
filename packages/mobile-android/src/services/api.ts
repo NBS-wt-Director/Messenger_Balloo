@@ -162,6 +162,18 @@ export const api = {
       data: { token, password },
     }),
 
+  // Смена пароля из настроек (авторизованный пользователь)
+  sendPasswordChangeCode: () =>
+    request<{ ok: boolean }>('/api/users/me/password/send-code', {
+      method: 'POST',
+    }),
+
+  changePassword: (code: string, newPassword: string) =>
+    request<{ ok: boolean }>('/api/users/me/password', {
+      method: 'POST',
+      data: { code, newPassword },
+    }),
+
   logout: () =>
     request<{ success: boolean }>('/api/auth/logout', { method: 'POST' }),
 

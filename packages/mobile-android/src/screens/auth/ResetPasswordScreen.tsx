@@ -216,6 +216,15 @@ export default function ResetPasswordScreen({ navigation }: ResetPasswordScreenP
               </TouchableOpacity>
             </View>
           )}
+
+          {/* Email confirmation block */}
+          <View style={[styles.emailConfirmBlock, { backgroundColor: 'rgba(59,158,255,0.08)', borderColor: '#3b9eff' }]}>
+            <Text style={{ fontSize: 13, color: '#3b9eff', marginBottom: 4 }}>📧 Подтверждение email</Text>
+            <Text style={{ fontSize: 12, color: colors.textSecondary }}>
+              Если email не подтверждён, функции ограничены.{' '}
+              <Text style={{ color: colors.accent }}>Отправить письмо подтверждения</Text>
+            </Text>
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -251,4 +260,5 @@ const styles = StyleSheet.create({
   emailText: { fontSize: 13 },
   emailStrong: { fontWeight: '700' },
   emailHint: { fontSize: 12, marginTop: 8 },
+  emailConfirmBlock: { padding: 16, borderWidth: 1, marginTop: 32, borderRadius: 6 },
 });

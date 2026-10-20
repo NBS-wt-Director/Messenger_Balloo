@@ -10,6 +10,7 @@ import {
   ScrollView,
   Switch,
   Alert,
+  TextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Constants from 'expo-constants';
@@ -17,6 +18,7 @@ import { getThemeColors } from '../styles/theme';
 import { useUIStore, SUPPORTED_LANGUAGES, Theme as ThemeType } from '../store/uiStore';
 import { useAuthStore } from '../store/authStore';
 import { checkForUpdates } from '../services/updateService';
+import { api } from '../services/api';
 
 interface SettingsScreenProps {
   navigation: any;
@@ -80,6 +82,49 @@ export default function SettingsScreen({ navigation }: SettingsScreenProps) {
 
   const toggleSwitch = (key: string) => {
     setSwitches((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  // Password change state
+  const [passwordChangeCodeSent, setPasswordChangeCodeSent] = useState(false);
+  const [passwordChangeSuccess, setPasswordChangeSuccess] = useState(false);
+  const [passwordCode, setPasswordCode] = useState('');
+  const [passwordNew, setPasswordNew] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+
+  const handlePasswordChange = async () => {
+    if (passwordNew !== passwordConfirm) {
+      setPasswordError('Пароли не совпадают');
+      return;
+    }
+    if (passwordNew.length < 8) {
+      setPasswordError('Пароль должен быть не менее 8 символов');
+      return;
+    }
+    setPasswordError(null);
+    setPasswordLoading(true);
+    try {
+      await api.changePassword(passwordCode, passwordNew);
+      setPasswordChangeSuccess(true);
+    } catch (err: any) {
+      setPasswordError(err.message || 'Ошибка смены пароля');
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
+
+  const handleSendPasswordCode = async () => {
+    setPasswordError(null);
+    setPasswordLoading(true);
+    try {
+      await api.sendPasswordChangeCode();
+      setPasswordChangeCodeSent(true);
+    } catch (err: any) {
+      setPasswordError(err.message || 'Ошибка отправки кода');
+    } finally {
+      setPasswordLoading(false);
+    }
   };
 
   const renderTab = () => {
@@ -155,6 +200,70 @@ export default function SettingsScreen({ navigation }: SettingsScreenProps) {
         return (
           <View style={styles.tabContent}>
             <Text style={[styles.tabTitle, { color: colors.textPrimary }]}>Безопасность</Text>
+
+            {/* Password change card */}
+            <View style={[styles.card, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
+              <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Смена пароля</Text>
+              {passwordChangeSuccess ? (
+                <View style={{ paddingVertical: 16, alignItems: 'center' }}>
+                  <Text style={{ fontSize: 32, marginBottom: 8 }}>✅</Text>
+                  <Text style={{ color: colors.accent, fontWeight: '700', fontSize: 14 }}>Пароль изменён</Text>
+                  <Text style={{ color: colors.textSecondary, fontSize: 12, marginTop: 4 }}>Все прочие сессии завершены</Text>
+                </View>
+              ) : !passwordChangeCodeSent ? (
+                <>
+                  <Text style={{ color: colors.textSecondary, fontSize: 13, marginBottom: 12 }}>
+                    Код подтверждения будет отправлен на вашу почту
+                  </Text>
+                  {passwordError && <Text style={{ color: '#e53e3e', fontSize: 12, marginBottom: 8 }}>{passwordError}</Text>}
+                  <TouchableOpacity
+                    style={[styles.supportBtn, { backgroundColor: colors.accent }]}
+                    onPress={handleSendPasswordCode}
+                    disabled={passwordLoading}
+                  >
+                    <Text style={styles.supportBtnText}>{passwordLoading ? 'Отправка...' : '📧 Отправить код на email'}</Text>
+                  </TouchableOpacity>
+                </>
+              ) : (
+                <>
+                  <Text style={{ color: colors.textSecondary, fontSize: 12, marginBottom: 8 }}>Код из письма</Text>
+                  <TextInput
+                    style={[styles.input, { backgroundColor: colors.bgSecondary, color: colors.textPrimary, borderColor: colors.border, textAlign: 'center', letterSpacing: 6 }]}
+                    value={passwordCode}
+                    onChangeText={(t) => setPasswordCode(t.replace(/\D/g, '').slice(0, 6))}
+                    placeholder="6-значный код"
+                    keyboardType="number-pad"
+                    maxLength={6}
+                  />
+                  <Text style={{ color: colors.textSecondary, fontSize: 12, marginTop: 12, marginBottom: 4 }}>Новый пароль</Text>
+                  <TextInput
+                    style={[styles.input, { backgroundColor: colors.bgSecondary, color: colors.textPrimary, borderColor: colors.border }]}
+                    value={passwordNew}
+                    onChangeText={setPasswordNew}
+                    placeholder="Минимум 8 символов"
+                    secureTextEntry
+                  />
+                  <Text style={{ color: colors.textSecondary, fontSize: 12, marginTop: 12, marginBottom: 4 }}>Подтверждение</Text>
+                  <TextInput
+                    style={[styles.input, { backgroundColor: colors.bgSecondary, color: colors.textPrimary, borderColor: colors.border }]}
+                    value={passwordConfirm}
+                    onChangeText={setPasswordConfirm}
+                    placeholder="Повторите пароль"
+                    secureTextEntry
+                  />
+                  {passwordError && <Text style={{ color: '#e53e3e', fontSize: 12, marginTop: 8 }}>{passwordError}</Text>}
+                  <TouchableOpacity
+                    style={[styles.supportBtn, { backgroundColor: passwordCode.length === 6 ? colors.accent : colors.bgTertiary, marginTop: 12 }]}
+                    onPress={handlePasswordChange}
+                    disabled={passwordLoading || passwordCode.length !== 6}
+                  >
+                    <Text style={styles.supportBtnText}>{passwordLoading ? 'Смена...' : 'Сменить пароль'}</Text>
+                  </TouchableOpacity>
+                </>
+              )}
+            </View>
+
+            {/* 2FA card */}
             <View style={[styles.card, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
               <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Двухфакторная аутентификация</Text>
               <SettingsRow
@@ -404,6 +513,13 @@ const styles = StyleSheet.create({
   deviceMeta: { fontSize: 12 },
   deviceChip: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 4 },
   deviceChipText: { color: '#fff', fontSize: 11, fontWeight: '600' },
+  input: {
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 14,
+    marginBottom: 8,
+  },
   statsRow: { flexDirection: 'row', gap: 8 },
   statCard: { flex: 1, padding: 10, alignItems: 'center' },
   statLabel: { fontSize: 11 },

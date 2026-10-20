@@ -1,5 +1,6 @@
 // DesktopPasswordResetScreen — desktop wrapper for password reset
 // Mockup: mockups/desktop/password-reset.html (1_09_08)
+// Обновлено: добавлен блок подтверждения email (тикет 1792477132-03)
 
 import React, { useState } from 'react';
 import { api } from '@balloo/web/services/api';
@@ -25,6 +26,16 @@ export function DesktopPasswordResetScreen() {
     }
   };
 
+  const emailBlock = (
+    <div style={{ marginTop: 20, padding: 16, background: 'rgba(59,158,255,0.08)', border: '1px solid var(--info, #3b9eff)', borderRadius: 6, textAlign: 'left' }}>
+      <p style={{ margin: '0 0 6px', fontSize: 13, color: 'var(--info, #3b9eff)' }}>📧 Подтверждение email</p>
+      <p style={{ margin: 0, fontSize: 12, color: 'var(--text-secondary, #8a8aa0)' }}>
+        Если email не подтверждён, функции ограничены.{' '}
+        <a href="#" style={{ color: 'var(--accent, #2db84d)' }} onClick={(e) => e.preventDefault()}>Отправить письмо подтверждения</a>
+      </p>
+    </div>
+  );
+
   if (sent) {
     return (
       <div style={styles.container}>
@@ -34,6 +45,7 @@ export function DesktopPasswordResetScreen() {
           <p style={styles.subtitle}>
             Если аккаунт с адресом {email} существует, мы отправили ссылку для сброса пароля.
           </p>
+          {emailBlock}
         </div>
       </div>
     );
@@ -58,6 +70,7 @@ export function DesktopPasswordResetScreen() {
             {loading ? 'Отправка…' : 'Отправить ссылку'}
           </button>
         </form>
+        {emailBlock}
       </div>
     </div>
   );

@@ -2,6 +2,7 @@
 // Mockup: mockups/desktop/settings.html (1_09_18)
 
 import React, { useState } from 'react';
+import { DesktopPasswordChangeScreen } from './DesktopPasswordChangeScreen';
 
 interface SettingSection {
   icon: string;
@@ -42,6 +43,12 @@ const sections: SettingSection[] = [
     ],
   },
   {
+    icon: '🔐', title: 'Безопасность',
+    items: [
+      { label: 'Смена пароля', type: 'button', value: 'Сменить пароль' },
+    ],
+  },
+  {
     icon: '💾', title: 'Данные',
     items: [
       { label: 'Кэш медиафайлов', type: 'button', value: 'Очистить кэш' },
@@ -52,9 +59,14 @@ const sections: SettingSection[] = [
 
 export function DesktopSettingsScreen() {
   const [values, setValues] = useState<Record<string, any>>({});
+  const [showPasswordChange, setShowPasswordChange] = useState(false);
 
   const getValue = (label: string, fallback: any) => values[label] ?? fallback;
   const setValue = (label: string, val: any) => setValues((prev) => ({ ...prev, [label]: val }));
+
+  if (showPasswordChange) {
+    return <DesktopPasswordChangeScreen onBack={() => setShowPasswordChange(false)} />;
+  }
 
   return (
     <div style={{ padding: 24, maxWidth: 600, margin: '0 auto', overflowY: 'auto', height: '100%' }}>
@@ -76,7 +88,12 @@ export function DesktopSettingsScreen() {
                 </select>
               )}
               {item.type === 'button' && (
-                <button style={{ padding: '6px 14px', background: 'var(--bg-tertiary, #2a2a3a)', border: '1px solid var(--border-color, #333)', color: 'var(--text-primary, #fff)', fontSize: 13, cursor: 'pointer' }}>{item.value}</button>
+                <button
+                  onClick={item.label === 'Смена пароля' ? () => setShowPasswordChange(true) : undefined}
+                  style={{ padding: '6px 14px', background: 'var(--bg-tertiary, #2a2a3a)', border: '1px solid var(--border-color, #333)', color: 'var(--text-primary, #fff)', fontSize: 13, cursor: 'pointer', borderRadius: 4 }}
+                >
+                  {item.value}
+                </button>
               )}
             </div>
           ))}

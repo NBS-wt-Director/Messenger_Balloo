@@ -149,3 +149,126 @@ router.put('/me/notifications', authRequired, async (req: Request, res: Response
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+// ============================================================
+// POST /api/users/me/password/send-code — отправить 6-значный
+// код смены пароля на email (тикет 1792477132-03)
+// ============================================================
+router.post('/me/password/send-code', authRequired, async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user.id;
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { email: true },
+    });
+
+    if (!user?.email) {
+      return res.status(400).json({ error: 'Bad Request', message: 'Email не подтверждён' });
+    }
+
+    // Генерация 6-значного кода
+    const code = String(Math.floor(100000 + Math.random() * 900000));
+
+    // TTL 15 минут (900 секунд)
+    const expiresAt = BigInt(Math.floor(Date.now() / 1000) + 900);
+
+    // Хеш кода для хранения (SHA-256)
+    const crypto = await import('crypto');
+    const tokenHash = crypto.createHash('sha256').update(code, 'utf8').digest('hex');
+
+    // Сохраняем VerificationToken с типом password_change
+    await prisma.verificationToken.create({
+      data: {
+        userId,
+        type: 'password_change',
+        token: tokenHash,
+        expiresAt,
+        createdAt: BigInt(Math.floor(Date.now() / 1000)),
+      },
+    });
+
+    // Отправка email с кодом
+    const { sendEmail } = await import('../services/emailService');
+    await sendEmail({
+      to: user.email,
+      subject: 'Код смены пароля Balloo',
+      html: `<p>Ваш код смены пароля: <strong style="font-size:24px;letter-spacing:4px">${code}</strong></p>
+             <p>Код действителен 15 минут. Если вы не запрашивали смену пароля, проигнорируйте это письмо.</p>`,
+      text: `Ваш код смены пароля: ${code}. Код действителен 15 минут.`,
+    });
+
+    res.json({ ok: true });
+  } catch (error: any) {
+    console.error('[users] POST /me/password/send-code error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// ============================================================
+// POST /api/users/me/password — смена пароля по 6-значному коду
+// (тикет 1792477132-03)
+// ============================================================
+router.post('/me/password', authRequired, async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user.id;
+    const { code, newPassword } = req.body;
+
+    if (!code || typeof code !== 'string' || code.length !== 6) {
+      return res.status(400).json({ error: 'Bad Request', message: 'Код должен быть 6-значным числом' });
+    }
+
+    if (!newPassword || typeof newPassword !== 'string' || newPassword.length < 8) {
+      return res.status(400).json({ error: 'Bad Request', message: 'Новый пароль должен быть не менее 8 символов' });
+    }
+
+    // Хеш введённого кода
+    const crypto = await import('crypto');
+    const tokenHash = crypto.createHash('sha256').update(code, 'utf8').digest('hex');
+
+    // Поиск валидного токена
+    const now = BigInt(Math.floor(Date.now() / 1000));
+    const token = await prisma.verificationToken.findFirst({
+      where: {
+        userId,
+        type: 'password_change',
+        token: tokenHash,
+        used: false,
+        expiresAt: { gt: now },
+      },
+    });
+
+    if (!token) {
+      return res.status(400).json({ error: 'Bad Request', message: 'Неверный или истёкший код' });
+    }
+
+    // Отметить токен использованным
+    await prisma.verificationToken.update({
+      where: { id: token.id },
+      data: { used: true },
+    });
+
+    // Хеш нового пароля (pre-hash + bcrypt)
+    const bcrypt = await import('bcryptjs');
+    const preHashPassword = (password: string): string => {
+      return crypto.createHash('sha256').update(password, 'utf8').digest('base64');
+    };
+    const passwordHash = await bcrypt.default.hash(preHashPassword(newPassword), 12);
+
+    // Обновить пароль
+    await prisma.user.update({
+      where: { id: userId },
+      data: { passwordHash: passwordHash, updatedAt: now },
+    });
+
+    // Инвалидация всех refresh-токенов (все сессии)
+    await prisma.refreshToken.deleteMany({
+      where: { userId },
+    });
+
+    res.json({ ok: true });
+  } catch (error: any) {
+    console.error('[users] POST /me/password error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});

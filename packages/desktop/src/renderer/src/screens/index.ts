@@ -13,6 +13,7 @@ export { DesktopMyDonatesScreen } from './DesktopMyDonatesScreen';
 export { DesktopReportMessageScreen } from './DesktopReportMessageScreen';
 export { DesktopChatAttachmentsScreen } from './DesktopChatAttachmentsScreen';
 export { DesktopPasswordResetScreen } from './DesktopPasswordResetScreen';
+export { DesktopPasswordChangeScreen } from './DesktopPasswordChangeScreen';
 export { DesktopTwoFactorScreen } from './DesktopTwoFactorScreen';
 export { DesktopChatScreen } from './DesktopChatScreen';
 export { DesktopStoriesScreen } from './DesktopStoriesScreen';
