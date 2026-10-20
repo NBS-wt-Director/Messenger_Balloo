@@ -29,6 +29,7 @@ import { router as clientErrorsRouter } from './client-errors';
 import { router as botsRouter } from './bots';
 import { router as onboardingRouter } from './onboarding';
 import { channelRouter, followRouter, blockedChannelRouter } from './channels';
+import { router as searchRouter } from './search';
 
 const router = Router() as import('express').Router;
 
@@ -80,6 +81,7 @@ router.use('/api/tasks', tasksRouter);
 router.use('/api/bots', botsRouter);
 router.use('/api/onboarding', onboardingRouter);
 router.use('/api', clientErrorsRouter);
+router.use('/api/search', searchRouter);
 router.use('/api/blocked/channels', blockedChannelRouter);
 
 export { router };
