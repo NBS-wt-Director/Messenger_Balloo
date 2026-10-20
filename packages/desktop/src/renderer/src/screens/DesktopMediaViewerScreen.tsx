@@ -1,7 +1,10 @@
 // DesktopMediaViewerScreen.tsx — Desktop media viewer for images/videos
 // Fullscreen media viewer with navigation and zoom
+// Тикет 1792311352: если items не переданы, галерея подгружается по chatId —
+// GET /api/chats/:id/attachments?type=media
 
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { api } from '@balloo/web/services/api';
 
 interface MediaItem {
   id: string;
@@ -14,21 +17,65 @@ interface MediaItem {
 }
 
 interface DesktopMediaViewerScreenProps {
-  items: MediaItem[];
+  items?: MediaItem[];
   initialIndex?: number;
   onClose?: () => void;
+  chatId?: string;
 }
 
-export function DesktopMediaViewerScreen({
-  items,
-  initialIndex = 0,
-  onClose,
-}: DesktopMediaViewerScreenProps) {
+export function DesktopMediaViewerScreen(props: DesktopMediaViewerScreenProps = {}) {
+  const {
+    items: itemsProp = [],
+    initialIndex = 0,
+    onClose,
+    chatId,
+  } = props;
+  const [items, setItems] = useState<MediaItem[]>(itemsProp);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    if (itemsProp.length > 0 || !chatId) return;
+    try {
+      setLoadError(null);
+      const res = await api.getChatAttachments(chatId, 'media');
+      setItems((Array.isArray(res) ? res : []).map((a: any) => ({
+        id: a.id,
+        url: a.url,
+        type: a.type === 'video' ? 'video' : 'image',
+        thumbnail: a.thumbnail ?? undefined,
+        width: a.width ?? undefined,
+        height: a.height ?? undefined,
+        name: a.name ?? undefined,
+      })));
+    } catch (e: any) {
+      setLoadError(e?.message || 'Не удалось загрузить медиа');
+    }
+  }, [chatId, itemsProp.length]);
+
+  useEffect(() => {
+    setItems(itemsProp);
+  }, [itemsProp]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [zoom, setZoom] = useState(1);
 
   const current = items[currentIndex];
-  if (!current) return null;
+  if (!current) {
+    // Пустая галерея: показываем причину вместо чёрного экрана (при загрузке по chatId)
+    if (!loadError) return null;
+    return (
+      <div style={{ position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.95)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px' }}>
+        <div style={{ color: '#e74c3c', fontSize: '14px' }}>{loadError}</div>
+        <button type="button" onClick={load} style={{ background: 'transparent', border: '1px solid #444', color: '#fff', padding: '6px 14px', fontSize: '13px', cursor: 'pointer' }}>
+          Повторить
+        </button>
+      </div>
+    );
+  }
 
   const handlePrev = () => {
     setCurrentIndex(prev => (prev > 0 ? prev - 1 : items.length - 1));

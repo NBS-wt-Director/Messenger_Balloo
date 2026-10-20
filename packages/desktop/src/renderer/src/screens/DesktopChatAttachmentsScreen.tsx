@@ -1,7 +1,9 @@
 // DesktopChatAttachmentsScreen.tsx — Desktop chat attachments browser
 // Shows all files, images, and links shared in a chat
+// Тикет 1792311350: данные берутся из GET /api/chats/:id/attachments?type=<tab>
 
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { api } from '@balloo/web/services/api';
 
 interface Attachment {
   id: string;
@@ -13,22 +15,50 @@ interface Attachment {
   date: number;
 }
 
-export function DesktopChatAttachmentsScreen() {
+// Маппинг серверного type в тип карточки
+const toAttachment = (a: any): Attachment => ({
+  id: a.id,
+  type: a.type === 'image' || a.type === 'video' ? 'image' : a.type === 'link' ? 'link' : 'file',
+  name: a.name ?? 'Без имени',
+  url: a.url ?? '#',
+  size: Number(a.size) || undefined,
+  sender: a.senderName ?? '',
+  date: (Number(a.createdAt) || 0) * 1000,
+});
+
+export function DesktopChatAttachmentsScreen({ chatId }: { chatId?: string } = {}) {
   const [activeTab, setActiveTab] = useState<'all' | 'images' | 'files' | 'links'>('all');
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const attachments: Attachment[] = [
-    { id: '1', type: 'image', name: 'photo_2026.jpg', url: '#', size: 2048576, sender: 'Иван', date: Date.now() - 3600000 },
-    { id: '2', type: 'file', name: 'document.pdf', url: '#', size: 5242880, sender: 'Мария', date: Date.now() - 7200000 },
-    { id: '3', type: 'link', name: 'https://balloo.su', url: '#', sender: 'Алексей', date: Date.now() - 10800000 },
-    { id: '4', type: 'image', name: 'screenshot.png', url: '#', size: 1048576, sender: 'Елена', date: Date.now() - 14400000 },
-  ];
+  // Вкладка «Все» = media (фото+видео) + файлы: отдельной вкладки на сервере нет
+  // (packages/server/src/services/messageService.ts:721)
+  const load = useCallback(async () => {
+    if (!chatId) {
+      setAttachments([]);
+      setError(null);
+      return;
+    }
+    try {
+      setLoading(true);
+      setError(null);
+      const tabs = activeTab === 'all' ? ['media', 'files'] : [activeTab];
+      const parts = await Promise.all(tabs.map((t) => api.getChatAttachments(chatId, t)));
+      setAttachments(parts.flat().map(toAttachment));
+    } catch (e: any) {
+      setError(e?.message || 'Не удалось загрузить вложения');
+      setAttachments([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [chatId, activeTab]);
 
-  const filtered = activeTab === 'all'
-    ? attachments
-    : attachments.filter(a => {
-        const tabMap: Record<string, string> = { images: 'image', files: 'file', links: 'link' };
-        return a.type === tabMap[activeTab];
-      });
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const filtered = attachments;
 
   const formatSize = (bytes?: number): string => {
     if (!bytes) return '';
@@ -90,9 +120,22 @@ export function DesktopChatAttachmentsScreen() {
       </div>
 
       <div style={{ flex: 1, overflow: 'auto' }}>
-        {filtered.length === 0 ? (
+        {loading ? (
           <div style={{ textAlign: 'center', padding: '48px 0', color: 'var(--text-secondary, #8a8aa0)' }}>
-            Нет вложений
+            Загрузка…
+          </div>
+        ) : error ? (
+          <div style={{ textAlign: 'center', padding: '48px 0', color: '#e74c3c' }}>
+            {error}
+            <div>
+              <button type="button" onClick={load} style={{ marginTop: '12px', background: 'transparent', border: '1px solid var(--border-color, #2a2a40)', color: 'var(--text-primary, #fff)', padding: '6px 14px', fontSize: '13px', cursor: 'pointer' }}>
+                Повторить
+              </button>
+            </div>
+          </div>
+        ) : filtered.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '48px 0', color: 'var(--text-secondary, #8a8aa0)' }}>
+            {chatId ? 'Нет вложений' : 'Выберите чат, чтобы увидеть вложения'}
           </div>
         ) : (
           filtered.map(item => (

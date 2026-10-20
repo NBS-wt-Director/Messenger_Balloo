@@ -35,9 +35,9 @@ export default function MyDonatesScreen() {
         api.getMyDonations(),
         api.getMySubscriptions(),
       ]);
-      setDonations(donationsData || []);
+      setDonations(donationsData?.donations ?? []);
       setSubscriptions(subsData || []);
-      const total = (donationsData || []).reduce((sum: number, d: Donation) => sum + d.amount, 0);
+      const total = (donationsData?.donations ?? []).reduce((sum: number, d: Donation) => sum + d.amount, 0);
       setTotalDonated(total);
     } catch {
       setDonations([]);

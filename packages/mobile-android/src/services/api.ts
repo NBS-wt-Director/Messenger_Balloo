@@ -253,7 +253,7 @@ export const api = {
 
   sendMessage: (
     chatId: string,
-    data: { type: string; content: string; replyToId?: string }
+    data: { type: string; content: string; replyToId?: string; attachments?: any[] }
   ) =>
     request<any>(`/api/chats/${chatId}/messages`, { method: 'POST', data }),
 
@@ -499,15 +499,14 @@ export const api = {
   getUserPublicProfile: (username: string) =>
     request<any>(`/api/users/${username}`, { method: 'GET' }),
 
-  getMyDevices: () => request<any[]>('/api/devices'),
+  // GET /api/devices — сервер отвечает { devices: [...] }
+  // (packages/server/src/services/deviceService.ts:34)
+  getMyDevices: () => request<{ devices: any[] }>('/api/devices'),
 
   removeDevice: (deviceId: string) =>
     request<{ success: boolean }>(`/api/devices/${deviceId}`, {
       method: 'DELETE',
     }),
-
-  createDonation: (data: { tierId: string; amount: number }) =>
-    request<any>('/api/payments/donate', { method: 'POST', data }),
 
   getDonationTiers: () => request<any[]>('/api/payments/tiers'),
 
@@ -586,6 +585,14 @@ export const api = {
       user?: { username: string | null; avatarUrl: string | null };
     }>(`/api/devices/pair/${token}/status`),
 
+  // Подтверждение входа с авторизованного устройства (тик. 1792311338):
+  // POST /api/devices/pair/confirm, тело { token, deviceType, deviceName }
+  confirmPair: (token: string, deviceType?: string, deviceName?: string) =>
+    request<{ message: string; deviceId: string }>('/api/devices/pair/confirm', {
+      method: 'POST',
+      data: { token, deviceType, deviceName },
+    }),
+
   // ============================================================
   // Payments / Donations
   // ============================================================
@@ -624,6 +631,7 @@ export const api = {
   // My Donations (история донатов)
   // ============================================================
 
+  // GET /api/payments/me/donations — { donations: [...], total, page, limit }
   getMyDonations: () =>
-    request<any[]>('/api/payments/me/donations'),
+    request<{ donations: any[]; total: number; page: number; limit: number }>('/api/payments/me/donations'),
 };

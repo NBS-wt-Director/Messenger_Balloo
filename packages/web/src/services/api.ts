@@ -974,8 +974,10 @@ export const api = {
   // Жалобы (тик. 1792160020) — createReport уже есть выше
 
   // Донаты (тик. 1792160021)
+  // Сервер отвечает { donations: [...], total, page, limit }
+  // (packages/server/src/services/paymentService.ts:473)
   getMyDonations: () =>
-    request<any[]>('/api/payments/me/donations'),
+    request<{ donations: any[]; total: number; page: number; limit: number }>('/api/payments/me/donations'),
 
   getMySubscriptions: () =>
     request<any[]>('/api/me/subscriptions'),

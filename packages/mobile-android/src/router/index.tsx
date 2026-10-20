@@ -74,6 +74,9 @@ export type MainStackParamList = {
   MediaViewer: { items: any[]; index: number };
   VoiceRecord: { chatId: string };
   HeaderMenu: undefined;
+  // Тикет 1792311348: экран импортировался, но не был зарегистрирован —
+  // navigate('Profile') из HeaderMenuScreen не работал.
+  Profile: undefined;
 };
 
 export type TabParamList = {

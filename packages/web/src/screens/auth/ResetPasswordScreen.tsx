@@ -3,15 +3,21 @@
 // 4 шага: email -> captcha -> check email -> new password
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AppTopbar } from '@/components/chrome/AppTopbar';
 import { AppFooter } from '@/components/chrome/AppFooter';
+import { api } from '@/services/api';
 
 type ResetStep = 1 | 2 | 3 | 4;
 
 function ResetPasswordScreen() {
   const navigate = useNavigate();
-  const [step, setStep] = useState<ResetStep>(1);
+  // Тикет 1792311335: ссылка из письма имеет вид /#/reset-password?token=<token>
+  // (packages/server/src/services/emailService.ts:166). Если токен есть —
+  // пользователь пришёл из письма, сразу шаг 4.
+  const [searchParams] = useSearchParams();
+  const tokenFromLink = searchParams.get('token') || '';
+  const [step, setStep] = useState<ResetStep>(tokenFromLink ? 4 : 1);
   const [email, setEmail] = useState('');
   const [captchaCode, setCaptchaCode] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -19,6 +25,7 @@ function ResetPasswordScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [resendCooldown, setResendCooldown] = useState(0);
 
   const cyrillicChars = 'АБВГДЕЖЗИКЛМНОПРСТУФХЦЧШ';
   const rotations = [-45, -30, -20, -15, -10, -5, 0, 5, 10, 15, 20, 30, 45];
@@ -44,36 +51,58 @@ function ResetPasswordScreen() {
 
   const goStep = (n: ResetStep) => { setError(''); setStep(n); };
 
-  const handleRequestReset = async () => {
+  const handleRequestReset = () => {
     if (!email.trim()) { setError('Введите email'); return; }
+    goStep(2);
+  };
+
+  // Реальная отправка письма со ссылкой (POST /api/auth/request-reset).
+  const sendResetLink = async (): Promise<boolean> => {
     setLoading(true);
     setError('');
     try {
-      await new Promise(r => setTimeout(r, 500));
-      goStep(2);
+      await api.requestPasswordReset(email.trim());
+      return true;
     } catch (err: any) {
-      setError(err.message || 'Ошибка отправки');
+      setError(err.message || 'Ошибка отправки письма');
+      return false;
     } finally {
       setLoading(false);
     }
   };
 
-  const handleVerifyCaptcha = () => {
+  const handleVerifyCaptcha = async () => {
     if (captchaCode.toUpperCase() !== captcha.toUpperCase()) {
       setError('Неверный код с картинки');
       generateCaptcha();
       return;
     }
-    goStep(3);
+    if (await sendResetLink()) goStep(3);
   };
 
+  const handleResend = async () => {
+    if (resendCooldown > 0) return;
+    if (await sendResetLink()) {
+      setSuccess('Письмо отправлено повторно');
+      setResendCooldown(30);
+    }
+  };
+
+  // Обратный отсчёт кнопки «Отправить повторно».
+  React.useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const t = setInterval(() => setResendCooldown((s) => (s <= 1 ? 0 : s - 1)), 1000);
+    return () => clearInterval(t);
+  }, [resendCooldown]);
+
   const handleResetPassword = async () => {
+    if (!tokenFromLink) { setError('Ссылка из письма не найдена: токен сброса отсутствует'); return; }
     if (!newPassword || newPassword.length < 8) { setError('Пароль минимум 8 символов'); return; }
     if (newPassword !== confirmPassword) { setError('Пароли не совпадают'); return; }
     setLoading(true);
     setError('');
     try {
-      await new Promise(r => setTimeout(r, 1000));
+      await api.resetPassword(tokenFromLink, newPassword);
       setSuccess('Пароль успешно сброшен!');
       setTimeout(() => navigate('/login', { replace: true }), 2000);
     } catch (err: any) {
@@ -128,7 +157,9 @@ function ResetPasswordScreen() {
               </div>
             </div>
             {error && <p className="text-sm" style={{ color: 'var(--danger)', marginBottom: '12px', textAlign: 'center' }}>{error}</p>}
-            <button className="btn btn--primary btn--block" onClick={handleVerifyCaptcha}>Отправить ссылку</button>
+            <button className="btn btn--primary btn--block" onClick={handleVerifyCaptcha} disabled={loading} style={{ opacity: loading ? 0.6 : 1 }}>
+              {loading ? 'Отправка...' : 'Отправить ссылку'}
+            </button>
             <button className="btn btn--tertiary btn--block mt-2" onClick={() => goStep(1)}>← Назад</button>
           </div>
         )}
@@ -140,14 +171,26 @@ function ResetPasswordScreen() {
               <div className="text-sm text-secondary">📧 Проверьте почту: <strong style={{ color: 'var(--text-primary)' }}>{email}</strong></div>
               <div className="text-xs text-muted mt-2">Ссылка действительна 1 час.</div>
             </div>
-            <button className="btn btn--secondary btn--block" onClick={() => goStep(4)}>Я перешёл по ссылке (демо)</button>
-            <button className="btn btn--tertiary btn--block mt-2">Отправить повторно</button>
+            {error && <p className="text-sm" style={{ color: 'var(--danger)', marginBottom: '12px', textAlign: 'center' }}>{error}</p>}
+            {success && <p className="text-sm" style={{ color: 'var(--accent)', marginBottom: '12px', textAlign: 'center' }}>{success}</p>}
+            <button className="btn btn--secondary btn--block" onClick={() => goStep(4)}>Я перешёл по ссылке</button>
+            <button className="btn btn--tertiary btn--block mt-2" onClick={handleResend} disabled={loading || resendCooldown > 0} style={{ opacity: loading || resendCooldown > 0 ? 0.6 : 1 }}>
+              {resendCooldown > 0 ? `Отправить повторно через ${resendCooldown} с` : 'Отправить повторно'}
+            </button>
           </div>
         )}
 
         {step === 4 && (
           <div style={{ maxWidth: 'none' }}>
             <p className="auth-subtitle">Придумайте новый пароль</p>
+            {!tokenFromLink && (
+              <div className="card" style={{ background: 'rgba(229,62,62,0.08)', borderColor: 'var(--danger)', padding: '12px', marginBottom: '16px' }}>
+                <div className="text-xs" style={{ color: 'var(--danger)' }}>
+                  Токен сброса не найден в ссылке. Откройте ссылку из письма вида
+                  <code> /#/reset-password?token=…</code> — иначе сервер отклонит сброс.
+                </div>
+              </div>
+            )}
             <div className="form-group">
               <label className="form-label">Новый пароль</label>
               <input type="password" className="form-input" placeholder="••••••••" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
