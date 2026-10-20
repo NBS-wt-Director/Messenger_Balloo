@@ -16,6 +16,7 @@ import {
   updateMemberRole,
   removeAdmin,
   updateAdminRole,
+  exportChat,
 } from '../controllers/chatController';
 import { authRequired } from '../middleware/auth';
 
@@ -88,5 +89,10 @@ router.delete('/:id/admins/:adminId', authRequired, removeAdmin);
 // PUT /api/chats/:id/admins/:adminId/role — изменить роль админа
 // ============================================================
 router.put('/:id/admins/:adminId/role', authRequired, updateAdminRole);
+
+// ============================================================
+// GET /api/chats/:id/export — экспорт чата
+// ============================================================
+router.get('/:id/export', authRequired, exportChat);
 
 export { router };

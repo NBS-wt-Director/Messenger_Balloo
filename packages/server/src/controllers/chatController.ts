@@ -489,3 +489,115 @@ export const updateAdminRole = async (req: AuthenticatedRequest, res: Response, 
     internalError(res, error, 'chatController.updateAdminRole');
   }
 };
+
+// ============================================================
+// GET /api/chats/:id/export — экспорт чата (HTML)
+// ============================================================
+
+export const exportChat = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const userId = req.user!.id;
+    const { id: chatId } = req.params;
+
+    if (!chatId) {
+      res.status(400).json({ error: 'Bad Request', message: 'Chat ID обязателен' });
+      return;
+    }
+
+    // Получаем чат и сообщения
+    const chat = await prisma.chat.findUnique({
+      where: { id: chatId },
+      include: {
+        messages: {
+          where: { deleted: false },
+          orderBy: { createdAt: 'asc' },
+          include: {
+            sender: { select: { id: true, displayName: true, username: true } },
+            attachments: { select: { url: true, type: true, name: true } },
+          },
+        },
+      },
+    });
+
+    if (!chat) {
+      res.status(404).json({ error: 'Not Found', message: 'Чат не найден' });
+      return;
+    }
+
+    // Проверяем, что пользователь — участник чата
+    const member = await prisma.userChat.findUnique({
+      where: { userId_chatId: { userId, chatId } },
+    });
+    if (!member) {
+      res.status(403).json({ error: 'Forbidden', message: 'Вы не являетесь участником этого чата' });
+      return;
+    }
+
+    // Генерируем HTML
+    const html = generateChatHTML(chat);
+    const size = Buffer.byteLength(html, 'utf-8');
+
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="chat-${chatId}.html"`);
+    res.send(html);
+  } catch (error: any) {
+    internalError(res, error, 'chatController.exportChat');
+  }
+};
+
+// Генерация HTML-экспорта чата
+function generateChatHTML(chat: any): string {
+  const chatName = chat.name || 'Без названия';
+  const messages = chat.messages || [];
+
+  const htmlMessages = messages.map((msg: any) => {
+    const senderName = msg.sender?.displayName || msg.sender?.username || 'Unknown';
+    const date = new Date(Number(msg.createdAt) || 0).toLocaleString('ru-RU');
+    const isOwn = false;
+    const content = escapeHtml(msg.content || '');
+    const attachments = (msg.attachments || []).map((a: any) => {
+      if (a.type === 'image') {
+        return `<div class="attachment"><img src="${escapeHtml(a.url)}" alt="${escapeHtml(a.name || '')}"></div>`;
+      }
+      return `<div class="attachment"><a href="${escapeHtml(a.url)}" download>${escapeHtml(a.name || 'Файл')}</a></div>`;
+    }).join('');
+
+    return `<div class="message ${isOwn ? 'sender' : 'receiver'}">
+      <div class="sender-name">${escapeHtml(senderName)}</div>
+      <div class="message-text">${content}</div>
+      ${attachments}
+      <div class="message-date">${escapeHtml(date)}</div>
+    </div>`;
+  }).join('');
+
+  return `<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${escapeHtml(chatName)} — Экспорт чата</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background: #1a1a2e; color: #e0e0e0; }
+    h1 { color: #2db84d; border-bottom: 2px solid #2db84d; padding-bottom: 10px; }
+    .message { margin: 10px 0; padding: 10px; border-radius: 4px; }
+    .sender { background: #2db84d20; margin-left: 10%; }
+    .receiver { background: #16213e; margin-right: 10%; }
+    .sender-name { font-weight: bold; color: #2db84d; font-size: 0.85em; }
+    .message-text { margin: 5px 0; word-wrap: break-word; }
+    .message-date { font-size: 0.75em; color: #888; }
+    .attachment img { max-width: 300px; border-radius: 4px; }
+    .attachment a { color: #2db84d; }
+  </style>
+</head>
+<body>
+  <h1>${escapeHtml(chatName)}</h1>
+  <p>Экспортировано: ${new Date().toLocaleString('ru-RU')}</p>
+  <p>Сообщений: ${messages.length}</p>
+  ${htmlMessages}
+</body>
+</html>`;
+}
+
+function escapeHtml(str: string): string {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
