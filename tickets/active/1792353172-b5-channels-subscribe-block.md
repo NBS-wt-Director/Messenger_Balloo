@@ -1,81 +1,44 @@
-# Тикет 1792353172 — B5: 6 эндпоинтов каналов (подписка/блок)
+# Тикет 1792353172 — B5: подписка на каналы (модель + 6 эндпоинтов + каскад блока)
 
-**Создан:** 19.10.2026 (unix 1792353172)
-**Статус:** ✅ разблокирован 19.10.2026
-**Источник:** тикет 1792335000, группа B5
+**Создан:** 19.10.2026; **исполняемым стал:** 20.10.2026 (перенесён из `with_lord/`)
+**Статус:** активен
+**Решение владельца:** 19.10.2026 (`РЕШЕНИЯ_ВЛАДЕЛЬЦА.md` §16, п.7): подписка нужна;
+**б** — follow = subscribe, /channels/:id = алиас; `DELETE /api/blocked/channels/:id`
+= каскад: отписаться → заблокировать канал → заблокировать создателя канала.
 
-## Решения владельца (19.10.2026)
+## Живые замеры (20.10.2026)
 
-1. **Подписка на каналы — нужна** (модель `BlogChannelSubscriber` создаётся).
-2. **Вариант Б:** `follow` = алиас `subscribe`, `/channels/:id` = алиас `/blog/channels/:id`.
-3. **`DELETE /api/blocked/channels/:id`** = каскад: отписаться → заблокировать канал → заблокировать создателя канала.
+- `python3 scripts/api-endpoints-check.py` → из B5 отсутствуют **все 6** маршрутов.
+- Роутера `packages/server/src/routes/channels.ts` **нет**; `blog.ts` имеет
+  `GET /api/blog/channels/:id` (blog.ts:49).
+- Prisma: модели подписки на каналы нет; `BlogChannel` есть (schema.prisma:716);
+  `BlockedUser` есть (:656) — переиспользуется для блока создателя.
+- Клиенты: mobile `services/api.ts:380,385,521,524,529`; web `api.ts:830`.
 
-## Что будет сделано
+## Подзадачи
 
-1. Создать модель `BlogChannelSubscriber` (userId, channelId, subscribedAt) + миграция.
-2. `GET /api/channels/:id` → алиас на `GET /api/blog/channels/:id`.
-3. `POST /api/channels/:id/subscribe` → создать подписку; `unsubscribe` → удалить.
-4. `POST/DELETE /api/blog/channels/:id/follow` → алиасы на subscribe/unsubscribe.
-5. `DELETE /api/blocked/channels/:id` → каскад: unsubscribe + block channel + block owner.
-6. Тесты зелёные.
+- [ ] 1. Prisma: модель `BlogChannelSubscriber` (id cuid, userId FK, channelId FK,
+      createdAt BigInt @default(0), @@unique([userId, channelId]), @@map
+      "blog_channel_subscribers") + миграция. Проверка: `npx prisma migrate dev`
+      exit 0 (или `prisma validate`).
+- [ ] 2. Сервер: контроллер channelSubscription + роуты (смонтировать `/api/channels`
+      в routes/index.ts): `GET /api/channels/:id` (алиас на blog getChannel),
+      `POST /api/channels/:id/subscribe`, `POST /api/channels/:id/unsubscribe`.
+- [ ] 3. Сервер: `POST/DELETE /api/blog/channels/:id/follow` — алиасы на subscribe/unsubscribe.
+- [ ] 4. Сервер: `DELETE /api/blocked/channels/:id` — каскад в одном запросе-контроллере:
+      удалить подписку → создать запись блока канала (BlockedChannel-механизм: если
+      отдельной таблицы нет — флаг/таблица по существующей схеме данных; решить по
+      `mockups/data_schema.json`, не выдумывая) → `BlockedUser` на owner канала.
+- [ ] 5. Тесты jest: subscribe→follow алиас эквивалентен, unsubscribe, каскад блока
+      (подписка снята + канал заблокирован + owner в блоке), доступ не-участника 403/401.
+- [ ] 6. `cd packages/server && npx jest dump-routes --forceExit --runInBand &&
+      python3 scripts/api-endpoints-check.py` → строки B5 исчезли;
+      `pnpm --filter @balloo/server test` зелёные; `pnpm --filter @balloo/web build` exit 0.
 
-## Что звонит
+## Критерии готовности
 
-| Вызов | Строка |
-|---|---|
-| `GET /api/channels/:id` | mobile/api.ts:522 |
-| `POST /api/channels/:id/subscribe` | mobile/api.ts:525 |
-| `POST /api/channels/:id/unsubscribe` | mobile/api.ts:530 |
-| `POST /api/blog/channels/:id/follow` | mobile/api.ts:380 |
-| `DELETE /api/blog/channels/:id/follow` | mobile/api.ts:385 |
-| `DELETE /api/blocked/channels/:id` | web/api.ts:830 |
+- 6 маршрутов B5 на сервере; тесты зелёные; скрипт сверки не показывает B5.
 
-## Что есть на сервере
+## Результат
 
-| Эндпоинт | Есть? | Где |
-|---|---|---|
-| `GET /api/blog/channels/:id` | ✅ | blog.ts:49 |
-| `GET /api/blog/channels` | ✅ | blog.ts:46 |
-| `POST /api/blog/channels` | ✅ | blog.ts:52 |
-| `PUT /api/blog/channels/:id` | ✅ | blog.ts:55 |
-| `DELETE /api/blog/channels/:id` | ✅ | blog.ts:58 |
-| `GET /api/channels/:id` | ❌ | нет |
-| `POST /api/channels/:id/subscribe` | ❌ | нет |
-| `POST /api/channels/:id/unsubscribe` | ❌ | нет |
-| `POST /api/blog/channels/:id/follow` | ❌ | нет |
-| `DELETE /api/blog/channels/:id/follow` | ❌ | нет |
-| `DELETE /api/blocked/channels/:id` | ❌ | нет |
-
-## Модель в Prisma
-
-`BlogChannel` — модель есть (строка 716): id, slug, name, description, imageUrl, ownerUserId, createdAt, updatedAt.
-
-**Нет модели подписки/фоллоу!** Нет таблицы `BlogChannelSubscriber` или аналога.
-
-## Варианты решения
-
-### Вариант A — создать модель подписки + роуты
-
-Создать модель `BlogChannelSubscriber` (userId, channelId, subscribedAt) и эндпоинты:
-- `GET /api/channels/:id` → алиас на `GET /api/blog/channels/:id`
-- `POST /api/channels/:id/subscribe` → создать подписку
-- `POST /api/channels/:id/unsubscribe` → удалить подписку
-- `POST/DELETE /api/blog/channels/:id/follow` → создать/удалить подписку
-- `DELETE /api/blocked/channels/:id` → заблокировать канал
-
-**Плюсы:** полная функциональность.
-**Минусы:** новая модель БД, миграция.
-
-### Вариант B — `follow` = alias для `subscribe`
-
-`/api/blog/channels/:id/follow` → переиспользовать `/api/channels/:id/subscribe`.
-`/api/channels/:id` → алиас на `/api/blog/channels/:id`.
-
-**Плюсы:** минимум кода.
-**Минусы:** всё равно нужна модель подписки.
-
-## Вопрос к владельцу
-
-1. Нужна ли подписка на каналы вообще (модель `BlogChannelSubscriber`)?
-2. Если да — создавать с нуля (вариант A) или `follow` = `subscribe` (вариант B)?
-3. `DELETE /api/blocked/channels/:id` — это «заблокировать канал» или «отписаться от заблокированного»?
+(заполняется по ходу)
