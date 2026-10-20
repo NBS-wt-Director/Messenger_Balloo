@@ -124,7 +124,10 @@ python3 scripts/api-endpoints-check.py
       — **11 из 29 создано** (B1 боты, B3 роли чата, B4 истории, B6 история сообщений,
       переименование устройства, onboarding steps). Осталось 18 (B2 admin, B5 channels,
       B6 прочие) — ждут решения владельца в `with_lord/`
-- [ ] 7. Финальный прогон: тесты сервера, web build, desktop build, сверка = 0
+- [~] 7. Финальный прогон 19.10.2026: web build ✓, web test 290 ✓, desktop build ✓,
+      mobile tsc 0 ✓, серверные тесты 651/654 (3 флека, сервер не менялся).
+      **Сверка = 18, не 0** — остаток заблокирован решением владельца (B2/B5/B6,
+      тикеты `with_lord/1792353171…1792353176`). Тикет остаётся в `active/` до этого решения.
 
 ## Критерии готовности
 
@@ -238,8 +241,58 @@ python3 scripts/api-endpoints-check.py
 | 5.5.5 | B6-3 онбординг PATCH | `1792353175` | 1 |
 | 5.5.6 | B6-4 подписки/инвайты/уведомления | `1792353176` | 3 |
 
-**Проверки:**
-- `pnpm --filter @balloo/server test`: 651/654 passed (3 — предсущ. `ws.test.ts`) ✓
-- `pnpm --filter @balloo/web build`: зелёный ✓
-- `pnpm --filter @balloo/desktop build`: зелёный ✓
-- `python3 scripts/api-endpoints-check.py`: `НЕ СОВПАДАЕТ: 18` ✓
+### Прогон 19.10.2026 (после подключения экранов, финальный в этой сессии)
+
+```
+$ cd packages/server && npx jest dump-routes --forceExit --runInBand
+Tests: 1 passed, 1 total            → scripts/server_routes.txt = 250 маршрутов
+
+$ python3 scripts/api-endpoints-check.py
+Клиентских путей (уник. метод+путь): 184
+Серверных маршрутов: 250
+НЕ СОВПАДАЕТ: 18
+```
+
+Счётчик клиентских путей вырос 183 → 184: в `mobile/services/api.ts` добавлен
+`confirmPair` (`POST /api/devices/pair/confirm`) — маршрут на сервере существует
+(`packages/server/src/routes/devices.ts:37`), в список расхождений не попал.
+
+Остаток 18 = ровно группа B, по которой нет решения владельца (тикеты
+`with_lord/1792353171…1792353176`): 6 × `/api/admin/*` (B2), 6 × каналы (B5),
+`GET /api/search`, `GET /api/chats/:id/export`, `GET /api/me/subscriptions`,
+`PATCH /api/users/me/onboarding`, `POST /api/invites`,
+`PUT /api/users/me/notifications` (B6).
+
+**Попутно исправлено в этой сессии (тикеты 1792311335–1792311357):**
+
+- `web/services/api.ts`: тип `getMyDonations` — `any[]` → `{ donations, total, page, limit }`
+  (совпадает с `paymentService.ts:473`); `web/screens/my-donates/MyDonatesScreen.tsx`
+  читает `donationsData?.donations ?? []` — раньше экран получал объект и рисовал
+  пустой список.
+- `mobile/services/api.ts`: то же для `getMyDevices` (`{ devices: [...] }`) и
+  `getMyDonations`; удалён дубль `createDonation` (в объекте `api` было два поля
+  с одним именем — `tsc` падал с `TS1117`); `sendMessage` принимает `attachments`
+  (сервер читает их в `messageController.ts:27`); добавлен `confirmPair`.
+- Экраны web/mobile/desktop подключены к этим методам — детали в тикетах
+  `Done/2026-10-19/1792311335…1792311357`.
+
+**Проверки (19.10.2026):**
+
+```
+$ pnpm --filter @balloo/web build     → ✓ built in 7.69s
+$ pnpm --filter @balloo/web test      → Test Files 33 passed, Tests 290 passed
+$ pnpm --filter @balloo/desktop build → зелёный (tsc && vite build)
+$ cd packages/mobile-android && ./node_modules/.bin/tsc --noEmit --pretty false
+0 ошибок (до правок — 77 строк ошибок типов в пакете)
+$ npx jest --forceExit --runInBand   (packages/server)
+Test Suites: 2 failed, 35 passed, 37 total
+Tests:       3 failed, 651 passed, 654 total
+```
+
+Падения серверных наборов (`ws.test.ts`, `client-errors.test.ts`, в другом прогоне
+`support.test.ts`) — **флакящие, к правкам отношения не имеют**: `git diff --stat --
+packages/server` пуст (сервер в этой сессии не менялся), а те же наборы в изоляции
+зелёные: `npx jest support.test client-errors.test --forceExit --runInBand` →
+`Tests: 14 passed, 14 total`. Набор падающих файлов меняется от прогона к прогону
+(1-й прогон: support+client-errors, 2-й: client-errors+ws) — это состояние тестов
+БД/таймингов, а не регресс. Отдельный тикет на починку флака не заводил — см. отчёт.

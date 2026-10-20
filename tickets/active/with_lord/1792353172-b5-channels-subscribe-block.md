@@ -1,8 +1,23 @@
 # Тикет 1792353172 — B5: 6 эндпоинтов каналов (подписка/блок)
 
 **Создан:** 19.10.2026 (unix 1792353172)
-**Статус:** заблокирован (нужно решение владельца)
+**Статус:** ✅ разблокирован 19.10.2026
 **Источник:** тикет 1792335000, группа B5
+
+## Решения владельца (19.10.2026)
+
+1. **Подписка на каналы — нужна** (модель `BlogChannelSubscriber` создаётся).
+2. **Вариант Б:** `follow` = алиас `subscribe`, `/channels/:id` = алиас `/blog/channels/:id`.
+3. **`DELETE /api/blocked/channels/:id`** = каскад: отписаться → заблокировать канал → заблокировать создателя канала.
+
+## Что будет сделано
+
+1. Создать модель `BlogChannelSubscriber` (userId, channelId, subscribedAt) + миграция.
+2. `GET /api/channels/:id` → алиас на `GET /api/blog/channels/:id`.
+3. `POST /api/channels/:id/subscribe` → создать подписку; `unsubscribe` → удалить.
+4. `POST/DELETE /api/blog/channels/:id/follow` → алиасы на subscribe/unsubscribe.
+5. `DELETE /api/blocked/channels/:id` → каскад: unsubscribe + block channel + block owner.
+6. Тесты зелёные.
 
 ## Что звонит
 

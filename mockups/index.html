@@ -271,7 +271,7 @@
     </div>
   </div>
   <div class="readiness-banner" id="readiness-banner" style="background: rgba(45,184,77,0.1); border-color: var(--accent); color: var(--accent);">
-    Готовность по реестру (<code>index_ecrans.json</code>): просмотрено <strong>168 / 168</strong>; принято владельцем <strong>96</strong>, ещё <strong>71</strong> в статусе «Просмотрен» ждут приёмки (тикеты <code>1790479162-1…4</code>), 1 «Реализован». <code>1_08_24</code> принят 29.09.2026.
+    Готовность по реестру (<code>index_ecrans.json</code>, замер 20.10.2026): всего экранов <strong>163</strong>; принято владельцем <strong>145</strong>, ещё <strong>18</strong> в статусе «Просмотрен» ждут приёмки. Приняты 20.10.2026: 23 экрана MVP1 (список 1) + 24 admin (у_02, список 3) — <code>with_lord/СДЕЛАТЬ_ВЛАДЕЛЬЦУ.md</code> Блок 6, 6.69–6.70.
     Отметка просмотра в этом браузере: <strong id="viewed-count">—</strong> / 168.
     <span style="color: var(--text-secondary);">Ревизия 16.10.2026 (тик. 1792143700): удалены дубли (В-83), исправлены пути (В-84, В-87), удалён vote (В-86), удалены черновики (В-88). Расхождение реестра устранено.</span>
     <button class="btn btn--sm btn--primary" style="margin-left:12px;" id="confirm-btn" onclick="alert('Готовность подтверждена!')">✅ Подтвердить готовность</button>
@@ -446,19 +446,21 @@
         <div class="mockup-card__tags"><span class="chip">chat</span></div>
         <span class="mockup-card__status">✓</span>
       </a>
-      <a class="mockup-card" href="balloo-su/attachment-panel.html">
+      <a class="mockup-card mockup-card--accepted" href="balloo-su/attachment-panel.html">
         <span class="mockup-card__num">1_01_40</span>
         <span class="mockup-card__title">Панель вложений</span>
         <span class="mockup-card__desc">Панель вложений</span>
         <div class="mockup-card__tags"><span class="chip">attachment</span></div>
 
+              <span class="mockup-card__status">✓</span>
       </a>
-      <a class="mockup-card" href="balloo-su/blocked-users.html">
+      <a class="mockup-card mockup-card--accepted" href="balloo-su/blocked-users.html">
         <span class="mockup-card__num">1_01_38</span>
         <span class="mockup-card__title">Блокированные пользователи</span>
         <span class="mockup-card__desc">Блокированные пользователи</span>
         <div class="mockup-card__tags"><span class="chip">user</span></div>
 
+              <span class="mockup-card__status">✓</span>
       </a>
       <a class="mockup-card mockup-card--accepted" href="balloo-su/bots.html">
         <span class="mockup-card__num">1_01_15</span>
@@ -517,6 +519,7 @@
         <span class="mockup-card__desc">Пустой чат</span>
         <div class="mockup-card__tags"><span class="chip">chat</span></div>
 
+              <span class="mockup-card__status">✓</span>
       </a>
       <a class="mockup-card mockup-card--accepted" href="balloo-su/file-viewer.html">
         <span class="mockup-card__num">1_01_33</span>
@@ -524,6 +527,7 @@
         <span class="mockup-card__desc">Просмотр файла/изображения</span>
         <div class="mockup-card__tags"><span class="chip">viewer</span></div>
 
+              <span class="mockup-card__status">✓</span>
       </a>
       <a class="mockup-card mockup-card--accepted" href="balloo-su/group-create.html">
         <span class="mockup-card__num">1_01_18</span>
@@ -531,6 +535,7 @@
         <span class="mockup-card__desc">Создание группы</span>
         <div class="mockup-card__tags"><span class="chip">group</span></div>
 
+              <span class="mockup-card__status">✓</span>
       </a>
       <a class="mockup-card" href="balloo-su/group-settings.html">
         <span class="mockup-card__num">1_01_19</span>
@@ -553,12 +558,13 @@
         <div class="mockup-card__tags"><span class="chip">auth</span></div>
         <span class="mockup-card__status">✓</span>
       </a>
-      <a class="mockup-card" href="balloo-su/message-editor.html">
+      <a class="mockup-card mockup-card--accepted" href="balloo-su/message-editor.html">
         <span class="mockup-card__num">1_01_32</span>
         <span class="mockup-card__title">Редактор сообщения</span>
         <span class="mockup-card__desc">Редактор сообщения</span>
         <div class="mockup-card__tags"><span class="chip">editor</span></div>
 
+              <span class="mockup-card__status">✓</span>
       </a>
       <a class="mockup-card" href="balloo-su/my-devices.html">
         <span class="mockup-card__num">1_01_21</span>
@@ -567,19 +573,21 @@
         <div class="mockup-card__tags"><span class="chip">device</span></div>
 
       </a>
-      <a class="mockup-card" href="balloo-su/my-donates.html">
+      <a class="mockup-card mockup-card--accepted" href="balloo-su/my-donates.html">
         <span class="mockup-card__num">1_01_31</span>
         <span class="mockup-card__title">Мои донаты</span>
         <span class="mockup-card__desc">Мои донаты</span>
         <div class="mockup-card__tags"><span class="chip">donate</span></div>
 
+              <span class="mockup-card__status">✓</span>
       </a>
-      <a class="mockup-card" href="balloo-su/notification-settings.html">
+      <a class="mockup-card mockup-card--accepted" href="balloo-su/notification-settings.html">
         <span class="mockup-card__num">1_01_34</span>
         <span class="mockup-card__title">Настройки уведомлений</span>
         <span class="mockup-card__desc">Настройки уведомлений</span>
         <div class="mockup-card__tags"><span class="chip">settings</span></div>
 
+              <span class="mockup-card__status">✓</span>
       </a>
       <a class="mockup-card mockup-card--accepted" href="balloo-su/onboarding.html">
         <span class="mockup-card__num">1_01_01</span>
@@ -602,12 +610,13 @@
         <div class="mockup-card__tags"><span class="chip">poll</span></div>
         <span class="mockup-card__status">✓</span>
       </a>
-      <a class="mockup-card" href="balloo-su/privacy-settings.html">
+      <a class="mockup-card mockup-card--accepted" href="balloo-su/privacy-settings.html">
         <span class="mockup-card__num">1_01_37</span>
         <span class="mockup-card__title">Настройки приватности</span>
         <span class="mockup-card__desc">Настройки приватности</span>
         <div class="mockup-card__tags"><span class="chip">settings</span></div>
 
+              <span class="mockup-card__status">✓</span>
       </a>
       <a class="mockup-card mockup-card--accepted" href="balloo-su/profile.html">
         <span class="mockup-card__num">1_01_08</span>
@@ -665,12 +674,13 @@
         <div class="mockup-card__tags"><span class="chip">stories</span></div>
 
       </a>
-      <a class="mockup-card" href="balloo-su/story-create.html">
+      <a class="mockup-card mockup-card--accepted" href="balloo-su/story-create.html">
         <span class="mockup-card__num">1_01_41</span>
         <span class="mockup-card__title">Создание историй</span>
         <span class="mockup-card__desc">Создание историй</span>
         <div class="mockup-card__tags"><span class="chip">new</span></div>
 
+              <span class="mockup-card__status">✓</span>
       </a>
       <a class="mockup-card mockup-card--accepted" href="balloo-su/support.html">
         <span class="mockup-card__num">1_01_14</span>
@@ -679,19 +689,21 @@
         <div class="mockup-card__tags"><span class="chip">support</span></div>
         <span class="mockup-card__status">✓</span>
       </a>
-      <a class="mockup-card" href="balloo-su/two-factor.html">
+      <a class="mockup-card mockup-card--accepted" href="balloo-su/two-factor.html">
         <span class="mockup-card__num">1_01_30</span>
         <span class="mockup-card__title">Двухфакторная аутентификация</span>
         <span class="mockup-card__desc">Двухфакторная аутентификация</span>
         <div class="mockup-card__tags"><span class="chip">2fa</span></div>
 
+              <span class="mockup-card__status">✓</span>
       </a>
-      <a class="mockup-card" href="balloo-su/voice-message.html">
+      <a class="mockup-card mockup-card--accepted" href="balloo-su/voice-message.html">
         <span class="mockup-card__num">1_01_39</span>
         <span class="mockup-card__title">Запись голосового</span>
         <span class="mockup-card__desc">Запись голосового</span>
         <div class="mockup-card__tags"><span class="chip">record</span></div>
 
+              <span class="mockup-card__status">✓</span>
       </a>
   </div>
 </div>
@@ -785,12 +797,13 @@
         <div class="mockup-card__tags"><span class="chip">screen</span></div>
         <span class="mockup-card__status">✓</span>
       </a>
-      <a class="mockup-card" href="admin-balloo-su/bots-mgmt.html">
+      <a class="mockup-card mockup-card--accepted" href="admin-balloo-su/bots-mgmt.html">
         <span class="mockup-card__num">1_02_10</span>
         <span class="mockup-card__title">Управление ботами</span>
         <span class="mockup-card__desc">Управление ботами</span>
         <div class="mockup-card__tags"><span class="chip">bot</span></div>
 
+              <span class="mockup-card__status">✓</span>
       </a>
       <a class="mockup-card mockup-card--accepted" href="admin-balloo-su/dashboard.html">
         <span class="mockup-card__num">1_02_27</span>
@@ -806,82 +819,93 @@
         <div class="mockup-card__tags"><span class="chip">department</span></div>
         <span class="mockup-card__status">✓</span>
       </a>
-      <a class="mockup-card" href="admin-balloo-su/donations.html">
+      <a class="mockup-card mockup-card--accepted" href="admin-balloo-su/donations.html">
         <span class="mockup-card__num">1_02_13</span>
         <span class="mockup-card__title">Донаты</span>
         <span class="mockup-card__desc">Донаты</span>
         <div class="mockup-card__tags"><span class="chip">donate</span></div>
 
+              <span class="mockup-card__status">✓</span>
       </a>
-      <a class="mockup-card" href="admin-balloo-su/employees.html">
+      <a class="mockup-card mockup-card--accepted" href="admin-balloo-su/employees.html">
         <span class="mockup-card__num">1_02_14</span>
         <span class="mockup-card__title">Сотрудники</span>
         <span class="mockup-card__desc">Сотрудники</span>
         <div class="mockup-card__tags"><span class="chip">screen</span></div>
 
+              <span class="mockup-card__status">✓</span>
       </a>
-      <a class="mockup-card" href="admin-balloo-su/features-flags.html">
+      <a class="mockup-card mockup-card--accepted" href="admin-balloo-su/features-flags.html">
         <span class="mockup-card__num">1_02_15</span>
         <span class="mockup-card__title">Feature flags</span>
         <span class="mockup-card__desc">Feature flags</span>
         <div class="mockup-card__tags"><span class="chip">feature</span></div>
 
+              <span class="mockup-card__status">✓</span>
       </a>
-      <a class="mockup-card" href="admin-balloo-su/features-mgmt.html">
+      <a class="mockup-card mockup-card--accepted" href="admin-balloo-su/features-mgmt.html">
         <span class="mockup-card__num">1_02_16</span>
         <span class="mockup-card__title">Управление фичами</span>
         <span class="mockup-card__desc">Управление фичами</span>
         <div class="mockup-card__tags"><span class="chip">feature</span></div>
 
+              <span class="mockup-card__status">✓</span>
       </a>
-      <a class="mockup-card" href="admin-balloo-su/files.html">
+      <a class="mockup-card mockup-card--accepted" href="admin-balloo-su/files.html">
         <span class="mockup-card__num">1_02_17</span>
         <span class="mockup-card__title">Файлы</span>
         <span class="mockup-card__desc">Файлы</span>
         <div class="mockup-card__tags"><span class="chip">file</span></div>
 
+              <span class="mockup-card__status">✓</span>
       </a>
-      <a class="mockup-card" href="admin-balloo-su/groups-mgmt.html">
+      <a class="mockup-card mockup-card--accepted" href="admin-balloo-su/groups-mgmt.html">
         <span class="mockup-card__num">1_02_18</span>
         <span class="mockup-card__title">Управление группами</span>
         <span class="mockup-card__desc">Управление группами</span>
         <div class="mockup-card__tags"><span class="chip">group</span></div>
 
+              <span class="mockup-card__status">✓</span>
       </a>
-      <a class="mockup-card" href="admin-balloo-su/metrics.html">
+      <a class="mockup-card mockup-card--accepted" href="admin-balloo-su/metrics.html">
         <span class="mockup-card__num">1_02_20</span>
         <span class="mockup-card__title">Метрики</span>
         <span class="mockup-card__desc">Метрики</span>
         <div class="mockup-card__tags"><span class="chip">screen</span></div>
 
+              <span class="mockup-card__status">✓</span>
       </a>
-      <a class="mockup-card" href="admin-balloo-su/reports.html">
+      <a class="mockup-card mockup-card--accepted" href="admin-balloo-su/reports.html">
         <span class="mockup-card__num">1_02_21</span>
         <span class="mockup-card__title">Отчёты</span>
         <span class="mockup-card__desc">Отчёты</span>
         <div class="mockup-card__tags"><span class="chip">report</span></div>
 
+              <span class="mockup-card__status">✓</span>
       </a>
-      <a class="mockup-card" href="admin-balloo-su/service-status.html">
+      <a class="mockup-card mockup-card--accepted" href="admin-balloo-su/service-status.html">
         <span class="mockup-card__num">1_02_22</span>
         <span class="mockup-card__title">Статус сервиса</span>
         <span class="mockup-card__desc">Статус сервиса</span>
         <div class="mockup-card__tags"><span class="chip">status</span></div>
 
+              <span class="mockup-card__status">✓</span>
       </a>
-      <a class="mockup-card" href="admin-balloo-su/texts.html">
+      <a class="mockup-card mockup-card--accepted" href="admin-balloo-su/texts.html">
         <span class="mockup-card__num">1_02_23</span>
         <span class="mockup-card__title">Тексты</span>
         <span class="mockup-card__desc">Тексты</span>
         <div class="mockup-card__tags"><span class="chip">text</span></div>
 
+              <span class="mockup-card__status">✓</span>
       </a>
-      <a class="mockup-card" href="admin-balloo-su/users.html">
+      <a class="mockup-card mockup-card--accepted" href="admin-balloo-su/users.html">
         <span class="mockup-card__num">1_02_24</span>
         <span class="mockup-card__title">Пользователи</span>
         <span class="mockup-card__desc">Пользователи</span>
         <div class="mockup-card__tags"><span class="chip">user</span></div>
 
+              <span class="mockup-card__status">✓</span>
       </a>
       <a class="mockup-card mockup-card--accepted" href="admin-balloo-su/vacancies.html">
         <span class="mockup-card__num">1_02_29</span>
@@ -890,12 +914,13 @@
         <div class="mockup-card__tags"><span class="chip">vacancy</span></div>
         <span class="mockup-card__status">✓</span>
       </a>
-      <a class="mockup-card" href="admin-balloo-su/versions.html">
+      <a class="mockup-card mockup-card--accepted" href="admin-balloo-su/versions.html">
         <span class="mockup-card__num">1_02_26</span>
         <span class="mockup-card__title">Версии</span>
         <span class="mockup-card__desc">Версии</span>
         <div class="mockup-card__tags"><span class="chip">version</span></div>
 
+              <span class="mockup-card__status">✓</span>
       </a>
   </div>
 </div>
@@ -1414,12 +1439,13 @@
         <div class="mockup-card__tags"><span class="chip">donate</span></div>
         <span class="mockup-card__status">✓</span>
       </a>
-      <a class="mockup-card" href="mobile/empty-chat.html">
+      <a class="mockup-card mockup-card--accepted" href="mobile/empty-chat.html">
         <span class="mockup-card__num">1_08_21</span>
         <span class="mockup-card__title">Пустой чат</span>
         <span class="mockup-card__desc">Пустой чат</span>
         <div class="mockup-card__tags"><span class="chip">chat</span></div>
 
+              <span class="mockup-card__status">✓</span>
       </a>
       <a class="mockup-card mockup-card--accepted" href="mobile/group-create.html">
         <span class="mockup-card__num">1_08_19</span>
@@ -1435,12 +1461,13 @@
         <div class="mockup-card__tags"><span class="chip">auth</span></div>
         <span class="mockup-card__status">✓</span>
       </a>
-      <a class="mockup-card" href="mobile/media-viewer.html">
+      <a class="mockup-card mockup-card--accepted" href="mobile/media-viewer.html">
         <span class="mockup-card__num">1_08_22</span>
         <span class="mockup-card__title">Полноэкранный просмотрщик медиа</span>
         <span class="mockup-card__desc">Полноэкранный просмотрщик медиа</span>
         <div class="mockup-card__tags"><span class="chip">viewer</span></div>
 
+              <span class="mockup-card__status">✓</span>
       </a>
       <a class="mockup-card mockup-card--accepted" href="mobile/my-devices.html">
         <span class="mockup-card__num">1_08_05</span>
@@ -1519,12 +1546,13 @@
         <div class="mockup-card__tags"><span class="chip">2fa</span></div>
         <span class="mockup-card__status">✓</span>
       </a>
-      <a class="mockup-card" href="mobile/voice-record.html">
+      <a class="mockup-card mockup-card--accepted" href="mobile/voice-record.html">
         <span class="mockup-card__num">1_08_23</span>
         <span class="mockup-card__title">Запись голосового (mobile)</span>
         <span class="mockup-card__desc">Запись голосового (mobile)</span>
         <div class="mockup-card__tags"><span class="chip">record</span></div>
 
+              <span class="mockup-card__status">✓</span>
       </a>
       <a class="mockup-card mockup-card--accepted" href="mobile/right-menu.html">
         <span class="mockup-card__num">1_08_24</span>
@@ -1625,12 +1653,13 @@
         <div class="mockup-card__tags"><span class="chip">group</span></div>
         <span class="mockup-card__status">✓</span>
       </a>
-      <a class="mockup-card" href="desktop/media-viewer.html">
+      <a class="mockup-card mockup-card--accepted" href="desktop/media-viewer.html">
         <span class="mockup-card__num">1_09_21</span>
         <span class="mockup-card__title">Полноэкранный просмотрщик медиа</span>
         <span class="mockup-card__desc">Полноэкранный просмотрщик медиа</span>
         <div class="mockup-card__tags"><span class="chip">viewer</span></div>
 
+              <span class="mockup-card__status">✓</span>
       </a>
       <a class="mockup-card mockup-card--accepted" href="desktop/modes.html">
         <span class="mockup-card__num">1_09_02</span>
@@ -1653,12 +1682,13 @@
         <div class="mockup-card__tags"><span class="chip">donate</span></div>
         <span class="mockup-card__status">✓</span>
       </a>
-      <a class="mockup-card" href="desktop/notification-settings.html">
+      <a class="mockup-card mockup-card--accepted" href="desktop/notification-settings.html">
         <span class="mockup-card__num">1_09_20</span>
         <span class="mockup-card__title">Настройки уведомлений</span>
         <span class="mockup-card__desc">Настройки уведомлений</span>
         <div class="mockup-card__tags"><span class="chip">settings</span></div>
 
+              <span class="mockup-card__status">✓</span>
       </a>
       <a class="mockup-card mockup-card--accepted" href="desktop/overview.html">
         <span class="mockup-card__num">1_09_01</span>
@@ -1667,7 +1697,7 @@
         <div class="mockup-card__tags"><span class="chip">overview</span></div>
         <span class="mockup-card__status">✓</span>
       </a>
-      <a class="mockup-card" href="desktop/password-reset.html">
+      <a class="mockup-card mockup-card--accepted" href="desktop/password-reset.html">
         <span class="mockup-card__num">1_09_08</span>
         <span class="mockup-card__title">Восстановление пароля</span>
         <span class="mockup-card__desc">Восстановление пароля</span>
@@ -1716,7 +1746,7 @@
         <div class="mockup-card__tags"><span class="chip">stories</span></div>
         <span class="mockup-card__status">✓</span>
       </a>
-      <a class="mockup-card" href="desktop/two-factor.html">
+      <a class="mockup-card mockup-card--accepted" href="desktop/two-factor.html">
         <span class="mockup-card__num">1_09_09</span>
         <span class="mockup-card__title">Двухфакторная аутентификация</span>
         <span class="mockup-card__desc">Двухфакторная аутентификация</span>

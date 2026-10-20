@@ -1,8 +1,21 @@
 # Тикет 1792353176 — B6-4: подписки, уведомления, инвайты (3 эндпоинта)
 
 **Создан:** 19.10.2026 (unix 1792353176)
-**Статус:** заблокирован (нужно решение владельца)
+**Статус:** ✅ разблокирован 19.10.2026
 **Источник:** тикет 1792335000, группа B6
+
+## Решения владельца (19.10.2026)
+
+1. **`GET /api/me/subscriptions`** — **а**: push-подписки (модель `PushSubscription` есть).
+2. **`POST /api/invites`** — **а**: алиас на существующий контроллер `/api/chats/:id/invite`.
+3. **`PUT /api/users/me/notifications`** — **б**: алиас на существующий `PATCH /api/accounts/:userId/notifications`.
+
+## Что будет сделано
+
+1. `GET /api/me/subscriptions` → список push-подписок текущего пользователя.
+2. `POST /api/invites` → алиас на существующий inviteController.
+3. `PUT /api/users/me/notifications` → алиас на существующий accountsController (userId из токена).
+4. Тесты зелёные.
 
 ## Что звонит
 

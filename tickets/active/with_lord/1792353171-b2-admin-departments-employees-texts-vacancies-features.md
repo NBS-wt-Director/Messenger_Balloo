@@ -1,8 +1,24 @@
 # Тикет 1792353171 — B2: 6 админ-эндпоинтов (кабинет сотрудников / контент)
 
 **Создан:** 19.10.2026 (unix 1792353171)
-**Статус:** заблокирован (нужно решение владельца)
+**Статус:** ✅ разблокирован 19.10.2026 — решение **в**
 **Источник:** тикет 1792335000, группа B2
+
+## Решение владельца (19.10.2026)
+
+**Вариант В:** переключить 4 экрана на `/api/knowledge/*` + `/api/features`:
+- DepartmentsScreen → `/api/knowledge/departments`
+- VacanciesScreen → `/api/knowledge/vacancies`
+- TextsScreen → `/api/knowledge/pages`
+- FeaturesMgmtScreen → `/api/features`
+
+`EmployeesScreen` — **отложить** (модели `Employee` в Prisma нет, нет источника данных).
+
+## Что будет сделано
+
+1. Переключить 4 вызова в экранах на существующие эндпоинты.
+2. `EmployeesScreen` — не трогать (отложен).
+3. `python3 scripts/api-endpoints-check.py` → 0 (для 4 из 6), тесты зелёные.
 
 ## Что звонит
 

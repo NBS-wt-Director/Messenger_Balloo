@@ -376,53 +376,53 @@
 | ID | Экран | Файл | Статус | Документация |
 |---|---|---|---|---|
 
-| `1_02_01` | Объявления | `admin-balloo-su/announcements.html` | Просмотрен | `admin-balloo-su/announcements.md` |
+| `1_02_01` | Объявления | `admin-balloo-su/announcements.html` | Принят | `admin-balloo-su/announcements.md` |
 
-| `1_02_02` | Аудит-лог | `admin-balloo-su/audit-log.html` | Просмотрен | `admin-balloo-su/audit-log.md` |
+| `1_02_02` | Аудит-лог | `admin-balloo-su/audit-log.html` | Принят | `admin-balloo-su/audit-log.md` |
 
-| `1_02_03` | Бан-лист | `admin-balloo-su/bans.html` | Просмотрен | `admin-balloo-su/bans.md` |
+| `1_02_03` | Бан-лист | `admin-balloo-su/bans.html` | Принят | `admin-balloo-su/bans.md` |
 
-| `1_02_05` | Каналы блога | `admin-balloo-su/blog-channels.html` | Просмотрен | `admin-balloo-su/blog-channels.md` |
+| `1_02_05` | Каналы блога | `admin-balloo-su/blog-channels.html` | Принят | `admin-balloo-su/blog-channels.md` |
 
-| `1_02_06` | Миграция блога | `admin-balloo-su/blog-migrate.html` | Просмотрен | `admin-balloo-su/blog-migrate.md` |
+| `1_02_06` | Миграция блога | `admin-balloo-su/blog-migrate.html` | Принят | `admin-balloo-su/blog-migrate.md` |
 
-| `1_02_07` | Очередь блога | `admin-balloo-su/blog-queue.html` | Просмотрен | `admin-balloo-su/blog-queue.md` |
+| `1_02_07` | Очередь блога | `admin-balloo-su/blog-queue.html` | Принят | `admin-balloo-su/blog-queue.md` |
 
-| `1_02_08` | Ревью блога | `admin-balloo-su/blog-review.html` | Просмотрен | `admin-balloo-su/blog-review.md` |
+| `1_02_08` | Ревью блога | `admin-balloo-su/blog-review.html` | Принят | `admin-balloo-su/blog-review.md` |
 
-| `1_02_09` | Статистика блога | `admin-balloo-su/blog-stats.html` | Просмотрен | `admin-balloo-su/blog-stats.md` |
+| `1_02_09` | Статистика блога | `admin-balloo-su/blog-stats.html` | Принят | `admin-balloo-su/blog-stats.md` |
 
-| `1_02_10` | Управление ботами | `admin-balloo-su/bots-mgmt.html` | Просмотрен | `admin-balloo-su/bots-mgmt.md` |
+| `1_02_10` | Управление ботами | `admin-balloo-su/bots-mgmt.html` | Принят | `admin-balloo-su/bots-mgmt.md` |
 
-| `1_02_27` | Дашборд | `admin-balloo-su/dashboard.html` | Просмотрен | `admin-balloo-su/dashboard.md` |
+| `1_02_27` | Дашборд | `admin-balloo-su/dashboard.html` | Принят | `admin-balloo-su/dashboard.md` |
 
-| `1_02_28` | Отделы | `admin-balloo-su/departments.html` | Просмотрен | `admin-balloo-su/departments.md` |
+| `1_02_28` | Отделы | `admin-balloo-su/departments.html` | Принят | `admin-balloo-su/departments.md` |
 
-| `1_02_13` | Донаты | `admin-balloo-su/donations.html` | Просмотрен | `admin-balloo-su/donations.md` |
+| `1_02_13` | Донаты | `admin-balloo-su/donations.html` | Принят | `admin-balloo-su/donations.md` |
 
-| `1_02_14` | Сотрудники | `admin-balloo-su/employees.html` | Просмотрен | `admin-balloo-su/employees.md` |
+| `1_02_14` | Сотрудники | `admin-balloo-su/employees.html` | Принят | `admin-balloo-su/employees.md` |
 
-| `1_02_15` | Feature flags | `admin-balloo-su/features-flags.html` | Просмотрен | `admin-balloo-su/features-flags.md` |
+| `1_02_15` | Feature flags | `admin-balloo-su/features-flags.html` | Принят | `admin-balloo-su/features-flags.md` |
 
-| `1_02_16` | Управление фичами | `admin-balloo-su/features-mgmt.html` | Просмотрен | `admin-balloo-su/features-mgmt.md` |
+| `1_02_16` | Управление фичами | `admin-balloo-su/features-mgmt.html` | Принят | `admin-balloo-su/features-mgmt.md` |
 
-| `1_02_17` | Файлы | `admin-balloo-su/files.html` | Просмотрен | `admin-balloo-su/files.md` |
+| `1_02_17` | Файлы | `admin-balloo-su/files.html` | Принят | `admin-balloo-su/files.md` |
 
-| `1_02_18` | Управление группами | `admin-balloo-su/groups-mgmt.html` | Просмотрен | `admin-balloo-su/groups-mgmt.md` |
+| `1_02_18` | Управление группами | `admin-balloo-su/groups-mgmt.html` | Принят | `admin-balloo-su/groups-mgmt.md` |
 
-| `1_02_20` | Метрики | `admin-balloo-su/metrics.html` | Просмотрен | `admin-balloo-su/metrics.md` |
+| `1_02_20` | Метрики | `admin-balloo-su/metrics.html` | Принят | `admin-balloo-su/metrics.md` |
 
-| `1_02_21` | Отчёты | `admin-balloo-su/reports.html` | Просмотрен | `admin-balloo-su/reports.md` |
+| `1_02_21` | Отчёты | `admin-balloo-su/reports.html` | Принят | `admin-balloo-su/reports.md` |
 
-| `1_02_22` | Статус сервиса | `admin-balloo-su/service-status.html` | Просмотрен | `admin-balloo-su/service-status.md` |
+| `1_02_22` | Статус сервиса | `admin-balloo-su/service-status.html` | Принят | `admin-balloo-su/service-status.md` |
 
-| `1_02_23` | Тексты | `admin-balloo-su/texts.html` | Просмотрен | `admin-balloo-su/texts.md` |
+| `1_02_23` | Тексты | `admin-balloo-su/texts.html` | Принят | `admin-balloo-su/texts.md` |
 
-| `1_02_24` | Пользователи | `admin-balloo-su/users.html` | Просмотрен | `admin-balloo-su/users.md` |
+| `1_02_24` | Пользователи | `admin-balloo-su/users.html` | Принят | `admin-balloo-su/users.md` |
 
-| `1_02_29` | Вакансии | `admin-balloo-su/vacancies.html` | Просмотрен | `admin-balloo-su/vacancies.md` |
+| `1_02_29` | Вакансии | `admin-balloo-su/vacancies.html` | Принят | `admin-balloo-su/vacancies.md` |
 
-| `1_02_26` | Версии | `admin-balloo-su/versions.html` | Просмотрен | `admin-balloo-su/versions.md` |
+| `1_02_26` | Версии | `admin-balloo-su/versions.html` | Принят | `admin-balloo-su/versions.md` |
 
 
 ---

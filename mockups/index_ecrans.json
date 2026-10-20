@@ -1,7 +1,7 @@
 {
   "project": "Balloo Messenger",
   "version": "1.0.0",
-  "last_updated": "2026-10-16",
+  "last_updated": "2026-10-20",
   "total_screens": 163,
   "screens_unviewed": 0,
   "nodes": [
@@ -455,63 +455,63 @@
           "id": "1_02_01",
           "name": "Объявления",
           "file": "admin-balloo-su/announcements.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "admin-balloo-su/announcements.md"
         },
         {
           "id": "1_02_02",
           "name": "Аудит-лог",
           "file": "admin-balloo-su/audit-log.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "admin-balloo-su/audit-log.md"
         },
         {
           "id": "1_02_03",
           "name": "Бан-лист",
           "file": "admin-balloo-su/bans.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "admin-balloo-su/bans.md"
         },
         {
           "id": "1_02_05",
           "name": "Каналы блога",
           "file": "admin-balloo-su/blog-channels.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "admin-balloo-su/blog-channels.md"
         },
         {
           "id": "1_02_06",
           "name": "Миграция блога",
           "file": "admin-balloo-su/blog-migrate.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "admin-balloo-su/blog-migrate.md"
         },
         {
           "id": "1_02_07",
           "name": "Очередь блога",
           "file": "admin-balloo-su/blog-queue.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "admin-balloo-su/blog-queue.md"
         },
         {
           "id": "1_02_08",
           "name": "Ревью блога",
           "file": "admin-balloo-su/blog-review.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "admin-balloo-su/blog-review.md"
         },
         {
           "id": "1_02_09",
           "name": "Статистика блога",
           "file": "admin-balloo-su/blog-stats.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "admin-balloo-su/blog-stats.md"
         },
         {
           "id": "1_02_10",
           "name": "Управление ботами",
           "file": "admin-balloo-su/bots-mgmt.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "admin-balloo-su/bots-mgmt.md"
         },
         {
@@ -532,77 +532,77 @@
           "id": "1_02_13",
           "name": "Донаты",
           "file": "admin-balloo-su/donations.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "admin-balloo-su/donations.md"
         },
         {
           "id": "1_02_14",
           "name": "Сотрудники",
           "file": "admin-balloo-su/employees.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "admin-balloo-su/employees.md"
         },
         {
           "id": "1_02_15",
           "name": "Feature flags",
           "file": "admin-balloo-su/features-flags.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "admin-balloo-su/features-flags.md"
         },
         {
           "id": "1_02_16",
           "name": "Управление фичами",
           "file": "admin-balloo-su/features-mgmt.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "admin-balloo-su/features-mgmt.md"
         },
         {
           "id": "1_02_17",
           "name": "Файлы",
           "file": "admin-balloo-su/files.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "admin-balloo-su/files.md"
         },
         {
           "id": "1_02_18",
           "name": "Управление группами",
           "file": "admin-balloo-su/groups-mgmt.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "admin-balloo-su/groups-mgmt.md"
         },
         {
           "id": "1_02_20",
           "name": "Метрики",
           "file": "admin-balloo-su/metrics.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "admin-balloo-su/metrics.md"
         },
         {
           "id": "1_02_21",
           "name": "Отчёты",
           "file": "admin-balloo-su/reports.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "admin-balloo-su/reports.md"
         },
         {
           "id": "1_02_22",
           "name": "Статус сервиса",
           "file": "admin-balloo-su/service-status.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "admin-balloo-su/service-status.md"
         },
         {
           "id": "1_02_23",
           "name": "Тексты",
           "file": "admin-balloo-su/texts.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "admin-balloo-su/texts.md"
         },
         {
           "id": "1_02_24",
           "name": "Пользователи",
           "file": "admin-balloo-su/users.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "admin-balloo-su/users.md"
         },
         {
@@ -616,7 +616,7 @@
           "id": "1_02_26",
           "name": "Версии",
           "file": "admin-balloo-su/versions.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "admin-balloo-su/versions.md"
         }
       ]
