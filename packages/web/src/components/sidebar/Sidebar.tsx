@@ -25,7 +25,6 @@ export function Sidebar() {
     { icon: '💬', label: 'Чаты', path: '/chat' },
     { icon: '👥', label: 'Контакты', path: '/contacts' },
     { icon: '📞', label: 'Звонки', path: '/calls' },
-    { icon: '📖', label: 'Блог', path: '/blog' },
     { icon: '📚', label: 'Знания', path: '/knowledge' },
     { icon: '💼', label: 'Вакансии', path: '/hiring' },
     { icon: '⚙️', label: 'Настройки', path: '/settings' },

@@ -16,7 +16,7 @@ import { useAuthStore } from '@/store/authStore';
 import { api } from '@/services/api';
 
 // Lazy-loaded screen components
-const LandingScreen = lazy(() => import('@/screens/landing/LandingScreen'));
+// Landing pages — тикет 1792472959-02: '/' гостя → OnboardingScreen (LandingScreen не используется)
 const LoginScreen = lazy(() => import('@/screens/auth/LoginScreen'));
 const RegisterScreen = lazy(() => import('@/screens/auth/RegisterScreen'));
 const TwoFactorScreen = lazy(() => import('@/screens/auth/TwoFactorScreen'));
@@ -57,31 +57,7 @@ const KnowledgePageScreen = lazy(() => import('@/screens/knowledge/KnowledgePage
 const EditPageScreen = lazy(() => import('@/screens/knowledge/EditPageScreen').then((m) => ({ default: m.EditPageScreen })));
 const NotFoundScreen = lazy(() => import('@/screens/shared/NotFoundScreen'));
 
-// Admin screens
-const AdminLayout = lazy(() => import('@/screens/admin/AdminLayout').then((m) => ({ default: m.AdminLayout })));
-const DashboardScreen = lazy(() => import('@/screens/admin/DashboardScreen').then((m) => ({ default: m.DashboardScreen })));
-const UsersScreen = lazy(() => import('@/screens/admin/UsersScreen').then((m) => ({ default: m.UsersScreen })));
-const UserDetailScreen = lazy(() => import('@/screens/admin/UserDetailScreen').then((m) => ({ default: m.UserDetailScreen })));
-const BansScreen = lazy(() => import('@/screens/admin/BansScreen').then((m) => ({ default: m.BansScreen })));
-const ReportsScreen = lazy(() => import('@/screens/admin/ReportsScreen').then((m) => ({ default: m.ReportsScreen })));
-const BlogQueueScreen = lazy(() => import('@/screens/admin/BlogQueueScreen').then((m) => ({ default: m.BlogQueueScreen })));
-const BlogChannelsScreen = lazy(() => import('@/screens/admin/BlogChannelsScreen').then((m) => ({ default: m.BlogChannelsScreen })));
-const BlogCategoriesScreen = lazy(() => import('@/screens/admin/BlogCategoriesScreen').then((m) => ({ default: m.BlogCategoriesScreen })));
-const AnalyticsScreen = lazy(() => import('@/screens/admin/AnalyticsScreen').then((m) => ({ default: m.AnalyticsScreen })));
-const FeatureFlagsScreen = lazy(() => import('@/screens/admin/FeatureFlagsScreen').then((m) => ({ default: m.FeatureFlagsScreen })));
-const VersionsScreen = lazy(() => import('@/screens/admin/VersionsScreen').then((m) => ({ default: m.VersionsScreen })));
-const AnnouncementsScreen = lazy(() => import('@/screens/admin/AnnouncementsScreen').then((m) => ({ default: m.AnnouncementsScreen })));
-const DownloadsScreen = lazy(() => import('@/screens/admin/DownloadsScreen').then((m) => ({ default: m.DownloadsScreen })));
-const AuditLogsScreen = lazy(() => import('@/screens/admin/AuditLogsScreen').then((m) => ({ default: m.AuditLogsScreen })));
-const SystemSettingsScreen = lazy(() => import('@/screens/admin/SystemSettingsScreen').then((m) => ({ default: m.SystemSettingsScreen })));
-const InstallScreen = lazy(() => import('@/screens/admin/InstallScreen').then((m) => ({ default: m.InstallScreen })));
-const AdminDonationsScreen = lazy(() => import('@/screens/admin/AdminDonationsScreen').then((m) => ({ default: m.AdminDonationsScreen })));
-const AdminSupportScreen = lazy(() => import('@/screens/admin/AdminSupportScreen').then((m) => ({ default: m.AdminSupportScreen })));
-const DepartmentsScreen = lazy(() => import('@/screens/admin/DepartmentsScreen').then((m) => ({ default: m.DepartmentsScreen })));
-const EmployeesScreen = lazy(() => import('@/screens/admin/EmployeesScreen').then((m) => ({ default: m.EmployeesScreen })));
-const VacanciesAdminScreen = lazy(() => import('@/screens/admin/VacanciesScreen').then((m) => ({ default: m.VacanciesScreen })));
-const TextsScreen = lazy(() => import('@/screens/admin/TextsScreen').then((m) => ({ default: m.TextsScreen })));
-const FeaturesMgmtScreen = lazy(() => import('@/screens/admin/FeaturesMgmtScreen').then((m) => ({ default: m.FeaturesMgmtScreen })));
+// Admin screens — вынесены в packages/web-admin (тикет 1792395490-05)
 
 // Landing pages
 const ForKassaScreen = lazy(() => import('@/screens/landing/ForKassaScreen').then((m) => ({ default: m.ForKassaScreen })));
@@ -218,14 +194,11 @@ export const router = createHashRouter([
     element: (
       <ErrorBoundary>
         <Suspense fallback={<LoadingFallback />}>
-          {/* P38-0 (тикет 1790480787-01): гость должен видеть лендинг на '/'.
-              Раньше здесь был голый <LandingScreen/>, а маршрут '/' выигрывала
-              защищённая группа ниже (path '/' + children[{index:true} → /chat]:
-              ветка с index ранжируется выше простой ветки '/'), поэтому у гостя
-              рендерился ProtectedRoute и редирект на /login. Индексный child
-              защищённой группы убран, редирект авторизованного в /chat — тут. */}
+          {/* §17.1 (тикет 1792472959-02): гость открывает '/' → онбординг.
+              Раньше здесь был <LandingScreen/>, теперь — OnboardingScreen
+              (правило владельца: гость не видит лендинг, он видит онбординг). */}
           <GuestRoute>
-            <LandingScreen />
+            <OnboardingScreen />
           </GuestRoute>
         </Suspense>
       </ErrorBoundary>
@@ -645,109 +618,6 @@ export const router = createHashRouter([
     ],
   },
 
-  // --- Admin routes ---
-  {
-    path: '/admin',
-    element: (
-      <ErrorBoundary>
-        <Suspense fallback={<LoadingFallback />}>
-          <AdminLayout />
-        </Suspense>
-      </ErrorBoundary>
-    ),
-    children: [
-      {
-        index: true,
-        element: <DashboardScreen />,
-      },
-      {
-        path: 'users',
-        element: <UsersScreen />,
-      },
-      {
-        path: 'users/:userId',
-        element: <UserDetailScreen />,
-      },
-      {
-        path: 'reports',
-        element: <ReportsScreen />,
-      },
-      {
-        path: 'bans',
-        element: <BansScreen />,
-      },
-      {
-        path: 'analytics',
-        element: <AnalyticsScreen />,
-      },
-      {
-        path: 'feature-flags',
-        element: <FeatureFlagsScreen />,
-      },
-      {
-        path: 'downloads',
-        element: <DownloadsScreen />,
-      },
-      {
-        path: 'texts',
-        element: <TextsScreen />,
-      },
-      {
-        path: 'departments',
-        element: <DepartmentsScreen />,
-      },
-      {
-        path: 'employees',
-        element: <EmployeesScreen />,
-      },
-      {
-        path: 'vacancies',
-        element: <VacanciesAdminScreen />,
-      },
-      {
-        path: 'versions',
-        element: <VersionsScreen />,
-      },
-      {
-        path: 'announcements',
-        element: <AnnouncementsScreen />,
-      },
-      {
-        path: 'features',
-        element: <FeaturesMgmtScreen />,
-      },
-      {
-        path: 'donations',
-        element: <AdminDonationsScreen />,
-      },
-      {
-        path: 'support',
-        element: <AdminSupportScreen />,
-      },
-      // --- Blog moderation ---
-      {
-        path: 'blog/queue',
-        element: <BlogQueueScreen />,
-      },
-      {
-        path: 'blog/channels',
-        element: <BlogChannelsScreen />,
-      },
-      {
-        path: 'blog/categories',
-        element: <BlogCategoriesScreen />,
-      },
-      {
-        path: 'audit-logs',
-        element: <AuditLogsScreen />,
-      },
-      {
-        path: 'system-settings',
-        element: <SystemSettingsScreen />,
-      },
-    ],
-  },
-
   // --- Command (employee portal) routes ---
   {
     path: '/command',
@@ -837,17 +707,6 @@ export const router = createHashRouter([
     ],
   },
 
-  // --- Service routes ---
-  {
-    path: '/install',
-    element: (
-      <ErrorBoundary>
-        <Suspense fallback={<LoadingFallback />}>
-          <InstallScreen />
-        </Suspense>
-      </ErrorBoundary>
-    ),
-  },
   // --- Features (узел 04) — тикет №55 ---
   {
     path: '/features',

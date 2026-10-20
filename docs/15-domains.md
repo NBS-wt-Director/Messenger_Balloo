@@ -117,3 +117,37 @@ DNS-записи зоны `balloo.su` приложит владелец (зап�
 3. **features.balloo.su** — отдельный контейнер `balloo-web-features` (порт 8091).
 4. **specifity.balloo.su** (у_10) — макет в `mockups/specifity-balloo-su/`, в nginx НЕ настроен, не входит в MVP1.
 5. **staging.balloo.su** — есть в nginx-production.conf, но не в CORS_ORIGIN и не в AGENTS.md (узлов). Вероятно, технический/резервный.
+
+---
+
+## SPA-навигация (левое меню / Sidebar)
+
+**Исходник:** `packages/web/src/components/sidebar/Sidebar.tsx`
+**Правило:** §17.2 РЕШЕНИЙ_ВЛАДЕЛЬЦА.md — только MVP1 + правила площадки.
+
+### Включено (MVP1 + legal)
+
+| Пункт | Путь | Узел | Примечание |
+|---|---|---|---|
+| Чаты | `/chat` | у_01 | Главная |
+| Контакты | `/contacts` | у_01 | |
+| Звонки | `/calls` | у_01 | |
+| Знания | `/knowledge` | у_01 | |
+| Вакансии | `/hiring` | у_01 | |
+| Настройки | `/settings` | у_01 | |
+| Админка | `/admin` | у_02 | Conditional: `user.isAdmin` |
+| Правила | `/rules` | legal | |
+| Конфиденциальность | `/privacy` | legal | |
+| Cookies | `/cookies` | legal | |
+
+### Исключено (не в MVP1)
+
+| Пункт | Путь | Узел | Причина |
+|---|---|---|---|
+| Блог | `/blog` | у_11 | Не в MVP1 |
+| Портал сотрудников | `/command` | у_03 | Не в MVP1 |
+| Фич-реквесты | `/features` | у_04 | Не в MVP1 |
+| API документация | `/doc` | у_07 | Не в MVP1 |
+| Спецификация | `/spec` | у_10 | Не в MVP1 |
+
+**Уточнение 20.10.2026:** «Блог» удалён из `Sidebar.tsx` по запросу владельца.

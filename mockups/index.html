@@ -26,6 +26,8 @@
     .node-url__link { font-size: 15px; font-weight: 600; color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
     .node-url__link:hover { text-decoration: none; opacity: 0.8; }
     .node-url__hint { font-size: 13px; color: var(--text-secondary); }
+    .node-footnote { padding: 8px 12px; margin-bottom: 8px; background: rgba(45,184,77,0.08); border-left: 3px solid var(--accent); border-radius: 4px; }
+    .node-footnote__text { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
     .mockups-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 16px; }
     .mockup-card { background: var(--bg-glass); backdrop-filter: blur(var(--blur)); border: 1px solid var(--border-color); box-shadow: var(--shadow-glass); padding: 20px; cursor: pointer; transition: border-color 0.15s, transform 0.15s; display: flex; flex-direction: column; gap: 8px; text-decoration: none; }
     .mockup-card:hover { border-color: var(--accent); transform: translateY(-3px); }
@@ -723,18 +725,21 @@
       <span class="node-url__label">Назначение:</span>
       <span class="node-url__hint">— Управление пользователями, бан-листом, features flags</span>
     </div>
+    <div class="node-footnote">
+      <span class="node-footnote__text">Решение владельца 19.10.2026 (п.0): admin вошёл в MVP1. Все 24 экрана приняты 20.10.2026. Реализация — `packages/web-admin/`, тикет 1792395490-05.</span>
+    </div>
     <details class="node-meta" data-node="admin">
       <summary>📋 Метаданные узла</summary>
       <div class="node-meta__body">
         <div class="meta-grid">
-          <div class="meta-item"><span class="meta-item__label">Просмотрен</span><span class="meta-item__value meta-item__value--no" data-field="viewed">👁 12/25</span></div>
+          <div class="meta-item"><span class="meta-item__label">Просмотрен</span><span class="meta-item__value meta-item__value--yes" data-field="viewed">👁 24/24</span></div>
           <div class="meta-item"><span class="meta-item__label">Правок частных</span><span class="meta-item__value" data-field="edits_specific">1</span></div>
           <div class="meta-item"><span class="meta-item__label">Правок глобальных принято</span><span class="meta-item__value" data-field="edits_global_accepted">4</span></div>
           <div class="meta-item"><span class="meta-item__label">Документация</span><span class="meta-item__value meta-item__value--no" data-field="documentation_written">❌ нет</span></div>
           <div class="meta-item"><span class="meta-item__label">Компоненты частные</span><span class="meta-item__value">25</span></div>
           <div class="meta-item"><span class="meta-item__label">Компоненты глобальные</span><span class="meta-item__value">5</span></div>
           <div class="meta-item"><span class="meta-item__label">Функций приложения</span><span class="meta-item__value">21</span></div>
-          <div class="meta-item"><span class="meta-item__label">Статус реализации</span><span class="meta-item__value meta-item__value--warn" data-field="implementation_status">запланирован</span></div>
+          <div class="meta-item"><span class="meta-item__label">Статус реализации</span><span class="meta-item__value meta-item__value--yes" data-field="implementation_status">спроектирован</span></div>
         </div>
         <div class="meta-functions">
           <div class="meta-functions__title">Функции приложения (21)</div>

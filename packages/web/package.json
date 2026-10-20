@@ -41,7 +41,6 @@
   },
   "exports": {
     ".": "./src/main.tsx",
-    "./screens/admin": "./src/screens/admin/index.ts",
     "./store/authStore": "./src/store/authStore.ts",
     "./store/adminStore": "./src/store/adminStore.ts",
     "./components/chrome": "./src/components/chrome/index.ts",

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "last_updated": "2026-10-20",
   "total_screens": 163,
-  "screens_unviewed": 0,
+  "screens_unviewed": 7,
   "nodes": [
     {
       "id": "у_00",
@@ -418,7 +418,7 @@
       "icon": "🛡️",
       "domain": "Админ-панель",
       "total_screens": 24,
-      "viewed": 21,
+      "viewed": 24,
       "edits_specific": 1,
       "edits_global_accepted": 4,
       "components_private": 25,
@@ -448,7 +448,7 @@
         "Статистика блога",
         "Управление ботами"
       ],
-      "status": "задокументирован",
+      "status": "спроектирован",
       "doc_md": null,
       "screens": [
         {
@@ -619,7 +619,8 @@
           "status": "Принят",
           "doc_md": "admin-balloo-su/versions.md"
         }
-      ]
+      ],
+      "footnote": "Решение владельца 19.10.2026 (п.0): admin (у_02) вошёл в MVP1. Все 24 экрана приняты 20.10.2026."
     },
     {
       "id": "у_03",
