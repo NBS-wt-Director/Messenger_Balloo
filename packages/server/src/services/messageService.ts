@@ -784,3 +784,41 @@ export const getChatAttachments = async (
     createdAt: Number(att.createdAt),
   }));
 };
+
+// ============================================================
+// История редактирования сообщения
+// ============================================================
+
+export const getMessageHistory = async (
+  messageId: string,
+  userId: string,
+): Promise<{ id: string; oldText: string; newText: string; editedAt: number }[]> => {
+  const message = await prisma.message.findUnique({
+    where: { id: messageId },
+    select: { chatId: true, deleted: true },
+  });
+
+  if (!message) {
+    throw new Error('Сообщение не найдено');
+  }
+
+  await assertChatMember(userId, message.chatId);
+
+  const edits = await prisma.messageEdit.findMany({
+    where: { messageId },
+    orderBy: { editedAt: 'asc' },
+    select: {
+      id: true,
+      oldText: true,
+      newText: true,
+      editedAt: true,
+    },
+  });
+
+  return edits.map((e) => ({
+    id: e.id,
+    oldText: e.oldText,
+    newText: e.newText,
+    editedAt: Number(e.editedAt),
+  }));
+};
