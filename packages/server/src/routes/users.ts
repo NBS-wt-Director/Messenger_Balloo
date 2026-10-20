@@ -81,6 +81,24 @@ router.post('/contacts/:userId', authRequired, addContact);
 router.delete('/contacts/:userId', authRequired, removeContact);
 
 // ============================================================
+// GET /api/users/me/subscriptions — push-подписки текущего пользователя
+// ============================================================
+router.get('/me/subscriptions', authRequired, async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user.id;
+    const subscriptions = await prisma.pushSubscription.findMany({
+      where: { userId },
+      select: { id: true, endpoint: true, p256dh: true, createdAt: true },
+      orderBy: { createdAt: 'desc' },
+    });
+    res.json({ subscriptions });
+  } catch (error: any) {
+    console.error('[users] GET /me/subscriptions error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// ============================================================
 // PATCH /api/users/me/onboarding — обновить статус онбординга
 // ============================================================
 router.patch('/me/onboarding', authRequired, async (req: Request, res: Response) => {
@@ -105,6 +123,29 @@ router.patch('/me/onboarding', authRequired, async (req: Request, res: Response)
     res.json({ user });
   } catch (error: any) {
     console.error('[users] PATCH /me/onboarding error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// ============================================================
+// PUT /api/users/me/notifications — алиас на PATCH /api/accounts/:userId/notifications
+// ============================================================
+router.put('/me/notifications', authRequired, async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user.id;
+    const { enabled } = req.body;
+
+    if (typeof enabled !== 'boolean') {
+      return res.status(400).json({ error: 'Bad Request', message: 'enabled должен быть boolean' });
+    }
+
+    // Переиспользуем ту же логику что accountsController.setAccountNotificationsCtrl
+    const { setAccountNotifications } = await import('../services/accountsService');
+    const deviceId = req.headers['x-device-id'] as string || 'default';
+    const result = await setAccountNotifications(deviceId, userId, enabled);
+    res.json(result);
+  } catch (error: any) {
+    console.error('[users] PUT /me/notifications error:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
