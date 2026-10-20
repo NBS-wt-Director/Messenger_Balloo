@@ -65,6 +65,7 @@ GET /api/chats/:chatId/messages
 GET /api/chats/:chatId/messages/search
 GET /api/chats/:id
 GET /api/chats/:id/attachments
+GET /api/chats/:id/export
 GET /api/devices
 GET /api/devices/pair/:token/status
 GET /api/docs/endpoints
@@ -124,6 +125,7 @@ GET /api/payments/tiers
 GET /api/polls/:id
 GET /api/polls/:id/results
 GET /api/reports
+GET /api/search
 GET /api/specs
 GET /api/specs/:nodeId/:screenId
 GET /api/stories
@@ -137,11 +139,14 @@ GET /api/users/contacts
 GET /api/users/me
 GET /api/users/me/blocked
 GET /api/users/me/export
+GET /api/users/me/subscriptions
 GET /api/users/search
 GET /health
 GET /health/ready
 PATCH /api/accounts/:userId/notifications
 PATCH /api/devices/:id
+PATCH /api/onboarding/me
+PATCH /api/users/me/onboarding
 POST /:id/follow
 POST /:id/subscribe
 POST /:id/unsubscribe
@@ -210,6 +215,7 @@ POST /api/install/test-db
 POST /api/install/test-domain
 POST /api/install/test-redis
 POST /api/install/verify-password
+POST /api/invites
 POST /api/invites/:id/accept
 POST /api/knowledge/categories
 POST /api/knowledge/departments
@@ -236,6 +242,8 @@ POST /api/upload/file
 POST /api/upload/story
 POST /api/users/:id/block
 POST /api/users/contacts/:userId
+POST /api/users/me/password
+POST /api/users/me/password/send-code
 PUT /api/admin/groups/media-requests/:id
 PUT /api/blog/channels/:id
 PUT /api/blog/posts/:id
@@ -254,3 +262,4 @@ PUT /api/knowledge/vacancies/:id
 PUT /api/messages/:id
 PUT /api/payments/admin/config
 PUT /api/users/me
+PUT /api/users/me/notifications
