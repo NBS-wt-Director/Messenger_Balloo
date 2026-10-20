@@ -378,6 +378,17 @@
     <div class="settings-content" id="tab-security">
       <h1 class="page-title">Безопасность</h1>
       <div class="card mb-4">
+        <h3 class="card__title mb-4">Смена пароля</h3>
+        <button class="btn btn--secondary btn--block" onclick="var f=this.nextElementSibling;f.style.display=(f.style.display==='none')?'block':'none';">🔑 Сменить пароль</button>
+        <div style="display:none;margin-top:12px;">
+          <div class="text-xs text-secondary mb-3">На email аккаунта отправлен код подтверждения.</div>
+          <div class="form-group"><input type="text" class="form-input" placeholder="Код из письма" inputmode="numeric" maxlength="6"></div>
+          <div class="form-group"><input type="password" class="form-input" placeholder="Новый пароль"></div>
+          <div class="form-group"><input type="password" class="form-input" placeholder="Подтверждение пароля"></div>
+          <button class="btn btn--primary btn--block">Сменить пароль</button>
+        </div>
+      </div>
+      <div class="card mb-4">
         <h3 class="card__title mb-4">Двухфакторная аутентификация</h3>
         <div class="list__item" style="border:none;">
           <div class="flex-1">

@@ -141,7 +141,7 @@
           "id": "1_01_22",
           "name": "Мультиаккаунт",
           "file": "balloo-su/accounts.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "balloo-su/accounts.md"
         },
         {
@@ -155,14 +155,14 @@
           "id": "1_01_23",
           "name": "Добавить устройство",
           "file": "balloo-su/add-device.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "balloo-su/add-device.md"
         },
         {
           "id": "1_01_07",
           "name": "Архив чатов",
           "file": "balloo-su/archive.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "balloo-su/archive.md"
         },
         {
@@ -176,7 +176,7 @@
           "id": "1_01_38",
           "name": "Блокированные пользователи",
           "file": "balloo-su/blocked-users.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "balloo-su/blocked-users.md"
         },
         {
@@ -253,7 +253,7 @@
           "id": "1_01_19",
           "name": "Настройки группы",
           "file": "balloo-su/group-settings.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "balloo-su/group-settings.md"
         },
         {
@@ -281,7 +281,7 @@
           "id": "1_01_21",
           "name": "Мои устройства",
           "file": "balloo-su/my-devices.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "balloo-su/my-devices.md"
         },
         {
@@ -330,14 +330,14 @@
           "id": "1_01_08",
           "name": "Профиль",
           "file": "balloo-su/profile.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "balloo-su/profile.md"
         },
         {
           "id": "1_01_09",
           "name": "Публичный профиль",
           "file": "balloo-su/public-profile.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "balloo-su/public-profile.md"
         },
         {
@@ -365,21 +365,21 @@
           "id": "1_01_06",
           "name": "Глобальный поиск",
           "file": "balloo-su/search.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "balloo-su/search.md"
         },
         {
           "id": "1_01_20",
           "name": "Настройки приложения",
           "file": "balloo-su/settings.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "balloo-su/settings.md"
         },
         {
           "id": "1_01_27",
           "name": "Сторис",
           "file": "balloo-su/stories.html",
-          "status": "Просмотрен",
+          "status": "Принят",
           "doc_md": "balloo-su/stories.md"
         },
         {

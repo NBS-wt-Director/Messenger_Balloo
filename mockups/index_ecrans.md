@@ -218,17 +218,17 @@
 
 | `1_01_16` | О компании | `balloo-su/about-company.html` | Принят | `balloo-su/about-company.md` |
 
-| `1_01_22` | Мультиаккаунт | `balloo-su/accounts.html` | Просмотрен | `balloo-su/accounts.md` |
+| `1_01_22` | Мультиаккаунт | `balloo-su/accounts.html` | Принят | `balloo-su/accounts.md` |
 
 | `1_01_11` | Активный звонок | `balloo-su/active-call.html` | Принят | `balloo-su/active-call.md` |
 
-| `1_01_23` | Добавить устройство | `balloo-su/add-device.html` | Просмотрен | `balloo-su/add-device.md` |
+| `1_01_23` | Добавить устройство | `balloo-su/add-device.html` | Принят | `balloo-su/add-device.md` |
 
-| `1_01_07` | Архив чатов | `balloo-su/archive.html` | Просмотрен | `balloo-su/archive.md` |
+| `1_01_07` | Архив чатов | `balloo-su/archive.html` | Принят | `balloo-su/archive.md` |
 
 | `1_01_40` | Панель вложений | `balloo-su/attachment-panel.html` | Принят | `balloo-su/attachment-panel.md` |
 
-| `1_01_38` | Блокированные пользователи | `balloo-su/blocked-users.html` | Просмотрен | `balloo-su/blocked-users.md` |
+| `1_01_38` | Блокированные пользователи | `balloo-su/blocked-users.html` | Принят | `balloo-su/blocked-users.md` |
 
 | `1_01_15` | Боты | `balloo-su/bots.html` | Просмотрен | `balloo-su/bots.md` |
 
@@ -250,7 +250,7 @@
 
 | `1_01_18` | Создание группы | `balloo-su/group-create.html` | Принят | `balloo-su/group-create.md` |
 
-| `1_01_19` | Настройки группы | `balloo-su/group-settings.html` | Просмотрен | `balloo-su/group-settings.md` |
+| `1_01_19` | Настройки группы | `balloo-su/group-settings.html` | Принят | `balloo-su/group-settings.md` |
 
 | `1_01_13` | Приглашения | `balloo-su/invites.html` | Принят | `balloo-su/invites.md` |
 
@@ -262,7 +262,7 @@
 
 | `1_01_32` | Редактор сообщения | `balloo-su/message-editor.html` | Принят | `balloo-su/message-editor.md` |
 
-| `1_01_21` | Мои устройства | `balloo-su/my-devices.html` | Просмотрен | `balloo-su/my-devices.md` |
+| `1_01_21` | Мои устройства | `balloo-su/my-devices.html` | Принят | `balloo-su/my-devices.md` |
 
 | `1_01_31` | Мои донаты | `balloo-su/my-donates.html` | Принят | `balloo-su/my-donates.md` |
 
@@ -276,9 +276,9 @@
 
 | `1_01_37` | Настройки приватности | `balloo-su/privacy-settings.html` | Принят | `balloo-su/privacy-settings.md` |
 
-| `1_01_08` | Профиль | `balloo-su/profile.html` | Просмотрен | `balloo-su/profile.md` |
+| `1_01_08` | Профиль | `balloo-su/profile.html` | Принят | `balloo-su/profile.md` |
 
-| `1_01_09` | Публичный профиль | `balloo-su/public-profile.html` | Просмотрен | `balloo-su/public-profile.md` |
+| `1_01_09` | Публичный профиль | `balloo-su/public-profile.html` | Принят | `balloo-su/public-profile.md` |
 
 | `1_01_03` | Регистрация | `balloo-su/register.html` | Принят | `balloo-su/register.md` |
 
@@ -286,11 +286,11 @@
 
 | `1_01_12` | Правила платформы | `balloo-su/rules.html` | Принят | `balloo-su/rules.md` |
 
-| `1_01_06` | Глобальный поиск | `balloo-su/search.html` | Просмотрен | `balloo-su/search.md` |
+| `1_01_06` | Глобальный поиск | `balloo-su/search.html` | Принят | `balloo-su/search.md` |
 
-| `1_01_20` | Настройки приложения | `balloo-su/settings.html` | Просмотрен | `balloo-su/settings.md` |
+| `1_01_20` | Настройки приложения | `balloo-su/settings.html` | Принят | `balloo-su/settings.md` |
 
-| `1_01_27` | Сторис | `balloo-su/stories.html` | Просмотрен | `balloo-su/stories.md` |
+| `1_01_27` | Сторис | `balloo-su/stories.html` | Принят | `balloo-su/stories.md` |
 
 | `1_01_41` | Создание историй | `balloo-su/story-create.html` | Принят | `balloo-su/story-create.md` |
 
