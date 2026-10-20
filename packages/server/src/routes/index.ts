@@ -28,6 +28,7 @@ import { router as tasksRouter } from './tasks';
 import { router as clientErrorsRouter } from './client-errors';
 import { router as botsRouter } from './bots';
 import { router as onboardingRouter } from './onboarding';
+import { channelRouter, followRouter, blockedChannelRouter } from './channels';
 
 const router = Router() as import('express').Router;
 
@@ -52,6 +53,8 @@ router.use('/api', messagesRouter);
 router.use('/api/upload', uploadRouter);
 router.use('/api/stories', storiesRouter);
 router.use('/api/polls', pollsRouter);
+router.use('/api/channels', channelRouter);
+router.use('/api/blog/channels', followRouter);
 router.use('/api/blog', blogRouter);
 router.use('/api/knowledge', knowledgeRouter);
 router.use('/api/hiring', knowledgeRouter);
@@ -77,5 +80,6 @@ router.use('/api/tasks', tasksRouter);
 router.use('/api/bots', botsRouter);
 router.use('/api/onboarding', onboardingRouter);
 router.use('/api', clientErrorsRouter);
+router.use('/api/blocked/channels', blockedChannelRouter);
 
 export { router };

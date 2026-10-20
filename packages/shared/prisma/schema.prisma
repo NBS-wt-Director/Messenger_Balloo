@@ -178,6 +178,7 @@ model User {
    assignedTasks       Task[]              @relation("TaskAssignee")
    feedbacks           Feedback[]
    contactsAsOwner     Contact[]           @relation("ContactOwner")
+  blogChannelSubscriptions BlogChannelSubscriber[]
    contactsAsPerson    Contact[]           @relation("ContactPerson")
    notifications       Notification[]
    drafts              Draft[]
@@ -724,10 +725,25 @@ model BlogChannel {
   updatedAt   BigInt   @default(0)
 
   // Relations
-  posts BlogPost[] @relation("BlogChannelPosts")
+  posts       BlogPost[]              @relation("BlogChannelPosts")
+  subscribers BlogChannelSubscriber[]
 
   @@index([name])
   @@map("blog_channels")
+}
+
+model BlogChannelSubscriber {
+  id         String   @id @default(cuid()) @db.VarChar(25)
+  userId     String
+  channelId  String
+  createdAt  BigInt   @default(0)
+
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  channel    BlogChannel   @relation(fields: [channelId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, channelId])
+  @@index([channelId])
+  @@map("blog_channel_subscribers")
 }
 
 model BlogCategory {

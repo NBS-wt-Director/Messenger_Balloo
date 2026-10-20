@@ -1,3 +1,5 @@
+DELETE /:id
+DELETE /:id/follow
 DELETE /api/accounts/:userId
 DELETE /api/archive/:id
 DELETE /api/auth/devices/:deviceId
@@ -26,6 +28,7 @@ DELETE /api/users/:id/block
 DELETE /api/users/contacts/:userId
 DELETE /api/users/me
 GET /
+GET /:id
 GET /api/accounts
 GET /api/admin/announcements
 GET /api/admin/audit-logs
@@ -139,6 +142,9 @@ GET /health
 GET /health/ready
 PATCH /api/accounts/:userId/notifications
 PATCH /api/devices/:id
+POST /:id/follow
+POST /:id/subscribe
+POST /:id/unsubscribe
 POST /api/accounts/switch
 POST /api/admin/announcements
 POST /api/admin/feature-flags/:id/toggle
