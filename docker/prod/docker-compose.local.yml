@@ -231,6 +231,27 @@ services:
     networks:
       - balloo-net
 
+  # ─── Web-admin (admin.balloo.su — админ-панель, тикет 1792395490-05) ───
+  # target: web_admin — третья финальная стадия Dockerfile.web.
+  # Хостовый nginx проксирует admin.balloo.su на WEB_ADMIN_HOST_PORT (8092).
+  web-admin:
+    build:
+      context: ../..
+      dockerfile: docker/Dockerfile.web
+      target: web_admin
+      args:
+        VITE_API_URL: ${VITE_API_URL:-https://api.balloo.su}
+    image: balloo/web-admin:local
+    container_name: balloo-web-admin
+    restart: always
+    ports:
+      - "127.0.0.1:${WEB_ADMIN_HOST_PORT:-8092}:80"
+    depends_on:
+      server:
+        condition: service_healthy
+    networks:
+      - balloo-net
+
   # ─── Monitoring (запускается только с --profile monitoring) ───
   prometheus:
     image: prom/prometheus:latest

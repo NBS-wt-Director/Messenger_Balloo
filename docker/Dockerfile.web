@@ -18,6 +18,7 @@ COPY packages/shared/package.json packages/shared/
 COPY packages/ui/package.json packages/ui/
 COPY packages/web/package.json packages/web/
 COPY packages/web-features/package.json packages/web-features/
+COPY packages/web-admin/package.json packages/web-admin/
 
 # Install all deps — pnpm store AND prisma engines persist across builds
 RUN --mount=type=cache,id=pnpm-web,target=/root/.local/share/pnpm/store,sharing=shared \
@@ -35,6 +36,8 @@ COPY packages/shared/ packages/shared/
 COPY packages/ui/ packages/ui/
 COPY packages/web/ packages/web/
 COPY packages/web-features/ packages/web-features/
+# web-admin (тикет 1792395490-05): alias @ → ../web/src, исходники web уже скопированы
+COPY packages/web-admin/ packages/web-admin/
 
 # Build shared (local tsc from node_modules, no global install needed)
 RUN cd packages/shared && ./node_modules/.bin/tsc
@@ -51,6 +54,9 @@ RUN cd packages/web && ./node_modules/.bin/vite build
 
 # Build features (features.balloo.su — публичная витрина фич)
 RUN cd packages/web-features && ./node_modules/.bin/vite build
+
+# Build web-admin (admin.balloo.su — админ-панель, тикет 1792395490-05)
+RUN cd packages/web-admin && ./node_modules/.bin/vite build
 
 # ---------- Production stage — web SPA served with nginx ----------
 FROM nginx:alpine AS web
@@ -69,6 +75,18 @@ CMD ["nginx", "-g", "daemon off;"]
 FROM nginx:alpine AS features
 
 COPY --from=builder /app/packages/web-features/dist /usr/share/nginx/html
+COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
+
+# ---------- Production stage — web-admin SPA served with nginx ----------
+# admin.balloo.su (тикеты 1792395490-05, 1792812416). Хостовый nginx
+# (docker/prod/nginx/balloo-docker.conf) проксирует на порт этого контейнера.
+FROM nginx:alpine AS web_admin
+
+COPY --from=builder /app/packages/web-admin/dist /usr/share/nginx/html
 COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
