@@ -3,7 +3,7 @@
 **Российский мессенджер нового поколения** — чаты, каналы, истории, блог, админ-панель и портал сотрудников в одном монорепо.
 
 **Версия:** 0.0.5 (pre-release)
-**Статус:** 🟢 Production-ready (deployed to balloo.su)
+**Статус:** 🟢 Прод balloo.su работает (бандль P37-1); main впереди прода — P38 ждёт команды «Деплой»
 **Лицензия:** MIT
 
 ---
@@ -94,12 +94,13 @@ balloo/
 │   │   └── src/                 ← Контроллеры, сервисы, маршруты
 │   ├── web/                     ← React + Vite (web-клиент)
 │   │   └── src/                 ← Компоненты, экраны, сторы
+│   ├── web-admin/               ← Админ-панель (React + Vite, отдельный билд)
+│   │   └── src/screens/         ← 24 админ-экрана (тикет 1792395490-05)
 │   ├── desktop/                 ← Electron-приложение
 │   │   └── src/                 ← Main process + React renderer
 │   ├── mobile-android/          ← Expo + React Native (Android)
 │   │   └── src/                 ← Экраны, компоненты
-│   └── mobile-ios/              ← Expo + React Native (iOS)
-│       └── src/                 ← Экраны, компоненты
+│   └── mobile-ios/              ← Expo-конфиг (вне MVP1, код не написан)
 │
 ├── docs/                        ← Документация проекта
 │   ├── 00-master-build-guide.md       ← Гайд по сборке
@@ -318,18 +319,19 @@ cookie-параметры/`CORS_ORIGIN` (смена домена cookie лома
 
 | Компонент | Статус | Примечание |
 |---|---|---|
-| Макеты (все узлы) | ⚠️ Спроектировано | 172 экрана в реестре (12 узлов); приёмка владельцем — 79 в статусе «Просмотрен» (В-1…В-76) |
-| Документация | ✅ Задокументировано | 14 файлов docs/ + CONTRIBUTING.md |
+| Макеты (все узлы) | ✅ Принято | MVP1: 79 экранов + 24 admin (приёмка 20.10.2026, `with_lord/СДЕЛАТЬ_ВЛАДЕЛЬЦУ.md` Блок 6) |
+| Документация | ✅ Задокументировано | 23 файла docs/ + CONTRIBUTING.md |
 | Shared-пакет | ✅ Реализовано | Типы, утилиты, Prisma, i18n |
-| База данных (Prisma) | ✅ Схема готова | 1059 строк schema.prisma, 3 миграции |
-| Server (API + WebSocket) | ✅ Реализовано | Express, 205 маршрутов, WS `/ws/` |
-| Web (React + Vite) | ✅ Реализовано | 119 экранов, hash-роутер |
-| Desktop (Electron) | ✅ Каркас | Обёртка над web, работает |
-| Mobile (Expo) | ⚠️ Частично | Android ~30%, iOS не начат |
+| База данных (Prisma) | ✅ Схема готова | 1713 строк schema.prisma, 78 моделей, 15 миграций |
+| Server (API + WebSocket) | ✅ Реализовано | Express, 228 маршрутов, WS `/ws/` (12 событий, вкл. call signaling) |
+| Web (React + Vite) | ✅ Реализовано | 137 экранов, hash-роутер, lazy loading |
+| Admin (web-admin) | ✅ Реализовано | 24 экрана, AdminGuard, отдельный vite-билд (MVP1, решение 19.10.2026) |
+| Desktop (Electron) | ✅ Каркас | Обёртка над web, win/linux/mac-сборки, CI job Windows |
+| Mobile (Expo) | ⚠️ Частично | Android: 35 экранов, APK-скрипты; iOS — вне MVP1 (только конфиг) |
 | Docker | ✅ Реализовано | docker-compose (prod: 5 сервисов + мониторинг), прод-образы |
-| CI/CD | ⚠️ Частично | GitHub Actions: локальная репродукция 21/21 наборов зелёная; CI-прогон падает на Test server — нужен лог владельца (`1790479490-07`) |
-| Тесты | ✅ 607 зелёных | shared 76, server 347, web 204 |
-| **Деплой** | **🟢 balloo.su** | **Прод работает (P37-1 принят выводом сервера 25.09); P38+/support — ждёт команды «Деплой» (В-105)** |
+| CI/CD | ⚠️ Частично | GitHub Actions: ci.yml (PostgreSQL+Redis services, typecheck, тесты, desktop-windows) |
+| Тесты | ✅ 366 unit + 18 e2e | shared 76, web 290 (33 файла), e2e cypress 18/18 (прогон 21.10.2026); server-тесты требуют БД+Redis (в CI с services) |
+| **Деплой** | **🟢 balloo.su** | **Прод работает (бандль P37-1); main впереди — P38 (admin, CSP, call WS, employees) ждёт команды «Деплой» (В-105)** |
 
 ---
 

@@ -314,6 +314,37 @@ ws://balloo.su/ws?token=<JWT>
 | `status.update` | `{nodeId, status, latencyMs}` | Изменение статуса узла сервиса (real-time дашборд) |
 | `2fa.required` | `{userId, methods: ["email"]}` | Требуется 2FA-код (email) для завершения действия |
 
+### Фактическая реализация (замер 21.10.2026, тикет 1792516969)
+
+Реальные имена событий в коде (`packages/server/src/ws/`) используют **точку**
+как разделитель (`message.send`, не `message:send`). На момент замера сервер
+обрабатывает 12 client→server событий:
+
+| Event (client→server) | Payload | Описание |
+|-------|---------|----------|
+| `message.send` | `{chatId, content, messageType?, replyToId?, attachmentUrl?...}` | Отправка сообщения |
+| `message.read` | `{chatId, messageId, readAt}` | Отметить прочитанным |
+| `typing.start` | `{chatId}` | Начал набирать (автостоп 5 с) |
+| `typing.stop` | `{chatId}` | Перестал набирать |
+| `presence.update` | `{status: online|offline|away}` | Смена статуса |
+| `story.view` | `{storyId, viewedAt}` | Просмотр сторис |
+| `reaction.add` | `{messageId, emoji}` | Добавить реакцию |
+| `reaction.remove` | `{messageId, emoji}` | Убрать реакцию |
+| `call.start` | `{callId, calleeId, callType: audio|video}` | Сигнал входящего звонка callee |
+| `call.answer` | `{callId}` | Ответ на звонок → всем участникам |
+| `call.decline` | `{callId}` | Отклонить звонок → всем участникам |
+| `call.end` | `{callId}` | Завершить звонок → всем участникам |
+
+Исходящие события звонков (server→client): `call.incoming`
+(`{callId, callerId, callerName, callType, timestamp}`), `call.answered`
+(`{callId, answeredBy, answeredByName, timestamp}`), `call.declined`
+(`{callId, declinedBy, timestamp}`), `call.ended`
+(`{callId, endedBy, duration, timestamp}`).
+
+**Не реализовано (останется в v2):** WebRTC signaling (`call:offer`,
+`call:ice`), mute/video/screen toggle, `poll:vote`, `device:pair:*`,
+`account:switch`, `ban:appeal:*` — описаны выше как план контракта.
+
 ---
 
 ## Features (`/api/v1/features`)

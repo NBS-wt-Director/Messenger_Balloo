@@ -33,6 +33,7 @@ GET /api/accounts
 GET /api/admin/announcements
 GET /api/admin/audit-logs
 GET /api/admin/bans
+GET /api/admin/employees
 GET /api/admin/feature-flags
 GET /api/admin/groups/media-requests
 GET /api/admin/metrics
