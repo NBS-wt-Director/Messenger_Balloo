@@ -23,7 +23,7 @@
 | Контейнеры Balloo | 6 живых: `balloo-web`, `balloo-web-admin`, `balloo-server`, `balloo-postgres`, `balloo-redis`, `balloo-minio` |
 | Откатные теги | `balloo/web:rollback-20261029`, `balloo/web-admin:rollback-20261029` |
 | Бэкап хостового nginx | `/root/balloo-docker.conf.bak-20261029` (6350 байт) |
-| Состояние деплоя | образы **собраны**, контейнеры **не пересозданы**; nginx **не тронут** |
+| Состояние деплоя | **P38 задеплоен**: nginx поправлен (admin→8092, CSP), `web`+`web-admin` пересозданы на новые образы, `restarts=0`. Блокер: ID Метрики не попадал в сборку — чинится тикетом 1793270207 (коммит `2f2d584`) |
 
 ---
 
@@ -216,6 +216,13 @@ $ wc -c docker/prod/nginx/balloo-docker.conf
 | Блок `cdn.balloo.su` | **есть** (→ `minio:9000/balloo-media/`) | **отсутствует** |
 | Сертификат `balloo.su` | `/etc/letsencrypt/live/balloo.su-0001/` | `/etc/letsencrypt/live/balloo.su/` |
 
+> **Примечание от 29.10.2026:** таблица описывает состояние хоста **на 15.10**
+> (это снимок, по которому принималось решение). После батча G хост изменён:
+> CSP добавлен (2 заголовка), блок `admin.balloo.su` выделен и ведёт на `:8092`.
+> Актуальное состояние — §6.5 и блок `nginx:` в §9. Копировать репозиторный файл
+> целиком по-прежнему нельзя: он не содержит блок `cdn.balloo.su` и ссылается на
+> `live/balloo.su/` вместо `live/balloo.su-0001/`.
+
 ### 5.3. Почему это критично
 
 Локальная проверка репозитория:
@@ -325,15 +332,79 @@ $ sudo ls -la /root/balloo-docker.conf.bak-20261029
 -rw-r--r-- 1 root root 6350 окт 15 21:42 /root/balloo-docker.conf.bak-20261029
 ```
 
-### 6.4. Осталось
-
 | Шаг | Статус |
 |---|---|
-| G. Точечная правка хостового nginx (`admin` → `:8092`, + CSP с Метрикой) | **не выполнено** |
-| H. `nginx -t` + reload | **не выполнено** |
-| I. Пересоздание `balloo-web` и `balloo-web-admin` | **не выполнено** |
-| J. Доказательства (`imageid`, `restart_count`, хэши бандлей, `curl`) | **не выполнено** |
+| G. Точечная правка хостового nginx (`admin` → `:8092`, + CSP с Метрикой) | **выполнено 29.10.2026** (файл 6350 → 8373 байт, `nginx -t` зелёный) |
+| H. `nginx -t` + reload | **выполнено 29.10.2026** (`reload OK`, в памяти 2× `server_name admin.balloo.su;`, 1× `proxy_pass …:8092/`) |
+| I. Пересоздание `balloo-web` и `balloo-web-admin` | **выполнено 29.10.2026** (image `84da8c18…` / `5eab97e7…`, `restarts=0`) |
+| J. Доказательства (`imageid`, `restart_count`, хэши бандлей, `curl`) | **снято 29.10.2026**, см. §6.5 |
 | K. Браузерный чек-лист владельца | **не выполнено** |
+| L. Метрика: ID не попадал в сборку (тикет 1793270207) | **не выполнено на проде** — ждёт пересборки `web` (батч J в тикете 1792812416) |
+
+### 6.5. Доказательства из батча I (29.10.2026)
+
+```text
+=== 1. КОНТЕЙНЕРЫ: ID ОБРАЗА, ЗАПУСК, РЕСТАРТЫ ===
+/balloo-web image=sha256:84da8c18b61c3da83e4993264b3b2cc093a91a40ab53e9ac9b7c2224f2eb176a started=2026-10-29T10:25:44.651363755Z restarts=0 status=running
+/balloo-web-admin image=sha256:5eab97e7e55ae61943ef5dff979c3dd2008c945e0e0a1e984ceb8f2ac612dde8 started=2026-10-29T10:25:43.606919792Z restarts=0 status=running
+balloo-server   Up 2 days (healthy)
+balloo-postgres Up 2 days (healthy)
+balloo-redis    Up 2 days (healthy)
+balloo-minio    Up 2 days (healthy)
+
+=== 2. ОТКАТНЫЕ ТЕГИ НА МЕСТЕ ===
+balloo/web:rollback-20261029 sha256:fa56089b41cc…
+balloo/web-admin:rollback-20261029 sha256:87ab1e4c067d…
+
+=== 3. БАНДЛИ: web ===
+8090:   assets/index-DEfZrNHf.js
+домен:  assets/index-DEfZrNHf.js
+
+=== 4. БАНДЛИ: admin ===
+8092:   assets/index-Df-Nw9rr.js
+домен:  assets/index-Df-Nw9rr.js
+
+=== 5. CSP НА balloo.su ===
+2
+content-security-policy: … script-src 'self' https://mc.yandex.ru; …
+content-security-policy: … script-src 'self' https://mc.yandex.ru; …
+
+=== 6. МАРКЕР НОВОГО КОДА В WEB-БАНДЛЕ ===
+mc.yandex.ru в бандле: 0
+
+=== 7. ЖИВЫЕ ОТВЕТЫ ===
+https://balloo.su/               200
+https://admin.balloo.su/         200
+https://api.balloo.su/health     401
+admin title: <title>Balloo Admin</title>
+```
+
+**Чтение результатов — честно, без прикрас:**
+
+1. **Имя web-бандля не изменилось** (`index-DEfZrNHf.js` до и после). Это **не**
+   провал деплоя: `git diff --stat ab1575c..fe602f0 -- packages/web/src` →
+   27 файлов, 10 545 удалений, **0 добавлений** (мёртвые admin-копии, в граф
+   модулей не входили: `git show ab1575c:packages/web/src/App.tsx | grep -i admin`
+   → пусто). Содержимое бандля идентично → хэш имени совпал.
+   Новизна подтверждается иначе: `image=84da8c18…` (было `fa56089b…`) и
+   появление `mc.yandex.ru` в контейнерном CSP (п.5 — оба заголовка с Метрикой).
+   **Вывод на будущее: для web хэш бандля — ненадёжный маркер; маркер = ID
+   образа + CSP контейнера + наличие целевого кода в бандле.**
+2. **`mc.yandex.ru` в бандле = 0 → Метрика на проде мертва, и CSP тут ни при
+   чём.** Причина в сборке: `docker/Dockerfile.web` принимал только
+   `ARG VITE_API_URL`; `VITE_YM_METRIKA_ID` (есть в `.env.production:158`)
+   не попадал в build args → `import.meta.env.VITE_YM_METRIKA_ID` = undefined →
+   `getMetrikaId()` → null → `initYandexMetrika()` выходит на
+   `packages/web/src/utils/yandex-metrika.ts:53-57` **до** вставки `<script>`.
+   Локальная проверка обеих веток: сборка с env → `tag.js` 1, `mc.yandex.ru` 1,
+   `112269610` найдено; без env → `tag.js` 0, `yaCounter` 0, `mc.` 0.
+   Исправление — тикет **1793270207**, коммит `2f2d584` (Dockerfile `ARG`+`ENV`,
+   compose build arg для `web`, тест `metrika-build-args.test.ts`, 4/4).
+3. **Админка починена полностью:** отдельный vhost на `:8092`, бандль совпадает
+   портом и доменом, `<title>Balloo Admin</title>`, 200.
+4. **Двойной CSP сохранён намеренно:** контейнерный и хостовый теперь
+   согласованы (оба с `mc.yandex.ru`), браузер применяет оба — ни один не
+   блокирует Метрику.
 
 ---
 
@@ -355,15 +426,21 @@ $ sudo ls -la /root/balloo-docker.conf.bak-20261029
 
 ## 8. Вопросы, требующие решения владельца
 
-1. **Правка nginx (блокирующее).** Подтвердить точечную правку (не копирование файла):
-   блок `admin.balloo.su` → `:8092` + `add_header CSP` с `mc.yandex.ru` в web-блоке.
-   Без этого пересоздание `web` даст белый экран админки.
+1. **Правка nginx — ЗАКРЫТО 29.10.2026.** Точечная правка применена (батч G),
+   `nginx -t` зелёный, reload выполнен (G2). Доказательства: §6.5, блок
+   `nginx:` в §9. Файл 6350 → 8373 байт, бэкап
+   `/root/balloo-docker.conf.bak-20261029-g`.
 2. **Место на корне.** Свободно 9,6 ГБ из 98 (90%). Данные Balloo на sdd, но корень
    растёт (68 ГБ → 84 ГБ с 27.10). Источник роста — `/home/cfr_balloo/sites` (38 ГБ
    статики центр-фр.рф, чужой проект). По D-002 п.5 перенос отложен владельцем.
    Нужно решение: переносить статику на sdb или пока не трогать.
 3. **Проверить расхождение `docker system df` (14.59 ГБ) vs `du /data/balloo` (1,1 ГБ).**
    Батч D5 ниже. До проверки неизвестно, все ли образы действительно на sdd.
+4. **Браузерная приёмка P38 (этап K).** Чек-лист в тикете 1792812416: вход,
+   запросы на `api.balloo.su`, консоль, `/#/`-роутер, `admin.balloo.su`
+   (вход + список), Метрика в Network.
+5. **Пересборка web с ID Метрики (батч J в тикете 1792812416).** Без неё
+   счётчик 112269610 не инициализируется, несмотря на открытый CSP.
 
 ---
 
@@ -452,27 +529,37 @@ foreign_containers:   # не трогать
 
 nginx:
   host_config: /etc/nginx/sites-enabled/balloo-docker.conf
-  host_config_size: 6350
-  host_config_mtime: "2026-10-15 21:42"
+  host_config_size: 8373            # после правки G (было 6350)
+  host_config_mtime: "2026-10-29 15:15"
+  host_config_sha_before: ef5e068ff5262439d67a4a97cabb5f30bd895dff90b65fb2cd5b9ea9291f5a1f
+  host_backup_g: /root/balloo-docker.conf.bak-20261029-g
   repo_config: /home/cfr_balloo/balloo/docker/prod/nginx/balloo-docker.conf
   repo_config_size: 9680
-  configs_identical: false
-  host_has_csp: false
-  host_has_admin_block: false
-  host_admin_proxies_to: "127.0.0.1:8090"   # ОШИБКА: должно быть 8092
+  configs_identical: false          # по-прежнему: хост хранит cdn-блок и balloo.su-0001
+  host_has_csp: true                # было false; 2 заголовка (web + admin)
+  host_has_admin_block: true        # было false
+  host_admin_proxies_to: "127.0.0.1:8092"   # было 8090 (ошибка)
   repo_admin_proxies_to: "127.0.0.1:8092"
   host_has_cdn_block: true
   repo_has_cdn_block: false
   cert_dir_used_by_host: /etc/letsencrypt/live/balloo.su-0001
   cert_dir_used_by_repo: /etc/letsencrypt/live/balloo.su
   cert_san_covers_admin: true
+  nginx_t: successful
+  reloaded: true
 
 live_http:
   balloo_su_status: 200
   admin_balloo_su_status: 200
-  csp_source: container_only
-  csp_has_mc_yandex: false
-  metrika_blocked: true
+  csp_source: container_and_host     # было container_only
+  csp_headers_count: 2
+  csp_has_mc_yandex: true            # было false
+  metrika_blocked: false             # CSP открыт
+  metrika_working: false             # но счётчик не инициализируется: см. blocker metrika-env
+  metrika_id_in_bundle: false        # grep tag.js в index-DEfZrNHf.js → 0
+  admin_title: "Balloo Admin"
+  web_bundle: assets/index-DEfZrNHf.js   # не изменился: web-код в диапазоне не правил
+  admin_bundle: assets/index-Df-Nw9rr.js # новый
 
 rollback:
   web_tag: balloo/web:rollback-20261029
@@ -480,27 +567,44 @@ rollback:
   web_admin_tag: balloo/web-admin:rollback-20261029
   web_admin_image_id: 87ab1e4c067d
   nginx_backup: /root/balloo-docker.conf.bak-20261029
+  nginx_backup_g: /root/balloo-docker.conf.bak-20261029-g
+
+running_images:
+  balloo-web: sha256:84da8c18b61c3da83e4993264b3b2cc093a91a40ab53e9ac9b7c2224f2eb176a
+  balloo-web-admin: sha256:5eab97e7e55ae61943ef5dff979c3dd2008c945e0e0a1e984ceb8f2ac612dde8
+  restart_count: 0
 
 built_images:
   web:
     manifest: sha256:ecaf4b6ae2b6e39e0ed0569779c93bbff5a35436929eb86b7b89283ea303308c
     config: sha256:db9ccaa3a396ca96eabc2a511077aa15b4930f3849f637f144f119769b3206f1
+    image_id: sha256:84da8c18b61c3da83e4993264b3b2cc093a91a40ab53e9ac9b7c2224f2eb176a
   web_admin:
     manifest: sha256:0b9e6848af5cc9af6ecab3779ff156e8d0c0d081fd3ffe3580a371a4a5dbd700
     config: sha256:838a31fcc139449360b6f75248dfa1ba0016c779aa52603f11cc4d993c053270
+    image_id: sha256:5eab97e7e55ae61943ef5dff979c3dd2008c945e0e0a1e984ceb8f2ac612dde8
+  note: "manifest/config ≠ image_id: docker images показывает ID образа,
+    в батче F записан digest манифеста — это разные хэши, не противоречие"
 
 deploy_state:
-  stage_completed: [A, B, C, D, E, F]
-  stage_pending: [G, H, I, J, K]
-  containers_recreated: false
-  nginx_reloaded: false
-  prod_serves_new_code: false
-  status: "не подтверждено"
+  stage_completed: [A, B, C, C2, C3, D, E, F, G, G2, H, I]
+  stage_pending: [J_metrika_rebuild, K_browser_checklist]
+  containers_recreated: true
+  nginx_reloaded: true
+  prod_serves_new_code: true
+  status: "P38 на проде работает; Метрика не подтверждена (блоккер metrika-env)"
 
 blockers:
   - id: nginx-stale
+    severity: resolved
+    description: "Хостовый nginx не знал про admin:8092 и CSP"
+    resolution: "правка G + reload G2 29.10.2026: admin → :8092, 2 CSP с mc.yandex.ru"
+    evidence: "nginx -T | grep -c 'server_name admin.balloo.su;' → 2; curl -sI → 2 CSP"
+  - id: metrika-env
     severity: blocking
-    description: "Хостовый nginx не знает про admin:8092 и не отдаёт CSP; пересоздание web без правки = белый экран админки"
+    description: "VITE_YM_METRIKA_ID не пробрасывался в docker-сборку web → счётчик мёртв"
+    resolution: "код починен тикетом 1793270207 (коммит 2f2d584); ждёт пересборки web на сервере"
+    evidence: "grep -c tag.js в прод-бандле → 0; локально с env → 1, без env → 0"
   - id: disk-space-root
     severity: warning
     description: "9,6 ГБ свободно из 98 ГБ (90%); рост с 68 до 84 ГБ из-за /home/cfr_balloo/sites (38 ГБ, чужой проект)"
