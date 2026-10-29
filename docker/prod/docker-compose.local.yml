@@ -200,6 +200,10 @@ services:
         # Запекается в бандль на vite build (см. docker/Dockerfile.web).
         # Тикет №0: всё API на api.balloo.su (голый origin, клиент дописывает /api/).
         VITE_API_URL: ${VITE_API_URL:-https://api.balloo.su}
+        # ID Яндекс.Метрики (тикет 1793270207): без него бандль молча выходит из
+        # initYandexMetrika() до вставки <script src=.../tag.js>. Значение берётся
+        # из --env-file .env.production (строка VITE_YM_METRIKA_ID).
+        VITE_YM_METRIKA_ID: ${VITE_YM_METRIKA_ID:-}
     image: balloo/web:local
     container_name: balloo-web
     restart: always

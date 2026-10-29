@@ -49,6 +49,11 @@ RUN cd packages/shared && ./node_modules/.bin/tsc
 ARG VITE_API_URL=https://api.balloo.su
 ENV VITE_API_URL=${VITE_API_URL}
 
+# Yandex Metrika counter ID — lazy-load по consent (тикет 1793270207).
+# Пусто или не задано — Метрика не подключается (безопасно по 152-ФЗ).
+ARG VITE_YM_METRIKA_ID=
+ENV VITE_YM_METRIKA_ID=${VITE_YM_METRIKA_ID}
+
 # Build web (vite build — no type-check, faster; local vite from node_modules)
 RUN cd packages/web && ./node_modules/.bin/vite build
 
