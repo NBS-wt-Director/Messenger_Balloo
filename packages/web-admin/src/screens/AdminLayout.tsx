@@ -2,7 +2,6 @@
 // Sidebar + breadcrumbs + user info + outlet
 // P35: единая шапка (@balloo/ui) — Topbar с лого-меню и breadcrumb в title
 
-import { useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
 import { AppTopbar } from '@/components/chrome/AppTopbar';
@@ -63,17 +62,13 @@ const BREADCRUMBS: Record<string, string> = {
 };
 
 export function AdminLayout() {
-  const navigate = useNavigate();
   const location = useLocation();
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
 
-  // Check if user is admin
-  useEffect(() => {
-    if (!user?.isAdmin) {
-      navigate('/login', { replace: true });
-    }
-  }, [user, navigate]);
+  // Доступ проверяет AdminGuard (обёртка в App.tsx). Дублировать проверку
+  // здесь не нужно: прежний navigate('/login') вёл на несуществующий маршрут
+  // и давал 404 (тикет 1793259599).
 
   const currentPath = location.pathname;
 

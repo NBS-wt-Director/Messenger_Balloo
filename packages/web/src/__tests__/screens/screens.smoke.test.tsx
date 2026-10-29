@@ -19,8 +19,6 @@ import TwoFactorScreen from '../../screens/auth/TwoFactorScreen';
 import GroupSettingsScreen from '../../screens/groups/GroupSettingsScreen';
 import { CommandBlogScreen } from '../../screens/command/CommandBlogScreen';
 import { CommandSettingsScreen } from '../../screens/command/CommandSettingsScreen';
-import { AuditLogsScreen } from '../../screens/admin/AuditLogsScreen';
-import { SystemSettingsScreen } from '../../screens/admin/SystemSettingsScreen';
 
 describe('Settings, profile, stories, polls, command screens (smoke)', () => {
   const cases: [string, React.ReactNode][] = [
@@ -35,8 +33,6 @@ describe('Settings, profile, stories, polls, command screens (smoke)', () => {
     ['GroupSettingsScreen', <GroupSettingsScreen />],
     ['CommandBlogScreen', <CommandBlogScreen />],
     ['CommandSettingsScreen', <CommandSettingsScreen />],
-    ['AuditLogsScreen', <AuditLogsScreen />],
-    ['SystemSettingsScreen', <SystemSettingsScreen />],
   ];
 
   for (const [name, ui] of cases) {

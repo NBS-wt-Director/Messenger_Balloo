@@ -3,7 +3,7 @@
 // Все endpoints НЕ требуют аутентификации (система ещё не настроена)
 // P37-3 (решение владельца 2026-09-23): единая шапка/подвал через PageChrome
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { PageChrome } from '@/components/chrome/PageChrome';
 
 const API_BASE = '/api/install';
@@ -49,13 +49,24 @@ export function InstallScreen() {
 
   const totalSteps = 4;
 
-  // Check install status on mount
-  useState(() => {
+  // Check install status on mount.
+  // Раньше вызов fetch стоял в инициализаторе useState(() => ...) — это
+  // побочный эффект в рендере; в StrictMode он исполнялся дважды и не
+  // отменялся. Тикет 1793259599.
+  useEffect(() => {
+    let cancelled = false;
     fetch(`${API_BASE}/status`)
       .then((r) => r.json())
-      .then((data) => setStatus(data))
-      .catch(() => setStatus({ installed: false, version: 'dev' }));
-  });
+      .then((data) => {
+        if (!cancelled) setStatus(data);
+      })
+      .catch(() => {
+        if (!cancelled) setStatus({ installed: false, version: 'dev' });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   if (status?.installed) {
     return (

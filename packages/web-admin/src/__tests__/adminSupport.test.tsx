@@ -17,7 +17,7 @@ vi.mock('@/services/api', () => ({
   },
 }));
 
-import { AdminSupportScreen } from '../../screens/admin/AdminSupportScreen';
+import { AdminSupportScreen } from '../screens/AdminSupportScreen';
 
 const TICKETS = {
   total: 2,
