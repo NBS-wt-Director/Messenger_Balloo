@@ -23,7 +23,7 @@
 | Контейнеры Balloo | 6 живых: `balloo-web`, `balloo-web-admin`, `balloo-server`, `balloo-postgres`, `balloo-redis`, `balloo-minio` |
 | Откатные теги | `balloo/web:rollback-20261029`, `balloo/web-admin:rollback-20261029` |
 | Бэкап хостового nginx | `/root/balloo-docker.conf.bak-20261029` (6350 байт) |
-| Состояние деплоя | **P38 задеплоен**: nginx поправлен (admin→8092, CSP), `web`+`web-admin` пересозданы на новые образы, `restarts=0`. Блокер: ID Метрики не попадал в сборку — чинится тикетом 1793270207 (коммит `2f2d584`) |
+| Состояние деплоя | **P38 задеплоен и работает**: nginx поправлен (admin→8092, CSP), `web`+`web-admin` пересозданы, ID Метрики в бандле (батч J 29.10.2026). Осталось: браузерная приёмка K |
 
 ---
 
@@ -406,6 +406,59 @@ admin title: <title>Balloo Admin</title>
    согласованы (оба с `mc.yandex.ru`), браузер применяет оба — ни один не
    блокирует Метрику.
 
+### 6.6. Батч J — Метрика в проде (29.10.2026)
+
+```text
+=== 1. КОД ===
+HEAD=4dae02b
+docker/Dockerfile.web:54:ARG VITE_YM_METRIKA_ID=
+docker/Dockerfile.web:55:ENV VITE_YM_METRIKA_ID=${VITE_YM_METRIKA_ID}
+docker/prod/docker-compose.local.yml:206:        VITE_YM_METRIKA_ID: ${VITE_YM_METRIKA_ID:-}
+
+=== 2. ID В ENV ===
+158:VITE_YM_METRIKA_ID="112269610"
+
+=== 3. ДО СБОРКИ ===
+image=sha256:84da8c18b61c… started=2026-10-29T10:25:44Z
+assets/index-DEfZrNHf.js
+
+=== 4. СБОРКА web ===
+#34 naming to docker.io/balloo/web:local … DONE 6.0s
+Image balloo/web:local Built
+
+=== 5. ПЕРЕСОЗДАНИЕ ===
+Container balloo-web Recreated
+Container balloo-web Started
+
+=== 6. МАРКЕР: Метрика в бандле ===
+бандль: assets/index-2omaDl-E.js
+tag.js: 1
+mc.yandex.ru: 1
+112269610: 1
+
+=== 7. КОНТЕЙНЕРЫ ===
+balloo-web  Up 4 seconds
+balloo-web-admin  Up 56 minutes
+balloo-server  Up 2 days (healthy)
+balloo-postgres Up 2 days (healthy)
+balloo-redis    Up 2 days (healthy)
+balloo-minio    Up 2 days (healthy)
+```
+
+**Чтение:**
+
+- **Имя бандля изменилось** (`index-DEfZrNHf.js` → `index-2omaDl-E.js`) —
+  в отличие от батча I, где код web в диапазоне не менялся. Здесь в код реально
+  добавился рабочий блок счётчика, что и подтверждают все три маркера по 1.
+- Манифест нового образа: `sha256:5c271dcc…` (в `docker inspect` отразится как
+  ID образа, это разные хэши — см. §6.5 примечание).
+- `balloo-web-admin` показывает `Up 56 minutes` — это перезапуск из батча H,
+  батч J его не трогал (`--no-deps web`).
+- Остальные четыре — прежний аптайм 2 days: пересоздание затронуло ровно один
+  контейнер, как и планировалось.
+- **Что ещё НЕ подтверждено:** что счётчик реально шлёт beacon в Яндексе —
+  это требует браузера (этап K, пункт K5). На уровне артефакта сборки всё сходится.
+
 ---
 
 ## 7. Ограничения и запреты на этом хосте
@@ -554,12 +607,12 @@ live_http:
   csp_source: container_and_host     # было container_only
   csp_headers_count: 2
   csp_has_mc_yandex: true            # было false
-  metrika_blocked: false             # CSP открыт
-  metrika_working: false             # но счётчик не инициализируется: см. blocker metrika-env
-  metrika_id_in_bundle: false        # grep tag.js в index-DEfZrNHf.js → 0
+  metrika_blocked: false             # CSP открыт (батч G)
+  metrika_id_in_bundle: true         # было false; чинится тикетом 1793270207, батч J 29.10.2026
+  metrika_working: unconfirmed       # требуется K5 (браузерный Network)
   admin_title: "Balloo Admin"
-  web_bundle: assets/index-DEfZrNHf.js   # не изменился: web-код в диапазоне не правил
-  admin_bundle: assets/index-Df-Nw9rr.js # новый
+  web_bundle: assets/index-2omaDl-E.js    # после J (было index-DEfZrNHf.js)
+  admin_bundle: assets/index-Df-Nw9rr.js  # после H
 
 rollback:
   web_tag: balloo/web:rollback-20261029
@@ -570,29 +623,21 @@ rollback:
   nginx_backup_g: /root/balloo-docker.conf.bak-20261029-g
 
 running_images:
-  balloo-web: sha256:84da8c18b61c3da83e4993264b3b2cc093a91a40ab53e9ac9b7c2224f2eb176a
+  balloo-web: sha256:5c271dcc41885d0dbdcf3b874e9e0e41080013f08c877557ca580eb9f0d95fb0   # J 29.10.2026 (было 84da8c18)
   balloo-web-admin: sha256:5eab97e7e55ae61943ef5dff979c3dd2008c945e0e0a1e984ceb8f2ac612dde8
   restart_count: 0
-
-built_images:
-  web:
-    manifest: sha256:ecaf4b6ae2b6e39e0ed0569779c93bbff5a35436929eb86b7b89283ea303308c
-    config: sha256:db9ccaa3a396ca96eabc2a511077aa15b4930f3849f637f144f119769b3206f1
-    image_id: sha256:84da8c18b61c3da83e4993264b3b2cc093a91a40ab53e9ac9b7c2224f2eb176a
-  web_admin:
-    manifest: sha256:0b9e6848af5cc9af6ecab3779ff156e8d0c0d081fd3ffe3580a371a4a5dbd700
-    config: sha256:838a31fcc139449360b6f75248dfa1ba0016c779aa52603f11cc4d993c053270
-    image_id: sha256:5eab97e7e55ae61943ef5dff979c3dd2008c945e0e0a1e984ceb8f2ac612dde8
-  note: "manifest/config ≠ image_id: docker images показывает ID образа,
-    в батче F записан digest манифеста — это разные хэши, не противоречие"
+  web_bundle: assets/index-2omaDl-E.js   # изменился после J (было index-DEfZrNHf.js)
+  admin_bundle: assets/index-Df-Nw9rr.js # с H
+  metrika_markers: {tag.js: 1, mc.yandex.ru: 1, id_112269610: 1}  # в прод-бандле
 
 deploy_state:
-  stage_completed: [A, B, C, C2, C3, D, E, F, G, G2, H, I]
-  stage_pending: [J_metrika_rebuild, K_browser_checklist]
+  stage_completed: [A, B, C, C2, C3, D, E, F, G, G2, H, I, J]
+  stage_pending: [K_browser_checklist]
   containers_recreated: true
   nginx_reloaded: true
   prod_serves_new_code: true
-  status: "P38 на проде работает; Метрика не подтверждена (блоккер metrika-env)"
+  metrika_id_in_bundle: true
+  status: "P38 на проде работает (включая Метрику); ждёт браузерной приёмки K"
 
 blockers:
   - id: nginx-stale
@@ -601,10 +646,10 @@ blockers:
     resolution: "правка G + reload G2 29.10.2026: admin → :8092, 2 CSP с mc.yandex.ru"
     evidence: "nginx -T | grep -c 'server_name admin.balloo.su;' → 2; curl -sI → 2 CSP"
   - id: metrika-env
-    severity: blocking
+    severity: resolved
     description: "VITE_YM_METRIKA_ID не пробрасывался в docker-сборку web → счётчик мёртв"
-    resolution: "код починен тикетом 1793270207 (коммит 2f2d584); ждёт пересборки web на сервере"
-    evidence: "grep -c tag.js в прод-бандле → 0; локально с env → 1, без env → 0"
+    resolution: "тик. 1793270207 (коммит 2f2d584), пересборка батчем J 29.10.2026"
+    evidence: "grep -c tag.js в прод-бандле → 1; mc.yandex.ru → 1; 112269610 → 1"
   - id: disk-space-root
     severity: warning
     description: "9,6 ГБ свободно из 98 ГБ (90%); рост с 68 до 84 ГБ из-за /home/cfr_balloo/sites (38 ГБ, чужой проект)"
