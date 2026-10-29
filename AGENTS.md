@@ -99,7 +99,7 @@
 | Почта | письма не отправлял, почту владельца не читаю | `SMTP_USER`/`SMTP_PASSWORD` в файле отсутствуют как ключи |
 | OAuth-входы | панель провайдера не открывал, реальный вход не проходил | `YANDEX_CLIENT_ID/SECRET`, `VK_CLIENT_ID/SECRET`, `MAILRU_CLIENT_ID/SECRET` заполнены |
 | Push | доставку не проверял | `VAPID_PUBLIC_KEY`/`VAPID_PRIVATE_KEY` заполнены |
-| Метрика | боевой счётчик подтверждён 15.10.2026 | `VITE_YM_METRIKA_ID=112269610` в проде; `packages/web/.env` отсутствует на диске (gitignored) |
+| Метрика | **запись 15.10 была ошибочной — исправлено 29.10.2026.** Счётчик не работал: `VITE_YM_METRIKA_ID` не пробрасывался в docker-сборку web (`docker/Dockerfile.web` знал только `VITE_API_URL`), поэтому `initYandexMetrika()` выходил до вставки `<script>`. Подтверждено: `grep -c tag.js` в прод-бандле → 0. Починено тикетом 1793270207 (коммит `2f2d584`), проверено батчем J 29.10.2026: `tag.js`=1, `mc.yandex.ru`=1, `112269610`=1, бандль `index-2omaDl-E.js`. **Доставка beacon в Яндекс — не подтверждена**, ждёт браузерной приёмки (пункт 3.3.10) | `VITE_YM_METRIKA_ID="112269610"` в `docker/prod/.env.production:158`; CSP с `mc.yandex.ru` в хостовом nginx с 29.10.2026 |
 | MAX, Яндекс Диск, Slack, YooMoney | ключей нет | `MAX_*`, `YANDEX_DISK_API_KEY`, `DEPLOY_SHA` (Slack) пустые; `YANDEX_DISK_API_KEY` и `DEPLOY_SHA` код бэкенда не читает вообще |
 | Продакшен-сборки, iOS | не собираю под `--mode production`, нет Xcode и симулятора | — |
 
