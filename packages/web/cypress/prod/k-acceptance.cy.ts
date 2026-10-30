@@ -146,6 +146,26 @@ describe('Прод: K5/K6 — Метрика и cookie-баннер', () => {
       expect(metrikaTag, 'tag.js после отказа').to.have.length(0);
     });
   });
+
+  it('K5 (решающий): после «Принять все» уходит beacon watch/… на mc.yandex.ru', () => {
+    const beacons: string[] = [];
+    cy.intercept('**/mc.yandex.ru/**', (req) => {
+      if (/\/watch\//.test(req.url)) beacons.push(req.url);
+      req.continue();
+    });
+    cy.clearCookies();
+    cy.visit(`${SITE}/#/login`);
+    cy.contains('button', 'Принять все', { timeout: 20000 }).click();
+    // Метрика шлёт beacon с задержкой и по событиям; даём время + шевелим страницу.
+    cy.wait(6000);
+    cy.get('body').click('topLeft');
+    cy.wait(4000);
+    cy.then(() => {
+      cy.log(`beacon watch/: ${beacons.length}`);
+      beacons.forEach((b) => cy.log(b));
+      expect(beacons.length, 'beacon watch/ в Яндекс').to.be.greaterThan(0);
+    });
+  });
 });
 
 describe('Прод: K10 — прочие узлы приложения', () => {
