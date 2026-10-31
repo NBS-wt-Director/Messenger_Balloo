@@ -75,7 +75,7 @@
 | --- | --- | --- |
 | Тесты shared | `pnpm --filter @balloo/shared test` | vitest: 4 файла, 76 тестов, зелёные |
 | Тесты web | `pnpm --filter @balloo/web test` | vitest: 15 файлов, 168 тестов, зелёные |
-| Тесты server | `pnpm --filter @balloo/server test` | jest: 20 наборов, 245 тестов, зелёные |
+| Тесты server | `pnpm --filter @balloo/server test` | jest: 20 наборов, 245 тестов, зелёные. **Уточнено 31.10.2026 прогоном `pnpm test`:** 46 наборов, **716 тестов** — число в столбце устарело (росло с 27.09) |
 | Все тесты монорепо | `pnpm test` | код возврата 0 |
 | Тестов нет | `pnpm --filter @balloo/ui test` (также desktop, mobile-android, mobile-ios) | `echo "No tests configured yet"` — заглушки, а не тесты |
 | Типы web | `pnpm --filter @balloo/web build` | `tsc && vite build` (tsc без `--noEmit`), 7.32 с, код 0 |
@@ -94,7 +94,7 @@
 
 | Область | Почему не подтверждаю | Что видно grep'ом по `docker/prod/.env.production` |
 | --- | --- | --- |
-| Прод-сервер | нет доступа к `balloo.su`: я не выполняю там команд и не читаю systemd/БД/логи | — |
+| Прод-сервер | нет доступа к `balloo.su`: я не выполняю там команд и не читаю systemd/БД/логи. **Но read-only `curl` к `api.balloo.su` делаю** — и им доказано 31.10.2026: контейнер `balloo-server` работает на образе из кода **~21.09.2026**, хотя git на сервере обновлён до HEAD. Все API-маршруты, добавленные после 21.09, на проде → 404 (в т.ч. `POST /api/chats/:id/messages` — **переписка в чате не работает**), при этом **старый** путь `/api/messages/chats/:id/messages` жив. Диагноз и доказательства — `tickets/active/1793435849.md`. **Правило: «HEAD сервера = HEAD репозитория» не означает «работает код репозитория» — образ контейнера надо проверять отдельно (`docker inspect … .Created` + прогон маршрутов).** | — |
 | Оплата | нет кабинета YooKassa | `YOOKASSA_SHOP_ID=""`, `YOOKASSA_API_KEY=""` — на проде платежи не настроены |
 | Почта | письма не отправлял, почту владельца не читаю | `SMTP_USER`/`SMTP_PASSWORD` в файле отсутствуют как ключи |
 | OAuth-входы | панель провайдера не открывал, реальный вход не проходил | `YANDEX_CLIENT_ID/SECRET`, `VK_CLIENT_ID/SECRET`, `MAILRU_CLIENT_ID/SECRET` заполнены |
