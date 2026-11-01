@@ -191,13 +191,20 @@ git rev-parse --short HEAD        # сверяем HEAD с локальным
 | `/data/messenger` (`sdb2`) | чужой проект | — |
 | `/data/nextcloud-1000` (`sdc`) | чужой проект | — |
 
-`/var/lib/docker` = **0** — Docker-хранилище вынесено на `sdd` через
-`/etc/docker/daemon.json` (`{"data-root": "/data/balloo/docker"}`). Подтверждено
-сервером 01.11.2026: `docker system df` → images 14.61GB, build cache 2.838GB — и
-`du -sh /var/lib/docker` → 0, то есть эти гигабайты лежат не на `/`.
+`/var/lib/docker` = **0** — каталог data-root вынесен на `sdd` через
+`/etc/docker/daemon.json` (`{"data-root": "/data/balloo/docker"}`).
 
-Значит, упираться в 91% будет не Docker, а хостовые `/home` и `/var` (данные вне
-Balloo — их чистка решается владельцем отдельно). Сам клон balloo занимает 68M.
+⚠️ **Но это не значит, что все гигабайты образов лежат вне `/`.** `docker system df`
+показывает images 14,61GB + build cache 2,838GB, а `df /data/balloo` — занято всего
+**1,2G** (≈ объём томов 1,056GB). Расхождение **не объяснено**: при
+`storage=overlayfs` (containerd image store) слои могут жить в
+`/var/lib/containerd`, который перенос data-root **не** затрагивает и который
+находится на `/`. Подтвердить прогоном: `sudo du -xsh /var/lib/containerd
+/var/lib/docker`. Пока не подтверждено — считать, что тяжёлые сборки способны
+упираться в `/` (свободно 9,0G), и перед `compose build` проверять `df -h /`.
+
+Значит, упираться в 91% могут и Docker-слои, и хостовые `/home` (43G, из них 39G —
+`sites/alpha.balloo.su`) и `/var` (18G). Сам клон balloo — 68M.
 
 ```bash
 # Проверка:

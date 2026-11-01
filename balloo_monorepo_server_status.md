@@ -70,7 +70,7 @@ Filesystem                         Size  Used Avail Use% Mounted on
 |---|---|---|---|
 | Репозиторий | **больше не на `/`** — перенесён на `sdd` (`/data/balloo/repo`), старый путь оставлен symlink'ом | 68 МБ (было на `/`) | ✅ данные Balloo целиком на `sdd` |
 | `/var/lib/docker` | — | **0 байт** (`sudo du -sh` → `0`) | ✅ data-root перенесён |
-| `/home/cfr_balloo` целиком | — | 43 ГБ (замер 01.11) | ⚠️ из них `sites` — 38 ГБ статики центр-фр.рф (чужой проект, D-002 п.5: перенос отложен). **Главный резерв для разгрузки `/`** |
+| `/home/cfr_balloo` целиком | — | 43 ГБ (замер 01.11) | ⚠️ из них **`sites/alpha.balloo.su` — 39 ГБ**. Замер 01.11.2026 **исправляет** прежнюю запись «38 ГБ статики центр-фр.рф, чужой проект»: `alpha.balloo.su` — поддомен Balloo (`docs/06` §428, решение владельца 19.09.2026; `docs/15-domains.md:86` — текущий сертификат имеет `CN=alpha.balloo.su`). Разбор и освобождение — `tickets/active/1793520686.md`. **Главный резерв для разгрузки `/`** |
 | `/usr` | — | 12 ГБ | системное |
 | `/var/log` | — | 3,8 ГБ | системное (журналы; чистится `journalctl --vacuum-size` — резерв второй величины) |
 | `/` итого | — | 84 ГБ из 98 (**91%**) | ⚠️ свободно **9,0 ГБ**. Balloo даёт здесь только swap-файлы сборки; перенос клона вернул 68 МБ и occupancy не изменил |
@@ -485,12 +485,17 @@ balloo-minio    Up 2 days (healthy)
    `nginx -t` зелёный, reload выполнен (G2). Доказательства: §6.5, блок
    `nginx:` в §9. Файл 6350 → 8373 байт, бэкап
    `/root/balloo-docker.conf.bak-20261029-g`.
-2. **Место на корне.** Свободно 9,6 ГБ из 98 (90%). Данные Balloo на sdd, но корень
-   растёт (68 ГБ → 84 ГБ с 27.10). Источник роста — `/home/cfr_balloo/sites` (38 ГБ
-   статики центр-фр.рф, чужой проект). По D-002 п.5 перенос отложен владельцем.
-   Нужно решение: переносить статику на sdb или пока не трогать.
-3. **Проверить расхождение `docker system df` (14.59 ГБ) vs `du /data/balloo` (1,1 ГБ).**
-   Батч D5 ниже. До проверки неизвестно, все ли образы действительно на sdd.
+ 2. **Место на корне.** Свободно **9,0 ГБ из 98 (91%)** — замер 01.11.2026. Данные
+    Balloo на sdd (клон перенесён 01.11, тикет 1793435849), но корень
+    растёт (68 ГБ → 84 ГБ с 27.10). Источник роста по замеру — `/home/cfr_balloo`
+    43G, из них **`sites/alpha.balloo.su` — 39G** (это поддомен Balloo, а НЕ «статика
+    чужого центр-фр.рф», как ошибочно было записано ранее) и `/var/lib` 18G.
+    Разбор и освобождение: `tickets/active/1793520686.md`.
+ 3. **Расхождение `docker system df` (images 14,61 ГБ) vs `df /data/balloo` (занято
+    1,2 ГБ) — НЕ объяснено.** Гипотеза: при `storage=overlayfs` слои образов живут в
+    `/var/lib/containerd` на `/` (перенос data-root его не касается). Проверить
+    `sudo du -xsh /var/lib/containerd /var/lib/docker`. Пока не проверено, тяжёлые
+    сборки считаются способными упираться в `/`.
 4. **Браузерная приёмка P38 (этап K).** Чек-лист в тикете 1792812416: вход,
    запросы на `api.balloo.su`, консоль, `/#/`-роутер, `admin.balloo.su`
    (вход + список), Метрика в Network.
@@ -523,20 +528,25 @@ storage:
   root_device: /dev/mapper/ubuntu--vg-ubuntu--lv
   root_size: 98G
   root_used: 84G
-  root_avail: 9.6G
-  root_use_percent: 90
+  root_avail: 9.0G
+  root_use_percent: 91
   root_top_consumers:
-    home_cfr_balloo: 42G
-    home_sites_static: 38G          # чужой проект центр-фр.рф, D-002 п.5 отложено
+    home_cfr_balloo: 43G
+    home_sites_alpha_balloo_su: 39G   # ⚠️ поддомен Balloo (не чужой проект; правка 01.11)
+    home_sites_cfrsite: 727M
+    home_balloo_api_old: 491M         # старое (не docker) развёртывание
+    home_balloo_app_old: 477M
+    var_lib: 18G                      # содержимое не разведено
+    var_log_journal: 3.7G
     usr: 12G
-    var_log: 3.9G
   repo_path: /data/balloo/repo     # перенесён с / на sdd 01.11.2026
   repo_symlink: /home/cfr_balloo/balloo -> /data/balloo/repo
   repo_size: 68M
   backups_dir: /data/balloo/backups   # sdd; LATEST.sql → balloo-20261101-124019.sql
   docker_root: /data/balloo/docker   # НА ОТДЕЛЬНОМ ДИСКЕ sdd
   var_lib_docker_size: 0             # du -sh → 0 (перенесён)
-  docker_images_size: 14.59GB        # ⚠️ расходится с du /data/balloo = 1.1G
+  docker_images_size: 14.61GB        # ⚠️ НЕ объяснено: df /data/balloo занято 1.2G
+  docker_images_hypothesis: "/var/lib/containerd на / (перенос data-root его не касается) — проверить sudo du -xsh /var/lib/containerd"
   docker_containers_size: 395.4MB
   docker_volumes_size: 1.056GB
   docker_build_cache: 1.599GB
