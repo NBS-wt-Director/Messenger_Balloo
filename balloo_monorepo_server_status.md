@@ -13,17 +13,19 @@
 | Хост / пользователь | `aedgar` / `cfr_balloo` (uid=1000, группы: `cfr_balloo`, `adm`, `cdrom`, …) |
 | Публичный IP | `188.73.176.34` (подтверждён ранее; LAN-адрес `192.168.1.85`) |
 | ОС | Ubuntu 24.04.4 LTS, ядро 6.8.0-138-generic |
-| Каталог репозитория | `/home/cfr_balloo/balloo` (68 МБ) |
-| Compose-файл прода | `/home/cfr_balloo/balloo/docker/prod/docker-compose.local.yml` |
-| Git HEAD сервера | `fe602f0` (ветка `main`, up to date с `origin/main`) |
-| Рабочее дерево сервера | чистое (`git status --porcelain` → пусто) |
-| Корневой диск | `/dev/mapper/ubuntu--vg-ubuntu--lv`, 98 ГБ, занято 84 ГБ, **свободно 9,6 ГБ (90%)** |
-| Диск данных Balloo | `/dev/sdd` (3,6 ТБ, метка `balloo`) → `/data/balloo`; **Docker data-root = `/data/balloo/docker`** |
-| Свободно на диске данных | 3,4 ТБ (занято 1,1 ГБ, 1%) |
+| Каталог репозитория | **`/data/balloo/repo`** (68 МБ, диск `sdd`; перенесён 01.11.2026). `/home/cfr_balloo/balloo` — symlink на него |
+| Compose-файл прода | `/data/balloo/repo/docker/prod/docker-compose.local.yml` (14 296 байт) |
+| Env прода | `/data/balloo/repo/docker/prod/.env.production` (9 241 байт, под git) |
+| Дампы БД | `/data/balloo/backups` (`sdd`) — `balloo-20261101-124019.sql` (90 489 байт) + symlink `LATEST.sql` |
+| Git HEAD сервера | `73c5272` (ветка `main`); `origin/main` = `5c5c667` — **отставание 1 коммит, и тот файл тикета** (`git diff --name-only 73c5272..5c5c667` → код не отличается) |
+| Рабочее дерево сервера | чистое (`MOD=0`) |
+| Корневой диск | `/dev/mapper/ubuntu--vg-ubuntu--lv`, 98 ГБ, занято 84 ГБ, **свободно 9,0 ГБ (91%)** |
+| Диск данных Balloo | `/dev/sdd` (3,6 ТБ, метка `balloo`) → `/data/balloo`; **Docker data-root = `/data/balloo/docker`**, там же клон и дампы |
+| Свободно на диске данных | 3,4 ТБ (занято 1,2 ГБ, 1%) |
 | Контейнеры Balloo | 6 живых: `balloo-web`, `balloo-web-admin`, `balloo-server`, `balloo-postgres`, `balloo-redis`, `balloo-minio` |
-| Откатные теги | `balloo/web:rollback-20261029`, `balloo/web-admin:rollback-20261029` |
-| Бэкап хостового nginx | `/root/balloo-docker.conf.bak-20261029` (6350 байт) |
-| Состояние деплоя | **P38 задеплоен и работает**: nginx поправлен (admin→8092, CSP), `web`+`web-admin` пересозданы, ID Метрики в бандле (батч J 29.10.2026). Осталось: браузерная приёмка K |
+| Откатные теги | `balloo/web:rollback-20261029`, `balloo/web-admin:rollback-20261029`, **`balloo/server:rollback-20261101`** (оба server-тега → `ed70243d4190`) |
+| **Состояние бэкенда прода** | ⚠️ контейнер `balloo-server` на образе, собранном **2026-09-21 14:32** (`ed70243d4190`, код `bcf8643`); в БД применено **2 миграции из 15** → новые маршруты (в т.ч. `POST /api/chats/:id/messages`) отдают 404, **переписка в чате не работает**. Диагностика и план: `tickets/active/1793435849.md` |
+| Состояние деплоя | **P38 задеплоен и работает**: nginx поправлен (admin→8092, CSP), `web`+`web-admin` пересозданы, ID Метрики в бандле (батч J 29.10.2026). Браузерная приёмка K: 20/20 (Cypress 19/19, `00d6d7c`) |
 
 ---
 
@@ -66,12 +68,12 @@ Filesystem                         Size  Used Avail Use% Mounted on
 
 | Объект | Путь | Размер | Оценка |
 |---|---|---|---|
-| Репозиторий (только код) | `/home/cfr_balloo/balloo` | 68 МБ | ✅ допустимо (код, не данные) |
+| Репозиторий | **больше не на `/`** — перенесён на `sdd` (`/data/balloo/repo`), старый путь оставлен symlink'ом | 68 МБ (было на `/`) | ✅ данные Balloo целиком на `sdd` |
 | `/var/lib/docker` | — | **0 байт** (`sudo du -sh` → `0`) | ✅ data-root перенесён |
-| `/home/cfr_balloo` целиком | — | 42 ГБ | ⚠️ из них `sites` — 38 ГБ статики центр-фр.рф (чужой проект, D-002 п.5: перенос отложен) |
+| `/home/cfr_balloo` целиком | — | 43 ГБ (замер 01.11) | ⚠️ из них `sites` — 38 ГБ статики центр-фр.рф (чужой проект, D-002 п.5: перенос отложен). **Главный резерв для разгрузки `/`** |
 | `/usr` | — | 12 ГБ | системное |
-| `/var/log` | — | 3,9 ГБ | системное |
-| `/` итого | — | 84 ГБ из 98 (90%) | ⚠️ свободно 9,6 ГБ |
+| `/var/log` | — | 3,8 ГБ | системное (журналы; чистится `journalctl --vacuum-size` — резерв второй величины) |
+| `/` итого | — | 84 ГБ из 98 (**91%**) | ⚠️ свободно **9,0 ГБ**. Balloo даёт здесь только swap-файлы сборки; перенос клона вернул 68 МБ и occupancy не изменил |
 
 ### 2.3. Расхождение с документацией соседнего репозитория
 
@@ -105,7 +107,7 @@ Filesystem                         Size  Used Avail Use% Mounted on
 ## 3. Git-состояние сервера
 
 ```text
-$ cd /home/cfr_balloo/balloo && git rev-parse --abbrev-ref HEAD && git rev-parse --short HEAD
+$ cd /data/balloo/repo && git rev-parse --abbrev-ref HEAD && git rev-parse --short HEAD
 main
 fe602f0
 
@@ -190,7 +192,7 @@ balloo-minio            Up 2 days (healthy)     9000/tcp, 127.0.0.1:9001->9001/t
 ### 5.1. Факты
 
 ```text
-$ sudo diff -q /etc/nginx/sites-enabled/balloo-docker.conf /home/cfr_balloo/balloo/docker/prod/nginx/balloo-docker.conf
+$ sudo diff -q /etc/nginx/sites-enabled/balloo-docker.conf /data/balloo/repo/docker/prod/nginx/balloo-docker.conf
 Files ... differ
 NGINX: РАЗЛИЧАЕТСЯ
 
@@ -291,7 +293,7 @@ DNS:admin.balloo.su, DNS:api.balloo.su, DNS:app.balloo.su, DNS:balloo.su, DNS:bl
 ### 6.2. Результат сборки (батч F)
 
 ```text
-$ cd /home/cfr_balloo/balloo/docker/prod && docker compose -f docker-compose.local.yml --env-file .env.production build web web-admin
+$ cd /data/balloo/repo/docker/prod && docker compose -f docker-compose.local.yml --env-file .env.production build web web-admin
 ...
 #36 exporting manifest sha256:ecaf4b6ae2b6e39e0ed0569779c93bbff5a35436929eb86b7b89283ea303308c
 #36 exporting config   sha256:db9ccaa3a396ca96eabc2a511077aa15b4930f3849f637f144f119769b3206f1
@@ -528,8 +530,10 @@ storage:
     home_sites_static: 38G          # чужой проект центр-фр.рф, D-002 п.5 отложено
     usr: 12G
     var_log: 3.9G
-  repo_path: /home/cfr_balloo/balloo
+  repo_path: /data/balloo/repo     # перенесён с / на sdd 01.11.2026
+  repo_symlink: /home/cfr_balloo/balloo -> /data/balloo/repo
   repo_size: 68M
+  backups_dir: /data/balloo/backups   # sdd; LATEST.sql → balloo-20261101-124019.sql
   docker_root: /data/balloo/docker   # НА ОТДЕЛЬНОМ ДИСКЕ sdd
   var_lib_docker_size: 0             # du -sh → 0 (перенесён)
   docker_images_size: 14.59GB        # ⚠️ расходится с du /data/balloo = 1.1G
@@ -546,20 +550,22 @@ storage:
 
 
 git:
-  repo: /home/cfr_balloo/balloo
+  repo: /data/balloo/repo
   branch: main
-  head: fe602f0
-  origin_main: fe602f0
-  behind: 0
+  head: 73c5272
+  origin_main: 5c5c667
+  behind: 1                    # 73c5272..5c5c667 = 1 коммит
   ahead: 0
   dirty: false
-  migrations_in_range: false
-  range: ab1575c..fe602f0
-  commits_in_range: 4
+  migrations_in_range: false   # git diff --name-only 73c5272..5c5c667 | grep -ci migration → 0
+  code_diff_in_range: false    # git diff --name-only 73c5272..5c5c667 | grep -cE '^(packages|docker)/' → 0
+  range: 73c5272..5c5c667
+  commits_in_range: 1          # файл tickets/Done/2026-10-30/1793374800.md, кода нет
+  server_image_commit: bcf8643 # ⚠️ образ balloo/server:local собран 2026-09-21 из этого коммита
 
 compose:
-  file: /home/cfr_balloo/balloo/docker/prod/docker-compose.local.yml
-  env_file: /home/cfr_balloo/balloo/docker/prod/.env.production
+  file: /data/balloo/repo/docker/prod/docker-compose.local.yml
+  env_file: /data/balloo/repo/docker/prod/.env.production
   env_file_size: 9241
   command: docker compose -f docker-compose.local.yml --env-file .env.production
 
@@ -586,7 +592,7 @@ nginx:
   host_config_mtime: "2026-10-29 15:15"
   host_config_sha_before: ef5e068ff5262439d67a4a97cabb5f30bd895dff90b65fb2cd5b9ea9291f5a1f
   host_backup_g: /root/balloo-docker.conf.bak-20261029-g
-  repo_config: /home/cfr_balloo/balloo/docker/prod/nginx/balloo-docker.conf
+  repo_config: /data/balloo/repo/docker/prod/nginx/balloo-docker.conf
   repo_config_size: 9680
   configs_identical: false          # по-прежнему: хост хранит cdn-блок и balloo.su-0001
   host_has_csp: true                # было false; 2 заголовка (web + admin)

@@ -46,9 +46,16 @@ WebSocket-канала `status.update` **в коде нет** — раздел �
 
 ### PostgreSQL
 
-**Механизм:** `pg_dump` в bind-каталог `/home/cfr_balloo/balloo/docker/prod/backups`
-(примонтирован в контейнер как `/backups` — единственный bind у postgres, остальное —
-named volumes).
+**Механизм:** `pg_dump` в каталог дампов. С 01.11.2026 он пишется в
+`/data/balloo/backups` (отдельный диск `sdd`, 3,6T) — там лежат дампы
+`balloo-<ГГГГММДД-ССССSS>.sql` и symlink `LATEST.sql`.
+
+Путь каталога внутри репозитория (`docker/prod/backups`, примонтирован к
+контейнеру postgres как `/backups` — единственный bind у postgres, остальное —
+named volumes) после переноса клона на `sdd` также указывает на `sdd`, потому что
+сам клон живёт на `sdd` (см. §5). До переноса этот bind-каталог лежал на корневом
+разделе `/`, занятом на 91%, и был пуст (проверено сервером 31.10: `ls -la` →
+только `.` и `..`, владелец `root:root`).
 
 **Скрипт бэкапа (внутри контейнера, роль `balloo` — в контейнере нет роли `postgres`):**
 
@@ -76,7 +83,7 @@ zcat /backups/balloo-backup-20260930-030000.sql.gz \
   | docker exec -i balloo-postgres psql -U balloo -d balloo
 
 # 3. Поднять server после восстановления:
-cd /home/cfr_balloo/balloo
+cd /data/balloo/repo
 docker compose -f docker/prod/docker-compose.local.yml \
   --env-file docker/prod/.env.production up -d --no-deps server
 ```
@@ -166,7 +173,7 @@ systemd-юнит `balloo` вызывает `/usr/local/bin/balloo-deploy.sh`, к
 Если на сервере `git checkout main` и `git pull` возвращает `Already up to date` при наличии новых коммитов в `origin/main` — значит сервер на старой ветке. **Правильный способ:**
 
 ```bash
-cd /home/cfr_balloo/balloo
+cd /data/balloo/repo
 git fetch origin
 git checkout -B main origin/main  # пересоздаёт main из origin
 git merge --ff-only origin/main   # fast-forward только
@@ -174,6 +181,23 @@ git rev-parse --short HEAD        # сверяем HEAD с локальным
 ```
 
 ### Диск заполнен — сборочный кэш Docker
+
+**Состояние 01.11.2026 (снято `lsblk` + `df` + `docker info` на сервере):**
+
+| Раздел | Что на нём | Заполнение |
+|---|---|---|
+| `/` (LVM `ubuntu--vg-ubuntu--lv`, 98G) | `/home` **43G**, `/var` **18G**, `/var/log` 3,8G; клон balloo больше не здесь | **91%**, свободно 9,0G |
+| `/data/balloo` (`sdd`, 3,6T) | Docker (`data-root`), том БД, образы, кэш сборки, дампы, клон | **1%**, свободно 3,4T |
+| `/data/messenger` (`sdb2`) | чужой проект | — |
+| `/data/nextcloud-1000` (`sdc`) | чужой проект | — |
+
+`/var/lib/docker` = **0** — Docker-хранилище вынесено на `sdd` через
+`/etc/docker/daemon.json` (`{"data-root": "/data/balloo/docker"}`). Подтверждено
+сервером 01.11.2026: `docker system df` → images 14.61GB, build cache 2.838GB — и
+`du -sh /var/lib/docker` → 0, то есть эти гигабайты лежат не на `/`.
+
+Значит, упираться в 91% будет не Docker, а хостовые `/home` и `/var` (данные вне
+Balloo — их чистка решается владельцем отдельно). Сам клон balloo занимает 68M.
 
 ```bash
 # Проверка:
@@ -216,13 +240,14 @@ healthcheck'и контейнеров ходят на `127.0.0.1:3100` напр�
 
 | Компонент | Путь / Порт |
 |---|---|
-| Git-репо | `/home/cfr_balloo/balloo` |
-| Compose (реально запущен) | `/home/cfr_balloo/balloo/docker/prod/docker-compose.local.yml` |
-| Env (единственный источник секретов) | `/home/cfr_balloo/balloo/docker/prod/.env.production` (`chmod 600`) |
+| Git-репо | `/data/balloo/repo` (реальное расположение с 01.11.2026, диск `sdd`). Старый путь `/home/cfr_balloo/balloo` сохранён как **symlink** на него — команды с любым из двух путей работают одинаково |
+| Compose (реально запущен) | `/data/balloo/repo/docker/prod/docker-compose.local.yml` |
+| Env (единственный источник секретов) | `/data/balloo/repo/docker/prod/.env.production` (`chmod 600`; файл **под git**, в `.gitignore` только `.env`, `.env.local`, `.env.dev`, `.env.staging`, `.env.development.local`) |
 | Nginx vhost | `/etc/nginx/sites-enabled/balloo-docker.conf` |
-| Бэкапы БД | `/home/cfr_balloo/balloo/docker/prod/backups` ↔ `/backups` в контейнере |
+| Бэкапы БД | `/data/balloo/backups` (дампы 01.11.2026) и bind `docker/prod/backups` ↔ `/backups` в контейнере — после переноса клона оба на `sdd` |
+| Docker-хранилище | `/data/balloo/docker` (`/etc/docker/daemon.json`, `data-root`) |
 | Сертификаты | `/etc/letsencrypt/live/` (certbot, по поддомену) |
-| БД | named volume `prod_postgres-data` |
+| БД | named volume `prod_postgres-data` → `/data/balloo/docker/volumes/prod_postgres-data/_data` |
 | Медиа | named volume `prod_minio-data` |
 | Сессии | named volume `prod_redis-data` |
 | server наружу | `127.0.0.1:3100` (web-контейнер `127.0.0.1:8090→80`, `WEB_HOST_PORT=8090`) |

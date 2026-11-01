@@ -237,7 +237,7 @@ CMD ["node", "dist/index.js"]
 
 ### Команда запуска (сервер)
 ```bash
-cd /home/cfr_balloo/balloo
+cd /data/balloo/repo
 docker compose -f docker/prod/docker-compose.local.yml \
   --env-file docker/prod/.env.production build server
 docker compose -f docker/prod/docker-compose.local.yml \

@@ -118,7 +118,7 @@ docker compose -f docker/prod/docker-compose.local.yml \
 ### Откат кодом (если образа-тега нет)
 
 ```bash
-cd /home/cfr_balloo/balloo
+cd /data/balloo/repo
 git fetch origin
 git checkout <откатной-коммит>          # не переписывать origin/main!
 docker compose -f docker/prod/docker-compose.local.yml \

@@ -11,7 +11,7 @@
 
 set -euo pipefail
 
-COMPOSE_DIR="${BALLOO_COMPOSE_DIR:-/home/cfr_balloo/balloo/docker/prod}"
+COMPOSE_DIR="${BALLOO_COMPOSE_DIR:-/data/balloo/repo/docker/prod}"
 COMPOSE_FILE="${COMPOSE_DIR}/docker-compose.local.yml"
 ENV_FILE="${COMPOSE_DIR}/.env.production"
 DOCKER_WAIT_TRIES="${BALLOO_DOCKER_WAIT_TRIES:-60}"

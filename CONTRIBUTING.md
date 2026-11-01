@@ -176,7 +176,7 @@ test(server): add unit tests for auth middleware
 Кратко:
 ```bash
 # На сервере:
-cd /home/cfr_balloo/balloo
+cd /data/balloo/repo
 git fetch origin
 git checkout -B main origin/main
 git merge --ff-only origin/main
