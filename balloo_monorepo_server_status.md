@@ -19,7 +19,7 @@
 | Дампы БД | `/data/balloo/backups` (`sdd`) — `balloo-20261101-124019.sql` (90 489 байт) + symlink `LATEST.sql` |
 | Git HEAD сервера | `73c5272` (ветка `main`); `origin/main` = `5c5c667` — **отставание 1 коммит, и тот файл тикета** (`git diff --name-only 73c5272..5c5c667` → код не отличается) |
 | Рабочее дерево сервера | чистое (`MOD=0`) |
-| Корневой диск | `/dev/mapper/ubuntu--vg-ubuntu--lv`, 98 ГБ, занято 84 ГБ, **свободно 9,0 ГБ (91%)** |
+| Корневой диск | `/dev/mapper/ubuntu--vg-ubuntu--lv`, 98 ГБ, занято **48 ГБ**, **свободно 46 ГБ (51%)** — после S3/S4 01.11.2026 (было 84G/9,1G/91%) |
 | Диск данных Balloo | `/dev/sdd` (3,6 ТБ, метка `balloo`) → `/data/balloo`; **Docker data-root = `/data/balloo/docker`**, там же клон и дампы |
 | Свободно на диске данных | 3,4 ТБ (занято 1,2 ГБ, 1%) |
 | Контейнеры Balloo | 6 живых: `balloo-web`, `balloo-web-admin`, `balloo-server`, `balloo-postgres`, `balloo-redis`, `balloo-minio` |
@@ -74,10 +74,10 @@ image store, на Ubuntu dockerd использует `/run/containerd/container
 |---|---|---|---|
 | Репозиторий | **больше не на `/`** — перенесён на `sdd` (`/data/balloo/repo`), старый путь оставлен symlink'ом | 68 МБ (было на `/`) | ✅ данные Balloo целиком на `sdd` |
 | `/var/lib/docker` | — | **0 байт** (`sudo du -sh` → `0`) | ✅ data-root перенесён |
-| `/home/cfr_balloo` целиком | — | 43 ГБ (замер 01.11) | ⚠️ из них **`sites/alpha.balloo.su` — 39 ГБ**. Замер 01.11.2026 **исправляет** прежнюю запись «38 ГБ статики центр-фр.рф, чужой проект»: `alpha.balloo.su` — поддомен Balloo (`docs/06` §428, решение владельца 19.09.2026; `docs/15-domains.md:86` — текущий сертификат имеет `CN=alpha.balloo.su`). Разбор и освобождение — `tickets/active/1793520686.md`. **Главный резерв для разгрузки `/`** |
+| `/home/cfr_balloo` целиком | — | 43G до S3; **после — не замерялось** (дельта = усечённый лог) | `sites/alpha.balloo.su` ужат с 39G до **2,3G** (замер `du` после S3): 37G из него — лог `messenger/pm2-error-24.log` (39 303 973 191 байт) краш-цикла старой Next.js-альфы; усечён 01.11.2026 (хвост сохранён в `/data/balloo/backups`), цикл остановлен `pm2 stop balloo-messenger`. Остаток (код 2,3G) — на решении владельца: `MOD=4`/`UNTRACKED=7`, удалять нельзя. Подробности: `tickets/active/1793520686.md` |
 | `/usr` | — | 12 ГБ | системное |
 | `/var/log` | — | 3,8 ГБ | системное (журналы; чистится `journalctl --vacuum-size` — резерв второй величины) |
-| `/` итого | — | 84 ГБ из 98 (**91%**) | ⚠️ свободно **9,0 ГБ**. Balloo даёт здесь только swap-файлы сборки; перенос клона вернул 68 МБ и occupancy не изменил |
+| `/` итого | — | **48 ГБ из 98 (51%)** после S3/S4 01.11.2026; до этого 84G (91%) | ✅ свободно **46 ГБ**. Balloo на `/`: containerd-слои образов (17G, включая чужие стеки), остальное — не balloo. Клон и дампы — на `sdd` |
 
 ### 2.3. Расхождение с документацией соседнего репозитория
 
@@ -489,17 +489,19 @@ balloo-minio    Up 2 days (healthy)
    `nginx -t` зелёный, reload выполнен (G2). Доказательства: §6.5, блок
    `nginx:` в §9. Файл 6350 → 8373 байт, бэкап
    `/root/balloo-docker.conf.bak-20261029-g`.
- 2. **Место на корне.** Свободно **9,0 ГБ из 98 (91%)** — замер 01.11.2026. Данные
-    Balloo на sdd (клон перенесён 01.11, тикет 1793435849), но корень
-    растёт (68 ГБ → 84 ГБ с 27.10). Источник роста по замеру — `/home/cfr_balloo`
-    43G, из них **`sites/alpha.balloo.su` — 39G** (это поддомен Balloo, а НЕ «статика
-    чужого центр-фр.рф», как ошибочно было записано ранее) и `/var/lib` 18G.
-    Разбор и освобождение: `tickets/active/1793520686.md`.
+ 2. **Место на корне — РЕШЕНО 01.11.2026 (тик. 1793520686).** Свободно **46 ГБ из 98
+    (51%)**; было 9,0G (91%). Причина 84G: `/home/cfr_balloo/sites/alpha.balloo.su`
+    (39G), из них **37G — один лог `messenger/pm2-error-24.log`** краш-цикла старой
+    Next.js-альфы balloo. Усечён (хвост 2M сохранён на `sdd`), цикл остановлен
+    `pm2 stop balloo-messenger` (`дельта=0` за 60 сек). Ранее — клон на `sdd` (+68M).
+    Чужое (журналы 3,7G, `ollama` 8,43GB, nc1000, crm, cfrsite) не тронуто — по
+    указанию владельца «освобождай корень только от того что относится к тебе».
+    ⚠️ Остановка pm2 **не переживёт перезагрузку** без `pm2 save`.
  3. **Расхождение `docker system df` (images 14,61 ГБ) vs `df /data/balloo` (1,2 ГБ) —
     ОБЪЯСНЕНО 01.11.2026:** включён containerd image store (`storage=overlayfs`), слои
     образов и build-кэш (14,61+2,84≈17,45ГБ) лежат в `/var/lib/containerd` на `/`
     (`sudo du` → 17G). data-root переносит только тома. Следствие: `compose build`
-    пишет на `/` (свободно 9,1G) — проверять `df` до/после сборки.
+    пишет на `/` (свободно 46G после S3) — проверять `df` до/после сборки.
 4. **Браузерная приёмка P38 (этап K).** Чек-лист в тикете 1792812416: вход,
    запросы на `api.balloo.su`, консоль, `/#/`-роутер, `admin.balloo.su`
    (вход + список), Метрика в Network.
@@ -531,18 +533,17 @@ storage:
   data_disk_use_percent: 1
   root_device: /dev/mapper/ubuntu--vg-ubuntu--lv
   root_size: 98G
-  root_used: 84G
-  root_avail: 9.1G
-  root_use_percent: 91
+  root_used: 48G                   # после S3/S4 01.11.2026 (было 84G)
+  root_avail: 46G
+  root_use_percent: 51
   root_top_consumers:
-    home_cfr_balloo: 43G
-    home_sites_alpha_balloo_su: 39G   # ⚠️ поддомен Balloo (не чужой проект; правка 01.11)
-    home_sites_cfrsite: 727M
+    var_lib_containerd: 17G           # образы balloo + чужих стеков (data-root не переносит)
+    home_cfr_balloo_after_S3: "не замерялось (было 43G)"
+    home_sites_alpha_balloo_su: 2.3G  # после усечения 37G-лога (было 39G)
     home_balloo_api_old: 491M         # старое (не docker) развёртывание
     home_balloo_app_old: 477M
-    var_lib: 18G                      # содержимое не разведено
-    var_log_journal: 3.7G
-    usr: 12G
+    var_log_journal: 3.7G             # чужое, не трогаем (решение владельца 01.11)
+    usr: 12G                          # системное
   repo_path: /data/balloo/repo     # перенесён с / на sdd 01.11.2026
   repo_symlink: /home/cfr_balloo/balloo -> /data/balloo/repo
   repo_size: 68M
