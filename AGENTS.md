@@ -452,7 +452,7 @@ tickets/active/with_lord/
 | Репозиторий на сервере | **`/data/balloo/repo`** (диск `sdd`; перенесён 01.11.2026 тикетом 1793435849). Старый путь `/home/cfr_balloo/balloo` оставлен **symlink'ом** на новый — команды с любым из двух путей работают | вывод сервера 01.11.2026: `ls -ld balloo` → `lrwxrwxrwx ... balloo -> /data/balloo/repo`; `readlink -f` → `/data/balloo/repo`; копия проверена: `HEAD=73c5272`, `MOD=0`, `ФАЙЛОВ_ГИТ=1690`, `.env.production` 9241 байт (путь `/home/aedgar192/balloo` в старых тикетах — ошибка) |
 | Compose | `cd /data/balloo/repo/docker/prod`; `docker compose -f docker-compose.local.yml --env-file .env.production` | §5 |
 | Дампы БД | `/data/balloo/backups` (`sdd`), symlink `LATEST.sql`; каталог создан и передан `cfr_balloo` 01.11.2026 | `pg_dump` → 90 489 байт, `ТАБЛИЦ=51`, `dump complete`=1 |
-| Docker data-root | `/data/balloo/docker` (`/etc/docker/daemon.json`); `/var/lib/docker` = 0 | `docker info` + `du` на сервере 01.11.2026 |
+| Docker data-root | `/data/balloo/docker` (`/etc/docker/daemon.json`); `/var/lib/docker` = 0. ⚠️ **Образы и build-кэш этим не переносятся**: включён containerd image store (`storage=overlayfs`), слои живут в системном `/var/lib/containerd` = **17G на `/`** (замер 01.11: images 14,61G + cache 2,84G ≈ 17G). Перед `compose build` проверять `df -h /` (свободно 9,1G), при <4G — сборку не начинать | `docker info` + `sudo du -xsh /var/lib/containerd` на сервере 01.11.2026 |
 | Фронт | контейнер `balloo-web`, `127.0.0.1:8090 -> 80`, образ `balloo/web:local` | §0 |
 | Бэкенд | `balloo-server` → `127.0.0.1:3100`; `api.balloo.su` → `:3100` | §0 |
 | Домен | `https://balloo.su`, роутер **hash** → `https://balloo.su/#/…` | §0 |

@@ -194,17 +194,32 @@ git rev-parse --short HEAD        # сверяем HEAD с локальным
 `/var/lib/docker` = **0** — каталог data-root вынесен на `sdd` через
 `/etc/docker/daemon.json` (`{"data-root": "/data/balloo/docker"}`).
 
-⚠️ **Но это не значит, что все гигабайты образов лежат вне `/`.** `docker system df`
-показывает images 14,61GB + build cache 2,838GB, а `df /data/balloo` — занято всего
-**1,2G** (≈ объём томов 1,056GB). Расхождение **не объяснено**: при
-`storage=overlayfs` (containerd image store) слои могут жить в
-`/var/lib/containerd`, который перенос data-root **не** затрагивает и который
-находится на `/`. Подтвердить прогоном: `sudo du -xsh /var/lib/containerd
-/var/lib/docker`. Пока не подтверждено — считать, что тяжёлые сборки способны
-упираться в `/` (свободно 9,0G), и перед `compose build` проверять `df -h /`.
+⚠️ **Перенос data-root НЕ переносит образы.** Подтверждено прогоном 01.11.2026:
+`sudo du -xsh /var/lib/containerd` → **17G на `/`**, при `df /data/balloo` занято
+1,2G (≈ только тома 1,056G). Причина: `docker info` → `storage=overlayfs`, то есть
+включён **containerd image store**; на Ubuntu dockerd работает с системным
+containerd (`/run/containerd/containerd.sock`), чей root — `/var/lib/containerd`,
+и data-root на него не влияет. Расхождение `docker system df` (images 14,61G) vs
+`df /data/balloo` (1,2G) этим объяснено полностью.
 
-Значит, упираться в 91% могут и Docker-слои, и хостовые `/home` (43G, из них 39G —
-`sites/alpha.balloo.su`) и `/var` (18G). Сам клон balloo — 68M.
+**Следствия для сборок (`compose build`):**
+1. новые слои образа пишутся **на `/`** (свободно 9,1G) — перед любой сборкой
+   проверять `df -h /`, после — сверять дельту; при `< 4G` свободных сборку не
+   начинать;
+2. **buildkit-кэш — тоже на `/`**, не на `sdd`: арифметика закрывает вопрос —
+   images 14,61G + build cache 2,84G = 17,45G ≈ 17G из `du /var/lib/containerd`,
+   при этом весь `sdd` занят на 1,2G (только тома). `docker builder prune`
+   освобождает именно `/`; но prune перед сборкой лишает кэша и растягивает
+   сборку — при 9,1G свободных не нужен;
+3. удаление старых образов (`docker rmi`) освобождает `/`, а не `sdd`;
+4. перенос containerd на `sdd` возможен только с рестартом containerd+docker —
+   это уронит весь стек (запрещено протоколом деплоя) и решается отдельной
+   операцией с владельцем.
+
+Хостовые потребители `/`: `/home` 43G (из них `sites/alpha.balloo.su` 39G —
+старая альфа Balloo, `messenger` 38G + `messenger.backup` 1,1G; vhost включён,
+`:3021` не слушается, pm2-лог обновляется), `/var/log/journal` 3,6G. Сам клон
+balloo — 68M, с `/` перенесён на `sdd` 01.11.2026.
 
 ```bash
 # Проверка:

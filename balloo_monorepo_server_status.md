@@ -60,9 +60,13 @@ Filesystem                         Size  Used Avail Use% Mounted on
 /dev/sdd                            3,6T  1,1G  3,4T   1% /data/balloo
 ```
 
-**Вывод:** Docker data-root = `/data/balloo/docker` на диске `sdd` (3,6 ТБ, метка `balloo`).
-Образы, тома PostgreSQL/Redis/MinIO, кэш сборки — **на отдельном диске**. Требование
-владельца «Balloo не на системном диске» — **выполнено**.
+**Вывод (уточнён 01.11.2026):** Docker data-root = `/data/balloo/docker` на диске `sdd` —
+сюда переносятся **тома** (PostgreSQL/Redis/MinIO) и buildkit-состояние. Но образы и
+build-кэш физически лежат в **системном containerd** (`storage=overlayfs` = containerd
+image store, на Ubuntu dockerd использует `/run/containerd/containerd.sock`):
+`sudo du -xsh /var/lib/containerd` → **17G на `/`**. Требование владельца «Balloo не на
+системном диске» для **данных** выполнено; для **слоёв образов** — не выполнено,
+перенос требует рестарта containerd+docker (уронит стек) и решается отдельно.
 
 ### 2.2. Что осталось на системном диске
 
@@ -491,11 +495,11 @@ balloo-minio    Up 2 days (healthy)
     43G, из них **`sites/alpha.balloo.su` — 39G** (это поддомен Balloo, а НЕ «статика
     чужого центр-фр.рф», как ошибочно было записано ранее) и `/var/lib` 18G.
     Разбор и освобождение: `tickets/active/1793520686.md`.
- 3. **Расхождение `docker system df` (images 14,61 ГБ) vs `df /data/balloo` (занято
-    1,2 ГБ) — НЕ объяснено.** Гипотеза: при `storage=overlayfs` слои образов живут в
-    `/var/lib/containerd` на `/` (перенос data-root его не касается). Проверить
-    `sudo du -xsh /var/lib/containerd /var/lib/docker`. Пока не проверено, тяжёлые
-    сборки считаются способными упираться в `/`.
+ 3. **Расхождение `docker system df` (images 14,61 ГБ) vs `df /data/balloo` (1,2 ГБ) —
+    ОБЪЯСНЕНО 01.11.2026:** включён containerd image store (`storage=overlayfs`), слои
+    образов и build-кэш (14,61+2,84≈17,45ГБ) лежат в `/var/lib/containerd` на `/`
+    (`sudo du` → 17G). data-root переносит только тома. Следствие: `compose build`
+    пишет на `/` (свободно 9,1G) — проверять `df` до/после сборки.
 4. **Браузерная приёмка P38 (этап K).** Чек-лист в тикете 1792812416: вход,
    запросы на `api.balloo.su`, консоль, `/#/`-роутер, `admin.balloo.su`
    (вход + список), Метрика в Network.
@@ -528,7 +532,7 @@ storage:
   root_device: /dev/mapper/ubuntu--vg-ubuntu--lv
   root_size: 98G
   root_used: 84G
-  root_avail: 9.0G
+  root_avail: 9.1G
   root_use_percent: 91
   root_top_consumers:
     home_cfr_balloo: 43G
@@ -545,8 +549,8 @@ storage:
   backups_dir: /data/balloo/backups   # sdd; LATEST.sql → balloo-20261101-124019.sql
   docker_root: /data/balloo/docker   # НА ОТДЕЛЬНОМ ДИСКЕ sdd
   var_lib_docker_size: 0             # du -sh → 0 (перенесён)
-  docker_images_size: 14.61GB        # ⚠️ НЕ объяснено: df /data/balloo занято 1.2G
-  docker_images_hypothesis: "/var/lib/containerd на / (перенос data-root его не касается) — проверить sudo du -xsh /var/lib/containerd"
+  docker_images_size: 14.61GB        # объяснено 01.11: слои в /var/lib/containerd (17G) на /
+  docker_images_actual_location: /var/lib/containerd   # containerd image store, data-root не влияет
   docker_containers_size: 395.4MB
   docker_volumes_size: 1.056GB
   docker_build_cache: 1.599GB
