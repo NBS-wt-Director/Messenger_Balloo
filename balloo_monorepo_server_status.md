@@ -671,14 +671,14 @@ blockers:
     description: "VITE_YM_METRIKA_ID не пробрасывался в docker-сборку web → счётчик мёртв"
     resolution: "тик. 1793270207 (коммит 2f2d584), пересборка батчем J 29.10.2026"
     evidence: "grep -c tag.js в прод-бандле → 1; mc.yandex.ru → 1; 112269610 → 1"
-  - id: disk-space-root
-    severity: warning
-    description: "9,6 ГБ свободно из 98 ГБ (90%); рост с 68 до 84 ГБ из-за /home/cfr_balloo/sites (38 ГБ, чужой проект)"
   - id: docker-df-mismatch
     severity: warning
     description: "docker system df = 14.59 ГБ образов, du /data/balloo = 1.1 ГБ — не подтверждено, что все образы на sdd"
 
 resolved:
+  - id: disk-space-root
+    resolution: "РЕШЕНО 01.11.2026 (тик. 1793520686 S3/S4): / освобождён с 9,1G до 46G свободно (84G/91% → 48G/51%). Вес давал sites/alpha.balloo.su (39G), из них 37G — ОДИН лог messenger/pm2-error-24.log краш-цикла старой Next.js-альфы balloo, а НЕ «38 ГБ чужого проекта центр-фр.рф» (прежняя запись была ошибкой). Лог усечён (хвост 2M на sdd), цикл остановлен pm2 stop balloo-messenger"
+    evidence: "df -h /: 84G/9,1G/91% → 48G/46G/51%; du sites/alpha.balloo.su: 39G → 2,3G"
   - id: disk-placement
     resolution: "Требование выполнено: sdd 3,6 ТБ → /data/balloo, Docker data-root = /data/balloo/docker"
     evidence: "docker info --format '{{.DockerRootDir}}' → /data/balloo/docker; lsblk: sdd ext4 balloo /data/balloo"
