@@ -273,7 +273,8 @@ healthcheck'и контейнеров ходят на `127.0.0.1:3100` напр�
 | Медиа | named volume `prod_minio-data` |
 | Сессии | named volume `prod_redis-data` |
 | server наружу | `127.0.0.1:3100` (web-контейнер `127.0.0.1:8090→80`, `WEB_HOST_PORT=8090`) |
-| MinIO console | `127.0.0.1:9001` (S3 9000 наружу не опубликован) |
+| MinIO console | `127.0.0.1:9001` (S3 API `:9000` проброшен на loopback с 02.11.2026 — нужно для `cdn.balloo.su`; см. `docker/prod/docker-compose.local.yml:95`) |
+| Redis пароль | задан: `REDIS_PASSWORD` + `REDIS_URL` в `.env.production` (сгенерирован 07.09.2026). Контейнер `redis` стартует с `--requirepass`, `healthcheck` — `redis-cli -a`. Хостовые `redis-cli` попадают в **хостовый** redis, в контейнер — только `docker exec -it balloo-redis redis-cli -a "$REDIS_PASSWORD"` |
 
 Контейнеры: `balloo-postgres`, `balloo-redis`, `balloo-minio`, `balloo-server`,
 `balloo-web` (все `restart: always`); мониторинг (`balloo-prometheus`,

@@ -50,8 +50,6 @@
 | **🟠 ПЛАТЕЖИ (опц.)** | | | | | |
 | 31 | **ЮKassa** | `YOOKASSA_SHOP_ID` | _________________ | yookassa.ru (опционально) | 🟠 Позже |
 | 32 | **ЮKassa** | `YOOKASSA_API_KEY` | _________________ | yookassa.ru (опционально) | 🟠 Позже |
-| **🟠 CDN (опц.)** | | | | | |
-| 33 | **Yandex Disk** | `YANDEX_DISK_API_KEY` | _________________ | disk.yandex.ru (опционально) | 🟠 Позже |
 | **🔵 CI/CD (GitHub)** | | | | | |
 | 34 | **SSH: хост** | `VPS_HOST` (GitHub Secret) | `188.73.176.34` | ✅ Получен | ✅ Готово |
 | 35 | **SSH: пользователь** | `VPS_USER` (GitHub Secret) | `cfr_balloo` | ✅ Получен | ✅ Готово |
@@ -64,7 +62,10 @@
 ### Что заполняешь ты:
 - **OAuth** (все 3 — Яндекс, VK, Mail.ru) — клиент ID + секрет ✅
 - **ЮKassa** — shop ID + API ключ (если нужны платежи)
-- **Yandex Disk** — API ключ (если нужен диск)
+
+> **Убрано 02.11.2026 (решение владельца):** `YANDEX_DISK_API_KEY` (Яндекс Диск),
+> `MAX_*` и `DEPLOY_SHA` — код их не читает, получения не требуется. Из анкет
+> удалены, чтобы не тянуть мёртвые ключи.
 
 ### Что уже сгенерировано:
 - `REDIS_PASSWORD` ✅ (2026-09-07, production)
@@ -94,7 +95,6 @@
 - [x] **Redis** — пароль сгенерирован ✅
 - [x] **MinIO** — кастомный SECRET_KEY ✅
 - [ ] **ЮKassa** — shop ID + API key (или «позже»)
-- [ ] **Yandex Disk** — API key (или «позже»)
 - [ ] **SSH-ключ** добавлен в GitHub Secrets (VPS_HOST, VPS_USER, VPS_SSH_KEY)
 - [x] **PTR-запись** — настроить у хостера (188.73.176.34 → mail.balloo.su) ✅ (2026-09-07)
 - [x] **DMARC** — TXT-запись: `_dmarc v=DMARC1; p=quarantine; rua=mailto:noreply@balloo.su` ✅ (2026-09-07)
