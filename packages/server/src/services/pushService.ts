@@ -38,13 +38,44 @@ const VAPID_PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY || '';
 const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY || '';
 const VAPID_SUBJECT = process.env.VAPID_SUBJECT || 'mailto:admin@balloo.su';
 
-// Инициализация web-push (если ключи есть)
+// Инициализация web-push (если ключи есть).
+// web-push валидирует ключи синхронно и бросает исключение при ошибке. Вызов
+// происходит на верхнем уровне модуля, а модуль импортируется через
+// routes/index → devices → deviceController: любой бросок здесь останавливал
+// весь процесс до httpServer.listen() (падение прода 02.11.2026). Push
+// опционален, переписка — нет, поэтому ошибка ключей деградирует gracefully.
+let vapidReady = false;
+
+// Длина значения в байтах после base64url-декодирования (для diagnostic-лога;
+// сами ключи в лог не пишутся).
+const decodedBytes = (value: string): number => {
+  try {
+    return Buffer.from(value, 'base64url').length;
+  } catch {
+    return -1;
+  }
+};
+
 if (VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY) {
-  webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
-  console.log('[Push] VAPID Web Push initialized');
+  try {
+    webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
+    vapidReady = true;
+    console.log('[Push] VAPID Web Push initialized');
+  } catch (error) {
+    console.error(
+      '[Push] VAPID keys rejected by web-push — browser push notifications ' +
+        'disabled, server startup continues. ' +
+        `VAPID_PUBLIC_KEY=${decodedBytes(VAPID_PUBLIC_KEY)} bytes (need 65), ` +
+        `VAPID_PRIVATE_KEY=${decodedBytes(VAPID_PRIVATE_KEY)} bytes (need 32). ` +
+        `Reason: ${(error as Error).message}`
+    );
+  }
 } else {
   console.warn('[Push] VAPID keys not set — browser push notifications disabled');
 }
+
+// Готов ли VAPID к отправке (ключи заданы и приняты web-push)
+export const isVapidReady = (): boolean => vapidReady;
 
 // ============================================================
 // Интерфейсы
@@ -248,8 +279,8 @@ export const sendVapidPush = async (
     tag?: string;
   }
 ): Promise<void> => {
-  if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
-    console.warn('[Push] VAPID keys not configured, skipping push');
+  if (!vapidReady) {
+    console.warn('[Push] VAPID not configured (keys missing or invalid), skipping push');
     return;
   }
 
@@ -274,7 +305,7 @@ export const sendVapidPushToUsers = async (
     data?: Record<string, any>;
   }
 ): Promise<void> => {
-  if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
+  if (!vapidReady) {
     return;
   }
 
