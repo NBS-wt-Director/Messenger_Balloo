@@ -95,7 +95,7 @@
 
 ---
 
-## 🔴 Инцидент 02.11.2026: зона не разрешается (DNS-хостинг beget не отвечает)
+## ✅ Инцидент 02.11.2026: зона не разрешалась (DNS-хостинг beget не отвечал) — восстановлен 04.11.2026
 
 `balloo.su` и все поддомены → SERVFAIL у публичных рекурсоров; браузер отдаёт
 `ERR_TIMED_OUT`. Делегирование корректно (`ns1/ns2.beget.ru|.com|.pro` — TLD `.su`
@@ -106,11 +106,28 @@
 `--resolve <host>:443:188.73.176.34` — `balloo.su` 200, `api` 200, `admin` 200,
 `cdn` 403, TLS валиден (без `-k`).
 
+**Реген 04.11.2026 — сбой снят провайдером.** Замеры обычным резолвером, без
+обхода: Google/Cloudflare DoH → `Status=0`, `A=188.73.176.34` (Google:
+`Response from 5.101.159.11` = `ns1.beget.ru`); `dig +tcp` к 5.101.159.11,
+93.92.81.0, 185.50.27.12 → запись отдаётся; `getent hosts` резолвит имена;
+наружные коды без `--resolve` и без `-k`: `balloo`/`api`/`admin`/`history`/
+`download`/`docs`/`blog`/`command` → **200**, `cdn` → **403** (норма политики),
+`features` → **000** (отложено владельцем). TLS `verify=0`, `CN=balloo.su`,
+`notAfter=Jan 13 2027` — Let's Encrypt продлился сам, то есть валидация по DNS
+снова работает.
+
 whois (`whois.ripn.net`, TCP 43): `state: REGISTERED, DELEGATED, UNVERIFIED`,
 `registrar: BEGET-SU`, `paid-till: 2026-11-08`, `free-date: 2026-12-11`.
 
-Разбор и команды обхода: `tickets/active/1793619928.md`,
-`tickets/active/with_lord/1793619928-dns-beget.md`.
+Разбор: `tickets/Done/2026-11-04/1793619928.md`,
+`tickets/active/with_lord/1793619928-dns-beget.md` (переходит в закрытые).
+
+❗ **Оставшийся риск по зоне — не DNS, а оплата:** `paid-till: 2026-11-08`
+(4 дня на момент замера), `free-date: 2026-12-11`, статус `UNVERIFIED`. Без
+продления 08.11 все 12 имён перестанут резолвиться на живом проде, а следом
+встанет и автоматическое продление TLS. Задача владельцу:
+`tickets/active/with_lord/❗СРОЧНО-продление-balloo.su-do-08-11.md`
+(пункт 5.8 в `СДЕЛАТЬ_ВЛАДЕЛЬЦУ.md`).
 
 ## Статус DNS-записей
 
