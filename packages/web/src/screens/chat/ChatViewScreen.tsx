@@ -132,8 +132,12 @@ export const ChatViewScreen: React.FC = () => {
         ws.onmessage = (event) => {
           const data = JSON.parse(event.data);
           switch (data.type) {
-            case 'message.send':
-              if (data.chatId === chatId) {
+            // Сервер доставляет новое сообщение событием message.received
+            // (см. packages/server/src/ws/types.ts). Прежний case 'message.send'
+            // слушал имя, которого сервер не отправляет никогда, поэтому
+            // входящие сообщения появлялись только после перезагрузки.
+            case 'message.received':
+              if (data.chatId === chatId && data.message) {
                 addMessage(chatId, {
                   ...data.message,
                   sender: data.message.sender

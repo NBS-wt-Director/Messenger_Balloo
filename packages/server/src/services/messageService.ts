@@ -1,4 +1,6 @@
 import { PrismaClient } from '@prisma/client';
+import { roomManager } from '../ws/room-manager';
+import { serializeWsMessage } from '../ws/types';
 
 const prisma = new PrismaClient();
 
@@ -159,7 +161,7 @@ export const sendMessage = async (userId: string, input: SendMessageInput) => {
     data: { updatedAt: now },
   });
 
-  return {
+  const payload = {
     id: message.id,
     chatId: message.chatId,
     senderId: message.senderId,
@@ -192,6 +194,32 @@ export const sendMessage = async (userId: string, input: SendMessageInput) => {
     createdAt: message.createdAt,
     updatedAt: message.updatedAt,
   };
+
+  // Доставка в реальном времени: получатели с открытым этим чатом видят
+  // сообщение без перезагрузки. Сокеты отправителя исключены — он уже добавил
+  // сообщение в интерфейс из ответа REST/WS.
+  // Ошибку рассылки не поднимаем: сообщение в БД создано, и 500 на успешную
+  // отправку был бы хуже, чем недоставка в одну вкладку (см. правило
+  // «опциональный сервис не валит процесс» в AGENTS.md).
+  try {
+    const event = serializeWsMessage({
+      type: 'message.received',
+      chatId: input.chatId,
+      message: payload,
+      messageId: payload.id,
+      senderId: payload.senderId,
+      senderName: payload.sender?.displayName || payload.sender?.username,
+      content: payload.content ?? '',
+      messageType: payload.type,
+      replyToId: payload.replyToId ?? undefined,
+      timestamp: payload.createdAt,
+    });
+    roomManager.broadcastToRoomExceptUser(input.chatId, event, userId);
+  } catch (err) {
+    console.error('[messages] broadcast message.received failed:', err);
+  }
+
+  return payload;
 };
 
 // ============================================================

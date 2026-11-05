@@ -1,10 +1,13 @@
 import { PrismaClient } from '@prisma/client';
 import {
   AuthenticatedWebSocket,
+  WsChatJoin,
+  WsChatLeave,
   WsIncomingMessage,
   WsOutgoingMessage,
   WsMessageReceived,
   WsMessageRead,
+  WsMessageSent,
   WsTypingStart,
   WsTypingStop,
   WsPresenceUpdate,
@@ -14,6 +17,7 @@ import {
   serializeWsMessage,
 } from './types';
 import { roomManager } from './room-manager';
+import { sendMessage as sendMessageService } from '../services/messageService';
 
 const prisma = new PrismaClient();
 
@@ -42,6 +46,14 @@ export const handleWsMessage = async (
 
   try {
     switch (parsed.type) {
+      case 'chat.join':
+        await handleChatJoin(ws, parsed);
+        break;
+
+      case 'chat.leave':
+        handleChatLeave(ws, parsed);
+        break;
+
       case 'message.send':
         await handleMessageSend(ws, parsed);
         break;
@@ -100,6 +112,52 @@ export const handleWsMessage = async (
 };
 
 // ============================================================
+// chat.join / chat.leave — подписка на комнату чата
+// ============================================================
+
+/**
+ * Без этого обработчика комнаты чатов были бы пусты всегда: joinRoom()
+ * вызывался только для 'presence:global', поэтому broadcast новых сообщений
+ * уходил в никуда и получатель видел сообщение только после перезагрузки.
+ * Клиент web шлёт chat.join при открытии чата (ChatViewScreen.tsx).
+ */
+const handleChatJoin = async (ws: AuthenticatedWebSocket, msg: WsChatJoin): Promise<void> => {
+  const chatId = String(msg.chatId ?? '');
+
+  if (!chatId) {
+    sendError(ws, 'MISSING_CHAT_ID', 'Для chat.join обязателен chatId');
+    return;
+  }
+
+  // Подписывать можно только тот чат, в котором ты участник — иначе любой
+  // клиент по чужому chatId получал бы чужие сообщения в реальном времени.
+  const member = await prisma.userChat.findFirst({
+    where: { userId: ws.userId, chatId },
+  });
+
+  if (!member) {
+    sendError(ws, 'NOT_IN_CHAT', 'Вы не участник этого чата');
+    return;
+  }
+
+  roomManager.joinRoom(chatId, ws);
+
+  ws.ws.send(
+    serializeWsMessage({
+      type: 'chat.joined',
+      chatId,
+      members: roomManager.getRoomMembers(chatId).size,
+    })
+  );
+};
+
+const handleChatLeave = (ws: AuthenticatedWebSocket, msg: WsChatLeave): void => {
+  const chatId = String(msg.chatId ?? '');
+  if (!chatId) return;
+  roomManager.leaveRoom(chatId, ws);
+};
+
+// ============================================================
 // message.send — отправка сообщения в чат
 // ============================================================
 
@@ -139,45 +197,58 @@ const handleMessageSend = async (
     return;
   }
 
-  // Создание сообщения в БД
-  const message = await prisma.message.create({
-    data: {
+  // Единый путь создания сообщения с REST (controllers/messageController.ts):
+  // unread, lastMessage у чата, вложения и broadcast в комнату делает сервис.
+  // Прежая копия логики здесь не обновляла unread и молча падала на
+  // JSON.stringify(BigInt) в serializeWsMessage.
+  let payload: Awaited<ReturnType<typeof sendMessageService>>;
+  try {
+    payload = await sendMessageService(ws.userId, {
       chatId,
-      senderId: ws.userId,
-      type: messageType,
+      type: messageType as any,
       content,
-      replyToId: replyToId || null,
-      status: 'sent',
-      createdAt: BigInt(Math.floor(Date.now() / 1000)),
-      updatedAt: BigInt(Math.floor(Date.now() / 1000)),
-    },
-  });
+      replyToId: replyToId || undefined,
+      attachments: msg.attachmentUrl
+        ? [
+            {
+              type: msg.attachmentType || 'file',
+              url: msg.attachmentUrl,
+              name: msg.attachmentName,
+              size: msg.attachmentSize,
+              width: msg.attachmentWidth,
+              height: msg.attachmentHeight,
+              duration: msg.attachmentDuration,
+            },
+          ]
+        : undefined,
+    });
+  } catch (error: any) {
+    // Сервис говорит текстом (как и REST-контроллер, который его переводит в
+    // 403/404). Здесь тот же смысл отдаётся кодом WS-контракта, а не
+    // обезличенным INTERNAL_ERROR из handleWsMessage.
+    const message = String(error?.message ?? '');
+    if (message.includes('не являетесь участником')) {
+      sendError(ws, 'NOT_IN_CHAT', message);
+    } else if (message.includes('заблокировали уведомления')) {
+      sendError(ws, 'CHAT_MUTED', message);
+    } else if (message.includes('не найдено')) {
+      sendError(ws, 'CHAT_NOT_FOUND', message);
+    } else {
+      throw error;
+    }
+    return;
+  }
 
-  // Формирование исходящего сообщения
-  const outgoing: WsOutgoingMessage & { type: 'message.received' } = {
-    type: 'message.received',
-    messageId: message.id,
-    chatId,
-    senderId: ws.userId,
-    senderName: ws.username,
-    content,
-    messageType,
-    replyToId: replyToId || undefined,
-    timestamp: message.createdAt,
-  };
-
-  // Broadcast всем участникам чата, кроме отправителя
-  roomManager.broadcastToRoom(chatId, serializeWsMessage(outgoing), ws.ws);
-
-  // Уведомление отправителю (подтверждение)
-  const sentConfirmation: WsOutgoingMessage & { type: 'message.sent' } = {
+  // Подтверждение отправителю. Собственное сообщение ему не возвращается
+  // событием message.received — сервис исключает сокеты отправителя.
+  const sentConfirmation: WsMessageSent = {
     type: 'message.sent',
-    messageId: message.id,
+    messageId: payload.id,
     chatId,
     senderId: ws.userId,
     content,
     messageType,
-    timestamp: Number(message.createdAt),
+    timestamp: Number(payload.createdAt),
   };
   ws.ws.send(serializeWsMessage(sentConfirmation));
 };

@@ -46,6 +46,8 @@ export interface WsAuthedRequest extends IncomingMessage {
 // ============================================================
 
 export type WsMessageType =
+  | 'chat.join'
+  | 'chat.leave'
   | 'message.send'
   | 'message.read'
   | 'typing.start'
@@ -62,6 +64,16 @@ export type WsMessageType =
 // ============================================================
 // Входящие сообщения от клиента
 // ============================================================
+
+export interface WsChatJoin {
+  type: 'chat.join';
+  chatId: string;
+}
+
+export interface WsChatLeave {
+  type: 'chat.leave';
+  chatId: string;
+}
 
 export interface WsMessageSend {
   type: 'message.send';
@@ -152,6 +164,8 @@ export interface WsCallEnd {
 
 // Union type всех входящих сообщений
 export type WsIncomingMessage =
+  | WsChatJoin
+  | WsChatLeave
   | WsMessageSend
   | WsMessageRead
   | WsTypingStart
@@ -169,6 +183,13 @@ export type WsIncomingMessage =
 // Исходящие сообщения от сервера (server→client)
 // ============================================================
 
+export interface WsChatJoined {
+  type: 'chat.joined';
+  chatId: string;
+  /** Сколько сокетов теперь состоит в комнате — для диагностики на клиенте. */
+  members: number;
+}
+
 export interface WsMessageSent {
   type: 'message.sent';
   messageId: string;
@@ -181,15 +202,23 @@ export interface WsMessageSent {
 
 export interface WsMessageReceived {
   type: 'message.received';
-  messageId: string;
   chatId: string;
+  /**
+   * Сообщение в той же форме, что отдаёт REST
+   * (POST/GET /api/chats/:chatId/messages): клиент вставляет объект в стор
+   * без адаптации. BigInt-поля сериализуются в строку тем же реплейсером,
+   * что и REST-ответ (app.ts, «BigInt JSON serializer»).
+   */
+  message: Record<string, any>;
+  // Плоские поля ниже — обратная совместимость со старыми клиентами.
+  messageId: string;
   senderId: string;
   senderName?: string;
   content: string;
   messageType: string;
   replyToId?: string;
   attachmentUrl?: string;
-  timestamp: bigint;
+  timestamp: bigint | number;
 }
 
 export interface WsMessageReadUpdate {
@@ -297,6 +326,7 @@ export interface WsConnected {
 
 // Union type всех исходящих сообщений
 export type WsOutgoingMessage =
+  | WsChatJoined
   | WsMessageSent
   | WsMessageReceived
   | WsMessageReadUpdate
@@ -318,8 +348,18 @@ export type WsOutgoingMessage =
 // Утилитарные функции
 // ============================================================
 
+/**
+ * JSON.stringify бросает TypeError на BigInt («Do not know how to serialize a
+ * BigInt»), а timestamps в схеме Prisma — BigInt. Любой исходящий
+ * ивент с `timestamp: message.createdAt` ронял обработку сообщения целиком
+ * (клиент получал error INTERNAL_ERROR, рассылка не происходила).
+ * Реплейсер совпадает с REST-сериализатором в app.ts: BigInt → строка.
+ */
+const bigIntReplacer = (_key: string, value: unknown) =>
+  typeof value === 'bigint' ? value.toString() : value;
+
 export const serializeWsMessage = (msg: WsOutgoingMessage): string =>
-  JSON.stringify(msg);
+  JSON.stringify(msg, bigIntReplacer);
 
 export const deserializeWsMessage = (data: string): WsIncomingMessage =>
   JSON.parse(data) as WsIncomingMessage;

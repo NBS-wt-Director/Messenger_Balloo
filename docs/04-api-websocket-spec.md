@@ -314,15 +314,17 @@ ws://balloo.su/ws?token=<JWT>
 | `status.update` | `{nodeId, status, latencyMs}` | Изменение статуса узла сервиса (real-time дашборд) |
 | `2fa.required` | `{userId, methods: ["email"]}` | Требуется 2FA-код (email) для завершения действия |
 
-### Фактическая реализация (замер 21.10.2026, тикет 1792516969)
+### Фактическая реализация (замер 21.10.2026, тикет 1792516969; дополнено 05.11.2026 — тикет 1793791062)
 
 Реальные имена событий в коде (`packages/server/src/ws/`) используют **точку**
-как разделитель (`message.send`, не `message:send`). На момент замера сервер
-обрабатывает 12 client→server событий:
+как разделитель (`message.send`, не `message:send`). Сервер обрабатывает
+14 client→server событий:
 
 | Event (client→server) | Payload | Описание |
 |-------|---------|----------|
-| `message.send` | `{chatId, content, messageType?, replyToId?, attachmentUrl?...}` | Отправка сообщения |
+| `chat.join` | `{chatId}` | Подписка на комнату чата → `chat.joined`. Не участник → `error NOT_IN_CHAT` |
+| `chat.leave` | `{chatId}` | Отписка от комнаты |
+| `message.send` | `{chatId, content, messageType?, replyToId?, attachmentUrl?...}` | Отправка сообщения (тот же путь, что REST) |
 | `message.read` | `{chatId, messageId, readAt}` | Отметить прочитанным |
 | `typing.start` | `{chatId}` | Начал набирать (автостоп 5 с) |
 | `typing.stop` | `{chatId}` | Перестал набирать |
@@ -340,6 +342,36 @@ ws://balloo.su/ws?token=<JWT>
 (`{callId, answeredBy, answeredByName, timestamp}`), `call.declined`
 (`{callId, declinedBy, timestamp}`), `call.ended`
 (`{callId, endedBy, duration, timestamp}`).
+
+**Доставка нового сообщения (замер 05.11.2026, тик. 1793791062).** Событие
+`message.received` уходит **только** подписанным на комнату `chatId`, кроме
+сокетов отправителя, и содержит сообщение в той же форме, что REST
+(`POST/GET /api/chats/:chatId/messages`):
+
+| Event (server→client) | Payload |
+|-------|---------|
+| `message.received` | `{chatId, message: {id, chatId, senderId, type, content, replyTo, sender, attachments, status, createdAt, updatedAt, ...}, messageId, senderId, senderName, content, messageType, replyToId?, timestamp}` |
+| `chat.joined` | `{chatId, members}` |
+| `message.sent` | `{messageId, chatId, senderId, content, messageType, timestamp}` — подтверждение отправителю |
+
+Плоские поля (`messageId`, `content`, …) оставлены для обратной совместимости
+со старыми клиентами; новые клиенты читают `message` (в нём есть `sender` с
+`username`/`displayName` — плоский `senderName` имени не даёт).
+
+Рассылку делает `services/messageService.ts`, поэтому событие приходит и при
+REST-отправке (web/desktop), и при WS-отправке (`message.send`): оба пути
+проходят один и тот же сервис — unread, `lastMessage` чата и вложения
+формируются одинаково.
+
+**Сериализация.** `serializeWsMessage` использует реплейсер `bigint → string`
+(как REST-сериализатор в `app.ts`). Без него `timestamp: message.createdAt`
+(`BigInt` в схеме Prisma) бросал `TypeError` внутри `JSON.stringify`, обработка
+сообщения падала и клиент получал `error INTERNAL_ERROR`.
+
+Проверка исполнением — `packages/server/src/__tests__/ws-realtime.test.ts`
+(два реальных WS-клиента + REST) и
+`packages/web/src/__tests__/screens/chat-realtime.test.tsx` (клиент слушает
+именно `message.received`).
 
 **Не реализовано (останется в v2):** WebRTC signaling (`call:offer`,
 `call:ice`), mute/video/screen toggle, `poll:vote`, `device:pair:*`,

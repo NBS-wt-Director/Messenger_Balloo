@@ -143,6 +143,23 @@ export class RoomManager {
     }
   }
 
+  /**
+   * Рассылка в комнату чата всем, кроме сокетов отправителя. Нужен именно
+   * фильтр по userId, а не по одному WebSocket: у REST-отправки исходного
+   * сокета нет, а у пользователя их может быть несколько (вкладки/устройства).
+   */
+  public broadcastToRoomExceptUser(roomId: string, message: string, senderUserId: string): void {
+    const room = this.rooms.get(roomId);
+    if (!room) return;
+
+    for (const member of room) {
+      if (member.userId === senderUserId) continue;
+      if (member.ws.readyState === WebSocket.OPEN) {
+        member.ws.send(message);
+      }
+    }
+  }
+
   public broadcastToStoryRoom(storyId: string, message: string): void {
     const key = `story:${storyId}`;
     const room = this.storyRooms.get(key);
