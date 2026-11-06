@@ -290,21 +290,54 @@ const handleMessageRead = async (
 // typing.start / typing.stop — индикатор набора
 // ============================================================
 
+/**
+ * Автостоп индикатора. roomManager.setTyping(true) сам через 5 с помечает
+ * состояние false, но **рассылку не делает**: если клиент оборвался и не прислал
+ * typing.stop, получатель навсегда остаётся с «печатает». Поэтому сервер сам
+ * рассылает isTyping:false. Таймер сбрасывается на каждом typing.start, чтобы
+ * индикатор не мигал у того, кто печатает длинное сообщение.
+ */
+const TYPING_AUTOSTOP_MS = 5_000;
+const typingAutoStop = new Map<string, NodeJS.Timeout>();
+
+const typingKey = (userId: string, chatId: string) => `${userId}:${chatId}`;
+
+const broadcastTypingIndicator = (
+  ws: AuthenticatedWebSocket,
+  chatId: string,
+  isTyping: boolean,
+): void => {
+  const indicator: WsOutgoingMessage & { type: 'typing.indicator' } = {
+    type: 'typing.indicator',
+    chatId,
+    userId: ws.userId,
+    userName: ws.username,
+    isTyping,
+  };
+  roomManager.broadcastToRoom(chatId, serializeWsMessage(indicator), ws.ws);
+};
+
 const handleTypingStart = (
   ws: AuthenticatedWebSocket,
   msg: WsIncomingMessage & { type: 'typing.start' }
 ): void => {
   roomManager.setTyping(ws.userId, ws.username, msg.chatId, true);
+  broadcastTypingIndicator(ws, msg.chatId, true);
 
-  const indicator: WsOutgoingMessage & { type: 'typing.indicator' } = {
-    type: 'typing.indicator',
-    chatId: msg.chatId,
-    userId: ws.userId,
-    userName: ws.username,
-    isTyping: true,
-  };
-
-  roomManager.broadcastToRoom(msg.chatId, serializeWsMessage(indicator), ws.ws);
+  const key = typingKey(ws.userId, msg.chatId);
+  const previous = typingAutoStop.get(key);
+  if (previous) clearTimeout(previous);
+  typingAutoStop.set(
+    key,
+    setTimeout(() => {
+      typingAutoStop.delete(key);
+      // Сокет мог закрыться между стартом и автостопом — broadcast это терпит,
+      // но рассылать «печатает выключился» от умершего соединения смысла нет.
+      if (ws.ws.readyState !== 1 /* WebSocket.OPEN */) return;
+      roomManager.setTyping(ws.userId, ws.username, msg.chatId, false);
+      broadcastTypingIndicator(ws, msg.chatId, false);
+    }, TYPING_AUTOSTOP_MS),
+  );
 };
 
 const handleTypingStop = (
@@ -313,15 +346,13 @@ const handleTypingStop = (
 ): void => {
   roomManager.setTyping(ws.userId, ws.username, msg.chatId, false);
 
-  const indicator: WsOutgoingMessage & { type: 'typing.indicator' } = {
-    type: 'typing.indicator',
-    chatId: msg.chatId,
-    userId: ws.userId,
-    userName: ws.username,
-    isTyping: false,
-  };
+  const pending = typingAutoStop.get(typingKey(ws.userId, msg.chatId));
+  if (pending) {
+    clearTimeout(pending);
+    typingAutoStop.delete(typingKey(ws.userId, msg.chatId));
+  }
 
-  roomManager.broadcastToRoom(msg.chatId, serializeWsMessage(indicator), ws.ws);
+  broadcastTypingIndicator(ws, msg.chatId, false);
 };
 
 // ============================================================

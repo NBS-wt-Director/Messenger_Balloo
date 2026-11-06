@@ -10,6 +10,12 @@ interface MessageInputProps {
   onAttachClick?: () => void;
   /** открытие модалки записи голосового (тик. 1792160023) */
   onVoiceClick?: () => void;
+  /**
+   * Факт ввода (тик. 1793873744): вызывается на каждый символ, родитель решает,
+   * слать ли typing.start. Без этого индикатор «печатает» не работал никогда —
+   * поле не сообщало наружу о наборе текста.
+   */
+  onTyping?: () => void;
   onCancelReply?: () => void;
   isTyping?: boolean;
 }
@@ -18,6 +24,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   onSend,
   onAttachClick,
   onVoiceClick,
+  onTyping,
   isTyping = false,
 }) => {
   const [content, setContent] = useState('');
@@ -163,6 +170,9 @@ export const MessageInput: React.FC<MessageInputProps> = ({
           onChange={(e) => {
             setContent(e.target.value);
             setShowSlashHint(e.target.value.startsWith('/'));
+            // Тик. 1793873744: о наборе текста сообщает родитель (WS typing.start).
+            // Пустое поле не считается «печатает» — собеседнику не о чём показывать.
+            if (e.target.value) onTyping?.();
           }}
           onKeyDown={handleKeyDown}
         />

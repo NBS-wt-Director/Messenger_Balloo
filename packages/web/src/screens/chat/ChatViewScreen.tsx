@@ -2,7 +2,7 @@
 // Структура макета: .content → chat-header → messages → reply-panel → input-area.
 // Интеграция с WebSocket для realtime.
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useChatStore, type MessageWithSender } from '@/store/chatStore';
 import { MessageList } from '@/components/chat/MessageList';
@@ -36,7 +36,14 @@ export const ChatViewScreen: React.FC = () => {
   const [replyTo, setReplyTo] = useState<{ id: string; author: string; content: string; avatarUrl?: string } | null>(null);
   const [showReactionPicker, setShowReactionPicker] = useState(false);
   const [reactionAnchor, setReactionAnchor] = useState<HTMLElement | null>(null);
-  const [typingTimeout, setTypingTimeout] = useState<ReturnType<typeof setTimeout> | null>(null);
+  // Тик. 1793873744: прежде здесь был useState typingTimeout, который больше
+  // нигде не использовался — набор текста наружу не сообщался. Теперь refs:
+  // таймер стопа и флаг «typing.start уже отправлен в этой сессии набора».
+  const typingStopTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const typingStartSent = useRef(false);
+  // Сокет нужен не только внутри эффекта подключения: typing.* шлётся из
+  // обработчика ввода, который живёт вне замыкания useEffect.
+  const wsRef = useRef<WebSocket | null>(null);
   // Панель вложений (тик. 1792124253, макет attachment-panel.html)
   const [attachmentPanelOpen, setAttachmentPanelOpen] = useState(false);
   // Модалка записи голосового (тик. 1792160023, макет voice-message.html)
@@ -124,6 +131,7 @@ export const ChatViewScreen: React.FC = () => {
       if (!ws || cancelled) return;
 
       if (ws) {
+        wsRef.current = ws;
         ws.onopen = () => {
           console.log('WS connected');
           ws!.send(JSON.stringify({ type: 'chat.join', chatId }));
@@ -156,22 +164,27 @@ export const ChatViewScreen: React.FC = () => {
                 updateMessage(chatId, data.messageId, { status: 'read' });
               }
               break;
-            case 'typing.start':
+            // Тик. 1793873744: сервер рассылает индикатор набор
+            // событием typing.indicator ({chatId,userId,userName,isTyping}).
+            // Прежние case 'typing.start'/'typing.stop' слушали имена ВХОДЯЩИХ
+            // событий клиента, которых сервер не отправляет, — индикатор не
+            // появлялся.
+            case 'typing.indicator':
               if (data.chatId === chatId) {
-                setTypingUsers(chatId, [
-                  ...(useChatStore.getState().typingUsers[chatId] || []),
-                  { userId: data.userId, username: data.username },
-                ]);
-              }
-              break;
-            case 'typing.stop':
-              if (data.chatId === chatId) {
-                setTypingUsers(
-                  chatId,
-                  (useChatStore.getState().typingUsers[chatId] || []).filter(
-                    (u) => u.userId !== data.userId
-                  )
-                );
+                const current = useChatStore.getState().typingUsers[chatId] || [];
+                if (data.isTyping) {
+                  if (!current.some((u) => u.userId === data.userId)) {
+                    setTypingUsers(chatId, [
+                      ...current,
+                      { userId: data.userId, username: data.userName },
+                    ]);
+                  }
+                } else {
+                  setTypingUsers(
+                    chatId,
+                    current.filter((u) => u.userId !== data.userId)
+                  );
+                }
               }
               break;
           }
@@ -187,15 +200,59 @@ export const ChatViewScreen: React.FC = () => {
 
     return () => {
       cancelled = true;
+      // Тик. 1793873744: сокет и таймер набора принадлежат этому chatId —
+      // при смене чата иначе остался бы висеть typing.stop от старого сокета.
+      if (typingStopTimer.current) {
+        clearTimeout(typingStopTimer.current);
+        typingStopTimer.current = null;
+      }
+      typingStartSent.current = false;
+      if (wsRef.current === ws) wsRef.current = null;
       if (ws) ws.close();
     };
   }, [chatId]);
+
+  // Тик. 1793873744 — набор текста.
+  // typing.start отправляется один раз на сессию набора (не на каждый символ),
+  // typing.stop — по таймауту простоя и сразу после отправки. Без стопа
+  // собеседник видел бы «печатает» до автостопа сервера (5 с).
+  const TYPING_STOP_MS = 3000;
+
+  const stopTyping = useCallback(() => {
+    if (typingStopTimer.current) {
+      clearTimeout(typingStopTimer.current);
+      typingStopTimer.current = null;
+    }
+    if (!typingStartSent.current) return;
+    typingStartSent.current = false;
+    const socket = wsRef.current;
+    if (socket && socket.readyState === WebSocket.OPEN && chatId) {
+      socket.send(JSON.stringify({ type: 'typing.stop', chatId }));
+    }
+  }, [chatId]);
+
+  const handleTyping = useCallback(() => {
+    const socket = wsRef.current;
+    if (!socket || socket.readyState !== WebSocket.OPEN || !chatId) return;
+
+    if (!typingStartSent.current) {
+      typingStartSent.current = true;
+      socket.send(JSON.stringify({ type: 'typing.start', chatId }));
+    }
+
+    if (typingStopTimer.current) clearTimeout(typingStopTimer.current);
+    typingStopTimer.current = setTimeout(stopTyping, TYPING_STOP_MS);
+  }, [chatId, stopTyping]);
+
+  // Отправка снимает индикатор немедленно, не дожидаясь таймаута.
+  useEffect(() => () => stopTyping(), [stopTyping]);
 
   // Send message
   const handleSend = useCallback(
     async (content: string, type: string) => {
       if (!chatId || !content.trim()) return;
 
+      stopTyping();
       try {
         const payload: any = { type, content };
         if (replyTo) {
@@ -220,7 +277,7 @@ export const ChatViewScreen: React.FC = () => {
         console.error('Failed to send message:', error);
       }
     },
-    [chatId, replyTo, addMessage]
+    [chatId, replyTo, addMessage, stopTyping]
   );
 
   // Перезагрузка сообщений чата — после отправки вложений из панели
@@ -361,7 +418,7 @@ export const ChatViewScreen: React.FC = () => {
               />
 
               {/* Message input */}
-              <MessageInput onSend={handleSend} onAttachClick={() => setAttachmentPanelOpen(true)} onVoiceClick={() => setVoiceModalOpen(true)} />
+              <MessageInput onSend={handleSend} onTyping={handleTyping} onAttachClick={() => setAttachmentPanelOpen(true)} onVoiceClick={() => setVoiceModalOpen(true)} />
             </div>
 
             {/* Панель вложений (тик. 1792124253) */}

@@ -292,3 +292,128 @@ describe('WebSocket: доставка нового сообщения', () => {
     }
   });
 });
+
+// ============================================================
+// Индикатор набора текста (тик. 1793873744). Имена событий сервера:
+// входящие typing.start / typing.stop, исходящее typing.indicator —
+// клиент web слушал typing.start, которого сервер не отправляет.
+// ============================================================
+
+describe('WebSocket: индикатор «печатает»', () => {
+  /** Ждёт typing.indicator с нужным флагом isTyping. */
+  function waitForTyping(sock: TestSocket, isTyping: boolean, timeout = 5_000): Promise<any> {
+    return new Promise((resolve, reject) => {
+      const deadline = Date.now() + timeout;
+      const tick = () => {
+        const hit = sock.events.find(
+          (e) => e.type === 'typing.indicator' && e.isTyping === isTyping,
+        );
+        if (hit) return resolve(hit);
+        if (Date.now() > deadline) {
+          return reject(
+            new Error(`нет typing.indicator isTyping=${isTyping} за ${timeout} мс`),
+          );
+        }
+        setTimeout(tick, 50);
+      };
+      tick();
+    });
+  }
+
+  it('typing.start от участника долетает второму в комнате как typing.indicator', async () => {
+    const alice = await registerTestUser();
+    const bob = await registerTestUser();
+    const chatId = await createChatWithTwoMembers(alice, bob);
+
+    const aliceSock = await connect(alice);
+    const bobSock = await connect(bob);
+    try {
+      aliceSock.send({ type: 'chat.join', chatId });
+      bobSock.send({ type: 'chat.join', chatId });
+      await aliceSock.waitFor('chat.joined');
+      await bobSock.waitFor('chat.joined');
+
+      aliceSock.send({ type: 'typing.start', chatId });
+
+      const indicator = await waitForTyping(bobSock, true);
+      expect(indicator.chatId).toBe(chatId);
+      expect(indicator.userId).toBe(alice.id);
+    } finally {
+      aliceSock.close();
+      bobSock.close();
+    }
+  });
+
+  it('typing.stop гасит индикатор у получателя (isTyping=false)', async () => {
+    const alice = await registerTestUser();
+    const bob = await registerTestUser();
+    const chatId = await createChatWithTwoMembers(alice, bob);
+
+    const aliceSock = await connect(alice);
+    const bobSock = await connect(bob);
+    try {
+      aliceSock.send({ type: 'chat.join', chatId });
+      bobSock.send({ type: 'chat.join', chatId });
+      await aliceSock.waitFor('chat.joined');
+      await bobSock.waitFor('chat.joined');
+
+      aliceSock.send({ type: 'typing.start', chatId });
+      await waitForTyping(bobSock, true);
+      aliceSock.send({ type: 'typing.stop', chatId });
+
+      await waitForTyping(bobSock, false);
+    } finally {
+      aliceSock.close();
+      bobSock.close();
+    }
+  });
+
+  it('без typing.stop сервер сам гасит индикатор (автостоп 5 с)', async () => {
+    const alice = await registerTestUser();
+    const bob = await registerTestUser();
+    const chatId = await createChatWithTwoMembers(alice, bob);
+
+    const aliceSock = await connect(alice);
+    const bobSock = await connect(bob);
+    try {
+      aliceSock.send({ type: 'chat.join', chatId });
+      bobSock.send({ type: 'chat.join', chatId });
+      await aliceSock.waitFor('chat.joined');
+      await bobSock.waitFor('chat.joined');
+
+      // Клиент «упал» сразу после start и typing.stop не шлёт никогда.
+      aliceSock.send({ type: 'typing.start', chatId });
+      await waitForTyping(bobSock, true);
+
+      // Без рассылки автостопа индикатор остался бы гореть у получателя.
+      await waitForTyping(bobSock, false, 6_500);
+    } finally {
+      aliceSock.close();
+      bobSock.close();
+    }
+  });
+
+  it('отправитель не получает собственный индикатор', async () => {
+    const alice = await registerTestUser();
+    const bob = await registerTestUser();
+    const chatId = await createChatWithTwoMembers(alice, bob);
+
+    const aliceSock = await connect(alice);
+    const bobSock = await connect(bob);
+    try {
+      aliceSock.send({ type: 'chat.join', chatId });
+      bobSock.send({ type: 'chat.join', chatId });
+      await aliceSock.waitFor('chat.joined');
+      await bobSock.waitFor('chat.joined');
+
+      aliceSock.send({ type: 'typing.start', chatId });
+      await waitForTyping(bobSock, true);
+
+      await new Promise((r) => setTimeout(r, 200));
+      expect(aliceSock.events.filter((e) => e.type === 'typing.indicator')).toHaveLength(0);
+    } finally {
+      aliceSock.close();
+      bobSock.close();
+    }
+  });
+});

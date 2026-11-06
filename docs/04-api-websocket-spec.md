@@ -353,6 +353,16 @@ ws://balloo.su/ws?token=<JWT>
 | `message.received` | `{chatId, message: {id, chatId, senderId, type, content, replyTo, sender, attachments, status, createdAt, updatedAt, ...}, messageId, senderId, senderName, content, messageType, replyToId?, timestamp}` |
 | `chat.joined` | `{chatId, members}` |
 | `message.sent` | `{messageId, chatId, senderId, content, messageType, timestamp}` — подтверждение отправителю |
+| `typing.indicator` | `{chatId, userId, userName, isTyping}` — «печатает» для получателей комнаты (кроме самого печатающего) |
+
+**Индикатор набора текста (тик. 1793873744).** Клиент шлёт входящие `typing.start`
+(один раз на сессию набора) и `typing.stop` (по таймауту простоя и сразу после
+отправки); сервер рассылает **исходящее `typing.indicator`** с флагом `isTyping`
+всем в комнате, кроме сокета печатающего. Если клиент оборвался и не прислал
+`typing.stop`, сервер сам гасит индикатор через 5 секунд (автостоп с рассылкой —
+прежде `roomManager.setTyping` менял состояние молча, и у получателя «печатает»
+оставался навсегда). Клиент web слушает именно `typing.indicator`, а не входящие
+`typing.start`/`typing.stop` (те сервер не отправляет).
 
 Плоские поля (`messageId`, `content`, …) оставлены для обратной совместимости
 со старыми клиентами; новые клиенты читают `message` (в нём есть `sender` с
