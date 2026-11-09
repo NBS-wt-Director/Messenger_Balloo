@@ -4,6 +4,7 @@
 
 import { AppTopbar } from '@/components/chrome/AppTopbar';
 import { AppFooter } from '@/components/chrome/AppFooter';
+import { LegalContacts } from '@/components/legal/LegalContacts';
 
 export function RulesScreen() {
   return (
@@ -180,7 +181,7 @@ export function RulesScreen() {
           <p>
             <strong>8.1.</strong> Споры разрешаются путём переговоров.
             Претензия направляется на{' '}
-            <a href="mailto:support@balloo.su" style={{ color: 'var(--accent)' }}>support@balloo.su</a>.
+            <a href="mailto:balu-messanger@rambler.ru" style={{ color: 'var(--accent)' }}>balu-messanger@rambler.ru</a>.
             Срок ответа — 30 дней.
           </p>
           <p>
@@ -216,15 +217,8 @@ export function RulesScreen() {
         </div>
       </div>
 
-      {/* Контакты */}
-      <div className="card" style={{ marginBottom: 48, borderColor: 'var(--accent)' }}>
-        <h2 className="card__title" style={{ marginBottom: 16 }}>Контакты</h2>
-        <div style={{ fontSize: 14, lineHeight: 1.8 }}>
-          <p><strong>Оператор:</strong> ООО «Баллоо»</p>
-          <p><strong>Email:</strong> <a href="mailto:support@balloo.su" style={{ color: 'var(--accent)' }}>support@balloo.su</a></p>
-          <p><strong>Форма обратной связи:</strong> <a href="/features" style={{ color: 'var(--accent)' }}>features.balloo.su</a></p>
-        </div>
-      </div>
+      {/* Контакты — единый блок (правило владельца 09.11.2026) */}
+      <LegalContacts />
       </div>
 
       {/* P35: единый подвал (@balloo/ui) */}

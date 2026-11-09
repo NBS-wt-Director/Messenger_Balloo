@@ -4,6 +4,7 @@
 
 import { AppTopbar } from '@/components/chrome/AppTopbar';
 import { AppFooter } from '@/components/chrome/AppFooter';
+import { LegalContacts } from '@/components/legal/LegalContacts';
 
 export function CookiesScreen() {
   return (
@@ -164,16 +165,8 @@ export function CookiesScreen() {
         </div>
       </div>
 
-      {/* 7. Контакты */}
-      <div className="card" style={{ marginBottom: 48, borderColor: 'var(--accent)' }}>
-        <h2 className="card__title" style={{ marginBottom: 16 }}>Контакты</h2>
-        <div style={{ fontSize: 14, lineHeight: 1.8 }}>
-          <p>
-            По вопросам, связанным с использованием cookie, обращайтесь на:{' '}
-            <a href="mailto:privacy@balloo.su" style={{ color: 'var(--accent)' }}>privacy@balloo.su</a>
-          </p>
-        </div>
-      </div>
+      {/* 7. Контакты — единый блок (правило владельца 09.11.2026) */}
+      <LegalContacts />
       </div>
 
       {/* P35: единый подвал (@balloo/ui) */}

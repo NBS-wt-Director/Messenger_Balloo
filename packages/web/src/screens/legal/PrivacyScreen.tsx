@@ -4,6 +4,7 @@
 
 import { AppTopbar } from '@/components/chrome/AppTopbar';
 import { AppFooter } from '@/components/chrome/AppFooter';
+import { LegalContacts } from '@/components/legal/LegalContacts';
 
 export function PrivacyScreen() {
   return (
@@ -33,12 +34,8 @@ export function PrivacyScreen() {
       <div className="card" style={{ marginBottom: 24 }}>
         <h2 className="card__title" style={{ marginBottom: 16 }}>1. Оператор персональных данных</h2>
         <div style={{ fontSize: 14, lineHeight: 1.8 }}>
-          <p><strong>Оператор:</strong> Balloo Messenger (ООО «Баллоо»)</p>
-          <p><strong>ИНН:</strong> [Указывается при регистрации ЮЛ]</p>
-          <p><strong>ОГРН:</strong> [Указывается при регистрации ЮЛ]</p>
-          <p><strong>Адрес:</strong> [Юридический адрес оператора]</p>
-          <p><strong>Email:</strong> <a href="mailto:privacy@balloo.su" style={{ color: 'var(--accent)' }}>privacy@balloo.su</a></p>
-          <p><strong>Телефон:</strong> +7 (912) 202-30-35</p>
+          <p><strong>Оператор:</strong> СЗ Оберюхтин Иван Анатольевич</p>
+          <p><strong>Email:</strong> <a href="mailto:balu-messanger@rambler.ru" style={{ color: 'var(--accent)' }}>balu-messanger@rambler.ru</a></p>
         </div>
       </div>
 
@@ -153,7 +150,7 @@ export function PrivacyScreen() {
           </ul>
           <p style={{ marginTop: 16 }}>
             Для реализации прав направьте запрос на{' '}
-            <a href="mailto:privacy@balloo.su" style={{ color: 'var(--accent)' }}>privacy@balloo.su</a>.
+            <a href="mailto:balu-messanger@rambler.ru" style={{ color: 'var(--accent)' }}>balu-messanger@rambler.ru</a>.
             Ответ предоставляется в течение 30 дней.
           </p>
         </div>
@@ -196,15 +193,8 @@ export function PrivacyScreen() {
         </div>
       </div>
 
-      {/* Contacts */}
-      <div className="card" style={{ marginBottom: 48, borderColor: 'var(--accent)' }}>
-        <h2 className="card__title" style={{ marginBottom: 16 }}>11. Контакты оператора</h2>
-        <div style={{ fontSize: 14, lineHeight: 1.8 }}>
-          <p><strong>Email:</strong> <a href="mailto:privacy@balloo.su" style={{ color: 'var(--accent)' }}>privacy@balloo.su</a></p>
-          <p><strong>Телефон:</strong> +7 (912) 202-30-35</p>
-          <p><strong>Форма обратной связи:</strong> <a href="/features" style={{ color: 'var(--accent)' }}>features.balloo.su</a></p>
-        </div>
-      </div>
+      {/* Contacts — единый блок (правило владельца 09.11.2026) */}
+      <LegalContacts title="11. Контакты" />
       </div>
 
       {/* P35: единый подвал (@balloo/ui) */}
