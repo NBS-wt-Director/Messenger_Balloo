@@ -12,6 +12,7 @@ import {
   authRequired,
   authRefresh,
   adminOnly,
+  requireSameOrigin,
   setAuthCookies,
   clearAuthCookies,
   ACCESS_COOKIE,
@@ -308,8 +309,49 @@ describe('middleware/auth.ts — cookie-утилиты', () => {
       name: REFRESH_COOKIE,
       value: 'refresh-value',
       opts: { httpOnly: true, secure: false, sameSite: 'lax', maxAge: 30 * 24 * 60 * 60 * 1000, path: '/' },
-    });
   });
+});
+
+// ============================================================
+// requireSameOrigin — Origin-only, без referer (тик. 1794211606)
+// ============================================================
+describe('middleware/auth.ts — requireSameOrigin (Origin only)', () => {
+  it('403 на Origin из чужого домена (атака iframe)', () => {
+    const req = makeReq({ header: { origin: 'https://evil.example' } });
+    const res = makeRes();
+    const next = jest.fn();
+
+    requireSameOrigin()(req as any, res as any, next);
+
+    expect(res.statusCode).toBe(403);
+    expect(res.body).toEqual({ error: 'FORGED_ORIGIN' });
+    expect(next).not.toHaveBeenCalled();
+  });
+
+  it('пропускает Origin из разрешённого домена', () => {
+    const req = makeReq({ header: { origin: 'https://balloo.su' } });
+    const res = makeRes();
+    const next = jest.fn();
+
+    requireSameOrigin()(req as any, res as any, next);
+
+    expect(res.statusCode).toBe(0);
+    expect(res.body).toBe(null);
+    expect(next).toHaveBeenCalled();
+  });
+
+  it('пропускает GET без Origin (OAuth-callback навигация), даже с чужим Referer', () => {
+    const req = makeReq({ header: { referer: 'https://oauth.yandex.ru/' } });
+    const res = makeRes();
+    const next = jest.fn();
+
+    requireSameOrigin()(req as any, res as any, next);
+
+    expect(res.statusCode).toBe(0);
+    expect(res.body).toBe(null);
+    expect(next).toHaveBeenCalled();
+  });
+});
 
   it('clearAuthCookies снимает оба cookie (строки 202-215)', () => {
     const res = makeRes();

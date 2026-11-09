@@ -63,22 +63,16 @@ export const requireSameOrigin = () => {
   );
 
   return (req: Request, res: Response, next: NextFunction): void => {
-    const origin = req.headers.origin;
-    const referer = req.headers.referer;
-
-    let source: string | undefined;
-    if (origin) {
-      source = origin;
-    } else if (referer) {
-      try {
-        source = new URL(referer).origin;
-      } catch {
-        // malformed referer — treat as no origin
-      }
-    }
+    // Проверяем ТОЛЬКО заголовок Origin: fetch/XHR (включая чужой iframe)
+    // шлют его всегда. Referer НЕ используем: OAuth-callback — это top-level
+    // навигация браузера с Referer провайдера (oauth.yandex.ru и т.п.), и
+    // проверка Referer сносила все внешние редиректы с 403 FORGED_ORIGIN
+    // (замер 09.11.2026, тикет 1794211606). CSRF-защита callback'ов — state
+    // в httpOnly cookie (authController), а не Origin.
+    const source = req.headers.origin;
 
     if (!source) {
-      // curl, mobile, CLI — без cookie получают 401, безопасно
+      // curl, mobile, CLI, top-level навигации — без cookie получают 401, безопасно
       next();
       return;
     }
