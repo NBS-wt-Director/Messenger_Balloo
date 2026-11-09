@@ -1,68 +1,95 @@
 // Onboarding Screen — приветственные экраны при первом запуске
 // Макет: mockups/balloo-su/onboarding.html
+//
+// Формат API: [{id, order, illustrationUrl, translations:[{language,title,description}]}]
+// Маппинг: выбираем translation по locale (useI18n), фолбэк 'ru', затем первая непустая.
+// Правило (09.11.2026): валидный шаг — title || description не пустые.
+// Нет валидных шагов → экран НЕ показываем, помечаем completed, редирект.
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '@/services/api';
 import { useAuthStore } from '@/store/authStore';
+import { useI18n } from '@/components/providers/I18nProvider';
+
+interface ApiTranslation {
+  language: string;
+  title?: string;
+  description?: string;
+}
+
+interface ApiStep {
+  id: string;
+  order: number;
+  illustrationUrl?: string;
+  translations?: ApiTranslation[];
+}
 
 interface OnboardingStepData {
   id: string;
-  illustration: string;
   title: string;
   text: string;
   order: number;
 }
 
-// Шаги по умолчанию (fallback, если API недоступен)
-const DEFAULT_STEPS: OnboardingStepData[] = [
-  {
-    id: '1',
-    illustration: '💬',
-    title: 'Добро пожаловать в Balloo!',
-    text: 'Кроссплатформенный мессенджер с уникальным дизайном, групповыми звонками и защитой ваших данных.',
-    order: 1,
-  },
-  {
-    id: '2',
-    illustration: '📞',
-    title: 'Звонки и группы',
-    text: 'Аудио и видео звонки до 30 человек, групповые чаты с опросами, квизами и интерактивными списками.',
-    order: 2,
-  },
-  {
-    id: '3',
-    illustration: '🔐',
-    title: 'Приватность и безопасность',
-    text: 'JWT-сессии, шифрование на сервере, 3 темы оформления, мультиязычность. Ваши файлы — на вашем Yandex Disk.',
-    order: 3,
-  },
-];
-
 export default function OnboardingScreen() {
   const navigate = useNavigate();
   const { user } = useAuthStore();
-  const [steps, setSteps] = useState<OnboardingStepData[]>(DEFAULT_STEPS);
+  const { locale } = useI18n();
+  const [steps, setSteps] = useState<OnboardingStepData[]>([]);
   const [currentStep, setCurrentStep] = useState(0);
   const [loading, setLoading] = useState(true);
+
+  // Маппинг API-шагов → формат экрана
+  const mapStep = useCallback((apiStep: ApiStep): OnboardingStepData | null => {
+    const translations = apiStep.translations || [];
+    // Приоритет: locale → 'ru' → любая первая непустая
+    let translation: ApiTranslation | undefined;
+    translation = translations.find((t) => t.language === locale);
+    if (!translation) translation = translations.find((t) => t.language === 'ru');
+    if (!translation) translation = translations[0];
+
+    const title = (translation?.title || '').trim();
+    const text = (translation?.description || '').trim();
+
+    // Правило: если нет контента — не показываем
+    if (!title && !text) return null;
+
+    return {
+      id: apiStep.id,
+      title,
+      text,
+      order: apiStep.order,
+    };
+  }, [locale]);
 
   // Загрузка шагов из API
   useEffect(() => {
     const fetchSteps = async () => {
       try {
         const data = await api.getOnboardingSteps();
-        if (data && Array.isArray(data) && data.length > 0) {
-          setSteps(data);
+        if (data && Array.isArray(data)) {
+          const mapped = data.map(mapStep).filter(Boolean) as OnboardingStepData[];
+          mapped.sort((a, b) => a.order - b.order);
+          setSteps(mapped);
         }
       } catch {
-        // fallback на дефолтные шаги
+        // API недоступен — пусто
       } finally {
         setLoading(false);
       }
     };
 
     fetchSteps();
-  }, []);
+  }, [mapStep]);
+
+  // Правило: нет шагов → не показываем, помечаем completed
+  useEffect(() => {
+    if (!loading && steps.length === 0) {
+      localStorage.setItem('onboarding_completed', 'true');
+      navigate(user ? '/chats' : '/login', { replace: true });
+    }
+  }, [loading, steps.length, user, navigate]);
 
   const nextStep = useCallback(() => {
     if (currentStep < steps.length - 1) {
@@ -110,13 +137,13 @@ export default function OnboardingScreen() {
   }
 
   const step = steps[currentStep];
-  const isFirst = currentStep === 0;
-  const isLast = currentStep === steps.length - 1;
+
+  // Guard: до срабатывания redirect-эффекта не рендерим битый JSX
+  if (!step) return null;
 
   return (
     <div className="onboarding">
       <div className="onboarding__step onboarding__step--active">
-        <div className="onboarding__illustration">{step.illustration}</div>
         <h2 className="onboarding__title">{step.title}</h2>
         <p className="onboarding__text">{step.text}</p>
 
@@ -133,7 +160,7 @@ export default function OnboardingScreen() {
 
         {/* Кнопки навигации */}
         <div className="onboarding__buttons">
-          {isFirst ? (
+          {currentStep === 0 ? (
             <button className="btn btn--tertiary" onClick={skipOnboarding}>
               Пропустить
             </button>
@@ -142,7 +169,7 @@ export default function OnboardingScreen() {
               ← Назад
             </button>
           )}
-          {isLast ? (
+          {currentStep === steps.length - 1 ? (
             <button className="btn btn--primary" onClick={finishOnboarding}>
               Начать →
             </button>

@@ -518,3 +518,61 @@
 .cursor-pointer { cursor: pointer; }
 .overflow-y-auto { overflow-y: auto; }
 .hidden { display: none; }
+
+/* ============================================================
+   Onboarding (тик. 1794211605)
+   ============================================================ */
+.onboarding {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px;
+}
+.onboarding__step {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+  max-width: 480px;
+  width: 100%;
+}
+.onboarding__step--active {
+  display: flex;
+}
+.onboarding__title {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-primary);
+}
+.onboarding__text {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0;
+}
+.onboarding__dots {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.onboarding__dot {
+  width: 8px;
+  height: 8px;
+  background: var(--bg-elevated, #444);
+  cursor: pointer;
+  opacity: .5;
+}
+.onboarding__dot--active {
+  opacity: 1;
+  background: var(--accent);
+}
+.onboarding__buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  margin-top: 24px;
+}
