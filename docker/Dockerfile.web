@@ -58,6 +58,12 @@ ENV VITE_API_URL=${VITE_API_URL}
 ARG VITE_YM_METRIKA_ID=
 ENV VITE_YM_METRIKA_ID=${VITE_YM_METRIKA_ID}
 
+# VAPID public key — запекается в web-бандль для PushManager.subscribe (тик. 1794474255).
+# service-worker-registration.ts:202 читает import.meta.env.VITE_VAPID_PUBLIC_KEY.
+# Без него subscribe() падает с TypeError (applicationServerKey пуст).
+ARG VITE_VAPID_PUBLIC_KEY=
+ENV VITE_VAPID_PUBLIC_KEY=${VITE_VAPID_PUBLIC_KEY}
+
 # Build web (vite build — no type-check, faster; local vite from node_modules)
 RUN cd packages/web && ./node_modules/.bin/vite build
 

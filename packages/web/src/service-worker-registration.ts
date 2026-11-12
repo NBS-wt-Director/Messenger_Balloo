@@ -197,9 +197,15 @@ export async function subscribeToPushNotifications(): Promise<PushSubscription |
     const hasPermission = await requestNotificationPermission();
     if (!hasPermission) return null;
 
+    const vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY || '';
+    if (!vapidKey) {
+      console.warn('VITE_VAPID_PUBLIC_KEY не задан — push-подписка пропущена');
+      return null;
+    }
+
     const subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(import.meta.env.VITE_VAPID_PUBLIC_KEY || ''),
+      applicationServerKey: urlBase64ToUint8Array(vapidKey),
     });
 
     console.log('Push-подписка создана');
