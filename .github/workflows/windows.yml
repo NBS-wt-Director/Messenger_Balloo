@@ -1,0 +1,50 @@
+# Windows CI — сборка desktop-приложения для Windows (тик. 1794474255, решение 14а)
+# Собирает nsis + msi + portable (packages/desktop/electron-builder.yml → win targets).
+# runs-on: windows-latest — NSIS/portable требуют wine на Linux, нативно на Windows.
+
+name: Windows CI
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '22'
+
+jobs:
+  build-win:
+    name: Desktop Windows build
+    runs-on: windows-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build desktop (tsc + vite + electron-builder --win)
+        run: pnpm --filter @balloo/desktop build:win
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: balloo-desktop-win
+          path: |
+            packages/desktop/release/*.exe
+            packages/desktop/release/*.msi
+          retention-days: 30
+          if-no-files-found: error
