@@ -16,6 +16,15 @@ export { TopbarMenu, DEFAULT_TOPBAR_ITEMS } from './components/TopbarMenu';
 export type { TopbarMenuItem } from './components/TopbarMenu';
 export { Footer, DEFAULT_FOOTER_LINKS } from './components/Footer';
 export type { FooterLink } from './components/Footer';
+// Хост-осознанные ссылки экосистемы (тик. 1794575221)
+export {
+  isBallooProdHost,
+  mainSiteUrl,
+  topbarItemsForHost,
+  rightMenuTargetsForHost,
+  footerLinksForHost,
+  SPA_TOPBAR_ITEMS,
+} from './components/ecosystem';
 export { ThemeSwitcher } from './components/ThemeSwitcher';
 export { LanguageSwitcher } from './components/LanguageSwitcher';
 export { RightMenu } from './components/RightMenu';

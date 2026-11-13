@@ -25,6 +25,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useUIStore, SUPPORTED_LANGUAGES, type Language, type Theme } from '../store/uiStore';
 import { useI18n } from '../providers/I18nProvider';
+import { rightMenuTargetsForHost } from './ecosystem';
 import type { TranslationKey } from '@balloo/shared';
 
 export interface RightMenuItem {
@@ -73,6 +74,10 @@ const THEMES: { id: Theme; icon: string; labelKey: TranslationKey }[] = [
   { id: 'russian', icon: '🇷🇺', labelKey: 'menu.themeRussian' },
 ];
 
+// Дефолтные списки — внутренние маршруты главного SPA (экспортированы как
+// эталон и для тестов). Фактические пункты по умолчанию строятся хост-осознанно
+// (rightMenuTargetsForHost, тик. 1794575221): на admin/features-хостах все
+// маршруты живут в balloo.su → абсолютные hash-URL.
 export const DEFAULT_LEGAL_ITEMS: RightMenuItem[] = [
   // Техподдержка — первым пунктом юр. секции, как в эталоне common.js:496
   { key: 'menu.support', to: '/support', icon: '🛠️' },
@@ -92,18 +97,26 @@ export const DEFAULT_ACCOUNT_ITEMS: RightMenuItem[] = [
   { key: 'menu.accounts', to: '/profile', icon: '👥' },
 ];
 
+export const DEFAULT_GUEST_ACTIONS = { loginTo: '/login', registerTo: '/register' };
+
 type SubmenuKey = 'lang' | 'theme' | null;
 
 export function RightMenu({
   auth = 'guest',
   userInitials = 'ИИ',
-  legalItems = DEFAULT_LEGAL_ITEMS,
-  accountItems = DEFAULT_ACCOUNT_ITEMS,
+  legalItems,
+  accountItems,
   onLogout,
-  guestActions = { loginTo: '/login', registerTo: '/register' },
+  guestActions,
   onNavigate,
 }: RightMenuProps) {
   const { t } = useI18n();
+  // Хост-осознанные цели по умолчанию (тик. 1794575221): на чужих поддоменах
+  // balloo.su маршруты главного SPA недоступны → абсолютные hash-URL.
+  const hostDefaults = rightMenuTargetsForHost();
+  const legal = legalItems ?? hostDefaults.legal;
+  const account = accountItems ?? hostDefaults.account;
+  const guest = guestActions ?? hostDefaults.guest;
   const language = useUIStore((s) => s.language);
   const setLanguage = useUIStore((s) => s.setLanguage);
   const theme = useUIStore((s) => s.theme);
@@ -244,7 +257,7 @@ export function RightMenu({
         <div className="right-menu__divider" />
 
         {/* Юридические пункты */}
-        {legalItems.map((item) => (
+        {legal.map((item) => (
           <div
             key={String(item.key)}
             className="right-menu__item"
@@ -263,16 +276,16 @@ export function RightMenu({
         <div className="right-menu__section-label">{t('settings.account')}</div>
         {auth === 'guest' ? (
           <div className="right-menu__auth-guest">
-            <button type="button" className="btn btn--primary btn--block" onClick={() => go(guestActions.loginTo)}>
+            <button type="button" className="btn btn--primary btn--block" onClick={() => go(guest.loginTo)}>
               {t('auth.login')}
             </button>
-            <button type="button" className="btn btn--secondary btn--block" onClick={() => go(guestActions.registerTo)}>
+            <button type="button" className="btn btn--secondary btn--block" onClick={() => go(guest.registerTo)}>
               {t('auth.register')}
             </button>
           </div>
         ) : (
           <>
-            {accountItems.map((item) => (
+            {account.map((item) => (
               <div
                 key={String(item.key)}
                 className="right-menu__item"

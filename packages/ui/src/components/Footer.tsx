@@ -2,22 +2,22 @@
 // Структура по макетам (mockups/assets/common.css: .balloo-footer):
 //   [© Balloo Messenger 2026] ......... [Правила | Конфиденциальность | Cookies]
 // Стили — @balloo/ui/styles/chrome.css (копия .balloo-footer* из common.css).
+// Хост-осознанные ссылки (тик. 1794575221): на чужих поддоменах balloo.su
+// маршруты правового блока — абсолютные hash-URL.
 
 import React from 'react';
 import { useI18n } from '../providers/I18nProvider';
 import type { TranslationKey } from '@balloo/shared';
+import { footerLinksForHost } from './ecosystem';
 
 export interface FooterLink {
   key: TranslationKey | string;
   href: string;
 }
 
-// Правовые ссылки по умолчанию (внутренние маршруты balloo.su)
-export const DEFAULT_FOOTER_LINKS: FooterLink[] = [
-  { key: 'footer.rules', href: '/rules' },
-  { key: 'footer.privacy', href: '/privacy' },
-  { key: 'footer.cookies', href: '/cookies' },
-];
+// Правовые ссылки по умолчанию — хост-осознанные (тик. 1794575221):
+// на balloo.su/localhost относительные пути, на чужих поддоменах — hash-URL.
+export const DEFAULT_FOOTER_LINKS: FooterLink[] = footerLinksForHost();
 
 interface FooterProps {
   /** Ссылки правового блока (default: Правила/Конфиденциальность/Cookies) */

@@ -13,6 +13,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useI18n } from '../providers/I18nProvider';
 import type { TranslationKey } from '@balloo/shared';
+import { topbarItemsForHost, SPA_TOPBAR_ITEMS } from './ecosystem';
 
 export interface TopbarMenuItem {
   key: TranslationKey | string;
@@ -25,17 +26,12 @@ export interface TopbarMenuItem {
   isCurrent?: boolean;
 }
 
-// Разделы по умолчанию — внутренние пути balloo.su (SPA).
-// Когда поддомены откроются (тик. №2–№5), web передаст абсолютные URL.
-export const DEFAULT_TOPBAR_ITEMS: TopbarMenuItem[] = [
-  { key: 'menu.balloo', to: '/chat', emoji: '💬' },
-  { key: 'menu.admin', to: '/admin', emoji: '🛡️', dividerBefore: true },
-  { key: 'menu.command', to: '/command', emoji: '🏢' },
-  { key: 'menu.features', to: '/features', emoji: '💡' },
-  { key: 'menu.history', to: '/history', emoji: '📜' },
-  { key: 'menu.download', to: '/download', emoji: '⬇️' },
-  { key: 'menu.docs', to: '/doc', emoji: '📚' },
-];
+// Разделы по умолчанию — зависят от текущего хоста (тик. 1794575221):
+// на balloo.su — собственные поддомены (admin/features) → абсолютные URL,
+// разделы без своих сайтов → внутренние маршруты SPA.
+// На localhost → внутренние маршруты, чтобы dev не уводило на прод.
+// SPA_TOPBAR_ITEMS экспортированы для тестов: 100% внутренние пути.
+export const DEFAULT_TOPBAR_ITEMS: TopbarMenuItem[] = topbarItemsForHost();
 
 interface TopbarMenuProps {
   items?: TopbarMenuItem[];
@@ -60,10 +56,12 @@ export function TopbarMenu({ items = DEFAULT_TOPBAR_ITEMS, onNavigate }: TopbarM
   }, []);
 
   const go = (to: string) => {
-    if (onNavigate) {
+    if (/^https?:\/\//.test(to)) {
+      window.location.href = to;
+    } else if (onNavigate) {
       onNavigate(to);
     } else {
-      // Статический сайт / внешний URL / SPA без роутера
+      // Статический сайт / абсолютный URL поддомена / SPA без роутера
       window.location.href = to;
     }
   };

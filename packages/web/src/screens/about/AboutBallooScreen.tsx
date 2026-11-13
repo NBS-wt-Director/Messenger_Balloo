@@ -26,9 +26,11 @@ const LICENSES = [
 
 const LINKS = [
   { icon: '⬇️', label: 'Скачать приложение', href: '/download' },
-  { icon: '📜', label: 'История версий', href: '/changelog' },
-  { icon: '📚', label: 'API документация', href: '/docs' },
-  { icon: '💡', label: 'Предложить функцию', href: '/features' },
+  { icon: '📜', label: 'История версий', href: '/history' },
+  { icon: '📚', label: 'API документация', href: '/doc' },
+  // features живёт отдельным сайтом (features.balloo.su) — ссылка абсолютная
+  // (тик. 1794575221; роут /changelog в SPA нет, docs — /doc)
+  { icon: '💡', label: 'Предложить функцию', href: 'https://features.balloo.su/' },
   { icon: '📋', label: 'Правила', href: '/rules' },
   { icon: '🏢', label: 'О компании', href: '/about-company' },
 ];
@@ -87,7 +89,7 @@ export function AboutBallooScreen() {
         <div className="card" style={{ marginBottom: 24 }}>
           <h2 className="card__title" style={{ marginBottom: 12 }}>Ссылки</h2>
           {LINKS.map((link) => (
-            <a key={link.href} href={`/#${link.href}`} style={{
+            <a key={link.href} href={/^https?:\/\//.test(link.href) ? link.href : `/#${link.href}`} style={{
               display: 'flex', alignItems: 'center', gap: 8, padding: '10px 0',
               color: 'var(--text-primary)', textDecoration: 'none',
               borderBottom: '1px solid var(--border-light)', fontSize: 14,
