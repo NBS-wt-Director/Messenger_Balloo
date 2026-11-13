@@ -1,0 +1,43 @@
+/* Page-level layout classes — copied from mockups/assets/common.css (source of truth).
+   These are used by features screens but were missing in web-features styles. */
+
+.page-container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.page-container--narrow {
+  max-width: 640px;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.page-subtitle {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+  margin-top: 32px;
+}
+
+.card--hover {
+  transition: border-color 0.15s, transform 0.15s;
+  cursor: pointer;
+}
+
+.card--hover:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+}
