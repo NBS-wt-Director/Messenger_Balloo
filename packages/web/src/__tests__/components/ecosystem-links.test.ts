@@ -24,14 +24,19 @@ describe('ecosystem — хост-осознанные ссылки (тик. 1794
     expect(isBallooProdHost('evil-balloo.su')).toBe(false);
   });
 
-  it('на balloo.su: admin/features — абсолютные URL поддоменов, остальное — SPA-пути', () => {
+  it('на balloo.su: каждый пункт → СВОЙ поддомен узла (решение владельца 13.11)', () => {
     const items = topbarItemsForHost('balloo.su');
     const byKey = Object.fromEntries(items.map((i) => [String(i.key), i.to]));
-    expect(byKey['menu.features']).toBe('https://features.balloo.su/');
-    expect(byKey['menu.admin']).toBe('https://admin.balloo.su/');
+    // главное SPA — остаётся внутренним маршрутом (пользователь уже здесь)
     expect(byKey['menu.balloo']).toBe('/chat');
-    expect(byKey['menu.history']).toBe('/history');
-    expect(byKey['menu.docs']).toBe('/doc');
+    // все узлы — абсолютные URL своих поддоменов
+    expect(byKey['menu.admin']).toBe('https://admin.balloo.su/');
+    expect(byKey['menu.features']).toBe('https://features.balloo.su/');
+    expect(byKey['menu.command']).toBe('https://command.balloo.su/#/command');
+    expect(byKey['menu.history']).toBe('https://history.balloo.su/#/history');
+    expect(byKey['menu.download']).toBe('https://download.balloo.su/#/download');
+    // API docs = api.balloo.su/docs (решение владельца, повторено 13.11.2026)
+    expect(byKey['menu.docs']).toBe('https://api.balloo.su/docs');
   });
 
   it('на features.balloo.su: все пункты абсолютные (свой роутер чужих маршрутов не знает)', () => {
@@ -42,6 +47,7 @@ describe('ecosystem — хост-осознанные ссылки (тик. 1794
     const byKey = Object.fromEntries(items.map((i) => [String(i.key), i.to]));
     expect(byKey['menu.balloo']).toBe('https://balloo.su/#/chat');
     expect(byKey['menu.features']).toBe('https://features.balloo.su/');
+    expect(byKey['menu.docs']).toBe('https://api.balloo.su/docs');
   });
 
   it('на localhost: внутренние SPA-пути (dev не уводит на прод)', () => {

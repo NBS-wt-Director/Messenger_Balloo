@@ -25,11 +25,11 @@ const LICENSES = [
 ];
 
 const LINKS = [
-  { icon: '⬇️', label: 'Скачать приложение', href: '/download' },
-  { icon: '📜', label: 'История версий', href: '/history' },
-  { icon: '📚', label: 'API документация', href: '/doc' },
+  { icon: '⬇️', label: 'Скачать приложение', href: 'https://download.balloo.su' },
+  { icon: '📜', label: 'История версий', href: 'https://history.balloo.su' },
+  { icon: '📚', label: 'API документация', href: 'https://api.balloo.su/docs' },
   // features живёт отдельным сайтом (features.balloo.su) — ссылка абсолютная
-  // (тик. 1794575221; роут /changelog в SPA нет, docs — /doc)
+  // (тик. 1794575221; решение владельца: все ссылки → свои поддомены)
   { icon: '💡', label: 'Предложить функцию', href: 'https://features.balloo.su/' },
   { icon: '📋', label: 'Правила', href: '/rules' },
   { icon: '🏢', label: 'О компании', href: '/about-company' },

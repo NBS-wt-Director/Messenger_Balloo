@@ -1,17 +1,19 @@
 // ecosystem — хост-осознанные ссылки между сайтами экосистемы Balloo
-// (тик. 1794575221)
+// (тик. 1794575221; карта узлов — AGENTS.md «Номера узлов» и docs/15-domains.md)
 //
-// Экосистема в проде: несколько SPA на своих поддоменах (каждое со своим
-// hash-роутером):
-//   balloo.su            — главное приложение (web)
-//   admin.balloo.su      — админ-панель (web-admin)
-//   features.balloo.su   — витрина фич-реквестов (web-features)
-// Разделы command/history/download/docs отдельных сайтов НЕ имеют (замер
-// 02.11.2026: одноимённые поддомены отдают то же главное SPA) — их ссылки
-// всегда ведут на маршруты главного SPA через hash-URL.
+// РЕШЕНИЕ ВЛАДЕЛЬЦА (повторено 13.11.2026): каждый пункт левого меню ведёт на
+// СВОЙ поддомен узла, а не на внутренний маршрут главного SPA:
+//   💬 Balloo   — balloo.su (главное приложение, web)
+//   🛡️ Admin    — admin.balloo.su (web-admin)
+//   🏢 Command  — command.balloo.su (портал сотрудников; nginx проксирует на
+//                 тот же SPA-контейнер :8090, hash-роутер открывает /#/command)
+//   💡 Features — features.balloo.su (web-features)
+//   📜 History  — history.balloo.su/#/history
+//   ⬇️ Download — download.balloo.su/#/download
+//   📚 API Docs — api.balloo.su/docs (бэкенд, GET /docs — HTML документации)
 //
 // Правило выбора: карта строится по hostname текущего документа:
-//   • balloo.su / *.balloo.su  → прод-ссылки (межсайтовые — абсолютные URL);
+//   • balloo.su / *.balloo.su  → прод-ссылки (абсолютные URL поддоменов);
 //   • всё остальное (localhost, preview) → внутренние SPA-пути: dev-серверы
 //     живут на портах, абсолютные URL на прод уводили бы с локалки.
 
@@ -22,6 +24,10 @@ import type { RightMenuItem } from './RightMenu';
 const MAIN_ORIGIN = 'https://balloo.su';
 const ADMIN_ORIGIN = 'https://admin.balloo.su';
 const FEATURES_ORIGIN = 'https://features.balloo.su';
+const COMMAND_ORIGIN = 'https://command.balloo.su';
+const HISTORY_ORIGIN = 'https://history.balloo.su';
+const DOWNLOAD_ORIGIN = 'https://download.balloo.su';
+const API_ORIGIN = 'https://api.balloo.su';
 
 /** Хосты, для которых строим прод-карту ссылок. */
 export function isBallooProdHost(host: string): boolean {
@@ -50,26 +56,27 @@ export const SPA_TOPBAR_ITEMS: TopbarMenuItem[] = [
 
 /**
  * Пункты лого-меню для текущего хоста.
- * На balloo.su собственные поддомены (admin/features) — абсолютные URL,
- * разделы без своих сайтов — внутренние маршруты SPA.
- * На admin/features-хостах все пункты абсолютные (у их роутеров чужих
- * маршрутов нет).
+ * РЕШЕНИЕ ВЛАДЕЛЬЦА (повторено 13.11.2026): каждый пункт → СВОЙ поддомен,
+ * не hash-маршрут на главном SPA.
+ *
+ * command/history/download: их поддомены (nginx → :8090) отдают тот же SPA,
+ * поэтому hash-роутер открывает нужный экран.
+ * API docs: бэкенд-маршрут GET /docs (точка у_07 — docsController).
  */
 export function topbarItemsForHost(host?: string): TopbarMenuItem[] {
   const h = host ?? (typeof window !== 'undefined' ? window.location.hostname : '');
   if (!isBallooProdHost(h)) return SPA_TOPBAR_ITEMS;
 
   const onMain = h === 'balloo.su';
-  const link = (path: string) => (onMain ? path : `${MAIN_ORIGIN}/#${path}`);
 
   return [
-    { key: 'menu.balloo', to: link('/chat'), emoji: '💬' },
-    { key: 'menu.admin', to: ADMIN_ORIGIN + '/', emoji: '🛡️', dividerBefore: true },
-    { key: 'menu.command', to: link('/command'), emoji: '🏢' },
-    { key: 'menu.features', to: FEATURES_ORIGIN + '/', emoji: '💡' },
-    { key: 'menu.history', to: link('/history'), emoji: '📜' },
-    { key: 'menu.download', to: link('/download'), emoji: '⬇️' },
-    { key: 'menu.docs', to: link('/doc'), emoji: '📚' },
+    { key: 'menu.balloo', to: onMain ? '/chat' : `${MAIN_ORIGIN}/#/chat`, emoji: '💬' },
+    { key: 'menu.admin', to: `${ADMIN_ORIGIN}/`, emoji: '🛡️', dividerBefore: true },
+    { key: 'menu.command', to: `${COMMAND_ORIGIN}/#/command`, emoji: '🏢' },
+    { key: 'menu.features', to: `${FEATURES_ORIGIN}/`, emoji: '💡' },
+    { key: 'menu.history', to: `${HISTORY_ORIGIN}/#/history`, emoji: '📜' },
+    { key: 'menu.download', to: `${DOWNLOAD_ORIGIN}/#/download`, emoji: '⬇️' },
+    { key: 'menu.docs', to: `${API_ORIGIN}/docs`, emoji: '📚' },
   ];
 }
 

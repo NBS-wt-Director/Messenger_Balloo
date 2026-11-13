@@ -17,6 +17,7 @@ import { router as historyRouter } from './history';
 import { router as docsRouter } from './docs';
 import { router as specRouter } from './spec';
 import { router as blogLandingRouter } from './blog-landing';
+import { getDocsHtml } from '../controllers/docsHtmlController';
 import { router as archiveRouter } from './archive';
 import { router as devicesRouter } from './devices';
 import { router as accountsRouter } from './accounts';
@@ -83,5 +84,8 @@ router.use('/api/onboarding', onboardingRouter);
 router.use('/api', clientErrorsRouter);
 router.use('/api/search', searchRouter);
 router.use('/api/blocked/channels', blockedChannelRouter);
+
+// ─── API Documentation (api.balloo.su/docs — решение владельца, тик. 1794575221) ─
+router.get('/docs', getDocsHtml);
 
 export { router };
