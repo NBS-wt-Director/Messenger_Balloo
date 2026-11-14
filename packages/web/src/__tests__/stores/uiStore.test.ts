@@ -7,11 +7,11 @@ import { useUIStore } from '../../store/uiStore';
 
 describe('uiStore (@balloo/ui): theme + language', () => {
   beforeEach(() => {
-    useThemeLangStore.setState({ theme: 'dark', language: 'ru' });
+    useThemeLangStore.setState({ theme: 'russian', language: 'ru' });
   });
 
-  it('starts with default theme dark', () => {
-    expect(useThemeLangStore.getState().theme).toBe('dark');
+  it('starts with default theme russian («Наша», решение владельца 13.11.2026)', () => {
+    expect(useThemeLangStore.getState().theme).toBe('russian');
   });
 
   it('starts with default language ru', () => {

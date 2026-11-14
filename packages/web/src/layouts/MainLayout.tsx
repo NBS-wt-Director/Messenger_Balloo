@@ -74,7 +74,7 @@ function MainLayout() {
         height: '100vh',
         width: '100%',
         overflow: 'hidden',
-        background: 'var(--bg-primary)',
+        background: 'var(--app-bg)',
       }}
     >
       {/* Единая шапка (@balloo/ui) — на всю ширину, как в макете */}

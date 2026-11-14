@@ -53,8 +53,11 @@ export const SUPPORTED_LANGUAGES: { code: Language; name: string; nativeName: st
   { code: 'uk', name: 'Ukrainian', nativeName: 'Українська' },
 ];
 
-// Default theme
-const DEFAULT_THEME: Theme = 'dark';
+// Default theme — «Наша» (russian): фирменная тема Balloo (флаг РФ + золото).
+// Решение владельца 13.11.2026: «почему она чёрная? где моя уникальная тема?»
+// Пользователь может переключить на 🌙/☀️ — выбор сохраняется в cookie
+// .balloo.su и действует на всех поддоменах.
+const DEFAULT_THEME: Theme = 'russian';
 
 // Load saved theme from cookie or use default
 function getInitialTheme(): Theme {

@@ -90,33 +90,45 @@ export function getDocsHtml(_req: Request, res: Response): void {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Balloo API — документация</title>
   <style>
-    :root { --accent: #2db84d; --bg: #0f1419; --card: #161d24; --border: #243040;
-            --text: #e6edf3; --muted: #8b98a5; }
+    /* Палитра фирменной темы «Наша» (russian): флаг РФ + золото (тик. 1794575221) */
+    :root { --accent: #c9a227; --bg: #0a0c10; --card: #141821; --border: #243040;
+            --text: #f4f0e8; --muted: #b0b8c8; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--bg); color: var(--text);
+    body { color: var(--text);
+           background:
+             linear-gradient(45deg,
+               rgba(255, 255, 255, 0.22) 0%,
+               rgba(0, 57, 166, 0.38) 50%,
+               rgba(213, 43, 30, 0.42) 100%),
+             var(--bg);
+           background-attachment: fixed;
            font: 15px/1.6 Inter, Manrope, system-ui, sans-serif; }
     header { display: flex; align-items: center; gap: 12px; padding: 16px 24px;
              background: var(--card); border-bottom: 1px solid var(--border); }
     header .logo { width: 32px; height: 32px; background: var(--accent);
-                   color: #fff; display: grid; place-items: center; font-weight: 800; }
+                   color: #1a1d21; display: grid; place-items: center; font-weight: 800; }
     header h1 { font-size: 18px; font-weight: 700; }
     header a { margin-left: auto; color: var(--muted); text-decoration: none; }
     header a:hover { color: var(--accent); }
     main { max-width: 1080px; margin: 0 auto; padding: 32px 24px; }
-    h2 { font-size: 22px; margin: 32px 0 8px; border-left: 3px solid var(--accent);
+    main > p, section { background: var(--card); border: 1px solid var(--border);
+            border-radius: 6px; padding: 20px; margin-bottom: 20px; }
+    main > p { padding: 16px 20px; }
+    h2 { font-size: 22px; margin: 8px 0; border-left: 3px solid var(--accent);
          padding-left: 12px; }
+    section > h2:first-child { margin-top: 0; }
     h3 { font-size: 16px; margin: 20px 0 8px; color: var(--muted); }
     .mod-desc { color: var(--muted); margin-bottom: 12px; }
     table { width: 100%; border-collapse: collapse; margin-bottom: 16px;
             font-size: 13px; }
     th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); }
     th { color: var(--muted); font-weight: 600; }
-    code { background: var(--card); padding: 2px 6px; border-radius: 3px;
+    code { background: var(--bg); padding: 2px 6px; border-radius: 3px;
            font: 12px/1.5 "JetBrains Mono", monospace; word-break: break-all; }
     .m { font-weight: 700; font-size: 12px; }
-    .m-get { color: #3b9eff; } .m-post { color: var(--accent); }
-    .m-put, .m-patch { color: #e8a317; } .m-delete { color: #f85149; }
-    pre { background: var(--card); border: 1px solid var(--border); padding: 16px;
+    .m-get { color: #1565c0; } .m-post { color: var(--accent); }
+    .m-put, .m-patch { color: #ffb300; } .m-delete { color: #d52b1e; }
+    pre { background: var(--bg); border: 1px solid var(--border); padding: 16px;
           overflow-x: auto; font-size: 13px; border-radius: 4px; }
     .qs { margin-bottom: 24px; }
     footer { text-align: center; color: var(--muted); padding: 24px;

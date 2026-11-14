@@ -58,6 +58,10 @@
   );
   --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-secondary: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+  /* App background surface: solid in dark/light, flag gradient in russian.
+     Full-screen wrappers use var(--app-bg) so the russian gradient is actually
+     visible (ticket 1794575221: theme 'Наша' looked black). */
+  --app-bg: var(--bg-primary);
 }
 
 /* --- Light Theme --- */
@@ -115,6 +119,10 @@
   );
   --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-secondary: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+  /* App background surface: solid in dark/light, flag gradient in russian.
+     Full-screen wrappers use var(--app-bg) so the russian gradient is actually
+     visible (ticket 1794575221: theme 'Наша' looked black). */
+  --app-bg: var(--bg-primary);
 }
 
 /* --- Russian Theme --- */
@@ -183,6 +191,15 @@
   );
   --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-secondary: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+  /* App background surface: solid in dark/light, flag gradient in russian.
+     Full-screen wrappers use var(--app-bg) so the russian gradient is actually
+     visible (ticket 1794575221: theme 'Наша' looked black). */
+  --app-bg:
+    linear-gradient(45deg,
+      rgba(255, 255, 255, 0.22) 0%,
+      rgba(0, 57, 166, 0.38) 50%,
+      rgba(213, 43, 30, 0.42) 100%),
+    var(--bg-primary);
 }
 
 /* Russian theme: 45° flag-colour gradient as page backdrop (darkened for readability) */
@@ -193,4 +210,11 @@
       rgba(0, 57, 166, 0.38) 50%,
       rgba(213, 43, 30, 0.42) 100%),
     var(--bg-primary);
+}
+
+/* Russian theme: chat.css paints .content solid --bg-primary, which hid the
+   flag gradient (ticket 1794575221). Transparent lets the wrapper --app-bg
+   gradient show through. Doubled class = specificity over chat.css. */
+[data-theme='russian'] .content.content {
+  background: transparent;
 }
