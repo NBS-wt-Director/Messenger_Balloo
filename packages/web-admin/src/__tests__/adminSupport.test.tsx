@@ -61,7 +61,7 @@ const DETAIL = {
 
 function renderScreen() {
   return render(
-    <MemoryRouter initialEntries={['/admin/support']}>
+    <MemoryRouter initialEntries={['/support']}>
       <AdminSupportScreen />
     </MemoryRouter>
   );

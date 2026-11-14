@@ -215,7 +215,7 @@ export function UserDetailScreen() {
     setDeleteProcessing(true);
     try {
       await api.deleteUser(user.id);
-      navigate('/admin/users', { replace: true });
+      navigate('/users', { replace: true });
     } catch {
       setUser({ ...user, status: 'deleted' });
       setShowDeleteConfirm(false);
@@ -293,7 +293,7 @@ export function UserDetailScreen() {
           Пользователь с ID {userId} не существует или был удалён.
         </p>
         <button
-          onClick={() => navigate('/admin/users')}
+          onClick={() => navigate('/users')}
           style={{
             marginTop: 16,
             padding: '8px 16px',
@@ -317,7 +317,7 @@ export function UserDetailScreen() {
     <div className="page-container fade-in">
       {/* Back button */}
       <button
-        onClick={() => navigate('/admin/users')}
+        onClick={() => navigate('/users')}
         style={{
           display: 'flex',
           alignItems: 'center',

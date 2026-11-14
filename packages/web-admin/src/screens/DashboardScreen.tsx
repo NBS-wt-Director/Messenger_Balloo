@@ -54,28 +54,28 @@ export function DashboardScreen() {
       label: 'Забанить пользователя',
       icon: '🔨',
       variant: 'danger' as const,
-      onClick: () => navigate('/admin/users'),
+      onClick: () => navigate('/users'),
     },
     {
       id: 'create-announcement',
       label: 'Создать объявление',
       icon: '📢',
       variant: 'primary' as const,
-      onClick: () => navigate('/admin/downloads'),
+      onClick: () => navigate('/downloads'),
     },
     {
       id: 'view-reports',
       label: 'Просмотр жалоб',
       icon: '🚩',
       variant: 'warning' as const,
-      onClick: () => navigate('/admin/reports'),
+      onClick: () => navigate('/reports'),
     },
     {
       id: 'check-analytics',
       label: 'Проверить метрики',
       icon: '📈',
       variant: 'info' as const,
-      onClick: () => navigate('/admin/analytics'),
+      onClick: () => navigate('/analytics'),
     },
   ];
 
@@ -412,7 +412,7 @@ export function DashboardScreen() {
                     }}
                   >
                     <button
-                      onClick={() => navigate('/admin/reports')}
+                      onClick={() => navigate('/reports')}
                       style={{
                         padding: '6px 14px',
                         background: 'var(--bg-tertiary)',

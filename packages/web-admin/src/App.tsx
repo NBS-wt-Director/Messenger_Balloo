@@ -1,5 +1,8 @@
 // App — роутер админ-панели
-// admin.balloo.su → все 24 маршрута под /admin
+// admin.balloo.su → все 24 маршрута под / (свой домен, корневой роутер)
+//
+// Раньше маршруты были под /admin (serve под-путь), но теперь admin.balloo.su
+// — отдельный домен, открывающийся по "/", поэтому базовый путь changed на "/".
 
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
@@ -109,7 +112,7 @@ export default function App() {
         <Suspense fallback={<LoadingFallback />}>
           <Routes>
             <Route
-              path="/admin"
+              path="/"
               element={
                 <AdminGuard>
                   <AdminLayout />

@@ -143,6 +143,7 @@ GET /api/users/me/blocked
 GET /api/users/me/export
 GET /api/users/me/subscriptions
 GET /api/users/search
+GET /docs
 GET /health
 GET /health/ready
 PATCH /api/accounts/:userId/notifications

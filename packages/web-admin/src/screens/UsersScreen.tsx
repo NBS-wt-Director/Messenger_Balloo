@@ -533,7 +533,7 @@ export function UsersScreen() {
                       if (!selectedIds.has(user.id))
                         e.currentTarget.style.background = 'transparent';
                     }}
-                    onClick={() => navigate(`/admin/users/${user.id}`)}
+                    onClick={() => navigate(`/users/${user.id}`)}
                   >
                     <td
                       style={{ ...tdStyle, width: 40 }}
@@ -641,7 +641,7 @@ export function UsersScreen() {
                     >
                       <div style={{ display: 'flex', gap: 4, justifyContent: 'flex-end' }}>
                         <button
-                          onClick={() => navigate(`/admin/users/${user.id}`)}
+                          onClick={() => navigate(`/users/${user.id}`)}
                           style={{
                             padding: '4px 10px',
                             background: 'var(--bg-tertiary)',

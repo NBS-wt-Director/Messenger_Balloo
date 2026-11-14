@@ -32,10 +32,10 @@ const adminUser = {
 describe('App (роутер админки)', () => {
   beforeEach(() => {
     useAuthStore.setState({ user: adminUser, isAuthenticated: true, isLoading: false });
-    window.history.pushState({}, '', '/admin');
+    window.history.pushState({}, '', '/');
   });
 
-  it('/admin рендерит дашборд через lazy-обёртку, а не ErrorBoundary', async () => {
+  it('/ рендерит дашборд через lazy-обёртку, а не ErrorBoundary', async () => {
     const { container } = render(<App />);
 
     await waitFor(
@@ -48,8 +48,8 @@ describe('App (роутер админки)', () => {
     );
   });
 
-  it('/admin/employees рендерит экран сотрудников', async () => {
-    window.history.pushState({}, '', '/admin/employees');
+  it('/employees рендерит экран сотрудников', async () => {
+    window.history.pushState({}, '', '/employees');
     const { container } = render(<App />);
 
     await waitFor(
