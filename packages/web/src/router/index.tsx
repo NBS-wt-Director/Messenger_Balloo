@@ -63,20 +63,6 @@ const NotFoundScreen = lazy(() => import('@/screens/shared/NotFoundScreen'));
 const ForKassaScreen = lazy(() => import('@/screens/landing/ForKassaScreen').then((m) => ({ default: m.ForKassaScreen })));
 const DonateScreen = lazy(() => import('@/screens/donate/DonateScreen').then((m) => ({ default: m.DonateScreen })));
 
-// Command (employee portal) screens
-const CommandLayout = lazy(() => import('@/screens/command/CommandLayout').then((m) => ({ default: m.CommandLayout })));
-const HRScreen = lazy(() => import('@/screens/command/HRScreen').then((m) => ({ default: m.HRScreen })));
-const CommandVacanciesScreen = lazy(() => import('@/screens/command/VacanciesScreen').then((m) => ({ default: m.VacanciesScreen })));
-const ApplicationsScreen = lazy(() => import('@/screens/command/ApplicationsScreen').then((m) => ({ default: m.ApplicationsScreen })));
-const InterviewsScreen = lazy(() => import('@/screens/command/InterviewsScreen').then((m) => ({ default: m.InterviewsScreen })));
-const HireScreen = lazy(() => import('@/screens/command/HireScreen').then((m) => ({ default: m.HireScreen })));
-const CommandKnowledgeScreen = lazy(() => import('@/screens/command/KnowledgeScreen').then((m) => ({ default: m.KnowledgeScreen })));
-const CommandKnowledgePageScreen = lazy(() => import('@/screens/command/KnowledgePageScreen').then((m) => ({ default: m.KnowledgePageScreen })));
-const CommandCreatePageScreen = lazy(() => import('@/screens/command/CreatePageScreen').then((m) => ({ default: m.CreatePageScreen })));
-const InternalChatScreen = lazy(() => import('@/screens/command/InternalChatScreen').then((m) => ({ default: m.InternalChatScreen })));
-const CommandBlogScreen = lazy(() => import('@/screens/command/CommandBlogScreen').then((m) => ({ default: m.CommandBlogScreen })));
-const CommandSettingsScreen = lazy(() => import('@/screens/command/CommandSettingsScreen').then((m) => ({ default: m.CommandSettingsScreen })));
-
 // Hiring screens
 const VacanciesScreen = lazy(() => import('@/screens/hiring/VacanciesScreen'));
 const VacancyScreen = lazy(() => import('@/screens/hiring/VacancyScreen'));
@@ -614,95 +600,6 @@ export const router = createHashRouter([
       {
         path: 'hiring/why-us',
         element: <VacanciesScreen />,
-      },
-    ],
-  },
-
-  // --- Command (employee portal) routes ---
-  {
-    path: '/command',
-    element: (
-      <ErrorBoundary>
-        <Suspense fallback={<LoadingFallback />}>
-          <CommandLayout />
-        </Suspense>
-      </ErrorBoundary>
-    ),
-    children: [
-      {
-        index: true,
-        element: <HireScreen />,
-      },
-      {
-        path: 'hr',
-        element: <HRScreen />,
-      },
-      {
-        path: 'vacancies',
-        element: <CommandVacanciesScreen />,
-      },
-      {
-        path: 'applications',
-        element: <ApplicationsScreen />,
-      },
-      {
-        path: 'interviews',
-        element: <InterviewsScreen />,
-      },
-      {
-        path: 'hiring',
-        element: <HireScreen />,
-      },
-      // Internal chat — тикет №50
-      {
-        path: 'chat',
-        element: <InternalChatScreen />,
-      },
-      {
-        path: 'meetings',
-        element: <NotFoundScreen />,
-      },
-      {
-        path: 'tasks',
-        element: <NotFoundScreen />,
-      },
-      // Command blog — тикет №52
-      {
-        path: 'blog',
-        element: <CommandBlogScreen />,
-      },
-      {
-        path: 'my-department',
-        element: <NotFoundScreen />,
-      },
-      {
-        path: 'departments',
-        element: <NotFoundScreen />,
-      },
-      {
-        path: 'knowledge',
-        element: <CommandKnowledgeScreen />,
-      },
-      {
-        path: 'knowledge/:pageId',
-        element: <CommandKnowledgePageScreen />,
-      },
-      {
-        path: 'knowledge/create',
-        element: <CommandCreatePageScreen />,
-      },
-      // Command settings — тикет №53
-      {
-        path: 'settings',
-        element: <CommandSettingsScreen />,
-      },
-      {
-        path: 'monitoring',
-        element: <NotFoundScreen />,
-      },
-      {
-        path: 'why-us',
-        element: <CommandVacanciesScreen />,
       },
     ],
   },
