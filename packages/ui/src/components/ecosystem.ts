@@ -5,8 +5,7 @@
 // СВОЙ поддомен узла, а не на внутренний маршрут главного SPA:
 //   💬 Balloo   — balloo.su (главное приложение, web)
 //   🛡️ Admin    — admin.balloo.su (web-admin)
-//   🏢 Command  — command.balloo.su (портал сотрудников; nginx проксирует на
-//                 тот же SPA-контейнер :8090, hash-роутер открывает /#/command)
+//   🏢 Command  — command.balloo.su (портал сотрудников; не в MVP1, в меню не показывается)
 //   💡 Features — features.balloo.su (web-features)
 //   📜 History  — history.balloo.su/#/history
 //   ⬇️ Download — download.balloo.su/#/download
@@ -24,7 +23,6 @@ import type { RightMenuItem } from './RightMenu';
 const MAIN_ORIGIN = 'https://balloo.su';
 const ADMIN_ORIGIN = 'https://admin.balloo.su';
 const FEATURES_ORIGIN = 'https://features.balloo.su';
-const COMMAND_ORIGIN = 'https://command.balloo.su';
 const HISTORY_ORIGIN = 'https://history.balloo.su';
 const DOWNLOAD_ORIGIN = 'https://download.balloo.su';
 const API_ORIGIN = 'https://api.balloo.su';
@@ -72,7 +70,6 @@ export function topbarItemsForHost(host?: string): TopbarMenuItem[] {
   return [
     { key: 'menu.balloo', to: onMain ? '/chat' : `${MAIN_ORIGIN}/#/chat`, emoji: '💬' },
     { key: 'menu.admin', to: `${ADMIN_ORIGIN}/`, emoji: '🛡️', dividerBefore: true },
-    { key: 'menu.command', to: `${COMMAND_ORIGIN}/#/command`, emoji: '🏢' },
     { key: 'menu.features', to: `${FEATURES_ORIGIN}/`, emoji: '💡' },
     { key: 'menu.history', to: `${HISTORY_ORIGIN}/#/history`, emoji: '📜' },
     { key: 'menu.download', to: `${DOWNLOAD_ORIGIN}/#/download`, emoji: '⬇️' },

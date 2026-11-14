@@ -32,11 +32,12 @@ describe('ecosystem — хост-осознанные ссылки (тик. 1794
     // все узлы — абсолютные URL своих поддоменов
     expect(byKey['menu.admin']).toBe('https://admin.balloo.su/');
     expect(byKey['menu.features']).toBe('https://features.balloo.su/');
-    expect(byKey['menu.command']).toBe('https://command.balloo.su/#/command');
     expect(byKey['menu.history']).toBe('https://history.balloo.su/#/history');
     expect(byKey['menu.download']).toBe('https://download.balloo.su/#/download');
     // API docs = api.balloo.su/docs (решение владельца, повторено 13.11.2026)
     expect(byKey['menu.docs']).toBe('https://api.balloo.su/docs');
+    // command — не в MVP1, не в меню
+    expect(byKey['menu.command']).toBeUndefined();
   });
 
   it('на features.balloo.su: все пункты абсолютные (свой роутер чужих маршрутов не знает)', () => {
