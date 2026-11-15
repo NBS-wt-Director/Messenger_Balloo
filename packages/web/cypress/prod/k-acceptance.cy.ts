@@ -191,12 +191,29 @@ describe('Прод: K3/K11 — WS-эндпоинт и CDN (без учётки)'
     });
   });
 
-  it('K11: CDN отдаёт 502 — зафиксированный дефект (не блокер P38)', () => {
-    cy.request({ url: 'https://cdn.balloo.su/', failOnStatusCode: false }).then((res) => {
-      // Ожидание по тикету 1792812416: сейчас 502 (MinIO API). Тест фиксирует факт,
-      // чтобы дефект был виден в отчёте, а не потерялся.
-      cy.log(`cdn.balloo.su → ${res.status}`);
-      expect([200, 502], 'CDN: 200 (починен) или 502 (известный дефект)').to.include(res.status);
+  it('K11: CDN отвечает (502 починен 02.11: листинг 403 = норма политики bucket)', () => {
+    // Замер 14.11.2026: 403 AccessDenied на листинг balloo-media — MinIO жив через
+    // nginx (тик. 1793609497 п.9). 200 допустим, если листинг откроют.
+    // Замер 15.11.2026: cdn НЕСТАБИЛЕН — 403 за 0.08с и таймаут >20с в соседних
+    // пробах (balloo.su в это же время 200/0.3с). Отсюда две пробы curl: провал =
+    // обе без ответа или любая дала 502. Деградация — в тикете 1793609497 (п.9).
+    const probe = () =>
+      cy
+        .exec('curl -s -o /dev/null -w "%{http_code}" --max-time 45 https://cdn.balloo.su/', {
+          failOnNonZeroExit: false,
+        })
+        .then((r) => r.stdout.trim());
+
+    probe().then((first) => {
+      const finish = (second?: string) => {
+        const codes = second === undefined ? [first] : [first, second];
+        cy.log(`пробы cdn.balloo.su: ${codes.join(', ')}`);
+        expect(codes, '502 = MinIO снова недоступен').to.not.include('502');
+        const good = codes.filter((c) => c === '200' || c === '403');
+        expect(good.length, `хотя бы одна проба 200/403, были: ${codes}`).to.be.greaterThan(0);
+      };
+      if (first === '200' || first === '403') return finish();
+      return probe().then(finish);
     });
   });
 });
@@ -220,9 +237,17 @@ describe('Прод: K7/K10 — поддомены отвечают и не бе�
     });
   });
 
-  it('K7: admin.balloo.su рендерит интерфейс (не белый экран)', () => {
+  it('K7: admin.balloo.su без сессии редиректит на вход balloo.su (AdminGuard)', () => {
+    // Решение владельца 19.10.2026 (1.2.13): не-админам — редирект с админки.
+    // AdminGuard (web-admin/src/AdminGuard.tsx): нет сессии → balloo.su/#/login.
+    // Проверка «админка не белая для админа» = K8, руки владельца (нужна учётка).
+    cy.clearCookies();
     cy.visit(ADMIN);
-    cy.title().should('match', /Balloo Admin/i);
-    cy.get('#root', { timeout: 20000 }).children().should('have.length.greaterThan', 0);
+    // Смена origin (window.location.replace на другой домен) — команды после
+    // редиректа Cypress выполняет только внутри cy.origin().
+    cy.origin('https://balloo.su', () => {
+      cy.location('hash', { timeout: 20000 }).should('match', /#\/login/);
+      cy.get('[data-testid="login-email"]', { timeout: 20000 }).should('be.visible');
+    });
   });
 });
