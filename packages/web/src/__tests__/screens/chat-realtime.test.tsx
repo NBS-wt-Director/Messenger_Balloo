@@ -46,6 +46,9 @@ vi.mock('@/store/chatStore', () => ({
 vi.mock('@/services/api', () => ({
   api: {
     getChatInfo: vi.fn().mockResolvedValue({ id: 'c1', name: 'Тестовый чат', type: 'private' }),
+    /** Мок слоя api, а не HTTP: api.getMessages нормализует страницу сервера
+     *  {messages, pagination} в массив (тик. 1793791062, регрессия покрыта
+     *  тестом packages/web/src/__tests__/services/api.messages.test.ts). */
     getMessages: vi.fn().mockResolvedValue([]),
     sendMessage: vi.fn().mockResolvedValue({ id: 'm1', content: 'x', senderId: 'u1' }),
     reactToMessage: vi.fn(),

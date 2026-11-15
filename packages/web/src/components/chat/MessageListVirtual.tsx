@@ -131,7 +131,9 @@ function groupByDate(messages: MessageWithSender[]) {
 
   messages.forEach((msg) => {
     if (!msg.createdAt) return;
-    const date = new Date(msg.createdAt);
+    // unix-секунды в строке (BigInt → string на сервере) → мс. Без Number()*1000
+    // разделитель даты рисовал «Invalid Date» (приёмка «два окна», тик. 1793567633).
+    const date = new Date(Number(msg.createdAt) * 1000);
     const dateStr = date.toLocaleDateString('ru-RU', {
       day: '2-digit',
       month: 'long',

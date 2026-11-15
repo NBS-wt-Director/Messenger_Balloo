@@ -122,4 +122,42 @@ describe('MessageBubble', () => {
     expect(screen.getByText('Yes')).toBeInTheDocument();
     expect(screen.getByText('No')).toBeInTheDocument();
   });
+
+  /**
+   * Регрессия приёмки «два окна» (тик. 1793567633, 15.11.2026).
+   *
+   * baseMessage.createdAt = 1700000000000 — миллисекеды числом, а реальный
+   * API отдаёт СЕКУНДЫ строкой: GET /api/chats/:id/messages →
+   *   {"createdAt":"1794768916"}   (BigInt сериализуется строкой в app.ts)
+   * new Date("1794768916") → Invalid Date, и в пузыре было видно «Invalid
+   * Date» вместо времени. Прежний набор тестов время не проверял вообще,
+   * поэтому дефект был зелёным.
+   */
+  describe('время сообщения в форме реального API', () => {
+    it('секунды unix строкой рисуются как ЧЧ:ММ, а не «Invalid Date»', () => {
+      const realShape = { ...baseMessage, createdAt: '1794768916' as any };
+      render(<MessageBubble message={realShape} isOwn={false} />);
+
+      const expected = new Date(1794768916 * 1000).toLocaleTimeString('ru-RU', {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+      const el = screen.getByText(expected);
+      expect(el).toBeInTheDocument();
+      expect(el.textContent).toMatch(/^\d{2}:\d{2}$/);
+      expect(document.body.textContent).not.toContain('Invalid Date');
+    });
+
+    it('секунды unix числом тоже дают корректное время', () => {
+      const numericSeconds = { ...baseMessage, createdAt: 1794768916 as any };
+      render(<MessageBubble message={numericSeconds} isOwn={false} />);
+
+      expect(document.body.textContent).not.toContain('Invalid Date');
+      const expected = new Date(1794768916 * 1000).toLocaleTimeString('ru-RU', {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+      expect(screen.getByText(expected)).toBeInTheDocument();
+    });
+  });
 });

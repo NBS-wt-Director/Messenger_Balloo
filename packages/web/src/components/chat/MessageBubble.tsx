@@ -38,7 +38,11 @@ export const MessageBubble = React.memo<MessageBubbleProps>(({
   // Кэшируем вычисления — не пересчитывать при ре-рендере
   const time = useMemo(() => {
     return message.createdAt
-      ? new Date(message.createdAt).toLocaleTimeString('ru-RU', {
+      ? // createdAt приходит секундами unix в строке (BigInt сериализуется
+        // строкой на сервере, см. app.ts). new Date("1794768916") → Invalid
+        // Date, поэтому Number() и ×1000 — как во всех остальных экранах
+        // (ArchiveScreen, ChannelViewScreen, SupportScreen и др.).
+        new Date(Number(message.createdAt) * 1000).toLocaleTimeString('ru-RU', {
           hour: '2-digit',
           minute: '2-digit',
         })

@@ -104,10 +104,27 @@ export const applyRateLimit = (
   //
   // P39 (2026-10-05): OAuth GET-маршруты теперь имеют отдельный oauthLimiter
   // (10/мин) вместо общего apiLimiter (100/15мин).
+  //
+  // Тик. 1793567633 (приёмка «два окна», 15.11.2026): в authLimiter (5/мин)
+  // попадали и служебные вызовы уже авторизованной сессии —
+  //   GET  /api/auth/ws-token      (берёт WS-токен из cookie),
+  //   POST /api/auth/refresh-cookie (продлевает пару токенов).
+  // Оба выполняются при каждом открытии приложения: React StrictMode дублирует
+  // эффект, поэтому ДВЕ вкладки с двумя аккаунтами выжигали лимит (2 refresh +
+  // 1 login на вкладку) и второй вход падал с 429 «Слишком много попыток
+  // авторизации» — то есть нормальный пользователь не мог зайти вторым окном.
+  // Это не подбор пароля: учётные данные в этих запросах не участвуют, а у
+  // refresh-cookie есть checkRefreshOrigin + валидация httpOnly-куки. Их уводит
+  // общий apiLimiter (100/15мин), строгий лимит остаётся на login/register/2fa.
   const isOAuthGetRedirect =
     req.method === 'GET' && req.path.startsWith('/api/auth/oauth/');
+  const isSessionMaintenance =
+    req.path === '/api/auth/ws-token' || req.path === '/api/auth/refresh-cookie';
+
   if (isOAuthGetRedirect) {
     oauthLimiter(req, res, next);
+  } else if (isSessionMaintenance) {
+    apiLimiter(req, res, next);
   } else if (req.path.startsWith('/api/auth/') && !isOAuthGetRedirect) {
     authLimiter(req, res, next);
   } else if (req.path.startsWith('/api/upload/')) {

@@ -107,6 +107,60 @@ describe('applyRateLimit — стратегия по пути', () => {
     });
   });
 
+  /**
+   * Регрессия приёмки «два окна» (тик. 1793567633, 15.11.2026).
+   *
+   * Служебные вызовы уже авторизованной сессии — GET /api/auth/ws-token и
+   * POST /api/auth/refresh-cookie — лежали в одном префиксе /api/auth/ и
+   * попадали под authLimiter (5/мин). Реальный сценарий двух окон: каждая
+   * вкладка при загрузке делает 2× refresh-cookie (React StrictMode дублирует
+   * эффект) + 1× ws-token, и только потом логин. Итого второй вход
+   * упирался в 429 «Слишком много попыток авторизации», хотя пароль никто не
+   * подбирал. Проверка идёт одним IP — как два окна за одним NAT.
+   */
+  it('обслуживание сессии (ws-token, refresh-cookie) не сжигает лимит входа', async () => {
+    const app = express();
+    app.set('trust proxy', true);
+    app.use(applyRateLimit);
+    const ok = (_req: any, res: any) => res.json({ ok: true });
+    app.get('/api/auth/ws-token', ok);
+    app.post('/api/auth/refresh-cookie', ok);
+    app.post('/api/auth/login', ok);
+
+    const ip = nextIp();
+
+    await withNodeEnv('development', async () => {
+      // Окно A: 2 refresh + 2 ws-token (StrictMode) + вход
+      for (let i = 0; i < 2; i += 1) {
+        expect((await request(app).post('/api/auth/refresh-cookie').set('X-Forwarded-For', ip).send({})).status).toBe(200);
+      }
+      for (let i = 0; i < 2; i += 1) {
+        expect((await request(app).get('/api/auth/ws-token').set('X-Forwarded-For', ip)).status).toBe(200);
+      }
+      expect((await request(app).post('/api/auth/login').set('X-Forwarded-For', ip).send({})).status).toBe(200);
+
+      // Окно B с того же IP: те же 5 вызовов + свой вход. До фикса вход падал
+      // в 429 — authLimiter уже был исчерпан служебными запросами окна A.
+      for (let i = 0; i < 2; i += 1) {
+        expect((await request(app).post('/api/auth/refresh-cookie').set('X-Forwarded-For', ip).send({})).status).toBe(200);
+      }
+      for (let i = 0; i < 2; i += 1) {
+        expect((await request(app).get('/api/auth/ws-token').set('X-Forwarded-For', ip)).status).toBe(200);
+      }
+      const secondLogin = await request(app).post('/api/auth/login').set('X-Forwarded-For', ip).send({});
+      expect(secondLogin.status).toBe(200);
+
+      // Но строгий лимит на сам ввод учётных данных сохраняется: ещё 4 логина
+      // (всего 6 за минуту) обязан отбить authLimiter.
+      for (let i = 0; i < 3; i += 1) {
+        expect((await request(app).post('/api/auth/login').set('X-Forwarded-For', ip).send({})).status).toBe(200);
+      }
+      const exhausted = await request(app).post('/api/auth/login').set('X-Forwarded-For', ip).send({});
+      expect(exhausted.status).toBe(429);
+      expect(exhausted.body.error).toContain('авторизации');
+    });
+  });
+
   it('POST /api/upload/* → uploadLimiter 10/мин', async () => {
     const app = makeApp();
     const ip = nextIp();

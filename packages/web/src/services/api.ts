@@ -282,11 +282,23 @@ export const api = {
     }),
 
   // Messages
-  getMessages: (chatId: string, cursor?: string, limit = 50) =>
-    request<any[]>(`/api/chats/${chatId}/messages`, {
+  /**
+   * Сообщения чата.
+   *
+   * Сервер отдаёт страницу `{ messages, pagination }`, а не голый массив
+   * (замер 15.11.2026: GET /api/chats/:id/messages → 200 {"messages":[],"pagination":{…}}).
+   * Экраны работают со списком, поэтому нормализуем здесь — единственном месте,
+   * где форма ответа известна. Иначе `messagesData.map` в ChatViewScreen падал
+   * с TypeError и экран выкидывало обратно на список чатов.
+   */
+  getMessages: async (chatId: string, cursor?: string, limit = 50): Promise<any[]> => {
+    const res = await request<any>(`/api/chats/${chatId}/messages`, {
       method: 'GET',
       data: undefined,
-    }),
+    });
+    if (Array.isArray(res)) return res;
+    return res?.messages ?? [];
+  },
 
   sendMessage: (
     chatId: string,

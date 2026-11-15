@@ -87,7 +87,11 @@ export const ChatViewScreen: React.FC = () => {
         }));
         setMessages(chatId, messagesWithSender);
       } catch {
-        const localChat = chats.find((c) => c.id === chatId);
+        // `chats` из замыкания рендера устаревает: чат мог появиться в сторе
+        // строкой выше (addChat) или быть добавленным списком во время этого
+        // await. Сверяемся с getState(), иначе первая же ошибка загрузки
+        // выбрасывала пользователя из открытого чата на /chat.
+        const localChat = useChatStore.getState().chats.find((c) => c.id === chatId);
         if (localChat) {
           setActiveChat(chatId);
         } else {
