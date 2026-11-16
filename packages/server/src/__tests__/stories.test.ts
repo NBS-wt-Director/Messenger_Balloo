@@ -65,6 +65,34 @@ describe('Stories API', () => {
 
       expect(res.status).toBe(400);
     });
+
+    it('создаёт историю с audienceGroupIds (тик. 1794850879)', async () => {
+      const user = await registerTestUser();
+
+      // Создаём группу контактов с участником
+      const groupRes = await request(app)
+        .post('/api/users/contact-groups')
+        .set('Authorization', `Bearer ${user.accessToken}`)
+        .send({ name: 'Тестовая группа', memberIds: [user.id] });
+
+      expect(groupRes.status).toBe(201);
+      const groupId = groupRes.body.id;
+
+      // Создаём историю с audienceGroupIds
+      const storyRes = await request(app)
+        .post('/api/stories')
+        .set('Authorization', `Bearer ${user.accessToken}`)
+        .send({
+          type: 'image',
+          mediaUrl: 'https://cdn.balloo.su/test.jpg',
+          expiresAt: futureTimestamp(),
+          visibility: 'selective',
+          audienceGroupIds: [groupId],
+        });
+
+      expect(storyRes.status).toBe(201);
+      expect(storyRes.body.visibility).toBe('selective');
+    });
   });
 
   describe('GET /api/stories', () => {

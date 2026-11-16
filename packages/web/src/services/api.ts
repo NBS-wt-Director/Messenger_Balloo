@@ -981,6 +981,25 @@ export const api = {
   deleteBot: (botId: string) =>
     request<any>(`/api/bots/${botId}`, { method: 'DELETE' }),
 
+  // Группы контактов (тик. 1794850879)
+  getContactGroups: () =>
+    request<any[]>('/api/users/contact-groups'),
+
+  createContactGroup: (data: { name: string; emoji?: string; description?: string; memberIds?: string[] }) =>
+    request<any>('/api/users/contact-groups', { method: 'POST', data }),
+
+  updateContactGroup: (groupId: string, data: { name?: string; emoji?: string; description?: string }) =>
+    request<any>(`/api/users/contact-groups/${groupId}`, { method: 'PATCH', data }),
+
+  deleteContactGroup: (groupId: string) =>
+    request<any>(`/api/users/contact-groups/${groupId}`, { method: 'DELETE' }),
+
+  addMemberToGroup: (groupId: string, memberId: string) =>
+    request<any>(`/api/users/contact-groups/${groupId}/members`, { method: 'POST', data: { memberId } }),
+
+  removeMemberFromGroup: (groupId: string, memberId: string) =>
+    request<any>(`/api/users/contact-groups/${groupId}/members/${memberId}`, { method: 'DELETE' }),
+
   // Устройства (тик. 1792160018) — getDevices уже есть выше
   renameDevice: (deviceId: string, name: string) =>
     request<any>(`/api/devices/${deviceId}`, { method: 'PATCH', data: { name } }),

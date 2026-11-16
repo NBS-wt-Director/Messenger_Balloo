@@ -12,6 +12,11 @@ interface CreateStoryInput {
   mediaUrl: string;
   thumbnail?: string;
   expiresAt: number; // Unix seconds
+  // Тикет 1792072292: выборочный доступ
+  visibility?: 'all' | 'friends' | 'self' | 'selective';
+  audienceUserIds?: string[];
+  // Тикет 1794850879: группы контактов как аудитория
+  audienceGroupIds?: string[];
 }
 
 interface DeleteStoryInput {
@@ -38,8 +43,26 @@ interface AddStoryReactionInput {
 export const createStory = async (input: CreateStoryInput) => {
   const { userId, type, mediaUrl, thumbnail, expiresAt } = input;
   // Тикет 1792072292: выборочный доступ к истории
-  const visibility = (input as any).visibility || 'all';
-  const audienceUserIds: string[] = (input as any).audienceUserIds || [];
+  const visibility = input.visibility || 'all';
+  const audienceUserIds: string[] = input.audienceUserIds || [];
+  // Тикет 1794850879: группы контактов как аудитория — состав разворачивается
+  // в StoryAudience на момент публикации (решение владельца: группа = её
+  // участники на момент публикации; удаление группы не отзывает доступ).
+  const audienceGroupIds: string[] = input.audienceGroupIds || [];
+
+  let finalAudience: string[] = [...audienceUserIds];
+  if (visibility === 'selective' && audienceGroupIds.length > 0) {
+    const groupMembers = await prisma.contactGroupMember.findMany({
+      where: {
+        groupId: { in: audienceGroupIds },
+        group: { ownerId: userId }, // только свои группы
+      },
+      select: { memberId: true },
+    });
+    finalAudience = Array.from(
+      new Set([...finalAudience, ...groupMembers.map((m) => m.memberId)]),
+    );
+  }
 
   // Валидация: expiresAt не в прошлом
   const now = Math.floor(Date.now() / 1000);
@@ -63,9 +86,9 @@ export const createStory = async (input: CreateStoryInput) => {
       thumbnail,
       expiresAt,
       visibility,
-      // Для selective — привязываем выбранных контактов
-      ...(visibility === 'selective' && audienceUserIds.length > 0
-        ? { audience: { create: audienceUserIds.map((uid) => ({ userId: uid })) } }
+      // Для selective — привязываем выбранных контактов и участников групп
+      ...(visibility === 'selective' && finalAudience.length > 0
+        ? { audience: { create: finalAudience.map((uid) => ({ userId: uid })) } }
         : {}),
     },
     include: {

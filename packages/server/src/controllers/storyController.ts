@@ -19,7 +19,7 @@ import { internalError } from '../middleware/errorHandler';
 export const createStory = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const userId = req.user!.id;
-    const { type, mediaUrl, thumbnail, expiresAt } = req.body;
+    const { type, mediaUrl, thumbnail, expiresAt, visibility, audienceUserIds, audienceGroupIds } = req.body;
 
     if (!type || !mediaUrl || !expiresAt) {
       res.status(400).json({ error: 'Bad Request', message: 'Необходимы: type, mediaUrl, expiresAt' });
@@ -31,7 +31,19 @@ export const createStory = async (req: AuthenticatedRequest, res: Response, next
       return;
     }
 
-    const story = await createStoryService({ userId, type, mediaUrl, thumbnail, expiresAt });
+    const story = await createStoryService({
+      userId,
+      type,
+      mediaUrl,
+      thumbnail,
+      expiresAt,
+      // Тикет 1792072292: выборочный доступ — раньше эти поля терялись
+      // при деструктуризации (существующий баг, найден тик. 1794850879)
+      visibility,
+      audienceUserIds,
+      // Тикет 1794850879: группы контактов как аудитория
+      audienceGroupIds,
+    });
 
     res.status(201).json(story);
   } catch (error: any) {

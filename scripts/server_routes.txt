@@ -26,6 +26,8 @@ DELETE /api/polls/:id
 DELETE /api/stories/:id
 DELETE /api/upload/:fileId
 DELETE /api/users/:id/block
+DELETE /api/users/contact-groups/:id
+DELETE /api/users/contact-groups/:id/members/:memberId
 DELETE /api/users/contacts/:userId
 DELETE /api/users/me
 GET /
@@ -138,6 +140,8 @@ GET /api/stories/feed
 GET /api/support/chat
 GET /api/support/status
 GET /api/users/:username
+GET /api/users/contact-groups
+GET /api/users/contact-groups/:id
 GET /api/users/contacts
 GET /api/users/me
 GET /api/users/me/blocked
@@ -150,6 +154,7 @@ GET /health/ready
 PATCH /api/accounts/:userId/notifications
 PATCH /api/devices/:id
 PATCH /api/onboarding/me
+PATCH /api/users/contact-groups/:id
 PATCH /api/users/me/onboarding
 POST /api/accounts/switch
 POST /api/admin/announcements
@@ -246,6 +251,8 @@ POST /api/upload/chat-avatar
 POST /api/upload/file
 POST /api/upload/story
 POST /api/users/:id/block
+POST /api/users/contact-groups
+POST /api/users/contact-groups/:id/members
 POST /api/users/contacts/:userId
 POST /api/users/me/password
 POST /api/users/me/password/send-code

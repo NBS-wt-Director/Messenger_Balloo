@@ -296,7 +296,7 @@
 
 | `1_01_41` | Создание историй | `balloo-su/story-create.html` | Принят | `balloo-su/story-create.md` |
 
-| `1_01_42` | Группы контактов | `balloo-su/contact-groups.html` | Проектируется | `balloo-su/contact-groups.md` |
+| `1_01_42` | Группы контактов | `balloo-su/contact-groups.html` | Принят | `balloo-su/contact-groups.md` |
 
 | `1_01_14` | Техподдержка | `balloo-su/support.html` | Принят | `balloo-su/support.md` |
 

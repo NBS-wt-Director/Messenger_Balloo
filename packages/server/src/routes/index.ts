@@ -28,6 +28,7 @@ import { router as supportRouter } from './support';
 import { router as tasksRouter } from './tasks';
 import { router as clientErrorsRouter } from './client-errors';
 import { router as botsRouter } from './bots';
+import { router as contactGroupsRouter } from './contactGroups';
 import { router as onboardingRouter } from './onboarding';
 import { channelRouter, followRouter, blockedChannelRouter } from './channels';
 import { router as searchRouter } from './search';
@@ -46,6 +47,7 @@ router.get('/', (_req, res) => {
 
 // API маршруты
 router.use('/api/auth', authRouter);
+router.use('/api/users', contactGroupsRouter);
 router.use('/api/users', usersRouter);
 router.use('/api/chats', chatsRouter);
 // Пути внутри messagesRouter уже содержат полный REST-путь (/chats/:id/messages,

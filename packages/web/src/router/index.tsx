@@ -38,6 +38,7 @@ const AccountsScreen = lazy(() => import('@/screens/profile/AccountsScreen'));
 const ProfileScreen = lazy(() => import('@/screens/profile/ProfileScreen'));
 const PublicProfileScreen = lazy(() => import('@/screens/profile/PublicProfileScreen'));
 const ContactsScreen = lazy(() => import('@/screens/contacts/ContactsScreen'));
+const ContactGroupsScreen = lazy(() => import('@/screens/contacts/ContactGroupsScreen'));
 const SettingsScreen = lazy(() => import('@/screens/settings/SettingsScreen'));
 const NotificationSettingsScreen = lazy(() => import('@/screens/settings/NotificationSettingsScreen'));
 const PrivacySettingsScreen = lazy(() => import('@/screens/settings/PrivacySettingsScreen'));
@@ -489,6 +490,10 @@ export const router = createHashRouter([
       {
         path: 'contacts',
         element: <ContactsScreen />,
+      },
+      {
+        path: 'contact-groups',
+        element: <ContactGroupsScreen />,
       },
       // --- Settings ---
       {

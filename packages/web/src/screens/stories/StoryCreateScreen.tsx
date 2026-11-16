@@ -31,6 +31,9 @@ function StoryCreateScreen() {
 
   // Тикет 1792072292: выборочный доступ
   const [visibility, setVisibility] = useState<Visibility>('all');
+  const [audienceMode, setAudienceMode] = useState<'contacts' | 'groups'>('contacts');
+  const [contactGroups, setContactGroups] = useState<any[]>([]);
+  const [selectedGroups, setSelectedGroups] = useState<Set<string>>(new Set());
   const [contacts, setContacts] = useState<ContactItem[]>([]);
   const [selectedContacts, setSelectedContacts] = useState<Set<string>>(new Set());
   const [contactsLoading, setContactsLoading] = useState(false);
@@ -42,6 +45,7 @@ function StoryCreateScreen() {
   ];
 
   // Тикет 1792072292: загрузка контактов при выборе «выборочный доступ»
+  // Тикет 1794850879: группы контактов
   useEffect(() => {
     if (visibility === 'selective' && contacts.length === 0) {
       setContactsLoading(true);
@@ -55,10 +59,26 @@ function StoryCreateScreen() {
         .catch(() => setError('Не удалось загрузить контакты'))
         .finally(() => setContactsLoading(false));
     }
+    // Тикет 1794850879: загрузка групп контактов
+    if (visibility === 'selective' && contactGroups.length === 0) {
+      api.getContactGroups()
+        .then((data) => setContactGroups(data || []))
+        .catch(() => setContactGroups([]));
+    }
   }, [visibility]);
 
   const toggleContact = (id: string) => {
     setSelectedContacts((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  // Тикет 1794850879: выбор группы контактов
+  const toggleGroup = (id: string) => {
+    setSelectedGroups((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
@@ -118,6 +138,8 @@ function StoryCreateScreen() {
 
     try {
       const audienceIds = visibility === 'selective' ? Array.from(selectedContacts) : [];
+      // Тикет 1794850879: группы контактов как аудитория
+      const audienceGroupIds = visibility === 'selective' ? Array.from(selectedGroups) : [];
 
       if (storyType === 'text') {
         await api.post('/api/stories', {
@@ -126,6 +148,7 @@ function StoryCreateScreen() {
           bgColor,
           visibility,
           audienceUserIds: audienceIds,
+          audienceGroupIds,
         });
       } else if (file) {
         const formData = new FormData();
@@ -134,6 +157,9 @@ function StoryCreateScreen() {
         formData.append('visibility', visibility);
         if (audienceIds.length > 0) {
           formData.append('audienceUserIds', JSON.stringify(audienceIds));
+        }
+        if (audienceGroupIds.length > 0) {
+          formData.append('audienceGroupIds', JSON.stringify(audienceGroupIds));
         }
 
         await api.request('/api/stories', { method: 'POST', body: formData as unknown as BodyInit });
@@ -360,32 +386,89 @@ function StoryCreateScreen() {
 
         {visibility === 'selective' && (
           <div style={{ marginTop: 12 }}>
-            <label className="form-label" style={{ display: 'block', marginBottom: 6 }}>
-              Выберите контакты {selectedContacts.size > 0 && `(${selectedContacts.size})`}
-            </label>
-            {contactsLoading ? (
-              <div className="text-muted" style={{ fontSize: 13 }}>Загрузка контактов…</div>
-            ) : contacts.length === 0 ? (
-              <div className="text-muted" style={{ fontSize: 13 }}>Контакты не найдены</div>
+            {/* Тикет 1794850879: переключатель «Контакты / Группы» */}
+            <div className="flex gap-2" style={{ marginBottom: 8 }}>
+              <button
+                type="button"
+                className={`btn btn--sm ${audienceMode === 'contacts' ? 'btn--primary' : 'btn--tertiary'}`}
+                onClick={() => setAudienceMode('contacts')}
+              >
+                Контакты
+              </button>
+              <button
+                type="button"
+                className={`btn btn--sm ${audienceMode === 'groups' ? 'btn--primary' : 'btn--tertiary'}`}
+                onClick={() => setAudienceMode('groups')}
+              >
+                👥 Группы
+              </button>
+            </div>
+
+            {audienceMode === 'contacts' ? (
+              <div>
+                <label className="form-label" style={{ display: 'block', marginBottom: 6 }}>
+                  Выберите контакты {selectedContacts.size > 0 && `(${selectedContacts.size})`}
+                </label>
+                {contactsLoading ? (
+                  <div className="text-muted" style={{ fontSize: 13 }}>Загрузка контактов…</div>
+                ) : contacts.length === 0 ? (
+                  <div className="text-muted" style={{ fontSize: 13 }}>Контакты не найдены</div>
+                ) : (
+                  <div style={{ maxHeight: 200, overflowY: 'auto', border: '1px solid var(--border-color)', borderRadius: 4 }}>
+                    {contacts.map((c) => (
+                      <label
+                        key={c.id}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 8,
+                          padding: '8px 12px', cursor: 'pointer',
+                          borderBottom: '1px solid var(--border-color)',
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedContacts.has(c.id)}
+                          onChange={() => toggleContact(c.id)}
+                        />
+                        <span style={{ fontSize: 14 }}>{c.displayName || c.username}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
             ) : (
-              <div style={{ maxHeight: 200, overflowY: 'auto', border: '1px solid var(--border-color)', borderRadius: 4 }}>
-                {contacts.map((c) => (
-                  <label
-                    key={c.id}
-                    style={{
-                      display: 'flex', alignItems: 'center', gap: 8,
-                      padding: '8px 12px', cursor: 'pointer',
-                      borderBottom: '1px solid var(--border-color)',
-                    }}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={selectedContacts.has(c.id)}
-                      onChange={() => toggleContact(c.id)}
-                    />
-                    <span style={{ fontSize: 14 }}>{c.displayName || c.username}</span>
-                  </label>
-                ))}
+              <div>
+                <label className="form-label" style={{ display: 'block', marginBottom: 6 }}>
+                  Выберите группы {selectedGroups.size > 0 && `(${selectedGroups.size})`}
+                </label>
+                {contactGroups.length === 0 ? (
+                  <div className="text-muted" style={{ fontSize: 13 }}>
+                    Групп контактов нет.{' '}
+                    <a href="/contact-groups" style={{ color: 'var(--accent)' }}>Создать группу →</a>
+                  </div>
+                ) : (
+                  <div style={{ maxHeight: 200, overflowY: 'auto', border: '1px solid var(--border-color)', borderRadius: 4 }}>
+                    {contactGroups.map((g) => (
+                      <label
+                        key={g.id}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 8,
+                          padding: '8px 12px', cursor: 'pointer',
+                          borderBottom: '1px solid var(--border-color)',
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedGroups.has(g.id)}
+                          onChange={() => toggleGroup(g.id)}
+                        />
+                        <span style={{ fontSize: 14 }}>{g.emoji} {g.name}</span>
+                        <span className="text-xs text-muted" style={{ marginLeft: 'auto' }}>
+                          {g.memberCount} участн.
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>
