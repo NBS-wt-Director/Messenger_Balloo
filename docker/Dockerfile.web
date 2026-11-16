@@ -107,3 +107,25 @@ COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]
+
+# ---------- Production stage — web-history SPA served with nginx ----------
+# history.balloo.su (тик. 1792061164, задел варианта А).
+FROM nginx:alpine AS web_history
+
+COPY --from=builder /app/packages/web-history/dist /usr/share/nginx/html
+COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
+
+# ---------- Production stage — web-download SPA served with nginx ----------
+# download.balloo.su (тик. 1792061164, задел варианта А).
+FROM nginx:alpine AS web_download
+
+COPY --from=builder /app/packages/web-download/dist /usr/share/nginx/html
+COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

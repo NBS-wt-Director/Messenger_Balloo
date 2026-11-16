@@ -259,6 +259,44 @@ services:
     networks:
       - balloo-net
 
+  # ─── web-history (history.balloo.su — changelog, тик. 1792061164) ───
+  web-history:
+    build:
+      context: ../..
+      dockerfile: docker/Dockerfile.web
+      target: web_history
+      args:
+        VITE_API_URL: ${VITE_API_URL:-https://api.balloo.su}
+    image: balloo/web-history:local
+    container_name: balloo-web-history
+    restart: always
+    ports:
+      - "127.0.0.1:${WEB_HISTORY_HOST_PORT:-8093}:80"
+    depends_on:
+      server:
+        condition: service_healthy
+    networks:
+      - balloo-net
+
+  # ─── web-download (download.balloo.su — загрузки, тик. 1792061164) ───
+  web-download:
+    build:
+      context: ../..
+      dockerfile: docker/Dockerfile.web
+      target: web_download
+      args:
+        VITE_API_URL: ${VITE_API_URL:-https://api.balloo.su}
+    image: balloo/web-download:local
+    container_name: balloo-web-download
+    restart: always
+    ports:
+      - "127.0.0.1:${WEB_DOWNLOAD_HOST_PORT:-8094}:80"
+    depends_on:
+      server:
+        condition: service_healthy
+    networks:
+      - balloo-net
+
   # ─── Monitoring (запускается только с --profile monitoring) ───
   prometheus:
     image: prom/prometheus:latest
