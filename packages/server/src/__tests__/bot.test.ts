@@ -19,6 +19,20 @@ describe('Bot API', () => {
       expect(res.body.description).toBe('Тестовый бот');
     });
 
+    it('возвращает API-токен бота (тик. 1792395490)', async () => {
+      const user = await registerTestUser();
+
+      const res = await request(app)
+        .post('/api/bots')
+        .set('Authorization', `Bearer ${user.accessToken}`)
+        .send({ name: 'TokenBot' });
+
+      expect(res.status).toBe(201);
+      expect(typeof res.body.token).toBe('string');
+      expect(res.body.token.length).toBeGreaterThan(0);
+      expect(res.body.token.length).toBeLessThanOrEqual(64);
+    });
+
     it('отклоняет без name', async () => {
       const user = await registerTestUser();
 
@@ -50,6 +64,25 @@ describe('Bot API', () => {
 
       expect(res.status).toBe(200);
       expect(Array.isArray(res.body)).toBe(true);
+    });
+
+    it('список содержит токен созданного бота', async () => {
+      const user = await registerTestUser();
+
+      const created = await request(app)
+        .post('/api/bots')
+        .set('Authorization', `Bearer ${user.accessToken}`)
+        .send({ name: 'ListTokenBot' });
+      expect(created.status).toBe(201);
+
+      const res = await request(app)
+        .get('/api/bots')
+        .set('Authorization', `Bearer ${user.accessToken}`);
+
+      expect(res.status).toBe(200);
+      const bot = res.body.find((b: { id: string }) => b.id === created.body.id);
+      expect(bot).toBeDefined();
+      expect(bot.token).toBe(created.body.token);
     });
 
     it('отклоняет без авторизации', async () => {

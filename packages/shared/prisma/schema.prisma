@@ -8,11 +8,6 @@ generator client {
   binaryTargets   = ["native", "debian-openssl-3.0.x"]
 }
 
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
 // ============================================================
 // Enums
 // ============================================================
@@ -1074,6 +1069,7 @@ model Bot {
   commands    String?  @db.Text // JSON: список команд бота
   isPublic    Boolean  @default(true)
   creatorId   String
+  token       String   @unique @default(cuid()) @db.VarChar(64) // API-токен бота (тик. 1792395490)
   createdAt   BigInt   @default(0)
   updatedAt   BigInt   @default(0)
 

@@ -16,6 +16,7 @@ export interface BotResponse {
   description: string | null;
   avatarUrl: string | null;
   isPublic: boolean;
+  token: string;
   creatorId: string;
   createdAt: number;
   updatedAt: number;
@@ -37,6 +38,7 @@ export const createBot = async (creatorId: string, data: CreateBotData): Promise
       description: true,
       avatarUrl: true,
       isPublic: true,
+      token: true,
       creatorId: true,
       createdAt: true,
       updatedAt: true,
@@ -60,6 +62,7 @@ export const getBots = async (): Promise<BotResponse[]> => {
       description: true,
       avatarUrl: true,
       isPublic: true,
+      token: true,
       creatorId: true,
       createdAt: true,
       updatedAt: true,
@@ -84,6 +87,7 @@ export const getBot = async (botId: string): Promise<BotResponse | null> => {
       description: true,
       avatarUrl: true,
       isPublic: true,
+      token: true,
       creatorId: true,
       createdAt: true,
       updatedAt: true,
