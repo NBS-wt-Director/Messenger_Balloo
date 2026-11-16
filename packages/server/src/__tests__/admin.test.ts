@@ -174,4 +174,51 @@ describe('Admin API', () => {
       expect(res.status).toBe(200);
     });
   });
+
+  describe('GET /api/admin/employees', () => {
+    it('rejects without auth', async () => {
+      const res = await request(app).get('/api/admin/employees');
+      expect(res.status).toBe(401);
+    });
+
+    it('rejects for non-admin users', async () => {
+      const user = await registerTestUser();
+
+      const res = await request(app)
+        .get('/api/admin/employees')
+        .set('Authorization', `Bearer ${user.accessToken}`);
+
+      expect(res.status).toBe(403);
+    });
+
+    it('returns employees list for admin', async () => {
+      const admin = await createAdminUser();
+      // Seed one employee row (ticket 1792514865)
+      const created = await prisma.employee.create({
+        data: {
+          name: 'Test Employee',
+          email: 'emp-test@example.com',
+          department: 'QA',
+          role: 'tester',
+          status: 'active',
+          createdAt: BigInt(Date.now()),
+          updatedAt: BigInt(Date.now()),
+        },
+      });
+
+      try {
+        const res = await request(app)
+          .get('/api/admin/employees')
+          .set('Authorization', `Bearer ${admin.accessToken}`);
+
+        expect(res.status).toBe(200);
+        expect(Array.isArray(res.body)).toBe(true);
+        const emp = res.body.find((e: { id: string }) => e.id === created.id);
+        expect(emp).toBeDefined();
+        expect(emp.name).toBe('Test Employee');
+      } finally {
+        await prisma.employee.delete({ where: { id: created.id } });
+      }
+    });
+  });
 });
