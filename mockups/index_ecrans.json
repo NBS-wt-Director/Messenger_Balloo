@@ -1,9 +1,9 @@
 {
   "project": "Balloo Messenger",
   "version": "1.0.0",
-  "last_updated": "2026-10-20",
-  "total_screens": 163,
-  "screens_unviewed": 7,
+  "last_updated": "2026-11-16",
+  "total_screens": 164,
+  "screens_unviewed": 8,
   "nodes": [
     {
       "id": "у_00",
@@ -84,13 +84,13 @@
       "name": "balloo.su",
       "icon": "💬",
       "domain": "Основной мессенджер",
-      "total_screens": 41,
+      "total_screens": 42,
       "viewed": 17,
       "edits_specific": 14,
       "edits_global_accepted": 3,
-      "components_private": 41,
+      "components_private": 42,
       "components_global": 5,
-      "app_functions_count": 27,
+      "app_functions_count": 28,
       "app_functions": [
         "Аутентификация",
         "Управление устройствами",
@@ -118,7 +118,8 @@
         "Создание групп",
         "Создание каналов",
         "Редактор сообщения",
-        "Просмотр файлов"
+        "Просмотр файлов",
+        "Группы контактов"
       ],
       "status": "задокументирован",
       "doc_md": null,
@@ -388,6 +389,13 @@
           "file": "balloo-su/story-create.html",
           "status": "Принят",
           "doc_md": "balloo-su/story-create.md"
+        },
+        {
+          "id": "1_01_42",
+          "name": "Группы контактов",
+          "file": "balloo-su/contact-groups.html",
+          "status": "Проектируется",
+          "doc_md": "balloo-su/contact-groups.md"
         },
         {
           "id": "1_01_14",

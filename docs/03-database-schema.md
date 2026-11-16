@@ -381,6 +381,39 @@ model BlockedUser {
 }
 ```
 
+### ContactGroup / ContactGroupMember (предварительно, тик. 1794853525)
+
+> Макет `1_01_42` (`contact-groups.html`) не принят владельцем — схема
+> спроектирована по нему и вступает в силу после приёмки.
+
+```prisma
+model ContactGroup {
+  id          String @id @default(cuid()) @db.VarChar(25)
+  ownerId     String
+  name        String @db.VarChar(60)
+  emoji       String @default("👥") @db.VarChar(8)
+  description String? @db.VarChar(200)
+  createdAt   BigInt @default(0)
+  updatedAt   BigInt @default(0)
+
+  members ContactGroupMember[]
+
+  @@index([ownerId])
+  @@map("contact_groups")
+}
+
+model ContactGroupMember {
+  groupId  String
+  memberId String // контакт-пользователь
+  addedAt  BigInt @default(0)
+
+  group ContactGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, memberId])
+  @@map("contact_group_members")
+}
+```
+
 ## Схема: Reports & Bans
 
 ```prisma

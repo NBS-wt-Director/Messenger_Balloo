@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balloo — Группы контактов</title>
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    /* Предварительный макет (тик. 1794853525): свёрстан по аналогии с
+       contacts.html / group-create.html / blocked-users.html */
+    .cg-preview-note {
+      background: rgba(59,158,255,0.08);
+      border: 1px solid var(--info);
+      padding: 10px 14px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+    .cg-group-card { padding: 4px 0; }
+    .cg-members {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+    }
+    .cg-member-count {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .cg-actions { display: flex; gap: 6px; align-items: center; }
+    .picker-list { max-height: 260px; overflow-y: auto; }
+    .picker-item { border: none; padding: 8px 0; }
+    .picker-item label { cursor: pointer; width: 100%; }
+    .picker-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      padding: 8px 0 4px;
+      border-top: 1px solid var(--border-color);
+      margin-top: 8px;
+    }
+    .cg-usage-list li { margin-bottom: 6px; }
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar__logo">
+    <div class="topbar__logo-icon">B</div><span>Balloo</span>
+    <div class="topbar__dropdown">
+      <div class="topbar__dropdown-item" onclick="window.location.href='chats.html'">💬 Balloo</div>
+      <div class="topbar__dropdown-divider"></div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../admin-balloo-su/index.html'">🛡️ Admin</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../command-balloo-su/index.html'">🏢 Command</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../features-balloo-su/index.html'">💡 Features</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../history-balloo-su/index.html'">📜 History</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../download-balloo-su/index.html'">⬇️ Download</div>
+      <div class="topbar__dropdown-item" onclick="window.location.href='../docs-balloo-su/index.html'">📚 API Docs</div>
+    </div>
+  </div>
+  <div class="topbar__title" onclick="toggleLearningMode()">Группы контактов</div>
+  <div class="topbar__actions"><div class="topbar__actions-btn" onclick="window.location.href='invites.html'">📨</div></div>
+  <div class="topbar__right">
+    <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact" onclick="window.location.href='profile.html'"><div class="avatar__inner"><span>ИИ</span></div></div>
+    <span class="topbar__lang" data-lang-toggle>🇷🇺 RU</span>
+    <span class="topbar__theme" data-theme-toggle>🌙 Тёмная</span>
+  </div>
+</div>
+
+<div class="main">
+  <!-- Sidebar: список групп (по образцу sidebar экрана «Контакты») -->
+  <div class="sidebar">
+    <div class="sidebar__search"><input type="text" class="search-input" placeholder="🔍 Поиск групп..." id="cg-side-search" oninput="filterSideGroups(this.value)"></div>
+    <div class="list" id="cg-side-list">
+      <div class="list__item list__item--active" data-name="коллеги">
+        <div class="avatar avatar--md avatar--bordered avatar--ctx-family"><div class="avatar__inner"><span>💼</span></div></div>
+        <div class="list__item-body"><div class="list__item-title">💼 Коллеги</div><div class="list__item-subtitle">6 участников</div></div>
+      </div>
+      <div class="list__item" data-name="семья">
+        <div class="avatar avatar--md avatar--bordered avatar--ctx-family"><div class="avatar__inner"><span>❤️</span></div></div>
+        <div class="list__item-body"><div class="list__item-title">👨‍👩‍👧 Семья</div><div class="list__item-subtitle">4 участника</div></div>
+      </div>
+      <div class="list__item" data-name="университет">
+        <div class="avatar avatar--md avatar--bordered avatar--ctx-new"><div class="avatar__inner"><span>🎓</span></div></div>
+        <div class="list__item-body"><div class="list__item-title">🎓 Университет</div><div class="list__item-subtitle">12 участников</div></div>
+      </div>
+      <div class="list__item" data-name="клиенты">
+        <div class="avatar avatar--md avatar--bordered avatar--ctx-contact"><div class="avatar__inner"><span>🤝</span></div></div>
+        <div class="list__item-body"><div class="list__item-title">🤝 Клиенты</div><div class="list__item-subtitle">9 участников</div></div>
+      </div>
+    </div>
+    <div style="padding:12px;">
+      <button class="btn btn--primary btn--block" onclick="openGroupEditor()">➕ Новая группа</button>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="content"><div class="page-container">
+
+    <div class="cg-preview-note">
+      🛠 <strong>Предварительный макет</strong> (тикет 1794853525, наработан по аналогии с
+      «Контакты», «Создание группы», «Чёрный список») — ждёт приёмки владельца.
+      Это <em>списки контактов</em> (для себя), не чаты-группы.
+    </div>
+
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <h1 class="page-title mb-1">👥 Группы контактов</h1>
+        <p class="page-subtitle">Именованные списки контактов: аудитория историй, рассылка, быстрый выбор в чатах</p>
+      </div>
+      <button class="btn btn--primary" onclick="openGroupEditor()">➕ Создать группу</button>
+    </div>
+
+    <!-- Tabs — как на экране «Контакты» -->
+    <div class="flex gap-2 mb-4">
+      <button class="btn btn--tertiary btn--sm" onclick="window.location.href='contacts.html'">Контакты</button>
+      <button class="btn btn--primary btn--sm">👥 Группы</button>
+      <button class="btn btn--tertiary btn--sm" onclick="window.location.href='blocked-users.html'">🚫 Чёрный список</button>
+    </div>
+
+    <!-- Stats — по образцу blocked-users -->
+    <div class="flex gap-3 mb-4" style="flex-wrap:wrap;">
+      <div class="card flex-1" style="min-width:140px;">
+        <div class="text-xs text-muted">Групп</div>
+        <div style="font-size:24px;font-weight:800;color:var(--accent);">4</div>
+      </div>
+      <div class="card flex-1" style="min-width:140px;">
+        <div class="text-xs text-muted">Уникальных контактов в группах</div>
+        <div style="font-size:24px;font-weight:800;color:var(--info);">27</div>
+        <div class="text-xs text-muted">из 41 контакта</div>
+      </div>
+    </div>
+
+    <!-- Список групп -->
+    <div class="card mb-4" id="cg-group-cards">
+      <div class="list__item cg-group-card">
+        <div class="flex items-center gap-3">
+          <div class="avatar avatar--md avatar--bordered avatar--ctx-family"><div class="avatar__inner"><span>💼</span></div></div>
+          <div class="flex-1">
+            <div class="text-sm font-bold" style="color:var(--text-primary);">💼 Коллеги</div>
+            <div class="cg-members">
+              <div class="avatar avatar--sm avatar--bordered avatar--ctx-contact"><div class="avatar__inner"><span>МА</span></div></div>
+              <div class="avatar avatar--sm avatar--bordered avatar--ctx-contact"><div class="avatar__inner"><span>АК</span></div></div>
+              <div class="avatar avatar--sm avatar--bordered avatar--ctx-contact"><div class="avatar__inner"><span>ДП</span></div></div>
+              <div class="avatar avatar--sm avatar--bordered avatar--ctx-contact"><div class="avatar__inner"><span>ОС</span></div></div>
+              <span class="cg-member-count">+2 ещё</span>
+            </div>
+            <div class="text-xs text-muted mt-1">Обновлена 14.11.2026 · используется в 3 историях</div>
+          </div>
+          <div class="cg-actions">
+            <button class="btn btn--secondary btn--sm" onclick="openGroupEditor('💼 Коллеги')">✏️ Изменить</button>
+            <button class="btn btn--tertiary btn--sm" title="Удалить группу" onclick="confirmDelete('💼 Коллеги')">🗑</button>
+          </div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="list__item cg-group-card">
+        <div class="flex items-center gap-3">
+          <div class="avatar avatar--md avatar--bordered avatar--ctx-family"><div class="avatar__inner"><span>❤️</span></div></div>
+          <div class="flex-1">
+            <div class="text-sm font-bold" style="color:var(--text-primary);">👨‍👩‍👧 Семья</div>
+            <div class="cg-members">
+              <div class="avatar avatar--sm avatar--bordered avatar--ctx-contact"><div class="avatar__inner"><span>ЕП</span></div></div>
+              <div class="avatar avatar--sm avatar--bordered avatar--ctx-contact"><div class="avatar__inner"><span>НС</span></div></div>
+              <div class="avatar avatar--sm avatar--bordered avatar--ctx-contact"><div class="avatar__inner"><span>ТД</span></div></div>
+              <span class="cg-member-count">+1 ещё</span>
+            </div>
+            <div class="text-xs text-muted mt-1">Обновлена 02.11.2026 · используется в 8 историях</div>
+          </div>
+          <div class="cg-actions">
+            <button class="btn btn--secondary btn--sm" onclick="openGroupEditor('👨‍👩‍👧 Семья')">✏️ Изменить</button>
+            <button class="btn btn--tertiary btn--sm" title="Удалить группу" onclick="confirmDelete('👨‍👩‍👧 Семья')">🗑</button>
+          </div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="list__item cg-group-card">
+        <div class="flex items-center gap-3">
+          <div class="avatar avatar--md avatar--bordered avatar--ctx-new"><div class="avatar__inner"><span>🎓</span></div></div>
+          <div class="flex-1">
+            <div class="text-sm font-bold" style="color:var(--text-primary);">🎓 Университет</div>
+            <div class="cg-members">
+              <div class="avatar avatar--sm avatar--bordered avatar--ctx-contact"><div class="avatar__inner"><span>ИВ</span></div></div>
+              <div class="avatar avatar--sm avatar--bordered avatar--ctx-contact"><div class="avatar__inner"><span>КЛ</span></div></div>
+              <span class="cg-member-count">+10 ещё</span>
+            </div>
+            <div class="text-xs text-muted mt-1">Обновлена 21.10.2026 · не используется</div>
+          </div>
+          <div class="cg-actions">
+            <button class="btn btn--secondary btn--sm" onclick="openGroupEditor('🎓 Университет')">✏️ Изменить</button>
+            <button class="btn btn--tertiary btn--sm" title="Удалить группу" onclick="confirmDelete('🎓 Университет')">🗑</button>
+          </div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="list__item cg-group-card">
+        <div class="flex items-center gap-3">
+          <div class="avatar avatar--md avatar--bordered avatar--ctx-contact"><div class="avatar__inner"><span>🤝</span></div></div>
+          <div class="flex-1">
+            <div class="text-sm font-bold" style="color:var(--text-primary);">🤝 Клиенты</div>
+            <div class="cg-members">
+              <div class="avatar avatar--sm avatar--bordered avatar--ctx-contact"><div class="avatar__inner"><span>РГ</span></div></div>
+              <span class="cg-member-count">+8 ещё</span>
+            </div>
+            <div class="text-xs text-muted mt-1">Обновлена 09.11.2026 · используется в 2 историях</div>
+          </div>
+          <div class="cg-actions">
+            <button class="btn btn--secondary btn--sm" onclick="openGroupEditor('🤝 Клиенты')">✏️ Изменить</button>
+            <button class="btn btn--tertiary btn--sm" title="Удалить группу" onclick="confirmDelete('🤝 Клиенты')">🗑</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty state (скрыт; показывается при 0 групп) -->
+    <div class="card mb-4" id="cg-empty" style="display:none;">
+      <div class="empty-state">
+        <div class="empty-state__animation">👥</div>
+        <div class="empty-state__title">Групп контактов пока нет</div>
+        <div class="empty-state__subtitle">Создайте первую группу — например «Семья» или «Коллеги» — и выбирайте её аудиторией в историях</div>
+        <button class="btn btn--primary mt-3" onclick="openGroupEditor()">➕ Создать группу</button>
+      </div>
+    </div>
+
+    <!-- Как используются группы -->
+    <div class="card">
+      <h3 class="card__title mb-3">ℹ️ Где используются группы контактов</h3>
+      <ul class="text-sm text-secondary cg-usage-list" style="padding-left:20px;">
+        <li><a href="story-create.html" style="color:var(--accent);">Создание истории</a> → «Выборочный доступ»: переключатель «Контакты / Группы», группа выбирается целиком</li>
+        <li>Профиль контакта — чипы групп, в которые он входит</li>
+        <li>Группы видны только вам: контакты не узнают, что добавлены в группу</li>
+      </ul>
+    </div>
+
+  </div></div>
+</div>
+
+<!-- Modal: создание / редактирование группы -->
+<div class="modal-overlay" id="modal-overlay"></div>
+<div class="modal" id="modal-group-editor" style="max-width:520px;">
+  <div class="modal__header">
+    <span class="modal__title" id="cg-editor-title">➕ Новая группа контактов</span>
+    <span class="modal__close" onclick="closeModal('modal-group-editor')">✕</span>
+  </div>
+  <div class="modal__body">
+    <div class="form-group">
+      <label class="form-label">Название *</label>
+      <input type="text" class="form-input" id="cg-name" placeholder="Например: Коллеги" maxlength="60">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Эмодзи группы</label>
+      <select class="form-select" id="cg-emoji">
+        <option>👥</option><option>💼</option><option>❤️</option><option>🎓</option>
+        <option>🤝</option><option>⚽</option><option>🎸</option><option>🏡</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Описание</label>
+      <input type="text" class="form-input" id="cg-desc" placeholder="Для чего эта группа" maxlength="200">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Участники из контактов</label>
+      <input type="text" class="form-input mb-2" placeholder="🔍 Поиск контактов..." id="cg-pick-search" oninput="filterPicker(this.value)">
+      <div class="list picker-list" id="cg-pick-list">
+        <div class="list__item picker-item" data-name="мария андреева">
+          <label class="flex items-center gap-3">
+            <input type="checkbox" style="width:18px;height:18px;cursor:pointer;" onchange="updatePickCount()">
+            <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>МА</span></div></div>
+            <div class="flex-1"><div class="text-sm font-bold">Мария Андреева</div><div class="text-xs text-muted">в сети</div></div>
+          </label>
+        </div>
+        <div class="list__item picker-item" data-name="алексей козлов">
+          <label class="flex items-center gap-3">
+            <input type="checkbox" style="width:18px;height:18px;cursor:pointer;" onchange="updatePickCount()">
+            <div class="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"><div class="avatar__inner"><span>АК</span></div></div>
+            <div class="flex-1"><div class="text-sm font-bold">Алексей Козлов</div><div class="text-xs text-muted">в сети</div></div>
+          </label>
+        </div>
+        <div class="list__item picker-item" data-name="дмитрий петров">
+          <label class="flex items-center gap-3">
+            <input type="checkbox" style="width:18px;height:18px;cursor:pointer;" onchange="updatePickCount()">
+            <div class="avatar avatar--sm avatar--bordered avatar--status-dnd avatar--ctx-contact"><div class="avatar__inner"><span>ДП</span></div></div>
+            <div class="flex-1"><div class="text-sm font-bold">Дмитрий Петров</div><div class="text-xs text-muted">🔇 Не беспокоить</div></div>
+          </label>
+        </div>
+        <div class="list__item picker-item" data-name="ольга смирнова">
+          <label class="flex items-center gap-3">
+            <input type="checkbox" style="width:18px;height:18px;cursor:pointer;" onchange="updatePickCount()">
+            <div class="avatar avatar--sm avatar--bordered avatar--status-busy avatar--ctx-contact"><div class="avatar__inner"><span>ОС</span></div></div>
+            <div class="flex-1"><div class="text-sm font-bold">Ольга Смирнова</div><div class="text-xs text-muted">🔴 Занята (в звонке)</div></div>
+          </label>
+        </div>
+        <div class="list__item picker-item" data-name="игорь волков">
+          <label class="flex items-center gap-3">
+            <input type="checkbox" style="width:18px;height:18px;cursor:pointer;" onchange="updatePickCount()">
+            <div class="avatar avatar--sm avatar--bordered avatar--status-offline avatar--ctx-contact"><div class="avatar__inner"><span>ИВ</span></div></div>
+            <div class="flex-1"><div class="text-sm font-bold">Игорь Волков</div><div class="text-xs text-muted">был вчера</div></div>
+          </label>
+        </div>
+      </div>
+      <div class="picker-toolbar">
+        <span>Выбрано: <strong id="cg-pick-count">0</strong></span>
+        <a style="color:var(--accent);cursor:pointer;" onclick="toggleAllPicker()">Выбрать все</a>
+      </div>
+    </div>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--tertiary" onclick="closeModal('modal-group-editor')">Отмена</button>
+    <button class="btn btn--primary" onclick="saveGroup()">💾 Сохранить</button>
+  </div>
+</div>
+
+<!-- Modal: подтверждение удаления -->
+<div class="modal modal--status-danger" id="modal-cg-delete" style="max-width:420px;">
+  <div class="modal__header">
+    <span class="modal__title">🗑 Удалить группу?</span>
+    <span class="modal__close" onclick="closeModal('modal-cg-delete')">✕</span>
+  </div>
+  <div class="modal__body">
+    <p class="text-sm text-secondary">Группа «<strong id="cg-delete-name" style="color:var(--text-primary);"></strong>» будет удалена.
+    Контакты останутся в списке. Истории, где группа была выбрана аудиторией, сохранят уже опубликованный доступ.</p>
+  </div>
+  <div class="modal__footer">
+    <button class="btn btn--tertiary" onclick="closeModal('modal-cg-delete')">Отмена</button>
+    <button class="btn btn--danger" onclick="deleteGroup()">Удалить</button>
+  </div>
+</div>
+
+<script src="../assets/common.js"></script>
+<!-- Toast-контейнер (по образцу chats.html) -->
+<div class="toast-container" id="toast-container"></div>
+<script>
+let deletingGroup = null;
+
+/* Toast-уведомления — копия реализации из chats.html (в common.js её нет) */
+function showToast(text, type) {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+  toast.className = 'toast toast--' + (type || 'info');
+  toast.innerHTML =
+    '<span class="toast__icon">' + (icons[type] || 'ℹ️') + '</span>' +
+    '<span class="toast__text">' + text + '</span>' +
+    '<span class="toast__close" onclick="this.parentElement.remove()">✕</span>';
+  container.appendChild(toast);
+  requestAnimationFrame(() => toast.classList.add('toast--visible'));
+  setTimeout(() => {
+    toast.classList.remove('toast--visible');
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+function openGroupEditor(name) {
+  document.getElementById('cg-editor-title').textContent = name ? '✏️ ' + name : '➕ Новая группа контактов';
+  document.getElementById('cg-name').value = name || '';
+  openModal('modal-group-editor');
+}
+
+function filterSideGroups(q) {
+  q = q.trim().toLowerCase();
+  document.querySelectorAll('#cg-side-list .list__item').forEach(function(el) {
+    el.style.display = el.dataset.name.indexOf(q) >= 0 ? '' : 'none';
+  });
+}
+
+function filterPicker(q) {
+  q = q.trim().toLowerCase();
+  document.querySelectorAll('#cg-pick-list .picker-item').forEach(function(el) {
+    el.style.display = el.dataset.name.indexOf(q) >= 0 ? '' : 'none';
+  });
+}
+
+function updatePickCount() {
+  document.getElementById('cg-pick-count').textContent =
+    document.querySelectorAll('#cg-pick-list input[type="checkbox"]:checked').length;
+}
+
+let pickAll = false;
+function toggleAllPicker() {
+  pickAll = !pickAll;
+  document.querySelectorAll('#cg-pick-list .picker-item').forEach(function(el) {
+    if (el.style.display !== 'none') el.querySelector('input[type="checkbox"]').checked = pickAll;
+  });
+  updatePickCount();
+}
+
+function saveGroup() {
+  const name = document.getElementById('cg-name').value.trim();
+  if (!name) { showToast('Укажите название группы', 'warning'); document.getElementById('cg-name').focus(); return; }
+  closeModal('modal-group-editor');
+  showToast('Группа «' + name + '» сохранена', 'success');
+}
+
+function confirmDelete(name) {
+  deletingGroup = name;
+  document.getElementById('cg-delete-name').textContent = name.replace(/^[^\s]+\s/, '');
+  openModal('modal-cg-delete');
+}
+
+function deleteGroup() {
+  closeModal('modal-cg-delete');
+  showToast('Группа «' + deletingGroup + '» удалена', 'success');
+}
+</script>
+</body>
+</html>

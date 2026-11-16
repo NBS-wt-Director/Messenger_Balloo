@@ -113,6 +113,11 @@
 | GET | `/users/contacts` | Список контактов |
 | POST | `/users/contacts/:id` | Добавить в контакты |
 | DELETE | `/users/contacts/:id` | Удалить из контактов |
+| GET | `/users/contact-groups` | Группы контактов владельца (memberCount, превью) — предв., тик. 1794853525 |
+| POST | `/users/contact-groups` | Создать группу {name, emoji, description, memberIds[]} — предв. |
+| PATCH | `/users/contact-groups/:id` | Изменить группу/состав — предв. |
+| DELETE | `/users/contact-groups/:id` | Удалить группу (контакты остаются) — предв. |
+| GET | `/users/contact-groups/:id/members` | Полный состав группы — предв. |
 | GET | `/users/blocked` | Список заблокированных |
 | POST | `/users/block/:id` | Заблокировать |
 | DELETE | `/users/block/:id` | Разблокировать |
