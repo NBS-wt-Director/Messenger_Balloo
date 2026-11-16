@@ -244,10 +244,17 @@ export const saveBrowserPushSubscription = async (
   userId: string,
   subscription: webpush.PushSubscription
 ): Promise<void> => {
-  await prisma.pushSubscription.create({
-    data: {
+  // Тикет 1794831100 (A.3): upsert по (userId, endpoint) — повторная подписка
+  // того же браузера обновляет ключи, а не создаёт дубль.
+  await prisma.pushSubscription.upsert({
+    where: { userId_endpoint: { userId, endpoint: subscription.endpoint } },
+    create: {
       userId,
       endpoint: subscription.endpoint,
+      p256dh: (subscription as any).keys?.p256dh || '',
+      auth: (subscription as any).keys?.auth || '',
+    },
+    update: {
       p256dh: (subscription as any).keys?.p256dh || '',
       auth: (subscription as any).keys?.auth || '',
     },

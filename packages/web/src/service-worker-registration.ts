@@ -216,6 +216,28 @@ export async function subscribeToPushNotifications(): Promise<PushSubscription |
   }
 }
 
+/**
+ * Тикет 1794831100 (A.2): полная цепочка — подписаться + отправить на сервер.
+ * Вызывается после входа/восстановления сессии. Идемпотентен: повторный вызов
+ * обновляет ключи через upsert на сервере.
+ */
+export async function subscribeAndRegisterPush(apiPost: <T>(url: string, body?: unknown) => Promise<T>): Promise<void> {
+  const isDev = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+  if (isDev) return; // на dev-сервере SW не зарегистрирован → push не работает
+  try {
+    const subscription = await subscribeToPushNotifications();
+    if (!subscription) return;
+    const json = subscription.toJSON();
+    await apiPost('/api/devices/browser-push', {
+      endpoint: json.endpoint,
+      keys: json.keys,
+    });
+  } catch (err) {
+    // Не критично: push не блокирует работу приложения
+    console.warn('[push] subscribeAndRegisterPush:', err);
+  }
+}
+
 /** Отписывается от push-уведомлений */
 export async function unsubscribeFromPushNotifications(): Promise<boolean> {
   try {

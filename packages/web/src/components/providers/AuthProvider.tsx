@@ -8,6 +8,7 @@ import { createContext, useContext, useCallback, useEffect, useState } from 'rea
 import { useAuthStore, type AuthUser } from '@/store/authStore';
 import { useChatStore } from '@/store/chatStore';
 import { api } from '@/services/api';
+import { subscribeAndRegisterPush } from '@/service-worker-registration';
 
 interface AuthContextValue {
   user: AuthUser | null;
@@ -55,6 +56,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         const me = await api.getMe();
         setUser(me as AuthUser);
+        // Тикет 1794831100 (A.2): push-подписка при восстановлении сессии
+        subscribeAndRegisterPush(api.post).catch(() => {});
       } catch {
         // Cookie нет / refresh не удался — пользователь не авторизован
         setUser(null);
@@ -75,6 +78,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Сервер устанавливает httpOnly cookie; в body приходит user
         const response = await api.login(email, password);
         setUser(response.user as AuthUser);
+        // Тикет 1794831100 (A.2): push-подписка после входа
+        subscribeAndRegisterPush(api.post).catch(() => {});
       } catch (error) {
         throw error;
       } finally {
@@ -93,6 +98,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Сервер устанавливает httpOnly cookie; в body приходит user
         const response = await api.register({ email, username, password });
         setUser(response.user as AuthUser);
+        // Тикет 1794831100 (A.2): push-подписка после регистрации
+        subscribeAndRegisterPush(api.post).catch(() => {});
       } catch (error) {
         throw error;
       } finally {

@@ -13,7 +13,8 @@ import {
   confirmPair,
   PairError,
 } from '../services/deviceService';
-import { registerPushToken } from '../services/pushService';
+import { registerPushToken, saveBrowserPushSubscription, removeBrowserPushSubscription } from '../services/pushService';
+import type webpush from 'web-push';
 
 export const getDevicesCtrl = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -213,5 +214,64 @@ export const renameDeviceCtrl = async (req: AuthenticatedRequest, res: Response,
     } else {
       internalError(res, error, 'deviceController.renameDeviceCtrl');
     }
+  }
+};
+
+// ============================================================
+// POST /api/devices/browser-push — сохранить browser-push подписку
+// ============================================================
+
+export const browserPushSubscribeCtrl = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const userId = req.user!.id;
+    const { endpoint, keys } = req.body || {};
+
+    if (!endpoint || typeof endpoint !== 'string') {
+      res.status(400).json({ error: 'Bad Request', message: 'endpoint обязателен' });
+      return;
+    }
+    if (!keys?.p256dh || typeof keys.p256dh !== 'string') {
+      res.status(400).json({ error: 'Bad Request', message: 'keys.p256dh обязателен' });
+      return;
+    }
+    if (!keys?.auth || typeof keys.auth !== 'string') {
+      res.status(400).json({ error: 'Bad Request', message: 'keys.auth обязателен' });
+      return;
+    }
+
+    await saveBrowserPushSubscription(userId, { endpoint, keys } as webpush.PushSubscription);
+    res.status(201).json({ message: 'Browser push subscription saved' });
+  } catch (error: any) {
+    if (error.code === 'P2002') {
+      // @@unique violation — upsert уже обновил, не ошибка
+      res.status(201).json({ message: 'Browser push subscription updated' });
+      return;
+    }
+    internalError(res, error, 'deviceController.browserPushSubscribeCtrl');
+  }
+};
+
+// ============================================================
+// DELETE /api/devices/browser-push — удалить browser-push подписку
+// ============================================================
+
+export const browserPushUnsubscribeCtrl = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const userId = req.user!.id;
+    const { endpoint } = req.body || {};
+    if (endpoint) {
+      await removeBrowserPushSubscription(userId, endpoint);
+    }
+    res.json({ message: 'Browser push subscription removed' });
+  } catch (error: any) {
+    internalError(res, error, 'deviceController.browserPushUnsubscribeCtrl');
   }
 };

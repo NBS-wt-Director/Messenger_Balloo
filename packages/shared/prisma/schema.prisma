@@ -1212,6 +1212,7 @@ model PushSubscription {
   // Relations
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@unique([userId, endpoint])
   @@index([userId])
   @@index([endpoint])
   @@map("push_subscriptions")
@@ -1335,7 +1336,10 @@ model RefreshToken {
   id        String   @id @default(cuid()) @db.VarChar(25)
   jti       String   @unique @db.VarChar(255)
   userId    String   @db.VarChar(25)
-  familyId  String   @db.VarChar(25)
+  // Тикет 1794831100 (B): familyId = crypto.randomUUID() (36 символов).
+  // Было VARCHAR(25) → INSERT отклонялся Postgres, refresh_tokens пуста,
+  // family-revocation (А-02) не работал. Расширено до 64.
+  familyId  String   @db.VarChar(64)
   revoked   Boolean  @default(false)
   createdAt BigInt   @default(0)
 

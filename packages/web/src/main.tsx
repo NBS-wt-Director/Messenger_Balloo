@@ -10,11 +10,17 @@ import './styles/chat.css';
 // P35: стили единой шапки/подвала из @balloo/ui (.topbar*, .balloo-footer*)
 import '@balloo/ui/styles/chrome.css';
 
-// Register service worker for PWA (future)
+// Тикет 1794831100 (A.1): регистрация SW — только на прод-хостах.
+// На dev-сервере Vite сам отдаёт всё по-новому, SW будет мешать hot-reload.
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    // navigator.serviceWorker.register('/sw.js');
-  });
+  const isDev = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+  if (!isDev) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch((err) => {
+        console.warn('[SW] регистрация не удалась:', err);
+      });
+    });
+  }
 }
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

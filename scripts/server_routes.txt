@@ -10,6 +10,7 @@ DELETE /api/chats/:id
 DELETE /api/chats/:id/admins/:adminId
 DELETE /api/chats/:id/members/:userId
 DELETE /api/devices/:id
+DELETE /api/devices/browser-push
 DELETE /api/features/:id
 DELETE /api/features/:id/vote
 DELETE /api/hiring/departments/:id
@@ -194,6 +195,7 @@ POST /api/chats/:id/leave
 POST /api/chats/:id/members
 POST /api/chats/invite/:code
 POST /api/client-errors
+POST /api/devices/browser-push
 POST /api/devices/end-all
 POST /api/devices/pair-token
 POST /api/devices/pair/confirm

@@ -10,6 +10,8 @@ import {
   getPairStatusCtrl,
   confirmPairCtrl,
   registerPushTokenCtrl,
+  browserPushSubscribeCtrl,
+  browserPushUnsubscribeCtrl,
 } from '../controllers/deviceController';
 import { authRequired } from '../middleware/auth';
 
@@ -42,6 +44,12 @@ router.post('/pair/confirm', authRequired, confirmPairCtrl);
 router.patch('/:id', authRequired, renameDeviceCtrl);
 
 // ============================================================
+// DELETE /api/devices/browser-push — удалить browser-push подписку
+// (тик. 1794831100, A.3: конкретный путь ДО параметрического /:id)
+// ============================================================
+router.delete('/browser-push', authRequired, browserPushUnsubscribeCtrl);
+
+// ============================================================
 // DELETE /api/devices/:id — завершить сессию устройства
 // ============================================================
 router.delete('/:id', authRequired, endSessionCtrl);
@@ -55,5 +63,11 @@ router.post('/end-all', authRequired, endAllSessionsCtrl);
 // POST /api/devices/push-token — регистрация mobile push-токена
 // ============================================================
 router.post('/push-token', authRequired, registerPushTokenCtrl);
+
+// ============================================================
+// POST /api/devices/browser-push — сохранить browser-push подписку
+// (тик. 1794831100, часть A.3)
+// ============================================================
+router.post('/browser-push', authRequired, browserPushSubscribeCtrl);
 
 export { router };

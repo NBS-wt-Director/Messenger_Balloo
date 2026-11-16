@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { roomManager } from '../ws/room-manager';
 import { serializeWsMessage } from '../ws/types';
+import { sendVapidPushToUsers } from './pushService';
 
 const prisma = new PrismaClient();
 
@@ -218,6 +219,28 @@ export const sendMessage = async (userId: string, input: SendMessageInput) => {
   } catch (err) {
     console.error('[messages] broadcast message.received failed:', err);
   }
+
+  // Тикет 1794831100 (A.4): push для получателей без активного WS-соединения.
+  // Ошибку не поднимаем: push — опциональный сервис, не блокирует доставку.
+  prisma.userChat
+    .findMany({ where: { chatId: input.chatId }, select: { userId: true } })
+    .then((rows) => {
+      const offlineIds = rows
+        .map((r) => r.userId)
+        .filter((id) => id !== userId && !roomManager.isUserOnline(id));
+      if (offlineIds.length > 0) {
+        sendVapidPushToUsers(offlineIds, {
+          title: payload.sender?.displayName || payload.sender?.username || 'Balloo',
+          body: payload.content ?? '',
+          data: { chatId: input.chatId, messageId: payload.id },
+        }).catch((err) => {
+          console.warn('[messages] sendVapidPushToUsers failed:', err);
+        });
+      }
+    })
+    .catch((err) => {
+      console.warn('[messages] push userChat query failed:', err);
+    });
 
   return payload;
 };
