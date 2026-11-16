@@ -16,10 +16,18 @@
 
 ## Подзадачи (не выполнены)
 
-- [ ] 1. Шаблон env-файла на сервис
-- [ ] 2. Шаблон compose-сервиса (SPA-контейнер + порт + health-check)
-- [ ] 3. Шаблон vhost nginx
-- [ ] 4. Проверить, что переход app/admin/command на вариант А не требует переписывания
+- [x] 1. Шаблон env-файла на сервис.
+      **Сделано 16.11:** `WEB_HISTORY_HOST_PORT=8093`, `WEB_DOWNLOAD_HOST_PORT=8094` в `.env.production`.
+- [x] 2. Шаблон compose-сервиса (SPA-контейнер + порт + health-check).
+      **Сделано:** `web-history` и `web-download` в `docker-compose.local.yml`
+      (target: web_history/web_download из Dockerfile.web, порты 8093/8094,
+      depends_on: server healthy).
+- [x] 3. Шаблон vhost nginx.
+      **Сделано:** `upstream history_backend` + vhost `history.balloo.su`;
+      `upstream download_backend` + vhost `download.balloo.su` (с /downloads/ proxy).
+- [x] 4. Проверить, что переход app/admin/command на вариант А не требует переписывания.
+      **Подтверждено:** admin уже работает по варианту А (порт 8092, upstream, vhost);
+      app/command отдают тот же SPA (web:8090) — переход не ломает их.
 
 ## Почему отложено
 

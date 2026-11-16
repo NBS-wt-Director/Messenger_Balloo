@@ -37,6 +37,9 @@ interface AddStoryReactionInput {
 
 export const createStory = async (input: CreateStoryInput) => {
   const { userId, type, mediaUrl, thumbnail, expiresAt } = input;
+  // Тикет 1792072292: выборочный доступ к истории
+  const visibility = (input as any).visibility || 'all';
+  const audienceUserIds: string[] = (input as any).audienceUserIds || [];
 
   // Валидация: expiresAt не в прошлом
   const now = Math.floor(Date.now() / 1000);
@@ -59,6 +62,11 @@ export const createStory = async (input: CreateStoryInput) => {
       mediaUrl,
       thumbnail,
       expiresAt,
+      visibility,
+      // Для selective — привязываем выбранных контактов
+      ...(visibility === 'selective' && audienceUserIds.length > 0
+        ? { audience: { create: audienceUserIds.map((uid) => ({ userId: uid })) } }
+        : {}),
     },
     include: {
       user: {
@@ -95,6 +103,25 @@ export const getStories = async (input: GetStoriesInput, viewerId?: string) => {
   // Cursor pagination
   if (before) {
     whereClause.createdAt = { lt: before };
+  }
+
+  // Тикет 1792072292: фильтрация по visibility для зрителя.
+  // Если viewerId задан (не автор), исключаем:
+  //   - visibility='self' — только автор видит
+  //   - visibility='selective' — зритель должен быть в audience
+  if (viewerId) {
+    whereClause.OR = [
+      { visibility: 'all' },
+      { visibility: 'friends' },
+      { userId: viewerId },
+      {
+        visibility: 'selective',
+        audience: { some: { userId: viewerId } },
+      },
+    ];
+  } else {
+    // Гость видит только публичные
+    whereClause.visibility = 'all';
   }
 
   const stories = await prisma.story.findMany({

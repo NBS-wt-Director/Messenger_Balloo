@@ -3,11 +3,19 @@
 // Функция: 0_01_11 — Истории
 // Тикет: №30
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '@/services/api';
 
 type StoryType = 'image' | 'video' | 'text';
+type Visibility = 'all' | 'friends' | 'self' | 'selective';
+
+interface ContactItem {
+  id: string;
+  username: string;
+  displayName?: string;
+  avatarUrl?: string;
+}
 
 function StoryCreateScreen() {
   const navigate = useNavigate();
@@ -21,11 +29,42 @@ function StoryCreateScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Тикет 1792072292: выборочный доступ
+  const [visibility, setVisibility] = useState<Visibility>('all');
+  const [contacts, setContacts] = useState<ContactItem[]>([]);
+  const [selectedContacts, setSelectedContacts] = useState<Set<string>>(new Set());
+  const [contactsLoading, setContactsLoading] = useState(false);
+
   const COLORS = [
     '#1a1a2e', '#16213e', '#0f3460', '#533483',
     '#2b2d42', '#3d405b', '#283618', '#6b273c',
     '#4a0e0e', '#1b4332', '#1a365d', '#2d3436',
   ];
+
+  // Тикет 1792072292: загрузка контактов при выборе «выборочный доступ»
+  useEffect(() => {
+    if (visibility === 'selective' && contacts.length === 0) {
+      setContactsLoading(true);
+      api.getContacts()
+        .then((list: any[]) => setContacts(list.map((c) => ({
+          id: c.id,
+          username: c.username,
+          displayName: c.displayName,
+          avatarUrl: c.avatarUrl,
+        }))))
+        .catch(() => setError('Не удалось загрузить контакты'))
+        .finally(() => setContactsLoading(false));
+    }
+  }, [visibility]);
+
+  const toggleContact = (id: string) => {
+    setSelectedContacts((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0];
@@ -78,18 +117,24 @@ function StoryCreateScreen() {
     setError('');
 
     try {
+      const audienceIds = visibility === 'selective' ? Array.from(selectedContacts) : [];
+
       if (storyType === 'text') {
-        // Text story — отправляем как JSON
         await api.post('/api/stories', {
           type: 'text',
           text,
           bgColor,
+          visibility,
+          audienceUserIds: audienceIds,
         });
       } else if (file) {
-        // Media story — multipart upload
         const formData = new FormData();
         formData.append('media', file);
         formData.append('type', storyType);
+        formData.append('visibility', visibility);
+        if (audienceIds.length > 0) {
+          formData.append('audienceUserIds', JSON.stringify(audienceIds));
+        }
 
         await api.request('/api/stories', { method: 'POST', body: formData as unknown as BodyInit });
       } else {
@@ -291,6 +336,58 @@ function StoryCreateScreen() {
                 ))}
               </div>
             </div>
+          </div>
+        )}
+      </div>
+
+      {/* Тикет 1792072292: видимость истории */}
+      <div className="card" style={{ margin: '0 16px 16px', padding: 16 }}>
+        <h3 style={{ margin: '0 0 12px', fontSize: 15 }}>👁 Видимость</h3>
+        <div style={{ marginBottom: 12 }}>
+          <label className="form-label" style={{ display: 'block', marginBottom: 6 }}>Кто может смотреть</label>
+          <select
+            className="form-select"
+            value={visibility}
+            onChange={(e) => setVisibility(e.target.value as Visibility)}
+            style={{ width: '100%', padding: '8px 12px' }}
+          >
+            <option value="all">Все подписчики</option>
+            <option value="friends">Друзья</option>
+            <option value="self">Только я</option>
+            <option value="selective">Выборочный доступ</option>
+          </select>
+        </div>
+
+        {visibility === 'selective' && (
+          <div style={{ marginTop: 12 }}>
+            <label className="form-label" style={{ display: 'block', marginBottom: 6 }}>
+              Выберите контакты {selectedContacts.size > 0 && `(${selectedContacts.size})`}
+            </label>
+            {contactsLoading ? (
+              <div className="text-muted" style={{ fontSize: 13 }}>Загрузка контактов…</div>
+            ) : contacts.length === 0 ? (
+              <div className="text-muted" style={{ fontSize: 13 }}>Контакты не найдены</div>
+            ) : (
+              <div style={{ maxHeight: 200, overflowY: 'auto', border: '1px solid var(--border-color)', borderRadius: 4 }}>
+                {contacts.map((c) => (
+                  <label
+                    key={c.id}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 8,
+                      padding: '8px 12px', cursor: 'pointer',
+                      borderBottom: '1px solid var(--border-color)',
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedContacts.has(c.id)}
+                      onChange={() => toggleContact(c.id)}
+                    />
+                    <span style={{ fontSize: 14 }}>{c.displayName || c.username}</span>
+                  </label>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>
