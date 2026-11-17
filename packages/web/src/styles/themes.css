@@ -58,6 +58,12 @@
      Full-screen wrappers use var(--app-bg) so the russian gradient is actually
      visible (ticket 1794575221: theme 'Наша' looked black). */
   --app-bg: var(--bg-primary);
+
+  /* Aliases for inline-style consumers (FeedbackModal, etc.) — ticket 1794892001 */
+  --bg: var(--bg-primary);
+  --bg-card: var(--bg-tertiary);
+  --border: var(--border-color);
+  --text: var(--text-primary);
 }
 
 /* --- Light Theme --- */
@@ -116,6 +122,12 @@
      Full-screen wrappers use var(--app-bg) so the russian gradient is actually
      visible (ticket 1794575221: theme 'Наша' looked black). */
   --app-bg: var(--bg-primary);
+
+  /* Aliases for inline-style consumers (FeedbackModal, etc.) — ticket 1794892001 */
+  --bg: var(--bg-primary);
+  --bg-card: var(--bg-tertiary);
+  --border: var(--border-color);
+  --text: var(--text-primary);
 }
 
 /* --- Russian Theme --- */
@@ -189,6 +201,12 @@
       rgba(0, 57, 166, 0.38) 50%,
       rgba(213, 43, 30, 0.42) 100%),
     var(--bg-primary);
+
+  /* Aliases for inline-style consumers (FeedbackModal, etc.) — ticket 1794892001 */
+  --bg: var(--bg-primary);
+  --bg-card: var(--bg-tertiary);
+  --border: var(--border-color);
+  --text: var(--text-primary);
 }
 
 /* Russian theme: 45° flag-colour gradient as page backdrop (darkened for readability) */

@@ -91,6 +91,20 @@
   min-width: 240px;
 }
 
+/* Mobile: sidebar takes full width */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100% !important;
+    min-width: 0;
+    max-width: none;
+    border-right: none;
+  }
+  .sidebar--narrow {
+    width: 100% !important;
+    min-width: 0;
+  }
+}
+
 /* Список чатов (ChatList): фиксированная ширина вместо inline (P35-mobile),
    на мобильных — на весь экран (макет mockups/mobile/chat.html: 1 колонка) */
 .sidebar--chat {
@@ -805,6 +819,8 @@
   display: flex;
   border-bottom: 1px solid var(--border-color);
   gap: 0;
+  overflow-x: auto;
+  flex-wrap: nowrap;
 }
 
 .tab {

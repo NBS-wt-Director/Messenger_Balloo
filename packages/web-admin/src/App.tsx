@@ -84,6 +84,18 @@ const BlogChannelsScreen = lazy(() =>
 const BlogCategoriesScreen = lazy(() =>
   import('./screens/BlogCategoriesScreen').then((m) => ({ default: m.BlogCategoriesScreen }))
 );
+const AdminBotsMgmtScreen = lazy(() =>
+  import('./screens/AdminBotsMgmtScreen').then((m) => ({ default: m.AdminBotsMgmtScreen }))
+);
+const AdminFilesScreen = lazy(() =>
+  import('./screens/AdminFilesScreen').then((m) => ({ default: m.AdminFilesScreen }))
+);
+const AdminGroupsMgmtScreen = lazy(() =>
+  import('./screens/AdminGroupsMgmtScreen').then((m) => ({ default: m.AdminGroupsMgmtScreen }))
+);
+const AdminServiceStatusScreen = lazy(() =>
+  import('./screens/AdminServiceStatusScreen').then((m) => ({ default: m.AdminServiceStatusScreen }))
+);
 
 // Layout
 const AdminLayout = lazy(() =>
@@ -140,6 +152,10 @@ export default function App() {
               <Route path="blog/queue" element={<BlogQueueScreen />} />
               <Route path="blog/channels" element={<BlogChannelsScreen />} />
               <Route path="blog/categories" element={<BlogCategoriesScreen />} />
+              <Route path="bots" element={<AdminBotsMgmtScreen />} />
+              <Route path="groups" element={<AdminGroupsMgmtScreen />} />
+              <Route path="files-stats" element={<AdminFilesScreen />} />
+              <Route path="service-status" element={<AdminServiceStatusScreen />} />
               <Route path="audit-logs" element={<AuditLogsScreen />} />
               <Route path="system-settings" element={<SystemSettingsScreen />} />
             </Route>

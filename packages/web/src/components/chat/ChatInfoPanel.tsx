@@ -25,7 +25,7 @@ export const ChatInfoPanel: React.FC<ChatInfoPanelProps> = ({
   return (
     <div
       style={{
-        width: '320px',
+        width: '90vw', maxWidth: 320,
         borderLeft: '1px solid var(--border-color)',
         display: 'flex',
         flexDirection: 'column',

@@ -254,7 +254,7 @@ export function DownloadScreen() {
               className="card card--hover"
               style={{
                 flex: 1,
-                minWidth: '320px',
+                minWidth: '280px',
                 padding: '24px',
                 borderColor: detected === 'android' ? 'var(--accent)' : undefined,
                 boxShadow: detected === 'android' ? '0 0 0 2px var(--accent)' : undefined,

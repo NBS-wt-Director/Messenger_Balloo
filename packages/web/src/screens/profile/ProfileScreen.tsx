@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '@/services/api';
 import { useAuthStore } from '@/store/authStore';
+import { useUIStore as useThemeStore } from '@balloo/ui';
 
 interface Device {
   id: string;
@@ -26,7 +27,8 @@ interface Account {
 }
 
 export default function ProfileScreen() {
-  const { user, updateUser, setTheme, setLanguage, logout } = useAuthStore();
+  const { user, updateUser, setLanguage, logout } = useAuthStore();
+  const setTheme = useThemeStore((s) => s.setTheme);
   const navigate = useNavigate();
   const [displayName, setDisplayName] = useState(user?.displayName || '');
   const [bio, setBio] = useState('');

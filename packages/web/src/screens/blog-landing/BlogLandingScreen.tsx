@@ -161,7 +161,7 @@ export default function BlogLandingScreen() {
 
             <div className="flex gap-6" style={{ flexWrap: 'wrap' }}>
               {/* Main content */}
-              <div className="flex-1" style={{ minWidth: 300, flexBasis: '70%' }}>
+              <div className="flex-1" style={{ minWidth: 240, flexBasis: '70%' }}>
                 {/* Featured post */}
                 {featuredPost && (
                   <div className="mb-6">
@@ -210,7 +210,7 @@ export default function BlogLandingScreen() {
               </div>
 
               {/* Sidebar */}
-              <div style={{ width: 300, flexShrink: 0 }}>
+              <div className="flex-shrink-0" style={{ width: 300, maxWidth: '90vw' }}>
                 <BlogSidebar
                   categories={categories}
                   recentPosts={featuredPosts.length > 0 ? featuredPosts : posts}

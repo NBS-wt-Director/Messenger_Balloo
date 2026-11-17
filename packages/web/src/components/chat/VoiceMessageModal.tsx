@@ -277,7 +277,7 @@ export const VoiceMessageModal: React.FC<VoiceMessageModalProps> = ({
       <div className="modal-overlay" onClick={handleClose} />
 
       {/* Modal */}
-      <div className="modal modal--status-info" style={{ width: 480 }}>
+      <div className="modal modal--status-info" style={{ width: '90vw', maxWidth: 480 }}>
         <div className="modal__header">
           <span className="modal__title">🎤 Запись голосового сообщения</span>
           <div className="modal__close" onClick={handleClose}>✕</div>

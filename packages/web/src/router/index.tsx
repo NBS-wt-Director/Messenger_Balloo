@@ -57,6 +57,11 @@ const KnowledgeScreen = lazy(() => import('@/screens/knowledge/KnowledgeScreen')
 const KnowledgePageScreen = lazy(() => import('@/screens/knowledge/KnowledgePageScreen').then((m) => ({ default: m.KnowledgePageScreen })));
 const EditPageScreen = lazy(() => import('@/screens/knowledge/EditPageScreen').then((m) => ({ default: m.EditPageScreen })));
 const NotFoundScreen = lazy(() => import('@/screens/shared/NotFoundScreen'));
+const Error503Screen = lazy(() => import('@/screens/shared/Error503Screen'));
+const OfflineAuthedScreen = lazy(() => import('@/screens/shared/OfflineAuthedScreen'));
+const OfflineGuestScreen = lazy(() => import('@/screens/shared/OfflineGuestScreen'));
+const Error555Screen = lazy(() => import('@/screens/shared/Error555Screen'));
+const BanAppealScreen = lazy(() => import('@/screens/shared/BanAppealScreen'));
 
 // Admin screens — вынесены в packages/web-admin (тикет 1792395490-05)
 
@@ -833,6 +838,58 @@ export const router = createHashRouter([
       <ErrorBoundary>
         <Suspense fallback={<LoadingFallback />}>
           <BlogSubscribeScreen />
+        </Suspense>
+      </ErrorBoundary>
+    ),
+  },
+
+  // --- Shared error pages (public, no auth required) ---
+  {
+    path: '/503',
+    element: (
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingFallback />}>
+          <Error503Screen />
+        </Suspense>
+      </ErrorBoundary>
+    ),
+  },
+  {
+    path: '/offline',
+    element: (
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingFallback />}>
+          <OfflineAuthedScreen />
+        </Suspense>
+      </ErrorBoundary>
+    ),
+  },
+  {
+    path: '/offline-guest',
+    element: (
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingFallback />}>
+          <OfflineGuestScreen />
+        </Suspense>
+      </ErrorBoundary>
+    ),
+  },
+  {
+    path: '/555',
+    element: (
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingFallback />}>
+          <Error555Screen />
+        </Suspense>
+      </ErrorBoundary>
+    ),
+  },
+  {
+    path: '/ban-appeal',
+    element: (
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingFallback />}>
+          <BanAppealScreen />
         </Suspense>
       </ErrorBoundary>
     ),

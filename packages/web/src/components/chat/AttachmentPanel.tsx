@@ -152,7 +152,7 @@ export function AttachmentPanel({ open, chatId, onClose, onSent }: AttachmentPan
           top: 56,
           right: open ? 0 : -400,
           bottom: 0,
-          width: 400,
+          width: '90vw', maxWidth: 400,
           background: 'var(--bg-secondary)',
           borderLeft: '1px solid var(--border-color)',
           zIndex: 401,

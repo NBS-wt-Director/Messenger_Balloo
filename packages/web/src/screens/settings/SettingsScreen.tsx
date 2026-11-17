@@ -3,6 +3,7 @@
 // Переиспользует: NotificationSettingsScreen, PrivacySettingsScreen, BlockedUsersScreen
 
 import { useState } from 'react';
+import { useUIStore } from '@balloo/ui';
 import NotificationSettingsScreen from './NotificationSettingsScreen';
 import PrivacySettingsScreen from './PrivacySettingsScreen';
 import BlockedUsersScreen from './BlockedUsersScreen';
@@ -24,7 +25,8 @@ type SettingsTab =
 
 // --- Inner settings sub-screens ---
 function AppearanceSettingsScreen() {
-  const [theme, setTheme] = useState<'dark' | 'light' | 'russian'>('dark');
+  const theme = useUIStore((s) => s.theme);
+  const setTheme = useUIStore((s) => s.setTheme);
 
   return (
     <div style={{ padding: 24, maxWidth: 720, margin: '0 auto' }}>
@@ -82,7 +84,11 @@ function AppearanceSettingsScreen() {
           }}
         >
           <span className="flex-1">🇷🇺 Российская</span>
-          <span className="text-xs text-muted">(флаг + драгметаллы)</span>
+          {theme === 'russian' ? (
+            <span className="chip chip--accent">Активна</span>
+          ) : (
+            <span className="text-xs text-muted">(флаг + драгметаллы)</span>
+          )}
         </div>
       </div>
 
