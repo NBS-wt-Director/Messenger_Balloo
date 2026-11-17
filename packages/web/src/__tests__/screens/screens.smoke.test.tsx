@@ -1,4 +1,4 @@
-// Smoke-тесты экранов настроек, профиля, историй, опросов, 2FA, командного портала
+// Smoke-тесты экранов настроек, профиля, историй, опросов, 2FA
 import { describe, it, expect, vi } from 'vitest';
 import { waitFor } from '@testing-library/react';
 import { renderScreen } from '../helpers/screenTestUtils';
@@ -17,10 +17,8 @@ import StoriesScreen from '../../screens/stories/StoriesScreen';
 import PollScreen from '../../screens/polls/PollScreen';
 import TwoFactorScreen from '../../screens/auth/TwoFactorScreen';
 import GroupSettingsScreen from '../../screens/groups/GroupSettingsScreen';
-import { CommandBlogScreen } from '../../screens/command/CommandBlogScreen';
-import { CommandSettingsScreen } from '../../screens/command/CommandSettingsScreen';
 
-describe('Settings, profile, stories, polls, command screens (smoke)', () => {
+describe('Settings, profile, stories, polls, 2FA screens (smoke)', () => {
   const cases: [string, React.ReactNode][] = [
     ['SettingsScreen', <SettingsScreen />],
     ['NotificationSettingsScreen', <NotificationSettingsScreen />],
@@ -31,8 +29,6 @@ describe('Settings, profile, stories, polls, command screens (smoke)', () => {
     ['PollScreen', <PollScreen />],
     ['TwoFactorScreen', <TwoFactorScreen />],
     ['GroupSettingsScreen', <GroupSettingsScreen />],
-    ['CommandBlogScreen', <CommandBlogScreen />],
-    ['CommandSettingsScreen', <CommandSettingsScreen />],
   ];
 
   for (const [name, ui] of cases) {

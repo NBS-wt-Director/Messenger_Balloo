@@ -115,7 +115,6 @@ export type TranslationKey =
   | 'oauth.validationNotice'
   | 'menu.balloo'
   | 'menu.admin'
-  | 'menu.command'
   | 'menu.features'
   | 'menu.history'
   | 'menu.download'
@@ -2623,11 +2622,6 @@ export const translations: Translations = {
     ru: 'Admin', en: 'Admin', tt: 'Admin', ba: 'Admin', ce: 'Admin', cv: 'Admin', av: 'Admin',
     dar: 'Admin', udm: 'Admin', lez: 'Admin', kbd: 'Admin', chm: 'Admin', os: 'Admin',
     sah: 'Admin', bua: 'Admin', uk: 'Admin', zh: 'Admin', hi: 'Admin', be: 'Admin', fr: 'Admin',
-  },
-  'menu.command': {
-    ru: 'Command', en: 'Command', tt: 'Command', ba: 'Command', ce: 'Command', cv: 'Command', av: 'Command',
-    dar: 'Command', udm: 'Command', lez: 'Command', kbd: 'Command', chm: 'Command', os: 'Command',
-    sah: 'Command', bua: 'Command', uk: 'Command', zh: 'Command', hi: 'Command', be: 'Command', fr: 'Command',
   },
   'menu.features': {
     ru: 'Features', en: 'Features', tt: 'Features', ba: 'Features', ce: 'Features', cv: 'Features', av: 'Features',

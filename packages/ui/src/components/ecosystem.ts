@@ -45,7 +45,6 @@ export function mainSiteUrl(path: string, host?: string): string {
 export const SPA_TOPBAR_ITEMS: TopbarMenuItem[] = [
   { key: 'menu.balloo', to: '/chat', emoji: '💬' },
   { key: 'menu.admin', to: '/admin', emoji: '🛡️', dividerBefore: true },
-  { key: 'menu.command', to: '/command', emoji: '🏢' },
   { key: 'menu.features', to: '/features', emoji: '💡' },
   { key: 'menu.history', to: '/history', emoji: '📜' },
   { key: 'menu.download', to: '/download', emoji: '⬇️' },

@@ -67,7 +67,7 @@ describe('LoginScreen (сценарий авторизации)', () => {
   it('renders topbar menu dropdown (левое меню — меню, не кнопка на главную) — P23', () => {
     renderLogin();
     expect(document.querySelector('.topbar__dropdown')).toBeInTheDocument();
-    expect(document.querySelectorAll('.topbar__dropdown-item').length).toBeGreaterThanOrEqual(7);
+    expect(document.querySelectorAll('.topbar__dropdown-item').length).toBeGreaterThanOrEqual(6);
   });
 
   it('renders link to registration', () => {

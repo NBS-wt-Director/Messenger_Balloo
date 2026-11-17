@@ -1,4 +1,4 @@
-// ChatSidebar — sidebar для внутреннего чата Command
+// ChatSidebar — sidebar для внутреннего чата (командного)
 // Список каналов (#разработка, #общий) и личных сообщений
 
 import { useState } from 'react';
