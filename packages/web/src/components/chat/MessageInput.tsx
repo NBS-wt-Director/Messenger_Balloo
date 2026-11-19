@@ -134,21 +134,11 @@ export const MessageInput: React.FC<MessageInputProps> = ({
           className="input-area__btn"
           title="Прикрепить файл"
           onClick={() => {
-            // Панель вложений (тик. 1792124253): при переданном обработчике
-            // открывает её; прежний одноразовый input остаётся как fallback.
-            if (onAttachClick) {
-              onAttachClick();
-              return;
-            }
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.onchange = () => {
-              const file = input.files?.[0];
-              if (file) {
-                // TODO: upload file
-              }
-            };
-            input.click();
+            // Панель вложений (тик. 1792124253) — единственный путь загрузки.
+            // Тик. 1795094089 (A1): мёртвый fallback с «TODO: upload file» удалён —
+            // он был недостижим (ChatViewScreen всегда передаёт onAttachClick) и
+            // вводил в заблуждение. Реальная загрузка: AttachmentPanel → api.uploadFile.
+            onAttachClick?.();
           }}
         >
           📎

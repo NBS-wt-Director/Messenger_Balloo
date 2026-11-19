@@ -307,6 +307,19 @@ export const getMessages = async ({ chatId, userId, cursor, limit = 50, before, 
         },
       },
       attachments: true,
+      // Тик. 1795094089 (A2): история обязана отдавать реакции сразу, чтобы
+      // клиент не дёргал GET /reactions на каждое сообщение.
+      reactions: {
+        include: {
+          user: {
+            include: {
+              publicProfile: {
+                select: { displayName: true },
+              },
+            },
+          },
+        },
+      },
       replyTo: {
         include: {
           sender: {
@@ -357,7 +370,16 @@ export const getMessages = async ({ chatId, userId, cursor, limit = 50, before, 
         height: att.height,
         duration: att.duration,
       })),
-      reactions: [], // TODO: загрузить реакции
+      // Тик. 1795094089 (A2): форма идентична getReactions() ниже — клиент
+      // получает один и тот же объект и из истории, и из точечного запроса.
+      reactions: msg.reactions.map((r) => ({
+        id: r.id,
+        messageId: r.messageId,
+        userId: r.userId,
+        user: formatSender(r.user),
+        emoji: r.emoji,
+        createdAt: r.createdAt,
+      })),
       editCount: msg.editCount,
       deleted: msg.deleted,
       status: msg.status,

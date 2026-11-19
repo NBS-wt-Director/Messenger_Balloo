@@ -112,6 +112,23 @@ describe('MessageInput (сценарий чата)', () => {
     expect(screen.getByText('/list_passive_')).toBeInTheDocument();
     expect(screen.getByText('/personali_')).toBeInTheDocument();
   });
+
+  // Тик. 1795094089 (A1): кнопка «Прикрепить файл» открывает панель вложений
+  // через onAttachClick. Прежний мёртвый fallback удалён.
+  it('attach button opens the attachment panel via onAttachClick', () => {
+    const onAttachClick = vi.fn();
+    render(<MessageInput onSend={onSend} onAttachClick={onAttachClick} />);
+
+    fireEvent.click(screen.getByTitle('Прикрепить файл'));
+
+    expect(onAttachClick).toHaveBeenCalledTimes(1);
+  });
+
+  it('attach button without handler does not throw', () => {
+    render(<MessageInput onSend={onSend} />);
+
+    expect(() => fireEvent.click(screen.getByTitle('Прикрепить файл'))).not.toThrow();
+  });
 });
 
 // P34: reply-панель вынесена в ReplyPreview (по макету — A1.2 над полем ввода)

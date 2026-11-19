@@ -124,7 +124,11 @@ export function FeatureDetailScreen() {
     return 'только что';
   }
 
-  const isAuthor = false; // TODO: check auth user === feature.author.id
+  // Тик. 1795094089 (A3): мёртвая `const isAuthor = false; // TODO` удалена.
+  // Макет (mockups/features-balloo-su/feature-detail.html) не содержит кнопок
+  // автора (редактировать/удалить) — chip «автор» ставится комментаторам,
+  // чей id совпадает с автором фичи (см. рендер комментариев ниже). Сравнивать
+  // с текущим пользователем здесь нечего, задел вводил в заблуждение.
 
   return (
     <div className="main">

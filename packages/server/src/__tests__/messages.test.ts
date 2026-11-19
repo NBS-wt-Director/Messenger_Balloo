@@ -101,6 +101,34 @@ describe('Messages API', () => {
       expect(res.status).toBe(200);
       expect(res.body.messages.length).toBeLessThanOrEqual(2);
     });
+
+    // Тик. 1795094089 (A2): до правки getMessages возвращал reactions: [] всегда.
+    it('history includes reactions added to a message', async () => {
+      const user = await registerTestUser();
+      const chatId = await createChatAndGetId(user.accessToken);
+
+      const sendRes = await request(app)
+        .post(`/api/chats/${chatId}/messages`)
+        .set('Authorization', `Bearer ${user.accessToken}`)
+        .send({ type: 'text', content: 'Reactions in history' });
+
+      await request(app)
+        .post(`/api/messages/${sendRes.body.id}/reactions`)
+        .set('Authorization', `Bearer ${user.accessToken}`)
+        .send({ emoji: '🔥' });
+
+      const res = await request(app)
+        .get(`/api/chats/${chatId}/messages`)
+        .set('Authorization', `Bearer ${user.accessToken}`);
+
+      expect(res.status).toBe(200);
+      const msg = res.body.messages.find((m: any) => m.id === sendRes.body.id);
+      expect(msg).toBeDefined();
+      expect(Array.isArray(msg.reactions)).toBe(true);
+      expect(msg.reactions.length).toBe(1);
+      expect(msg.reactions[0].emoji).toBe('🔥');
+      expect(msg.reactions[0]).toHaveProperty('user');
+    });
   });
 
   describe('PUT /api/messages/:id', () => {
