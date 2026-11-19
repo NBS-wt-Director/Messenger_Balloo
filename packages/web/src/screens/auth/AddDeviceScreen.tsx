@@ -9,6 +9,7 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import QRCode from 'qrcode';
 import { AppTopbar } from '@/components/chrome/AppTopbar';
 import { AppFooter } from '@/components/chrome/AppFooter';
 import { api } from '@/services/api';
@@ -20,6 +21,7 @@ function AddDeviceScreen() {
   const navigate = useNavigate();
   const [qrSeconds, setQrSeconds] = useState(60);
   const [pairToken, setPairToken] = useState<string | null>(null);
+  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   // Токен для эффектов: меняем только когда получили новый код
   const tokenRef = useRef<string | null>(null);
@@ -43,6 +45,31 @@ function AddDeviceScreen() {
   useEffect(() => {
     refreshQr();
   }, [refreshQr]);
+
+  // Настоящий QR-код (тик. 1795101592): раньше на экране была CSS-заглушка
+  // (repeating-conic-gradient), которая не содержала токена и не сканировалась.
+  // Рендерим SVG (toString) — не зависит от canvas, работает и в тестах/jsdom.
+  useEffect(() => {
+    if (!pairToken) {
+      setQrDataUrl(null);
+      return;
+    }
+    let cancelled = false;
+    QRCode.toString(`balloo://pair/${pairToken}`, {
+      type: 'svg',
+      margin: 1,
+      errorCorrectionLevel: 'M',
+    })
+      .then((svg) => {
+        if (!cancelled) setQrDataUrl(`data:image/svg+xml;utf8,${encodeURIComponent(svg)}`);
+      })
+      .catch(() => {
+        if (!cancelled) setQrDataUrl(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [pairToken]);
 
   // Таймер QR-кода: N → 0, при 0 — автозапрос нового кода (как «Обновить код»)
   useEffect(() => {
@@ -129,42 +156,35 @@ function AddDeviceScreen() {
             сек.
           </div>
 
-          {/* QR Code (визуал по макету; реальный токен — серверный pair-token API) */}
+          {/* QR Code — настоящий, из deep-link balloo://pair/<token> (тик. 1795101592) */}
           <div style={{ display: 'inline-block', padding: '24px', background: '#fff' }}>
-            <div
-              style={{
-                width: '220px',
-                height: '220px',
-                background: 'repeating-conic-gradient(#000 0% 25%, #fff 0% 50%) 50% / 14px 14px',
-                position: 'relative',
-                opacity: qrSeconds <= 0 ? 0.25 : 1,
-                transition: 'opacity 0.3s',
-              }}
-            >
-              <div style={{ position: 'absolute', top: '10px', left: '10px', width: '48px', height: '48px', background: '#fff', border: '10px solid #000' }} />
-              <div style={{ position: 'absolute', top: '10px', right: '10px', width: '48px', height: '48px', background: '#fff', border: '10px solid #000' }} />
-              <div style={{ position: 'absolute', bottom: '10px', left: '10px', width: '48px', height: '48px', background: '#fff', border: '10px solid #000' }} />
+            {qrDataUrl ? (
+              <img
+                src={qrDataUrl}
+                alt="QR-код для входа со второго устройства"
+                data-testid="pair-qr"
+                width={220}
+                height={220}
+                style={{ opacity: qrSeconds <= 0 ? 0.25 : 1, transition: 'opacity 0.3s', display: 'block' }}
+              />
+            ) : (
               <div
+                data-testid="pair-qr-placeholder"
                 style={{
-                  position: 'absolute',
-                  top: '50%',
-                  left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  width: '40px',
-                  height: '40px',
-                  clipPath: 'polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%)',
-                  background: 'var(--accent)',
+                  width: '220px',
+                  height: '220px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#fff',
-                  fontSize: '18px',
-                  fontWeight: 900,
+                  color: '#888',
+                  fontSize: '13px',
+                  textAlign: 'center',
+                  padding: '12px',
                 }}
               >
-                B
+                {loadError ? 'QR недоступен' : 'Генерация кода…'}
               </div>
-            </div>
+            )}
           </div>
 
           <div className="text-xs text-muted mt-4">

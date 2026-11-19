@@ -31,6 +31,7 @@ const ReportMessageScreen = lazy(() => import('@/screens/report-message/ReportMe
 const MyDonatesScreen = lazy(() => import('@/screens/my-donates/MyDonatesScreen'));
 const MessageEditorScreen = lazy(() => import('@/screens/message-editor/MessageEditorScreen'));
 const AddDeviceScreen = lazy(() => import('@/screens/auth/AddDeviceScreen'));
+const PairScanScreen = lazy(() => import('@/screens/auth/PairScanScreen'));
 const MainLayout = lazy(() => import('@/layouts/MainLayout'));
 const ChatViewScreen = lazy(() => import('@/screens/chat/ChatViewScreen'));
 const ArchiveScreen = lazy(() => import('@/screens/chat/ArchiveScreen'));
@@ -402,6 +403,18 @@ export const router = createHashRouter([
       <ErrorBoundary>
         <Suspense fallback={<LoadingFallback />}>
           <AddDeviceScreen />
+        </Suspense>
+      </ErrorBoundary>
+    ),
+  },
+
+  // Подтверждение входа по QR с авторизованного устройства (тик. 1795101592)
+  {
+    path: '/pair-scan',
+    element: (
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingFallback />}>
+          <PairScanScreen />
         </Suspense>
       </ErrorBoundary>
     ),

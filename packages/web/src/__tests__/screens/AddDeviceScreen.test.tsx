@@ -111,6 +111,19 @@ describe('AddDeviceScreen', () => {
     expect(screen.getByText(/balloo:\/\/pair\//)).toBeInTheDocument();
   });
 
+  // Тик. 1795101592: раньше был CSS-«QR» (не сканировался). Теперь — настоящий
+  // SVG-QR, сгенерированный из deep-link; проверяем, что картинка появляется.
+  it('генерирует настоящий QR-код (img с data:image/svg+xml)', async () => {
+    renderScreen();
+    await waitFor(
+      () => {
+        const img = screen.getByTestId('pair-qr') as HTMLImageElement;
+        expect(img.getAttribute('src') || '').toContain('data:image/svg+xml');
+      },
+      { timeout: 3000 }
+    );
+  });
+
   it('при mount вызывает createPairToken', async () => {
     renderScreen();
     await waitFor(() => {

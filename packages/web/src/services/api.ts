@@ -181,6 +181,14 @@ export const api = {
       user?: { username: string | null; avatarUrl: string | null };
     }>(`/api/devices/pair/${token}/status`),
 
+  // Подтверждение входа с авторизованного устройства (тик. 1795101592):
+  // сканер QR на «доверенном» устройстве шлёт сюда токен из balloo://pair/<token>.
+  confirmPair: (token: string, deviceType: 'web' | 'desktop' | 'android' | 'ios' = 'web', deviceName?: string) =>
+    request<{ message: string; deviceId: string }>('/api/devices/pair/confirm', {
+      method: 'POST',
+      data: { token, deviceType, deviceName },
+    }),
+
   updateMe: (data: Partial<any>) =>
     request<any>(`/api/users/me`, {
       method: 'PUT',

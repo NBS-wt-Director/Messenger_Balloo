@@ -210,6 +210,14 @@ export default function MyDevicesScreen() {
           <button className="btn btn--tertiary btn--block" onClick={() => navigate('/add-device')}>
             ➕ Добавить устройство
           </button>
+          {/* Подтвердить вход по QR (тик. 1795101592) — вторая половина pair-flow */}
+          <button
+            className="btn btn--tertiary btn--block"
+            style={{ marginTop: 8 }}
+            onClick={() => navigate('/pair-scan')}
+          >
+            📷 Отсканировать QR для входа
+          </button>
 
           {/* Опасная зона */}
           {otherDevices.length > 0 && (
