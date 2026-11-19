@@ -29,11 +29,22 @@ describe('роутер: публичный / не должен затенять�
     }
   });
 
-  it('публичные юридические страницы и блог матчатся как публичные (ветка длиной 1)', () => {
-    for (const p of ['/privacy', '/rules', '/cookies', '/blog', '/donat', '/for_kassa']) {
+  it('публичные юридические страницы матчатся как публичные (ветка длиной 1)', () => {
+    for (const p of ['/privacy', '/rules', '/cookies', '/donat', '/for_kassa']) {
       const matches = matchRoutes(router.routes, p);
       expect(matches, `маршрут ${p} не матчится`).not.toBeNull();
       expect(matches, `маршрут ${p} ушёл в защищённую группу`).toHaveLength(1);
+    }
+  });
+
+  // Тик. 1795094088 (решение владельца 19.11.2026): blog (узел 11) выведен из
+  // MVP1 — маршруты /blog* удалены из роутера, путь обязан гаснуть в 404-splat.
+  it('blog выведен из MVP1: /blog* не матчится ни на какой маршрут, кроме 404-splat', () => {
+    for (const p of ['/blog', '/blog/post/1', '/blog/category/news', '/blog/search',
+                     '/blog/channel/1', '/blog/subscribe']) {
+      const matches = matchRoutes(router.routes, p);
+      expect(matches, `${p} обязан уходить в fallback-404`).not.toBeNull();
+      expect(matches![matches!.length - 1].route.path, `${p} не в 404-splat`).toBe('*');
     }
   });
 

@@ -99,13 +99,8 @@ const SpecifityScreen = lazy(() => import('@/screens/specifity/SpecifityScreen')
 // Calls — тикет 1792137287
 const CallsScreen = lazy(() => import('@/screens/calls/CallsScreen'));
 
-// Blog Landing screens (узел 11) — тикет №60
-const BlogLandingScreen = lazy(() => import('@/screens/blog-landing/BlogLandingScreen'));
-const BlogLandingPostScreen = lazy(() => import('@/screens/blog-landing/BlogLandingPostScreen'));
-const BlogCategoryScreen = lazy(() => import('@/screens/blog-landing/BlogCategoryScreen'));
-const BlogSearchScreen = lazy(() => import('@/screens/blog-landing/BlogSearchScreen'));
-const BlogChannelScreen = lazy(() => import('@/screens/blog-landing/BlogChannelScreen'));
-const BlogSubscribeScreen = lazy(() => import('@/screens/blog-landing/BlogSubscribeScreen'));
+// Blog Landing (узел 11) выведен из MVP1 — тик. 1795094088 (решение владельца
+// 19.11.2026): экраны остаются в screens/blog-landing/, вызовов из роутера нет.
 
 // Loading fallback
 function LoadingFallback() {
@@ -781,67 +776,9 @@ export const router = createHashRouter([
     ),
   },
 
-  // --- Blog Landing (узел 11) — тикет №60 ---
-  {
-    path: '/blog',
-    element: (
-      <ErrorBoundary>
-        <Suspense fallback={<LoadingFallback />}>
-          <BlogLandingScreen />
-        </Suspense>
-      </ErrorBoundary>
-    ),
-  },
-  {
-    path: '/blog/post/:id',
-    element: (
-      <ErrorBoundary>
-        <Suspense fallback={<LoadingFallback />}>
-          <BlogLandingPostScreen />
-        </Suspense>
-      </ErrorBoundary>
-    ),
-  },
-  {
-    path: '/blog/category/:slug',
-    element: (
-      <ErrorBoundary>
-        <Suspense fallback={<LoadingFallback />}>
-          <BlogCategoryScreen />
-        </Suspense>
-      </ErrorBoundary>
-    ),
-  },
-  {
-    path: '/blog/search',
-    element: (
-      <ErrorBoundary>
-        <Suspense fallback={<LoadingFallback />}>
-          <BlogSearchScreen />
-        </Suspense>
-      </ErrorBoundary>
-    ),
-  },
-  {
-    path: '/blog/channel/:id',
-    element: (
-      <ErrorBoundary>
-        <Suspense fallback={<LoadingFallback />}>
-          <BlogChannelScreen />
-        </Suspense>
-      </ErrorBoundary>
-    ),
-  },
-  {
-    path: '/blog/subscribe',
-    element: (
-      <ErrorBoundary>
-        <Suspense fallback={<LoadingFallback />}>
-          <BlogSubscribeScreen />
-        </Suspense>
-      </ErrorBoundary>
-    ),
-  },
+  // --- Blog Landing (узел 11) выведен из MVP1 — тик. 1795094088 ---
+  // Маршруты /blog* удалены по решению владельца 19.11.2026; код экранов
+  // остаётся в screens/blog-landing/. Несуществующий /blog уходит в 404-splat ниже.
 
   // --- Shared error pages (public, no auth required) ---
   {
