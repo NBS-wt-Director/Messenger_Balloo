@@ -143,7 +143,7 @@ export function KnowledgeScreen() {
   };
 
   return (
-    <div style={{ display: 'flex', height: '100vh', background: 'var(--app-bg)' }}>
+    <div style={{ display: 'flex', height: '100%', minHeight: 0, background: 'var(--app-bg)' }}>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {/* Topbar */}
         <div

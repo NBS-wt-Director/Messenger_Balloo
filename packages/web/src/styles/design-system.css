@@ -576,3 +576,26 @@
   width: 100%;
   margin-top: 24px;
 }
+
+/* ---------- Page container (экраны-страницы) ----------
+   Источник: mockups/assets/common.css (.page-container).
+   Экраны-страницы (Profile, Contacts, Calls, Bots, CreateGroup, hiring,
+   features, history, download…) используют этот класс как корень.
+   Класс отсутствовал в web: контент не центрировался по макету, а главное —
+   НЕ прокручивался, т.к. body/#root/.main-content стоят с overflow:hidden и
+   прокрутку обязан давать сам контейнер. flex/min-height/overflow — скролл
+   внутри MainLayout (flex-колонка), max-width/padding — как в макете. */
+.page-container {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 32px 24px;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.page-container--narrow {
+  max-width: 640px;
+}
