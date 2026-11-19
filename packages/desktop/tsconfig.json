@@ -26,6 +26,7 @@
       "@/screens/*": ["../web/src/screens/*"],
       "@/layouts/*": ["../web/src/layouts/*"],
       "@/services/*": ["../web/src/services/*"],
+      "@/utils/*": ["../web/src/utils/*"],
       "@/service-worker-registration": ["../web/src/service-worker-registration"]
     }
   },
