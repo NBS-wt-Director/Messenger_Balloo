@@ -1,9 +1,33 @@
-import { defineConfig } from 'vite';
+import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import fs from 'fs';
+
+/**
+ * Подставляет уникальный BUILD_ID в скопированный в dist Service Worker
+ * (`public/sw.js`). Имя кэша в sw.js меняется на каждый релиз, поэтому старый
+ * кэш удаляется на `activate` и пользователь не застревает на прежней версии
+ * (тик. 1795152410). Хук closeBundle с enforce:'post' — после того как Vite
+ * скопировал publicDir в dist.
+ */
+function swCacheVersion(): Plugin {
+  return {
+    name: 'balloo-sw-cache-version',
+    apply: 'build',
+    enforce: 'post',
+    closeBundle() {
+      const swPath = path.resolve(__dirname, 'dist/sw.js');
+      if (!fs.existsSync(swPath)) return;
+      const buildId = Date.now().toString(36);
+      const src = fs.readFileSync(swPath, 'utf8');
+      if (!src.includes('__BUILD_ID__')) return;
+      fs.writeFileSync(swPath, src.replace(/__BUILD_ID__/g, buildId));
+    },
+  };
+}
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), swCacheVersion()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

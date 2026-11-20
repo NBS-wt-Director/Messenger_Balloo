@@ -1,7 +1,13 @@
 /* sw.js — Service Worker для Balloo Messenger (PWA) */
 
-const CACHE_NAME = 'balloo-v1';
-const DATA_CACHE_NAME = 'balloo-api-v1';
+// Версия кэша. Плейсхолдер __BUILD_ID__ подставляется при `vite build`
+// плагином balloo-sw-cache-version (vite.config.ts) — см. тик. 1795152410.
+// Имя меняется на каждый релиз, поэтому на `activate` старый кэш удаляется
+// автоматически, и пользователь получает новую версию без ручного Unregister.
+// Если по какой-то причине подстановка не произошла (dev-режим), остаётся
+// безопасное значение ниже.
+const CACHE_NAME = 'balloo-__BUILD_ID__';
+const DATA_CACHE_NAME = 'balloo-api-__BUILD_ID__';
 const SYNC_DB_NAME = 'balloo-sync';
 const SYNC_STORE_NAME = 'queue';
 
@@ -255,9 +261,7 @@ self.addEventListener('push', (event) => {
   const options = {
     body: data.body,
     icon: data.icon || '/assets/logos/product-logo.png',
-  '/offline.html',
     badge: '/assets/logos/product-logo.png',
-  '/offline.html',
     vibrate: [200, 100, 200],
     data: {
       date: Date.now(),
