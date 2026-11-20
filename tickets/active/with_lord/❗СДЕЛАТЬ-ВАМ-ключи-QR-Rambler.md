@@ -46,7 +46,11 @@
 ## 2. OAuth-приложение Rambler (СДЕЛАТЬ_ВЛАДЕЛЬЦУ 1.6.4)
 
 **Что нужно от вас:** завести приложение на аккаунте разработчика Rambler&Co
-(`https://dev.rambler.berlin/`) → получить **Tech ID + secret**.
+(`https://developers.rambler.ru/`) → получить **Tech ID + secret**.
+
+> **Поправка 20.11.2026:** прежний адрес `https://dev.rambler.berlin/` **не
+> резолвится** (`curl` → `Could not resolve host`). Актуальный портал —
+> <https://developers.rambler.ru/> (проверен `curl` → 200).
 
 **Что делаю я после ключей:** дописываю провайдера (`authorize` + обмен
 токенов + `/oauth/rambler/callback`) за один проход с прогоном. Плитка Rambler
