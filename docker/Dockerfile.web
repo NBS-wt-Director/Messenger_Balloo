@@ -23,6 +23,8 @@ COPY packages/ui/package.json packages/ui/
 COPY packages/web/package.json packages/web/
 COPY packages/web-features/package.json packages/web-features/
 COPY packages/web-admin/package.json packages/web-admin/
+COPY packages/web-history/package.json packages/web-history/
+COPY packages/web-download/package.json packages/web-download/
 
 # Install all deps — pnpm store AND prisma engines persist across builds
 RUN --mount=type=cache,id=pnpm-web,target=/root/.local/share/pnpm/store,sharing=shared \
@@ -42,6 +44,10 @@ COPY packages/web/ packages/web/
 COPY packages/web-features/ packages/web-features/
 # web-admin (тикет 1792395490-05): alias @ → ../web/src, исходники web уже скопированы
 COPY packages/web-admin/ packages/web-admin/
+# web-history / web-download (тикет 1792061164, задел варианта А): стадии
+# web_history/web_download копируют их dist, поэтому исходники обязаны быть здесь
+COPY packages/web-history/ packages/web-history/
+COPY packages/web-download/ packages/web-download/
 
 # Build shared (local tsc from node_modules, no global install needed)
 RUN cd packages/shared && ./node_modules/.bin/tsc
@@ -72,6 +78,13 @@ RUN cd packages/web-features && ./node_modules/.bin/vite build
 
 # Build web-admin (admin.balloo.su — админ-панель, тикет 1792395490-05)
 RUN cd packages/web-admin && ./node_modules/.bin/vite build
+
+# Build web-history / web-download (history.balloo.su / download.balloo.su,
+# тикет 1792061164). Без этих строк стадии web_history/web_download падали:
+# «/app/packages/web-history/dist: not found» (батч 20.11.2026).
+RUN cd packages/web-history && ./node_modules/.bin/vite build
+
+RUN cd packages/web-download && ./node_modules/.bin/vite build
 
 # ---------- Production stage — web SPA served with nginx ----------
 FROM nginx:alpine AS web
