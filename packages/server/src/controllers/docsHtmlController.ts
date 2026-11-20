@@ -103,13 +103,35 @@ export function getDocsHtml(_req: Request, res: Response): void {
              var(--bg);
            background-attachment: fixed;
            font: 15px/1.6 Inter, Manrope, system-ui, sans-serif; }
-    header { display: flex; align-items: center; gap: 12px; padding: 16px 24px;
-             background: var(--card); border-bottom: 1px solid var(--border); }
-    header .logo { width: 32px; height: 32px; background: var(--accent);
-                   color: #1a1d21; display: grid; place-items: center; font-weight: 800; }
-    header h1 { font-size: 18px; font-weight: 700; }
-    header a { margin-left: auto; color: var(--muted); text-decoration: none; }
-    header a:hover { color: var(--accent); }
+    /* ── Единая шапка экосистемы (макет mockups/docs-balloo-su/api-docs.html) ──
+       Раньше здесь был упрощённый <header> без меню (дефект приёмки 20.11.2026:
+       «на api.balloo.su/docs нет ни одного меню»). Левое меню-дропдаун и правый
+       блок повторяют .topbar из mockups/assets/common.css. */
+    .topbar { display: flex; align-items: center; height: 56px; padding: 0 16px;
+              gap: 12px; background: var(--card);
+              border-bottom: 1px solid var(--border); position: relative; z-index: 100; }
+    .topbar__logo { display: flex; align-items: center; gap: 8px; font-weight: 700;
+                    font-size: 18px; color: var(--text); cursor: pointer; position: relative; }
+    .topbar__logo-icon { width: 32px; height: 32px; background: var(--accent);
+                         color: #1a1d21; display: grid; place-items: center;
+                         font-size: 16px; font-weight: 900; }
+    .topbar__dropdown { position: absolute; top: 100%; left: 0; min-width: 240px;
+                        background: var(--card); border: 1px solid var(--border);
+                        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45); padding: 8px 0;
+                        display: none; }
+    .topbar__logo:hover .topbar__dropdown,
+    .topbar__logo:focus-within .topbar__dropdown { display: block; }
+    .topbar__dropdown-item { display: flex; align-items: center; gap: 10px;
+                             padding: 10px 16px; font-size: 14px; color: var(--text);
+                             text-decoration: none; cursor: pointer; }
+    .topbar__dropdown-item:hover { background: var(--border); }
+    .topbar__dropdown-item--current { color: var(--accent); font-weight: 700; }
+    .topbar__dropdown-divider { height: 1px; background: var(--border); margin: 8px 0; }
+    .topbar__title { flex: 1; text-align: center; font-size: 16px; font-weight: 600;
+                     color: var(--text); }
+    .topbar__right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+    .topbar__right a { color: var(--muted); text-decoration: none; font-size: 14px; }
+    .topbar__right a:hover { color: var(--accent); }
     main { max-width: 1080px; margin: 0 auto; padding: 32px 24px; }
     main > p, section { background: var(--card); border: 1px solid var(--border);
             border-radius: 6px; padding: 20px; margin-bottom: 20px; }
@@ -137,11 +159,25 @@ export function getDocsHtml(_req: Request, res: Response): void {
   </style>
 </head>
 <body>
-  <header>
-    <div class="logo">B</div>
-    <h1>Balloo Messenger API</h1>
-    <a href="https://balloo.su">← balloo.su</a>
-  </header>
+  <div class="topbar">
+    <div class="topbar__logo" tabindex="0" title="Разделы Balloo">
+      <div class="topbar__logo-icon">B</div>
+      <span>API Docs</span>
+      <div class="topbar__dropdown">
+        <a class="topbar__dropdown-item" href="https://balloo.su/#/chat">💬 Balloo</a>
+        <div class="topbar__dropdown-divider"></div>
+        <a class="topbar__dropdown-item" href="https://admin.balloo.su/">🛡️ Admin</a>
+        <a class="topbar__dropdown-item" href="https://features.balloo.su/">💡 Features</a>
+        <a class="topbar__dropdown-item" href="https://history.balloo.su/#/history">📜 History</a>
+        <a class="topbar__dropdown-item" href="https://download.balloo.su/#/download">⬇️ Download</a>
+        <span class="topbar__dropdown-item topbar__dropdown-item--current">📚 API Docs (текущий)</span>
+      </div>
+    </div>
+    <div class="topbar__title">API Documentation</div>
+    <div class="topbar__right">
+      <a href="https://balloo.su">← balloo.su</a>
+    </div>
+  </div>
   <main>
     <p>REST + WebSocket API мессенджера Balloo. База:
       <code>https://api.balloo.su/api</code>, WS:

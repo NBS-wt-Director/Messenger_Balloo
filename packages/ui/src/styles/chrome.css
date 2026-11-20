@@ -125,6 +125,11 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  /* Прижимает правый блок к правому краю. В макете это делал .topbar__title
+     (flex:1), но Topbar может вызываться БЕЗ заголовка (features.balloo.su,
+     HistoryScreen и др.) — тогда правого «распорного» элемента нет и меню
+     липло к логотипу слева (дефект приёмки 20.11.2026). */
+  margin-left: auto;
 }
 
 .topbar__lang,
