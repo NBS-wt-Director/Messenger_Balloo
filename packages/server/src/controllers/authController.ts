@@ -20,6 +20,7 @@ import {
   enable2FA as enable2FAService,
   verify2FA as verify2FAService,
   verify2FAEnable as verify2FAEnableService,
+  requestLoginCode as requestLoginCodeService,
   disable2FA as disable2FAService,
   getUserDevices,
   revokeDevice,
@@ -220,6 +221,37 @@ export const verify2FA = async (req: Request, res: Response, next: NextFunction)
     });
   } catch (error: any) {
     res.status(401).json({ error: 'Unauthorized', message: error.message });
+  }
+};
+
+// ============================================================
+// Отправка кода входа (13 цифр) — push/email (тик. 1795101593)
+// ============================================================
+
+export const send2FACode = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      res.status(400).json({ error: 'Bad Request', message: 'Email обязателен' });
+      return;
+    }
+
+    const result = await requestLoginCodeService(email);
+
+    res.json({
+      channel: result.channel,
+      expiresIn: result.expiresIn,
+      message:
+        result.channel === 'push'
+          ? 'Код отправлен на ваше доверенное устройство'
+          : 'Код отправлен на email',
+    });
+  } catch (error: any) {
+    if (error?.code === 'CODE_UNAVAILABLE') {
+      res.status(503).json({ error: 'Service Unavailable', message: error.message });
+      return;
+    }
+    internalError(res, error, 'authController.send2FACode');
   }
 };
 

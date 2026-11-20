@@ -7,6 +7,13 @@ import { PrismaClient } from '@prisma/client';
 import { setAuthCookies, clearAuthCookies } from '../middleware/auth';
 import { revokeAllSessions, isSessionRevoked } from './sessionRevocation';
 import { sendWelcomeEmail, sendVerificationEmail, sendResetPasswordEmail } from './emailService';
+import {
+  issueLoginCode,
+  verifyLoginCode,
+  LoginCodeError,
+  LOGIN_CODE_TTL_SECONDS,
+  type LoginCodeChannel,
+} from './loginCodeService';
 
 const prisma = new PrismaClient();
 
@@ -424,7 +431,12 @@ export const verify2FA = async (input: Verify2FAInput) => {
 
   const twoFA = user.twoFASecrets[0];
 
-  const totpValid = verifyTOTP(twoFA.secret, input.code);
+  // Код входа (13 цифр) из push/email проверяется первым (тик. 1795101593):
+  // он одноразовый, живёт 5 минут и является основным путём второго фактора.
+  // TOTP и backup-коды остаются рабочим фолбэком.
+  const loginCodeValid = await verifyLoginCode(user.id, input.code);
+
+  const totpValid = loginCodeValid || verifyTOTP(twoFA.secret, input.code);
   if (totpValid) {
     // TOTP OK
   } else {
@@ -479,6 +491,30 @@ export const verify2FA = async (input: Verify2FAInput) => {
     tokens,
     deviceId: createdDeviceId,
   };
+};
+
+// ============================================================
+// Код входа (13 цифр) — push на доверенное устройство или email
+// (тик. 1795101593)
+// ============================================================
+
+/**
+ * Запросить код входа для аккаунта по email. Вызывается после того, как
+ * login вернул needs2FA (пароль уже проверен), а также по кнопке «Отправить
+ * код повторно». Не раскрывает существование аккаунта: для неизвестного или
+ * заблокированного email отвечает тем же контрактом, но код не отправляет.
+ */
+export const requestLoginCode = async (
+  email: string
+): Promise<{ channel: LoginCodeChannel; expiresIn: number }> => {
+  const user = await prisma.user.findUnique({ where: { email: normalizeEmail(email) } });
+
+  if (!user || user.status === 'banned' || user.status === 'deleted') {
+    // Анти-enumeration: не подтверждаем существование аккаунта
+    return { channel: 'email', expiresIn: LOGIN_CODE_TTL_SECONDS };
+  }
+
+  return issueLoginCode({ userId: user.id, email: user.email! });
 };
 
 // ============================================================

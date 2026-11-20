@@ -5,6 +5,7 @@ import {
   register,
   login,
   verify2FA,
+  send2FACode,
   refreshCookie,
   clearCookie,
   logout,
@@ -38,6 +39,10 @@ router.post('/login', login);
 
 // Верификация 2FA (после login с needs2FA)
 router.post('/2fa/verify', verify2FA);
+
+// Отправка кода входа (13 цифр) на push доверенного устройства или email
+// (тик. 1795101593). Публичный: вызывается после проверки пароля (login → needs2FA).
+router.post('/2fa/send-code', send2FACode);
 
 // Обновление cookie через refresh token (принимает refreshToken из body)
 

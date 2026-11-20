@@ -4,13 +4,17 @@
 // 1. Вход с 2FA (ввод TOTP кода после логина)
 // 2. Настройка 2FA в настройках (QR + verification + backup codes)
 
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
 import { api } from '@/services/api';
 import { CodeInput } from '@/components/auth/CodeInput';
 import { AppTopbar } from '@/components/chrome/AppTopbar';
 import { AppFooter } from '@/components/chrome/AppFooter';
+
+// Длина кода входа — 13 цифр (тик. 1795101593): приходит push'ом на доверенное
+// устройство или письмом на email.
+const LOGIN_CODE_LENGTH = 13;
 
 type TwoFactorMode = 'login' | 'setup' | 'disable';
 
@@ -20,6 +24,7 @@ interface TwoFactorScreenProps {
 
 function TwoFactorScreen({ mode = 'login' }: TwoFactorScreenProps) {
   const navigate = useNavigate();
+  const location = useLocation();
   const setUser = useAuthStore((s) => s.setUser);
   const updateUser = useAuthStore((s) => s.updateUser);
 
@@ -27,6 +32,13 @@ function TwoFactorScreen({ mode = 'login' }: TwoFactorScreenProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  // Вход по коду (тик. 1795101593): email приходит из LoginScreen (state),
+  // канал доставки (push/email) определяет сервер.
+  const emailFromState = ((location.state as { email?: string } | null)?.email) || '';
+  const [codeChannel, setCodeChannel] = useState<'push' | 'email' | null>(null);
+  const [sending, setSending] = useState(false);
+  const [resendIn, setResendIn] = useState(0);
 
   // Setup mode state
   const [qrCode, setQrCode] = useState<string | null>(null);
@@ -37,6 +49,37 @@ function TwoFactorScreen({ mode = 'login' }: TwoFactorScreenProps) {
 
   // Disable mode state
   const [disablePassword, setDisablePassword] = useState('');
+
+  // Отправка кода входа (13 цифр): сервер сам выбирает канал — push на
+  // доверенное устройство или email (тик. 1795101593).
+  const sendCode = useCallback(async () => {
+    if (!emailFromState) return;
+    setSending(true);
+    setError('');
+    try {
+      const res = await api.send2FACode(emailFromState);
+      setCodeChannel(res.channel);
+      setResendIn(30);
+    } catch (e: any) {
+      setError(e?.message || 'Не удалось отправить код');
+    } finally {
+      setSending(false);
+    }
+  }, [emailFromState]);
+
+  // Автоотправка при открытии экрана входа
+  useEffect(() => {
+    if (mode === 'login' && emailFromState) {
+      sendCode();
+    }
+  }, [mode, emailFromState, sendCode]);
+
+  // Таймер повторной отправки
+  useEffect(() => {
+    if (resendIn <= 0) return;
+    const t = setTimeout(() => setResendIn((s) => s - 1), 1000);
+    return () => clearTimeout(t);
+  }, [resendIn]);
 
   // Generate QR code placeholder (in real app, use QR library)
   const generateQRPlaceholder = () => {
@@ -91,15 +134,16 @@ function TwoFactorScreen({ mode = 'login' }: TwoFactorScreenProps) {
 
   // Verify 2FA code
   const handleVerify = async () => {
-    if (code.length !== 6) {
-      setError('Введите 6-значный код');
+    const expectedLength = mode === 'login' ? LOGIN_CODE_LENGTH : 6;
+    if (code.length !== expectedLength) {
+      setError(mode === 'login' ? 'Введите 13-значный код' : 'Введите 6-значный код');
       return;
     }
 
     setLoading(true);
     setError('');
     try {
-      const data = await api.verify2FA(code);
+      const data = await api.verify2FA(code, mode === 'login' ? emailFromState : undefined);
 
       if (mode === 'login') {
         // After login 2FA verification, go to main chat
@@ -179,28 +223,39 @@ function TwoFactorScreen({ mode = 'login' }: TwoFactorScreenProps) {
           >
             🔐
           </div>
-          <h1 className="auth-title">Двухфакторная аутентификация</h1>
+          <h1 className="auth-title">Подтверждение входа</h1>
           <p className="auth-subtitle">
-            Введите код из вашего приложения-аутентификатора
+            {codeChannel === 'push'
+              ? 'Мы отправили код на ваше доверенное устройство (push-уведомление)'
+              : codeChannel === 'email'
+                ? `Мы отправили код на ${emailFromState || 'ваш email'}`
+                : sending
+                  ? 'Отправляем код…'
+                  : 'Введите код подтверждения входа'}
           </p>
 
-          {/* Code input */}
+          {/* Code input — 13 цифр */}
           <div className="form-group">
-            <label className="form-label">6-значный код</label>
+            <label className="form-label" htmlFor="twofa-code">13-значный код</label>
             <input
+              id="twofa-code"
+              data-testid="twofa-code"
               type="text"
+              inputMode="numeric"
               className="form-input"
-              placeholder="000 000"
-              maxLength={7}
+              placeholder="0000000000000"
+              maxLength={LOGIN_CODE_LENGTH}
               style={{
                 textAlign: 'center',
-                fontSize: '22px',
-                letterSpacing: '6px',
+                fontSize: '18px',
+                letterSpacing: '4px',
                 fontFamily: 'monospace',
               }}
               value={code}
               onChange={(e) =>
-                setCode(e.target.value.replace(/\s/g, '').replace(/[^0-9]/g, '').slice(0, 6))
+                setCode(
+                  e.target.value.replace(/\s/g, '').replace(/[^0-9]/g, '').slice(0, LOGIN_CODE_LENGTH)
+                )
               }
               onKeyDown={(e) => {
                 if (e.key === 'Enter') handleVerify();
@@ -218,37 +273,37 @@ function TwoFactorScreen({ mode = 'login' }: TwoFactorScreenProps) {
 
           {/* Submit */}
           <button
+            data-testid="twofa-submit"
             className="btn btn--primary btn--block"
             onClick={handleVerify}
-            disabled={loading || code.length !== 6}
-            style={{ opacity: loading || code.length !== 6 ? 0.6 : 1 }}
+            disabled={loading || code.length !== LOGIN_CODE_LENGTH}
+            style={{ opacity: loading || code.length !== LOGIN_CODE_LENGTH ? 0.6 : 1 }}
           >
             {loading ? 'Проверка...' : 'Подтвердить'}
           </button>
 
           <div className="divider" />
 
-          {/* Backup code */}
+          {/* Resend */}
           <p className="text-center text-sm text-secondary mb-3">
-            Нет доступа к коду?
+            Не пришёл код?
           </p>
           <button
+            type="button"
+            data-testid="twofa-resend"
             className="btn btn--secondary btn--block"
-            onClick={() => {
-              // Navigate to backup code input
-              alert('Введите backup-код');
-            }}
+            onClick={sendCode}
+            disabled={sending || resendIn > 0 || !emailFromState}
+            style={{ opacity: sending || resendIn > 0 || !emailFromState ? 0.6 : 1 }}
           >
-            Использовать backup-код
+            {sending ? 'Отправляем…' : resendIn > 0 ? `Отправить снова (${resendIn})` : 'Отправить код снова'}
           </button>
 
           <div className="divider" />
 
-          {/* SMS fallback */}
+          {/* Backup code */}
           <p className="text-center text-xs text-muted">
-            <a href="#" className="text-accent" onClick={(e) => { e.preventDefault(); alert('Код отправлен по SMS'); }}>
-              Отправить код по SMS
-            </a>
+            Есть backup-код или TOTP-код? Введите его в поле выше — сервер примет любой из них.
           </p>
         </div>
       </div>

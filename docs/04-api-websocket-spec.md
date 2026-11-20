@@ -71,8 +71,16 @@
 | POST | `/auth/password-reset/confirm` | Подтверждение сброса (token + new password) |
 | POST | `/auth/email-verify/send` | Повторная отправка письма подтверждения email |
 | GET | `/auth/email-verify/:token` | Подтверждение email по токену из письма |
-| POST | `/auth/2fa/send-code` | Отправить email-код 2FA на почту пользователя |
-| POST | `/auth/2fa/verify` | Подтвердить 2FA email-кодом |
+| POST | `/auth/2fa/send-code` | Отправить код входа (13 цифр) — push на доверенное устройство или email |
+| POST | `/auth/2fa/verify` | Подтвердить вход кодом (13 цифр из push/email), TOTP или backup-кодом |
+
+**Код входа (тик. 1795101593, 20.11.2026):** `POST /auth/2fa/send-code` принимает
+`{ email }` и отправляет **13-значный** код: если у пользователя есть browser-push
+подписка — push'ом на доверенное устройство, иначе письмом на email. Код хранится
+в Redis (`login-code:<userId>`, TTL 300 сек) в виде `sha256(userId:code)`, не более
+5 попыток, одноразовый. `POST /auth/2fa/verify` принимает `{ email, code }` и
+проверяет 13-значный код **первым**; TOTP и backup-коды остаются фолбэком.
+Неизвестный email → `200` без отправки (анти-enumeration). Без Redis → `503`.
 
 ### Devices (`/api/v1/devices`)
 

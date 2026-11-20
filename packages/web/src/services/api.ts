@@ -202,11 +202,19 @@ export const api = {
       { method: 'POST' }
     ),
 
-  verify2FA: (code: string) =>
+  verify2FA: (code: string, email?: string) =>
     request<{ success: boolean; backupCodes?: string[] }>('/api/auth/2fa/verify', {
       method: 'POST',
-      data: { code },
+      data: { code, email },
     }),
+
+  // Код входа (13 цифр) на доверенное устройство (push) или email —
+  // тик. 1795101593. Вызывается после login с needs2FA.
+  send2FACode: (email: string) =>
+    request<{ channel: 'push' | 'email'; expiresIn: number; message: string }>(
+      '/api/auth/2fa/send-code',
+      { method: 'POST', data: { email } }
+    ),
 
   disable2FA: (password: string) =>
     request<{ success: boolean }>('/api/auth/2fa/disable', {

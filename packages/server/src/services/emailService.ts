@@ -212,10 +212,46 @@ const getResetPasswordEmailHtml = (token: string): string => {
   `;
 };
 
+const getLoginCodeEmailHtml = (code: string): string => `
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <meta charset="utf-8">
+    <title>Код входа — Balloo</title>
+  </head>
+  <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #1a1a2e; color: #e0e0e0;">
+    <table align="center" width="600" cellpadding="0" cellspacing="0" style="margin: 40px auto; background-color: #16213e; border-radius: 12px; overflow: hidden;">
+      <tr>
+        <td style="background: linear-gradient(135deg, #2db84d 0%, #1a8a3a 100%); padding: 40px 30px; text-align: center;">
+          <h1 style="margin: 0; font-size: 28px; color: #ffffff;">🎈 Код входа в Balloo</h1>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding: 40px 30px;">
+          <p style="font-size: 16px; line-height: 1.6; color: #b0b0c0;">
+            Кто-то входит в ваш аккаунт Balloo с нового устройства. Введите этот код на экране входа:
+          </p>
+          <p style="font-size: 32px; letter-spacing: 6px; font-family: monospace; font-weight: bold; color: #2db84d; text-align: center; margin: 24px 0;">
+            ${code}
+          </p>
+          <p style="font-size: 14px; color: #888;">
+            Код действует 5 минут. Если это были не вы — просто проигнорируйте письмо и смените пароль.
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td style="background-color: #0f0f23; padding: 20px 30px; text-align: center; font-size: 13px; color: #666;">
+          <p style="margin: 0;">© ${new Date().getFullYear()} Balloo Messenger. Все права защищены.</p>
+        </td>
+      </tr>
+    </table>
+  </body>
+  </html>
+`;
+
 // ============================================================
 // Публичные функции
 // ============================================================
-
 /**
  * Отправить приветственное письмо после регистрации
  */
@@ -251,6 +287,20 @@ export const sendResetPasswordEmail = async (email: string, token: string): Prom
     subject: 'Сброс пароля — Balloo Messenger',
     html: getResetPasswordEmailHtml(token),
     text: `Сбросьте пароль, перейдя по ссылке: ${env.APP_URL}/#/reset-password?token=${token}\n\nЭта ссылка действительна в течение 15 минут.`,
+  });
+  return result.success;
+};
+
+/**
+ * Отправить код входа (13 цифр) на email — используется, когда у пользователя
+ * нет browser-push подписки на доверенном устройстве (тик. 1795101593).
+ */
+export const sendLoginCodeEmail = async (email: string, code: string): Promise<boolean> => {
+  const result = await sendEmail({
+    to: email,
+    subject: 'Код входа — Balloo Messenger',
+    html: getLoginCodeEmailHtml(code),
+    text: `Код входа в Balloo: ${code}\n\nКод действует 5 минут. Если это были не вы — смените пароль.`,
   });
   return result.success;
 };
