@@ -97,4 +97,30 @@ describe('PairScanScreen', () => {
     fireEvent.click(screen.getByText('Назад'));
     expect(navigateMock).toHaveBeenCalledWith(-1);
   });
+
+  it('есть кнопка «Сфотографировать QR-код» и скрытый input с capture=environment', () => {
+    Object.defineProperty(navigator, 'mediaDevices', {
+      configurable: true,
+      value: { getUserMedia: vi.fn().mockRejectedValue(new Error('nope')) },
+    });
+    renderScreen();
+    const button = screen.getByTestId('pair-scan-photo-button');
+    expect(button).toHaveTextContent('Сфотографировать QR-код');
+    const input = screen.getByTestId('pair-scan-photo-input') as HTMLInputElement;
+    expect(input.type).toBe('file');
+    expect(input.getAttribute('accept')).toBe('image/*');
+    expect(input.getAttribute('capture')).toBe('environment');
+  });
+
+  it('клик по кнопке открывает выбор/съёмку файла (input.click)', () => {
+    Object.defineProperty(navigator, 'mediaDevices', {
+      configurable: true,
+      value: { getUserMedia: vi.fn().mockRejectedValue(new Error('nope')) },
+    });
+    renderScreen();
+    const input = screen.getByTestId('pair-scan-photo-input') as HTMLInputElement;
+    const clickSpy = vi.spyOn(input, 'click').mockImplementation(() => {});
+    fireEvent.click(screen.getByTestId('pair-scan-photo-button'));
+    expect(clickSpy).toHaveBeenCalled();
+  });
 });

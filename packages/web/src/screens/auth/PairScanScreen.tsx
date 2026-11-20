@@ -16,16 +16,73 @@ import { parsePairDeepLink } from '@/utils/pairLink';
 
 type Phase = 'starting' | 'scanning' | 'confirming' | 'done' | 'error';
 
+/** Загрузка File в HTMLImageElement (для декодирования снимка). */
+function loadImage(src: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error('image load failed'));
+    img.src = src;
+  });
+}
+
+/**
+ * Декодирует QR из файла-снимка (тик. 1795101592, кнопка «Сфотографировать»).
+ * Сначала пробует нативный BarcodeDetector (Chrome/Android), затем jsQR по
+ * пикселям canvas. Возвращает payload QR или null, если код не найден.
+ */
+async function decodeQrFromFile(file: File): Promise<string | null> {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await loadImage(url);
+    const width = img.naturalWidth || img.width;
+    const height = img.naturalHeight || img.height;
+    if (!width || !height) return null;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+    ctx.drawImage(img, 0, 0, width, height);
+
+    // Нативный BarcodeDetector (умеет работать с canvas/ImageBitmap)
+    const BD = (window as any).BarcodeDetector;
+    if (BD) {
+      try {
+        const detector = new BD({ formats: ['qr_code'] });
+        const codes = await detector.detect(canvas);
+        if (codes && codes.length > 0 && codes[0].rawValue) {
+          return codes[0].rawValue as string;
+        }
+      } catch {
+        // детектор не справился — идём в jsQR
+      }
+    }
+
+    // Фолбэк: jsQR. attemptBoth — на фото инверсия встречается чаще, чем в потоке
+    const imageData = ctx.getImageData(0, 0, width, height);
+    const code = jsQR(imageData.data, imageData.width, imageData.height, {
+      inversionAttempts: 'attemptBoth',
+    });
+    return code?.data ?? null;
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
 function PairScanScreen() {
   const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const rafRef = useRef<number | null>(null);
   const doneRef = useRef(false);
 
   const [phase, setPhase] = useState<Phase>('starting');
   const [error, setError] = useState<string | null>(null);
+  const [photoBusy, setPhotoBusy] = useState(false);
 
   const stopCamera = useCallback(() => {
     if (rafRef.current !== null) {
@@ -52,6 +109,35 @@ function PairScanScreen() {
       }
     },
     [stopCamera]
+  );
+
+  // Снимок QR камерой/из галереи: декодируем файл и подтверждаем вход.
+  // Нужно, когда live-камера не распознаёт код (плохой свет, далёкий экран)
+  // или когда браузер не даёт поток (тик. 1795101592, кнопка «Сфотографировать»).
+  const handlePhotoSelected = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      // Сбрасываем значение, чтобы повторный выбор того же файла снова сработал
+      e.target.value = '';
+      if (!file) return;
+
+      setPhotoBusy(true);
+      setError(null);
+      try {
+        const raw = await decodeQrFromFile(file);
+        const token = parsePairDeepLink(raw);
+        if (token) {
+          await confirmToken(token);
+        } else {
+          setError('На снимке не найден QR-код. Сфотографируйте код целиком и ближе.');
+        }
+      } catch {
+        setError('Не удалось обработать изображение.');
+      } finally {
+        setPhotoBusy(false);
+      }
+    },
+    [confirmToken]
   );
 
   useEffect(() => {
@@ -179,6 +265,17 @@ function PairScanScreen() {
             />
           </div>
           <canvas ref={canvasRef} style={{ display: 'none' }} />
+          {/* Скрытый input: на телефоне открывает камеру (capture=environment),
+              на десктопе — выбор файла-снимка. Файл декодируется в handlePhotoSelected */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            data-testid="pair-scan-photo-input"
+            style={{ display: 'none' }}
+            onChange={handlePhotoSelected}
+          />
 
           {phase === 'starting' && <div className="text-sm text-secondary mt-4">Открываем камеру…</div>}
           {phase === 'scanning' && <div className="text-sm text-secondary mt-4">Ищем QR-код…</div>}
@@ -195,6 +292,16 @@ function PairScanScreen() {
           )}
 
           <div className="flex gap-2 justify-center mt-6">
+            <button
+              type="button"
+              className="btn btn--primary"
+              data-testid="pair-scan-photo-button"
+              disabled={photoBusy || phase === 'confirming' || phase === 'done'}
+              style={{ opacity: photoBusy || phase === 'confirming' || phase === 'done' ? 0.6 : 1 }}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              📸 {photoBusy ? 'Распознаём…' : 'Сфотографировать QR-код'}
+            </button>
             <button type="button" className="btn btn--secondary" onClick={() => navigate(-1)}>
               Назад
             </button>
@@ -206,7 +313,7 @@ function PairScanScreen() {
           <div className="card__body">
             <ol style={{ paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <li>На новом устройстве откройте экран входа и нажмите «Войти через другое устройство»</li>
-              <li>На этом (уже авторизованном) устройстве отсканируйте показанный QR</li>
+              <li>На этом (уже авторизованном) устройстве наведите камеру на QR — или нажмите «📸 Сфотографировать QR-код» и сделайте снимок</li>
               <li>Подтвердите вход — новое устройство войдёт автоматически</li>
             </ol>
           </div>
