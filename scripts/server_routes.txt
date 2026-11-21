@@ -28,6 +28,7 @@ DELETE /api/service/chats/:id
 DELETE /api/service/messages/:id
 DELETE /api/service/stories/:id
 DELETE /api/service/users/:id
+DELETE /api/service/users/:id/contacts/:contactId
 DELETE /api/stories/:id
 DELETE /api/upload/:fileId
 DELETE /api/users/:id/block
@@ -114,6 +115,8 @@ GET /api/history/versions/:id
 GET /api/history/versions/:id/neighbors
 GET /api/install/status
 GET /api/invites
+GET /api/invites/preview/:code
+GET /api/invites/referrals
 GET /api/knowledge/applications/me
 GET /api/knowledge/categories
 GET /api/knowledge/categories/:slug
@@ -238,6 +241,7 @@ POST /api/install/test-redis
 POST /api/install/verify-password
 POST /api/invites
 POST /api/invites/:id/accept
+POST /api/invites/accept/:code
 POST /api/knowledge/categories
 POST /api/knowledge/departments
 POST /api/knowledge/pages
@@ -255,11 +259,13 @@ POST /api/polls/chats/:chatId
 POST /api/reports
 POST /api/service/calls
 POST /api/service/chats
+POST /api/service/contacts/mutual
 POST /api/service/groups
 POST /api/service/messages
 POST /api/service/messages/:id/attachments
 POST /api/service/stories
 POST /api/service/users
+POST /api/service/users/:id/contacts
 POST /api/service/users/:id/role
 POST /api/stories
 POST /api/stories/:id/reactions
