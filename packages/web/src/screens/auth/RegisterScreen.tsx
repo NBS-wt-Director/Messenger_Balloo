@@ -5,7 +5,7 @@
 // квадратов (Яндекс/VK/Mail.ru/Rambler), i18n через useI18n.
 
 import React, { useState, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
 import { api } from '@/services/api';
 import { OAuthGrid, isOAuthConfigured, type OAuthProvider } from '@/components/auth/OAuthGrid';
@@ -18,6 +18,11 @@ function RegisterScreen() {
   const navigate = useNavigate();
   const setUser = useAuthStore((s) => s.setUser);
   const { t } = useI18n();
+
+  // id-метка приглашения (тик. 1795270823): приходит из /join/:code
+  // как /register?invite=<code>; передаётся в регистрацию для рефералов.
+  const [searchParams] = useSearchParams();
+  const inviteCode = searchParams.get('invite') || undefined;
 
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
@@ -135,6 +140,7 @@ function RegisterScreen() {
         password,
         username: email.split('@')[0],
         displayName,
+        inviteCode,
       });
 
       // Получаем текущего пользователя (cookie уже установлены)

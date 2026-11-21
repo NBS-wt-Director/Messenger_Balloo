@@ -24,6 +24,7 @@ const ResetPasswordScreen = lazy(() => import('@/screens/auth/ResetPasswordScree
 const OnboardingScreen = lazy(() => import('@/screens/onboarding/OnboardingScreen'));
 const ActiveCallScreen = lazy(() => import('@/screens/active-call/ActiveCallScreen'));
 const InvitesScreen = lazy(() => import('@/screens/invites/InvitesScreen'));
+const JoinInviteScreen = lazy(() => import('@/screens/invites/JoinInviteScreen'));
 const BotsScreen = lazy(() => import('@/screens/bots/BotsScreen'));
 const MyDevicesScreen = lazy(() => import('@/screens/my-devices/MyDevicesScreen'));
 const ChatAttachmentsScreen = lazy(() => import('@/screens/chat-attachments/ChatAttachmentsScreen'));
@@ -230,6 +231,18 @@ export const router = createHashRouter([
       <ErrorBoundary>
         <Suspense fallback={<LoadingFallback />}>
           <DonateScreen />
+        </Suspense>
+      </ErrorBoundary>
+    ),
+  },
+
+  // --- Публичная страница приглашения по ссылке (тик. 1795270823) ---
+  {
+    path: '/join/:code',
+    element: (
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingFallback />}>
+          <JoinInviteScreen />
         </Suspense>
       </ErrorBoundary>
     ),

@@ -127,6 +127,8 @@ export const api = {
     password: string;
     username: string;
     displayName?: string;
+    // id-метка приглашения (тик. 1795270823)
+    inviteCode?: string;
   }) =>
     request<{ user: any }>('/api/auth/register', {
       method: 'POST',
@@ -244,8 +246,10 @@ export const api = {
     request<{ blocked: any[] }>('/api/users/me/blocked'),
 
   // Chats
+  // Сервер отдаёт { chats, pagination } (routes/chats.ts → chatController.getChats),
+  // НЕ массив. Раньше тип был any[] и потребитель вызывал .map на объекте — TypeError.
   getChats: (cursor?: string, limit = 50) =>
-    request<any[]>('/api/chats', {
+    request<{ chats: any[]; pagination: any }>('/api/chats', {
       method: 'GET',
       data: undefined,
     }),
@@ -977,15 +981,35 @@ export const api = {
   endCall: (callId: string) =>
     request<any>(`/api/calls/${callId}/end`, { method: 'POST' }),
 
-  // Приглашения (тик. 1792160016)
+  // Приглашения (тик. 1792160016, 1795270823)
   getInvites: () =>
     request<any[]>('/api/invites'),
 
-  createInvite: (data: { email: string; durationType: string; durationDays?: number }) =>
+  // Публичный предпросмотр приглашения по коду (без авторизации)
+  previewInvite: (code: string) =>
+    request<any>(`/api/invites/preview/${encodeURIComponent(code)}`),
+
+  // Принятие приглашения по коду (авторизованный пользователь)
+  acceptInviteByCode: (code: string) =>
+    request<any>(`/api/invites/accept/${encodeURIComponent(code)}`, { method: 'POST' }),
+
+  createInvite: (data: {
+    chatId: string;
+    groupIds?: string[];
+    addToContacts?: boolean;
+    message?: string;
+    ttlType?: string;
+    maxUses?: number | null;
+    expiresAt?: number | null;
+  }) =>
     request<any>('/api/invites', { method: 'POST', data }),
 
   deleteInvite: (inviteId: string) =>
     request<any>(`/api/invites/${inviteId}`, { method: 'DELETE' }),
+
+  // «Я присоединил к Balloo» — рефералы (тик. 1795270823)
+  getReferrals: () =>
+    request<{ total: number; referrals: any[] }>('/api/invites/referrals'),
 
   // Боты (тик. 1792160017)
   getBots: () =>

@@ -26,8 +26,10 @@ export function ChatList({ onChatSelect }: ChatListProps) {
     if (useChatStore.getState().chats.length > 0) return;
     api
       .getChats()
-      .then((data: any[]) => {
-        const normalized: UserChat[] = (data || []).map((c: any) => ({
+      .then((data: any) => {
+        // Сервер отдаёт { chats, pagination }; массив поддерживаем для совместимости.
+        const list: any[] = Array.isArray(data) ? data : data?.chats ?? [];
+        const normalized: UserChat[] = list.map((c: any) => ({
           ...c,
           joinedAt: c.joinedAt ?? c.createdAt ?? 0,
           pinned: !!c.pinned,
