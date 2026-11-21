@@ -7,8 +7,11 @@ import {
   setUserRole,
   deleteUser,
   createChat,
+  listChats,
+  getChat,
   deleteChat,
   createMessage,
+  listMessages,
   addAttachments,
   deleteMessage,
   createCall,
@@ -40,11 +43,14 @@ router.post('/users/:id/role', setUserRole);
 router.delete('/users/:id', deleteUser);
 
 // Чаты / группы / каналы
+router.get('/chats', listChats);
+router.get('/chats/:id', getChat);
 router.post('/chats', createChat);
 router.post('/groups', createChat); // то же, по умолчанию type=group
 router.delete('/chats/:id', deleteChat);
 
 // Сообщения и вложения
+router.get('/messages', listMessages);
 router.post('/messages', createMessage);
 router.post('/messages/:id/attachments', addAttachments);
 router.delete('/messages/:id', deleteMessage);

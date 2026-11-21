@@ -136,7 +136,10 @@ GET /api/polls/:id
 GET /api/polls/:id/results
 GET /api/reports
 GET /api/search
+GET /api/service/chats
+GET /api/service/chats/:id
 GET /api/service/health
+GET /api/service/messages
 GET /api/service/users
 GET /api/specs
 GET /api/specs/:nodeId/:screenId

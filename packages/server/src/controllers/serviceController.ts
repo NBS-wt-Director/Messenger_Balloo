@@ -297,6 +297,62 @@ const createChatSchema = z.object({
   settings: chatSettingsSchema,
 });
 
+// GET /api/service/chats — список чатов (фильтры type/memberId/q) для проверок
+export const listChats = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const type = typeof req.query.type === 'string' ? req.query.type : undefined;
+    const memberId = typeof req.query.memberId === 'string' ? req.query.memberId : undefined;
+    const q = typeof req.query.q === 'string' ? req.query.q.trim() : '';
+    const limit = Math.min(Math.max(parseInt(String(req.query.limit ?? '200'), 10) || 200, 1), 1000);
+    const offset = Math.max(parseInt(String(req.query.offset ?? '0'), 10) || 0, 0);
+
+    const where: Record<string, any> = {};
+    if (type) where.type = type;
+    if (memberId) where.members = { some: { userId: memberId } };
+    if (q) where.name = { contains: q, mode: 'insensitive' };
+
+    const [chats, total] = await Promise.all([
+      prisma.chat.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip: offset,
+        take: limit,
+        include: { _count: { select: { members: true, messages: true } } },
+      }),
+      prisma.chat.count({ where }),
+    ]);
+
+    res.json({ chats, total, limit, offset });
+  } catch (error: any) {
+    internalError(res, error, 'serviceController.listChats');
+  }
+};
+
+// GET /api/service/chats/:id — детали чата (участники, настройки, счётчики)
+export const getChat = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const chat = await prisma.chat.findUnique({
+      where: { id: req.params.id },
+      include: {
+        members: {
+          include: { user: { select: { id: true, username: true, displayName: true, avatarUrl: true, role: true } } },
+        },
+        settings: true,
+        _count: { select: { members: true, messages: true } },
+      },
+    });
+
+    if (!chat) {
+      res.status(404).json({ error: 'Not Found', message: 'Чат не найден' });
+      return;
+    }
+
+    res.json({ chat });
+  } catch (error: any) {
+    handlePrismaError(res, error, 'Чат не найден');
+  }
+};
+
 // POST /api/service/chats — создать чат (type: direct | group | channel)
 // POST /api/service/groups — то же, но по умолчанию type=group
 export const createChat = async (req: Request, res: Response): Promise<void> => {
@@ -411,6 +467,39 @@ const createMessageSchema = z.object({
   attachments: attachmentsSchema.optional(),
   poll: pollSchema.optional(),
 });
+
+// GET /api/service/messages — список сообщений (фильтр chatId/senderId)
+export const listMessages = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const chatId = typeof req.query.chatId === 'string' ? req.query.chatId : undefined;
+    const senderId = typeof req.query.senderId === 'string' ? req.query.senderId : undefined;
+    const limit = Math.min(Math.max(parseInt(String(req.query.limit ?? '100'), 10) || 100, 1), 500);
+    const offset = Math.max(parseInt(String(req.query.offset ?? '0'), 10) || 0, 0);
+
+    const where: Record<string, any> = {};
+    if (chatId) where.chatId = chatId;
+    if (senderId) where.senderId = senderId;
+
+    const [messages, total] = await Promise.all([
+      prisma.message.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip: offset,
+        take: limit,
+        include: {
+          attachments: true,
+          sender: { select: { id: true, username: true, displayName: true } },
+          _count: { select: { reactions: true } },
+        },
+      }),
+      prisma.message.count({ where }),
+    ]);
+
+    res.json({ messages, total, limit, offset });
+  } catch (error: any) {
+    internalError(res, error, 'serviceController.listMessages');
+  }
+};
 
 // POST /api/service/messages — создать сообщение (с вложениями/опросом)
 export const createMessage = async (req: Request, res: Response): Promise<void> => {
