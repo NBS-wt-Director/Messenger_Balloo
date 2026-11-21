@@ -199,4 +199,41 @@ describe('Users API', () => {
       expect(res.status).toBe(401);
     });
   });
+
+  // Тик. 1795282577: `GET /api/users/contacts` был затенён `GET /:username`
+  // (объявлен выше) → в UI «Нет контактов». Проверяем, что маршрут достижим.
+  describe('GET /api/users/contacts', () => {
+    it('не затенён публичным профилем — возвращает массив', async () => {
+      const user = await registerTestUser();
+
+      const res = await request(app)
+        .get('/api/users/contacts')
+        .set('Authorization', `Bearer ${user.accessToken}`);
+
+      expect(res.status).toBe(200);
+      expect(Array.isArray(res.body)).toBe(true);
+    });
+
+    it('возвращает добавленный контакт', async () => {
+      const user1 = await registerTestUser();
+      const user2 = await registerTestUser();
+
+      await request(app)
+        .post(`/api/users/contacts/${user2.id}`)
+        .set('Authorization', `Bearer ${user1.accessToken}`);
+
+      const res = await request(app)
+        .get('/api/users/contacts')
+        .set('Authorization', `Bearer ${user1.accessToken}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body.some((c: any) => c.id === user2.id)).toBe(true);
+    });
+
+    it('без авторизации — 401', async () => {
+      const res = await request(app).get('/api/users/contacts');
+
+      expect(res.status).toBe(401);
+    });
+  });
 });

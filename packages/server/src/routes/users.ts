@@ -45,6 +45,15 @@ router.get('/me/export', authRequired, exportMe);
 router.get('/search', searchUsers);
 
 // ============================================================
+// Контакты (тик. 1795282577): объявлены ДО `/:username`, иначе
+// `GET /api/users/contacts` перехватывался бы публичным профилем
+// (`/:username` с username='contacts') → «Нет контактов» в UI.
+// ============================================================
+router.get('/contacts', authRequired, getContacts);
+router.post('/contacts/:userId', authRequired, addContact);
+router.delete('/contacts/:userId', authRequired, removeContact);
+
+// ============================================================
 // GET /api/users/:username — публичный профиль
 // ============================================================
 router.get('/:username', getPublicProfile);
@@ -65,21 +74,6 @@ router.delete('/:id/block', authRequired, unblockUser);
 router.get('/me/blocked', authRequired, getBlockedUsers);
 
 export { router };
-// ============================================================
-// GET /api/users/contacts - список контактов
-// ============================================================
-router.get('/contacts', authRequired, getContacts);
-
-// ============================================================
-// POST /api/users/contacts/:userId - добавить контакт
-// ============================================================
-router.post('/contacts/:userId', authRequired, addContact);
-
-// ============================================================
-// DELETE /api/users/contacts/:userId - удалить контакт
-// ============================================================
-router.delete('/contacts/:userId', authRequired, removeContact);
-
 // ============================================================
 // GET /api/users/me/subscriptions — push-подписки текущего пользователя
 // ============================================================
