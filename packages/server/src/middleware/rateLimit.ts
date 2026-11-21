@@ -68,6 +68,22 @@ export const uploadLimiter: RateLimitRequestHandler = rateLimit({
   keyGenerator: getClientId,
 });
 
+// --- Лимитер для сервисных эмуляционных эндпоинтов (/api/service/*) ---
+// Доступ закрыт длинным секретом (SERVICE_API_KEY), но наполнение тестовыми
+// данными — это много последовательных запросов, поэтому лимит выше общего
+// apiLimiter (100/15мин). Барьер против перебора ключа сохраняется.
+export const serviceLimiter: RateLimitRequestHandler = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 минут
+  max: 2000,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    error: 'Слишком много сервисных запросов, попробуйте позже',
+    retryAfter: '15 minutes',
+  },
+  keyGenerator: getClientId,
+});
+
 // --- Лимитер для OAuth (GET-редиректы) ---
 // OAuth: 10 req/min на IP (state-параметр + callback могут дать несколько
 // редиректов на один вход, поэтому не 5 как authLimiter)
@@ -96,6 +112,9 @@ export const applyRateLimit = (
   }
 
   // Стратегия лимитирования зависит от пути (тикет №64)
+  // Service API (/api/service/*) — отдельный, более щедрый лимитер: эмуляция
+  // создаёт много сущностей подряд, общий apiLimiter (100/15мин) мешал бы.
+  const isServiceApi = req.path.startsWith('/api/service/');
   // P28 (2026-09-19): GET /api/auth/oauth/* — это 302-редиректы (начало OAuth
   // и колбэки провайдеров), а не ввод учётных данных. authLimiter (5/мин)
   // срабатывал на приёмке раньше, чем проверялись все 4 провайдера, и браузер
@@ -121,7 +140,9 @@ export const applyRateLimit = (
   const isSessionMaintenance =
     req.path === '/api/auth/ws-token' || req.path === '/api/auth/refresh-cookie';
 
-  if (isOAuthGetRedirect) {
+  if (isServiceApi) {
+    serviceLimiter(req, res, next);
+  } else if (isOAuthGetRedirect) {
     oauthLimiter(req, res, next);
   } else if (isSessionMaintenance) {
     apiLimiter(req, res, next);

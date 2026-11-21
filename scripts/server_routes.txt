@@ -23,6 +23,11 @@ DELETE /api/knowledge/vacancies/:id
 DELETE /api/messages/:id
 DELETE /api/messages/:id/reactions
 DELETE /api/polls/:id
+DELETE /api/service/calls/:id
+DELETE /api/service/chats/:id
+DELETE /api/service/messages/:id
+DELETE /api/service/stories/:id
+DELETE /api/service/users/:id
 DELETE /api/stories/:id
 DELETE /api/upload/:fileId
 DELETE /api/users/:id/block
@@ -131,6 +136,8 @@ GET /api/polls/:id
 GET /api/polls/:id/results
 GET /api/reports
 GET /api/search
+GET /api/service/health
+GET /api/service/users
 GET /api/specs
 GET /api/specs/:nodeId/:screenId
 GET /api/stories
@@ -170,6 +177,7 @@ POST /api/archive/:id
 POST /api/archive/:id/restore
 POST /api/auth/2fa/disable
 POST /api/auth/2fa/enable
+POST /api/auth/2fa/send-code
 POST /api/auth/2fa/verify
 POST /api/auth/2fa/verify-enable
 POST /api/auth/clear-cookie
@@ -242,6 +250,14 @@ POST /api/polls
 POST /api/polls/:id/vote
 POST /api/polls/chats/:chatId
 POST /api/reports
+POST /api/service/calls
+POST /api/service/chats
+POST /api/service/groups
+POST /api/service/messages
+POST /api/service/messages/:id/attachments
+POST /api/service/stories
+POST /api/service/users
+POST /api/service/users/:id/role
 POST /api/stories
 POST /api/stories/:id/reactions
 POST /api/stories/:id/view

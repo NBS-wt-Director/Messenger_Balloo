@@ -28,6 +28,9 @@ apikeys.json
 .context_pre/
 .old/
 tmp/
+
+# Локальная документация с секретами (Service API и т.п.) — НЕ коммитить
+docs/local/
 # Песочница локальной самопроверки docker/prod/enable-probes.selftest.sh
 docker/prod/.selftest-tmp/
 

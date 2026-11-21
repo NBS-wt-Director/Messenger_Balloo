@@ -32,6 +32,7 @@ import { router as contactGroupsRouter } from './contactGroups';
 import { router as onboardingRouter } from './onboarding';
 import { channelRouter, followRouter, blockedChannelRouter } from './channels';
 import { router as searchRouter } from './search';
+import { router as serviceRouter } from './service';
 
 const router = Router() as import('express').Router;
 
@@ -86,6 +87,10 @@ router.use('/api/onboarding', onboardingRouter);
 router.use('/api', clientErrorsRouter);
 router.use('/api/search', searchRouter);
 router.use('/api/blocked/channels', blockedChannelRouter);
+
+// Service API — внутренние эмуляционные эндпоинты, закрыты длинным ключом
+// (SERVICE_API_KEY, заголовок X-Service-Key). Пусто в env → 404 на всех путях.
+router.use('/api/service', serviceRouter);
 
 // ─── API Documentation (api.balloo.su/docs — решение владельца, тик. 1794575221) ─
 router.get('/docs', getDocsHtml);

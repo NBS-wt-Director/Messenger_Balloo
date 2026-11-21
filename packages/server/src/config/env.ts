@@ -89,6 +89,13 @@ export const envSchema = z.object({
   YOOKASSA_API_KEY: z.string().optional(),
   YOOKASSA_WEBHOOK_URL: z.string().optional(),
 
+  // Service API (внутренние эмуляционные эндпоинты /api/service/*).
+  // Длинный секрет (>=32 символов). Пусто/короче — эндпоинты выключены (404),
+  // чтобы случайный деплой без ключа не открыл управление данными.
+  // Значение живёт только в локальном .env и в незагружаемом в git документе
+  // docs/local/service-api.md.
+  SERVICE_API_KEY: z.string().optional().default(''),
+
   // Setup password (для первоначальной настройки)
   SETUP_PASSWORD: z.string().default(''),
 

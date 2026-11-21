@@ -149,6 +149,8 @@ services:
       # docker/entrypoint.server.sh). "0" — пропустить. Тикет 1791623683.
       RUN_MIGRATIONS: ${RUN_MIGRATIONS:-1}
       RUN_SEED: ${RUN_SEED:-1}
+      # Service API (/api/service/*) — закрыт длинным ключом. Пусто = 404.
+      SERVICE_API_KEY: ${SERVICE_API_KEY:-}
     depends_on:
       postgres:
         condition: service_healthy
