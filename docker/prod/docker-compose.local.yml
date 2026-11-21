@@ -166,6 +166,9 @@ services:
       # закрыты длинным ключом (middleware/serviceAuth.ts). Пусто = выключены
       # (404). Значение — только в .env.production на сервере (вне git).
       SERVICE_API_KEY: ${SERVICE_API_KEY:-}
+      # Новостной канал (тик. 1795270823): id чата, в который автоматически
+      # вступают новые пользователи при регистрации/OAuth. Пусто = выключено.
+      NEWS_CHAT_ID: ${NEWS_CHAT_ID:-}
       # Раздача сборок APK/AAB (тикет 1791927977): express раздаёт DOWNLOADS_DIR
       # на /downloads, nginx проксирует download.balloo.su/downloads/ на server.
       # КАТАЛОГ НА ХОСТЕ ДОЛЖЕН БЫТЬ ЗАПИСЫВАЕМЫМ из контейнера (USER app, не root):

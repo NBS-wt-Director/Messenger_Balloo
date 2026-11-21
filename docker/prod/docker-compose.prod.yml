@@ -151,6 +151,9 @@ services:
       RUN_SEED: ${RUN_SEED:-1}
       # Service API (/api/service/*) — закрыт длинным ключом. Пусто = 404.
       SERVICE_API_KEY: ${SERVICE_API_KEY:-}
+      # Новостной канал (тик. 1795270823): id чата для авто-вступления
+      # новых пользователей. Пусто = выключено.
+      NEWS_CHAT_ID: ${NEWS_CHAT_ID:-}
     depends_on:
       postgres:
         condition: service_healthy
