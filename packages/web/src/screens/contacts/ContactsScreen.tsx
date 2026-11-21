@@ -197,7 +197,11 @@ export default function ContactsScreen() {
                       } avatar--ctx-contact`}
                     >
                       <div className="avatar__inner">
-                        <span>{contact.avatarUrl ? '' : getInitials(contact.displayName || contact.username)}</span>
+                        {contact.avatarUrl ? (
+                          <img src={contact.avatarUrl} alt={contact.displayName || contact.username} />
+                        ) : (
+                          <span>{getInitials(contact.displayName || contact.username)}</span>
+                        )}
                       </div>
                     </div>
                     <div style={{ flex: 1 }}>
@@ -273,7 +277,11 @@ export default function ContactsScreen() {
                 >
                   <div className="avatar avatar--sm avatar--bordered avatar--status-offline avatar--ctx-blocked">
                     <div className="avatar__inner">
-                      <span>{getInitials(user.displayName || user.username || '??')}</span>
+                      {user.avatarUrl ? (
+                        <img src={user.avatarUrl} alt={user.displayName || user.username || '??'} />
+                      ) : (
+                        <span>{getInitials(user.displayName || user.username || '??')}</span>
+                      )}
                     </div>
                   </div>
                   <div style={{ flex: 1 }}>
