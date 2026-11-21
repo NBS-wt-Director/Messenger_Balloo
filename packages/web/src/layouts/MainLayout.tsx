@@ -80,6 +80,27 @@ function MainLayout() {
       {/* Единая шапка (@balloo/ui) — на всю ширину, как в макете */}
       <AppTopbar
         title="Чаты"
+        actions={
+          <>
+            {/* Быстрый доступ к историям и приглашениям (тик. 1795282577) */}
+            <button
+              type="button"
+              className="topbar__actions-btn"
+              title="Истории"
+              onClick={() => navigate('/stories')}
+            >
+              📷
+            </button>
+            <button
+              type="button"
+              className="topbar__actions-btn"
+              title="Приглашения"
+              onClick={() => navigate('/invites')}
+            >
+              📨
+            </button>
+          </>
+        }
         right={
           <>
             <NotificationsBell />
@@ -103,7 +124,9 @@ function MainLayout() {
         {isSidebarOpen && <Sidebar />}
 
         {/* Column 2: Chat list */}
-        {showChatList && <ChatList />}
+        {showChatList && (
+          <ChatList onChatSelect={(chatId) => navigate(`/chat/${chatId}`)} />
+        )}
 
         {/* Column 3: Chat view / content */}
         {showOutlet && (

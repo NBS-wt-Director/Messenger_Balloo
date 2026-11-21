@@ -24,15 +24,24 @@ export function Sidebar() {
   const navItems = [
     { icon: '💬', label: 'Чаты', path: '/chat' },
     { icon: '👥', label: 'Контакты', path: '/contacts' },
+    // Истории и Приглашения — по запросу владельца (тик. 1795282577)
+    { icon: '📷', label: 'Истории', path: '/stories' },
+    { icon: '📨', label: 'Приглашения', path: '/invites' },
     { icon: '📞', label: 'Звонки', path: '/calls' },
     { icon: '📚', label: 'Знания', path: '/knowledge' },
     { icon: '💼', label: 'Вакансии', path: '/hiring' },
     { icon: '⚙️', label: 'Настройки', path: '/settings' },
   ];
 
-  // Admin link
+  // Admin link — перед «Вакансии» (индекс ищется по пути, чтобы не зависеть
+  // от числа пунктов выше после добавления «Историй»/«Приглашений»).
   if (user.isAdmin) {
-    navItems.splice(4, 0, { icon: '🛡️', label: 'Админка', path: '/admin' });
+    const adminIndex = navItems.findIndex((i) => i.path === '/hiring');
+    navItems.splice(adminIndex >= 0 ? adminIndex : navItems.length, 0, {
+      icon: '🛡️',
+      label: 'Админка',
+      path: '/admin',
+    });
   }
 
   // Legal nav items (visible only when sidebar is expanded)

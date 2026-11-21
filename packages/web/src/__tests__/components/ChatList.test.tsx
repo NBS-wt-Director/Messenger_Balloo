@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { ChatList } from '../../components/chat/ChatList';
@@ -142,5 +142,18 @@ describe('ChatList (P34: редизайн по mockups/balloo-su/chats.html)', (
     const searchInput = screen.getByPlaceholderText(/поиск/i);
     fireEvent.change(searchInput, { target: { value: 'nonexistent' } });
     expect(screen.getByText('Чаты не найдены')).toBeInTheDocument();
+  });
+
+  // Тик. 1795282577: клик по чату должен сообщать id наружу (MainLayout →
+  // navigate('/chat/:id')). Раньше onChatSelect не прокидывался и чат не открывался.
+  it('вызывает onChatSelect с id чата при клике', () => {
+    const onChatSelect = vi.fn();
+    render(
+      <MemoryRouter>
+        <ChatList onChatSelect={onChatSelect} />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText('Alice'));
+    expect(onChatSelect).toHaveBeenCalledWith('chat1');
   });
 });

@@ -14,6 +14,8 @@ interface AppTopbarProps {
   onTitleClick?: () => void;
   /** Доп. контент справа ПЕРЕД переключателями (аватар, колокольчик, маскот) */
   right?: React.ReactNode;
+  /** Кнопки-действия раздела (.topbar__actions) — Истории/Приглашения и т.п. */
+  actions?: React.ReactNode;
   /** Показывать переключатели языка/темы (default: true) */
   showSwitchers?: boolean;
   /**
@@ -35,7 +37,7 @@ function initialsOf(user: { displayName?: string; username: string } | null): st
   return letters || (user.username?.[0]?.toUpperCase() ?? 'ИИ');
 }
 
-export function AppTopbar({ title, onTitleClick, right, showSwitchers = true, auth }: AppTopbarProps) {
+export function AppTopbar({ title, onTitleClick, right, actions, showSwitchers = true, auth }: AppTopbarProps) {
   const navigate = useNavigate();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const user = useAuthStore((s) => s.user);
@@ -59,6 +61,7 @@ export function AppTopbar({ title, onTitleClick, right, showSwitchers = true, au
       title={title}
       onTitleClick={onTitleClick}
       right={right}
+      actions={actions}
       showSwitchers={showSwitchers}
       auth={menuAuth}
       onNavigate={navigate}
