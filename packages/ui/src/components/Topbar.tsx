@@ -17,6 +17,8 @@ interface TopbarProps {
   onTitleClick?: () => void;
   /** Доп. контекст справа ПЕРЕД переключателями (аватар, уведомления, маскот) */
   right?: React.ReactNode;
+  /** Кнопки-действия раздела (.topbar__actions) — между заголовком и правым блоком */
+  actions?: React.ReactNode;
   /** Показывать ли правое меню (default: true) */
   showSwitchers?: boolean;
   /** Авторизация для RightMenu (автор/настройки/аккаунты/войти-выйти) */
@@ -31,6 +33,7 @@ export function Topbar({
   title,
   onTitleClick,
   right,
+  actions,
   showSwitchers = true,
   auth,
   menuItems,
@@ -49,6 +52,9 @@ export function Topbar({
           {title}
         </div>
       )}
+
+      {/* Кнопки-действия раздела (по макету: .topbar__actions перед .topbar__right) */}
+      {actions && <div className="topbar__actions">{actions}</div>}
 
       <div className="topbar__right">
         {right}

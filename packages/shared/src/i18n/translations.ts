@@ -128,6 +128,8 @@ export type TranslationKey =
   | 'menu.accounts'
   | 'menu.support'
   | 'menu.contacts'
+  | 'menu.stories'
+  | 'menu.invites'
   | 'footer.rules'
   | 'footer.privacy'
   | 'footer.cookies';
@@ -2822,6 +2824,44 @@ export const translations: Translations = {
     hi: 'संपर्क',
     be: 'Кантакты',
     fr: 'Contacts',
+  },
+  'menu.stories': {
+    // «Истории» — пункт правого меню и кнопка шапки (тик. 1795282577).
+    ru: 'Истории',
+    en: 'Stories',
+    tt: 'Тарихлар',
+    ba: 'Тарихтар',
+    cv: 'Историсем',
+    udm: 'Историос',
+    kbd: 'Тхыдэхэр',
+    chm: 'Историй-влак',
+    os: 'Историтæ',
+    sah: 'Остуоруйалар',
+    bua: 'Түүхэнүүд',
+    uk: 'Історії',
+    zh: '动态',
+    hi: 'कहानियाँ',
+    be: 'Гісторыі',
+    fr: 'Stories',
+  },
+  'menu.invites': {
+    // «Приглашения» — пункт правого меню и кнопка шапки (тик. 1795282577).
+    ru: 'Приглашения',
+    en: 'Invites',
+    tt: 'Чакырулар',
+    ba: 'Сәкерләүҙәр',
+    cv: 'Чӗннисем',
+    udm: 'Ӧтёнъёс',
+    kbd: 'Къедзэхэр',
+    chm: 'Ӱжмö-влак',
+    os: 'Хонынтæ',
+    sah: 'Ыҥырыылар',
+    bua: 'Урилгууд',
+    uk: 'Запрошення',
+    zh: '邀请',
+    hi: 'आमंत्रण',
+    be: 'Запрашэнні',
+    fr: 'Invitations',
   },
   'footer.rules': {
     ru: 'Правила',

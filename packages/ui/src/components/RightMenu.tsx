@@ -92,6 +92,9 @@ export const DEFAULT_LEGAL_ITEMS: RightMenuItem[] = [
 export const DEFAULT_ACCOUNT_ITEMS: RightMenuItem[] = [
   { key: 'menu.profile', to: '/profile', icon: '👤' },
   { key: 'menu.contacts', to: '/contacts', icon: '📇' },
+  // Истории и Приглашения — по запросу владельца (тик. 1795282577)
+  { key: 'menu.stories', to: '/stories', icon: '📷' },
+  { key: 'menu.invites', to: '/invites', icon: '📨' },
   { key: 'menu.settings', to: '/settings', icon: '⚙️' },
   // Мультиаккаунт: секция аккаунтов живёт в профиле (ProfileScreen)
   { key: 'menu.accounts', to: '/profile', icon: '👥' },
