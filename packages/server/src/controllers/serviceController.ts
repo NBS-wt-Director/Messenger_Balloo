@@ -3,6 +3,8 @@ import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 import { internalError } from '../middleware/errorHandler';
+import { addContact as addContactService, removeContact as removeContactService, ensureMutualContacts } from '../services/userService';
+import { joinNewsChannel } from '../services/authService';
 
 // ============================================================
 // Service API — внутренние эмуляционные эндпоинты (/api/service/*).
@@ -210,6 +212,9 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
     });
 
     res.status(201).json({ user });
+
+    // Fire-and-forget: авто-вступление в новостной канал (не блокирует создание)
+    joinNewsChannel(user.id);
   } catch (error: any) {
     handlePrismaError(res, error, 'Пользователь не найден');
   }
@@ -802,4 +807,76 @@ export const deleteStory = async (req: Request, res: Response): Promise<void> =>
   } catch (error: any) {
     handlePrismaError(res, error, 'История не найдена');
   }
+};
+
+// ============================================================
+// Контакты
+// ============================================================
+
+const addContactSchema = z.object({
+  contactId: z.string().min(1),
+});
+
+// POST /api/service/contacts — добавить контакт (ownerId → contactId)
+export const addContact = async (req: Request, res: Response): Promise<void> => {
+  const parsed = addContactSchema.safeParse(req.body);
+  if (!parsed.success) {
+    badRequest(res, 'Неверные данные контакта', parsed.error.errors);
+    return;
+  }
+
+  try {
+    const result = await addContactService(req.params.id, parsed.data.contactId);
+    res.json(result);
+  } catch (error: any) {
+    if (error.message === 'Пользователь не найден') {
+      res.status(404).json({ error: 'Not Found', message: 'Пользователь не найден' });
+    } else if (error.message === 'Пользователь уже в контактах') {
+      res.status(409).json({ error: 'Conflict', message: error.message });
+    } else if (error.message === 'Нельзя добавить себя в контакты') {
+      res.status(400).json({ error: 'Bad Request', message: error.message });
+    } else {
+      handlePrismaError(res, error, 'Сервис контактов');
+    }
+  }
+};
+
+// DELETE /api/service/contacts/:contactId — удалить контакт
+export const deleteContact = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const result = await removeContactService(req.params.id, req.params.contactId);
+    res.json(result);
+  } catch (error: any) {
+    if (error.message === 'Пользователь не в контактах') {
+      res.status(404).json({ error: 'Not Found', message: error.message });
+    } else {
+      handlePrismaError(res, error, 'Сервис контактов');
+    }
+  }
+};
+
+const mutualContactsSchema = z.object({
+  userA: z.string().min(1),
+  userB: z.string().min(1),
+});
+
+// POST /api/service/contacts/mutual — взаимные контакты двух пользователей
+export const addMutualContacts = async (req: Request, res: Response): Promise<void> => {
+  const parsed = mutualContactsSchema.safeParse(req.body);
+  if (!parsed.success) {
+    badRequest(res, 'Неверные данные контактов', parsed.error.errors);
+    return;
+  }
+  const { userA, userB } = parsed.data;
+  if (userA === userB) {
+    badRequest(res, 'userA и userB должны различаться');
+    return;
+  }
+  const found = await prisma.user.count({ where: { id: { in: [userA, userB] } } });
+  if (found !== 2) {
+    badRequest(res, 'Один из пользователей не найден');
+    return;
+  }
+  await ensureMutualContacts(userA, userB);
+  res.json({ ok: true, userA, userB });
 };

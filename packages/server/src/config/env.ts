@@ -117,6 +117,10 @@ export const envSchema = z.object({
   // Cookie domain для шаринга на поддомены (решение владельца 09.10.2026).
   // Для боевого домена: .balloo.su. Для localhost: не задавать (cookie привязан к origin).
   COOKIE_DOMAIN: z.string().optional(),
+
+  // Новостной канал (авто-вступление новых пользователей при регистрации/OAuth).
+  // Пусто или не задан — авто-вступление отключено.
+  NEWS_CHAT_ID: z.string().optional(),
 });
 
 export const env = envSchema.parse(process.env);

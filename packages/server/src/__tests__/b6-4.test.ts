@@ -95,8 +95,12 @@ describe('B6-4: subscriptions / invites / notifications', () => {
         .send({ chatId: chat.id });
 
       expect(res.status).toBe(201);
-      expect(res.body.inviteLink).toBeTruthy();
-      expect(res.body.inviteLink.chatId).toBe(chat.id);
+      // Тик. 1795270823: ответ — сам объект приглашения (не обёртка inviteLink),
+      // с code и url страницы /join/:code.
+      expect(res.body.id).toBeTruthy();
+      expect(res.body.chatId).toBe(chat.id);
+      expect(res.body.code).toBeTruthy();
+      expect(res.body.url).toContain('/join/');
     });
 
     it('returns 403 for non-participant', async () => {

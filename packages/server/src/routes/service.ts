@@ -18,6 +18,9 @@ import {
   deleteCall,
   createStory,
   deleteStory,
+  addContact,
+  deleteContact,
+  addMutualContacts,
 } from '../controllers/serviceController';
 
 // ============================================================
@@ -62,5 +65,10 @@ router.delete('/calls/:id', deleteCall);
 // Истории
 router.post('/stories', createStory);
 router.delete('/stories/:id', deleteStory);
+
+// Контакты (эмуляция: user → contact)
+router.post('/contacts/mutual', addMutualContacts);
+router.post('/users/:id/contacts', addContact);
+router.delete('/users/:id/contacts/:contactId', deleteContact);
 
 export { router };

@@ -1,6 +1,7 @@
 // callService.ts — Сервис для истории и инициации звонков (тик. 1792160007)
 
 import { PrismaClient } from '@prisma/client';
+import { ensureMutualContacts } from './userService';
 
 const prisma = new PrismaClient();
 
@@ -116,6 +117,10 @@ export const createCall = async (
         },
       },
     }));
+
+  // Автосоздание контактов (тик. 1795270823): позвонившие становятся
+  // контактами друг друга.
+  await ensureMutualContacts(callerId, calleeId);
 
   const call = await prisma.call.create({
     data: {

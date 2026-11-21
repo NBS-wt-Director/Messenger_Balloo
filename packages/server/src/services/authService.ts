@@ -14,6 +14,7 @@ import {
   LOGIN_CODE_TTL_SECONDS,
   type LoginCodeChannel,
 } from './loginCodeService';
+import { applyInviteOnRegister } from './inviteService';
 
 const prisma = new PrismaClient();
 
@@ -27,6 +28,30 @@ export const hasAdmin = async (): Promise<boolean> => {
     where: { role: 'admin' },
   });
   return count > 0;
+};
+
+// ============================================================
+// Авто-вступление в новостной канал (NEWS_CHAT_ID)
+// ============================================================
+
+// Идемпотентная функция: если канал не настроен или пользователь уже в нём —
+// просто пропускаем. Не блокирует регистрацию при ошибке (fire-and-forget).
+export const joinNewsChannel = async (userId: string): Promise<void> => {
+  const chatId = env.NEWS_CHAT_ID;
+  if (!chatId) return;
+  try {
+    const existing = await prisma.userChat.findUnique({
+      where: { userId_chatId: { userId, chatId } },
+      select: { id: true },
+    });
+    if (existing) return;
+    const now = BigInt(Math.floor(Date.now() / 1000));
+    await prisma.userChat.create({
+      data: { userId, chatId, role: 'member', joinedAt: now, lastRead: now },
+    });
+  } catch (err) {
+    console.error('[JOIN_NEWS] Failed to auto-join news channel:', err);
+  }
 };
 
 const randomString = (length: number = 32): string =>
@@ -198,6 +223,8 @@ interface RegisterInput {
   email: string;
   password: string;
   username?: string;
+  // id-метка приглашения (тик. 1795270823): по ссылке /join/:code.
+  inviteCode?: string;
 }
 
 export const register = async (input: RegisterInput) => {
@@ -292,6 +319,17 @@ export const register = async (input: RegisterInput) => {
     .catch((err: unknown) => {
       console.error('[REGISTER] Failed to create verification token:', err);
     });
+
+  // Авто-вступление в новостной канал (идемпотентно, fail-safe)
+  joinNewsChannel(user.id);
+
+  // Обработка приглашения по ссылке (тик. 1795270823): вступление в группы,
+  // контакты пригласившего, реферал. Не блокирует регистрацию.
+  if (input.inviteCode) {
+    applyInviteOnRegister(input.inviteCode, user.id).catch((err: unknown) => {
+      console.error('[REGISTER] Failed to apply invite:', err);
+    });
+  }
 
   return { user, tokens };
 };
@@ -1149,6 +1187,9 @@ export const oauthLogin = async (input: OAuthLoginInput) => {
   }
 
   const tokens = await generateTokens(user.id, user.email!, user.username || undefined);
+
+  // Авто-вступление в новостной канал (идемпотентно, fail-safe)
+  joinNewsChannel(user.id);
 
   return {
     user: {

@@ -992,3 +992,31 @@ export const removeContact = async (userId: string, contactId: string) => {
 
   return { message: 'Контакт удалён' };
 };
+
+// ============================================================
+// Автосоздание контактов (тик. 1795270823)
+// ============================================================
+
+/**
+ * Идемпотентно создаёт взаимные контакты между двумя пользователями.
+ * Безопасна для повторных вызовов: уже существующие пары не дублируются,
+ * self-контакт игнорируется. Ошибки БД не пробрасываются — вызывающий код
+ * (принятие приглашения, регистрация, direct-чат) не должен падать из-за
+ * необязательного контакта.
+ */
+export const ensureMutualContacts = async (userA: string, userB: string): Promise<void> => {
+  if (!userA || !userB || userA === userB) return;
+
+  const now = BigInt(Math.floor(Date.now() / 1000));
+  try {
+    await prisma.contact.createMany({
+      data: [
+        { userId: userA, contactId: userB, createdAt: now },
+        { userId: userB, contactId: userA, createdAt: now },
+      ],
+      skipDuplicates: true,
+    });
+  } catch (err) {
+    console.error('[ensureMutualContacts] failed:', err);
+  }
+};

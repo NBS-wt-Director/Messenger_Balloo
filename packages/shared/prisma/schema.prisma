@@ -181,16 +181,18 @@ model User {
    contactsAsOwner     Contact[]           @relation("ContactOwner")
    contactGroups       ContactGroup[]      @relation("ContactGroupOwner")
    contactGroupMembers ContactGroupMember[] @relation("ContactGroupMemberUser")
-  blogChannelSubscriptions BlogChannelSubscriber[]
-   contactsAsPerson    Contact[]           @relation("ContactPerson")
-   notifications       Notification[]
-   drafts              Draft[]
-   sessions            Session[]
-   pairTokens          PairToken[]
-   callParticipants    CallParticipant[]
-   banAppeals          BanAppeal[]
+   blogChannelSubscriptions BlogChannelSubscriber[]
+    contactsAsPerson    Contact[]           @relation("ContactPerson")
+    notifications       Notification[]
+    drafts              Draft[]
+    sessions            Session[]
+    pairTokens          PairToken[]
+    callParticipants    CallParticipant[]
+    banAppeals          BanAppeal[]
+    inviteAcceptances      InviteAcceptance[] @relation("InviteAcceptedBy")
+    inviteAcceptancesMade  InviteAcceptance[] @relation("InviteAcceptedInviter")
 
-   @@map("users")
+    @@map("users")
 }
 
 // ============================================================
@@ -492,17 +494,41 @@ model InviteLink {
   status     String   @default("pending") // pending | accepted | expired
   ttlType    String   @default("permanent") // permanent | timed | onetime
   groupIds   Json?    // массив id групп (тик. 1792160011)
+  addToContacts Boolean @default(false) // добавлять принявшего в контакты создателя (тик. 1795270823)
+  message       String? @db.Text         // текст на странице приглашения (тик. 1795270823)
   createdAt  BigInt   @default(0)
   updatedAt  BigInt   @default(0)
 
   // Relations
   chat    Chat    @relation(fields: [chatId], references: [id], onDelete: Cascade)
   creator User   @relation(fields: [creatorId], references: [id])
+  acceptances InviteAcceptance[]
 
   @@unique([chatId, code])
   @@index([chatId])
   @@index([status])
+  @@index([code])
   @@map("invite_links")
+}
+
+// Реферал: кто по чьей ссылке присоединился (вкладка «Я присоединил к Balloo»).
+// Тик. 1795270823. MVP2/3 — реферальная программа с бонусами.
+model InviteAcceptance {
+  id        String @id @default(cuid()) @db.VarChar(25)
+  inviteId  String
+  userId    String @db.VarChar(25) // принявший
+  inviterId String @db.VarChar(25) // создатель приглашения
+  code      String @db.VarChar(20)
+  createdAt BigInt @default(0)
+
+  invite  InviteLink @relation(fields: [inviteId], references: [id], onDelete: Cascade)
+  user    User       @relation("InviteAcceptedBy", fields: [userId], references: [id], onDelete: Cascade)
+  inviter User       @relation("InviteAcceptedInviter", fields: [inviterId], references: [id], onDelete: Cascade)
+
+  @@unique([inviteId, userId])
+  @@index([inviterId])
+  @@index([userId])
+  @@map("invite_acceptances")
 }
 
 // ============================================================

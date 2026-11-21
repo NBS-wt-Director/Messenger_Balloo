@@ -76,6 +76,9 @@ const registerSchema = z.object({
     .max(256, 'Пароль слишком длинный (максимум 256 символов)')
     .refine((p) => p === p.trim(), 'Пароль не должен начинаться или заканчиваться пробелом'),
   username: z.string().min(1).max(50).optional(),
+  // id-метка приглашения (тик. 1795270823): новый пользователь по ссылке
+  // засчитывается в рефералы пригласившего.
+  inviteCode: z.string().max(32).optional(),
 });
 
 export const register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -90,10 +93,10 @@ export const register = async (req: Request, res: Response, next: NextFunction):
       return;
     }
 
-    const { email, password, username } = parsed.data;
+    const { email, password, username, inviteCode } = parsed.data;
     console.log('[REGISTER] Body:', { email, username });
 
-    const result = await registerService({ email, password, username });
+    const result = await registerService({ email, password, username, inviteCode });
 
     // Устанавливаем httpOnly cookie вместо возврата токенов в body
     setAuthCookies(res, result.tokens!.accessToken, result.tokens!.refreshToken);
