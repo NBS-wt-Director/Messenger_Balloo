@@ -42,7 +42,9 @@ KODA.md §7). Все генераторы ссылки приглашения о
 - [x] 4. Тесты: `joinPathRescue.test.ts` (5 кейсов); существующие `b6-4`/`invites-link-flow`
       проверяют `toContain('/join/')` — новый формат проходит
 - [x] 5. Проверки: server tsc 0 + jest 54 suites/805 tests; web tsc 0 + vitest 53/393; vite build ✓
-- [ ] 6. Деплой (server + web) — батчами
+- [x] 6. Деплой (server + web) — батчи C3–G3, 23.11.2026: `HEAD=65b4606`,
+      бандль `index-BMWJl9HD.js` (=8090=домен), `joinPathRescue` в бандле,
+      server img `a569328b…` (док-во: тик. `1795357403`, раздел «Батчи C3–G3»)
 
 ## Результат
 

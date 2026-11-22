@@ -252,3 +252,74 @@ docker exec balloo-web sh -c "ls /usr/share/nginx/html/assets/chunks | grep '^Ch
 на новых образах, restarts=0, миграции 22→22). Батч G2 подтвердил web-образ фикса
 `853da64`. Откат не потребовался; теги `:rollback-20261122`, `:rollback-20261122b`
 и дамп `pre-deploy-20261122.sql` остаются на сервере.
+
+### Батчи C3–G3 — переразвёртка server+web на `65b4606` (23.11.2026)
+
+Цель: выложить коммит `65b4606` (тикеты `1795369071` hash-ссылки приглашений,
+`1795369072` личные чаты, `1795369073` тема «Наша», `1795369074` sw POST-guard;
+сверх уже выложенного `853da64`). Диапазон `853da64..65b4606`: 2 коммита,
+**миграций нет** (`packages/shared/prisma` не менялся), `.env.production` не менялся.
+
+```text
+C3 (read-only ДО):
+  whoami=cfr_balloo branch=main HEAD=853da64  behind=2 origin/main=65b4606
+  imageid ДО: server f8c19be20839 | web 528f8002e6ba | features e320f566 | web-admin cc140776
+              web-history 223ca551 | web-download cca76e17
+  bundle8090 ДО: index-BMhcrtaK.js
+  migrations=22   диск: 98G/37G, свободно 56G (40%)
+
+D3: $ git checkout -B main origin/main → HEAD=65b4606  (трекаемое: только M .env.production)
+
+E3 (откатная точка, пары ID совпадают):
+  balloo/server:rollback-20261123 = f8c19be20839 (= server:local)
+  balloo/web:rollback-20261123    = 528f8002e6ba (= web:local)
+  бэкап БД: /data/balloo/backups/pre-deploy-20261123.sql — 182 032 B
+
+F1: build server → Image balloo/server:local Built (133.8s);
+    up -d --no-deps --force-recreate server → Container balloo-server Started (29.8s),
+    Up (healthy) с 1-й проверки; logs: Migrations applied (no-op), Seed OK,
+    [Push] VAPID Web Push initialized, [WS] initialized on /ws/,
+    Server running on http://0.0.0.0:3000, [EMAIL] SMTP connection verified
+
+F2: build web → Image balloo/web:local Built (80.6s; vite по web/web-features/
+    web-admin/web-history/web-download — все ✓);
+    up -d --no-deps --force-recreate web → Container balloo-web Started (10.5s)
+
+G3 (доказательства ПОСЛЕ):
+  HEAD=65b4606                                                             ✅
+  server img=sha256:a569328b96ff… (было f8c19be2) started=20:51:36Z restarts=0  ✅
+  web    img=sha256:8c1aff2cfd9f… (было 528f8002) started=20:54:44Z restarts=0  ✅
+  бандль: 8090 = index-BMWJl9HD.js ; домен = index-BMWJl9HD.js
+          (совпадают, ≠ index-BMhcrtaK.js)                                ✅
+  маркеры кода 65b4606:
+    joinPathRescue в бандле web: есть
+    sw.js: `method === 'GET'` = 2 (cacheFirst + apiFirst)
+    chatService.js (server dist): `direct` = 11
+  server /health = 200                                                     ✅
+  features/web-admin/web-history/web-download: Up 6h (не пересоздавались)   ✅
+  postgres/redis/minio: Up 2 weeks (не тронуты)                             ✅
+```
+
+Откат не потребовался. Теги `:rollback-20261123` (server+web) и дамп
+`pre-deploy-20261123.sql` остаются на сервере.
+
+**Остаток:** этап H — браузерная приёмка владельца (чек-лист ниже). До неё
+серверная часть подтверждена выводом батча G3, пользовательская — нет.
+
+### Чек-лист приёмки H (на владельце)
+
+- [ ] `https://balloo.su/#/chat` открывается, экрана «Что-то пошло не так» нет
+      (фикс `853da64` null-displayName);
+- [ ] в контактах есть люди, имена и аватарки отображаются;
+- [ ] клик по контакту открывает **личный чат**, повторный клик — **тот же** чат
+      (тик. `1795369072`); контакт с открытым чатом исчезает из подсказок Балунишки;
+- [ ] кнопка «✏️ Новый чат» фокусирует поиск списка контактов;
+- [ ] приглашение: `POST /api/invites` → `url` = `https://balloo.su/#/join/…`
+      (тик. `1795369071`); открытие ссылки ведёт на лендинг приглашения;
+- [ ] регистрация по ссылке → реферал засчитан (вкладка «Я присоединил к Balloo»),
+      контакты добавлены (если стояла галочка);
+- [ ] тема «Наша»: карточки/панели/меню с золотой рамкой, стеклянные контейнеры,
+      фон с флаговым градиентом (тик. `1795369073`);
+- [ ] консоль DevTools без `Uncaught TypeError … Request method 'POST' is unsupported`
+      от `sw.js` (тик. `1795369074`); при визуально старом коде — DevTools →
+      Application → Service Workers → Unregister + жёсткая перезагрузка.

@@ -25,7 +25,8 @@ Request method 'POST' is unsupported
 
 - [x] 1. sw.js: guard `request.method === 'GET'` в apiFirst и cacheFirst
 - [x] 2. Проверка: sw.js — статический файл (копируется как есть), сборку не требует
-- [ ] 3. Деплой web (вместе с остальными фиксами)
+- [x] 3. Деплой web — батчи F2/G3, 23.11.2026: в образе `sw.js` guard
+      `method === 'GET'` = 2 (док-во: тик. `1795357403`, раздел «Батчи C3–G3»)
 
 ## Результат
 

@@ -38,7 +38,8 @@
 - [x] 1. themes.css: `--surface: var(--bg-glass)` во все три темы
 - [x] 2. design-system.css: `.card:hover`/`.card--hover:hover` → border-strong (как в макете); `.onboarding__dot` → border-strong
 - [x] 3. Проверки: web tsc 0 + vitest 53/393 + vite build ✓ (визуальная приёмка — владелец)
-- [ ] 4. Деплой web
+- [x] 4. Деплой web — батчи F2/G3, 23.11.2026: бандль `index-BMWJl9HD.js`
+      (=8090=домен) (док-во: тик. `1795357403`, раздел «Батчи C3–G3»)
 
 ## Результат
 

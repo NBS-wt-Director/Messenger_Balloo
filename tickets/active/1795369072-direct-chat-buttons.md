@@ -50,7 +50,9 @@
 - [x] 3. web: ChatItem имя direct из peer; chatStore типы peer/memberIds
 - [x] 4. Тесты: `direct-chat.test.ts` (5 кейсов), `EmptyChatState.direct.test.tsx` (клик→POST+navigate)
 - [x] 5. Проверки: tsc server+web 0; jest server 805/805; vitest web 393/393; vite build ✓
-- [ ] 6. Деплой (server + web)
+- [x] 6. Деплой (server + web) — батчи C3–G3, 23.11.2026: `HEAD=65b4606`,
+      `chatService.js` dist содержит `direct` (11), бандль `index-BMWJl9HD.js`
+      (док-во: тик. `1795357403`, раздел «Батчи C3–G3»)
 
 ## Результат
 

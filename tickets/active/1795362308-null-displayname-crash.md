@@ -59,7 +59,8 @@ contact.displayName.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 
 - [x] 4. `CreateChannelScreen.tsx`: то же
 - [x] 5. `CreateGroupScreen.tsx`: то же + `@username` выводится только когда username есть
 - [x] 6. Проверки: `tsc --noEmit` exit 0 + vitest web **51 файла / 387 тестов** + `vite build` ✓ built in 9.76s
-- [ ] 7. Деплой (web-контейнер) — по команде владельца, батчами
+- [x] 7. Деплой (web-контейнер) — батчи D2/G2 (`853da64`) и C3–G3 (`65b4606`),
+      23.11.2026: бандль `index-BMWJl9HD.js` (док-во: тик. `1795357403`)
 
 ## Регрессия-тест
 
