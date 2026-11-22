@@ -51,7 +51,8 @@ retry-after: 506
       `services/api.ts` (класс `ApiError` с флагом `transient`),
       `AuthProvider.tsx` (сбрасывает user только при не-transient ошибке)
 - [x] 6. Проверки: tsc + тесты server/web + vite build (вывод приложен)
-- [ ] 7. Деплой — батчами, команды владельца
+- [x] 7. Деплой — батчи C–G, 22.11.2026: `HEAD=24975f7`, `ratelimit-limit: 3000`
+      (было 100), 429 нет (док-во: тик. `1795357403`, батч G)
 
 ## Вне области
 
