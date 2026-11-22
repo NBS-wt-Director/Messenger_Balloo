@@ -10,6 +10,25 @@ interface ApiOptions extends RequestInit {
   data?: unknown;
 }
 
+/**
+ * Ошибка API с HTTP-статусом и признаком временности (тик. 1795343610).
+ *
+ * `transient` — сбой, при котором сессия НЕ потеряна (429 «слишком много
+ * запросов», 5xx, сеть). Вызывающий не должен сбрасывать пользователя: иначе
+ * холодное обновление вкладки при 429 выбрасывало авторизованного на /login.
+ */
+export class ApiError extends Error {
+  readonly status?: number;
+  readonly transient: boolean;
+
+  constructor(message: string, status?: number, transient = false) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+    this.transient = transient;
+  }
+}
+
 // Очистка httpOnly refresh-cookie при выходе из аккаунта.
 // Не проходит через request(): при logout 401 и ошибки сети штатны, а
 // retry-with-refresh и редирект на #/login из общего клиента здесь только мешают.
@@ -82,9 +101,14 @@ async function request<T>(
       });
     } else if (refreshResponse?.status === 401) {
       window.location.hash = '#/login';
-      throw new Error('Session expired. Please login again.');
+      throw new ApiError('Session expired. Please login again.', 401);
+    } else if (!refreshResponse || refreshResponse.status >= 500) {
+      // Сеть/недоступный API/5xx — про сессию ничего не известно: помечаем
+      // ошибку временной, чтобы вызывающий не сбрасывал пользователя.
+      throw new ApiError('Not authenticated.', refreshResponse?.status, true);
     } else {
-      throw new Error('Not authenticated.');
+      // 400 — refresh-куки нет вообще: сессии не было (гость) или она завершена.
+      throw new ApiError('Not authenticated.', refreshResponse.status);
     }
   }
 
@@ -92,7 +116,11 @@ async function request<T>(
     const error = await response.json().catch(() => ({
       message: response.statusText,
     }));
-    throw new Error(error.message || 'API Error');
+    // 429 (лимит запросов) и 5xx — временный сбой сервера, а не потеря сессии:
+    // помечаем transient, иначе авторизованного выбрасывало на /login
+    // (тик. 1795343610).
+    const transient = response.status === 429 || response.status >= 500;
+    throw new ApiError(error.message || 'API Error', response.status, transient);
   }
 
   return response.json();

@@ -10,7 +10,7 @@
  * мокается только транспорт, ветвление обработки 400/401 — настоящий код api.ts.
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { api } from '@/services/api';
+import { api, ApiError } from '@/services/api';
 
 type StaticReply = { status: number; body?: unknown } | { networkError: true };
 
@@ -135,5 +135,81 @@ describe('api.ts — обработка 401 и ответов /refresh-cookie (�
     await expect(api.getMe()).rejects.toThrow();
     expect(window.location.hash).toBe('');
     expect(calls.some((u) => u.endsWith('/api/auth/refresh-cookie'))).toBe(false);
+  });
+
+  // Тик. 1795343610: 429/5xx/сеть — временный сбой, сессия не потеряна.
+  // Ошибка обязана нести флаг transient, чтобы AuthProvider не сбрасывал
+  // пользователя и холодное обновление не выбрасывало на /login.
+  describe('transient-ошибки (тик. 1795343610)', () => {
+    it('429 (лимит запросов) → transient, hash не меняется, refresh не зовётся', async () => {
+      const calls = stubFetch([
+        {
+          path: '/api/users/me',
+          reply: { status: 429, body: { error: 'Слишком много запросов, попробуйте позже' } },
+        },
+      ]);
+
+      const err = (await api.getMe().catch((e) => e)) as ApiError;
+
+      expect(err).toBeInstanceOf(ApiError);
+      expect(err.status).toBe(429);
+      expect(err.transient).toBe(true);
+      expect(window.location.hash).toBe('');
+      expect(calls.some((u) => u.endsWith('/api/auth/refresh-cookie'))).toBe(false);
+    });
+
+    it('500 сервер → transient', async () => {
+      stubFetch([{ path: '/api/users/me', reply: { status: 500, body: { error: 'Internal' } } }]);
+
+      const err = (await api.getMe().catch((e) => e)) as ApiError;
+
+      expect(err).toBeInstanceOf(ApiError);
+      expect(err.transient).toBe(true);
+    });
+
+    it('403 — не transient (не сбой сервера)', async () => {
+      stubFetch([{ path: '/api/users/me', reply: { status: 403, body: { error: 'Forbidden' } } }]);
+
+      const err = (await api.getMe().catch((e) => e)) as ApiError;
+
+      expect(err).toBeInstanceOf(ApiError);
+      expect(err.transient).toBe(false);
+    });
+
+    it('refresh упал по сети → transient', async () => {
+      stubFetch([
+        { path: '/api/users/me', reply: { status: 401, body: { error: 'Unauthorized' } } },
+        { path: '/api/auth/refresh-cookie', reply: { networkError: true } },
+      ]);
+
+      const err = (await api.getMe().catch((e) => e)) as ApiError;
+
+      expect(err).toBeInstanceOf(ApiError);
+      expect(err.transient).toBe(true);
+    });
+
+    it('refresh 500 → transient', async () => {
+      stubFetch([
+        { path: '/api/users/me', reply: { status: 401, body: { error: 'Unauthorized' } } },
+        { path: '/api/auth/refresh-cookie', reply: { status: 500, body: { error: 'Internal' } } },
+      ]);
+
+      const err = (await api.getMe().catch((e) => e)) as ApiError;
+
+      expect(err).toBeInstanceOf(ApiError);
+      expect(err.transient).toBe(true);
+    });
+
+    it('refresh 400 (refresh-куки нет) → не transient (сессия действительно отсутствует)', async () => {
+      stubFetch([
+        { path: '/api/users/me', reply: { status: 401, body: { error: 'Unauthorized' } } },
+        { path: '/api/auth/refresh-cookie', reply: { status: 400, body: { error: 'Bad Request' } } },
+      ]);
+
+      const err = (await api.getMe().catch((e) => e)) as ApiError;
+
+      expect(err).toBeInstanceOf(ApiError);
+      expect(err.transient).toBe(false);
+    });
   });
 });

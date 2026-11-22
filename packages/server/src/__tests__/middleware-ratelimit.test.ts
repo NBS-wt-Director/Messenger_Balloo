@@ -1,13 +1,34 @@
 /**
- * Тесты middleware/rateLimit.ts (тикеты 1790479490-08 / В-93, критический контур).
+ * Тесты middleware/rateLimit.ts (тик. 1795343610; ранее 1790479490-08 / В-93).
+ *
+ * Новое поведение (решение владельца 22.11.2026):
+ *   • все лимитеры — 3000 запросов / 15 минут;
+ *   • ключ «на каждого свой»: userId (req.user или подписанный access-cookie),
+ *     иначе реальный IP (trust proxy=1);
+ *   • маршрутизация по пути — через pickLimiter.
  *
  * Лимитеры — однопоточный memory-store на весь процесс, поэтому каждый кейс
- * получает собственный IP через X-Forwarded-For (trust proxy включён) и не
- * зависит от порядка других кейсов.
+ * берёт собственный IP (X-Forwarded-For) или userId и не зависит от порядка
+ * других кейсов.
  */
 import express from 'express';
 import request from 'supertest';
-import { applyRateLimit } from '../middleware/rateLimit';
+import jwt from 'jsonwebtoken';
+import { env } from '../config/env';
+import {
+  applyRateLimit,
+  getClientId,
+  pickLimiter,
+  apiLimiter,
+  authLimiter,
+  messageLimiter,
+  uploadLimiter,
+  serviceLimiter,
+  oauthLimiter,
+  RATE_LIMIT_MAX,
+  RATE_LIMIT_WINDOW_MS,
+} from '../middleware/rateLimit';
+import { ACCESS_COOKIE } from '../middleware/auth';
 
 let ipCounter = 0;
 const nextIp = () => {
@@ -15,13 +36,10 @@ const nextIp = () => {
   return `10.77.${(ipCounter >> 8) & 0xff}.${ipCounter & 0xff}`;
 };
 
-function makeApp(opts?: {
-  user?: { id: string };
-  hideIp?: boolean;
-  socketRemoteAddress?: string;
-}) {
+function makeApp(opts?: { user?: { id: string } }) {
   const app = express();
-  app.set('trust proxy', true);
+  // 1 (число хопов), а не true — как в app.ts: true падает в express-rate-limit.
+  app.set('trust proxy', 1);
 
   if (opts?.user) {
     const user = opts.user;
@@ -31,29 +49,22 @@ function makeApp(opts?: {
     });
   }
 
-  if (opts?.hideIp) {
-    app.use((req, _res, next) => {
-      // Тень для expr-геттера req.ip → getClientId уходит в req.socket.remoteAddress
-      Object.defineProperty(req, 'ip', { value: undefined, configurable: true });
-      if (opts.socketRemoteAddress === undefined) {
-        (req as any).socket = {};
-      } else {
-        (req as any).socket = { remoteAddress: opts.socketRemoteAddress };
-      }
-      next();
-    });
-  }
-
   app.use(applyRateLimit);
 
   const ok = (_req: any, res: any) => res.json({ ok: true });
   app.post('/api/auth/login', ok);
   app.get('/api/auth/oauth/yandex', (_req, res) => res.redirect(302, 'https://oauth.test/example'));
+  app.get('/api/auth/ws-token', ok);
+  app.post('/api/auth/refresh-cookie', ok);
   app.post('/api/upload/file', ok);
   app.post('/api/chats/c1/messages', ok);
   app.get('/api/other', ok);
   return app;
 }
+
+/** Минимальный объект запроса для юнит-тестов getClientId/pickLimiter. */
+const fakeReq = (over: Record<string, unknown> = {}) =>
+  ({ cookies: {}, socket: {}, ...over }) as any;
 
 const withNodeEnv = (value: string, fn: () => Promise<void>) => {
   const previous = process.env.NODE_ENV;
@@ -76,21 +87,21 @@ describe('applyRateLimit — режим тестов', () => {
 });
 
 describe('applyRateLimit — стратегия по пути', () => {
-  it('POST /api/auth/* жёсткий лимит 5/мин → 429 с текстом про авторизацию', async () => {
+  it('все лимитеры: 3000/15мин — заголовки RateLimit на общем пути', async () => {
     const app = makeApp();
     const ip = nextIp();
 
     await withNodeEnv('development', async () => {
-      for (let i = 0; i < 5; i += 1) {
-        const res = await request(app).post('/api/auth/login').set('X-Forwarded-For', ip).send({});
-        expect(res.status).toBe(200);
-      }
-      const limited = await request(app).post('/api/auth/login').set('X-Forwarded-For', ip).send({});
-      expect(limited.status).toBe(429);
-      expect(limited.body).toEqual({
-        error: 'Слишком много попыток авторизации. Подождите 1 минуту',
-        retryAfter: '1 minute',
-      });
+      const res = await request(app).get('/api/other').set('X-Forwarded-For', ip);
+      expect(res.status).toBe(200);
+      // standardHeaders: true, legacyHeaders: false → заголовки RateLimit-* без
+      // устаревших X-RateLimit-*; лимит общего API = 3000 за окно 900 с.
+      expect(res.headers['x-ratelimit-limit']).toBeUndefined();
+      expect(res.headers['ratelimit-limit']).toBe(String(RATE_LIMIT_MAX));
+      expect(res.headers['ratelimit-remaining']).toBe(String(RATE_LIMIT_MAX - 1));
+      expect(res.headers['ratelimit-policy']).toBe(
+        `${RATE_LIMIT_MAX};w=${RATE_LIMIT_WINDOW_MS / 1000}`,
+      );
     });
   });
 
@@ -99,7 +110,6 @@ describe('applyRateLimit — стратегия по пути', () => {
     const ip = nextIp();
 
     await withNodeEnv('development', async () => {
-      // 8 раз подряд: authLimiter (5) дал бы 429, apiLimiter (100) не даёт
       for (let i = 0; i < 8; i += 1) {
         const res = await request(app).get('/api/auth/oauth/yandex').set('X-Forwarded-For', ip);
         expect(res.status).toBe(302);
@@ -112,141 +122,170 @@ describe('applyRateLimit — стратегия по пути', () => {
    *
    * Служебные вызовы уже авторизованной сессии — GET /api/auth/ws-token и
    * POST /api/auth/refresh-cookie — лежали в одном префиксе /api/auth/ и
-   * попадали под authLimiter (5/мин). Реальный сценарий двух окон: каждая
-   * вкладка при загрузке делает 2× refresh-cookie (React StrictMode дублирует
-   * эффект) + 1× ws-token, и только потом логин. Итого второй вход
-   * упирался в 429 «Слишком много попыток авторизации», хотя пароль никто не
-   * подбирал. Проверка идёт одним IP — как два окна за одним NAT.
+   * попадали под authLimiter. Теперь они считаются общим apiLimiter, поэтому
+   * проверяем раздельность счётчиков через заголовок RateLimit-Remaining:
+   * refresh-cookie и /api/other делят apiLimiter, а login — отдельный authLimiter.
    */
-  it('обслуживание сессии (ws-token, refresh-cookie) не сжигает лимит входа', async () => {
-    const app = express();
-    app.set('trust proxy', true);
-    app.use(applyRateLimit);
-    const ok = (_req: any, res: any) => res.json({ ok: true });
-    app.get('/api/auth/ws-token', ok);
-    app.post('/api/auth/refresh-cookie', ok);
-    app.post('/api/auth/login', ok);
-
-    const ip = nextIp();
-
-    await withNodeEnv('development', async () => {
-      // Окно A: 2 refresh + 2 ws-token (StrictMode) + вход
-      for (let i = 0; i < 2; i += 1) {
-        expect((await request(app).post('/api/auth/refresh-cookie').set('X-Forwarded-For', ip).send({})).status).toBe(200);
-      }
-      for (let i = 0; i < 2; i += 1) {
-        expect((await request(app).get('/api/auth/ws-token').set('X-Forwarded-For', ip)).status).toBe(200);
-      }
-      expect((await request(app).post('/api/auth/login').set('X-Forwarded-For', ip).send({})).status).toBe(200);
-
-      // Окно B с того же IP: те же 5 вызовов + свой вход. До фикса вход падал
-      // в 429 — authLimiter уже был исчерпан служебными запросами окна A.
-      for (let i = 0; i < 2; i += 1) {
-        expect((await request(app).post('/api/auth/refresh-cookie').set('X-Forwarded-For', ip).send({})).status).toBe(200);
-      }
-      for (let i = 0; i < 2; i += 1) {
-        expect((await request(app).get('/api/auth/ws-token').set('X-Forwarded-For', ip)).status).toBe(200);
-      }
-      const secondLogin = await request(app).post('/api/auth/login').set('X-Forwarded-For', ip).send({});
-      expect(secondLogin.status).toBe(200);
-
-      // Но строгий лимит на сам ввод учётных данных сохраняется: ещё 4 логина
-      // (всего 6 за минуту) обязан отбить authLimiter.
-      for (let i = 0; i < 3; i += 1) {
-        expect((await request(app).post('/api/auth/login').set('X-Forwarded-For', ip).send({})).status).toBe(200);
-      }
-      const exhausted = await request(app).post('/api/auth/login').set('X-Forwarded-For', ip).send({});
-      expect(exhausted.status).toBe(429);
-      expect(exhausted.body.error).toContain('авторизации');
-    });
-  });
-
-  it('POST /api/upload/* → uploadLimiter 10/мин', async () => {
+  it('служебные ws-token / refresh-cookie считаются apiLimiter, а не authLimiter', async () => {
     const app = makeApp();
     const ip = nextIp();
 
     await withNodeEnv('development', async () => {
-      for (let i = 0; i < 10; i += 1) {
-        const res = await request(app).post('/api/upload/file').set('X-Forwarded-For', ip).send({});
-        expect(res.status).toBe(200);
-      }
-      const limited = await request(app).post('/api/upload/file').set('X-Forwarded-For', ip).send({});
-      expect(limited.status).toBe(429);
-      expect(limited.body.error).toBe('Превышен лимит загрузки файлов');
+      const refresh = await request(app)
+        .post('/api/auth/refresh-cookie')
+        .set('X-Forwarded-For', ip)
+        .send({});
+      expect(refresh.status).toBe(200);
+      expect(refresh.headers['ratelimit-remaining']).toBe(String(RATE_LIMIT_MAX - 1));
+
+      // /api/other — тот же apiLimiter: счётчик общий с refresh-cookie
+      const other = await request(app).get('/api/other').set('X-Forwarded-For', ip);
+      expect(other.headers['ratelimit-remaining']).toBe(String(RATE_LIMIT_MAX - 2));
+
+      // login — отдельный authLimiter: свой счётчик, apiLimiter не тронут
+      const login = await request(app).post('/api/auth/login').set('X-Forwarded-For', ip).send({});
+      expect(login.headers['ratelimit-remaining']).toBe(String(RATE_LIMIT_MAX - 1));
     });
   });
 
-  it('POST /api/chats/:id/messages → messageLimiter 30/мин', async () => {
+  it('POST /api/upload/* → uploadLimiter (свой счётчик)', async () => {
     const app = makeApp();
     const ip = nextIp();
 
     await withNodeEnv('development', async () => {
-      for (let i = 0; i < 30; i += 1) {
-        const res = await request(app).post('/api/chats/c1/messages').set('X-Forwarded-For', ip).send({});
-        expect(res.status).toBe(200);
-      }
-      const limited = await request(app).post('/api/chats/c1/messages').set('X-Forwarded-For', ip).send({});
-      expect(limited.status).toBe(429);
-      expect(limited.body.error).toBe('Слишком много сообщений. Подождите');
-    });
-  });
-
-  it('прочие пути → apiLimiter (100) со стандартными заголовками RateLimit', async () => {
-    const app = makeApp();
-    const ip = nextIp();
-
-    await withNodeEnv('development', async () => {
-      const res = await request(app).get('/api/other').set('X-Forwarded-For', ip);
+      const res = await request(app).post('/api/upload/file').set('X-Forwarded-For', ip).send({});
       expect(res.status).toBe(200);
-      // standardHeaders: true, legacyHeaders: false → заголовки RateLimit-* без
-      // устаревших X-RateLimit-*, лимит общего API = 100 за окно 900 с
-      expect(res.headers['x-ratelimit-limit']).toBeUndefined();
-      expect(res.headers['ratelimit-limit']).toBe('100');
-      expect(res.headers['ratelimit-remaining']).toBe('99');
-      expect(res.headers['ratelimit-policy']).toBe('100;w=900');
+      expect(res.headers['ratelimit-remaining']).toBe(String(RATE_LIMIT_MAX - 1));
+    });
+  });
+
+  it('POST /api/chats/:id/messages → messageLimiter (свой счётчик)', async () => {
+    const app = makeApp();
+    const ip = nextIp();
+
+    await withNodeEnv('development', async () => {
+      const res = await request(app)
+        .post('/api/chats/c1/messages')
+        .set('X-Forwarded-For', ip)
+        .send({});
+      expect(res.status).toBe(200);
+      expect(res.headers['ratelimit-remaining']).toBe(String(RATE_LIMIT_MAX - 1));
+    });
+  });
+
+  it('лимит на каждого: два userId с одного IP не делят счётчик', async () => {
+    const ip = nextIp();
+
+    await withNodeEnv('development', async () => {
+      const appA = makeApp({ user: { id: `user-A-${ip}` } });
+      for (let i = 0; i < 2; i += 1) {
+        await request(appA).get('/api/other').set('X-Forwarded-For', ip);
+      }
+      const thirdA = await request(appA).get('/api/other').set('X-Forwarded-For', ip);
+      expect(thirdA.headers['ratelimit-remaining']).toBe(String(RATE_LIMIT_MAX - 3));
+
+      // Другой пользователь на том же IP — свой ключ, счётчик не тронут
+      const appB = makeApp({ user: { id: `user-B-${ip}` } });
+      const firstB = await request(appB).get('/api/other').set('X-Forwarded-For', ip);
+      expect(firstB.headers['ratelimit-remaining']).toBe(String(RATE_LIMIT_MAX - 1));
+    });
+  });
+
+  it('гость: разные IP — разные ключи (trust proxy отдаёт реальный адрес)', async () => {
+    const app = makeApp();
+    const ipA = nextIp();
+    const ipB = nextIp();
+
+    await withNodeEnv('development', async () => {
+      const firstA = await request(app).get('/api/other').set('X-Forwarded-For', ipA);
+      expect(firstA.headers['ratelimit-remaining']).toBe(String(RATE_LIMIT_MAX - 1));
+      const secondA = await request(app).get('/api/other').set('X-Forwarded-For', ipA);
+      expect(secondA.headers['ratelimit-remaining']).toBe(String(RATE_LIMIT_MAX - 2));
+
+      const firstB = await request(app).get('/api/other').set('X-Forwarded-For', ipB);
+      expect(firstB.headers['ratelimit-remaining']).toBe(String(RATE_LIMIT_MAX - 1));
     });
   });
 });
 
-describe('getClientId — ключ лимитирования', () => {
-  it('аутентифицированные пользователи считаются раздельно с одного IP', async () => {
-    const ip = nextIp();
+describe('getClientId — ключ лимитирования «на каждого свой»', () => {
+  const sign = (payload: Record<string, unknown>) => jwt.sign(payload, env.JWT_ACCESS_SECRET);
 
-    await withNodeEnv('development', async () => {
-      // первый пользователь: 5 попыток исчерпывают authLimiter (ключ user:<id>)
-      const appA = makeApp({ user: { id: 'user-A' } });
-      for (let i = 0; i < 5; i += 1) {
-        expect((await request(appA).post('/api/auth/login').set('X-Forwarded-For', ip).send({})).status).toBe(200);
-      }
-      expect((await request(appA).post('/api/auth/login').set('X-Forwarded-For', ip).send({})).status).toBe(429);
-
-      // второй пользователь на том же IP — лимит не потрачен
-      const appB = makeApp({ user: { id: 'user-B' } });
-      expect((await request(appB).post('/api/auth/login').set('X-Forwarded-For', ip).send({})).status).toBe(200);
-    });
+  it('req.user.id → user:<id>', () => {
+    expect(getClientId(fakeReq({ user: { id: 'u1' } }))).toBe('user:u1');
   });
 
-  it('без req.ip ключ берётся из req.socket.remoteAddress', async () => {
-    const app = makeApp({ hideIp: true, socketRemoteAddress: '203.0.113.9' });
-    await withNodeEnv('development', async () => {
-      for (let i = 0; i < 5; i += 1) {
-        const res = await request(app).post('/api/auth/login').send({});
-        expect(res.status).toBe(200);
-      }
-      expect((await request(app).post('/api/auth/login').send({})).status).toBe(429);
-    });
+  it('подписанный access-cookie → user:<id> (лимитер идёт до authRequired)', () => {
+    const token = sign({ userId: 'u2', type: 'access' });
+    expect(getClientId(fakeReq({ cookies: { [ACCESS_COOKIE]: token } }))).toBe('user:u2');
   });
 
-  it('без ip и без remoteAddress ключ = unknown, лимит работает и не падает', async () => {
-    const app = makeApp({ hideIp: true });
-    await withNodeEnv('development', async () => {
-      for (let i = 0; i < 5; i += 1) {
-        const res = await request(app).post('/api/auth/login').send({});
-        expect(res.status).toBe(200);
-      }
-      const limited = await request(app).post('/api/auth/login').send({});
-      expect(limited.status).toBe(429);
-      expect(limited.body.error).toContain('авторизации');
-    });
+  it('токен без userId → ключ по IP', () => {
+    const token = sign({ type: 'access' });
+    expect(getClientId(fakeReq({ cookies: { [ACCESS_COOKIE]: token }, ip: '1.2.3.4' }))).toBe(
+      'ip:1.2.3.4',
+    );
+  });
+
+  it('битый токен → ключ по IP (не падает)', () => {
+    expect(getClientId(fakeReq({ cookies: { [ACCESS_COOKIE]: 'not-a-jwt' }, ip: '5.6.7.8' }))).toBe(
+      'ip:5.6.7.8',
+    );
+  });
+
+  it('без cookies и без user → ключ по req.ip', () => {
+    expect(getClientId(fakeReq({ cookies: undefined, ip: '10.0.0.1' }))).toBe('ip:10.0.0.1');
+  });
+
+  it('без req.ip → ключ по req.socket.remoteAddress', () => {
+    expect(getClientId(fakeReq({ ip: undefined, socket: { remoteAddress: '203.0.113.9' } }))).toBe(
+      'ip:203.0.113.9',
+    );
+  });
+
+  it('без ip и remoteAddress → ключ unknown (лимит работает и не падает)', () => {
+    expect(getClientId(fakeReq({ ip: undefined, socket: {} }))).toBe('ip:unknown');
+    expect(getClientId(fakeReq({ ip: undefined, socket: undefined }))).toBe('ip:unknown');
+  });
+});
+
+describe('pickLimiter — выбор лимитера по пути', () => {
+  const r = (path: string, method = 'GET') => ({ path, method }) as any;
+
+  it('service API → serviceLimiter', () => {
+    expect(pickLimiter(r('/api/service/users'))).toBe(serviceLimiter);
+  });
+
+  it('GET /api/auth/oauth/* → oauthLimiter', () => {
+    expect(pickLimiter(r('/api/auth/oauth/yandex'))).toBe(oauthLimiter);
+  });
+
+  it('POST /api/auth/oauth/* → authLimiter (не GET-редирект)', () => {
+    expect(pickLimiter(r('/api/auth/oauth/yandex', 'POST'))).toBe(authLimiter);
+  });
+
+  it('ws-token и refresh-cookie → apiLimiter', () => {
+    expect(pickLimiter(r('/api/auth/ws-token'))).toBe(apiLimiter);
+    expect(pickLimiter(r('/api/auth/refresh-cookie', 'POST'))).toBe(apiLimiter);
+  });
+
+  it('POST /api/auth/login → authLimiter', () => {
+    expect(pickLimiter(r('/api/auth/login', 'POST'))).toBe(authLimiter);
+  });
+
+  it('/api/upload/* → uploadLimiter', () => {
+    expect(pickLimiter(r('/api/upload/file', 'POST'))).toBe(uploadLimiter);
+  });
+
+  it('/api/chats/:id/messages → messageLimiter', () => {
+    expect(pickLimiter(r('/api/chats/c1/messages', 'POST'))).toBe(messageLimiter);
+  });
+
+  it('/api/chats/:id без /messages → apiLimiter', () => {
+    expect(pickLimiter(r('/api/chats/c1'))).toBe(apiLimiter);
+  });
+
+  it('прочие пути → apiLimiter', () => {
+    expect(pickLimiter(r('/api/users/me'))).toBe(apiLimiter);
   });
 });

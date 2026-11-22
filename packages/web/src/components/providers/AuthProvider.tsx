@@ -7,7 +7,7 @@
 import { createContext, useContext, useCallback, useEffect, useState } from 'react';
 import { useAuthStore, type AuthUser } from '@/store/authStore';
 import { useChatStore } from '@/store/chatStore';
-import { api } from '@/services/api';
+import { api, ApiError } from '@/services/api';
 import { subscribeAndRegisterPush } from '@/service-worker-registration';
 
 interface AuthContextValue {
@@ -58,9 +58,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(me as AuthUser);
         // Тикет 1794831100 (A.2): push-подписка при восстановлении сессии
         subscribeAndRegisterPush(api.post).catch(() => {});
-      } catch {
-        // Cookie нет / refresh не удался — пользователь не авторизован
-        setUser(null);
+      } catch (error) {
+        // 429/5xx/сеть — сервер временно недоступен, сессия НЕ потеряна:
+        // не сбрасываем пользователя, иначе холодное обновление вкладки
+        // выбрасывало авторизованного на /login (тик. 1795343610).
+        // Очищаем только при явной потере сессии (401 и подобное).
+        const transient = error instanceof ApiError ? error.transient : true;
+        if (!transient) setUser(null);
       } finally {
         setInitialLoad(false);
       }
@@ -119,8 +123,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       // Обновляем cookie; при неудаче api.ts уже редиректит на /login
       await api.post('/api/auth/refresh-cookie');
-    } catch {
-      setUser(null);
+    } catch (error) {
+      // Временный сбой (429/5xx/сеть) сессию не отменяет — не сбрасываем
+      // пользователя (тик. 1795343610).
+      const transient = error instanceof ApiError ? error.transient : true;
+      if (!transient) setUser(null);
     }
   }, [setUser]);
 

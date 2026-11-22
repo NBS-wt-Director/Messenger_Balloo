@@ -1,21 +1,51 @@
 import { Request, Response, NextFunction } from 'express';
 import type { RateLimitRequestHandler } from 'express-rate-limit';
 import rateLimit from 'express-rate-limit';
+import jwt from 'jsonwebtoken';
 import { env } from '../config/env';
+import { ACCESS_COOKIE } from './auth';
 
-// --- Helper: get client identifier (IP or user ID) ---
-function getClientId(req: Request): string {
+// --- Общие параметры лимитов (решение владельца 22.11.2026, тик. 1795343610) ---
+// Единое окно 15 минут и потолок 3000 запросов для ВСЕХ лимитеров.
+// Прежний apiLimiter (100/15мин) выжигался одним активным клиентом, а ответ
+// 429 клиент трактовал как «сессия истекла» и уводил пользователя на экран
+// входа. Лимит остаётся барьером против флуда, но не мешает нормальной работе.
+export const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
+export const RATE_LIMIT_MAX = 3000;
+
+/**
+ * Ключ лимитирования — «на каждого свой» (тик. 1795343610).
+ *
+ * 1. `req.user` — если лимитер стоит после authRequired.
+ * 2. Иначе (глобальный лимитер в app.ts идёт ДО auth) — берём userId из
+ *    access-cookie и ПРОВЕРЯЕМ подпись: иначе произвольной cookie можно было бы
+ *    подделать ключ и обойти лимит.
+ * 3. Гость — по реальному IP: `trust proxy=1` в app.ts отдаёт адрес клиента,
+ *    а не адрес прокси-контейнера (иначе лимит был бы один на всех).
+ */
+export function getClientId(req: Request): string {
   // Если пользователь аутентифицирован — используем user ID
   const userId = (req as any).user?.id;
   if (userId) return `user:${userId}`;
-  return `ip:${req.ip || req.socket.remoteAddress || 'unknown'}`;
+
+  const token = req.cookies?.[ACCESS_COOKIE];
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, env.JWT_ACCESS_SECRET) as { userId?: string };
+      if (decoded?.userId) return `user:${decoded.userId}`;
+    } catch {
+      // Истёкший/битый токен — считаем как гостя по IP.
+    }
+  }
+
+  return `ip:${req.ip || req.socket?.remoteAddress || 'unknown'}`;
 }
 
 // --- Лимитер для API (общий) ---
-// Глобальный: 100 req/s (тикет №64)
+// Общий потолок: 3000 запросов / 15 минут (тик. 1795343610).
 export const apiLimiter: RateLimitRequestHandler = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 минут
-  max: 100, // 100 запросов на 15 минут
+  windowMs: RATE_LIMIT_WINDOW_MS,
+  max: RATE_LIMIT_MAX,
   standardHeaders: true,
   legacyHeaders: false,
   skipSuccessfulRequests: false,
@@ -26,55 +56,55 @@ export const apiLimiter: RateLimitRequestHandler = rateLimit({
   keyGenerator: getClientId,
 });
 
-// --- Лимитер для аутентификации (строже) ---
-// Auth endpoints: 5 req/min на IP (тикет №64)
+// --- Лимитер для аутентификации ---
+// До 22.11.2026 был строже (5/мин); теперь общий потолок 3000/15мин
+// (тик. 1795343610). Барьер против флуда сохранён, а ключ «на каждого свой»
+// (user/IP) не даёт одному клиенту выжечь лимит за всех.
 export const authLimiter: RateLimitRequestHandler = rateLimit({
-  windowMs: 60 * 1000, // 1 минута
-  max: 5, // 5 попыток на минуту
+  windowMs: RATE_LIMIT_WINDOW_MS,
+  max: RATE_LIMIT_MAX,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
-    error: 'Слишком много попыток авторизации. Подождите 1 минуту',
-    retryAfter: '1 minute',
+    error: 'Слишком много попыток авторизации, попробуйте позже',
+    retryAfter: '15 minutes',
   },
   keyGenerator: getClientId,
 });
 
 // --- Лимитер для сообщений ---
-// Messages: 30 req/min на пользователя (тикет №64)
 export const messageLimiter: RateLimitRequestHandler = rateLimit({
-  windowMs: 60 * 1000, // 1 минута
-  max: 30, // 30 сообщений на минуту
+  windowMs: RATE_LIMIT_WINDOW_MS,
+  max: RATE_LIMIT_MAX,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
-    error: 'Слишком много сообщений. Подождите',
-    retryAfter: '1 minute',
+    error: 'Слишком много сообщений, попробуйте позже',
+    retryAfter: '15 minutes',
   },
   keyGenerator: getClientId,
 });
 
-// --- Лимитер для загрузки файлов (очень строгий) ---
-// Upload: 10 req/min на пользователя (тикет №64)
+// --- Лимитер для загрузки файлов ---
 export const uploadLimiter: RateLimitRequestHandler = rateLimit({
-  windowMs: 60 * 1000, // 1 минута
-  max: 10, // 10 загрузок на минуту
+  windowMs: RATE_LIMIT_WINDOW_MS,
+  max: RATE_LIMIT_MAX,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
     error: 'Превышен лимит загрузки файлов',
-    retryAfter: '1 minute',
+    retryAfter: '15 minutes',
   },
   keyGenerator: getClientId,
 });
 
 // --- Лимитер для сервисных эмуляционных эндпоинтов (/api/service/*) ---
-// Доступ закрыт длинным секретом (SERVICE_API_KEY), но наполнение тестовыми
-// данными — это много последовательных запросов, поэтому лимит выше общего
-// apiLimiter (100/15мин). Барьер против перебора ключа сохраняется.
+// Доступ закрыт длинным секретом (SERVICE_API_KEY), барьер против перебора
+// ключа сохраняется. С 22.11.2026 — те же 3000/15мин, что и остальные
+// (тик. 1795343610).
 export const serviceLimiter: RateLimitRequestHandler = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 минут
-  max: 2000,
+  windowMs: RATE_LIMIT_WINDOW_MS,
+  max: RATE_LIMIT_MAX,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
@@ -85,19 +115,50 @@ export const serviceLimiter: RateLimitRequestHandler = rateLimit({
 });
 
 // --- Лимитер для OAuth (GET-редиректы) ---
-// OAuth: 10 req/min на IP (state-параметр + callback могут дать несколько
-// редиректов на один вход, поэтому не 5 как authLimiter)
+// GET-редиректы (начало OAuth и колбэки провайдеров) не являются вводом
+// учётных данных, но с 22.11.2026 делят общий потолок 3000/15мин
+// (тик. 1795343610).
 export const oauthLimiter: RateLimitRequestHandler = rateLimit({
-  windowMs: 60 * 1000, // 1 минута
-  max: 10, // 10 запросов на минуту
+  windowMs: RATE_LIMIT_WINDOW_MS,
+  max: RATE_LIMIT_MAX,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
-    error: 'Слишком много OAuth-запросов. Подождите 1 минуту',
-    retryAfter: '1 minute',
+    error: 'Слишком много OAuth-запросов, попробуйте позже',
+    retryAfter: '15 minutes',
   },
   keyGenerator: getClientId,
 });
+
+/**
+ * Выбор лимитера по пути и методу запроса (тик. 1795343610).
+ * Экспортируется для юнит-тестов маршрутизации.
+ *
+ * Порядок веток важен:
+ *   • Service API (/api/service/*) — отдельный лимитер: эмуляция создаёт много
+ *     сущностей подряд пачкой последовательных запросов.
+ *   • P28/P39: GET /api/auth/oauth/* — 302-редиректы (начало OAuth и колбэки
+ *     провайдеров), а не ввод учётных данных → отдельный oauthLimiter.
+ *   • Тик. 1793567633: служебные вызовы уже авторизованной сессии
+ *     (GET /api/auth/ws-token, POST /api/auth/refresh-cookie) выполняются при
+ *     каждом открытии приложения (React StrictMode дублирует эффект) и не
+ *     являются вводом учётных данных → общий apiLimiter, а не authLimiter.
+ */
+export function pickLimiter(req: Request): RateLimitRequestHandler {
+  if (req.path.startsWith('/api/service/')) return serviceLimiter;
+
+  if (req.method === 'GET' && req.path.startsWith('/api/auth/oauth/')) return oauthLimiter;
+
+  if (req.path === '/api/auth/ws-token' || req.path === '/api/auth/refresh-cookie') {
+    return apiLimiter;
+  }
+
+  if (req.path.startsWith('/api/auth/')) return authLimiter;
+  if (req.path.startsWith('/api/upload/')) return uploadLimiter;
+  if (req.path.startsWith('/api/chats/') && req.path.includes('/messages')) return messageLimiter;
+
+  return apiLimiter;
+}
 
 // --- Middleware для применения лимитеров ---
 export const applyRateLimit = (
@@ -111,48 +172,5 @@ export const applyRateLimit = (
     return;
   }
 
-  // Стратегия лимитирования зависит от пути (тикет №64)
-  // Service API (/api/service/*) — отдельный, более щедрый лимитер: эмуляция
-  // создаёт много сущностей подряд, общий apiLimiter (100/15мин) мешал бы.
-  const isServiceApi = req.path.startsWith('/api/service/');
-  // P28 (2026-09-19): GET /api/auth/oauth/* — это 302-редиректы (начало OAuth
-  // и колбэки провайдеров), а не ввод учётных данных. authLimiter (5/мин)
-  // срабатывал на приёмке раньше, чем проверялись все 4 провайдера, и браузер
-  // показывал сырой JSON 429. Строгий лимит остаётся на POST (ввод данных)
-  // и остальных /api/auth/* маршрутах.
-  //
-  // P39 (2026-10-05): OAuth GET-маршруты теперь имеют отдельный oauthLimiter
-  // (10/мин) вместо общего apiLimiter (100/15мин).
-  //
-  // Тик. 1793567633 (приёмка «два окна», 15.11.2026): в authLimiter (5/мин)
-  // попадали и служебные вызовы уже авторизованной сессии —
-  //   GET  /api/auth/ws-token      (берёт WS-токен из cookie),
-  //   POST /api/auth/refresh-cookie (продлевает пару токенов).
-  // Оба выполняются при каждом открытии приложения: React StrictMode дублирует
-  // эффект, поэтому ДВЕ вкладки с двумя аккаунтами выжигали лимит (2 refresh +
-  // 1 login на вкладку) и второй вход падал с 429 «Слишком много попыток
-  // авторизации» — то есть нормальный пользователь не мог зайти вторым окном.
-  // Это не подбор пароля: учётные данные в этих запросах не участвуют, а у
-  // refresh-cookie есть checkRefreshOrigin + валидация httpOnly-куки. Их уводит
-  // общий apiLimiter (100/15мин), строгий лимит остаётся на login/register/2fa.
-  const isOAuthGetRedirect =
-    req.method === 'GET' && req.path.startsWith('/api/auth/oauth/');
-  const isSessionMaintenance =
-    req.path === '/api/auth/ws-token' || req.path === '/api/auth/refresh-cookie';
-
-  if (isServiceApi) {
-    serviceLimiter(req, res, next);
-  } else if (isOAuthGetRedirect) {
-    oauthLimiter(req, res, next);
-  } else if (isSessionMaintenance) {
-    apiLimiter(req, res, next);
-  } else if (req.path.startsWith('/api/auth/') && !isOAuthGetRedirect) {
-    authLimiter(req, res, next);
-  } else if (req.path.startsWith('/api/upload/')) {
-    uploadLimiter(req, res, next);
-  } else if (req.path.startsWith('/api/chats/') && req.path.includes('/messages')) {
-    messageLimiter(req, res, next);
-  } else {
-    apiLimiter(req, res, next);
-  }
+  pickLimiter(req)(req, res, next);
 };

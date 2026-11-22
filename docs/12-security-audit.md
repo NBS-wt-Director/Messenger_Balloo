@@ -90,9 +90,9 @@ Critical `tar@6.0.5` (Decompression/parse DoS) живёт только в expo-�
 |---|---|---|
 | Role-based access | `adminOnly` middleware — проверка роли в JWT | ✅ |
 | Owner-only actions | Проверка `userId` в middleware каждого контроллера | ✅ |
-| Rate limiting | 4 лимитера: api (100/15min), auth (5/min), messages (30/min), upload (10/min) — `middleware/rateLimit.ts` | ✅ |
+| Rate limiting | 6 лимитеров, все 3000/15мин (api/auth/message/upload/service/oauth) — `middleware/rateLimit.ts`; ключ «на каждого»: userId из JWT-cookie, иначе реальный IP (`trust proxy=1`) | ✅ |
 | CORS | Строгий контроль origin через `CORS_ORIGIN` env (список 8 поддоменов) | ✅ |
-| Auth endpoints | `authLimiter` — 5 попыток/минуту | ✅ |
+| Auth endpoints | `authLimiter` — общий потолок 3000/15мин, ключ «на каждого» (тик. 1795343610) | ✅ |
 
 ### 2.2 A02: Cryptographic Failures
 
