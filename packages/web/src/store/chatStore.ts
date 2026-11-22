@@ -13,6 +13,15 @@ export interface UserChat extends Chat {
   unreadCount: number;
   lastMessage?: MessageWithSender;
   description?: string;
+  /** id участников чата (тик. 1795369072) — прячем контакты с открытым чатом. */
+  memberIds?: string[];
+  /** Собеседник direct-чата (тик. 1795369072) — имя/аватар для списка чатов. */
+  peer?: {
+    id: string;
+    username: string | null;
+    displayName: string | null;
+    avatarUrl: string | null;
+  } | null;
 }
 
 export interface MessageWithSender extends Message {

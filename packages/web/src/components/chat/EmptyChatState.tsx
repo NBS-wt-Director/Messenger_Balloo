@@ -24,10 +24,52 @@ interface EmptyChatStateProps {
 export function EmptyChatState({ onNewChat }: EmptyChatStateProps) {
   const navigate = useNavigate();
   const chats = useChatStore((s) => s.chats);
+  const setActiveChat = useChatStore((s) => s.setActiveChat);
+  const addChat = useChatStore((s) => s.addChat);
 
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const searchRef = React.useRef<HTMLInputElement>(null);
+
+  // Клик по контакту = начать/открыть личный чат (тик. 1795369072).
+  // Раньше вызывался onNewChat без id → navigate('/chat') = no-op.
+  const openChatWith = async (contact: Contact) => {
+    if (busyId) return;
+    setBusyId(contact.id);
+    try {
+      const chat = await api.createDirectChat(contact.id);
+      addChat({
+        ...chat,
+        joinedAt: chat.joinedAt ?? chat.createdAt ?? 0,
+        pinned: !!chat.pinned,
+        muted: !!chat.muted,
+        unreadCount: chat.unreadCount ?? 0,
+        peer: chat.peer ?? {
+          id: contact.id,
+          username: contact.username,
+          displayName: contact.displayName,
+          avatarUrl: contact.avatarUrl,
+        },
+      });
+      setActiveChat(chat.id);
+      navigate(`/chat/${chat.id}`);
+    } catch {
+      /* без сети/ошибка — остаёмся на экране */
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  // «Новый чат»: список контактов уже на экране — фокусируем поиск.
+  const focusNewChat = () => {
+    if (onNewChat) {
+      onNewChat();
+      return;
+    }
+    searchRef.current?.focus();
+  };
 
   // Load contacts and filter out those with existing chats
   useEffect(() => {
@@ -115,7 +157,7 @@ export function EmptyChatState({ onNewChat }: EmptyChatStateProps) {
 
         {/* Quick actions */}
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 40 }}>
-          <button className="btn btn--primary" onClick={onNewChat}>
+          <button className="btn btn--primary" onClick={focusNewChat}>
             ✏️ Новый чат
           </button>
           <button className="btn btn--secondary" onClick={() => navigate('/group/create')}>
@@ -135,6 +177,7 @@ export function EmptyChatState({ onNewChat }: EmptyChatStateProps) {
           {/* Search */}
           <div className="form-group" style={{ marginBottom: 12 }}>
             <input
+              ref={searchRef}
               type="text"
               className="form-input"
               placeholder="🔍 Поиск человека..."
@@ -164,8 +207,13 @@ export function EmptyChatState({ onNewChat }: EmptyChatStateProps) {
                     <div
                       key={contact.id}
                       className="list__item"
-                      style={{ border: 'none', padding: '8px 0', cursor: 'pointer' }}
-                      onClick={onNewChat}
+                      style={{
+                        border: 'none',
+                        padding: '8px 0',
+                        cursor: busyId ? 'default' : 'pointer',
+                        opacity: busyId === contact.id ? 0.5 : 1,
+                      }}
+                      onClick={() => openChatWith(contact)}
                     >
                       <div
                         className="avatar avatar--sm avatar--bordered"

@@ -47,7 +47,7 @@ function GroupSettingsScreen() {
   const [groupName, setGroupName] = useState('Моя группа');
   const [groupDescription, setGroupDescription] = useState('Описание группы');
   const [groupAvatar, setGroupAvatar] = useState<string | null>(null);
-  const [inviteLink, setInviteLink] = useState('https://balloo.su/join/abc123');
+  const [inviteLink, setInviteLink] = useState('https://balloo.su/#/join/abc123');
   const [members, setMembers] = useState<GroupMember[]>([
     {
       id: '1',

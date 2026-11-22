@@ -259,6 +259,28 @@
   padding: 20px;
 }
 
+/* Hover-рамка карточек (тик. 1795369073, макет common.css:2667-2690):
+   в «Нашей» теме --border-strong золотой — отсюда «золотые рамки». */
+.card {
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+
+.card:hover {
+  border-color: var(--border-strong);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  transform: translateY(-1px);
+}
+
+.card--hover {
+  transition: border-color 0.15s, transform 0.15s;
+  cursor: pointer;
+}
+
+.card--hover:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+}
+
 .card__title {
   font-size: 16px;
   font-weight: 700;
@@ -564,7 +586,9 @@
 .onboarding__dot {
   width: 8px;
   height: 8px;
-  background: var(--bg-elevated, #444);
+  /* Макет common.css: background var(--border-strong) — в «Нашей» теме золото
+     (тик. 1795369073). */
+  background: var(--border-strong);
   cursor: pointer;
   opacity: .5;
 }

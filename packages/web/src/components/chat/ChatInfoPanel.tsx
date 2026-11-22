@@ -1,7 +1,8 @@
 // ChatInfoPanel — панель информации о чате (справа)
 
-import React from 'react';
+import React, { useState } from 'react';
 import type { UserChat } from '@/store/chatStore';
+import { api } from '@/services/api';
 
 interface ChatInfoPanelProps {
   chat: UserChat;
@@ -18,6 +19,21 @@ export const ChatInfoPanel: React.FC<ChatInfoPanelProps> = ({
   members = [],
   onMemberClick,
 }) => {
+  const [inviteUrl, setInviteUrl] = useState('');
+  const [inviteBusy, setInviteBusy] = useState(false);
+
+  const handleCreateInvite = async () => {
+    setInviteBusy(true);
+    try {
+      const res = await api.createInviteLink(chat.id);
+      setInviteUrl(res.url || `https://balloo.su/#/join/${res.code}`);
+    } catch {
+      /* ошибка показана не будет — кнопка останется «Создать ссылку» */
+    } finally {
+      setInviteBusy(false);
+    }
+  };
+
   if (!isOpen) return null;
 
   const displayName = chat.name || 'Чат';
@@ -116,33 +132,47 @@ export const ChatInfoPanel: React.FC<ChatInfoPanelProps> = ({
 
         <div className="divider" />
 
-        {/* Invite link */}
-        <div style={{ padding: '16px' }}>
-          <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-            Ссылка для приглашения
-          </div>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '8px 12px',
-              background: 'var(--bg-tertiary)',
-              fontSize: '12px',
-              color: 'var(--text-muted)',
-            }}
-          >
-            <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              balloo.su/invite/{chat.inviteCode || 'xxxxx'}
-            </span>
-            <button
-              style={{ fontSize: '12px', color: 'var(--accent)', whiteSpace: 'nowrap' }}
-              onClick={() => navigator.clipboard.writeText(`balloo.su/invite/${chat.inviteCode}`)}
+        {/* Invite link (тик. 1795369071): ссылка создаётся реальным запросом —
+            статичный chat.inviteCode не резолвится preview/accept (они ищут
+            таблицу InviteLink) и вёл на URL без hash-роутера. */}
+        {chat.type !== 'direct' && (
+          <div style={{ padding: '16px' }}>
+            <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              Ссылка для приглашения
+            </div>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '8px 12px',
+                background: 'var(--bg-tertiary)',
+                fontSize: '12px',
+                color: 'var(--text-muted)',
+              }}
             >
-              Копировать
-            </button>
+              <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {inviteUrl || 'нажмите «Создать ссылку»'}
+              </span>
+              {!inviteUrl ? (
+                <button
+                  style={{ fontSize: '12px', color: 'var(--accent)', whiteSpace: 'nowrap' }}
+                  disabled={inviteBusy}
+                  onClick={handleCreateInvite}
+                >
+                  {inviteBusy ? '…' : 'Создать ссылку'}
+                </button>
+              ) : (
+                <button
+                  style={{ fontSize: '12px', color: 'var(--accent)', whiteSpace: 'nowrap' }}
+                  onClick={() => navigator.clipboard.writeText(inviteUrl)}
+                >
+                  Копировать
+                </button>
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="divider" />
 

@@ -9,6 +9,11 @@
   --bg-secondary: #0a0d11;
   --bg-tertiary: #14191f;
   --bg-glass: rgba(30, 36, 44, 0.65);
+  /* Стеклянная поверхность карточек/панелей (тик. 1795369073): экраны
+     (CreateGroup/CreateChannel/GroupSettings/…) красили контейнеры через
+     var(--surface), которая нигде не была определена → фон прозрачный.
+     В макете аналог этих карточек — .card (bg-glass + blur). */
+  --surface: var(--bg-glass);
   --bg-glass-hover: rgba(40, 48, 58, 0.75);
   --bg-hover: #252d36;
   --bg-active: #2d3742;
@@ -73,6 +78,7 @@
   --bg-secondary: #ffffff;
   --bg-tertiary: #eef1f5;
   --bg-glass: rgba(255, 255, 255, 0.72);
+  --surface: var(--bg-glass);
   --bg-glass-hover: rgba(255, 255, 255, 0.85);
   --bg-hover: #e8edf2;
   --bg-active: #dde4ec;
@@ -137,6 +143,7 @@
   --bg-secondary: #141821;
   --bg-tertiary: #1c2230;
   --bg-glass: rgba(28, 34, 48, 0.72);
+  --surface: var(--bg-glass);
   --bg-glass-hover: rgba(38, 46, 64, 0.82);
   --bg-hover: #283042;
   --bg-active: #323c52;

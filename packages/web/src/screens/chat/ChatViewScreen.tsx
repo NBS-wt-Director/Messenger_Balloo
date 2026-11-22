@@ -465,9 +465,7 @@ export const ChatViewScreen: React.FC = () => {
         </>
       ) : (
         /* Empty state when no chat is selected */
-        <EmptyChatState
-          onNewChat={() => navigate('/chat')}
-        />
+        <EmptyChatState />
       )}
     </div>
   );

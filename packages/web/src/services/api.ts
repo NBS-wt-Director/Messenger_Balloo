@@ -282,6 +282,13 @@ export const api = {
       data: undefined,
     }),
 
+  // Личный чат (тик. 1795369072): name не нужен, memberIds — ровно один собеседник.
+  createDirectChat: (peerId: string) =>
+    request<any>('/api/chats', {
+      method: 'POST',
+      data: { type: 'direct', memberIds: [peerId] },
+    }),
+
   createChat: (data: { type: string; name: string; description?: string }) =>
     request<any>('/api/chats', {
       method: 'POST',

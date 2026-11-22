@@ -276,7 +276,7 @@ export const API_MODULES: ApiModule[] = [
         description: 'Создание invite link.',
         auth: true,
         bodyExample: `{ "maxUses": 10, "expiresAt": 1700000000 }`,
-        responseExample: `{ "code": "abc123", "url": "https://balloo.su/invite/abc123" }`,
+        responseExample: `{ "code": "abc123", "url": "https://balloo.su/#/join/abc123" }`,
         responseCodes: [{ code: 201, description: 'Invite создан' }],
       },
       {

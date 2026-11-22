@@ -22,11 +22,18 @@ export const createChat = async (req: AuthenticatedRequest, res: Response, next:
   try {
     const userId = req.user!.id;
     const { type, name, description, avatarUrl, memberIds, groupType, settings, mediaCert } = req.body;
-    if (!type || !['group', 'channel'].includes(type)) {
+    if (!type || !['group', 'channel', 'direct'].includes(type)) {
       res.status(400).json({ error: 'Bad Request', message: 'Поле type обязательно' });
       return;
     }
-    if (!name || typeof name !== 'string' || name.trim().length === 0) {
+    // Личный чат (тик. 1795369072): имя не требуется, нужен ровно один
+    // собеседник в memberIds.
+    if (type === 'direct') {
+      if (!Array.isArray(memberIds) || memberIds.length !== 1 || memberIds[0] === userId) {
+        res.status(400).json({ error: 'Bad Request', message: 'Для личного чата нужен ровно один собеседник' });
+        return;
+      }
+    } else if (!name || typeof name !== 'string' || name.trim().length === 0) {
       res.status(400).json({ error: 'Bad Request', message: 'Поле name обязательно' });
       return;
     }
@@ -41,8 +48,8 @@ export const createChat = async (req: AuthenticatedRequest, res: Response, next:
     }
 
     const data = await createChatService(userId, {
-      type: type as 'group' | 'channel',
-      name: name.trim(),
+      type: type as 'group' | 'channel' | 'direct',
+      name: typeof name === 'string' ? name.trim() : undefined,
       description: description || undefined,
       avatarUrl: avatarUrl || undefined,
       memberIds: memberIds || undefined,

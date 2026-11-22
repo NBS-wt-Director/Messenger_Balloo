@@ -172,7 +172,8 @@ async function cacheFirst(request) {
 
   try {
     const response = await fetch(request);
-    if (response.ok) {
+    // Cache.put принимает только GET (тик. 1795369074) — тот же guard, что в apiFirst.
+    if (response.ok && request.method === 'GET') {
       const cache = await caches.open(CACHE_NAME);
       cache.put(request, response.clone());
     }
@@ -205,7 +206,9 @@ async function networkFirst(request) {
 async function apiFirst(request) {
   try {
     const response = await fetch(request);
-    if (response.ok) {
+    // Cache.put принимает только GET (тик. 1795369074): попытка положить POST
+    // бросала «Failed to execute 'put' on 'Cache': Request method 'POST'».
+    if (response.ok && request.method === 'GET') {
       const cache = await caches.open(DATA_CACHE_NAME);
       cache.put(request, response.clone());
     }

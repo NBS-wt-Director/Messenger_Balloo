@@ -6,6 +6,7 @@
 
 import React, { useMemo } from 'react';
 import type { UserChat } from '@/store/chatStore';
+import { displayNameOf } from '@/utils/display';
 
 interface ChatItemProps {
   chat: UserChat;
@@ -65,7 +66,12 @@ export const ChatItem = React.memo<ChatItemProps>(({ chat, active = false, onCli
     () => (lastMsg?.createdAt ? formatTime(lastMsg.createdAt) : ''),
     [lastMsg?.createdAt]
   );
-  const displayName = useMemo(() => chat.name || 'Чат', [chat.name]);
+  // Имя direct-чата = собеседник (тик. 1795369072): у direct-чата нет chat.name,
+  // сервер отдаёт peer {username, displayName}.
+  const displayName = useMemo(
+    () => chat.name || (chat.peer ? displayNameOf(chat.peer) : '') || 'Чат',
+    [chat.name, chat.peer]
+  );
   const initials = useMemo(() => getInitials(displayName), [displayName]);
   const avatarCtx = useMemo(() => getAvatarCtx(chat.type), [chat.type]);
 

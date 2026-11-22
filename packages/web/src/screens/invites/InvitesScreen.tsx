@@ -111,7 +111,7 @@ export default function InvitesScreen() {
   }, [fetchInvites]);
 
   const copyLink = useCallback(async (invite: Invite) => {
-    const url = invite.url || `https://balloo.su/join/${invite.code}`;
+    const url = invite.url || `https://balloo.su/#/join/${invite.code}`;
     try {
       await navigator.clipboard.writeText(url);
       setCopiedCode(invite.code);

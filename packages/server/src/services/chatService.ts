@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { ensureMutualContacts } from './userService';
 
 const prisma = new PrismaClient();
 
@@ -46,8 +47,8 @@ const canEditChat = (role: string): boolean => {
 };
 
 interface CreateChatInput {
-  type: 'group' | 'channel';
-  name: string;
+  type: 'group' | 'channel' | 'direct';
+  name?: string;
   description?: string;
   avatarUrl?: string;
   memberIds?: string[];
@@ -55,6 +56,69 @@ interface CreateChatInput {
 
 export const createChat = async (ownerId: string, input: CreateChatInput) => {
   const now = BigInt(Math.floor(Date.now() / 1000));
+
+  // Личный чат (тик. 1795369072): find-or-create между ownerId и единственным
+  // собеседником — идемпотентен, повторный вызов отдаёт тот же чат. Паттерн
+  // взят из callService.ts (там direct-чат создаётся при звонке).
+  if (input.type === 'direct') {
+    const peerId = input.memberIds?.[0];
+    if (!peerId || peerId === ownerId) {
+      throw new Error('Для личного чата нужен ровно один собеседник');
+    }
+
+    const existing = await prisma.chat.findFirst({
+      where: {
+        type: 'direct',
+        members: { every: { userId: { in: [ownerId, peerId] } } },
+      },
+      include: { members: true },
+    });
+
+    if (existing) {
+      await ensureMutualContacts(ownerId, peerId);
+      return {
+        id: existing.id,
+        type: existing.type,
+        name: existing.name,
+        avatarUrl: existing.avatarUrl,
+        inviteCode: existing.inviteCode,
+        createdAt: existing.createdAt,
+        updatedAt: existing.updatedAt,
+        memberCount: existing.members.length,
+      };
+    }
+
+    const chat = await prisma.chat.create({
+      data: {
+        type: 'direct',
+        createdAt: now,
+        updatedAt: now,
+        members: {
+          create: [
+            { userId: ownerId, role: 'member', joinedAt: now, lastRead: now, unread: 0, pinned: false, muted: false },
+            { userId: peerId, role: 'member', joinedAt: now, lastRead: now, unread: 0, pinned: false, muted: false },
+          ],
+        },
+      },
+      include: { members: true },
+    });
+
+    // Автосоздание контактов (тик. 1795270823): начавшие переписку становятся
+    // контактами друг друга.
+    await ensureMutualContacts(ownerId, peerId);
+
+    return {
+      id: chat.id,
+      type: chat.type,
+      name: chat.name,
+      avatarUrl: chat.avatarUrl,
+      inviteCode: chat.inviteCode,
+      createdAt: chat.createdAt,
+      updatedAt: chat.updatedAt,
+      memberCount: chat.members.length,
+    };
+  }
+
   const inviteCode = await generateUniqueInviteCode();
 
   const chat = await prisma.chat.create({
@@ -140,6 +204,9 @@ export const getChats = async ({ userId, page = 1, limit = 20, sortBy = 'lastMes
       chat: {
         include: {
           settings: true,
+          // memberIds нужны клиенту, чтобы прятать контакты с уже открытым
+          // чатом, и чтобы определить собеседника direct-чата (тик. 1795369072).
+          members: { select: { userId: true } },
           _count: {
             select: { members: true },
           },
@@ -175,6 +242,13 @@ export const getChats = async ({ userId, page = 1, limit = 20, sortBy = 'lastMes
       lastRead: m.lastRead,
       inviteCode: chat.inviteCode,
       memberCount: chat._count.members,
+      memberIds: chat.members.map((mm) => mm.userId),
+      peer: null as null | {
+        id: string;
+        username: string | null;
+        displayName: string | null;
+        avatarUrl: string | null;
+      },
       settings: chat.settings
         ? {
             allowMessages: chat.settings.allowMessages,
@@ -186,6 +260,28 @@ export const getChats = async ({ userId, page = 1, limit = 20, sortBy = 'lastMes
         : null,
     };
   });
+
+  // Собеседник для direct-чатов (тик. 1795369072): клиент показывает его имя
+  // вместо пустого chat.name. Один запрос на все direct-чаты.
+  const peerIds = [
+    ...new Set(
+      chats
+        .filter((c) => c.type === 'direct')
+        .flatMap((c) => c.memberIds.filter((id) => id !== userId))
+    ),
+  ];
+  if (peerIds.length > 0) {
+    const peers = await prisma.user.findMany({
+      where: { id: { in: peerIds } },
+      select: { id: true, username: true, displayName: true, avatarUrl: true },
+    });
+    const byId = new Map(peers.map((p) => [p.id, p]));
+    chats = chats.map((c) => {
+      if (c.type !== 'direct') return c;
+      const peerId = c.memberIds.find((id) => id !== userId);
+      return { ...c, peer: peerId ? byId.get(peerId) ?? null : null };
+    });
+  }
 
   if (sortBy === 'name') {
     chats.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
@@ -531,7 +627,7 @@ export const createInviteLink = async (chatId: string, creatorId: string, input:
     id: inviteLink.id,
     chatId: inviteLink.chatId,
     code: inviteLink.code,
-    url: `https://app.balloo.su/invite/${inviteLink.code}`,
+    url: `https://balloo.su/#/join/${inviteLink.code}`,
     maxUses: inviteLink.maxUses,
     expiresAt: inviteLink.expiresAt,
     usedCount: inviteLink.usedCount,
