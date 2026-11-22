@@ -48,8 +48,14 @@ async function request<T>(
 ): Promise<T> {
   const { data, headers: customHeaders, ...rest } = options;
 
+  // FormData (загрузка файла/аватара/истории): Content-Type должен проставить
+  // сам браузер — `multipart/form-data; boundary=…`. Явный application/json
+  // ломал загрузку: express.json() до multer пытался распарсить multipart-тело
+  // как JSON и отдавал 400 (тик. 1795381463).
+  const isFormData = typeof FormData !== 'undefined' && rest.body instanceof FormData;
+
   const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
+    ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
     // Мультиаккаунт (тик. 1792124252): сервер связывает вход/операции
     // аккаунтов со стабильным id устройства.
     'X-Device-Id': getDeviceId(),
