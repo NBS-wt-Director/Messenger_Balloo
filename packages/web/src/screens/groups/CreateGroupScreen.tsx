@@ -6,11 +6,12 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '@/services/api';
 import { useChatStore } from '@/store/chatStore';
+import { displayNameOf, initialsOf } from '@/utils/display';
 
 interface Contact {
   id: string;
-  username: string;
-  displayName: string;
+  username: string | null;
+  displayName: string | null;
   avatarUrl: string | null;
 }
 
@@ -144,8 +145,8 @@ function CreateGroupScreen() {
 
   const filteredContacts = contacts.filter((c) => {
     if (!contactSearch.trim()) return true;
-    const q = contactSearch.toLowerCase();
-    return c.displayName.toLowerCase().includes(q) || c.username.toLowerCase().includes(q);
+    const q = contactSearch.trim().toLowerCase();
+    return displayNameOf(c).toLowerCase().includes(q) || (c.username ?? '').toLowerCase().includes(q);
   });
 
   const handleAvatarClick = () => {
@@ -508,13 +509,15 @@ function CreateGroupScreen() {
                   }} onClick={() => toggleContact(c.id)}>
                     <div className="flex items-center gap-3">
                       <div className="avatar avatar--sm avatar--bordered" style={{ clipPath: 'var(--octagon-clip)', flexShrink: 0 }}>
-                        {c.avatarUrl ? <img src={c.avatarUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : (
-                          <div className="avatar__inner"><span>{c.displayName.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)}</span></div>
+                        {c.avatarUrl ? <img src={c.avatarUrl} alt={displayNameOf(c)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : (
+                          <div className="avatar__inner"><span>{initialsOf(displayNameOf(c))}</span></div>
                         )}
                       </div>
                       <div style={{ flex: 1 }}>
-                        <div className="font-semibold" style={{ fontSize: 13 }}>{c.displayName}</div>
-                        <div className="text-xs" style={{ opacity: 0.7 }}>@{c.username}</div>
+                        <div className="font-semibold" style={{ fontSize: 13 }}>{displayNameOf(c)}</div>
+                        {c.username && (
+                          <div className="text-xs" style={{ opacity: 0.7 }}>@{c.username}</div>
+                        )}
                       </div>
                       <span style={{ fontSize: 18 }}>{sel ? '✅' : '⬜'}</span>
                     </div>

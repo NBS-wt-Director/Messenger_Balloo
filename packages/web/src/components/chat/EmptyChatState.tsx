@@ -7,11 +7,12 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '@/services/api';
 import { useChatStore } from '@/store/chatStore';
+import { displayNameOf, initialsOf } from '@/utils/display';
 
 interface Contact {
   id: string;
-  username: string;
-  displayName: string;
+  username: string | null;
+  displayName: string | null;
   avatarUrl: string | null;
   status?: string;
 }
@@ -57,11 +58,10 @@ export function EmptyChatState({ onNewChat }: EmptyChatStateProps) {
 
   const filteredContacts = contacts.filter((c) => {
     if (!search.trim()) return true;
-    const q = search.toLowerCase();
-    return (
-      c.displayName.toLowerCase().includes(q) ||
-      c.username.toLowerCase().includes(q)
-    );
+    const q = search.trim().toLowerCase();
+    const name = displayNameOf(c).toLowerCase();
+    const login = (c.username ?? '').toLowerCase();
+    return name.includes(q) || login.includes(q);
   });
 
   return (
@@ -174,24 +174,17 @@ export function EmptyChatState({ onNewChat }: EmptyChatStateProps) {
                         {contact.avatarUrl ? (
                           <img
                             src={contact.avatarUrl}
-                            alt={contact.displayName}
+                            alt={displayNameOf(contact)}
                             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                           />
                         ) : (
                           <div className="avatar__inner">
-                            <span>
-                              {contact.displayName
-                                .split(' ')
-                                .map((n) => n[0])
-                                .join('')
-                                .toUpperCase()
-                                .slice(0, 2)}
-                            </span>
+                            <span>{initialsOf(displayNameOf(contact))}</span>
                           </div>
                         )}
                       </div>
                       <div className="list__item-body">
-                        <div className="list__item-title">{contact.displayName}</div>
+                        <div className="list__item-title">{displayNameOf(contact)}</div>
                         <div className="list__item-subtitle">
                           {contact.status === 'online' ? 'в сети' : 'был(а) недавно'}
                         </div>

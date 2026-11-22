@@ -6,11 +6,12 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '@/services/api';
 import { useChatStore } from '@/store/chatStore';
+import { displayNameOf, initialsOf } from '@/utils/display';
 
 interface Contact {
   id: string;
-  username: string;
-  displayName: string;
+  username: string | null;
+  displayName: string | null;
   avatarUrl: string | null;
 }
 
@@ -134,11 +135,10 @@ function CreateChannelScreen() {
 
   const filteredContacts = contacts.filter((c) => {
     if (!contactSearch.trim()) return true;
-    const q = contactSearch.toLowerCase();
-    return (
-      c.displayName.toLowerCase().includes(q) ||
-      c.username.toLowerCase().includes(q)
-    );
+    const q = contactSearch.trim().toLowerCase();
+    const name = displayNameOf(c).toLowerCase();
+    const login = (c.username ?? '').toLowerCase();
+    return name.includes(q) || login.includes(q);
   });
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -607,25 +607,18 @@ function CreateChannelScreen() {
                           {contact.avatarUrl ? (
                             <img
                               src={contact.avatarUrl}
-                              alt={contact.displayName}
+                              alt={displayNameOf(contact)}
                               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                             />
                           ) : (
                             <div className="avatar__inner">
-                              <span>
-                                {contact.displayName
-                                  .split(' ')
-                                  .map((n) => n[0])
-                                  .join('')
-                                  .toUpperCase()
-                                  .slice(0, 2)}
-                              </span>
+                              <span>{initialsOf(displayNameOf(contact))}</span>
                             </div>
                           )}
                         </div>
                         <div>
                           <div className="font-semibold" style={{ fontSize: 13 }}>
-                            {contact.displayName}
+                            {displayNameOf(contact)}
                           </div>
                           <div className="text-xs" style={{ opacity: 0.7 }}>
                             @{contact.username}
