@@ -9,6 +9,11 @@ import './styles/design-system.css';
 import './styles/chat.css';
 // P35: стили единой шапки/подвала из @balloo/ui (.topbar*, .balloo-footer*)
 import '@balloo/ui/styles/chrome.css';
+import { installPreloadErrorGuard } from './utils/preloadErrorGuard';
+
+// Самовосстановление после деплоя в открытой вкладке (тик. 1795292000):
+// упавший динамический импорт чанка → перезагрузка со свежим index.html.
+installPreloadErrorGuard();
 
 // Тикет 1794831100 (A.1): регистрация SW — только на прод-хостах.
 // На dev-сервере Vite сам отдаёт всё по-новому, SW будет мешать hot-reload.
