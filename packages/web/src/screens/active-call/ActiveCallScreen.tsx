@@ -5,6 +5,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '@/services/api';
 import { useAuthStore } from '@/store/authStore';
+import { PageChrome } from '@/components/chrome/PageChrome';
 
 interface Participant {
   id: string;
@@ -62,6 +63,7 @@ export default function ActiveCallScreen() {
   }, [navigate]);
 
   return (
+    <PageChrome title="Звонок">
     <div className="call-overlay">
       {/* Header */}
       <div className="call-header">
@@ -160,5 +162,6 @@ export default function ActiveCallScreen() {
         </button>
       </div>
     </div>
+    </PageChrome>
   );
 }

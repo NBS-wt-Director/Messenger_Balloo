@@ -11,6 +11,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import jsQR from 'jsqr';
 import { AppTopbar } from '@/components/chrome/AppTopbar';
+import { AppFooter } from '@/components/chrome/AppFooter';
 import { api } from '@/services/api';
 import { parsePairDeepLink } from '@/utils/pairLink';
 
@@ -319,6 +320,9 @@ function PairScanScreen() {
           </div>
         </div>
       </div>
+
+      {/* Единый подвал (тик. 1795292000) */}
+      <AppFooter />
     </div>
   );
 }

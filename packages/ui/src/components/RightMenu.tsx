@@ -1,20 +1,21 @@
-// RightMenu — сворачиваемое ПРАВОЕ меню шапки (P38, тикет №1)
-// Контракт: mockups/assets/common.js buildRightMenu() строки 433–554
-// («Unified across all nodes — built by common.js»):
-//   триггер .topbar__menu-btn: гость → маскот 🐻, авторизован → октагон-аватар;
-//   панель .right-menu (fixed, top:56px, right:0, 280px):
-//     «Язык / Language» → подменю языков; «Тема» → подменю тем; divider;
-//     юр. пункты (Приватность / Правила пользования); divider; «Аккаунт»:
-//       гость → кнопки Вход + Регистрация; авторизован → Профиль / Настройки /
-//       Мультиаккаунт / Выйти.
-//   поведение: toggle по кнопке, подменю ▾/▴, закрытие по клику вне и Escape.
-//   2026-10-01 (В-12, тикет 1790847000): в авторизованную секцию «Аккаунт»
-//   добавлен пункт «Контакты» → /contacts (решение владельца при приёмке
-//   экрана 1_01_05).
+// Правое меню шапки — РОВНО ДВА меню (решение владельца 22.11.2026):
+//
+//   1. PrivateRightMenu — ЧАСТНОЕ, только для авторизованного. Триггер —
+//      аватарка пользователя, а если её нет — логотип компании. Панель —
+//      частные пункты приложения (Профиль/Контакты/Истории/Приглашения/
+//      Настройки/Аккаунты). В гостевом режиме не рендерится вовсе.
+//
+//   2. RightMenu — ОБЩЕЕ, для всех. Триггер — статичный маскот 🐻. Панель —
+//      общие пункты: язык, тема, юр. ссылки; авторизован → «Выйти»,
+//      гость → «Вход»/«Регистрация». Всегда САМОЕ ПРАВОЕ.
+//
+// Порядок в правом блоке: [контент экрана] [частное] [общее].
+// Эталон состава панели — mockups/assets/common.js buildRightMenu() (433–570),
+// но по решению владельца меню разделено на частное и общее.
 //
 // Расхождения мокапа с контрактом web (решения зафиксированы в мультитикете §7 P38):
 //   - языков 20 (SUPPORTED_LANGUAGES), а не 6 из мокапа;
-//   - «Мультиаккаунт» — новое требование владельца, в мокапа нет; ведёт на
+//   - «Мультиаккаунт» — новое требование владельца, в мокапе нет; ведёт на
 //     /profile (секция аккаунтов в ProfileScreen; маршрута /accounts в web нет);
 //   - «Техподдержка» (/support) в web не реализован — в меню не кладётся;
 //   - Cookies в правом меню мокапа нет — не добавляем.
@@ -40,29 +41,39 @@ export interface RightMenuItem {
   icon: string;
 }
 
-/** Контент авторизации для Topbar→RightMenu (web прокидывает из AuthProvider) */
+/** Контент авторизации для Topbar→RightMenu/PrivateRightMenu (web прокидывает из AuthProvider) */
 export interface RightMenuAuth {
-  /** true — аватар + пункты аккаунта + Выйти; false/нет — маскот + Вход/Регистрация */
+  /** true — частное меню + «Выйти» в общем; false/нет — общее меню с Вход/Регистрация */
   isAuthenticated?: boolean;
-  /** Инициалы в аватар-триггере (авторизованный) */
+  /** Инициалы авторизованного (alt аватара частного меню) */
   initials?: string;
+  /** URL аватарки авторизованного; нет — логотип компании (частное меню) */
+  avatarUrl?: string | null;
   /** Клик по «Выйти» (авторизованный) */
   onLogout?: () => void;
 }
 
 export interface RightMenuProps {
-  /** 'guest' — кнопки Вход/Регистрация; 'user' — пункты аккаунта + Выйти */
+  /** 'guest' — кнопки Вход/Регистрация; 'user' — «Выйти» */
   auth?: 'guest' | 'user';
-  /** Инициалы в аватар-триггере (авторизованный), по умолчанию «ИИ» как в мокапе */
-  userInitials?: string;
   /** Юр. пункты (по умолчанию: Приватность /privacy, Правила /rules) */
   legalItems?: RightMenuItem[];
-  /** Пункты «Аккаунт» для авторизованного (по умолчанию: Профиль/Настройки/Мультиаккаунт) */
-  accountItems?: RightMenuItem[];
   /** Клик по «Выйти» (нет — пункт не рендерится) */
   onLogout?: () => void;
   /** Переходы гостя (по умолчанию: /login, /register) */
   guestActions?: { loginTo: string; registerTo: string };
+  /** SPA-навигация (react-router navigate). Нет — переход location.href. */
+  onNavigate?: (to: string) => void;
+}
+
+/** Пропсы частного (авторизованного) меню. */
+export interface PrivateRightMenuProps {
+  /** Инициалы авторизованного (alt аватара) */
+  initials?: string;
+  /** URL аватарки; нет — логотип компании */
+  avatarUrl?: string | null;
+  /** Частные пункты (по умолчанию: Профиль/Контакты/Истории/Приглашения/Настройки/Аккаунты) */
+  items?: RightMenuItem[];
   /** SPA-навигация (react-router navigate). Нет — переход location.href. */
   onNavigate?: (to: string) => void;
 }
@@ -86,8 +97,8 @@ export const DEFAULT_LEGAL_ITEMS: RightMenuItem[] = [
 ];
 
 /**
- * Пункты секции «Аккаунт» по умолчанию. Экспортированы: тест проверяет по ним
- * наличие ключей в словаре, чтобы список не мог устареть молча.
+ * Частные пункты приложения (по умолчанию). Экспортированы: тест проверяет по
+ * ним наличие ключей в словаре, чтобы список не мог устареть молча.
  */
 export const DEFAULT_ACCOUNT_ITEMS: RightMenuItem[] = [
   { key: 'menu.profile', to: '/profile', icon: '👤' },
@@ -104,11 +115,36 @@ export const DEFAULT_GUEST_ACTIONS = { loginTo: '/login', registerTo: '/register
 
 type SubmenuKey = 'lang' | 'theme' | null;
 
+/** Общее поведение сворачиваемой панели: закрытие по клику вне и по Escape
+ *  (common.js:549–562). Переиспользуется частным и общим меню. */
+function usePanelBehavior() {
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    function handleClick(e: MouseEvent) {
+      if (rootRef.current && !rootRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') setOpen(false);
+    }
+    document.addEventListener('mousedown', handleClick);
+    document.addEventListener('keydown', handleKey);
+    return () => {
+      document.removeEventListener('mousedown', handleClick);
+      document.removeEventListener('keydown', handleKey);
+    };
+  }, [open]);
+
+  return { open, setOpen, rootRef };
+}
+
 export function RightMenu({
   auth = 'guest',
-  userInitials = 'ИИ',
   legalItems,
-  accountItems,
   onLogout,
   guestActions,
   onNavigate,
@@ -118,38 +154,18 @@ export function RightMenu({
   // balloo.su маршруты главного SPA недоступны → абсолютные hash-URL.
   const hostDefaults = rightMenuTargetsForHost();
   const legal = legalItems ?? hostDefaults.legal;
-  const account = accountItems ?? hostDefaults.account;
   const guest = guestActions ?? hostDefaults.guest;
   const language = useUIStore((s) => s.language);
   const setLanguage = useUIStore((s) => s.setLanguage);
   const theme = useUIStore((s) => s.theme);
   const setTheme = useUIStore((s) => s.setTheme);
 
-  const [open, setOpen] = useState(false);
+  const { open, setOpen, rootRef } = usePanelBehavior();
   const [submenu, setSubmenu] = useState<SubmenuKey>(null);
-  const rootRef = useRef<HTMLDivElement>(null);
 
-  // Закрытие по клику вне (common.js:549–553) и по Escape
+  // Сброс подменю при закрытии панели
   useEffect(() => {
-    if (!open) return;
-    function handleClick(e: MouseEvent) {
-      if (rootRef.current && !rootRef.current.contains(e.target as Node)) {
-        setOpen(false);
-        setSubmenu(null);
-      }
-    }
-    function handleKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') {
-        setOpen(false);
-        setSubmenu(null);
-      }
-    }
-    document.addEventListener('mousedown', handleClick);
-    document.addEventListener('keydown', handleKey);
-    return () => {
-      document.removeEventListener('mousedown', handleClick);
-      document.removeEventListener('keydown', handleKey);
-    };
+    if (!open) setSubmenu(null);
   }, [open]);
 
   const go = (to: string) => {
@@ -168,7 +184,8 @@ export function RightMenu({
 
   return (
     <div className="right-menu-host" ref={rootRef}>
-      {/* Триггер: гость — маскот 🐻, авторизован — октагон-аватар (common.js:452–463) */}
+      {/* Триггер ОБЩЕГО меню — статичный маскот для всех ролей
+          (решение владельца 22.11.2026). Аватарка/логотип — в частном меню. */}
       <button
         type="button"
         id="balloo-menu-btn"
@@ -178,15 +195,7 @@ export function RightMenu({
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
       >
-        {auth === 'guest' ? (
-          <img className="mascot" src="/assets/logos/mascot.png" alt="Маскот Balloo — медведь Борис" />
-        ) : (
-          <div className="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact">
-            <div className="avatar__inner">
-              <span>{userInitials}</span>
-            </div>
-          </div>
-        )}
+        <img className="mascot" src="/assets/logos/mascot.png" alt="Маскот Balloo — медведь Борис" />
       </button>
 
       {/* Панель (common.js:522–526: append в body; здесь — внутри host,
@@ -275,7 +284,8 @@ export function RightMenu({
 
         <div className="right-menu__divider" />
 
-        {/* Аккаунт */}
+        {/* Аккаунт: гость → Вход/Регистрация; авторизован → Выйти.
+            Частные пункты приложения живут в PrivateRightMenu. */}
         <div className="right-menu__section-label">{t('settings.account')}</div>
         {auth === 'guest' ? (
           <div className="right-menu__auth-guest">
@@ -287,41 +297,96 @@ export function RightMenu({
             </button>
           </div>
         ) : (
-          <>
-            {account.map((item) => (
-              <div
-                key={String(item.key)}
-                className="right-menu__item"
-                role="menuitem"
-                tabIndex={open ? 0 : -1}
-                onClick={() => go(item.to)}
-              >
-                <span className="right-menu__item-icon">{item.icon}</span>
-                <span className="right-menu__item-label">{t(item.key)}</span>
-              </div>
-            ))}
-            {onLogout && (
-              <div
-                className="right-menu__item"
-                role="menuitem"
-                tabIndex={open ? 0 : -1}
-                onClick={() => {
-                  setOpen(false);
-                  setSubmenu(null);
-                  onLogout();
-                }}
-              >
-                <span className="right-menu__item-icon">🚪</span>
-                <span className="right-menu__item-label">{t('auth.logout')}</span>
-              </div>
-            )}
-          </>
+          onLogout && (
+            <div
+              className="right-menu__item"
+              role="menuitem"
+              tabIndex={open ? 0 : -1}
+              onClick={() => {
+                setOpen(false);
+                setSubmenu(null);
+                onLogout();
+              }}
+            >
+              <span className="right-menu__item-icon">🚪</span>
+              <span className="right-menu__item-label">{t('auth.logout')}</span>
+            </div>
+          )
         )}
       </div>
     </div>
   );
 }
 
-// NOTE: This file was patched — mascot emoji replaced with actual image.
-// The emoji was at line 166: <img className="mascot" src="/assets/logos/mascot.png" alt="Маскот Balloo — медведь Борис" />
-// Now replaced with: <img className="mascot" src="/assets/logos/mascot.png" alt="Маскот Balloo" />
+/**
+ * PrivateRightMenu — ЧАСТНОЕ правое меню (видит только авторизованный).
+ * Триггер: аватарка пользователя, а если её нет — логотип компании. Панель —
+ * частные пункты приложения. Общее меню (RightMenu) идёт правее частного.
+ */
+export function PrivateRightMenu({
+  initials = 'ИИ',
+  avatarUrl = null,
+  items,
+  onNavigate,
+}: PrivateRightMenuProps) {
+  const { t } = useI18n();
+  const hostDefaults = rightMenuTargetsForHost();
+  const menuItems = items ?? hostDefaults.account;
+
+  const { open, setOpen, rootRef } = usePanelBehavior();
+
+  const go = (to: string) => {
+    setOpen(false);
+    if (onNavigate && !/^https?:\/\//.test(to)) {
+      onNavigate(to);
+    } else {
+      // Статический сайт / абсолютный URL поддомена / SPA без роутера
+      window.location.href = to;
+    }
+  };
+
+  return (
+    <div className="right-menu-host" ref={rootRef}>
+      {/* Триггер ЧАСТНОГО меню — аватарка или логотип компании (тик. 1795292000) */}
+      <button
+        type="button"
+        id="balloo-private-menu-btn"
+        className={`topbar__menu-btn${open ? ' topbar__menu-btn--open' : ''}`}
+        title={t('menu.button')}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+      >
+        <div className="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact">
+          <div className="avatar__inner">
+            {avatarUrl ? (
+              <img src={avatarUrl} alt={initials} />
+            ) : (
+              <img src="/assets/logos/company-logo.png" alt="Balloo" />
+            )}
+          </div>
+        </div>
+      </button>
+
+      <div
+        id="balloo-private-menu"
+        className={`right-menu${open ? ' right-menu--open' : ''}`}
+        role="menu"
+        aria-hidden={!open}
+      >
+        {menuItems.map((item) => (
+          <div
+            key={String(item.key)}
+            className="right-menu__item"
+            role="menuitem"
+            tabIndex={open ? 0 : -1}
+            onClick={() => go(item.to)}
+          >
+            <span className="right-menu__item-icon">{item.icon}</span>
+            <span className="right-menu__item-label">{t(item.key)}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}

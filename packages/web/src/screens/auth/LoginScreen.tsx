@@ -86,10 +86,7 @@ function LoginScreen() {
       }}
     >
       {/* Единая шапка (@balloo/ui, P35) — как в макете login.html */}
-      <AppTopbar
-        title={t('auth.loginPage')}
-        right={<img className="mascot" src="/assets/logos/mascot.png" alt="Маскот Balloo — медведь Борис" />}
-      />
+      <AppTopbar title={t('auth.loginPage')} />
 
       {/* Auth card */}
       <div className="auth-container">

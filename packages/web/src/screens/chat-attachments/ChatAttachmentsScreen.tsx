@@ -4,6 +4,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '@/services/api';
+import { PageChrome } from '@/components/chrome/PageChrome';
 
 type TabType = 'media' | 'audio' | 'files' | 'links' | 'polls';
 
@@ -70,6 +71,7 @@ export default function ChatAttachmentsScreen() {
   ];
 
   return (
+    <PageChrome title="Вложения чата">
     <div className="chat-attachments-panel">
       {/* Заголовок */}
       <div className="chat-attachments-header">
@@ -169,5 +171,6 @@ export default function ChatAttachmentsScreen() {
         )}
       </div>
     </div>
+    </PageChrome>
   );
 }

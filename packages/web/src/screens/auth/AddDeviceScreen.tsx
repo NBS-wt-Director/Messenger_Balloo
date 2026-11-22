@@ -121,10 +121,7 @@ function AddDeviceScreen() {
       }}
     >
       {/* Единая шапка (@balloo/ui, P35) */}
-      <AppTopbar
-        title="Добавить устройство"
-        right={<img className="mascot" src="/assets/logos/mascot.png" alt="Маскот Balloo — медведь Борис" />}
-      />
+      <AppTopbar title="Добавить устройство" />
 
       {/* Content (narrow) */}
       <div

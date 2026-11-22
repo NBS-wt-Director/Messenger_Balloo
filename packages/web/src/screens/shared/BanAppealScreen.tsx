@@ -4,6 +4,7 @@
 
 import { useState } from 'react';
 import { useUIStore } from '@balloo/ui';
+import { PageChrome } from '@/components/chrome/PageChrome';
 
 interface BanAppealScreenProps {
   onClose?: () => void;
@@ -69,10 +70,11 @@ function BanAppealScreen({ onClose }: BanAppealScreenProps) {
       : 'countdown';
 
   return (
+    <PageChrome title="Обжалование бана">
     <div
       className="appeal-overlay"
       style={{
-        position: 'fixed',
+        position: 'absolute',
         inset: 0,
         zIndex: 9999,
         display: 'flex',
@@ -256,6 +258,7 @@ function BanAppealScreen({ onClose }: BanAppealScreenProps) {
         </div>
       </div>
     </div>
+    </PageChrome>
   );
 }
 

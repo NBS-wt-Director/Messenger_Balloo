@@ -7,6 +7,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '@/services/api';
+import { PageChrome } from '@/components/chrome/PageChrome';
 
 interface Invite {
   id: string;
@@ -183,9 +184,10 @@ export default function InvitesScreen() {
     .join(', ');
 
   return (
-    <div className="page-container">
-      <h1 className="page-title">Приглашения</h1>
-      <p className="page-subtitle">Создавайте ссылки-приглашения для групп</p>
+    <PageChrome title="Приглашения">
+      <div className="page-container">
+        <h1 className="page-title">Приглашения</h1>
+        <p className="page-subtitle">Создавайте ссылки-приглашения для групп</p>
 
       {/* Табы */}
       <div className="tabs">
@@ -431,6 +433,7 @@ export default function InvitesScreen() {
           )}
         </div>
       )}
-    </div>
+      </div>
+    </PageChrome>
   );
 }

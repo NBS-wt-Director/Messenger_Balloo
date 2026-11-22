@@ -35,8 +35,8 @@ function NotFoundScreen() {
         textAlign: 'center',
       }}
     >
-      {/* P35: единая шапка по макету error-404.html */}
-      <AppTopbar title="Ошибка 404" right={<img className="mascot" src="/assets/logos/mascot.png" alt="Маскот Balloo — медведь Борис" />} />
+      {/* P35: единая шапка по макету error-404.html (правое меню строит Topbar) */}
+      <AppTopbar title="Ошибка 404" />
 
       <div
         style={{

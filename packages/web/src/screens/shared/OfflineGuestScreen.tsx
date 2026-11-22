@@ -7,7 +7,7 @@ import { AppFooter } from '@/components/chrome/AppFooter';
 function OfflineGuestScreen() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-      <AppTopbar title="Офлайн" right={<img className="mascot" src="/assets/logos/mascot.png" alt="Маскот Balloo" />} />
+      <AppTopbar title="Офлайн" />
 
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 24px', textAlign: 'center' }}>
         <div style={{ fontSize: 72, marginBottom: 16 }}>🦊📡</div>

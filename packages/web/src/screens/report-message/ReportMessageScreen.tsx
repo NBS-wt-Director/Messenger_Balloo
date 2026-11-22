@@ -4,6 +4,7 @@
 import { useState, useCallback } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { api } from '@/services/api';
+import { PageChrome } from '@/components/chrome/PageChrome';
 
 interface ReportReason {
   id: string;
@@ -69,6 +70,7 @@ export default function ReportMessageScreen() {
   }
 
   return (
+    <PageChrome title="Жалоба на сообщение">
     <div className="report-panel">
       {/* Заголовок */}
       <div className="report-header">
@@ -139,5 +141,6 @@ export default function ReportMessageScreen() {
         </button>
       </div>
     </div>
+    </PageChrome>
   );
 }

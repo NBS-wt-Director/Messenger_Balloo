@@ -27,11 +27,12 @@ export {
 } from './components/ecosystem';
 export { ThemeSwitcher } from './components/ThemeSwitcher';
 export { LanguageSwitcher } from './components/LanguageSwitcher';
-export { RightMenu } from './components/RightMenu';
+export { RightMenu, PrivateRightMenu } from './components/RightMenu';
 export type {
   RightMenuAuth,
   RightMenuItem,
   RightMenuProps,
+  PrivateRightMenuProps,
 } from './components/RightMenu';
 
 // Cookie utils (функциональные cookie, общие для поддоменов)

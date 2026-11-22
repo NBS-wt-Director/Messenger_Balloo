@@ -1,27 +1,30 @@
 // Topbar — ЕДИНАЯ шапка всех сайтов balloo.su (тик. №1, P35)
 // Структура по макетам (mockups/assets/common.css: .topbar):
 //   [лого-меню (TopbarMenu)] [заголовок раздела (.topbar__title)] [правый блок (.topbar__right)]
-// Правый блок: произвольный контент сайта (аватар, колокольчик, маскот) +
-// переключатели языка и темы (общий контракт).
+// Правый блок: контент сайта (колокольчик/кнопки) + ДВА правых меню
+// (решение владельца 22.11.2026):
+//   • частное (PrivateRightMenu) — только авторизованному, триггер-аватарка/лого;
+//   • общее (RightMenu) — всем, триггер-маскот, самое правое.
 //
 // Стили — @balloo/ui/styles/chrome.css (копия .topbar* из common.css).
 
 import React from 'react';
 import { TopbarMenu, type TopbarMenuItem } from './TopbarMenu';
-import { RightMenu, type RightMenuAuth } from './RightMenu';
+import { RightMenu, PrivateRightMenu, type RightMenuAuth } from './RightMenu';
 
 interface TopbarProps {
-  /** Заголовок раздела (центр, .topbar__title) */
-  title?: string;
+  /** Заголовок раздела (центр, .topbar__title). ReactNode — чтобы вместить
+   *  бегущую строку уведомления (тик. 1795292000). */
+  title?: React.ReactNode;
   /** Клик по заголовку (в макетах — режим обучения); нет — заголовок не кликабелен */
   onTitleClick?: () => void;
-  /** Доп. контекст справа ПЕРЕД переключателями (аватар, уведомления, маскот) */
+  /** Доп. контекст справа ПЕРЕД меню (колокольчик, кнопки) */
   right?: React.ReactNode;
   /** Кнопки-действия раздела (.topbar__actions) — между заголовком и правым блоком */
   actions?: React.ReactNode;
-  /** Показывать ли правое меню (default: true) */
+  /** Показывать ли общее меню (default: true) */
   showSwitchers?: boolean;
-  /** Авторизация для RightMenu (автор/настройки/аккаунты/войти-выйти) */
+  /** Авторизация для правых меню (частное + аккаунт/вход-выход в общем) */
   auth?: RightMenuAuth;
   /** Пункты меню лого (default: разделы balloo.su) */
   menuItems?: TopbarMenuItem[];
@@ -58,10 +61,18 @@ export function Topbar({
 
       <div className="topbar__right">
         {right}
+        {/* Частное меню — только авторизованному */}
+        {auth?.isAuthenticated && (
+          <PrivateRightMenu
+            initials={auth.initials}
+            avatarUrl={auth.avatarUrl}
+            onNavigate={onNavigate}
+          />
+        )}
+        {/* Общее меню — всем, самое правое */}
         {showSwitchers && (
           <RightMenu
             auth={auth?.isAuthenticated ? 'user' : 'guest'}
-            userInitials={auth?.initials}
             onLogout={auth?.onLogout}
             onNavigate={onNavigate}
           />

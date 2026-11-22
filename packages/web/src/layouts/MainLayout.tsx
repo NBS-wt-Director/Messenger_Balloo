@@ -11,15 +11,13 @@ import { Sidebar } from '@/components/sidebar/Sidebar';
 import { ChatList } from '@/components/chat/ChatList';
 import { AppTopbar } from '@/components/chrome/AppTopbar';
 import { AppFooter } from '@/components/chrome/AppFooter';
-import { NotificationsBell } from '@/components/topbar/NotificationsBell';
-import { useAuthStore } from '@/store/authStore';
+import { sectionTitleForPath } from '@/components/chrome/sectionTitles';
 
 function MainLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const isSidebarOpen = useUIStore((s) => s.isSidebarOpen);
   const setSidebarOpen = useUIStore((s) => s.setSidebarOpen);
-  const user = useAuthStore((s) => s.user);
 
   // Responsive handling — реактивно (state), чтобы поворот/ресайз перерисовывал колонки
   const [viewport, setViewport] = useState<'mobile' | 'tablet' | 'desktop'>(() =>
@@ -55,15 +53,8 @@ function MainLayout() {
   const showChatList = !isMobile || isChatIndex;
   const showOutlet = !(isMobile && isChatIndex);
 
-  // Аватар пользователя в шапке (клик → профиль), как в макете chats.html
-  const displayName = user?.displayName || user?.username || '';
-  const initials = displayName
-    .split(' ')
-    .filter(Boolean)
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
+  // Аватар пользователя в шапке (клик → профиль) теперь строит AppTopbar
+  // по состоянию авторизации (тик. 1795292000) — здесь дублировать не нужно.
 
   return (
     <div
@@ -77,9 +68,11 @@ function MainLayout() {
         background: 'var(--app-bg)',
       }}
     >
-      {/* Единая шапка (@balloo/ui) — на всю ширину, как в макете */}
+      {/* Единая шапка (@balloo/ui) — на всю ширину, как в макете.
+          Заголовок — раздел текущего маршрута (тик. 1795292000);
+          правый блок (колокольчик + аватар / «Войти») строит AppTopbar. */}
       <AppTopbar
-        title="Чаты"
+        title={sectionTitleForPath(location.pathname)}
         actions={
           <>
             {/* Быстрый доступ к историям и приглашениям (тик. 1795282577) */}
@@ -99,21 +92,6 @@ function MainLayout() {
             >
               📨
             </button>
-          </>
-        }
-        right={
-          <>
-            <NotificationsBell />
-            <div
-              className="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact"
-              title={displayName || 'Профиль'}
-              onClick={() => navigate('/profile')}
-              style={{ cursor: 'pointer' }}
-            >
-              <div className="avatar__inner">
-                {user?.avatarUrl ? <img src={user.avatarUrl} alt={displayName} /> : <span>{initials || '?'}</span>}
-              </div>
-            </div>
           </>
         }
       />

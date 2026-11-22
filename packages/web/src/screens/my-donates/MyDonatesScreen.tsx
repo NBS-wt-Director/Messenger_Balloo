@@ -4,6 +4,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '@/services/api';
+import { PageChrome } from '@/components/chrome/PageChrome';
 
 interface Donation {
   id: string;
@@ -60,6 +61,7 @@ export default function MyDonatesScreen() {
   };
 
   return (
+    <PageChrome title="Мои донаты">
     <div className="page-container">
       <h1 className="page-title">💝 Мои донаты</h1>
 
@@ -125,5 +127,6 @@ export default function MyDonatesScreen() {
         </>
       )}
     </div>
+    </PageChrome>
   );
 }

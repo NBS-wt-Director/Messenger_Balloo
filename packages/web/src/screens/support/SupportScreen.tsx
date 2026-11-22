@@ -11,6 +11,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AppTopbar } from '@/components/chrome/AppTopbar';
+import { AppFooter } from '@/components/chrome/AppFooter';
 import { api } from '@/services/api';
 import { useAuthStore } from '@/store/authStore';
 
@@ -199,6 +200,9 @@ export function SupportScreen() {
           ➤
         </button>
       </div>
+
+      {/* Единый подвал (тик. 1795292000) */}
+      <AppFooter />
     </div>
   );
 }

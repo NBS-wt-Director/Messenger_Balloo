@@ -39,6 +39,59 @@ interface StoryReaction {
   createdAt: number;
 }
 
+// Ответ GET /api/stories — НЕ массив StoryUser[]: сервер отдаёт
+// `{ stories, nextCursor }` (storyService.getStories), где каждая история
+// плоская, а автор вложен в `user`. Раньше этот объект клали прямо в state,
+// `users.filter(...)` падал с TypeError и ErrorBoundary заменял всю страницу
+// (вместе с шапкой/подвалом) на «Что-то пошло не так».
+interface ApiStory {
+  id: string;
+  userId: string;
+  type: string;
+  mediaUrl: string;
+  thumbnail: string | null;
+  createdAt: number;
+  expiresAt: number;
+  viewCount: number;
+  hasViewed?: boolean;
+  user?: {
+    id: string;
+    username?: string | null;
+    displayName?: string | null;
+    avatarUrl?: string | null;
+  };
+}
+
+// Группируем плоский список историй в StoryUser[] (по одному элементу на автора).
+function groupStories(list: ApiStory[]): StoryUser[] {
+  const byUser = new Map<string, StoryUser>();
+  for (const s of list) {
+    const group = byUser.get(s.userId) ?? {
+      id: s.userId,
+      userId: s.userId,
+      username: s.user?.username ?? '',
+      displayName: s.user?.displayName || s.user?.username || 'Пользователь',
+      avatarUrl: s.user?.avatarUrl ?? null,
+      stories: [],
+      hasUnviewed: false,
+    };
+    group.stories.push({
+      id: s.id,
+      userId: s.userId,
+      type: s.type as Story['type'],
+      mediaUrl: s.mediaUrl,
+      thumbnail: s.thumbnail,
+      createdAt: s.createdAt,
+      expiresAt: s.expiresAt,
+      viewCount: s.viewCount,
+      reactions: [],
+    });
+    if (!s.hasViewed) group.hasUnviewed = true;
+    byUser.set(s.userId, group);
+  }
+  return Array.from(byUser.values());
+}
+
 // --- Story Circle Component ---
 
 function StoryCircle({
@@ -427,8 +480,13 @@ function StoriesScreen() {
   const loadStories = async () => {
     setLoading(true);
     try {
-      const data = await api.get<StoryUser[]>('/api/stories');
-      setUsers(data);
+      // Сервер отдаёт объект { stories, nextCursor }; на всякий случай
+      // принимаем и голый массив (старые моки/эндпоинты).
+      const res = await api.get<{ stories?: ApiStory[] } | ApiStory[]>(
+        '/api/stories'
+      );
+      const list = Array.isArray(res) ? res : res?.stories ?? [];
+      setUsers(groupStories(list));
     } catch {
       setUsers([]);
     } finally {

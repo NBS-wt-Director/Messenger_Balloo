@@ -4,6 +4,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '@/services/api';
+import { PageChrome } from '@/components/chrome/PageChrome';
 
 interface Device {
   id: string;
@@ -102,6 +103,7 @@ export default function MyDevicesScreen() {
   const activeCount = devices.filter((d) => d.sessions?.some((s) => s.isActive)).length;
 
   return (
+    <PageChrome title="Мои устройства">
     <div className="page-container page-container--narrow">
       <button className="btn btn--tertiary btn--sm" onClick={() => navigate('/profile')}>
         ← Назад в профиль
@@ -230,5 +232,6 @@ export default function MyDevicesScreen() {
         </>
       )}
     </div>
+    </PageChrome>
   );
 }

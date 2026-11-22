@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '@/services/api';
 import { useAuthStore } from '@/store/authStore';
 import { useI18n } from '@/components/providers/I18nProvider';
+import { PageChrome } from '@/components/chrome/PageChrome';
 
 interface ApiTranslation {
   language: string;
@@ -128,11 +129,13 @@ export default function OnboardingScreen() {
 
   if (loading) {
     return (
-      <div className="onboarding">
-        <div className="onboarding__step onboarding__step--active">
-          <p>Загрузка...</p>
+      <PageChrome title="Онбординг">
+        <div className="onboarding">
+          <div className="onboarding__step onboarding__step--active">
+            <p>Загрузка...</p>
+          </div>
         </div>
-      </div>
+      </PageChrome>
     );
   }
 
@@ -142,6 +145,7 @@ export default function OnboardingScreen() {
   if (!step) return null;
 
   return (
+    <PageChrome title="Онбординг">
     <div className="onboarding">
       <div className="onboarding__step onboarding__step--active">
         <h2 className="onboarding__title">{step.title}</h2>
@@ -181,5 +185,6 @@ export default function OnboardingScreen() {
         </div>
       </div>
     </div>
+    </PageChrome>
   );
 }

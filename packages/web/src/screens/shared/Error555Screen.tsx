@@ -7,7 +7,7 @@ import { AppFooter } from '@/components/chrome/AppFooter';
 function Error555Screen() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-      <AppTopbar title="Ошибка 555" right={<img className="mascot" src="/assets/logos/mascot.png" alt="Маскот Balloo" />} />
+      <AppTopbar title="Ошибка 555" />
 
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 24px', textAlign: 'center' }}>
         <div style={{ fontSize: 72, marginBottom: 16 }}>🦊🔒</div>

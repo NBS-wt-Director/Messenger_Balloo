@@ -212,10 +212,7 @@ function RegisterScreen() {
       }}
     >
       {/* Единая шапка (@balloo/ui, P35) — как в макете register.html */}
-      <AppTopbar
-        title={t('auth.register')}
-        right={<img className="mascot" src="/assets/logos/mascot.png" alt="Маскот Balloo — медведь Борис" />}
-      />
+      <AppTopbar title={t('auth.register')} />
 
       {/* Auth */}
       <div className="auth-container">

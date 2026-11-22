@@ -3,6 +3,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '@/services/api';
+import { PageChrome } from '@/components/chrome/PageChrome';
 
 interface Bot {
   id: string;
@@ -69,7 +70,8 @@ export default function BotsScreen() {
   };
 
   return (
-    <div className="page-container">
+    <PageChrome title="Боты">
+      <div className="page-container">
       <h1 className="page-title">🤖 Боты в Balloo</h1>
       <p className="page-subtitle">Создание и управление ботами через Balloo Bot API</p>
 
@@ -158,6 +160,7 @@ export default function BotsScreen() {
           📚 Полная документация API →
         </a>
       </div>
-    </div>
+      </div>
+    </PageChrome>
   );
 }

@@ -526,7 +526,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
+  /* Внутри единой шапки/подвала (тик. 1795292000) экран занимает
+     контентную область, а не всю высоту вьюпорта. */
+  flex: 1;
+  min-height: 0;
   padding: 24px;
 }
 .onboarding__step {
@@ -598,4 +601,78 @@
 
 .page-container--narrow {
   max-width: 640px;
+}
+
+/* ---------- Режим обучения (тик. 1795292000) ---------- */
+/* Панель справки, открывается кликом по заголовку в шапке. */
+.learning-help {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.learning-help__window {
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow);
+}
+
+.learning-help__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.learning-help__icon {
+  font-size: 22px;
+}
+
+.learning-help__title {
+  flex: 1;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.learning-help__list {
+  margin: 0;
+  padding: 16px 20px;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.learning-help__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.learning-help__item-icon {
+  flex-shrink: 0;
+}
+
+.learning-help__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 20px;
+  border-top: 1px solid var(--border-color);
 }

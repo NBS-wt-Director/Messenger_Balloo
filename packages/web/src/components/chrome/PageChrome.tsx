@@ -21,7 +21,10 @@ export function PageChrome({ title, right, footer = true, children }: PageChrome
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
       <AppTopbar title={title} right={right} />
-      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      {/* position:relative — чтобы экраны-оверлеи (например, обжалование бана)
+          позиционировались внутри контентной области, не перекрывая шапку/подвал
+          (тик. 1795292000). */}
+      <div style={{ position: 'relative', flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {children}
       </div>
       {footer && <AppFooter />}

@@ -5,6 +5,7 @@ import { useState, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { api } from '@/services/api';
 import { useAuthStore } from '@/store/authStore';
+import { PageChrome } from '@/components/chrome/PageChrome';
 
 interface MessageEdit {
   id: string;
@@ -98,6 +99,7 @@ export default function MessageEditorScreen() {
   }
 
   return (
+    <PageChrome title={isReply ? 'Ответ на сообщение' : 'Редактирование сообщения'}>
     <div className="modal-overlay" onClick={() => navigate(-1)}>
       <div className="modal modal--editor" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
@@ -192,5 +194,6 @@ export default function MessageEditorScreen() {
         </div>
       </div>
     </div>
+    </PageChrome>
   );
 }

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import LoginScreen from '../../screens/auth/LoginScreen';
 import { I18nProvider } from '../../components/providers/I18nProvider';
@@ -32,8 +32,11 @@ describe('LoginScreen (сценарий авторизации)', () => {
     renderLogin();
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/пароль/i)).toBeInTheDocument();
+    // Кнопка «Войти» в правом блоке шапки (гость, тик. 1795292000) тоже носит
+    // это имя, поэтому submit ищем внутри карточки формы.
+    const card = document.querySelector('.auth-card') as HTMLElement;
     expect(
-      screen.getByRole('button', { name: /^войти$/i })
+      within(card).getByRole('button', { name: /^войти$/i })
     ).toBeInTheDocument();
   });
 

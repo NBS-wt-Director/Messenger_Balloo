@@ -18,6 +18,17 @@ interface UIState {
   isSettingsOpen: boolean;
   isSearchOpen: boolean;
 
+  /**
+   * Режим обучения (тик. 1795292000): активируется кликом по заголовку в шапке.
+   * Пока включён — показываем панель подсказок по текущему экрану.
+   */
+  learningMode: boolean;
+  /**
+   * Бегущая строка уведомления в шапке (тик. 1795292000): пока строка показывается,
+   * она заменяет заголовок раздела; по окончании заголовок возвращается.
+   */
+  notice: string | null;
+
   // Actions
   toggleSidebar: () => void;
   setSidebarOpen: (isOpen: boolean) => void;
@@ -27,6 +38,11 @@ interface UIState {
   setSettingsOpen: (isOpen: boolean) => void;
   toggleSearch: () => void;
   setSearchOpen: (isOpen: boolean) => void;
+  toggleLearningMode: () => void;
+  setLearningMode: (isOpen: boolean) => void;
+  setNotice: (message: string | null) => void;
+  /** Показать бегущую строку на `durationMs` мс, затем вернуть заголовок */
+  showNotice: (message: string, durationMs?: number) => void;
 }
 
 // Load saved sidebar state from cookie (default: open)
@@ -45,6 +61,8 @@ export const useUIStore = create<UIState>()((set) => ({
   isRightPanelOpen: false,
   isSettingsOpen: false,
   isSearchOpen: false,
+  learningMode: false,
+  notice: null,
 
   toggleSidebar: () =>
     set((state) => {
@@ -65,4 +83,14 @@ export const useUIStore = create<UIState>()((set) => ({
 
   toggleSearch: () => set((state) => ({ isSearchOpen: !state.isSearchOpen })),
   setSearchOpen: (isOpen: boolean) => set({ isSearchOpen: isOpen }),
+
+  toggleLearningMode: () => set((state) => ({ learningMode: !state.learningMode })),
+  setLearningMode: (isOpen: boolean) => set({ learningMode: isOpen }),
+
+  setNotice: (message: string | null) => set({ notice: message }),
+  showNotice: (message: string, durationMs = 6000) => {
+    set({ notice: message });
+    // По окончании показа возвращаем заголовок (тик. 1795292000).
+    setTimeout(() => set({ notice: null }), durationMs);
+  },
 }));

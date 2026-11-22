@@ -1,27 +1,44 @@
-// AppTopbar — web-обёртка единой шапки из @balloo/ui (P35, тикет №1)
+// AppTopbar — web-обёртка единой шапки из @balloo/ui (P35, тикет №1;
+// тик. 1795292000 — единая шапка на всех экранах).
 // Topbar из @balloo/ui + SPA-навигация react-router для лого-меню разделов.
 // ЕДИНАЯ шапка всех экранов balloo.su (по макетам: .topbar из common.css).
+//
+// Отвечает за:
+//   • заголовок раздела (по центру) — кликабельная кнопка;
+//   • контент правого блока ПЕРЕД меню:
+//       авторизован — колокольчик уведомлений;
+//       гость       — кнопка «Войти»;
+//   • передачу авторизации в Topbar для ДВУХ правых меню (тик. 1795292000):
+//       частное (PrivateRightMenu) — аватарка/логотип, только авторизованному;
+//       общее (RightMenu) — маскот, всем, самое правое;
+//   • бегущую строку уведомления вместо заголовка на время показа;
+//   • активацию режима обучения по клику на заголовок.
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Topbar, type RightMenuAuth } from '@balloo/ui';
 import { useAuthStore } from '@/store/authStore';
+import { useUIStore } from '@/store/uiStore';
+import { NotificationsBell } from '@/components/topbar/NotificationsBell';
+import { LearningHelp } from './LearningHelp';
 
 interface AppTopbarProps {
   /** Заголовок раздела (центр, .topbar__title) */
   title?: string;
-  /** Клик по заголовку (режим обучения в макетах) */
+  /** Клик по заголовку. По умолчанию — активация режима обучения. */
   onTitleClick?: () => void;
-  /** Доп. контент справа ПЕРЕД переключателями (аватар, колокольчик, маскот) */
+  /**
+   * Контент правого блока ПЕРЕД правыми меню. Если не задан — строится
+   * автоматически: колокольчик (авторизован) или кнопка «Войти» (гость).
+   * Два правых меню (частное/общее) рисует Topbar (тик. 1795292000).
+   */
   right?: React.ReactNode;
   /** Кнопки-действия раздела (.topbar__actions) — Истории/Приглашения и т.п. */
   actions?: React.ReactNode;
-  /** Показывать переключатели языка/темы (default: true) */
+  /** Показывать общее меню (default: true) */
   showSwitchers?: boolean;
   /**
-   * Авторизация для правого меню. По умолчанию берётся из authStore —
-   * раньше не прокидывалась вовсе, и RightMenu всегда рисовал гостевой
-   * вариант (маскот + «Войти/Регистрация») даже у вошедшего пользователя.
+   * Авторизация для правых меню. По умолчанию берётся из authStore.
    * Явным `auth={null}` можно принудительно вернуть гостевой вид.
    */
   auth?: RightMenuAuth | null;
@@ -43,12 +60,18 @@ export function AppTopbar({ title, onTitleClick, right, actions, showSwitchers =
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
 
+  const learningMode = useUIStore((s) => s.learningMode);
+  const toggleLearningMode = useUIStore((s) => s.toggleLearningMode);
+  const notice = useUIStore((s) => s.notice);
+  const showNotice = useUIStore((s) => s.showNotice);
+
   // auth === undefined — из стора; auth === null — гость принудительно.
   const menuAuth: RightMenuAuth | undefined =
     auth === undefined
       ? {
           isAuthenticated,
           initials: initialsOf(user),
+          avatarUrl: user?.avatarUrl ?? null,
           onLogout: () => {
             logout();
             navigate('/');
@@ -56,15 +79,64 @@ export function AppTopbar({ title, onTitleClick, right, actions, showSwitchers =
         }
       : auth ?? undefined;
 
+  const authed = Boolean(auth ? auth.isAuthenticated : isAuthenticated);
+
+  // Контент правого блока ПЕРЕД правыми меню: явный `right` побеждает; иначе —
+  // колокольчик (авторизован) или кнопка «Войти» (гость). Два правых меню
+  // (частное с аватаркой и общее с маскотом) рисует Topbar (тик. 1795292000).
+  const rightBlock =
+    right !== undefined ? (
+      right
+    ) : authed ? (
+      <NotificationsBell />
+    ) : (
+      <button
+        type="button"
+        className="topbar__login-btn btn btn--primary btn--sm"
+        onClick={() => navigate('/login')}
+      >
+        Войти
+      </button>
+    );
+
+  // Клик по заголовку: режим обучения + бегущая строка уведомления,
+  // после показа заголовок возвращается (тик. 1795292000).
+  const handleTitleClick = () => {
+    if (onTitleClick) {
+      onTitleClick();
+      return;
+    }
+    const next = !learningMode;
+    toggleLearningMode();
+    if (next) {
+      showNotice(
+        'Режим обучения включён — нажмите на элементы интерфейса, чтобы узнать их назначение',
+        6000
+      );
+    }
+  };
+
+  // Пока идёт бегущая строка — она заменяет заголовок.
+  const titleNode = notice ? (
+    <span className="topbar__ticker" role="status" aria-live="polite">
+      <span className="topbar__ticker-inner">{notice}</span>
+    </span>
+  ) : (
+    title
+  );
+
   return (
-    <Topbar
-      title={title}
-      onTitleClick={onTitleClick}
-      right={right}
-      actions={actions}
-      showSwitchers={showSwitchers}
-      auth={menuAuth}
-      onNavigate={navigate}
-    />
+    <>
+      <Topbar
+        title={titleNode}
+        onTitleClick={handleTitleClick}
+        right={rightBlock}
+        actions={actions}
+        showSwitchers={showSwitchers}
+        auth={menuAuth}
+        onNavigate={navigate}
+      />
+      {learningMode && <LearningHelp title={typeof title === 'string' ? title : undefined} />}
+    </>
   );
 }
