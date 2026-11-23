@@ -53,7 +53,9 @@ api.ts:69  POST https://api.balloo.su/api/upload/file 400 (Bad Request)
 - [x] 1. `api.ts` `request()`: `Content-Type: application/json` только для не-FormData
 - [x] 2. Регресс-тест `__tests__/services/api.upload.test.ts` (заголовок не json, body — FormData)
 - [x] 3. Проверки: `tsc --noEmit` (web), `pnpm test:web`, `vite build`
-- [ ] 4. Деплой web (батчами, по команде владельца)
+- [x] 4. Деплой web — батчи D/F/G, 23.11.2026: `HEAD=4e9e9e5`, бандль
+      `index-B6MIL7kE.js` (=8090=домен), маркер `instanceof FormData` = 1
+      (в прежнем образе = 0)
 
 ## Результат
 
@@ -74,6 +76,31 @@ pnpm --filter @balloo/web exec vite build      → ✓ built in 7.63s (index-DUN
 ```
 
 Требуется деплой **web**.
+
+## Деплой (батчи D/F/G, 23.11.2026)
+
+```text
+D: git fetch origin → origin/main=4e9e9e5; git checkout -B main origin/main → HEAD=4e9e9e5
+E: откатный тег balloo/web:rollback-20261123b = 8c1aff2cfd9f (= web:local);
+   дамп БД pre-deploy-20261123b.sql — 182 742 B
+F: build web → слои 18/28 (COPY packages/web) и 24/28 (vite build) БЕЗ CACHED,
+   config-хэш 6e2f7825… (≠ ce0a4364 прежнего образа);
+   up -d --no-deps --force-recreate web → Container balloo-web Started (9.8s)
+G: HEAD=4e9e9e5; web img=9c121cb3… restarts=0;
+   бандль: 8090 = index-B6MIL7kE.js = домен (≠ index-BMWJl9HD.js)
+G2 (маркер фикса, устойчивый к минификации):
+   новый образ balloo-web  : `instanceof FormData` = 1
+     контекст: "undefined"!=typeof FormData&&n.body instanceof FormData?{}:{"Content-Type":"application/json"}
+   прежний rollback-20261123b: index-BMWJl9HD.js, `instanceof FormData` = 0
+   server: Up 13 hours (healthy) — не перезапускался; postgres/redis/minio — Up 2 weeks
+```
+
+Откат не потребовался. Тег `balloo/web:rollback-20261123b` и дамп
+`pre-deploy-20261123b.sql` остаются на сервере.
+
+**Остаток — браузерная приёмка владельца:** вложение в чат (скрепка → файл →
+отправить) → `POST /api/upload/file` отвечает 200, файл появляется в сообщении;
+загрузка аватара пользователя тоже работает.
 
 ## Критерии готовности
 
