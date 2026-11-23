@@ -63,7 +63,8 @@ const usersWithStories = users.filter((u) => u.stories.length > 0);
 - [x] 1. `StoriesScreen`: нормализация ответа `{ stories, nextCursor }` →
       группировка по пользователю в `StoryUser[]`
 - [x] 2. Регрессионный тест: объектный ответ `/api/stories` не роняет экран
-- [ ] 3. Шапка/подвал на экранах без них — объём уточняется у владельца
+- [x] 3. Шапка/подвал на экранах без них — реализовано в тикете `1795292000`
+      (единый `PageChrome`/`AppTopbar`/`AppFooter` на всех экранах)
 - [x] 4. Проверки: `tsc --noEmit` (web), `pnpm test:web`, `vite build`
 
 ## Выполнено

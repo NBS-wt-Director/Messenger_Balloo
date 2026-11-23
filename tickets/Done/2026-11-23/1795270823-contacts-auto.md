@@ -44,3 +44,10 @@
 - Регистрация по приглашению → `authService.register` → `applyInviteOnRegister`
 - Звонок (direct-чат) → `callService.createCall`
 - Service API: `POST /api/service/contacts/mutual`
+
+## Деплой и приёмка
+
+Код входит в задеплоенный диапазон (прод `65b4606`, батчи C3–G3 23.11.2026;
+ранее `24975f7` 22.11.2026) — см. `tickets/Done/2026-11-23/1795357403…`.
+Пользовательская приёмка авто-контактов — на владельце (раздел A свода
+`with_lord/СДЕЛАТЬ_ВЛАДЕЛЬЦУ.md`).
