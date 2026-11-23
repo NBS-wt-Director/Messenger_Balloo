@@ -4,7 +4,7 @@
 > сборке, запуске и правилах работы в этом монорепо. Дополняет `AGENTS.md`
 > (там — ролевые и процессные правила) и `CONTRIBUTING.md`.
 >
-> Обновлено: 20.11.2026.
+> Обновлено: 23.11.2026.
 
 ---
 
@@ -37,7 +37,7 @@
 | Десктоп | Electron, Vite, TypeScript |
 | Доставка | Nginx (reverse proxy), CDN — MinIO (self-hosted S3) |
 | Мониторинг | Prometheus + Grafana (docker-профиль monitoring) |
-| Тесты | vitest (shared, web), jest (server), Cypress (e2e) |
+| Тесты | vitest (shared, web, web-admin), jest (server), Cypress (e2e) |
 
 ---
 
@@ -112,7 +112,8 @@ pnpm build:shared
 
 ```bash
 pnpm test             # все тесты монорепо (последовательно!)
-pnpm test:server      # jest
+pnpm test:all         # то же, но `-r --parallel` — НЕ использовать (см. ниже)
+pnpm test:server      # jest --runInBand
 pnpm test:web         # vitest
 pnpm test:shared      # vitest
 pnpm test:e2e         # cypress (web)
@@ -120,7 +121,12 @@ pnpm test:e2e         # cypress (web)
 
 > ⚠️ **`pnpm test` и пакетные прогоны запускать только последовательно.** Параллельные
 > процессы делят одну тестовую БД `balloo` и лимит Postgres `max_connections=100` →
-> падение ws-тестов с `● Timeout`, хотя поодиночке они зелёные.
+> падение ws-тестов с `● Timeout`, хотя поодиночке они зелёные. По той же причине
+> `pnpm test:all` (`pnpm -r --parallel test`) для серверных наборов не годится.
+>
+> Своих тестов нет у `ui`, `web-features`, `web-history`, `web-download`, `desktop`:
+> их `test` — `echo` (у `desktop` — `exit 0`). Реально тестируются
+> `shared`/`server`/`web`/`web-admin`.
 
 ### Проверка типов
 
@@ -151,9 +157,10 @@ pnpm db:studio        # prisma studio
 pnpm lint
 ```
 
-> ⚠️ **`pnpm lint` НЕ является проверкой.** В `shared` скрипта нет; в
-> `server`/`web`/`ui`/`desktop` это `echo "No linter configured yet"`. Зелёный
-> `pnpm lint` ничего не доказывает. Настоящая проверка = `tsc --noEmit` + тесты + `vite build`.
+> ⚠️ **`pnpm lint` НЕ является проверкой.** Скрипта `lint` нет вовсе в `shared`
+> и `web-admin`; в `ui`/`server`/`web`/`web-features`/`web-history`/`web-download`/
+> `desktop` это `echo "No linter configured yet"`. Зелёный `pnpm lint` ничего не
+> доказывает. Настоящая проверка = `tsc --noEmit` + тесты + `vite build`.
 
 ### Docker (локально)
 
@@ -263,3 +270,17 @@ prune -a`; миграции/`prisma db push` «на всякий случай».
   (после фикса `791f283`).
 - Локальная сборка/тесты ≠ прод: состояние прода доказывается только обращением
   к проду (read-only `curl`, `scripts/p37-prod-check.cjs`) или выводом сервера.
+- **Service API** — `/api/service/*` с заголовком `X-Service-Key` (`SERVICE_API_KEY`
+  из `.env.production`): админские операции без сессии (уборка тестовых данных,
+  создание пользователей, контакты). Подключён в `routes/index.ts:93`.
+- **Клиент `services/api.ts`:** `request()` НЕ ставит `Content-Type: application/json`,
+  когда тело — `FormData` (загрузка файла/аватара/истории). Иначе глобальный
+  `express.json()` парсит multipart как JSON и отдаёт `400` (тик. `1795381463`).
+  Тот же принцип: upload-роутер `multer` стоит после `express.json` — multipart
+  должен доходить до multer без предварительного JSON-парсинга.
+- **Реальные данные прода:** пользователи `o8eryuhtin` (admin), `chiv2607`,
+  `lev224838` — не трогать. Тестовые чаты/пользователи удаляются скриптом тикета
+  `1795254659` (порядок: сначала чаты, потом пользователи).
+- **Масштаб (на 23.11.2026):** Prisma — 82 модели, 22 миграции; миграции только
+  аддитивные, диапазоны деплоя часто идут без миграций (проверять
+  `git diff --stat <a>..<b> -- packages/shared/prisma`).
