@@ -4,8 +4,9 @@
 // Структура (одна строка):
 //   [© copy → меню] ···точки··· [Поддержка] ···точки··· [Правила|Конфиденциальность|Cookies]
 //
-// Меню (клик по copyright): «О компании» (активно), «Контакты»/«О Balloo»/
-// «Другие проекты компании» (Позже), «Поддержать нас» (активно).
+// Меню (клик по copyright): «О компании» и «Поддержать нас» — рабочие экраны;
+// «Контакты» и «Другие проекты компании» — заглушка «Экран в разработке»
+// (требование владельца 24.11.2026: пункты активны, а не «(Позже)»).
 // Пустые зоны заполнены декоративными «бегущими» точками (.balloo-footer__dots).
 // Стили — @balloo/ui/styles/chrome.css.
 // Хост-осознанные ссылки (тик. 1794575221): на чужих поддоменах balloo.su
@@ -14,7 +15,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useI18n } from '../providers/I18nProvider';
 import type { TranslationKey } from '@balloo/shared';
-import { footerLinksForHost } from './ecosystem';
+import { footerLinksForHost, mainSiteUrl } from './ecosystem';
 
 export interface FooterLink {
   key: TranslationKey | string;
@@ -25,12 +26,14 @@ export interface FooterLink {
 // «Поддержка» вынесена отдельной ссылкой, «О компании»/«Поддержать нас» — в меню.
 export const DEFAULT_FOOTER_LINKS: FooterLink[] = footerLinksForHost();
 
-/** Пункты меню подвала (тик. 1795507295). soon=true → неактивный «(Позже)». */
-export const FOOTER_MENU_ITEMS: { key: string; label: string; href?: string; soon?: boolean }[] = [
+/** Пункты меню подвала (тик. 1795507295). Готовые — свой маршрут, неготовые — заглушка. */
+const comingSoon = (name: string) => `/coming-soon?name=${encodeURIComponent(name)}`;
+
+export const FOOTER_MENU_ITEMS: { key: string; label: string; href: string }[] = [
   { key: 'about-company', label: 'О компании', href: '/about-company' },
-  { key: 'contacts', label: 'Контакты', soon: true },
-  { key: 'about-balloo', label: 'О Balloo', soon: true },
-  { key: 'other-projects', label: 'Другие проекты компании', soon: true },
+  { key: 'contacts', label: 'Контакты', href: comingSoon('Контакты') },
+  { key: 'about-balloo', label: 'О Balloo', href: '/about-balloo' },
+  { key: 'other-projects', label: 'Другие проекты компании', href: comingSoon('Другие проекты компании') },
   { key: 'donate', label: 'Поддержать нас', href: '/donat' },
 ];
 
@@ -86,22 +89,16 @@ export function Footer({ links = DEFAULT_FOOTER_LINKS, onCopyrightClick }: Foote
 
         {menuOpen && (
           <div className="balloo-footer__menu" role="menu">
-            {FOOTER_MENU_ITEMS.map((item) =>
-              item.soon ? (
-                <span
-                  key={item.key}
-                  className="balloo-footer__menu-item balloo-footer__menu-item--soon"
-                  role="menuitem"
-                  aria-disabled="true"
-                >
-                  {item.label} <em>(Позже)</em>
-                </span>
-              ) : (
-                <a key={item.key} className="balloo-footer__menu-item" role="menuitem" href={item.href}>
-                  {item.label}
-                </a>
-              ),
-            )}
+            {FOOTER_MENU_ITEMS.map((item) => (
+              <a
+                key={item.key}
+                className="balloo-footer__menu-item"
+                role="menuitem"
+                href={mainSiteUrl(item.href)}
+              >
+                {item.label}
+              </a>
+            ))}
           </div>
         )}
       </div>

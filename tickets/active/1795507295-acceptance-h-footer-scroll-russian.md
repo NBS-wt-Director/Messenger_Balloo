@@ -82,6 +82,22 @@
 - `/doc`, `/spec` — узловые экраны со своей раскладкой (спиннер/сплит-панель):
   скролл внутри панелей; проверены отдельно (подвал + скролл-контейнер).
 
+## Уточнения владельца (24.11.2026, второй проход)
+
+1. **«Плитки»** = баблы (пузыри) сообщений «и тому подобное» — подтверждено,
+   реализовано как малахитовые пузыри + золотые рамки в теме «Русская».
+2. **Пункты меню подвала должны быть активны**, неготовые — вести на заглушку
+   «Экран в разработке» с извинением (вместо неактивного «(Позже)»).
+
+### Реализация уточнения 2
+
+| Файл | Что |
+|---|---|
+| `screens/shared/ComingSoonScreen.tsx` | новый экран-заглушка: 🐻, «Экран в разработке», имя запрошенного экрана (`?name=`), текст с извинением, кнопка возврата, единые шапка/подвал |
+| `router/index.tsx` | маршрут `/coming-soon` (публичный) |
+| `packages/ui/components/Footer.tsx` | `FOOTER_MENU_ITEMS` — все пункты ссылки; «Контакты» и «Другие проекты компании» → `/coming-soon?name=…` (encodeURIComponent), «О компании»/«О Balloo»/«Поддержать нас» → рабочие экраны; ссылки хост-осознанные (`mainSiteUrl`) |
+| `cypress/e2e/footer-scroll.cy.ts` | проверка: 5 активных ссылок в меню, «Позже» отсутствует; заглушка открывается |
+
 ## Результат
 
 Проверено запуском (команды и вывод):
@@ -90,16 +106,17 @@
 pnpm --filter @balloo/ui exec tsc --noEmit   → EXIT 0
 pnpm --filter @balloo/web exec tsc --noEmit  → EXIT 0
 pnpm --filter @balloo/web exec vitest run    → 54 файла, 404 теста, 0 failed
-pnpm --filter @balloo/web build              → ✓ built in 7.64s (index-Q-722okI.js)
-xvfb-run cypress run --spec cypress/e2e/footer-scroll.cy.ts → 18 passing, 0 failing
+pnpm --filter @balloo/web build              → ✓ built in 7.44s (index-Ba7CYrO4.js)
+xvfb-run cypress run --spec cypress/e2e/footer-scroll.cy.ts → 19 passing, 0 failing
 ```
 
 Cypress (реальный браузер, dev http://localhost:5173) подтвердил на 11 страничных
 экранах (about-balloo, about-company, donat, for_kassa, support, privacy, rules,
 cookies, features, history, download): `.balloo-footer` виден + контент скроллится;
-на /doc и /spec — подвал + скролл-контейнер; меню подвала открывается;
-донат = «Поддержите нас»; тема «Русская» — `data-theme=russian`, `--app-bg`
-содержит градиент, фон `.message__bubble` — градиент (малахит); cookie-баннер
-не перекрывает подвал.
+на /doc и /spec — подвал + скролл-контейнер; меню подвала открывается, в нём
+5 активных ссылок (без «Позже»); неготовые пункты ведут на заглушку
+«Экран в разработке»; донат = «Поддержите нас»; тема «Русская» — `data-theme=russian`,
+`--app-bg` содержит градиент, фон `.message__bubble` — градиент (малахит);
+cookie-баннер не перекрывает подвал.
 
 Деплой — батчи D–G, приёмка H — за владельцем.

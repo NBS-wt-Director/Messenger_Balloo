@@ -52,7 +52,16 @@ describe('Подвал и прокрутка на публичных экран�
     cy.get('.balloo-footer__menu').should('be.visible');
     cy.contains('.balloo-footer__menu-item', 'О компании').should('be.visible');
     cy.contains('.balloo-footer__menu-item', 'Поддержать нас').should('be.visible');
-    cy.contains('.balloo-footer__menu-item', 'Контакты').should('contain.text', 'Позже');
+    // Все пункты активны (ссылки), неактивных «(Позже)» нет (тик. 1795507295)
+    cy.get('.balloo-footer__menu a.balloo-footer__menu-item').should('have.length', 5);
+    cy.get('.balloo-footer__menu').should('not.contain.text', 'Позже');
+  });
+
+  it('неготовые пункты меню ведут на заглушку «Экран в разработке»', () => {
+    cy.visit('/#/coming-soon?name=%D0%9A%D0%BE%D0%BD%D1%82%D0%B0%D0%BA%D1%82%D1%8B');
+    cy.contains('h1', 'Экран в разработке', { timeout: 20000 }).should('be.visible');
+    cy.contains('h2', 'Контакты').should('be.visible');
+    cy.get('.balloo-footer').should('be.visible');
   });
 
   it('донат: заголовок «Поддержите нас»', () => {

@@ -59,6 +59,7 @@ const KnowledgeScreen = lazy(() => import('@/screens/knowledge/KnowledgeScreen')
 const KnowledgePageScreen = lazy(() => import('@/screens/knowledge/KnowledgePageScreen').then((m) => ({ default: m.KnowledgePageScreen })));
 const EditPageScreen = lazy(() => import('@/screens/knowledge/EditPageScreen').then((m) => ({ default: m.EditPageScreen })));
 const NotFoundScreen = lazy(() => import('@/screens/shared/NotFoundScreen'));
+const ComingSoonScreen = lazy(() => import('@/screens/shared/ComingSoonScreen'));
 const Error503Screen = lazy(() => import('@/screens/shared/Error503Screen'));
 const OfflineAuthedScreen = lazy(() => import('@/screens/shared/OfflineAuthedScreen'));
 const OfflineGuestScreen = lazy(() => import('@/screens/shared/OfflineGuestScreen'));
@@ -851,6 +852,18 @@ export const router = createHashRouter([
       <ErrorBoundary>
         <Suspense fallback={<LoadingFallback />}>
           <BanAppealScreen />
+        </Suspense>
+      </ErrorBoundary>
+    ),
+  },
+
+  // --- Заглушка «Экран в разработке» (тик. 1795507295): пункты меню подвала ---
+  {
+    path: '/coming-soon',
+    element: (
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingFallback />}>
+          <ComingSoonScreen />
         </Suspense>
       </ErrorBoundary>
     ),
