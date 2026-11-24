@@ -60,24 +60,19 @@ export function DonateScreen() {
     <div style={{
       display: 'flex',
       flexDirection: 'column',
-      minHeight: '100vh',
+      height: '100vh',
       fontFamily: 'Inter, Manrope, sans-serif',
     }}>
       {/* P35: единая шапка (@balloo/ui) */}
-      <AppTopbar title="Донаты" />
+      <AppTopbar title="Поддержите нас" />
 
-      <div style={{
-        maxWidth: 600,
-        width: '100%',
-        margin: '0 auto',
-        padding: '40px 24px',
-        flex: 1,
-      }}>
+      {/* height:100vh + .page-container — прокрутка внутри экрана (тик. 1795507295) */}
+      <div className="page-container">
       {/* Header */}
       <div style={{ textAlign: 'center', marginBottom: 48 }}>
         <div style={{ fontSize: 48, marginBottom: 16 }}>💚</div>
         <h1 style={{ fontSize: 32, fontWeight: 700, marginBottom: 8 }}>
-          Поддержать Balloo
+          Поддержите нас
         </h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: 16, lineHeight: 1.5 }}>
           Мессенджер бесплатный. Ваши донаты идут на развитие проекта,

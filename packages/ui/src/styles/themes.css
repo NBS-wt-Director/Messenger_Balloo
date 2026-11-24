@@ -218,3 +218,13 @@
 [data-theme='russian'] .content.content {
   background: transparent;
 }
+
+/* Russian theme: малахитовые контейнеры сообщений + золотые рамки
+   (требование владельца 24.11.2026, тик. 1795507295). */
+[data-theme='russian'] .message__bubble {
+  background: linear-gradient(135deg,
+    rgba(11, 110, 79, 0.94) 0%,
+    rgba(23, 166, 115, 0.88) 50%,
+    rgba(11, 110, 79, 0.94) 100%);
+  border-color: var(--border-strong);
+}

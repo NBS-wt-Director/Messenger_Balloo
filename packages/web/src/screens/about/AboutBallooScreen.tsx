@@ -37,9 +37,11 @@ const LINKS = [
 
 export function AboutBallooScreen() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', fontFamily: 'Inter, Manrope, sans-serif' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', fontFamily: 'Inter, Manrope, sans-serif' }}>
       <AppTopbar title="О Balloo" />
-      <div style={{ maxWidth: 640, width: '100%', margin: '0 auto', padding: '40px 24px', flex: 1 }}>
+      {/* height:100vh + .page-container (overflow-y:auto) — прокрутка внутри
+          экрана; иначе контент уезжает за вьюпорт и подвал не виден (тик. 1795507295) */}
+      <div className="page-container page-container--narrow">
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
           <img src="/assets/logos/mascot.png" alt="Маскот Balloo — медведь Борис" style={{ width: 80, height: 80, marginBottom: 16, objectFit: 'contain' }} />

@@ -7,9 +7,10 @@ import { AppFooter } from '@/components/chrome/AppFooter';
 
 export function AboutCompanyScreen() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', fontFamily: 'Inter, Manrope, sans-serif' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', fontFamily: 'Inter, Manrope, sans-serif' }}>
       <AppTopbar title="О компании" />
-      <div style={{ maxWidth: 640, width: '100%', margin: '0 auto', padding: '40px 24px', flex: 1 }}>
+      {/* height:100vh + .page-container — прокрутка внутри экрана (тик. 1795507295) */}
+      <div className="page-container page-container--narrow">
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
           <h1 style={{ fontSize: 28, fontWeight: 700, marginBottom: 8 }}>О компании</h1>

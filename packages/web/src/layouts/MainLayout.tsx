@@ -127,8 +127,9 @@ function MainLayout() {
         )}
       </div>
 
-      {/* Единый подвал (@balloo/ui) */}
-      <AppFooter onCopyrightClick={() => navigate('/about-balloo')} />
+      {/* Единый подвал (@balloo/ui). Клик по copyright открывает меню подвала
+          (тик. 1795507295) — onCopyrightClick не передаём. */}
+      <AppFooter />
     </div>
   );
 }

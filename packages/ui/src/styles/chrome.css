@@ -366,7 +366,6 @@
   height: 36px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   padding: 0 16px;
   background: var(--bg-secondary);
   border-top: 1px solid var(--border-color);
@@ -377,6 +376,7 @@
 }
 
 .balloo-footer__left {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -384,6 +384,11 @@
 }
 
 .balloo-footer__copyright {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
   cursor: pointer;
   transition: color 0.15s;
   white-space: nowrap;
@@ -391,6 +396,81 @@
 
 .balloo-footer__copyright:hover {
   color: var(--text-primary);
+}
+
+/* Меню подвала (клик по copyright) — раскрывается вверх (тик. 1795507295) */
+.balloo-footer__menu {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  margin-bottom: 6px;
+  min-width: 230px;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow);
+  z-index: 60;
+}
+
+.balloo-footer__menu-item {
+  display: block;
+  padding: 8px 14px;
+  color: var(--text-primary);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+}
+
+.balloo-footer__menu-item:hover {
+  background: var(--bg-hover);
+  color: var(--accent);
+}
+
+.balloo-footer__menu-item--soon {
+  color: var(--text-muted);
+  cursor: default;
+}
+
+.balloo-footer__menu-item--soon:hover {
+  background: none;
+  color: var(--text-muted);
+}
+
+.balloo-footer__menu-item--soon em {
+  font-style: italic;
+  opacity: 0.8;
+  font-size: 11px;
+}
+
+/* Пустое пространство с декоративными «бегущими» точками (тик. 1795507295) */
+.balloo-footer__dots {
+  flex: 1 1 0;
+  position: relative;
+  height: 100%;
+  min-width: 24px;
+  overflow: hidden;
+}
+
+.balloo-footer__dots i {
+  position: absolute;
+  top: 50%;
+  left: -4px;
+  width: 4px;
+  height: 4px;
+  margin-top: -2px;
+  background: var(--accent);
+  animation: balloo-footer-dot-run 3.6s linear infinite;
+}
+
+.balloo-footer__dots i:nth-child(2) { animation-delay: 1.2s; }
+.balloo-footer__dots i:nth-child(3) { animation-delay: 2.4s; }
+
+@keyframes balloo-footer-dot-run {
+  0%   { left: -4px; opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { left: 100%; opacity: 0; }
 }
 
 .balloo-footer__links {
@@ -417,6 +497,11 @@
     flex-direction: column;
     gap: 4px;
     padding: 6px 12px;
+  }
+
+  /* На мобиле декоративные точки-разделители не нужны */
+  .balloo-footer__dots {
+    display: none;
   }
 
   /* ---------- Topbar: мобильная компактизация (макеты mockups/mobile/*) ---------- */

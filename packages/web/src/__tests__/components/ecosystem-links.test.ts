@@ -73,22 +73,18 @@ describe('ecosystem — хост-осознанные ссылки (тик. 1794
   });
 
   it('подвал на features.balloo.su: правовые ссылки — абсолютные hash-URL', () => {
+    // Тик. 1795507295: правовой блок подвала — только три пункта
+    // («Поддержка» — отдельная ссылка, «О компании»/«Донат» — в меню copyright).
     const links = footerLinksForHost('features.balloo.su');
     expect(links.map((l) => l.href)).toEqual([
       'https://balloo.su/#/rules',
       'https://balloo.su/#/privacy',
       'https://balloo.su/#/cookies',
-      'https://balloo.su/#/support',
-      'https://balloo.su/#/about-company',
-      'https://balloo.su/#/donat',
     ]);
     expect(footerLinksForHost('balloo.su').map((l) => l.href)).toEqual([
       '/rules',
       '/privacy',
       '/cookies',
-      '/support',
-      '/about-company',
-      '/donat',
     ]);
   });
 

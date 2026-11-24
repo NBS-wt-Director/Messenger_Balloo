@@ -118,13 +118,12 @@ export function rightMenuTargetsForHost(host?: string): {
 
 // ─── Подвал (Footer) ────────────────────────────────────────────────────────
 
+// Подвал (Footer). Тик. 1795507295: правовой блок — только три пункта;
+// «Поддержка» — отдельная ссылка подвала, «О компании»/«Поддержать нас» — в меню.
 export const SPA_FOOTER_LINKS: FooterLink[] = [
   { key: 'footer.rules', href: '/rules' },
   { key: 'footer.privacy', href: '/privacy' },
   { key: 'footer.cookies', href: '/cookies' },
-  { key: 'footer.support', href: '/support' },
-  { key: 'footer.about', href: '/about-company' },
-  { key: 'footer.donate', href: '/donat' },
 ];
 
 export function footerLinksForHost(host?: string): FooterLink[] {

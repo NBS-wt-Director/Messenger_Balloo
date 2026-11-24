@@ -8,17 +8,11 @@ import { LegalContacts } from '@/components/legal/LegalContacts';
 
 export function PrivacyScreen() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflowY: 'auto' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
       <AppTopbar title="Конфиденциальность" />
 
-      <div style={{
-        maxWidth: 800,
-        width: '100%',
-        margin: '0 auto',
-        padding: '48px 24px',
-        fontFamily: 'Inter, Manrope, sans-serif',
-        color: 'var(--text-primary)',
-      }}>
+      {/* Скроллится только контент; шапка/подвал фиксированы (тик. 1795507295) */}
+      <div className="page-container" style={{ maxWidth: 800, padding: '48px 24px', color: 'var(--text-primary)' }}>
       {/* Header */}
       <div style={{ marginBottom: 48 }}>
         <div style={{ fontSize: 40, marginBottom: 16 }}>🔒</div>

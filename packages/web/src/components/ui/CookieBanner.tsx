@@ -47,7 +47,9 @@ export function CookieBanner() {
       aria-label="Настройки cookie"
       style={{
         position: "fixed",
-        bottom: 0,
+        // Над подвалом (36px), иначе перекрывает его до выбора согласия
+        // (тик. 1795507295: «подвал виден на всех экранах»)
+        bottom: 36,
         left: 0,
         right: 0,
         background: "var(--bg-secondary)",

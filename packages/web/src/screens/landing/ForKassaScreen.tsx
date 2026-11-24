@@ -7,17 +7,11 @@ import { AppFooter } from '@/components/chrome/AppFooter';
 
 export function ForKassaScreen() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
       <AppTopbar title="Для ЮKassa" />
 
-      <div style={{
-      maxWidth: 800,
-      width: '100%',
-      flex: 1,
-      margin: '0 auto',
-      padding: '40px 24px',
-      fontFamily: 'Inter, Manrope, sans-serif',
-    }}>
+      {/* height:100vh + .page-container — прокрутка внутри экрана (тик. 1795507295) */}
+      <div className="page-container" style={{ maxWidth: 800 }}>
       {/* Header */}
       <div style={{ textAlign: 'center', marginBottom: 48 }}>
         <div style={{ fontSize: 48, marginBottom: 16 }}>💚</div>

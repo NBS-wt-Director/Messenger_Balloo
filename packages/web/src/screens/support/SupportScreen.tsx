@@ -123,9 +123,10 @@ export function SupportScreen() {
   // Гость: FAQ + почта (тик. 1795497139-support-access-faq)
   if (!user) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
         <AppTopbar title="Поддержка" />
-        <div style={{ flex: 1, padding: '24px 16px', maxWidth: 640, margin: '0 auto', width: '100%' }}>
+        {/* height:100vh + .page-container — прокрутка внутри экрана (тик. 1795507295) */}
+        <div className="page-container page-container--narrow">
           <h2 style={{ color: 'var(--text-primary)', marginBottom: 16 }}>Часто задаваемые вопросы</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {FAQ_ITEMS.map((item, i) => (
