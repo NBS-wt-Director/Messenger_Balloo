@@ -120,3 +120,34 @@ cookies, features, history, download): `.balloo-footer` виден + конте�
 cookie-баннер не перекрывает подвал.
 
 Деплой — батчи D–G, приёмка H — за владельцем.
+
+## Деплой 397477e (батчи D–G, вывод сервера 24.11.2026 ~14:30 МСК)
+
+```text
+git fetch origin            → 04f03a5..397477e  main -> origin/main
+git log --oneline -1        → 397477e (HEAD -> main) feat(web,ui): пункты меню подвала…
+docker compose build web    → Image balloo/web:local Built (87.4s);
+                              шаги COPY ui/web и vite build (13.8s) — НЕ CACHED
+up -d --no-deps --force-recreate web → balloo-web Started (10.8s)
+etag                        → "6b055971-66e" (было 6b0534cf-66e) ✓
+бандль                      → index-C7z_n3XL.js (был index-CCwYx2io.js) ✓
+coming-soon в index-бандле  → 1 ✓
+message__attachments        → 1 (чанк ChatViewScreen) ✓
+API                         → running ✓
+```
+
+**Замечание к команде G:** `grep -c 'Поддержите нас'` по index-бандлу дал 0 —
+маркер искался не в том файле: DonateScreen — ленивый чанк. Проверено напрямую
+на проде (curl, 24.11.2026):
+
+| Маркер | Где на проде | Результат |
+|---|---|---|
+| «Поддержите нас» | `chunks/DonateScreen-PXUaASzz.js` | 1 ✓ |
+| «Экран в разработке» + «Приносим извинения» | `chunks/ComingSoonScreen-7iP21ia2.js` | 1 + 1 ✓ |
+| `balloo-footer__menu`, `balloo-footer__dots`, «Другие проекты компании» | `index-C7z_n3XL.js` | 1, 1, 1 ✓ |
+| Малахит `linear-gradient(135deg,#0b6e4ff0,#17a673e0,…)` + `border-color:var(--border-strong)` | `styles/index-dhylnDOA.css`, селектор `[data-theme=russian] .message__bubble` | 1 ✓ |
+| `page-container` (скролл контейнер) | `styles/index-dhylnDOA.css` | 1 ✓ |
+
+**Итог: батчи D–G подтверждены выводом сервера и curl к проду. Осталось H —
+браузерная приёмка владельца** (подвал+прокрутка на экранах, меню по copyright,
+заглушка «Контакты», донат «Поддержите нас», тема «Русская» в чате).
