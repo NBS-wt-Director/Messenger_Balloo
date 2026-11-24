@@ -1,0 +1,5 @@
+[
+  "COOKIE SET: {\"name\":\"__Secure-balloo_at\",\"value\":\"dummy.jwt.token\",\"path\":\"/\",\"secure\":true,\"httpOnly\":false,\"expiry\":1829899928.810691,\"domain\":\".balloo.su\",\"sameSite\":\"strict\"}",
+  "FETCH status=401",
+  "FETCH body={\"error\":\"Invalid token\",\"message\":\"Недействительный токен авторизации\"}"
+]

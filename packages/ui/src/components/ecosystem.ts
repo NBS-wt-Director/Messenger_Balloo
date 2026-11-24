@@ -122,6 +122,9 @@ export const SPA_FOOTER_LINKS: FooterLink[] = [
   { key: 'footer.rules', href: '/rules' },
   { key: 'footer.privacy', href: '/privacy' },
   { key: 'footer.cookies', href: '/cookies' },
+  { key: 'footer.support', href: '/support' },
+  { key: 'footer.about', href: '/about-company' },
+  { key: 'footer.donate', href: '/donat' },
 ];
 
 export function footerLinksForHost(host?: string): FooterLink[] {

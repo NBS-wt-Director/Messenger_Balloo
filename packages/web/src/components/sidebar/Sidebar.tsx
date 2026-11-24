@@ -1,5 +1,5 @@
-// Sidebar — навигация: чаты, контакты, настройки, блог, админка
-// + юридические ссылки (правила, конфиденциальность, cookies)
+// Sidebar — навигация: чаты, контакты, настройки + юридические ссылки (правила, конфиденциальность, cookies)
+// Command-пункты (Знания/Вакансии — узел у_03) убраны по решению владельца 24.11.2026 (тик. 1795497139-removable-command-sidebar).
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -28,15 +28,14 @@ export function Sidebar() {
     { icon: '📷', label: 'Истории', path: '/stories' },
     { icon: '📨', label: 'Приглашения', path: '/invites' },
     { icon: '📞', label: 'Звонки', path: '/calls' },
-    { icon: '📚', label: 'Знания', path: '/knowledge' },
-    { icon: '💼', label: 'Вакансии', path: '/hiring' },
+    { icon: '🎧', label: 'Поддержка', path: '/support' },
     { icon: '⚙️', label: 'Настройки', path: '/settings' },
   ];
 
-  // Admin link — перед «Вакансии» (индекс ищется по пути, чтобы не зависеть
-  // от числа пунктов выше после добавления «Историй»/«Приглашений»).
+  // Admin link — перед «Настройки» (индекс ищется по пути, чтобы не зависеть
+  // от числа пунктов выше после удаления «Знаний»/«Вакансий» — тик. 1795497139-removable-command-sidebar).
   if (user.isAdmin) {
-    const adminIndex = navItems.findIndex((i) => i.path === '/hiring');
+    const adminIndex = navItems.findIndex((i) => i.path === '/settings');
     navItems.splice(adminIndex >= 0 ? adminIndex : navItems.length, 0, {
       icon: '🛡️',
       label: 'Админка',

@@ -8,7 +8,7 @@
 //   - reply-quote, реакции-chips, edit history с diff, msg-ticks (✓✓)
 
 import React, { useState, useMemo } from 'react';
-import type { MessageWithSender } from '@/store/chatStore';
+import type { MessageWithSender, MessageAttachment } from '@/store/chatStore';
 
 interface MessageBubbleProps {
   message: MessageWithSender;
@@ -18,7 +18,36 @@ interface MessageBubbleProps {
   onEdit?: (messageId: string, content: string) => void;
   onDelete?: (messageId: string) => void;
   onForward?: (message: MessageWithSender) => void;
-  onFileView?: (attachment: { url?: string; name?: string; size?: number; thumbnail?: string; width?: number; height?: number; duration?: number }) => void;
+  /** Клик по вложению — открыть просмотрщик (index + весь список). */
+  onFileView?: (attachment: MessageAttachment, index: number, all: MessageAttachment[]) => void;
+}
+
+/** Вложения сообщения: сервер отдаёт массив, legacy — одиночный объект. */
+export function resolveAttachments(message: MessageWithSender): MessageAttachment[] {
+  if (message.attachments && message.attachments.length > 0) return message.attachments;
+  const legacy = message.attachment;
+  if (legacy && (legacy.url || legacy.name)) {
+    return [{ type: message.type || 'file', ...legacy, url: legacy.url || '' }];
+  }
+  return [];
+}
+
+function isImageAtt(att: MessageAttachment): boolean {
+  if (att.type === 'image') return true;
+  return /\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i.test(att.url || '');
+}
+
+function isTextAtt(att: MessageAttachment): boolean {
+  if (att.type === 'text') return true;
+  return /\.(txt|md|csv|json|log|xml|yml|yaml|ini)$/i.test(att.name || att.url || '');
+}
+
+function attachmentIcon(att: MessageAttachment): string {
+  if (isImageAtt(att)) return '🖼';
+  if (att.type === 'video') return '🎥';
+  if (att.type === 'audio') return '🎵';
+  if (isTextAtt(att)) return '📝';
+  return '📄';
 }
 
 // Memoized — не перерисовывать при изменениях в других сообщениях
@@ -34,6 +63,11 @@ export const MessageBubble = React.memo<MessageBubbleProps>(({
 }) => {
   const [showActions, setShowActions] = useState(false);
   const [showEditHistory, setShowEditHistory] = useState(false);
+  // Раскрыт ли collapsible-блок вложений (макет chats.html:245-255)
+  const [attachmentsOpen, setAttachmentsOpen] = useState(false);
+
+  // Вложения: массив от сервера либо legacy-одиночное
+  const attachments = useMemo(() => resolveAttachments(message), [message]);
 
   // Кэшируем вычисления — не пересчитывать при ре-рендере
   const time = useMemo(() => {
@@ -60,22 +94,29 @@ export const MessageBubble = React.memo<MessageBubbleProps>(({
 
     switch (message.type) {
       case 'voice':
-        return renderVoiceMessage();
-      case 'image':
-        return renderImageMessage();
-      case 'file':
-        return renderFileMessage();
+        // Голосовое: если есть аудио-вложение — плеер, иначе макетная заглушка
+        return attachments.length > 0 ? renderAttachments(attachments) : renderVoiceMessage();
       case 'poll':
-        return renderPollMessage();
+        return (
+          <>
+            {renderPollMessage()}
+            {attachments.length > 0 && renderAttachments(attachments)}
+          </>
+        );
       case 'system':
         return renderSystemMessage();
       default:
         return (
-          <div
-            className="message__body--markdown"
-            style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
-            dangerouslySetInnerHTML={{ __html: formatMarkdown(message.content || '') }}
-          />
+          <>
+            {message.content ? (
+              <div
+                className="message__body--markdown"
+                style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
+                dangerouslySetInnerHTML={{ __html: formatMarkdown(message.content || '') }}
+              />
+            ) : null}
+            {attachments.length > 0 && renderAttachments(attachments)}
+          </>
         );
     }
   };
@@ -104,44 +145,88 @@ export const MessageBubble = React.memo<MessageBubbleProps>(({
     );
   };
 
-  const renderImageMessage = () => (
-    <div>
-      <div
-        style={{
-          width: '280px',
-          height: '200px',
-          background: 'var(--bg-tertiary)',
-          marginBottom: '8px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: 'var(--text-muted)',
-        }}
-      >
-        🖼 Изображение
-      </div>
-      {message.content && <div>{message.content}</div>}
-    </div>
-  );
+  // Одиночное вложение — превью по типу (изображение/видео/аудио/файл)
+  const renderSingleAttachment = (att: MessageAttachment, index: number, all: MessageAttachment[]) => {
+    const open = () => onFileView?.(att, index, all);
 
-  const renderFileMessage = () => (
-    <div
-      style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '8px', background: 'var(--bg-tertiary)', cursor: 'pointer' }}
-      onClick={() => {
-        if (message.attachment?.url) {
-          onFileView?.(message.attachment);
-        }
-      }}
-    >
-      <span style={{ fontSize: '24px' }}>📄</span>
-      <div>
-        <div style={{ fontSize: '13px', fontWeight: 600 }}>{message.attachment?.name || 'Файл'}</div>
-        <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-          {formatBytes(message.attachment?.size || 0)}
+    if (isImageAtt(att)) {
+      return (
+        <img
+          src={att.thumbnail || att.url}
+          alt={att.name || 'Изображение'}
+          className="message__attachment-image"
+          onClick={open}
+          style={{ display: 'block', maxWidth: 280, maxHeight: 280, objectFit: 'cover', cursor: 'pointer' }}
+        />
+      );
+    }
+    if (att.type === 'video') {
+      return (
+        <video
+          src={att.url}
+          controls
+          className="message__attachment-video"
+          style={{ display: 'block', maxWidth: 280 }}
+          onClick={(e) => e.stopPropagation()}
+        />
+      );
+    }
+    if (att.type === 'audio') {
+      return <audio src={att.url} controls style={{ display: 'block', maxWidth: 280 }} />;
+    }
+    // Файл / текстовое вложение — карточка (имя + размер), клик открывает просмотрщик
+    return (
+      <div
+        className="message__attachment-file"
+        onClick={att.url ? open : undefined}
+        style={{ cursor: att.url ? 'pointer' : 'default' }}
+        title={att.name || 'Файл'}
+      >
+        <span className="message__attachment-file-icon">{attachmentIcon(att)}</span>
+        <div className="message__attachment-file-info">
+          <span className="message__attachment-file-name">{att.name || 'Файл'}</span>
+          <span className="message__attachment-file-size">{formatBytes(att.size || 0)}</span>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
+
+  // Вложения: одиночное — превью; несколько — collapsible-блок по макету
+  const renderAttachments = (list: MessageAttachment[]) => {
+    if (list.length === 1) {
+      return <div style={{ marginTop: 6 }}>{renderSingleAttachment(list[0], 0, list)}</div>;
+    }
+    return (
+      <div className={`message__attachments${attachmentsOpen ? ' message__attachments--open' : ''}`}>
+        <div className="message__attachments-toggle" onClick={() => setAttachmentsOpen((v) => !v)}>
+          <span>📎 {list.length} вложений</span>
+          <span>{attachmentsOpen ? '▲' : '▼'}</span>
+        </div>
+        <div className="message__attachments-content">
+          {list.map((att, i) =>
+            isImageAtt(att) ? (
+              <img
+                key={att.id || i}
+                src={att.thumbnail || att.url}
+                alt={att.name || ''}
+                className="message__attachment-thumb"
+                onClick={() => onFileView?.(att, i, list)}
+              />
+            ) : (
+              <div
+                key={att.id || i}
+                className="message__attachment-thumb message__attachment-thumb--file"
+                title={att.name || 'Файл'}
+                onClick={() => onFileView?.(att, i, list)}
+              >
+                <span>{attachmentIcon(att)}</span>
+              </div>
+            )
+          )}
+        </div>
+      </div>
+    );
+  };
 
   const renderPollMessage = () => {
     const poll = message.poll || (message.content ? parsePollContent(message.content) : null);

@@ -119,4 +119,24 @@ describe('FileViewer', () => {
     // Кнопка скачать
     expect(screen.getByText('📥 Скачать')).toBeInTheDocument();
   });
+
+  // Тик. 1795456886 — текстовое вложение показывается содержимым, а не только «Скачать»
+  it('текстовое вложение подгружает и показывает содержимое', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      text: () => Promise.resolve('hello from notes'),
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const txtAttachment: FileAttachment[] = [
+      { id: 'a1', type: 'text', url: 'https://example.com/notes.txt', name: 'notes.txt', size: 4096 },
+    ];
+    render(
+      <FileViewer attachments={txtAttachment} initialIndex={0} onClose={onClose} />
+    );
+
+    await waitFor(() => expect(screen.getByText('hello from notes')).toBeInTheDocument());
+    expect(fetchMock).toHaveBeenCalledWith('https://example.com/notes.txt');
+    vi.unstubAllGlobals();
+  });
 });

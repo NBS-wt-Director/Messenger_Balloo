@@ -86,9 +86,10 @@ describe('AttachmentPanel', () => {
     fireEvent.click(screen.getByRole('button', { name: /Отправить/ }));
 
     await waitFor(() => expect(uploadFile).toHaveBeenCalledWith(file, 'chat-1'));
+    // Тип сообщения определяется по вложению (тик. 1795456886): image/png → 'image'
     await waitFor(() =>
       expect(sendMessage).toHaveBeenCalledWith('chat-1', {
-        type: 'file',
+        type: 'image',
         content: '',
         attachments: [
           {
@@ -106,6 +107,29 @@ describe('AttachmentPanel', () => {
     );
     await waitFor(() => expect(props.onSent).toHaveBeenCalled());
     await waitFor(() => expect(props.onClose).toHaveBeenCalled());
+  });
+
+  it('текстовое вложение (.txt) отправляется как message type=file, attachment type=text', async () => {
+    renderPanel();
+    uploadFile.mockResolvedValue({
+      success: true,
+      data: { url: 'https://cdn/notes.txt', name: 'notes.txt', size: 4096 },
+    });
+    const input = document.querySelector('input[type=file][multiple]') as HTMLInputElement;
+    fireEvent.change(input, { target: { files: [makeFile('notes.txt', 'text/plain', 4096)] } });
+    await waitFor(() => expect(screen.getByText('📎 Выбрано: 1')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /Отправить/ }));
+
+    await waitFor(() =>
+      expect(sendMessage).toHaveBeenCalledWith(
+        'chat-1',
+        expect.objectContaining({
+          type: 'file',
+          attachments: [expect.objectContaining({ type: 'text', name: 'notes.txt' })],
+        })
+      )
+    );
   });
 
   it('ошибка загрузки показывает сообщение и не шлёт сообщение', async () => {

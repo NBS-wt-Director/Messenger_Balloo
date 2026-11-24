@@ -1,19 +1,43 @@
 // SupportScreen — чат с техподдержкой (/support), тикет 1790572800-01
 // ТЗ: mockups/balloo-su/support.md, макет mockups/balloo-su/support.html
 //
+// Доступен всем (тик. 1795497139-support-access-faq): гость видит FAQ +
+// кнопку написать на почту; авторизованный — чат с поддержкой.
+//
 // Структура по макету: topbar (AppTopbar, title «Чат с поддержкой») →
 // chat header (октагон-аватар 🦊, «Техподдержка Balloo», онлайн + среднее время
 // ответа, chip приоритета) → лента сообщений (пузыри sender/receiver, тег
 // «⚙ Автоответ» у бота) → input area (📎, textarea, ➤).
 //
 // Однопанельный экран без sidebar (ТЗ §Адаптивность: «Desktop: content без
-// sidebar»), поэтому живёт отдельным top-level защищённым маршрутом.
+// sidebar»), поэтому живёт отдельным top-level маршрутом.
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AppTopbar } from '@/components/chrome/AppTopbar';
 import { AppFooter } from '@/components/chrome/AppFooter';
 import { api } from '@/services/api';
 import { useAuthStore } from '@/store/authStore';
+
+const SUPPORT_EMAIL = 'help@balloo.su';
+
+const FAQ_ITEMS = [
+  {
+    q: 'Как восстановить пароль?',
+    a: 'На экране входа нажмите «Забыли пароль?» и следуйте инструкциям — код придёт на email или push.',
+  },
+  {
+    q: 'Как удалить аккаунт?',
+    a: 'Настройки → Безопасность → Удалить аккаунт. Действие необратимо.',
+  },
+  {
+    q: 'Не приходят уведомления',
+    a: 'Проверьте настройки уведомлений (Настройки → Уведомления) и разрешения браузера.',
+  },
+  {
+    q: 'Как связаться с оператором?',
+    a: `Отправьте сообщение в этот чат или напишите на ${SUPPORT_EMAIL}.`,
+  },
+];
 
 interface SupportMessage {
   id: string;
@@ -51,6 +75,7 @@ export function SupportScreen() {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const load = useCallback(async () => {
+    if (!user) return; // гость — чат недоступен, рендерим FAQ
     try {
       const chat = await api.getSupportChat();
       setMessages(chat.messages ?? []);
@@ -61,7 +86,7 @@ export function SupportScreen() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     load();
@@ -94,6 +119,40 @@ export function SupportScreen() {
       send();
     }
   };
+
+  // Гость: FAQ + почта (тик. 1795497139-support-access-faq)
+  if (!user) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+        <AppTopbar title="Поддержка" />
+        <div style={{ flex: 1, padding: '24px 16px', maxWidth: 640, margin: '0 auto', width: '100%' }}>
+          <h2 style={{ color: 'var(--text-primary)', marginBottom: 16 }}>Часто задаваемые вопросы</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {FAQ_ITEMS.map((item, i) => (
+              <details key={i} style={{ background: 'var(--bg-secondary)', borderRadius: 8, padding: '12px 16px' }}>
+                <summary style={{ cursor: 'pointer', fontWeight: 600, color: 'var(--text-primary)' }}>
+                  {item.q}
+                </summary>
+                <p style={{ margin: '8px 0 0', color: 'var(--text-secondary)', fontSize: 14 }}>{item.a}</p>
+              </details>
+            ))}
+          </div>
+          <div style={{ marginTop: 24, padding: 16, background: 'var(--bg-secondary)', borderRadius: 8 }}>
+            <p style={{ color: 'var(--text-primary)', margin: '0 0 12px' }}>
+              Не нашли ответ? Напишите нам — ответим в течение 24 часов.
+            </p>
+            <a
+              href={`mailto:${SUPPORT_EMAIL}`}
+              style={{ color: 'var(--accent)', fontWeight: 600, textDecoration: 'none' }}
+            >
+              ✉ {SUPPORT_EMAIL}
+            </a>
+          </div>
+        </div>
+        <AppFooter />
+      </div>
+    );
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>

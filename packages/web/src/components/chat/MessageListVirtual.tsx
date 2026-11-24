@@ -5,7 +5,7 @@
 
 import React, { useRef, useEffect, useCallback, useMemo } from 'react';
 import { Virtuoso } from 'react-virtuoso';
-import { useChatStore, type MessageWithSender } from '@/store/chatStore';
+import { useChatStore, type MessageWithSender, type MessageAttachment } from '@/store/chatStore';
 import { MessageBubble } from './MessageBubble';
 
 interface MessageListProps {
@@ -15,6 +15,8 @@ interface MessageListProps {
   onEdit?: (messageId: string, content: string) => void;
   onDelete?: (messageId: string) => void;
   onForward?: (message: MessageWithSender) => void;
+  /** Клик по вложению — открыть полноэкранный просмотрщик */
+  onFileView?: (attachment: MessageAttachment, index: number, all: MessageAttachment[]) => void;
   onScrollToBottom?: () => void;
 }
 
@@ -29,6 +31,7 @@ export const MessageList = React.memo<MessageListProps>(({
   onEdit,
   onDelete,
   onForward,
+  onFileView,
 }) => {
   const messages = useChatStore((s) => s.messages[chatId] || []);
   const typingUsers = useChatStore((s) => s.typingUsers[chatId] || []);
@@ -76,13 +79,14 @@ export const MessageList = React.memo<MessageListProps>(({
                 onEdit={onEdit}
                 onDelete={onDelete}
                 onForward={onForward}
+                onFileView={onFileView}
               />
             );
           })}
         </div>
       );
     },
-    [groupedMessages, onReact, onReply, onEdit, onDelete, onForward]
+    [groupedMessages, onReact, onReply, onEdit, onDelete, onForward, onFileView]
   );
 
   // Count total items (groups)

@@ -132,7 +132,10 @@ export type TranslationKey =
   | 'menu.invites'
   | 'footer.rules'
   | 'footer.privacy'
-  | 'footer.cookies';
+  | 'footer.cookies'
+  | 'footer.donate'
+  | 'footer.support'
+  | 'footer.about';
 
 export interface Translations {
   [key: string]: {
@@ -2928,6 +2931,72 @@ export const translations: Translations = {
     hi: 'Cookies',
     be: 'Cookies',
     fr: 'Cookies',
+  },
+  'footer.donate': {
+    ru: 'Донат',
+    en: 'Donate',
+    tt: 'Донат',
+    ba: 'Донат',
+    ce: 'Донат',
+    cv: 'Донат',
+    av: 'Донат',
+    dar: 'Донат',
+    udm: 'Донат',
+    lez: 'Донат',
+    kbd: 'Донат',
+    chm: 'Донат',
+    os: 'Донат',
+    sah: 'Донат',
+    bua: 'Донат',
+    uk: 'Донат',
+    zh: '捐赠',
+    hi: 'दान',
+    be: 'Донат',
+    fr: 'Faire un don',
+  },
+  'footer.support': {
+    ru: 'Поддержка',
+    en: 'Support',
+    tt: 'Ярдәм',
+    ba: 'Ярҙам',
+    ce: 'ГӀо',
+    cv: 'Пулӑшу',
+    av: 'Кверелӏи',
+    dar: 'Кматӏи',
+    udm: 'Юрттэт',
+    lez: 'Куьмек',
+    kbd: 'Ядэ',
+    chm: 'Полшал',
+    os: 'Æххуыс',
+    sah: 'Көмө',
+    bua: 'Дэмжыгэ',
+    uk: 'Підтримка',
+    zh: '支持',
+    hi: 'सहायता',
+    be: 'Падтрымка',
+    fr: 'Assistance',
+  },
+  'footer.about': {
+    ru: 'О компании',
+    en: 'About company',
+    tt: 'Шirket турында',
+    ba: 'Компания тураһында',
+    ce: 'Компаниехь',
+    cv: 'Компани ҫинчен',
+    av: 'Компаниялъул хӀакъалъулъ',
+    dar: 'Компаниялӏ хӀакъалъулъ',
+    udm: 'Компани сярысь',
+    lez: 'Компаниякай',
+    kbd: 'Компаниэм',
+    chm: 'Компании неран',
+    os: 'Компанийы тыххӕй',
+    sah: 'Хампаанньа туһунан',
+    bua: 'Компани тухай',
+    uk: 'Про компанію',
+    zh: '关于公司',
+    hi: 'कंपनी के बारे में',
+    be: 'Пра кампанію',
+    fr: 'À propos de la société',
   },
 };
 

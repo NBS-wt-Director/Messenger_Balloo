@@ -248,15 +248,13 @@ export const router = createHashRouter([
     ),
   },
 
-  // --- Support (protected, однопанельный — по ТЗ «content без sidebar») ---
+  // --- Support (доступен всем, тик. 1795497139-support-access-faq) ---
   {
     path: '/support',
     element: (
       <ErrorBoundary>
         <Suspense fallback={<LoadingFallback />}>
-          <ProtectedRoute>
-            <SupportScreen />
-          </ProtectedRoute>
+          <SupportScreen />
         </Suspense>
       </ErrorBoundary>
     ),

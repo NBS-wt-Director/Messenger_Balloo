@@ -24,6 +24,23 @@ export interface UserChat extends Chat {
   } | null;
 }
 
+/**
+ * Вложение сообщения — как отдаёт сервер
+ * (messageService.ts:362-372, ws/handlers.ts:211-220): массив `attachments`.
+ */
+export interface MessageAttachment {
+  id?: string;
+  /** image | video | audio | file */
+  type: string;
+  url: string;
+  thumbnail?: string | null;
+  name?: string | null;
+  size?: number;
+  width?: number | null;
+  height?: number | null;
+  duration?: number | null;
+}
+
 export interface MessageWithSender extends Message {
   sender?: {
     id: string;
@@ -47,6 +64,9 @@ export interface MessageWithSender extends Message {
     votes?: number;
     anonymous?: boolean;
   };
+  /** Вложения — массив (как отдаёт сервер). */
+  attachments?: MessageAttachment[];
+  /** @deprecated одиночное вложение — legacy-форма; читать через resolveAttachments(). */
   attachment?: {
     name?: string;
     size?: number;

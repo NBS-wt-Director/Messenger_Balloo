@@ -78,11 +78,17 @@ describe('ecosystem — хост-осознанные ссылки (тик. 1794
       'https://balloo.su/#/rules',
       'https://balloo.su/#/privacy',
       'https://balloo.su/#/cookies',
+      'https://balloo.su/#/support',
+      'https://balloo.su/#/about-company',
+      'https://balloo.su/#/donat',
     ]);
     expect(footerLinksForHost('balloo.su').map((l) => l.href)).toEqual([
       '/rules',
       '/privacy',
       '/cookies',
+      '/support',
+      '/about-company',
+      '/donat',
     ]);
   });
 

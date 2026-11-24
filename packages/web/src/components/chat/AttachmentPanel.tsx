@@ -31,17 +31,31 @@ function formatSize(bytes: number): string {
 }
 
 // тип вложения по MIME — как принимает messageService.attachments[].type
-function attachmentType(mime: string): string {
+// (text — текстовые вложения: txt/md/csv/json/log, тик. 1795456886)
+function attachmentType(mime: string, name?: string): string {
   if (mime.startsWith('image/')) return 'image';
   if (mime.startsWith('video/')) return 'video';
   if (mime.startsWith('audio/')) return 'audio';
+  if (mime.startsWith('text/') || /\.(txt|md|csv|json|log|xml|yml|yaml|ini)$/i.test(name || '')) {
+    return 'text';
+  }
+  return 'file';
+}
+
+// тип самого сообщения (messageController допускает: text, image, file, voice,
+// video, poll, system). audio → voice.
+function messageTypeFor(attachments: Array<{ type: string }>): string {
+  const t = attachments[0]?.type;
+  if (t === 'image') return 'image';
+  if (t === 'video') return 'video';
+  if (t === 'audio') return 'voice';
   return 'file';
 }
 
 const QUICK_ACTIONS: Array<{ icon: string; label: string; accept: string | null; hint?: string; capture?: string }> = [
   { icon: '🖼', label: 'Фото', accept: 'image/*' },
   { icon: '🎥', label: 'Видео', accept: 'video/*' },
-  { icon: '📄', label: 'Документ', accept: '.pdf,.doc,.docx,.txt,.xls,.xlsx' },
+  { icon: '📄', label: 'Документ', accept: '.pdf,.doc,.docx,.txt,.md,.csv,.json,.log,.xls,.xlsx,.rtf' },
   { icon: '📸', label: 'Скриншот', accept: null, hint: 'Вставьте скриншот из буфера: Ctrl+V' },
   { icon: '🎵', label: 'Аудио', accept: 'audio/*' },
   { icon: '📦', label: 'Файл', accept: null },
@@ -103,7 +117,7 @@ export function AttachmentPanel({ open, chatId, onClose, onSent }: AttachmentPan
           const res = await api.uploadFile(file, chatId);
           const d = res?.data ?? res;
           return {
-            type: attachmentType(file.type),
+            type: attachmentType(file.type, file.name),
             url: d.url,
             thumbnail: d.thumbnailUrl || undefined,
             size: d.size ?? file.size,
@@ -114,7 +128,11 @@ export function AttachmentPanel({ open, chatId, onClose, onSent }: AttachmentPan
           };
         })
       );
-      await api.sendMessage(chatId, { type: 'file', content: '', attachments: uploaded });
+      await api.sendMessage(chatId, {
+        type: messageTypeFor(uploaded),
+        content: '',
+        attachments: uploaded,
+      });
       setSelected([]);
       onSent();
       onClose();

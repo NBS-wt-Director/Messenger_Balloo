@@ -34,6 +34,8 @@ export function FileViewer({ attachments, initialIndex, onClose }: FileViewerPro
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [zoom, setZoom] = useState(1);
   const [showInfo, setShowInfo] = useState(false);
+  // Содержимое текстового вложения (тик. 1795456886): txt/md/csv/json/…
+  const [textContent, setTextContent] = useState<string | null>(null);
 
   const current = attachments[currentIndex];
 
@@ -68,6 +70,33 @@ export function FileViewer({ attachments, initialIndex, onClose }: FileViewerPro
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleKeyDown]);
+
+  const isText = !!current && (
+    current.type === 'text' ||
+    /\.(txt|md|csv|json|log|xml|yml|yaml|ini)$/i.test(current.name || current.url || '')
+  );
+
+  // Текстовое вложение: подгружаем содержимое для превью (тик. 1795456886)
+  useEffect(() => {
+    if (!current || !isText) {
+      setTextContent(null);
+      return;
+    }
+    let cancelled = false;
+    setTextContent(null);
+    fetch(current.url)
+      .then((r) => (r.ok ? r.text() : Promise.reject(new Error(String(r.status)))))
+      .then((txt) => {
+        if (!cancelled) setTextContent(txt.slice(0, 100_000));
+      })
+      .catch(() => {
+        if (!cancelled) setTextContent(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [current?.url, isText]);
 
   if (!current) return null;
 
@@ -201,6 +230,28 @@ export function FileViewer({ attachments, initialIndex, onClose }: FileViewerPro
               transition: 'transform 0.2s ease',
             }}
           />
+        ) : isText ? (
+          <div className="viewer-text" style={{ width: '90vw', maxWidth: 900, maxHeight: '80vh', overflow: 'auto' }}>
+            {textContent === null ? (
+              <div style={{ color: '#fff', textAlign: 'center', padding: 24 }}>Загрузка…</div>
+            ) : (
+              <pre
+                style={{
+                  margin: 0,
+                  padding: 16,
+                  background: 'rgba(255,255,255,0.06)',
+                  color: '#fff',
+                  fontSize: 13,
+                  lineHeight: 1.5,
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-word',
+                  textAlign: 'left',
+                }}
+              >
+                {textContent}
+              </pre>
+            )}
+          </div>
         ) : (
           <div
             style={{
@@ -210,7 +261,7 @@ export function FileViewer({ attachments, initialIndex, onClose }: FileViewerPro
             }}
           >
             <div style={{ fontSize: 64, marginBottom: 16 }}>
-              {current.type === 'video' ? '🎥' : current.type === 'audio' ? '🎵' : '📄'}
+              {current.type === 'video' ? '🎥' : current.type === 'audio' ? '🎵' : isText ? '📝' : '📄'}
             </div>
             <div style={{ fontSize: 16 }}>{current.name || 'Файл'}</div>
             {current.size && (
@@ -296,7 +347,7 @@ export function FileViewer({ attachments, initialIndex, onClose }: FileViewerPro
                 />
               ) : (
                 <span>
-                  {att.type === 'image' ? '🖼️' : att.type === 'video' ? '🎥' : att.type === 'audio' ? '🎵' : '📄'}
+                  {att.type === 'image' ? '🖼️' : att.type === 'video' ? '🎥' : att.type === 'audio' ? '🎵' : att.type === 'text' ? '📝' : '📄'}
                 </span>
               )}
             </div>

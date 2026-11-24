@@ -1,9 +1,11 @@
 // Footer — ЕДИНЫЙ подвал всех сайтов balloo.su (тик. №1, P35)
 // Структура по макетам (mockups/assets/common.css: .balloo-footer):
-//   [© Balloo Messenger 2026] ......... [Правила | Конфиденциальность | Cookies]
+//   [© Balloo Messenger 2026] ... [Правила | Конфиденциальность | Cookies | Поддержка | О компании | Донат]
 // Стили — @balloo/ui/styles/chrome.css (копия .balloo-footer* из common.css).
 // Хост-осознанные ссылки (тик. 1794575221): на чужих поддоменах balloo.su
 // маршруты правового блока — абсолютные hash-URL.
+// «Донат» — решение владельца 23.11.2026 (в макете common.js:680, в коде был потерян).
+// «Поддержка» и «О компании» — решение владельца 24.11.2026 (тик. 1795497139-support-sidebar-footer).
 
 import React from 'react';
 import { useI18n } from '../providers/I18nProvider';

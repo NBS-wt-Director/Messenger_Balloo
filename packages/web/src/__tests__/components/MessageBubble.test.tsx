@@ -102,6 +102,80 @@ describe('MessageBubble', () => {
     expect(screen.getByText('document.pdf')).toBeInTheDocument();
   });
 
+  // Тик. 1795456886 — вложения приходят массивом `attachments` (сервер:
+  // messageService.ts:362-372), а не одиночным `attachment`.
+  describe('вложения (массив attachments)', () => {
+    it('одиночное изображение рендерится как <img> с url вложения', () => {
+      const imgMsg = {
+        ...baseMessage,
+        type: 'image' as const,
+        content: '',
+        attachments: [{ id: 'a1', type: 'image', url: 'https://cdn/photo.jpg', name: 'photo.jpg', size: 2048 }],
+      };
+      const { container } = render(<MessageBubble message={imgMsg} isOwn={false} />);
+      const img = container.querySelector('img.message__attachment-image') as HTMLImageElement;
+      expect(img).toBeInTheDocument();
+      expect(img.getAttribute('src')).toBe('https://cdn/photo.jpg');
+    });
+
+    it('одиночный файл рендерится карточкой с именем и размером', () => {
+      const fileMsg = {
+        ...baseMessage,
+        type: 'file' as const,
+        content: '',
+        attachments: [{ id: 'a1', type: 'file', url: 'https://cdn/doc.pdf', name: 'doc.pdf', size: 2048 }],
+      };
+      render(<MessageBubble message={fileMsg} isOwn={false} />);
+      expect(screen.getByText('doc.pdf')).toBeInTheDocument();
+      expect(screen.getByText('2 КБ')).toBeInTheDocument();
+    });
+
+    it('несколько вложений — collapsible-блок «📎 N вложений» (макет chats.html:245)', () => {
+      const multi = {
+        ...baseMessage,
+        type: 'file' as const,
+        content: '',
+        attachments: [
+          { id: 'a1', type: 'image', url: 'https://cdn/1.png', name: '1.png' },
+          { id: 'a2', type: 'file', url: 'https://cdn/2.pdf', name: '2.pdf' },
+          { id: 'a3', type: 'file', url: 'https://cdn/3.txt', name: '3.txt' },
+        ],
+      };
+      const { container } = render(<MessageBubble message={multi} isOwn={false} />);
+      expect(screen.getByText('📎 3 вложений')).toBeInTheDocument();
+      expect(container.querySelector('.message__attachments')).toBeInTheDocument();
+    });
+
+    it('клик по изображению вызывает onFileView с вложением и индексом', () => {
+      const onFileView = vi.fn();
+      const imgMsg = {
+        ...baseMessage,
+        type: 'image' as const,
+        content: '',
+        attachments: [{ id: 'a1', type: 'image', url: 'https://cdn/photo.jpg', name: 'photo.jpg' }],
+      };
+      const { container } = render(
+        <MessageBubble message={imgMsg} isOwn={false} onFileView={onFileView} />
+      );
+      fireEvent.click(container.querySelector('img.message__attachment-image')!);
+      expect(onFileView).toHaveBeenCalledTimes(1);
+      expect(onFileView.mock.calls[0][0]).toMatchObject({ url: 'https://cdn/photo.jpg' });
+      expect(onFileView.mock.calls[0][1]).toBe(0);
+    });
+
+    it('текстовое вложение показывается иконкой 📝', () => {
+      const txtMsg = {
+        ...baseMessage,
+        type: 'file' as const,
+        content: '',
+        attachments: [{ id: 'a1', type: 'text', url: 'https://cdn/notes.txt', name: 'notes.txt', size: 4096 }],
+      };
+      const { container } = render(<MessageBubble message={txtMsg} isOwn={false} />);
+      expect(container.querySelector('.message__attachment-file-icon')?.textContent).toBe('📝');
+      expect(screen.getByText('notes.txt')).toBeInTheDocument();
+    });
+  });
+
   it('renders poll message', () => {
     const pollMsg = {
       ...baseMessage,

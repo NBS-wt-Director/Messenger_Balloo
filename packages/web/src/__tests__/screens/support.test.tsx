@@ -23,9 +23,12 @@ vi.mock('@/services/api', () => ({
   },
 }));
 
+// Управляемое состояние auth для мока (тик. 1795497139-support-access-faq):
+// по умолчанию авторизован, тест гостя переключает на null.
+const authState = { isAuthenticated: true, user: { id: 'u1', username: 'edb', displayName: 'Тест Тестов' } as any };
+
 vi.mock('@/store/authStore', () => ({
-  useAuthStore: (selector: (s: any) => unknown) =>
-    selector({ isAuthenticated: true, user: { id: 'u1', username: 'edb', displayName: 'Тест Тестов' } }),
+  useAuthStore: (selector: (s: any) => unknown) => selector(authState),
 }));
 
 import { SupportScreen } from '../../screens/support/SupportScreen';
@@ -51,6 +54,9 @@ function renderScreen() {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  // Восстанавливаем авторизованное состояние по умолчанию
+  authState.isAuthenticated = true;
+  authState.user = { id: 'u1', username: 'edb', displayName: 'Тест Тестов' };
   getSupportChat.mockResolvedValue(CHAT);
   getSupportStatus.mockResolvedValue({ online: true, avgResponseMinutes: 5 });
   sendSupportMessage.mockResolvedValue({
@@ -134,5 +140,20 @@ describe('SupportScreen', () => {
     await waitFor(() => {
       expect(screen.getByText('Не удалось загрузить чат поддержки')).toBeTruthy();
     });
+  });
+
+  // Тик. 1795497139-support-access-faq: гость видит FAQ + почту
+  it('гость видит FAQ и ссылку на почту вместо чата', () => {
+    authState.isAuthenticated = false;
+    authState.user = null;
+
+    renderScreen();
+
+    expect(screen.getByText('Часто задаваемые вопросы')).toBeTruthy();
+    expect(screen.getByText('Как восстановить пароль?')).toBeTruthy();
+    const mailLink = screen.getByRole('link', { name: /help@balloo\.su/ });
+    expect(mailLink.getAttribute('href')).toBe('mailto:help@balloo.su');
+    // Чат не должен быть виден
+    expect(screen.queryByText('Техподдержка Balloo')).toBeNull();
   });
 });

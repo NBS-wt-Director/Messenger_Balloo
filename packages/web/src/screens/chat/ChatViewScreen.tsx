@@ -4,11 +4,12 @@
 
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useChatStore, type MessageWithSender } from '@/store/chatStore';
+import { useChatStore, type MessageWithSender, type MessageAttachment } from '@/store/chatStore';
 import { MessageList } from '@/components/chat/MessageList';
 import { MessageInput } from '@/components/chat/MessageInput';
 import { AttachmentPanel } from '@/components/chat/AttachmentPanel';
 import { VoiceMessageModal } from '@/components/chat/VoiceMessageModal';
+import { FileViewer } from '@/components/chat/FileViewer';
 import { ChatHeader } from '@/components/chat/ChatHeader';
 import { ChatInfoPanel } from '@/components/chat/ChatInfoPanel';
 import { ReplyPreview } from '@/components/chat/ReplyPreview';
@@ -48,6 +49,15 @@ export const ChatViewScreen: React.FC = () => {
   const [attachmentPanelOpen, setAttachmentPanelOpen] = useState(false);
   // Модалка записи голосового (тик. 1792160023, макет voice-message.html)
   const [voiceModalOpen, setVoiceModalOpen] = useState(false);
+  // Полноэкранный просмотрщик вложений (макет file-viewer.html, тик. 1795456886)
+  const [viewer, setViewer] = useState<{ attachments: MessageAttachment[]; index: number } | null>(null);
+
+  const handleFileView = useCallback(
+    (attachment: MessageAttachment, index: number, all: MessageAttachment[]) => {
+      setViewer({ attachments: all.length > 0 ? all : [attachment], index });
+    },
+    []
+  );
 
   // Load chat and messages
   useEffect(() => {
@@ -419,6 +429,7 @@ export const ChatViewScreen: React.FC = () => {
                 onEdit={handleEdit}
                 onDelete={handleDelete}
                 onForward={handleForward}
+                onFileView={handleFileView}
               />
 
               {/* Message input */}
@@ -452,6 +463,24 @@ export const ChatViewScreen: React.FC = () => {
               onClose={() => setShowInfo(false)}
             />
           </div>
+
+          {/* Полноэкранный просмотрщик вложений (тик. 1795456886) */}
+          {viewer && viewer.attachments.length > 0 && (
+            <FileViewer
+              attachments={viewer.attachments.map((a, i) => ({
+                id: a.id || String(i),
+                type: a.type,
+                url: a.url,
+                thumbnail: a.thumbnail || undefined,
+                name: a.name || undefined,
+                size: a.size,
+                width: a.width || undefined,
+                height: a.height || undefined,
+              }))}
+              initialIndex={viewer.index}
+              onClose={() => setViewer(null)}
+            />
+          )}
 
           {/* Reaction picker */}
           {showReactionPicker && (
