@@ -59,19 +59,26 @@ export function FooterMorseTicker({ text, direction, variant = 'default' }: Foot
     .join(' ');
 
   return (
-    <span className={className} aria-hidden="true">
-      {/* Два одинаковых прогона — бесшовная петля (translateX на 50%) */}
-      <span
-        className="balloo-footer__ticker-track"
-        style={{ animationDuration: `${duration.toFixed(2)}s` }}
-      >
-        {[0, 1].map((copy) => (
-          <span className="balloo-footer__ticker-run" key={copy}>
-            {cells.map((cell, i) => (
-              <i key={i} className={`balloo-footer__morse balloo-footer__morse--${cell}`} />
-            ))}
-          </span>
-        ))}
+    // Обёртка держит подсказку расшифровки (тик. 1795721513): сам тикер имеет
+    // overflow: hidden, поэтому тултип живёт рядом с ним, а не внутри.
+    <span className="balloo-footer__ticker-wrap">
+      <span className={className} aria-hidden="true" title={text}>
+        {/* Два одинаковых прогона — бесшовная петля (translateX на 50%) */}
+        <span
+          className="balloo-footer__ticker-track"
+          style={{ animationDuration: `${duration.toFixed(2)}s` }}
+        >
+          {[0, 1].map((copy) => (
+            <span className="balloo-footer__ticker-run" key={copy}>
+              {cells.map((cell, i) => (
+                <i key={i} className={`balloo-footer__morse balloo-footer__morse--${cell}`} />
+              ))}
+            </span>
+          ))}
+        </span>
+      </span>
+      <span className="balloo-footer__morse-tip" role="tooltip">
+        {text}
       </span>
     </span>
   );

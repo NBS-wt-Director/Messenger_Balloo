@@ -52,6 +52,7 @@ export function Sidebar() {
 
   return (
     <div
+      id="app-sidebar"
       className="sidebar"
       style={{
         display: 'flex',
@@ -72,7 +73,7 @@ export function Sidebar() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '12px 8px 8px',
+          padding: isSidebarOpen ? '12px 8px 8px' : '8px',
           flexShrink: 0,
         }}
       >
@@ -82,7 +83,7 @@ export function Sidebar() {
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            padding: '0 8px',
+            padding: isSidebarOpen ? '0 8px' : 0,
             fontWeight: 700,
             fontSize: '16px',
             color: 'var(--accent)',
@@ -96,7 +97,9 @@ export function Sidebar() {
           {!isSidebarOpen || <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Balloo</span>}
         </div>
 
-        {/* Toggle sidebar */}
+        {/* Toggle sidebar — на десктопе кнопка теперь также в шапке (тик. 1795721513),
+            поэтому в панели при collapsed скрываем, чтобы не переполнять рейл 64px. */}
+        {isSidebarOpen && (
         <button
           onClick={toggleSidebar}
           style={{
@@ -109,8 +112,9 @@ export function Sidebar() {
             flexShrink: 0,
           }}
         >
-          {isSidebarOpen ? '◀' : '▶'}
+          ◀
         </button>
+        )}
       </div>
 
       {/* User card */}

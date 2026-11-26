@@ -4,9 +4,11 @@
 // показывает текущее число баллов и предлагает поддержать проект.
 // Баланс начисляется при регистрации (REGISTRATION_BONUS = 555).
 // Значение баланса в шапке показывается только в частном правом меню.
+//
+// Тик. 1795721513: экран — child-маршрут MainLayout, который уже даёт единые
+// шапку и подвал. Собственные AppTopbar/AppFooter убраны — они давали второй
+// ряд шапки и второй подвал на скриншоте владельца.
 
-import { AppTopbar } from '@/components/chrome/AppTopbar';
-import { AppFooter } from '@/components/chrome/AppFooter';
 import { useAuthStore } from '@/store/authStore';
 import { useI18n } from '@/components/providers/I18nProvider';
 import { mainSiteUrl } from '@balloo/ui';
@@ -20,8 +22,7 @@ export function BalanceScreen() {
   const donateHref = mainSiteUrl('/donat');
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', fontFamily: 'Inter, Manrope, sans-serif' }}>
-      <AppTopbar title={t('balance.title' as TranslationKey)} />
+    <div style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
       <div className="page-container page-container--narrow">
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <div style={{ fontSize: 56, lineHeight: 1, marginBottom: 12 }} aria-hidden="true">💰</div>
@@ -60,7 +61,6 @@ export function BalanceScreen() {
           </a>
         </div>
       </div>
-      <AppFooter />
     </div>
   );
 }

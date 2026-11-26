@@ -42,6 +42,13 @@ interface AppTopbarProps {
    * Явным `auth={null}` можно принудительно вернуть гостевой вид.
    */
   auth?: RightMenuAuth | null;
+  /**
+   * Переключатель левой панели (тик. 1795721513). Передаётся только экранами,
+   * у которых есть панель: кнопка `☰` остаётся доступной и при свёрнутой панели.
+   */
+  onToggleSidebar?: () => void;
+  /** Текущее состояние панели — для `aria-expanded` и подписи кнопки */
+  sidebarOpen?: boolean;
 }
 
 /** Инициалы как в мокапе: первые буквы имени и фамилии (common.js — «ИИ»). */
@@ -54,7 +61,16 @@ function initialsOf(user: { displayName?: string; username: string } | null): st
   return letters || (user.username?.[0]?.toUpperCase() ?? 'ИИ');
 }
 
-export function AppTopbar({ title, onTitleClick, right, actions, showSwitchers = true, auth }: AppTopbarProps) {
+export function AppTopbar({
+  title,
+  onTitleClick,
+  right,
+  actions,
+  showSwitchers = true,
+  auth,
+  onToggleSidebar,
+  sidebarOpen,
+}: AppTopbarProps) {
   const navigate = useNavigate();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const user = useAuthStore((s) => s.user);
@@ -126,6 +142,22 @@ export function AppTopbar({ title, onTitleClick, right, actions, showSwitchers =
     title
   );
 
+  // Кнопка «скрыть/открыть панель» (тик. 1795721513). Живёт в шапке, а не в
+  // самой панели: иначе при свёрнутой панели вернуть её нечем.
+  const leading = onToggleSidebar ? (
+    <button
+      type="button"
+      className="topbar__sidebar-btn"
+      onClick={onToggleSidebar}
+      aria-expanded={sidebarOpen ?? false}
+      aria-controls="app-sidebar"
+      aria-label={sidebarOpen ? 'Скрыть панель' : 'Открыть панель'}
+      title={sidebarOpen ? 'Скрыть панель' : 'Открыть панель'}
+    >
+      {sidebarOpen ? '⟨' : '☰'}
+    </button>
+  ) : undefined;
+
   return (
     <>
       <Topbar
@@ -136,6 +168,7 @@ export function AppTopbar({ title, onTitleClick, right, actions, showSwitchers =
         showSwitchers={showSwitchers}
         auth={menuAuth}
         onNavigate={navigate}
+        leading={leading}
       />
       {learningMode && <LearningHelp title={typeof title === 'string' ? title : undefined} />}
     </>

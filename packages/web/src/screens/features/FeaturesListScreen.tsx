@@ -61,6 +61,11 @@ export function FeaturesListScreen() {
   const [sortBy, setSortBy] = useState<'votes' | 'date' | 'comments'>('votes');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  // Тик. 1795721513: левая панель сворачивается кнопкой в шапке; на мобиле
+  // по умолчанию закрыта.
+  const [sidebarOpen, setSidebarOpen] = useState(
+    () => typeof window === 'undefined' || window.innerWidth > 768
+  );
 
   // Загрузка данных
   const loadFeatures = useCallback(async () => {
@@ -137,11 +142,16 @@ export function FeaturesListScreen() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
-      {/* P35: единая шапка (@balloo/ui) — как в макете features list.html */}
-      <AppTopbar title="Фич-реквесты" />
+      {/* P35: единая шапка (@balloo/ui) */}
+      <AppTopbar
+        title="Фич-реквесты"
+        onToggleSidebar={() => setSidebarOpen((v) => !v)}
+        sidebarOpen={sidebarOpen}
+      />
 
       <div className="main" style={{ flex: 1, minHeight: 0 }}>
       {/* Sidebar */}
+      {sidebarOpen && (
       <div className="sidebar sidebar--narrow">
         <div className="sidebar__search">
           <form onSubmit={handleSearch}>
@@ -185,6 +195,7 @@ export function FeaturesListScreen() {
           </div>
         </div>
       </div>
+      )}
 
       {/* Content */}
       <div className="content overflow-y-auto">

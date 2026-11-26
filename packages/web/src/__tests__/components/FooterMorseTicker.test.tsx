@@ -82,12 +82,23 @@ describe('FooterMorseTicker — рендер', () => {
     const cells = container.querySelectorAll('.balloo-footer__morse');
     expect(cells.length).toBeGreaterThan(0);
 
-    // Внутри нет читаемых букв исходного текста
-    expect(container.textContent).not.toContain('SOS');
+    // Внутри самого тикера нет читаемых букв исходного текста
+    expect(container.querySelector('.balloo-footer__ticker')?.textContent).not.toContain('SOS');
 
     // Точки и тире присутствуют
     expect(container.querySelectorAll('.balloo-footer__morse--dot').length).toBeGreaterThan(0);
     expect(container.querySelectorAll('.balloo-footer__morse--dash').length).toBeGreaterThan(0);
+  });
+
+  it('показывает расшифровку в подсказке при наведении (тик. 1795721513)', () => {
+    const { container } = render(<FooterMorseTicker text="SOS" direction="ltr" />);
+
+    const tip = container.querySelector('[role="tooltip"]');
+    expect(tip).not.toBeNull();
+    expect(tip?.textContent).toBe('SOS');
+
+    // Нативный fallback-тултип на самом тикере
+    expect(container.querySelector('.balloo-footer__ticker')?.getAttribute('title')).toBe('SOS');
   });
 
   it('направление задаёт класс ltr/rtl', () => {

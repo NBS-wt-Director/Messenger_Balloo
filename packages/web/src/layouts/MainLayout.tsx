@@ -73,6 +73,8 @@ function MainLayout() {
           правый блок (колокольчик + аватар / «Войти») строит AppTopbar. */}
       <AppTopbar
         title={sectionTitleForPath(location.pathname)}
+        onToggleSidebar={() => setSidebarOpen(!isSidebarOpen)}
+        sidebarOpen={isSidebarOpen}
         actions={
           <>
             {/* Быстрый доступ к историям и приглашениям (тик. 1795282577) */}
@@ -98,8 +100,12 @@ function MainLayout() {
 
       {/* Main: sidebar | chat list | chat view */}
       <div className="main" style={{ display: 'flex', flex: 1, overflow: 'hidden', minHeight: 0 }}>
-        {/* Column 1: Sidebar */}
-        {isSidebarOpen && <Sidebar />}
+        {/* Column 1: Sidebar.
+            Тик. 1795721513: на десктопе/планшете панель рендерится ВСЕГДА —
+            свёрнутая в рейл 64px. Раньше при `isSidebarOpen=false` она
+            исчезала вместе с кнопкой возврата, и открыть её было нечем.
+            На мобиле панель занимает весь экран, поэтому там — по состоянию. */}
+        {(!isMobile || isSidebarOpen) && <Sidebar />}
 
         {/* Column 2: Chat list */}
         {showChatList && (

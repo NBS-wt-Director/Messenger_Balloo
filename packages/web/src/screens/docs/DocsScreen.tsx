@@ -61,6 +61,11 @@ export function DocsScreen() {
 
   const [viewMode, setViewMode] = useState<ViewMode>('overview');
   const [activeModuleId, setActiveModuleId] = useState<string | null>(null);
+  // Тик. 1795721513: левая панель сворачивается кнопкой в шапке; на мобиле
+  // по умолчанию закрыта (иначе занимает всю ширину).
+  const [sidebarOpen, setSidebarOpen] = useState(
+    () => typeof window === 'undefined' || window.innerWidth > 768
+  );
 
   // --- Load endpoints list ---
   useEffect(() => {
@@ -498,11 +503,15 @@ export function DocsScreen() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
       {/* P35: единая шапка (@balloo/ui) */}
-      <AppTopbar title="API Documentation" />
+      <AppTopbar
+        title="API Documentation"
+        onToggleSidebar={() => setSidebarOpen((v) => !v)}
+        sidebarOpen={sidebarOpen}
+      />
 
       <div className="main" style={{ flex: 1, minHeight: 0 }}>
         {/* Sidebar + Content */}
-        {renderSidebar()}
+        {sidebarOpen && renderSidebar()}
         <div className="content overflow-y-auto">{renderContent()}</div>
       </div>
 

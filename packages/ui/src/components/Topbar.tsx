@@ -30,6 +30,11 @@ interface TopbarProps {
   menuItems?: TopbarMenuItem[];
   /** SPA-навигация для пунктов меню (react-router navigate); нет — location.href */
   onNavigate?: (to: string) => void;
+  /**
+   * Контент перед лого-меню (кнопка «скрыть/открыть панель», тик. 1795721513).
+   * Сайты без левой панели не передают — шапка не меняется.
+   */
+  leading?: React.ReactNode;
 }
 
 export function Topbar({
@@ -41,9 +46,12 @@ export function Topbar({
   auth,
   menuItems,
   onNavigate,
+  leading,
 }: TopbarProps) {
   return (
     <header className="topbar">
+      {leading && <div className="topbar__leading">{leading}</div>}
+
       <TopbarMenu items={menuItems} onNavigate={onNavigate} />
 
       {title && (
