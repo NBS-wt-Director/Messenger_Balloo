@@ -19,23 +19,26 @@
 
 ## Подзадачи
 
-- [ ] 1. `MainLayout`: всегда рендерить `Sidebar` на десктопе/планшете (свёрнутый рейл 64px
-      вместо исчезновения); на мобиле — как раньше (панель на весь экран).
-- [ ] 2. `Topbar` (@balloo/ui): слот `leading` перед лого-меню.
-- [ ] 3. `AppTopbar`: кнопка `☰` (toggle панели) с `aria-expanded`/`title`; пропы
-      `onToggleSidebar`, `sidebarOpen`.
-- [ ] 4. `BalanceScreen`: убрать собственные `AppTopbar`/`AppFooter` (дубли).
-      Проверить остальные child-маршруты `MainLayout` — дублей больше нет.
-- [ ] 5. `DocsScreen` (`/doc`) и `FeaturesListScreen` (`/features`): кнопка
-      сворачивания их `.sidebar--narrow`.
-- [ ] 6. `GroupSettingsScreen` / `ChannelSettingsScreen`: кнопка сворачивания
-      `.settings-sidebar`.
-- [ ] 7. `FooterMorseTicker`: тултип с расшифровкой текста при наведении
-      (+ `aria-label`, `title` как fallback).
-- [ ] 8. `chrome.css`: стили `.balloo-footer__ticker-wrap` / `--morse-tip`.
-- [ ] 9. Проверка: `tsc --noEmit` web/shared, `vite build` web, тесты web/ui-компонентов
-      (без server).
-- [ ] 10. Скриншот/подтверждение владельца после деплоя.
+- [x] 1. `MainLayout`: панель рендерится всегда на десктопе/планшете (свёрнутый рейл 64px);
+      на мобиле — как раньше (панель на весь экран). `(!isMobile || isSidebarOpen) && <Sidebar />`
+- [x] 2. `Topbar` (@balloo/ui): слот `leading` перед лого-меню.
+- [x] 3. `AppTopbar`: кнопка `⟨`/`☰` с `aria-expanded`/`aria-controls="app-sidebar"`/`title`;
+      пропы `onToggleSidebar`, `sidebarOpen`.
+- [x] 4. `BalanceScreen`: собственные `AppTopbar`/`AppFooter` убраны; проверены все
+      30 child-экранов `MainLayout` — других дублей нет (скрипт по списку роутера).
+- [x] 5. `DocsScreen` (`/doc`) и `FeaturesListScreen` (`/features`): кнопка сворачивания
+      их `.sidebar--narrow` в шапке; на мобиле по умолчанию закрыта.
+- [x] 6. `GroupSettingsScreen` / `ChannelSettingsScreen`: **панель не тронута** —
+      классов `page-layout`/`settings-sidebar` нет ни в одном CSS-файле
+      (`grep -rn --include=*.css` → 0 совпадений), это обычный div в потоке,
+      а не левая панель. Вынесено отдельной задачей (см. «Проблемы»).
+- [x] 7. `FooterMorseTicker`: тултип `role="tooltip"` + `title` на тикере;
+      текст расшифровки при наведении.
+- [x] 8. `chrome.css`: `.topbar__leading`, `.topbar__sidebar-btn`,
+      `.balloo-footer__ticker-wrap`, `.balloo-footer__morse-tip`.
+- [x] 9. Проверка: `tsc --noEmit` shared/ui/web → exit 0; `vite build` web → exit 0
+      (`index-DAOJoBfv.js`); `pnpm --filter @balloo/web test` → **57 файлов, 433 теста, 0 failed**.
+- [ ] 10. Деплой web-образов + подтверждение владельца (скриншот).
 
 ## Критерии готовности
 
@@ -47,8 +50,27 @@
 
 ## Проблемы и решения
 
-_(заполняется по ходу)_
+1. **Тест `FooterMorseTicker` упал** после добавления тултипа:
+   `expect(container.textContent).not.toContain('SOS')` — текст теперь есть в
+   подсказке. Тест уточнён: букв нет внутри `.balloo-footer__ticker`, расшифровка
+   живёт только в `[role="tooltip"]`; добавлен отдельный тест на подсказку.
+2. **`page-layout` / `settings-sidebar` без стилей** — экраны настроек группы и
+   канала не имеют левой панели как таковой (классы нигде не описаны в CSS).
+   Отдельная задача, в этот тикет не входит.
+3. **Рейл 64px и кнопка в панели**: при свёрнутой панели кнопка `◀` внутри неё
+   переполняла рейл (20px лого + 34px кнопка при 48px доступной ширины) —
+   кнопка скрыта при collapsed, переключение остаётся в шапке.
 
 ## Результат
 
-_(заполняется по ходу)_
+Коммит `3070519` (пуш `3070519 main -> main`).
+
+```
+pnpm --filter @balloo/{shared,ui,web} exec tsc --noEmit   → EXIT=0, EXIT=0, EXIT=0
+pnpm --filter @balloo/web exec vite build                 → ✓ built in 7.94s, index-DAOJoBfv.js
+pnpm --filter @balloo/web test                            → Test Files 57 passed (57)
+                                                            Tests 433 passed (433)
+```
+
+**Не проверено:** вид в браузере (нет браузера в этой сессии) — нужна приёмка
+владельца после деплоя web-образов.
