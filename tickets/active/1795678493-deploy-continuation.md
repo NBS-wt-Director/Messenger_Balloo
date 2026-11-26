@@ -111,6 +111,23 @@ Workers → **Unregister** → Application → Storage → **Clear site data** �
 Сборка идёт из общего builder-стейджа `docker/Dockerfile.web`, поэтому все 4 SPA
 пересобираются одной командой.
 
+### Второй батч выполнен 26.11.2026 (доказано выводом сервера)
+
+| Шаг | Доказательство |
+|---|---|
+| D: `git checkout -B main origin/main` | `HEAD=6afdce0`, `git status --porcelain` → только `M docker/prod/.env.production` |
+| Бэкап до миграции | **не выполнялся** (в логе отсутствует) — выполнен после: `post-migration-6afdce0-20261126-2338.sql`, 191K, начинается с `-- PostgreSQL database dump` |
+| F1: сборка 6 образов | `Image balloo/{web,features,web-admin,web-history,web-download,server}:local Built` |
+| F2: `up -d server` | `Container balloo-server Started`; лог: `23 migrations found`, `Applying migration 20261126120000_user_balance_points`, `All migrations have been successfully applied` |
+| F3: API | `ps` → `balloo-server Up (healthy)`; `/health` → 200; последняя миграция в `_prisma_migrations` = `20261126120000_user_balance_points` |
+| F3: данные | `SELECT count(*) AS users, count(*) FILTER (WHERE balancePoints=555) AS bonus` → `10 | 10` (все получили бонус) |
+| F4: `up -d` 5 SPA | все 5 → `Started`, `Up ~15-20 s`, образы сменились с `sha256:…` на `balloo/*:local` |
+| G: коды доменов | `balloo.su 200`, `admin 200`, `features 200`, `history 200`, `download 200` |
+| G: бандли | web `index-pwhyhZOv.js` (был `index-ButcXBhZ.js`), admin `index-CypuNVLu.js` (был `index-CPA2O_Mn.js`) — новый код раздаётся |
+| G: новый роут | `GET https://api.balloo.su/api/notifications` без токена → **401** (роут существует и защищён; 404 означал бы «кода на проде нет») |
+
+**R1 (фикс чата-сироты) — на проде.** Осталось: удалить саму запись-сироту.
+
 ## Порядок выполнения (батчи)
 
 1. **E4:** коммит (фикс + тикеты + docs) → `git push origin main` — *по команде владельца «Деплой»*.
@@ -121,7 +138,7 @@ Workers → **Unregister** → Application → Storage → **Clear site data** �
 
 ## Критерии готовности
 
-- [ ] Фикс чата-сироты на проде (коммит виден в `git log` сервера, сервер пересобран).
+- [x] Фикс чата-сироты на проде (коммит виден в `git log` сервера, сервер пересобран).
 - [ ] N1–N9 приняты владельцем в браузере.
 - [ ] Консоль прода без CSP-ошибок (после R3).
 - [ ] Чат-сирота удалён из БД.
