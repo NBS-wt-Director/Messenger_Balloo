@@ -102,7 +102,14 @@ Workers → **Unregister** → Application → Storage → **Clear site data** �
 + `UPDATE users SET balancePoints=555 WHERE balancePoints=0` (аддитивная).
 **Бэкап при деплое обязателен** (первая миграция с UPDATE данных).
 
-**Коммит** (после этого блока): `feat(web,server,shared,ui): уведомления, баланс, морзе-тикер, i18n, QR`
+**Коммит:** `4f85330 feat(web,server,shared,ui): уведомления, баланс баллов, морзе-тикер, i18n без хардкода, QR загрузок`
+**Пуш:** `353cca5..4f85330  main -> main` ✓ (26.11.2026)
+**Компиляция (не тесты):** `tsc --noEmit` shared/server/web → exit 0 у всех трёх.
+
+**Затронутые образы:** `server` (routes/services), `web`, `web-admin`, `web-features`,
+`web-history`, `web-download` — все SPA зависят от `@balloo/ui` (Footer/RightMenu/chrome.css).
+Сборка идёт из общего builder-стейджа `docker/Dockerfile.web`, поэтому все 4 SPA
+пересобираются одной командой.
 
 ## Порядок выполнения (батчи)
 
