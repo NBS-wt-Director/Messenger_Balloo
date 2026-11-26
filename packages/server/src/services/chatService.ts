@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { ensureMutualContacts } from './userService';
+import { roomManager } from '../ws/room-manager';
 
 const prisma = new PrismaClient();
 
@@ -210,6 +211,30 @@ export const getChats = async ({ userId, page = 1, limit = 20, sortBy = 'lastMes
           _count: {
             select: { members: true },
           },
+          // Тикет 1795560003: клиент показывает последнее сообщение в sidebar.
+          // Берём одно самое свежее + автора + вложения (для превью фото/голоса).
+          messages: {
+            take: 1,
+            orderBy: { createdAt: 'desc' },
+            include: {
+              sender: {
+                select: { id: true, username: true, displayName: true, avatarUrl: true },
+              },
+              attachments: {
+                select: {
+                  id: true,
+                  type: true,
+                  url: true,
+                  thumbnail: true,
+                  name: true,
+                  size: true,
+                  width: true,
+                  height: true,
+                  duration: true,
+                },
+              },
+            },
+          },
         },
       },
     },
@@ -230,6 +255,7 @@ export const getChats = async ({ userId, page = 1, limit = 20, sortBy = 'lastMes
 
   let chats = filtered.map((m) => {
     const chat = m.chat;
+    const lastMsg = chat.messages[0] ?? null;
     return {
       id: chat.id,
       type: chat.type,
@@ -239,7 +265,37 @@ export const getChats = async ({ userId, page = 1, limit = 20, sortBy = 'lastMes
       pinned: m.pinned,
       muted: m.muted,
       unread: Number(m.unread),
+      // Тикет 1795560003: клиент (ChatList/ChatViewScreen) читает unreadCount,
+      // а не unread. Оставляем оба для совместимости со старыми клиентами.
+      unreadCount: Number(m.unread),
       lastRead: m.lastRead,
+      // Тикет 1795560003: превью последнего сообщения для sidebar.
+      // null когда сообщений нет — клиент покажет «Нет сообщений».
+      lastMessage: lastMsg
+        ? {
+            id: lastMsg.id,
+            type: lastMsg.type,
+            content: lastMsg.content,
+            createdAt: Number(lastMsg.createdAt),
+            sender: {
+              id: lastMsg.sender.id,
+              username: lastMsg.sender.username,
+              displayName: lastMsg.sender.displayName,
+              avatarUrl: lastMsg.sender.avatarUrl,
+            },
+            attachments: lastMsg.attachments.map((a) => ({
+              id: a.id,
+              type: a.type,
+              url: a.url,
+              thumbnail: a.thumbnail,
+              name: a.name,
+              size: Number(a.size ?? 0),
+              width: a.width,
+              height: a.height,
+              duration: a.duration,
+            })),
+          }
+        : null,
       inviteCode: chat.inviteCode,
       memberCount: chat._count.members,
       memberIds: chat.members.map((mm) => mm.userId),
@@ -279,7 +335,12 @@ export const getChats = async ({ userId, page = 1, limit = 20, sortBy = 'lastMes
     chats = chats.map((c) => {
       if (c.type !== 'direct') return c;
       const peerId = c.memberIds.find((id) => id !== userId);
-      return { ...c, peer: peerId ? byId.get(peerId) ?? null : null };
+      const peer = peerId ? byId.get(peerId) ?? null : null;
+      // Тикет 1795560001: presence собеседника direct-чата из roomManager.
+      const withPresence = peer
+        ? { ...peer, online: roomManager.isUserOnline(peer.id) }
+        : null;
+      return { ...c, peer: withPresence };
     });
   }
 
@@ -288,7 +349,9 @@ export const getChats = async ({ userId, page = 1, limit = 20, sortBy = 'lastMes
   } else if (sortBy === 'unread') {
     chats.sort((a, b) => b.unread - a.unread);
   } else {
-    chats.sort((a, b) => Number(b.lastRead || 0) - Number(a.lastRead || 0));
+    // Тикет 1795560003: сортировка по дате последнего сообщения (не по lastRead,
+    // который обновляется только когда пользователь читает чат).
+    chats.sort((a, b) => (b.lastMessage?.createdAt ?? 0) - (a.lastMessage?.createdAt ?? 0));
   }
 
   chats.sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
@@ -338,6 +401,30 @@ export const getChatInfo = async (chatId: string, userId: string) => {
       _count: {
         select: { members: true },
       },
+      // Тикет 1795560003: превью последнего сообщения — для addChat в сторе,
+      // когда клиент открывает чат по прямой ссылке без загрузки getChats.
+      messages: {
+        take: 1,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          sender: {
+            select: { id: true, username: true, displayName: true, avatarUrl: true },
+          },
+          attachments: {
+            select: {
+              id: true,
+              type: true,
+              url: true,
+              thumbnail: true,
+              name: true,
+              size: true,
+              width: true,
+              height: true,
+              duration: true,
+            },
+          },
+        },
+      },
     },
   });
 
@@ -354,6 +441,13 @@ export const getChatInfo = async (chatId: string, userId: string) => {
     throw new Error('Чат не найден');
   }
 
+  // Тикет 1795560003: счётчик непрочитанных текущего участника.
+  const membership = await prisma.userChat.findUnique({
+    where: { userId_chatId: { userId, chatId } },
+    select: { unread: true },
+  });
+  const lastMsg = chat.messages[0] ?? null;
+
   return {
     id: chat.id,
     type: chat.type,
@@ -361,6 +455,32 @@ export const getChatInfo = async (chatId: string, userId: string) => {
     avatarUrl: chat.avatarUrl,
     inviteCode: chat.inviteCode,
     memberCount: chat._count.members,
+    unreadCount: Number(membership?.unread ?? 0),
+    lastMessage: lastMsg
+      ? {
+          id: lastMsg.id,
+          type: lastMsg.type,
+          content: lastMsg.content,
+          createdAt: Number(lastMsg.createdAt),
+          sender: {
+            id: lastMsg.sender.id,
+            username: lastMsg.sender.username,
+            displayName: lastMsg.sender.displayName,
+            avatarUrl: lastMsg.sender.avatarUrl,
+          },
+          attachments: lastMsg.attachments.map((a) => ({
+            id: a.id,
+            type: a.type,
+            url: a.url,
+            thumbnail: a.thumbnail,
+            name: a.name,
+            size: Number(a.size ?? 0),
+            width: a.width,
+            height: a.height,
+            duration: a.duration,
+          })),
+        }
+      : null,
     settings: chat.settings
       ? {
           allowMessages: chat.settings.allowMessages,
@@ -378,6 +498,8 @@ export const getChatInfo = async (chatId: string, userId: string) => {
       avatarUrl: m.user.avatarUrl,
       role: m.role,
       joinedAt: m.joinedAt,
+      // Тикет 1795560001: presence собеседника direct-чата из roomManager.
+      online: roomManager.isUserOnline(m.user.id),
     })),
   };
 };

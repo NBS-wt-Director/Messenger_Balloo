@@ -17,6 +17,8 @@ interface AttachmentPanelProps {
   onClose: () => void;
   /** вызывается после успешной отправки — родитель перезагружает сообщения */
   onSent: () => void;
+  /** Тикет 1795560006: открыть модалку текстовой заметки. */
+  onTextNote?: () => void;
 }
 
 interface PickedFile {
@@ -62,14 +64,16 @@ const QUICK_ACTIONS: Array<{ icon: string; label: string; accept: string | null;
   { icon: '📷', label: 'С камеры', accept: 'image/*', capture: 'environment' },
 ];
 
-// Не-файловые вложения (замечание 1.1.18): опросы, геолокация, контакты
-const NON_FILE_ACTIONS: Array<{ icon: string; label: string; route?: string }> = [
+// Не-файловые вложения (замечание 1.1.18): опросы, геолокация, контакты, заметка
+const NON_FILE_ACTIONS: Array<{ icon: string; label: string; route?: string; action?: 'note' }> = [
   { icon: '📊', label: 'Опрос', route: 'poll' },
+  // Тикет 1795560006: текстовое вложение (заметка) — модалка TextNoteModal.
+  { icon: '📝', label: 'Текст', action: 'note' },
   { icon: '📍', label: 'Геолокация' },
   { icon: '👤', label: 'Контакт' },
 ];
 
-export function AttachmentPanel({ open, chatId, onClose, onSent }: AttachmentPanelProps) {
+export function AttachmentPanel({ open, chatId, onClose, onSent, onTextNote }: AttachmentPanelProps) {
   const [selected, setSelected] = useState<PickedFile[]>([]);
   const [dragOver, setDragOver] = useState(false);
   const [sending, setSending] = useState(false);
@@ -336,9 +340,20 @@ export function AttachmentPanel({ open, chatId, onClose, onSent }: AttachmentPan
                   if (na.route === 'poll') {
                     onClose();
                     window.location.hash = `/chat/${chatId}/poll`;
+                  } else if (na.action === 'note') {
+                    // Тикет 1795560006: открываем модалку текстовой заметки.
+                    onTextNote?.();
                   }
                 }}
-                onKeyDown={(e) => e.key === 'Enter' && na.route === 'poll' && (onClose(), (window.location.hash = `/chat/${chatId}/poll`))}
+                onKeyDown={(e) => {
+                  if (e.key !== 'Enter') return;
+                  if (na.route === 'poll') {
+                    onClose();
+                    (window.location.hash = `/chat/${chatId}/poll`);
+                  } else if (na.action === 'note') {
+                    onTextNote?.();
+                  }
+                }}
                 style={{
                   textAlign: 'center',
                   padding: '14px 8px',

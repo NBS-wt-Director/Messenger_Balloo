@@ -143,7 +143,16 @@ export const MessageInput: React.FC<MessageInputProps> = ({
         >
           📎
         </button>
-        <button className="input-area__btn" title="Фото/видео">🖼</button>
+        <button
+          className="input-area__btn"
+          title="Фото/видео"
+          onClick={() => {
+            // Тикет 1795560005: кнопка была мёртвой (без onClick).
+            // Открывает ту же панель вложений (AttachmentPanel), где
+            // есть быстрый выбор «Фото» с multiple.
+            onAttachClick?.();
+          }}
+        >🖼</button>
         <button
           className="input-area__btn"
           title="Голосовое"

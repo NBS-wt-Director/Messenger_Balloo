@@ -4,6 +4,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import type { UserChat } from '@/store/chatStore';
+import { usePresenceStore } from '@/store/presenceStore';
 
 interface ChatHeaderProps {
   chat: UserChat;
@@ -40,7 +41,7 @@ function getAvatarCtx(type: string): string {
 
 export const ChatHeader: React.FC<ChatHeaderProps> = ({
   chat,
-  onlineStatus = 'в сети',
+  onlineStatus,
   onBack,
   onCall,
   onAttachments,
@@ -54,6 +55,14 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
+  // Тикет 1795560001: presence собеседника direct-чата из presenceStore.
+  // Раньше здесь был захардкоженный avatar--status-online + onlineStatus="в сети"
+  // — все чаты выглядели «онлайн», даже когда собеседник офлайн.
+  const peerId = chat.type === 'direct' ? chat.peer?.id ?? null : null;
+  const peerPresence = usePresenceStore((s) => (peerId ? s.byUser[peerId] : undefined));
+  const peerOnline = peerPresence === 'online' || peerPresence === 'away';
+  const statusClass = peerOnline ? 'avatar--status-online' : 'avatar--status-offline';
+
   // Закрытие меню по клику вне
   useEffect(() => {
     if (!menuOpen) return;
@@ -66,9 +75,19 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
     return () => document.removeEventListener('mousedown', handleClick);
   }, [menuOpen]);
 
-  const displayName = chat.name || 'Чат';
+  const displayName = chat.name || (chat.peer
+    ? (chat.peer.displayName || chat.peer.username || 'Чат')
+    : 'Чат');
   const initials = getInitials(displayName);
   const avatarCtx = getAvatarCtx(chat.type);
+
+  // Подпись статуса: для direct — presence собеседника;
+  // для групп/каналов — количество участников (presence суммарно не показываем).
+  const statusText = onlineStatus ?? (
+    chat.type === 'direct'
+      ? (peerOnline ? 'в сети' : 'не в сети')
+      : `${(chat as any).memberCount ?? 0} участников`
+  );
 
   const menuItems: { label: string; action?: () => void; danger?: boolean }[] = [
     { label: '📎 Вложения чата', action: onAttachments },
@@ -92,7 +111,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
       </button>
 
       {/* Аватар-октагон с двойной рамкой (контекст + статус) */}
-      <div className={`avatar avatar--sm avatar--bordered avatar--status-online ${avatarCtx}`}>
+      <div className={`avatar avatar--sm avatar--bordered ${statusClass} ${avatarCtx}`}>
         <div className="avatar__inner">
           {chat.avatarUrl ? <img src={chat.avatarUrl} alt={displayName} /> : <span>{initials}</span>}
         </div>
@@ -110,7 +129,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
           )}
         </div>
         <div className="chat-header__status">
-          {onlineStatus}
+          {statusText}
           {chat.unreadCount > 0 && (
             <span style={{ marginLeft: '8px', color: 'var(--accent)' }}>
               {chat.unreadCount} новых

@@ -3,7 +3,7 @@
 // Функция: 0_01_12 — Опросы
 // Тикет: №30
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { api } from '@/services/api';
 
@@ -542,6 +542,15 @@ function PollScreen() {
   const [mode, setMode] = useState<'create' | 'view'>('view');
   const [poll, setPoll] = useState<Poll | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // Тикет 1795560007: если pollId нет — сразу режим создания, не ждём загрузки.
+  // Раньше при /chat/:chatId/poll mode='view', poll=null → «Опрос не найден»
+  // вместо формы создания.
+  useEffect(() => {
+    if (!pollId) {
+      setMode('create');
+    }
+  }, [pollId]);
 
   // Загрузка опроса по ID
   const loadPoll = async (id: string) => {

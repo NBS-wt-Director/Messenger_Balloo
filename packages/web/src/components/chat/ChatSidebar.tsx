@@ -68,7 +68,10 @@ export function ChatSidebar({ channels, activeChatId, onSelectChat, onSearch }: 
             onClick={() => onSelectChat(chat.id)}
             style={{ cursor: 'pointer' }}
           >
-            <div className="avatar avatar--sm avatar--bordered avatar--status-online avatar--ctx-contact">
+            {/* Тикет 1795560001: presence здесь не вычисляем — командный
+                чат вне MVP1, но захардкоженный avatar--status-online убран,
+                чтобы не красить все точки зелёным. */}
+            <div className="avatar avatar--sm avatar--bordered avatar--ctx-contact">
               <div className="avatar__inner">
                 <span>{getInitials(chat.name.replace('#', ''))}</span>
               </div>

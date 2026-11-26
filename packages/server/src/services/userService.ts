@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { roomManager } from '../ws/room-manager';
 
 const prisma = new PrismaClient();
 
@@ -57,6 +58,10 @@ export const getMe = async (userId: string) => {
     avatarUrl: user.avatarUrl,
     status: user.status,
     language: user.language,
+    // Тикет 1795560009: роль и признак админа для клиента/админ-панели.
+    // superadmin — надмножество admin (все права админки).
+    role: user.role,
+    isAdmin: user.role === 'admin' || user.role === 'superadmin',
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
     publicProfile: user.publicProfile
@@ -252,6 +257,8 @@ export const getPublicProfile = async (username: string, viewerId?: string) => {
     avatarUrl: publicProfile.avatarUrl,
     bio: publicProfile.bio,
     isPrivate: publicProfile.isPrivate,
+    // Тикет 1795560001: presence из памяти WS-сервера.
+    online: roomManager.isUserOnline(publicProfile.userId),
     profile: publicProfile.user.profile
       ? {
           bio: publicProfile.user.profile.bio,
@@ -938,12 +945,16 @@ export const getContacts = async (userId: string) => {
     orderBy: { createdAt: 'desc' },
   });
 
+  // Тикет 1795560001: реальный online-статус живёт в памяти WS-сервера
+  // (roomManager.presence), а не в User.status (enum БД: active/banned/...).
+  // Клиент должен видеть presence, а не lifecycle-статус.
   return contacts.map((c) => ({
     id: c.contact.id,
     username: c.contact.username,
     displayName: c.contact.displayName,
     avatarUrl: c.contact.avatarUrl,
     status: c.contact.status,
+    online: roomManager.isUserOnline(c.contact.id),
     mutualChats: 0,
   }));
 };

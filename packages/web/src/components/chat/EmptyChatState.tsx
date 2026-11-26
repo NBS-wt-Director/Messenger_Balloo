@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '@/services/api';
 import { useChatStore } from '@/store/chatStore';
+import { seedPresenceFromRest, usePresenceStore } from '@/store/presenceStore';
 import { displayNameOf, initialsOf } from '@/utils/display';
 
 interface Contact {
@@ -15,6 +16,8 @@ interface Contact {
   displayName: string | null;
   avatarUrl: string | null;
   status?: string;
+  /** Тикет 1795560001: реальный presence из roomManager. */
+  online?: boolean;
 }
 
 interface EmptyChatStateProps {
@@ -27,10 +30,20 @@ export function EmptyChatState({ onNewChat }: EmptyChatStateProps) {
   const setActiveChat = useChatStore((s) => s.setActiveChat);
   const addChat = useChatStore((s) => s.addChat);
 
+  // Тикет 1795560001: presence контакта из presenceStore (WS) или REST (online).
+  const presenceByUser = usePresenceStore((s) => s.byUser);
+  const isContactOnline = (c: Contact): boolean => {
+    const ws = presenceByUser[c.id];
+    if (ws !== undefined) return ws === 'online' || ws === 'away';
+    return c.online === true;
+  };
+
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [busyId, setBusyId] = useState<string | null>(null);
+  // Тикет 1795560002: ошибка создания чата (раньше catch {} молчал).
+  const [createError, setCreateError] = useState<string | null>(null);
   const searchRef = React.useRef<HTMLInputElement>(null);
 
   // Клик по контакту = начать/открыть личный чат (тик. 1795369072).
@@ -38,6 +51,7 @@ export function EmptyChatState({ onNewChat }: EmptyChatStateProps) {
   const openChatWith = async (contact: Contact) => {
     if (busyId) return;
     setBusyId(contact.id);
+    setCreateError(null);
     try {
       const chat = await api.createDirectChat(contact.id);
       addChat({
@@ -45,7 +59,7 @@ export function EmptyChatState({ onNewChat }: EmptyChatStateProps) {
         joinedAt: chat.joinedAt ?? chat.createdAt ?? 0,
         pinned: !!chat.pinned,
         muted: !!chat.muted,
-        unreadCount: chat.unreadCount ?? 0,
+        unreadCount: chat.unreadCount ?? chat.unread ?? 0,
         peer: chat.peer ?? {
           id: contact.id,
           username: contact.username,
@@ -55,8 +69,9 @@ export function EmptyChatState({ onNewChat }: EmptyChatStateProps) {
       });
       setActiveChat(chat.id);
       navigate(`/chat/${chat.id}`);
-    } catch {
-      /* без сети/ошибка — остаёмся на экране */
+    } catch (err: any) {
+      // Тикет 1795560002: показываем понятную ошибку вместо тихого catch.
+      setCreateError(err?.message || 'Не удалось создать чат');
     } finally {
       setBusyId(null);
     }
@@ -88,6 +103,8 @@ export function EmptyChatState({ onNewChat }: EmptyChatStateProps) {
             (c: Contact) => !chatUserIds.has(c.id)
           );
           setContacts(filtered);
+          // Тикет 1795560001: засеиваем presence из REST-ответа.
+          seedPresenceFromRest(filtered);
         }
       } catch {
         // silently handle
@@ -170,6 +187,23 @@ export function EmptyChatState({ onNewChat }: EmptyChatStateProps) {
 
         {/* Contacts without chats */}
         <div style={{ textAlign: 'left' }}>
+          {/* Тикет 1795560002: понятная ошибка вместо тихого catch. */}
+          {createError && (
+            <div
+              role="alert"
+              style={{
+                padding: '10px 14px',
+                marginBottom: 12,
+                background: 'var(--danger-bg)',
+                border: '1px solid var(--danger)',
+                borderRadius: '8px',
+                color: 'var(--danger)',
+                fontSize: '13px',
+              }}
+            >
+              ⚠ {createError}
+            </div>
+          )}
           <div className="text-sm font-bold" style={{ color: 'var(--text-primary)', marginBottom: 8 }}>
             🐻 Балунишка предлагает пообщаться
           </div>
@@ -234,7 +268,7 @@ export function EmptyChatState({ onNewChat }: EmptyChatStateProps) {
                       <div className="list__item-body">
                         <div className="list__item-title">{displayNameOf(contact)}</div>
                         <div className="list__item-subtitle">
-                          {contact.status === 'online' ? 'в сети' : 'был(а) недавно'}
+                          {isContactOnline(contact) ? 'в сети' : 'был(а) недавно'}
                         </div>
                       </div>
                     </div>

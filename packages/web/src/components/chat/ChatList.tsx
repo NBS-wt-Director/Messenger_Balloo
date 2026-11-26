@@ -5,6 +5,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useChatStore, type UserChat } from '@/store/chatStore';
+import { seedPresenceFromRest } from '@/store/presenceStore';
 import { ChatItem } from './ChatItem';
 import { ChatSearch } from './ChatSearch';
 import { api } from '@/services/api';
@@ -34,9 +35,18 @@ export function ChatList({ onChatSelect }: ChatListProps) {
           joinedAt: c.joinedAt ?? c.createdAt ?? 0,
           pinned: !!c.pinned,
           muted: !!c.muted,
-          unreadCount: c.unreadCount ?? 0,
+          // Тикет 1795560003: сервер отдаёт unreadCount И unread (для старых
+          // клиентов); читаем оба, чтобы sidebar показывал реальный счётчик.
+          unreadCount: c.unreadCount ?? c.unread ?? 0,
         }));
         useChatStore.getState().setChats(normalized);
+        // Тикет 1795560001: засеиваем presence собеседников direct-чатов,
+        // пока WS-события не пришли.
+        seedPresenceFromRest(
+          normalized
+            .filter((c: any) => c.type === 'direct' && c.peer)
+            .map((c: any) => c.peer)
+        );
       })
       .catch(() => {
         /* без сети — пустой список, состояние «Нет чатов» */

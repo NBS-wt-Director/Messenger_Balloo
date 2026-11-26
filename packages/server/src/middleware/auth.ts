@@ -220,7 +220,8 @@ export const adminOnly = (
     return;
   }
 
-  if (req.user.role !== 'admin') {
+  // Тикет 1795560009: superadmin — надмножество admin.
+  if (req.user.role !== 'admin' && req.user.role !== 'superadmin') {
     res.status(403).json({
       error: 'Forbidden',
       message: 'Доступ разрешён только администраторам',
@@ -245,7 +246,12 @@ export const moderatorOnly = (
     return;
   }
 
-  if (req.user.role !== 'admin' && req.user.role !== 'moderator') {
+  // Тикет 1795560009: superadmin входит в moderatorOnly.
+  if (
+    req.user.role !== 'admin' &&
+    req.user.role !== 'moderator' &&
+    req.user.role !== 'superadmin'
+  ) {
     res.status(403).json({
       error: 'Forbidden',
       message: 'Доступ разрешён только модераторам и администраторам',

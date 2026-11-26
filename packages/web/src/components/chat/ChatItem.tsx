@@ -6,6 +6,7 @@
 
 import React, { useMemo } from 'react';
 import type { UserChat } from '@/store/chatStore';
+import { usePresenceStore } from '@/store/presenceStore';
 import { displayNameOf } from '@/utils/display';
 
 interface ChatItemProps {
@@ -75,13 +76,35 @@ export const ChatItem = React.memo<ChatItemProps>(({ chat, active = false, onCli
   const initials = useMemo(() => getInitials(displayName), [displayName]);
   const avatarCtx = useMemo(() => getAvatarCtx(chat.type), [chat.type]);
 
-  // Подзаголовок: «Автор: текст» для групп, текст — для личных
+  // Тикет 1795560001: presence собеседника direct-чата.
+  // Раньше класс avatar--status-online был захардкожен — все чаты выглядели
+  // зелёными даже когда собеседник офлайн.
+  const peerId = chat.type === 'direct' ? chat.peer?.id ?? null : null;
+  const peerPresence = usePresenceStore((s) => (peerId ? s.byUser[peerId] : undefined));
+  const peerOnline = peerPresence === 'online' || peerPresence === 'away';
+  const statusClass = peerOnline ? 'avatar--status-online' : 'avatar--status-offline';
+
+  // Подзаголовок: «Автор: текст» для групп, текст — для личных.
+  // Тикет 1795560003: медиа-сообщения (без content) показывают тип вложения.
   const subtitle = useMemo(() => {
     const authorName = lastMsg?.sender?.displayName || lastMsg?.sender?.username;
+    const text = (() => {
+      if (!lastMsg) return 'Нет сообщений';
+      if (lastMsg.content && lastMsg.content.trim()) return lastMsg.content;
+      const att = (lastMsg as any).attachments?.[0];
+      const t = lastMsg.type ?? att?.type;
+      if (t === 'image') return '📷 Фото';
+      if (t === 'video') return '🎥 Видео';
+      if (t === 'voice') return '🎤 Голосовое';
+      if (t === 'file') return `📄 ${att?.name || 'Файл'}`;
+      if (t === 'poll') return '📊 Опрос';
+      if (t === 'text') return 'Текст';
+      return 'Сообщение';
+    })();
     if (chat.type === 'group' && authorName) {
-      return `${authorName}: ${lastMsg?.content || ''}`;
+      return `${authorName}: ${text}`;
     }
-    return lastMsg?.content || 'Нет сообщений';
+    return text;
   }, [chat.type, lastMsg]);
 
   // Тип чата: chip в заголовке (СМИ / КОРП / КАНАЛ) — как в макете
@@ -98,7 +121,7 @@ export const ChatItem = React.memo<ChatItemProps>(({ chat, active = false, onCli
       onClick={onClick}
     >
       {/* Аватар-октагон с двойной рамкой (контекст + статус) */}
-      <div className={`avatar avatar--md avatar--bordered avatar--status-online ${avatarCtx}`}>
+      <div className={`avatar avatar--md avatar--bordered ${statusClass} ${avatarCtx}`}>
         <div className="avatar__inner">
           {chat.avatarUrl ? <img src={chat.avatarUrl} alt={displayName} /> : <span>{initials}</span>}
         </div>

@@ -4,6 +4,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { api } from '@/services/api';
+import { usePresenceStore } from '@/store/presenceStore';
 
 interface PublicProfile {
   id: string;
@@ -12,6 +13,8 @@ interface PublicProfile {
   avatarUrl?: string;
   bio?: string;
   status: string;
+  /** Тикет 1795560001: presence из roomManager на сервере. */
+  online?: boolean;
   birthDate?: string;
   website?: string;
   socialLinks?: Record<string, string>;
@@ -41,6 +44,17 @@ export default function PublicProfileScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  // Тикет 1795560001: presence собеседника из presenceStore (WS) или из REST-ответа.
+  // Раньше класс avatar--status-online был захардкожен — любой просмотренный
+  // профиль выглядел «в сети».
+  const profilePresence = usePresenceStore((s) =>
+    profile ? s.byUser[profile.id] : undefined
+  );
+  const profileOnline =
+    profilePresence === 'online' ||
+    profilePresence === 'away' ||
+    profile?.online === true;
 
   const loadProfile = useCallback(async () => {
     if (!username) return;
@@ -131,7 +145,7 @@ export default function PublicProfileScreen() {
       {/* Header with avatar and basic info */}
       <div className="text-center mb-6">
         <div
-          className="avatar avatar--xl avatar--bordered avatar--status-online avatar--ctx-contact"
+          className={`avatar avatar--xl avatar--bordered ${profileOnline ? 'avatar--status-online' : 'avatar--status-offline'} avatar--ctx-contact`}
           style={{ margin: '0 auto 16px' }}
         >
           <div className="avatar__inner">

@@ -105,6 +105,27 @@ export const VoiceMessageModal: React.FC<VoiceMessageModalProps> = ({
   // Start recording
   const startRecording = useCallback(async () => {
     setError(null);
+
+    // Тикет 1795560008: если разрешение уже явно запрещено (например, через
+    // Chrome Enterprise Policy AudioCaptureAllowed=false или настройку сайта),
+    // getUserMedia вернёт NotAllowedError мгновенно, без prompt. Проверка
+    // Permissions API даёт нам шанс показать понятное сообщение ДО вызова.
+    if (typeof navigator !== 'undefined' && (navigator as any).permissions) {
+      try {
+        const perm = await (navigator as any).permissions.query({ name: 'microphone' as any });
+        if (perm?.state === 'denied') {
+          setError(
+            'Микрофон запрещён для этого сайта. ' +
+              'Если политика организации блокирует микрофон — обратитесь к системному администратору. ' +
+              'Иначе разрешите доступ в настройках сайта (🔒 слева от адресной строки → Микрофон → Разрешить).'
+          );
+          return;
+        }
+      } catch {
+        /* Permissions API не поддерживает microphone — пропускаем */
+      }
+    }
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
@@ -166,8 +187,26 @@ export const VoiceMessageModal: React.FC<VoiceMessageModalProps> = ({
         animFrameRef.current = requestAnimationFrame(animate);
       };
       animate();
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Нет доступа к микрофону';
+    } catch (err: any) {
+      // Тикет 1795560008: понятная ошибка вместо «Permission denied».
+      const name = err?.name || '';
+      let message = '';
+      if (name === 'NotAllowedError' || name === 'SecurityError') {
+        message =
+          'Браузер запретил доступ к микрофону. Возможные причины: ' +
+          '(а) политика организации (Chrome Enterprise Policy «AudioCaptureAllowed»), ' +
+          '(б) запрет в настройках сайта. ' +
+          'Обратитесь к системному администратору или разрешите микрофон для этого сайта ' +
+          '(🔒 слева от адресной строки → Микрофон → Разрешить).';
+      } else if (name === 'NotFoundError' || name === 'DevicesNotFoundError') {
+        message = 'Микрофон не найден. Подключите устройство записи.';
+      } else if (name === 'NotReadableError' || name === 'TrackStartError') {
+        message = 'Микрофон занят другим приложением. Закройте его и повторите.';
+      } else if (name === 'OverconstrainedError') {
+        message = 'Микрофон не соответствует запрошенным параметрам.';
+      } else {
+        message = err?.message || 'Нет доступа к микрофону';
+      }
       setError(message);
     }
   }, [generatePreviewWaveform]);

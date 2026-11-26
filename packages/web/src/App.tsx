@@ -2,7 +2,7 @@
 import { useEffect } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { router } from '@/router';
-import { ThemeProvider, I18nProvider, AuthProvider } from '@/components/providers';
+import { ThemeProvider, I18nProvider, AuthProvider, PresenceProvider } from '@/components/providers';
 import { CookieBanner } from '@/components/ui/CookieBanner';
 import { hasAnalyticsConsent } from '@/utils/cookieUtils';
 import { initYandexMetrika } from '@/utils/yandex-metrika';
@@ -21,8 +21,10 @@ function App() {
     <ThemeProvider>
       <I18nProvider>
         <AuthProvider>
-          <RouterProvider router={router} />
-          <CookieBanner />
+          <PresenceProvider>
+            <RouterProvider router={router} />
+            <CookieBanner />
+          </PresenceProvider>
         </AuthProvider>
       </I18nProvider>
     </ThemeProvider>

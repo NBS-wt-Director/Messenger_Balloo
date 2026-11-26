@@ -82,7 +82,8 @@ export default function AccountsScreen() {
         status: 'active',
         language: user?.language ?? 'ru',
         theme: user?.theme ?? 'dark',
-        isAdmin: res.user.role === 'admin',
+        // Тикет 1795560009: superadmin тоже имеет доступ к админке.
+        isAdmin: res.user.role === 'admin' || res.user.role === 'superadmin',
         isTwoFAEnabled: false,
       };
       setUser(switched);

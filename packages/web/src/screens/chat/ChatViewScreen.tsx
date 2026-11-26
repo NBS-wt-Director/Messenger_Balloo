@@ -3,12 +3,14 @@
 // Интеграция с WebSocket для realtime.
 
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useChatStore, type MessageWithSender, type MessageAttachment } from '@/store/chatStore';
+import { seedPresenceFromRest } from '@/store/presenceStore';
 import { MessageList } from '@/components/chat/MessageList';
 import { MessageInput } from '@/components/chat/MessageInput';
 import { AttachmentPanel } from '@/components/chat/AttachmentPanel';
 import { VoiceMessageModal } from '@/components/chat/VoiceMessageModal';
+import { TextNoteModal } from '@/components/chat/TextNoteModal';
 import { FileViewer } from '@/components/chat/FileViewer';
 import { ChatHeader } from '@/components/chat/ChatHeader';
 import { ChatInfoPanel } from '@/components/chat/ChatInfoPanel';
@@ -20,6 +22,7 @@ import { api } from '@/services/api';
 export const ChatViewScreen: React.FC = () => {
   const { chatId } = useParams<{ chatId?: string }>();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const {
     chats,
     activeChat,
@@ -30,6 +33,44 @@ export const ChatViewScreen: React.FC = () => {
     deleteMessage,
     setTypingUsers,
   } = useChatStore();
+
+  // Тикет 1795560002: авто-создание direct-чата при переходе /chat?userId=<id>.
+  // Кнопки «Написать» в ContactsScreen и PublicProfileScreen ведут сюда.
+  const [chatCreateError, setChatCreateError] = useState<string | null>(null);
+  useEffect(() => {
+    if (chatId) return;
+    const userId = searchParams.get('userId');
+    if (!userId) return;
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const chat = await api.createDirectChat(userId);
+        if (cancelled) return;
+        const state = useChatStore.getState();
+        if (!state.chats.find((c) => c.id === chat.id)) {
+          state.addChat({
+            ...chat,
+            joinedAt: chat.joinedAt ?? chat.createdAt ?? 0,
+            pinned: !!chat.pinned,
+            muted: !!chat.muted,
+            unreadCount: chat.unreadCount ?? chat.unread ?? 0,
+          });
+        }
+        // replace: не оставляем в истории /chat?userId= — иначе «Назад» снова
+        // триггерит создание.
+        navigate(`/chat/${chat.id}`, { replace: true });
+      } catch (err: any) {
+        if (!cancelled) {
+          setChatCreateError(err?.message || 'Не удалось открыть чат');
+          // чистим query чтобы не зацикливать
+          setSearchParams({}, { replace: true });
+        }
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [chatId, searchParams, navigate, setSearchParams]);
 
   // State
   const [isLoading, setIsLoading] = useState(true);
@@ -49,6 +90,8 @@ export const ChatViewScreen: React.FC = () => {
   const [attachmentPanelOpen, setAttachmentPanelOpen] = useState(false);
   // Модалка записи голосового (тик. 1792160023, макет voice-message.html)
   const [voiceModalOpen, setVoiceModalOpen] = useState(false);
+  // Тикет 1795560006: модалка текстовой заметки.
+  const [textNoteOpen, setTextNoteOpen] = useState(false);
   // Полноэкранный просмотрщик вложений (макет file-viewer.html, тик. 1795456886)
   const [viewer, setViewer] = useState<{ attachments: MessageAttachment[]; index: number } | null>(null);
 
@@ -80,10 +123,19 @@ export const ChatViewScreen: React.FC = () => {
             joinedAt: chatData.joinedAt ?? chatData.createdAt ?? 0,
             pinned: !!chatData.pinned,
             muted: !!chatData.muted,
-            unreadCount: chatData.unreadCount ?? 0,
+            // Тикет 1795560003: сервер getChatInfo/getChats теперь отдаёт
+            // unreadCount И unread — читаем оба для совместимости.
+            unreadCount: chatData.unreadCount ?? chatData.unread ?? 0,
           });
         }
         setActiveChat(chatId);
+
+        // Тикет 1795560001: presence собеседника direct-чата из REST (members).
+        if (chatData?.members && Array.isArray(chatData.members)) {
+          seedPresenceFromRest(
+            chatData.members.map((m: any) => ({ id: m.id, online: m.online }))
+          );
+        }
 
         const messagesData = await api.getMessages(chatId);
         const messagesWithSender: MessageWithSender[] = messagesData.map((m: any) => ({
@@ -397,7 +449,6 @@ export const ChatViewScreen: React.FC = () => {
           {activeChat && (
             <ChatHeader
               chat={activeChat}
-              onlineStatus="в сети"
               onCall={handleCall}
               onAttachments={() => setAttachmentPanelOpen((v) => !v)}
               onMenu={() => setShowInfo(!showInfo)}
@@ -443,6 +494,7 @@ export const ChatViewScreen: React.FC = () => {
                 chatId={chatId}
                 onClose={() => setAttachmentPanelOpen(false)}
                 onSent={refreshMessages}
+                onTextNote={() => setTextNoteOpen(true)}
               />
             )}
 
@@ -452,6 +504,16 @@ export const ChatViewScreen: React.FC = () => {
                 open={voiceModalOpen}
                 chatId={chatId}
                 onClose={() => setVoiceModalOpen(false)}
+                onSent={refreshMessages}
+              />
+            )}
+
+            {/* Тикет 1795560006: модалка текстовой заметки */}
+            {chatId && (
+              <TextNoteModal
+                open={textNoteOpen}
+                chatId={chatId}
+                onClose={() => setTextNoteOpen(false)}
                 onSent={refreshMessages}
               />
             )}
@@ -494,7 +556,25 @@ export const ChatViewScreen: React.FC = () => {
         </>
       ) : (
         /* Empty state when no chat is selected */
-        <EmptyChatState />
+        <>
+          {chatCreateError && (
+            <div
+              role="alert"
+              style={{
+                padding: '12px 16px',
+                margin: '8px',
+                background: 'var(--danger-bg)',
+                border: '1px solid var(--danger)',
+                borderRadius: '8px',
+                color: 'var(--danger)',
+                fontSize: '14px',
+              }}
+            >
+              ⚠ {chatCreateError}
+            </div>
+          )}
+          <EmptyChatState />
+        </>
       )}
     </div>
   );

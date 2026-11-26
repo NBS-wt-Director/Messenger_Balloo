@@ -138,17 +138,18 @@
 
 /* --- Russian Theme --- */
 /* Тёмная тема с флагом РФ (градиент 45°) + драгметаллы (золото, серебро, платина) */
+/* Тикет 1795560004: подняты базовые цвета и opacity градиента для видимости. */
 [data-theme='russian'] {
-  --bg-primary: #0a0c10;
-  --bg-secondary: #141821;
-  --bg-tertiary: #1c2230;
-  --bg-glass: rgba(28, 34, 48, 0.72);
+  --bg-primary: #161a26;
+  --bg-secondary: #1e2432;
+  --bg-tertiary: #262e40;
+  --bg-glass: rgba(38, 46, 64, 0.72);
   --surface: var(--bg-glass);
-  --bg-glass-hover: rgba(38, 46, 64, 0.82);
+  --bg-glass-hover: rgba(50, 60, 82, 0.82);
   --bg-hover: #283042;
   --bg-active: #323c52;
-  --border-color: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(255, 215, 0, 0.30);
+  --border-color: rgba(255, 255, 255, 0.10);
+  --border-strong: rgba(255, 215, 0, 0.35);
   --text-primary: #f4f0e8;
   --text-secondary: #b0b8c8;
   --text-muted: #727c90;
@@ -201,12 +202,14 @@
   --font-secondary: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
   /* App background surface: solid in dark/light, flag gradient in russian.
      Full-screen wrappers use var(--app-bg) so the russian gradient is actually
-     visible (ticket 1794575221: theme 'Наша' looked black). */
+     visible (ticket 1794575221: theme 'Наша' looked black).
+     Тикет 1795560004: opacity градиента поднят (0.22→0.32 / 0.38→0.55 / 0.42→0.60),
+     чтобы флаг РФ был виден, а не тонул в --bg-primary. */
   --app-bg:
     linear-gradient(45deg,
-      rgba(255, 255, 255, 0.22) 0%,
-      rgba(0, 57, 166, 0.38) 50%,
-      rgba(213, 43, 30, 0.42) 100%),
+      rgba(255, 255, 255, 0.32) 0%,
+      rgba(0, 57, 166, 0.55) 50%,
+      rgba(213, 43, 30, 0.60) 100%),
     var(--bg-primary);
 
   /* Aliases for inline-style consumers (FeedbackModal, etc.) — ticket 1794892001 */
@@ -216,13 +219,14 @@
   --text: var(--text-primary);
 }
 
-/* Russian theme: 45° flag-colour gradient as page backdrop (darkened for readability) */
+/* Russian theme: 45° flag-colour gradient as page backdrop (darkened for readability).
+   Тикет 1795560004: те же значения, что и в --app-bg. */
 [data-theme='russian'] body {
   background:
     linear-gradient(45deg,
-      rgba(255, 255, 255, 0.22) 0%,
-      rgba(0, 57, 166, 0.38) 50%,
-      rgba(213, 43, 30, 0.42) 100%),
+      rgba(255, 255, 255, 0.32) 0%,
+      rgba(0, 57, 166, 0.55) 50%,
+      rgba(213, 43, 30, 0.60) 100%),
     var(--bg-primary);
 }
 
@@ -230,6 +234,12 @@
    flag gradient (ticket 1794575221). Transparent lets the wrapper --app-bg
    gradient show through. Doubled class = specificity over chat.css. */
 [data-theme='russian'] .content.content {
+  background: transparent;
+}
+
+/* Тикет 1795560004: .messages не должен красить фон — иначе градиент
+   родителя не виден за областью сообщений. */
+[data-theme='russian'] .messages.messages {
   background: transparent;
 }
 

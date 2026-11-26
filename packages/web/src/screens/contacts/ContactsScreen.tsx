@@ -4,6 +4,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '@/services/api';
 import { useAuthStore } from '@/store/authStore';
+import { usePresenceStore, seedPresenceFromRest } from '@/store/presenceStore';
 
 interface Contact {
   id: string;
@@ -14,6 +15,8 @@ interface Contact {
   status: string;
   lastSeen?: string;
   mutualChats?: number;
+  /** Тикет 1795560001: реальный online из roomManager. */
+  online?: boolean;
 }
 
 export default function ContactsScreen() {
@@ -24,11 +27,24 @@ export default function ContactsScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Тикет 1795560001: presence из presenceStore (WS) либо из REST-ответа (поле online).
+  // Раньше сравнивали contact.status === 'online', но сервер отдаёт lifecycle-enum
+  // (active/banned/...), поэтому сравнение всегда было false.
+  const presenceByUser = usePresenceStore((s) => s.byUser);
+  const isContactOnline = (c: Contact): boolean => {
+    const ws = presenceByUser[c.id];
+    if (ws !== undefined) return ws === 'online' || ws === 'away';
+    return c.online === true;
+  };
+
   const fetchContacts = useCallback(async () => {
     try {
       setLoading(true);
       const data = await api.getContacts();
       setContacts(data || []);
+      // Тикет 1795560001: засеиваем presence из REST-ответа,
+      // пока WS-события не пришли.
+      seedPresenceFromRest(data || []);
     } catch (err) {
       setError('Не удалось загрузить контакты');
       setContacts([]);
@@ -193,7 +209,7 @@ export default function ContactsScreen() {
                   >
                     <div
                       className={`avatar avatar--md avatar--bordered avatar--status-${
-                        contact.status === 'online' ? 'online' : 'offline'
+                        isContactOnline(contact) ? 'online' : 'offline'
                       } avatar--ctx-contact`}
                     >
                       <div className="avatar__inner">
@@ -209,7 +225,7 @@ export default function ContactsScreen() {
                         {contact.displayName || contact.username}
                       </div>
                       <div className="text-sm text-secondary">
-                        {contact.status === 'online'
+                        {isContactOnline(contact)
                           ? 'в сети'
                           : contact.lastSeen
                           ? `был ${contact.lastSeen}`
