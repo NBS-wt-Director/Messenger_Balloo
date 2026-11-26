@@ -92,6 +92,20 @@ export const SPA_ACCOUNT_ITEMS: RightMenuItem[] = [
   { key: 'menu.invites', to: '/invites', icon: '📨' },
   { key: 'menu.settings', to: '/settings', icon: '⚙️' },
   { key: 'menu.accounts', to: '/profile', icon: '👥' },
+  // Баланс баллов — только в частном меню (тик. 1795686329)
+  { key: 'menu.balance', to: '/balance', icon: '💰' },
+];
+
+/**
+ * Секция «О нас» общего правого меню (тик. 1795686329) — копия меню
+ * копирайта подвала. «О компании»/«Контакты» переиспользуют существующие ключи.
+ */
+export const SPA_ABOUT_ITEMS: RightMenuItem[] = [
+  { key: 'footer.about', to: '/about-company', icon: '🏢' },
+  { key: 'menu.contacts', to: '/coming-soon?name=Контакты', icon: '📞' },
+  { key: 'menu.aboutBalloo', to: '/about-balloo', icon: 'ℹ️' },
+  { key: 'menu.otherProjects', to: '/coming-soon?name=Другие%20проекты%20компании', icon: '🌐' },
+  { key: 'menu.donate', to: '/donat', icon: '❤️' },
 ];
 
 export const SPA_GUEST_ACTIONS = { loginTo: '/login', registerTo: '/register' };
@@ -103,12 +117,14 @@ export const SPA_GUEST_ACTIONS = { loginTo: '/login', registerTo: '/register' };
 export function rightMenuTargetsForHost(host?: string): {
   legal: RightMenuItem[];
   account: RightMenuItem[];
+  aboutUs: RightMenuItem[];
   guest: { loginTo: string; registerTo: string };
 } {
   const h = host ?? (typeof window !== 'undefined' ? window.location.hostname : '');
   return {
     legal: SPA_LEGAL_ITEMS.map((i) => ({ ...i, to: mainSiteUrl(i.to, h) })),
     account: SPA_ACCOUNT_ITEMS.map((i) => ({ ...i, to: mainSiteUrl(i.to, h) })),
+    aboutUs: SPA_ABOUT_ITEMS.map((i) => ({ ...i, to: mainSiteUrl(i.to, h) })),
     guest: {
       loginTo: mainSiteUrl(SPA_GUEST_ACTIONS.loginTo, h),
       registerTo: mainSiteUrl(SPA_GUEST_ACTIONS.registerTo, h),

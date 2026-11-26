@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
+import { REGISTRATION_BONUS } from '@balloo/shared';
 import { internalError } from '../middleware/errorHandler';
 import { addContact as addContactService, removeContact as removeContactService, ensureMutualContacts } from '../services/userService';
 import { joinNewsChannel } from '../services/authService';
@@ -194,6 +195,7 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
         language: data.language ?? 'ru',
         passwordHash,
         createdAt: now,
+        balancePoints: REGISTRATION_BONUS,
         updatedAt: now,
         ...(data.username
           ? {

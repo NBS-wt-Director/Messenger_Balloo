@@ -300,6 +300,14 @@
   transition: transform 0.15s;
 }
 
+/* Значение справа в пункте меню — баланс баллов (тик. 1795686329) */
+.right-menu__item-value {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
 .right-menu__item--active {
   color: var(--accent);
 }
@@ -443,34 +451,76 @@
   font-size: 11px;
 }
 
-/* Пустое пространство с декоративными «бегущими» точками (тик. 1795507295) */
-.balloo-footer__dots {
+/* Морзе-тикер подвала (тик. 1795677854): точки/тире бегут ОТ КРАЁВ К ЦЕНТРУ.
+   Левый (ltr) — вправо, к центру; правый (rtl) — влево, к центру. */
+.balloo-footer__ticker {
   flex: 1 1 0;
   position: relative;
   height: 100%;
   min-width: 24px;
   overflow: hidden;
+  display: flex;
+  align-items: center;
 }
 
-.balloo-footer__dots i {
-  position: absolute;
-  top: 50%;
-  left: -4px;
-  width: 4px;
+.balloo-footer__ticker-track {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  will-change: transform;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.balloo-footer__ticker--ltr .balloo-footer__ticker-track {
+  animation-name: balloo-morse-to-center-left;
+}
+
+.balloo-footer__ticker--rtl .balloo-footer__ticker-track {
+  animation-name: balloo-morse-to-center-right;
+}
+
+.balloo-footer__ticker-run {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.balloo-footer__morse {
+  display: block;
+  flex-shrink: 0;
   height: 4px;
-  margin-top: -2px;
+  margin: 0 2px;
   background: var(--accent);
-  animation: balloo-footer-dot-run 3.6s linear infinite;
 }
 
-.balloo-footer__dots i:nth-child(2) { animation-delay: 1.2s; }
-.balloo-footer__dots i:nth-child(3) { animation-delay: 2.4s; }
+.balloo-footer__morse--dot { width: 4px; border-radius: 50%; }
+.balloo-footer__morse--dash { width: 12px; }
+.balloo-footer__morse--gap { width: 6px; margin: 0; background: transparent; }
+.balloo-footer__morse--wordgap { width: 18px; margin: 0; background: transparent; }
 
-@keyframes balloo-footer-dot-run {
-  0%   { left: -4px; opacity: 0; }
-  10%  { opacity: 1; }
-  90%  { opacity: 1; }
-  100% { left: 100%; opacity: 0; }
+.balloo-footer__ticker--emergency .balloo-footer__morse {
+  background: var(--danger);
+}
+
+/* Две одинаковые копии паттерна (2×W): сдвиг на 50% = ровно одна копия,
+   поэтому петля бесшовная. */
+@keyframes balloo-morse-to-center-left {
+  from { transform: translateX(-50%); }
+  to   { transform: translateX(0); }
+}
+
+@keyframes balloo-morse-to-center-right {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .balloo-footer__ticker-track {
+    animation: none;
+    transform: translateX(0);
+  }
 }
 
 .balloo-footer__links {
@@ -499,9 +549,14 @@
     padding: 6px 12px;
   }
 
-  /* На мобиле декоративные точки-разделители не нужны */
-  .balloo-footer__dots {
-    display: none;
+  /* На мобиле тикер остаётся, но компактный (тик. 1795677854) */
+  .balloo-footer__ticker {
+    min-width: 48px;
+    height: 12px;
+  }
+
+  .balloo-footer__morse {
+    height: 3px;
   }
 
   /* ---------- Topbar: мобильная компактизация (макеты mockups/mobile/*) ---------- */

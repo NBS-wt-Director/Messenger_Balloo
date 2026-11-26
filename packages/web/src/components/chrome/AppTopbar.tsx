@@ -72,6 +72,7 @@ export function AppTopbar({ title, onTitleClick, right, actions, showSwitchers =
           isAuthenticated,
           initials: initialsOf(user),
           avatarUrl: user?.avatarUrl ?? null,
+          balancePoints: user?.balancePoints,
           onLogout: () => {
             logout();
             navigate('/');

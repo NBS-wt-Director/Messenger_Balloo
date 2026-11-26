@@ -92,15 +92,19 @@ export const createCall = async (
 
   const now = BigInt(Math.floor(Date.now() / 1000));
 
-  // Прямой чат между caller и callee (создаётся при необходимости)
-  const existing = await prisma.chat.findFirst({
+  // Прямой чат между caller и callee (создаётся при необходимости).
+  // `every` не годится: для чата с 0 участников он истинен vacuously.
+  const found = await prisma.chat.findFirst({
     where: {
       type: 'direct',
-      members: {
-        every: { userId: { in: [callerId, calleeId] } },
-      },
+      AND: [
+        { members: { some: { userId: callerId } } },
+        { members: { some: { userId: calleeId } } },
+      ],
     },
+    include: { members: { select: { userId: true } } },
   });
+  const existing = found && found.members.length === 2 ? found : null;
 
   const chat =
     existing ??

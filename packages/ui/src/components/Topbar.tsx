@@ -66,6 +66,7 @@ export function Topbar({
           <PrivateRightMenu
             initials={auth.initials}
             avatarUrl={auth.avatarUrl}
+            balancePoints={auth.balancePoints}
             onNavigate={onNavigate}
           />
         )}

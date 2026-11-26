@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import { roomManager } from '../ws/room-manager';
 import { serializeWsMessage } from '../ws/types';
 import { sendVapidPushToUsers } from './pushService';
+import { notifyUser } from './notificationService';
 
 const prisma = new PrismaClient();
 
@@ -219,6 +220,40 @@ export const sendMessage = async (userId: string, input: SendMessageInput) => {
   } catch (err) {
     console.error('[messages] broadcast message.received failed:', err);
   }
+
+  // Уведомление получателям (тик. 1795677854): пишет Notification и шлёт
+  // `notification.new` — источник для морзе-тикера подвала и колокольчика.
+  // Ошибку не поднимаем (то же правило, что выше).
+  prisma.userChat
+    .findMany({ where: { chatId: input.chatId }, select: { userId: true } })
+    .then(async (rows) => {
+      const recipients = rows.map((r) => r.userId).filter((id) => id !== userId);
+      if (recipients.length === 0) return;
+      const chat = await prisma.chat.findUnique({
+        where: { id: input.chatId },
+        select: { type: true, name: true },
+      });
+      const senderName =
+        payload.sender?.displayName || payload.sender?.username || 'Balloo';
+      const source =
+        chat?.type === 'direct'
+          ? senderName
+          : chat?.name || (chat?.type === 'channel' ? 'Канал' : 'Группа');
+      const kind: 'chat' | 'group' =
+        chat?.type === 'direct' ? 'chat' : 'group';
+      await Promise.all(
+        recipients.map((id) =>
+          notifyUser({
+            userId: id,
+            kind,
+            source,
+            body: payload.content ?? '',
+            payload: { chatId: input.chatId, messageId: payload.id },
+          }).catch((err) => console.warn('[messages] notifyUser failed:', err))
+        )
+      );
+    })
+    .catch((err) => console.warn('[messages] notifications failed:', err));
 
   // Тикет 1794831100 (A.4): push для получателей без активного WS-соединения.
   // Ошибку не поднимаем: push — опциональный сервис, не блокирует доставку.

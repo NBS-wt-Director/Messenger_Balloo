@@ -61,6 +61,43 @@ describe('POST /api/chats — личный чат (direct)', () => {
 
     expect(res.status).toBe(400);
   });
+
+  // Регресс (найдено на проде 26.11.2026): уборка оставила direct-чат с 0
+  // участников. Поиск через `members: { every: … }` матчил его (для пустого
+  // списка условие истинно vacuously), клиент попадал в чат без membership:
+  // GET /api/chats/:id → 404, POST .../messages → 403 «Вы не являетесь
+  // участником». Ожидаем НОВЫЙ чат с двумя участниками, а не сироту.
+  it('не переиспользует direct-чат-сироту с 0 участников', async () => {
+    const { PrismaClient } = require('@prisma/client');
+    const prisma = new PrismaClient();
+    const now = BigInt(Math.floor(Date.now() / 1000));
+
+    const orphan = await prisma.chat.create({
+      data: { type: 'direct', createdAt: now, updatedAt: now },
+    });
+
+    try {
+      const me = await registerTestUser();
+      const peer = await registerTestUser();
+
+      const res = await request(app)
+        .post('/api/chats')
+        .set(auth(me.accessToken))
+        .send({ type: 'direct', memberIds: [peer.id] });
+
+      expect(res.status).toBe(201);
+      expect(res.body.id).not.toBe(orphan.id);
+      expect(res.body.memberCount).toBe(2);
+
+      // Созданный чат действительно открывается участнику.
+      const info = await request(app)
+        .get(`/api/chats/${res.body.id}`)
+        .set(auth(me.accessToken));
+      expect(info.status).toBe(200);
+    } finally {
+      await prisma.chat.delete({ where: { id: orphan.id } }).catch(() => {});
+    }
+  });
 });
 
 describe('GET /api/chats — direct-чат отдаёт peer и memberIds', () => {

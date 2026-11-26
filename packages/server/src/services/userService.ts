@@ -62,6 +62,8 @@ export const getMe = async (userId: string) => {
     // superadmin — надмножество admin (все права админки).
     role: user.role,
     isAdmin: user.role === 'admin' || user.role === 'superadmin',
+    // Тикет 1795686329: баланс баллов Balloo (приветственный бонус 555).
+    balancePoints: user.balancePoints,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
     publicProfile: user.publicProfile

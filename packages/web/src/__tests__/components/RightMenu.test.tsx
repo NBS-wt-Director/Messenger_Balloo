@@ -34,6 +34,13 @@ const PRIVATE_RAW_KEYS = [
   'menu.accounts',
 ];
 
+/**
+ * Пункты, которых НЕ должно быть в общем меню. «Контакты» исключены: с тик.
+ * 1795686329 в общем меню появилась секция «О нас» (копия меню подвала), где
+ * «Контакты» — это контакты компании (coming-soon), а не приложения.
+ */
+const COMMON_ABSENT_LABELS = ['Профиль', 'Истории', 'Приглашения', 'Настройки', 'Аккаунты'];
+
 /** Общее меню: рендер + открытие панели (по умолчанию она закрыта и aria-hidden). */
 function renderCommon(props = {}) {
   const onNavigate = vi.fn();
@@ -80,7 +87,7 @@ describe('RightMenu (общее) — состав панели', () => {
 
     // Ярлык секции общий, а вот частных пунктов приложения у гостя быть не должно.
     expect(screen.getAllByText('Аккаунт').length).toBeGreaterThan(0);
-    for (const label of PRIVATE_LABELS) {
+    for (const label of COMMON_ABSENT_LABELS) {
       expect(screen.queryByText(label)).toBeNull();
     }
   });
@@ -91,9 +98,28 @@ describe('RightMenu (общее) — состав панели', () => {
     fireEvent.click(screen.getByText('Выйти'));
     expect(onLogout).toHaveBeenCalledTimes(1);
 
-    for (const label of PRIVATE_LABELS) {
+    for (const label of COMMON_ABSENT_LABELS) {
       expect(screen.queryByText(label)).toBeNull();
     }
+  });
+
+  it('секция «О нас» между «Темой» и юр. пунктами (тик. 1795686329)', () => {
+    const { container, onNavigate } = renderCommon({ auth: 'user' });
+
+    // Ярлык секции подписан переводом, сырого ключа нет
+    expect(screen.getByText('О нас')).toBeTruthy();
+    expect(screen.queryByText('menu.sectionAboutUs')).toBeNull();
+
+    // Порядок секций: Язык → Тема → О нас → юр.
+    const labels = Array.from(
+      container.querySelectorAll('.right-menu__section-label')
+    ).map((el) => el.textContent);
+    expect(labels.indexOf('О нас')).toBeGreaterThan(labels.indexOf('Тема'));
+    expect(labels.indexOf('О нас')).toBeLessThan(labels.indexOf('Аккаунт'));
+
+    // Пункты секции ведут на свои маршруты
+    fireEvent.click(screen.getByText('Поддержать нас'));
+    expect(onNavigate).toHaveBeenLastCalledWith('/donat');
   });
 
   it('темы подписаны переводом, а не ключами menu.theme*', () => {
@@ -271,6 +297,16 @@ describe('PrivateRightMenu (частное) — пункты приложени�
 
     fireEvent.click(screen.getByText('Аккаунты'));
     expect(onNavigate).toHaveBeenLastCalledWith('/profile');
+  });
+
+  it('пункт «Баланс» показывает баланс со склонением и ведёт на /balance (тик. 1795686329)', () => {
+    const { onNavigate } = renderPrivate({ balancePoints: 555 });
+
+    expect(screen.getByText('Баланс')).toBeTruthy();
+    expect(screen.getByText('555 баллов')).toBeTruthy();
+
+    fireEvent.click(screen.getByText('Баланс'));
+    expect(onNavigate).toHaveBeenLastCalledWith('/balance');
   });
 
   it('триггер: аватарка пользователя, нет — логотип компании', () => {

@@ -172,6 +172,7 @@ model User {
   messageReadCounts   MessageReadCount[]
   pushSubscriptions   PushSubscription[]
   verificationTokens  VerificationToken[]
+  balancePoints       Int              @default(0)
    supportTickets      SupportTicket[]    @relation("SupportTicketUser")
    assignedSupportTickets SupportTicket[] @relation("SupportTicketAdmin")
    supportMessages     SupportMessage[]   @relation("SupportMessageAuthor")

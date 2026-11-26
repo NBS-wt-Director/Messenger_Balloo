@@ -67,15 +67,21 @@ export const createChat = async (ownerId: string, input: CreateChatInput) => {
       throw new Error('Для личного чата нужен ровно один собеседник');
     }
 
+    // Ищем именно чат между этими двумя: `every` не годится — для чата с 0
+    // участников (сирота после уборки) условие истинно vacuously и клиент
+    // попадал в чат без membership (404/403). Требуем обоих участников и ровно 2.
     const existing = await prisma.chat.findFirst({
       where: {
         type: 'direct',
-        members: { every: { userId: { in: [ownerId, peerId] } } },
+        AND: [
+          { members: { some: { userId: ownerId } } },
+          { members: { some: { userId: peerId } } },
+        ],
       },
       include: { members: true },
     });
 
-    if (existing) {
+    if (existing && existing.members.length === 2) {
       await ensureMutualContacts(ownerId, peerId);
       return {
         id: existing.id,

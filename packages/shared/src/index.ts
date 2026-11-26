@@ -15,8 +15,10 @@ export * from './utils/strings';
 // Constants
 export * from './constants/languages';
 export * from './constants/themes';
+export * from './constants/points';
 
 // i18n
 export * from './i18n/translations';
+export * from './i18n/plural';
 export * from './i18n/detectLanguage';
 

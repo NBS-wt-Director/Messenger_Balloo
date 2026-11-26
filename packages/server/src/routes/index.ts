@@ -33,6 +33,7 @@ import { router as onboardingRouter } from './onboarding';
 import { channelRouter, followRouter, blockedChannelRouter } from './channels';
 import { router as searchRouter } from './search';
 import { router as serviceRouter } from './service';
+import { router as notificationsRouter } from './notifications';
 
 const router = Router() as import('express').Router;
 
@@ -87,6 +88,8 @@ router.use('/api/onboarding', onboardingRouter);
 router.use('/api', clientErrorsRouter);
 router.use('/api/search', searchRouter);
 router.use('/api/blocked/channels', blockedChannelRouter);
+// Уведомления (тик. 1795677854) — список, прочтение, источник морзе-тикера
+router.use('/api/notifications', notificationsRouter);
 
 // Service API — внутренние эмуляционные эндпоинты, закрыты длинным ключом
 // (SERVICE_API_KEY, заголовок X-Service-Key). Пусто в env → 404 на всех путях.

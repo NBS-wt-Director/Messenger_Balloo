@@ -19,6 +19,8 @@ export interface AuthUser {
   theme: string;
   isAdmin: boolean;
   isTwoFAEnabled: boolean;
+  /** Баланс баллов Balloo (тик. 1795686329) */
+  balancePoints?: number;
 }
 
 interface AuthState {

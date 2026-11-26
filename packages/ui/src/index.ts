@@ -15,6 +15,10 @@ export { Topbar } from './components/Topbar';
 export { TopbarMenu, DEFAULT_TOPBAR_ITEMS } from './components/TopbarMenu';
 export type { TopbarMenuItem } from './components/TopbarMenu';
 export { Footer, DEFAULT_FOOTER_LINKS } from './components/Footer';
+export { FooterMorseTicker } from './components/FooterMorseTicker';
+export { useFooterTickerStore } from './store/footerTickerStore';
+export { toMorse, MORSE_TIMING } from './lib/morse';
+export { detectTimeZone, tzOffsetHours, formatTimeZoneCity } from './lib/locale';
 export type { FooterLink } from './components/Footer';
 // Хост-осознанные ссылки экосистемы (тик. 1794575221)
 export {
@@ -28,6 +32,7 @@ export {
 export { ThemeSwitcher } from './components/ThemeSwitcher';
 export { LanguageSwitcher } from './components/LanguageSwitcher';
 export { RightMenu, PrivateRightMenu } from './components/RightMenu';
+export { DEFAULT_ABOUT_ITEMS } from './components/RightMenu';
 export type {
   RightMenuAuth,
   RightMenuItem,

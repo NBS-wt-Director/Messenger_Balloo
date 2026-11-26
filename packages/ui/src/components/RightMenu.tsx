@@ -30,6 +30,7 @@ import { useUIStore, SUPPORTED_LANGUAGES, type Language, type Theme } from '../s
 import { useI18n } from '../providers/I18nProvider';
 import { rightMenuTargetsForHost } from './ecosystem';
 import type { TranslationKey } from '@balloo/shared';
+import { pluralKeyFor } from '@balloo/shared';
 
 export interface RightMenuItem {
   /**
@@ -51,6 +52,8 @@ export interface RightMenuAuth {
   initials?: string;
   /** URL аватарки авторизованного; нет — логотип компании (частное меню) */
   avatarUrl?: string | null;
+  /** Баланс баллов (тик. 1795686329) — показывается в частном меню, пункт «Баланс» */
+  balancePoints?: number;
   /** Клик по «Выйти» (авторизованный) */
   onLogout?: () => void;
 }
@@ -60,6 +63,8 @@ export interface RightMenuProps {
   auth?: 'guest' | 'user';
   /** Юр. пункты (по умолчанию: Приватность /privacy, Правила /rules) */
   legalItems?: RightMenuItem[];
+  /** Пункты секции «О нас» (тик. 1795686329); по умолчанию — хост-осознанно */
+  aboutItems?: RightMenuItem[];
   /** Клик по «Выйти» (нет — пункт не рендерится) */
   onLogout?: () => void;
   /** Переходы гостя (по умолчанию: /login, /register) */
@@ -74,7 +79,9 @@ export interface PrivateRightMenuProps {
   initials?: string;
   /** URL аватарки; нет — логотип компании */
   avatarUrl?: string | null;
-  /** Частные пункты (по умолчанию: Профиль/Контакты/Истории/Приглашения/Настройки/Аккаунты) */
+  /** Баланс баллов (тик. 1795686329) — значение в пункте «Баланс» */
+  balancePoints?: number;
+  /** Частные пункты (по умолчанию: Профиль/Контакты/Истории/Приглашения/Настройки/Аккаунты/Баланс) */
   items?: RightMenuItem[];
   /** SPA-навигация (react-router navigate). Нет — переход location.href. */
   onNavigate?: (to: string) => void;
@@ -99,6 +106,20 @@ export const DEFAULT_LEGAL_ITEMS: RightMenuItem[] = [
 ];
 
 /**
+ * Секция «О нас» в ОБЩЕМ правом меню (тик. 1795686329, решение владельца
+ * 26.11.2026): копия меню копирайта подвала, размещается между блоком «Тема»
+ * и юр. пунктами. «О компании»/«Контакты» переиспользуют существующие ключи
+ * (`footer.about`, `menu.contacts` — тот же русский текст, 20 локалей).
+ */
+export const DEFAULT_ABOUT_ITEMS: RightMenuItem[] = [
+  { key: 'footer.about', to: '/about-company', icon: '🏢' },
+  { key: 'menu.contacts', to: '/coming-soon?name=Контакты', icon: '📞' },
+  { key: 'menu.aboutBalloo', to: '/about-balloo', icon: 'ℹ️' },
+  { key: 'menu.otherProjects', to: '/coming-soon?name=Другие%20проекты%20компании', icon: '🌐' },
+  { key: 'menu.donate', to: '/donat', icon: '❤️' },
+];
+
+/**
  * Частные пункты приложения (по умолчанию). Экспортированы: тест проверяет по
  * ним наличие ключей в словаре, чтобы список не мог устареть молча.
  */
@@ -111,6 +132,8 @@ export const DEFAULT_ACCOUNT_ITEMS: RightMenuItem[] = [
   { key: 'menu.settings', to: '/settings', icon: '⚙️' },
   // Мультиаккаунт: секция аккаунтов живёт в профиле (ProfileScreen)
   { key: 'menu.accounts', to: '/profile', icon: '👥' },
+  // Баланс баллов (тик. 1795686329): значение показывается справа от подписи
+  { key: 'menu.balance', to: '/balance', icon: '💰' },
 ];
 
 export const DEFAULT_GUEST_ACTIONS = { loginTo: '/login', registerTo: '/register' };
@@ -147,6 +170,7 @@ function usePanelBehavior() {
 export function RightMenu({
   auth = 'guest',
   legalItems,
+  aboutItems,
   onLogout,
   guestActions,
   onNavigate,
@@ -156,6 +180,7 @@ export function RightMenu({
   // balloo.su маршруты главного SPA недоступны → абсолютные hash-URL.
   const hostDefaults = rightMenuTargetsForHost();
   const legal = legalItems ?? hostDefaults.legal;
+  const about = aboutItems ?? hostDefaults.aboutUs;
   const guest = guestActions ?? hostDefaults.guest;
   const language = useUIStore((s) => s.language);
   const setLanguage = useUIStore((s) => s.setLanguage);
@@ -270,6 +295,24 @@ export function RightMenu({
 
         <div className="right-menu__divider" />
 
+        {/* Секция «О нас» (тик. 1795686329): копия меню копирайта подвала,
+            между блоком «Тема» и юр. пунктами. */}
+        <div className="right-menu__section-label">{t('menu.sectionAboutUs')}</div>
+        {about.map((item) => (
+          <div
+            key={String(item.key)}
+            className="right-menu__item"
+            role="menuitem"
+            tabIndex={open ? 0 : -1}
+            onClick={() => go(item.to)}
+          >
+            <span className="right-menu__item-icon">{item.icon}</span>
+            <span className="right-menu__item-label">{t(item.key)}</span>
+          </div>
+        ))}
+
+        <div className="right-menu__divider" />
+
         {/* Юридические пункты */}
         {legal.map((item) => (
           <div
@@ -328,12 +371,20 @@ export function RightMenu({
 export function PrivateRightMenu({
   initials = 'ИИ',
   avatarUrl = null,
+  balancePoints,
   items,
   onNavigate,
 }: PrivateRightMenuProps) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const hostDefaults = rightMenuTargetsForHost();
   const menuItems = items ?? hostDefaults.account;
+
+  // Баланс в пункте «Баланс» (тик. 1795686329): «555 баллов» со склонением.
+  // Показываем только в частном меню (решение владельца 26.11.2026).
+  const balanceLabel =
+    typeof balancePoints === 'number'
+      ? `${balancePoints} ${t(pluralKeyFor(balancePoints, locale))}`
+      : null;
 
   const { open, setOpen, rootRef } = usePanelBehavior();
 
@@ -376,18 +427,24 @@ export function PrivateRightMenu({
         role="menu"
         aria-hidden={!open}
       >
-        {menuItems.map((item) => (
-          <div
-            key={String(item.key)}
-            className="right-menu__item"
-            role="menuitem"
-            tabIndex={open ? 0 : -1}
-            onClick={() => go(item.to)}
-          >
-            <span className="right-menu__item-icon">{item.icon}</span>
-            <span className="right-menu__item-label">{t(item.key)}</span>
-          </div>
-        ))}
+        {menuItems.map((item) => {
+          const isBalance = item.key === 'menu.balance';
+          return (
+            <div
+              key={String(item.key)}
+              className="right-menu__item"
+              role="menuitem"
+              tabIndex={open ? 0 : -1}
+              onClick={() => go(item.to)}
+            >
+              <span className="right-menu__item-icon">{item.icon}</span>
+              <span className="right-menu__item-label">{t(item.key)}</span>
+              {isBalance && balanceLabel && (
+                <span className="right-menu__item-value">{balanceLabel}</span>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

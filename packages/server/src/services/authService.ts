@@ -15,6 +15,7 @@ import {
   type LoginCodeChannel,
 } from './loginCodeService';
 import { applyInviteOnRegister } from './inviteService';
+import { REGISTRATION_BONUS } from '@balloo/shared';
 
 const prisma = new PrismaClient();
 
@@ -270,6 +271,7 @@ export const register = async (input: RegisterInput) => {
         language: 'ru',
         status: 'active',
         createdAt: BigInt(Math.floor(Date.now() / 1000)),
+        balancePoints: REGISTRATION_BONUS,
         updatedAt: BigInt(Math.floor(Date.now() / 1000)),
       },
     });
@@ -435,6 +437,7 @@ export const login = async (input: LoginInput) => {
       status: user.status,
       language: user.language,
       avatarUrl: user.avatarUrl,
+      balancePoints: user.balancePoints,
       needs2FA: false,
     },
     tokens,
@@ -524,6 +527,7 @@ export const verify2FA = async (input: Verify2FAInput) => {
       status: user.status,
       language: user.language,
       avatarUrl: user.avatarUrl,
+      balancePoints: user.balancePoints,
       needs2FA: false,
     },
     tokens,
@@ -1129,6 +1133,7 @@ export const oauthLogin = async (input: OAuthLoginInput) => {
         status: 'active',
         role: isAdmin ? 'user' : 'admin',
         createdAt: BigInt(Math.floor(Date.now() / 1000)),
+        balancePoints: REGISTRATION_BONUS,
         updatedAt: BigInt(Math.floor(Date.now() / 1000)),
         oAuthAccounts: {
           create: {
@@ -1199,6 +1204,7 @@ export const oauthLogin = async (input: OAuthLoginInput) => {
       status: user.status,
       language: user.language,
       avatarUrl: user.avatarUrl,
+      balancePoints: user.balancePoints,
       needs2FA: false,
     },
     tokens,

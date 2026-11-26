@@ -1111,4 +1111,21 @@ export const api = {
   // Редактор сообщения (тик. 1792160022) — updateMessage/deleteMessage уже есть выше
   getMessageHistory: (messageId: string) =>
     request<any[]>(`/api/messages/${messageId}/history`),
+
+  // Уведомления (тик. 1795677854): список + отметка прочтения.
+  // Ответ: { items: Notification[], unread: number }
+  getNotifications: (limit = 30) =>
+    request<{
+      items: Array<{
+        id: string;
+        type: string;
+        preview: string;
+        isRead: boolean;
+        payload: any;
+        createdAt: number;
+      }>;
+      unread: number;
+    }>(`/api/notifications?limit=${limit}`),
+  readNotification: (id: string) =>
+    request<{ success: boolean }>(`/api/notifications/${id}/read`, { method: 'POST' }),
 };

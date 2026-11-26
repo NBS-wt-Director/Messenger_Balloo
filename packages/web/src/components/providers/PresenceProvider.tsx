@@ -11,6 +11,7 @@
 import { useEffect } from 'react';
 import { useAuth } from './AuthProvider';
 import { usePresenceStore } from '@/store/presenceStore';
+import { useFooterTickerStore } from '@balloo/ui';
 
 export function PresenceProvider({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuth().isAuthenticated;
@@ -44,6 +45,19 @@ export function PresenceProvider({ children }: { children: React.ReactNode }) {
                 : data.status === 'away' ? 'away'
                 : 'offline';
               usePresenceStore.getState().setPresence(data.userId, status);
+            }
+
+            // Уведомление → морзе-тикер подвала (тик. 1795677854).
+            // Приоритеты (emergency > update > notification) — в store.
+            if (data.type === 'notification.new' && data.source && data.body) {
+              const ticker = useFooterTickerStore.getState();
+              if (data.priority === 'emergency') {
+                ticker.setEmergency({ left: data.source, right: data.body });
+              } else if (data.priority === 'update') {
+                ticker.setUpdate({ left: data.source, right: data.body });
+              } else {
+                ticker.setNotification({ source: data.source, body: data.body });
+              }
             }
           } catch {
             /* игнорируем битые кадры */

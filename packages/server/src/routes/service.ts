@@ -1,5 +1,8 @@
 import { Router } from 'express';
+import type { Request, Response } from 'express';
 import { serviceAuth } from '../middleware/serviceAuth';
+import { internalError } from '../middleware/errorHandler';
+import { announceUpdate } from '../services/notificationService';
 import {
   health,
   listUsers,
@@ -70,5 +73,21 @@ router.delete('/stories/:id', deleteStory);
 router.post('/contacts/mutual', addMutualContacts);
 router.post('/users/:id/contacts', addContact);
 router.delete('/users/:id/contacts/:contactId', deleteContact);
+
+// Объявление обновления всем онлайн (тик. 1795677854, шаг 7):
+// показывается в морзе-тикере подвала у подключённых пользователей.
+router.post('/announce-update', async (req: Request, res: Response) => {
+  const text = typeof req.body?.text === 'string' ? req.body.text.trim() : '';
+  if (!text) {
+    res.status(400).json({ error: 'Bad Request', message: 'Нужен text' });
+    return;
+  }
+  try {
+    const result = await announceUpdate(text);
+    res.json(result);
+  } catch (error) {
+    internalError(res, error, 'service.announceUpdate');
+  }
+});
 
 export { router };

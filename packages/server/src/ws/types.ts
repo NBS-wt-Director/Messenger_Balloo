@@ -270,6 +270,21 @@ export interface WsChatNotification {
   timestamp: number;
 }
 
+/**
+ * Уведомление для морзе-тикера подвала и колокольчика (тик. 1795677854):
+ * `source` — что случилось (чат/группа/контакт/приглашение/вызов/обновление),
+ * `body` — тело для правого тикера.
+ */
+export interface WsNotificationNew {
+  type: 'notification.new';
+  notificationId?: string;
+  kind: 'chat' | 'group' | 'contact' | 'invite' | 'call' | 'update' | 'emergency';
+  source: string;
+  body: string;
+  priority: 'notification' | 'update' | 'emergency';
+  timestamp: number;
+}
+
 export interface WsCallIncoming {
   type: 'call.incoming';
   callId: string;
@@ -335,6 +350,7 @@ export type WsOutgoingMessage =
   | WsStoryViewBroadcast
   | WsReactionUpdate
   | WsChatNotification
+  | WsNotificationNew
   | WsCallIncoming
   | WsCallAnswered
   | WsCallDeclined

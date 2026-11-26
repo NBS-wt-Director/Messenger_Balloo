@@ -101,7 +101,10 @@ const SpecifityScreen = lazy(() => import('@/screens/specifity/SpecifityScreen')
 
 // Calls — тикет 1792137287
 const CallsScreen = lazy(() => import('@/screens/calls/CallsScreen'));
-
+// Баланс баллов — тикет 1795686329
+const BalanceScreen = lazy(() =>
+  import('@/screens/balance/BalanceScreen').then((m) => ({ default: m.BalanceScreen }))
+);
 // Blog Landing (узел 11) выведен из MVP1 — тик. 1795094088 (решение владельца
 // 19.11.2026): экраны остаются в screens/blog-landing/, вызовов из роутера нет.
 
@@ -587,6 +590,11 @@ export const router = createHashRouter([
       {
         path: 'calls',
         element: <CallsScreen />,
+      },
+      // Баланс баллов — тикет 1795686329 (только авторизованным)
+      {
+        path: 'balance',
+        element: <BalanceScreen />,
       },
       // Blog (internal) — moved to blog-landing (public, тикет №60)
       // Knowledge
