@@ -32,16 +32,9 @@ export function Sidebar() {
     { icon: '⚙️', label: 'Настройки', path: '/settings' },
   ];
 
-  // Admin link — перед «Настройки» (индекс ищется по пути, чтобы не зависеть
-  // от числа пунктов выше после удаления «Знаний»/«Вакансий» — тик. 1795497139-removable-command-sidebar).
-  if (user.isAdmin) {
-    const adminIndex = navItems.findIndex((i) => i.path === '/settings');
-    navItems.splice(adminIndex >= 0 ? adminIndex : navItems.length, 0, {
-      icon: '🛡️',
-      label: 'Админка',
-      path: '/admin',
-    });
-  }
+  // Админка в левой панели НЕ показывается (U9, тик. 1795683301): она живёт
+  // только в правом меню (@balloo/ui ecosystem.ts → menu.admin), иначе
+  // получается дублирующая навигация.
 
   // Legal nav items (visible only when sidebar is expanded)
   const legalItems = [

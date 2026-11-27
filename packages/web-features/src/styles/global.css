@@ -87,23 +87,15 @@ input::placeholder, textarea::placeholder {
   color: var(--text-muted);
 }
 
-/* --- Scrollbar --- */
+/* --- Scrollbar ---
+   U2 (тик. 1795683301): прокрутка есть, полоса не видна. */
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--scrollbar-track);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--scrollbar-thumb);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
+  display: none;
 }
 
 /* --- Animations --- */

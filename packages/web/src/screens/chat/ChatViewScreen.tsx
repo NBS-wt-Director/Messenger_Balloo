@@ -440,7 +440,7 @@ export const ChatViewScreen: React.FC = () => {
 
   return (
     <div
-      className="content"
+      className="content content--chat"
       style={{ overflow: 'hidden', height: '100%' }} /* скролл внутри .messages */
     >
       {chatId ? (

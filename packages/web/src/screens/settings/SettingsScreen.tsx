@@ -2,7 +2,7 @@
 // Макет: mockups/balloo-su/settings.html
 // Переиспользует: NotificationSettingsScreen, PrivacySettingsScreen, BlockedUsersScreen
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useUIStore } from '@balloo/ui';
 import NotificationSettingsScreen from './NotificationSettingsScreen';
 import PrivacySettingsScreen from './PrivacySettingsScreen';
@@ -939,6 +939,19 @@ function AboutSettingsScreen() {
 export default function SettingsScreen() {
   const [activeTab, setActiveTab] = useState<SettingsTab>('notifications');
 
+  // U8 (тик. 1795683301): дублирующая навигация запрещена — верхняя панель
+  // вкладок убрана. На мобиле, где боковое меню скрыто, навигация остаётся
+  // в виде компактного <select>.
+  const [isMobile, setIsMobile] = useState(
+    () => typeof window !== 'undefined' && window.innerWidth <= 768
+  );
+
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
   const tabs: { key: SettingsTab; label: string; icon: string }[] = [
     { key: 'notifications', label: '🔔 Уведомления', icon: '🔔' },
     { key: 'appearance', label: '🎨 Оформление', icon: '🎨' },
@@ -990,8 +1003,9 @@ export default function SettingsScreen() {
 
   return (
     <div style={{ display: 'flex', height: '100%', overflow: 'hidden' }}>
-      {/* Sidebar */}
+      {/* Sidebar — на мобиле скрыт, навигация уходит в <select> ниже (U8) */}
       <aside style={{
+        display: isMobile ? 'none' : 'block',
         width: 280,
         background: 'var(--bg-secondary)',
         borderRight: '1px solid var(--border-color)',
@@ -1027,38 +1041,33 @@ export default function SettingsScreen() {
       </aside>
 
       {/* Content area */}
-      <main style={{ flex: 1, overflowY: 'auto' }}>
-        {/* Tabs header */}
-        <div style={{
-          display: 'flex',
-          gap: 4,
-          borderBottom: '2px solid var(--border-color)',
-          padding: '0 16px',
-          marginBottom: 0,
-          overflowX: 'auto',
-          background: 'var(--bg-primary)',
-        }}>
-          {tabs.map(tab => (
-            <div
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              className={`settings-tab ${activeTab === tab.key ? 'settings-tab--active' : ''}`}
+      <main style={{ flex: 1, overflowY: 'auto', minWidth: 0 }}>
+        {/* Мобильная навигация вместо скрытого aside (U8) */}
+        {isMobile && (
+          <div style={{ padding: '12px 16px 0' }}>
+            <select
+              aria-label="Раздел настроек"
+              value={activeTab}
+              onChange={(e) => setActiveTab(e.target.value as SettingsTab)}
               style={{
-                padding: '10px 16px',
-                fontSize: 13,
+                width: '100%',
+                padding: '10px 12px',
+                fontSize: 14,
                 fontWeight: 600,
-                color: activeTab === tab.key ? 'var(--accent)' : 'var(--text-secondary)',
-                cursor: 'pointer',
-                borderBottom: `2px solid ${activeTab === tab.key ? 'var(--accent)' : 'transparent'}`,
-                marginBottom: -2,
-                whiteSpace: 'nowrap',
-                transition: 'all 0.15s',
+                color: 'var(--text-primary)',
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border-color)',
+                borderRadius: 6,
               }}
             >
-              {tab.icon} {tab.label.replace(/^[^\s]+\s/, '')}
-            </div>
-          ))}
-        </div>
+              {tabs.map((tab) => (
+                <option key={tab.key} value={tab.key}>
+                  {tab.icon} {tab.label.replace(/^[^\s]+\s/, '')}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         {/* Sub-content */}
         <div style={{ overflowY: 'auto' }}>

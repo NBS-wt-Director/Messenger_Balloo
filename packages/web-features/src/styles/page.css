@@ -1,10 +1,23 @@
 /* Page-level layout classes — copied from mockups/assets/common.css (source of truth).
    These are used by features screens but were missing in web-features styles. */
 
+/* U2 (тик. 1795683301): контейнер обязан прокручиваться внутри flex-колонки
+   и не обрезать контент; отступы не дают контенту прилипнуть к краям (U3). */
 .page-container {
   max-width: 960px;
   margin: 0 auto;
   padding: 32px 24px;
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .page-container {
+    padding: 24px 16px;
+  }
 }
 
 .page-container--narrow {

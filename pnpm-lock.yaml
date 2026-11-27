@@ -504,6 +504,9 @@ importers:
       '@balloo/ui':
         specifier: workspace:*
         version: link:../ui
+      qrcode:
+        specifier: ^1.5.4
+        version: 1.5.4
       react:
         specifier: ^18.3.0
         version: 18.3.0
@@ -517,6 +520,9 @@ importers:
       '@types/node':
         specifier: ^20.11.0
         version: 20.19.43
+      '@types/qrcode':
+        specifier: ^1.5.5
+        version: 1.5.6
       '@types/react':
         specifier: ^18.3.0
         version: 18.3.31

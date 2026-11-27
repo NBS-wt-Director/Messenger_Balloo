@@ -121,9 +121,13 @@ describe('CallsScreen', () => {
     getCallHistory.mockResolvedValue([]);
     renderScreen();
 
+    // U5 (тик. 1795683301): пустое состояние — объяснение + призыв к действию,
+    // а не сухая строка «нет данных».
     await waitFor(() =>
-      expect(screen.getByText('У вас пока нет звонков')).toBeInTheDocument(),
+      expect(screen.getByText('Здесь пока пусто — ни одного звонка')).toBeInTheDocument(),
     );
+    expect(screen.getAllByText('❓ Что это?').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('🎛 Проверить оборудование').length).toBeGreaterThan(0);
   });
 
   it('при ошибке загрузки показывает сообщение об ошибке', async () => {

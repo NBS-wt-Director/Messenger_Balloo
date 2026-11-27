@@ -131,6 +131,26 @@
   min-height: 0;
 }
 
+/* U3 (тик. 1795683301): контент не прилипает к краям. Отступ даём контентной
+   зоне, а не каждому экрану — иначе экраны без .page-container (таблицы,
+   «широкие» карточки) остаются без полей. Чат исключён: у него свои отступы
+   у сообщений и композера, боковой padding ломает раскладку. */
+.content:not(.content--chat) {
+  padding-inline: 24px;
+  box-sizing: border-box;
+}
+
+/* .page-container внутри уже имеет свой padding — не удваиваем */
+.content > .page-container {
+  padding-inline: 0;
+}
+
+@media (max-width: 768px) {
+  .content:not(.content--chat) {
+    padding-inline: 16px;
+  }
+}
+
 /* ---------- Sidebar: Search ---------- */
 .sidebar__search {
   padding: 12px;

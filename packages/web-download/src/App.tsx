@@ -1,24 +1,27 @@
-// App.tsx — задел варианта А для download.balloo.su
-// Экран: downloads (mockups/download-balloo-su/)
-// Пока — минимальный SPA-роутер, заглушка под контент из mockups/
+// App.tsx — download.balloo.su: страницы загрузок приложений Balloo.
+//
+// Тик. 1795683301:
+//   U1 — единые шапка/подвал из @balloo/ui (StandaloneChrome), узел не рисует свои;
+//   U2/U3 — прокрутка внутри контейнера без полосы + горизонтальные отступы;
+//   D1/U7 — платформа без собранного артефакта остаётся в списке, но с
+//          текстом-извинением и БЕЗ битой ссылки;
+//   D2 — настоящий QR (библиотека `qrcode`), значение — download.balloo.su.
+//
+// Раньше узел был заглушкой «Раздел в разработке».
 
 import { HashRouter, Routes, Route } from 'react-router-dom';
-
-function DownloadList() {
-  return (
-    <div style={{ padding: 24, fontFamily: 'Inter, sans-serif' }}>
-      <h1>Скачать Balloo</h1>
-      <p>Раздел в разработке. Макет-эталон: mockups/download-balloo-su/downloads.html</p>
-    </div>
-  );
-}
+import { StandaloneChrome } from '@balloo/ui';
+import { DownloadPage } from './screens/DownloadPage';
 
 export default function App() {
   return (
     <HashRouter>
-      <Routes>
-        <Route path="/" element={<DownloadList />} />
-      </Routes>
+      <StandaloneChrome title="Скачать Balloo">
+        <Routes>
+          <Route path="/" element={<DownloadPage />} />
+          <Route path="*" element={<DownloadPage />} />
+        </Routes>
+      </StandaloneChrome>
     </HashRouter>
   );
 }

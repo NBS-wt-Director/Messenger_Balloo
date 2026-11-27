@@ -5,6 +5,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { api } from '@/services/api';
+import { CallsInfoModal } from './CallsInfoModal';
+import { DeviceCheckModal } from './DeviceCheckModal';
 
 // --- Types ---
 
@@ -144,6 +146,9 @@ function CallsScreen() {
   const [error, setError] = useState(false);
   const [filter, setFilter] = useState('');
   const [page, setPage] = useState(1);
+  // «Что это?» и «Проверить оборудование» (тик. 1795683301, C2/C3)
+  const [infoOpen, setInfoOpen] = useState(false);
+  const [checkOpen, setCheckOpen] = useState(false);
   const limit = 50;
 
   const loadCalls = async (pageNum: number, callFilter: string) => {
@@ -194,6 +199,16 @@ function CallsScreen() {
         История всех звонков
       </p>
 
+      {/* Действия экрана: «Что это?» + проверка оборудования (тик. 1795683301) */}
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
+        <button type="button" className="btn btn--secondary btn--sm" onClick={() => setInfoOpen(true)}>
+          ❓ Что это?
+        </button>
+        <button type="button" className="btn btn--secondary btn--sm" onClick={() => setCheckOpen(true)}>
+          🎛 Проверить оборудование
+        </button>
+      </div>
+
       {/* Filter buttons */}
       <FilterButtons filter={filter} onFilterChange={(f) => { setFilter(f); setPage(1); }} />
 
@@ -207,8 +222,44 @@ function CallsScreen() {
           Не удалось загрузить звонки
         </div>
       ) : calls.length === 0 ? (
-        <div className="text-muted" style={{ padding: 24, textAlign: 'center' }}>
-          У вас пока нет звонков
+        // Пустое состояние (U5, тик. 1795683301): объяснение + призыв к действию,
+        // а не сухая строка «нет данных».
+        <div
+          style={{
+            padding: '32px 24px',
+            textAlign: 'center',
+            border: '1px dashed var(--border-color)',
+          }}
+        >
+          <div style={{ fontSize: 44, lineHeight: 1, marginBottom: 12 }} aria-hidden="true">📞</div>
+          <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0, marginBottom: 8 }}>
+            Здесь пока пусто — ни одного звонка
+          </h2>
+          <p
+            style={{
+              margin: 0,
+              marginBottom: 16,
+              color: 'var(--text-secondary)',
+              fontSize: 14,
+              lineHeight: 1.6,
+              maxWidth: 520,
+              marginInline: 'auto',
+            }}
+          >
+            Как только вы позвоните или вам позвонят, разговор появится в этом списке —
+            с длительностью, датой и статусом. Ничего не потеряется.
+          </p>
+          <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <a className="btn btn--primary" href="/#/chat">
+              Написать в чат
+            </a>
+            <button type="button" className="btn btn--secondary" onClick={() => setInfoOpen(true)}>
+              ❓ Что это?
+            </button>
+            <button type="button" className="btn btn--secondary" onClick={() => setCheckOpen(true)}>
+              🎛 Проверить оборудование
+            </button>
+          </div>
         </div>
       ) : (
         <div className="list" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -217,8 +268,10 @@ function CallsScreen() {
           ))}
         </div>
       )}
+
+      <CallsInfoModal open={infoOpen} onClose={() => setInfoOpen(false)} />
+      <DeviceCheckModal open={checkOpen} onClose={() => setCheckOpen(false)} />
     </div>
   );
 }
-
 export default CallsScreen;
