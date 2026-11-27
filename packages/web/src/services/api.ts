@@ -1019,6 +1019,9 @@ export const api = {
     request<any>('/api/users/me/onboarding', { method: 'PATCH' }),
 
   // Звонки (тик. 1792160015)
+  startCall: (calleeId: string, type: 'audio' | 'video' = 'audio') =>
+    request<any>('/api/calls', { method: 'POST', data: { calleeId, type } }),
+
   endCall: (callId: string) =>
     request<any>(`/api/calls/${callId}/end`, { method: 'POST' }),
 

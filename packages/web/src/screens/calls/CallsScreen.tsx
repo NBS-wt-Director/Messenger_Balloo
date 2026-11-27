@@ -4,9 +4,11 @@
 // Тикет: 1792137287
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { api } from '@/services/api';
 import { CallsInfoModal } from './CallsInfoModal';
 import { DeviceCheckModal } from './DeviceCheckModal';
+import { CallStartModal } from './CallStartModal';
 
 // --- Types ---
 
@@ -141,6 +143,7 @@ function FilterButtons({
 // --- Main Screen ---
 
 function CallsScreen() {
+  const navigate = useNavigate();
   const [calls, setCalls] = useState<CallItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -149,6 +152,8 @@ function CallsScreen() {
   // «Что это?» и «Проверить оборудование» (тик. 1795683301, C2/C3)
   const [infoOpen, setInfoOpen] = useState(false);
   const [checkOpen, setCheckOpen] = useState(false);
+  // C4: кнопка звонка — форма выбора контакта и типа
+  const [startOpen, setStartOpen] = useState(false);
   const limit = 50;
 
   const loadCalls = async (pageNum: number, callFilter: string) => {
@@ -199,8 +204,11 @@ function CallsScreen() {
         История всех звонков
       </p>
 
-      {/* Действия экрана: «Что это?» + проверка оборудования (тик. 1795683301) */}
+      {/* Действия экрана: звонок, «Что это?», проверка оборудования (тик. 1795683301) */}
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
+        <button type="button" className="btn btn--primary btn--sm" onClick={() => setStartOpen(true)}>
+          📞 Позвонить
+        </button>
         <button type="button" className="btn btn--secondary btn--sm" onClick={() => setInfoOpen(true)}>
           ❓ Что это?
         </button>
@@ -250,9 +258,9 @@ function CallsScreen() {
             с длительностью, датой и статусом. Ничего не потеряется.
           </p>
           <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a className="btn btn--primary" href="/#/chat">
-              Написать в чат
-            </a>
+            <button type="button" className="btn btn--primary" onClick={() => setStartOpen(true)}>
+              📞 Позвонить
+            </button>
             <button type="button" className="btn btn--secondary" onClick={() => setInfoOpen(true)}>
               ❓ Что это?
             </button>
@@ -271,6 +279,14 @@ function CallsScreen() {
 
       <CallsInfoModal open={infoOpen} onClose={() => setInfoOpen(false)} />
       <DeviceCheckModal open={checkOpen} onClose={() => setCheckOpen(false)} />
+      <CallStartModal
+        open={startOpen}
+        onClose={() => setStartOpen(false)}
+        onStarted={() => {
+          // Звонок создан на сервере (POST /api/calls) — открываем экран звонка.
+          navigate('/active-call');
+        }}
+      />
     </div>
   );
 }

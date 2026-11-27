@@ -72,11 +72,18 @@
 
 ### Подзадачи
 
-- [ ] H1. **Прокрутка без полосы** (U2) на всех экранах узла.
-- [ ] H2. **Данные привести к реальности**: только **две** версии — `MVP0` (первый деплой на сервер) и `MVP0.5` (текущая). Убрать 6 сгенерированных версий из seed (или пометить как черновик, не показывать). Новая версия — только по команде владельца «MVP1 — закончен» (U6).
-- [ ] H3. **Единая шапка/подвал** (U1) — на `web-history` их нет вовсе.
-- [ ] H4. Перенести/переиспользовать экран из `web` (`HistoryScreen` + `HistoryTimeline` + `VersionDetailScreen`) в `web-history`, а не держать заглушку.
-- [ ] H5. Переключить хостовый nginx `history.balloo.su` на контейнер `balloo-web-history` (порт 8093) — сейчас отдаётся общий SPA (P-6). Правка — владелец, батч деплоя.
+- [x] H1. **Прокрутка без полосы** (U2): новый `web-history/src/styles/global.css`.
+- [x] H2. **Данные**: `loadVersions()` фильтрует `publishedAt > 0` — черновики и
+      запланированные не показываются (U6). В БД остаются 6 записей seed, но
+      неопубликованные на экран не попадают.
+- [x] H3. **Единая шапка/подвал** (U1): `StandaloneChrome` из `@balloo/ui`
+      (новый компонент), узел больше не рисует свою разметку.
+- [x] H4. Экран истории перенесён по смыслу: список версий + детальная страница
+      (`/version/:id`), данные — `GET /api/history/versions` (форма ответа
+      `{ items, total, page, limit, totalPages }` сверена с
+      `historyService.getVersions`).
+- [ ] H5. Переключить хостовый nginx `history.balloo.su` на контейнер
+      `balloo-web-history` (8093) — правка владельца, батч деплоя.
 - [ ] H6. i18n (см. `1795679146`).
 
 ---
@@ -94,20 +101,20 @@
 
 ### Подзадачи
 
-- [ ] D1. **Плитка без сборки**: если для платформы нет артефакта — плитка остаётся, но с текстом-извинением и без битой ссылки (U7), текст через `t()`.
-- [ ] D2. **QR-код невалиден — причина найдена (26.11.2026).** `DownloadScreen.tsx:413`
-      рендерит `<QRCode value={DOWNLOAD_URL}>`, но сам компонент
-      (`screens/download/components/QRCode.tsx:21-90`) — **CSS-имитация**:
-      `repeating-conic-gradient` + три квадрата + октагон, без кодирования данных.
-      Сканеры его не читают. Значение при этом верное:
-      `DOWNLOAD_URL = 'https://download.balloo.su'` (`DownloadScreen.tsx:82`).
-      **Требование владельца:** QR на `download.balloo.su` ведёт на
-      `download.balloo.su`. Библиотека `qrcode@^1.5.4` + `@types/qrcode` уже в
-      `packages/web/package.json`. Заменить имитацию на настоящий QR
-      (`QRCode.toDataURL`), сохранить октагон-логотип в центре как наложение.
-- [ ] D3. **Прокрутка + отступы** (U2, U3).
-- [ ] D4. **Единая шапка/подвал** (U1) + переключение nginx на `balloo-web-download` (8094) — владелец.
-- [ ] D5. i18n.
+- [x] D1. **Плитка без сборки**: `web-download/src/screens/DownloadPage.tsx` —
+      наличие артефакта проверяется по `GET /api/downloads`; если пакетов нет,
+      плитка остаётся с текстом-извинением и **без ссылки**.
+- [x] D2. **QR заменён на настоящий** (`web-download/src/screens/QRCodeImage.tsx`):
+      `QRCode.toString(value, {type:'svg', errorCorrectionLevel:'H'})`, значение
+      `https://download.balloo.su`, октагон-логотип наложением. Зависимость
+      `qrcode@^1.5.4` + `@types/qrcode` добавлена в `packages/web-download/package.json`.
+      (Тот же фикс ранее сделан в `web/src/screens/download/components/QRCode.tsx`.)
+- [x] D3. **Прокрутка + отступы** (U2, U3): `.page-container` в новом
+      `web-download/src/styles/global.css` + скрытая полоса прокрутки.
+- [ ] D4. **Переключение nginx** на `balloo-web-download` (8094) — владелец,
+      батч деплоя. Шапка/подвал внутри узла уже единые (U1).
+- [ ] D5. i18n: тексты страницы пока на русском хардкодом — вынесение в словарь
+      идёт отдельным тикетом `1795679146`.
 
 ---
 
@@ -140,10 +147,24 @@
 
 ### Подзадачи
 
-- [ ] W1. Ввести общее правило: любой контент-контейнер имеет `padding-inline: max(24px, env(safe-area-inset-*))`; на мобиле — 16px.
-- [ ] W2. Пройти экраны `web` без `.page-container` (чат, таблицы админки, settings-контент) — добавить отступ.
-- [ ] W3. То же для `web-features`, `web-history`, `web-download`, `web-admin`, `desktop`, `mobile-android`.
+- [x] W1. Введено общее правило: `.content:not(.content--chat)` получает
+      `padding-inline: 24px` (мобиле — 16px), а `.content > .page-container`
+      обнуляет свой padding, чтобы отступ не удваивался — `web/src/styles/chat.css`.
+- [x] W2. Чат исключён явно (`content--chat` в `ChatViewScreen.tsx`) — у него свои
+      отступы у сообщений и композера, боковой padding ломал раскладку.
+- [x] W3. `web-features`: `.page-container` получил `flex/min-height/overflow`
+      и мобильный padding (`web-features/src/styles/page.css`); `web-history` и
+      `web-download` получили собственный `global.css` с теми же правилами.
+      `web-admin`, `desktop`, `mobile-android` — **не трогалось** (см. «Проблемы»).
 - [ ] W4. Проверка: скриншоты 360 / 768 / 1440 px — контент не касается краёв.
+      **Не выполнено:** браузера в этой сессии нет.
+
+### U2 — прокрутка без видимой полосы
+
+- [x] `web/src/styles/global.css` — `*{scrollbar-width:none}` + `::-webkit-scrollbar{display:none}`
+      (раньше полоса была видимой, 6px).
+- [x] `web-features/src/styles/global.css` — то же.
+- [x] `web-history`, `web-download` — новый `global.css` с тем же правилом.
 
 ---
 
@@ -159,9 +180,10 @@
 
 ### Подзадачи
 
-- [ ] S1. Удалить верхнюю панель вкладок (`1031-1061`), оставить `aside`.
-- [ ] S2. На мобиле (где `aside` скрыт) — заменить на компактный `<select>` или выпадающее меню, чтобы навигация не потерялась.
-- [ ] S3. Проверить, что все 13 разделов достижимы, `activeTab` сохраняется.
+- [x] S1. Удалена верхняя панель вкладок (`SettingsScreen.tsx:1031-1061`), остался `aside`.
+- [x] S2. На мобиле (`≤768px`) `aside` скрыт, вместо него `<select aria-label="Раздел настроек">`
+      с теми же 13 разделами.
+- [x] S3. Все 13 разделов достижимы через `setActiveTab`; `activeTab` не сбрасывается.
 
 ---
 
@@ -176,9 +198,10 @@
 
 ### Подзадачи
 
-- [ ] A1. Удалить блок `if (user.isAdmin) { … }` из `Sidebar.tsx` (U9).
-- [ ] A2. Проверить, что пункт «Админка» остаётся в правом меню (`ecosystem.ts`) и ведёт на `admin.balloo.su`.
-- [ ] A3. Тест: у админа в левой панели нет «Админки», в правом меню — есть.
+- [x] A1. Блок `if (user.isAdmin) { … }` удалён из `Sidebar.tsx` (U9).
+- [x] A2. Пункт «Админка» остаётся в лого-меню и правом меню
+      (`ecosystem.ts:47` — SPA-путь, `:71` — прод `admin.balloo.su`).
+- [x] A3. `grep -n "Админка" Sidebar.tsx` → только комментарий-пояснение.
 
 ---
 
@@ -229,11 +252,26 @@
 
 ### Подзадачи
 
-- [ ] C1. **Пустое состояние**: «звонков пока нет» + предложение позвонить (кнопка).
-- [ ] C2. **«Что это?»** — модалка с описанием экрана звонков (история, фильтры, как позвонить).
-- [ ] C3. **«Проверить оборудование»** — проверка микрофона/камеры/динамиков (`getUserMedia`, `enumerateDevices`, тестовый тон) с понятными ошибками (переиспользовать логику `VoiceMessageModal` из `1795560008`).
-- [ ] C4. **Кнопка звонка** → форма выбора чата/контакта из доступных для звонка → инициировать `POST /api/calls`.
-- [ ] C5. i18n всех новых текстов.
+- [x] C1. **Пустое состояние**: «Здесь пока пусто — ни одного звонка» + объяснение +
+      кнопки «Позвонить», «Что это?», «Проверить оборудование».
+- [x] C2. **«Что это?»** — `screens/calls/CallsInfoModal.tsx`: 5 разделов
+      (история, пиктограммы, фильтры, как позвонить, приватность), закрытие
+      по Escape и клику вне.
+- [x] C3. **«Проверить оборудование»** — `screens/calls/DeviceCheckModal.tsx`:
+      микрофон (`getUserMedia({audio})` + индикатор уровня), камера
+      (`getUserMedia({video})` + превью), динамики (тестовый тон Web Audio).
+      Ошибки объясняются по-русски (`NotAllowedError`, `NotFoundError`,
+      `NotReadableError`, `OverconstrainedError`); устройства освобождаются
+      при закрытии модалки.
+- [x] C4. **Кнопка звонка** — `screens/calls/CallStartModal.tsx`: выбор контакта
+      (`api.getContacts`) и типа (аудио/видео) → `POST /api/calls`
+      (`createCallCtrl: { calleeId, type }`, ответ `{ id, chatId, status }`),
+      после успеха — переход на `/active-call`. В `api.ts` добавлен `startCall`.
+- [ ] C5. i18n новых текстов — идёт тикетом `1795679146`.
+
+**Оговорка по C4:** серверная часть звонка создаётся реально (запись `Call`,
+участники, direct-чат, взаимные контакты). Медиаслой (WebRTC) в MVP1 не
+реализован — `ActiveCallScreen` остаётся макетом; это отдельная задача.
 
 ---
 
@@ -256,4 +294,41 @@
 
 ## 12. Результат
 
-_(заполняется по ходу)_
+### Выполнено 27.11.2026 (коммиты `2838853`, `e2e`-прогоны ниже)
+
+| Раздел | Что сделано | Доказательство |
+|---|---|---|
+| §5 W1–W3 | `padding-inline` для `.content` (24px / 16px на мобиле), `.page-container` внутри без двойного padding; чат исключён классом `content--chat` | `web/src/styles/chat.css`, `web/src/screens/chat/ChatViewScreen.tsx` |
+| §5 U2 | Полоса прокрутки скрыта (`scrollbar-width:none` + `::-webkit-scrollbar{display:none}`) в `web`, `web-features`, `web-history`, `web-download` | `*/styles/global.css` |
+| §6 S1–S3 | Верхняя панель вкладок настроек удалена, на мобиле — `<select>` | `SettingsScreen.tsx` |
+| §7 A1–A3 | «Админка» убрана из левой панели, осталась в правом/лого-меню | `Sidebar.tsx`, `ecosystem.ts:47,71` |
+| §9 C1–C4 | Пустое состояние, «Что это?», «Проверить оборудование», кнопка звонка | `screens/calls/{CallsInfoModal,DeviceCheckModal,CallStartModal}.tsx`, `api.startCall` |
+| §2 H1–H4 | `web-history` больше не заглушка: единые шапка/подвал (`StandaloneChrome`), реальные версии с API, скролл и отступы | `packages/web-history/src/{App.tsx,main.tsx,styles/global.css}`, `packages/ui/src/components/StandaloneChrome.tsx` |
+| §3 D1–D3 | `web-download` больше не заглушка: плитки платформ, состояние «не собрано» без битой ссылки, настоящий QR (`qrcode`), RuStore/Google Play | `packages/web-download/src/{App.tsx,screens/*,lib/*,styles/global.css}` |
+| §1 F4 | `.page-container` в `web-features` получил `flex/min-height/overflow` и мобильный padding | `web-features/src/styles/page.css` |
+
+**Проверки (прогон 27.11.2026):**
+
+```
+tsc --noEmit  web-history / web-download / web-features / ui / web   → exit 0 (пустой вывод)
+vite build    web-history  → ✓ built in 1.95s  (index-L1cNJLfa.js)
+vite build    web-download → ✓ built in 2.14s  (index-BrHxeDpj.js)
+vite build    web-features → ✓ built in 1.99s  (index-CXiokqbV.js)
+vite build    web          → ✓ built in 8.84s  (index-TxwsA2D2.js)
+vitest web                 → 57 файлов, 433 теста, 0 failed
+node scripts/check-i18n.cjs → словарь 151 / TranslationKey 151, расхождений 0
+```
+
+### Осталось (не сделано — честно)
+
+| Раздел | Почему |
+|---|---|
+| §1 F1–F3, F5–F7 (features: данные seed, статусы «волна N», левая панель на `/features/create`, голосование, i18n) | не начиналось |
+| §2 H5, §3 D4 — переключение хостового nginx на контейнеры `balloo-web-history` / `balloo-web-download` | правка владельца на сервере |
+| §4 P1–P3 (`api.balloo.su/docs` — шапка/подвал из `@balloo/ui`) | HTML генерируется контроллером бэкенда, требует переработки `docsHtmlController.ts` |
+| §8 T1–T6 (истории: пустое состояние, 3 демо-видео, «Что это?», бейдж) | нужны видеофайлы (подбор по лицензии) — отдельная задача |
+| §5 W4 — скриншоты 360/768/1440 | браузера в сессии нет |
+| i18n всех новых текстов | идёт тикетом `1795679146` |
+| `web-admin`, `desktop`, `mobile-android` (отступы) | не начиналось |
+
+Тикет остаётся в `active/`.
