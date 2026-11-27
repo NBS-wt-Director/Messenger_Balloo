@@ -59,6 +59,7 @@ export async function createFeatureController(req: Request, res: Response): Prom
 export async function getFeaturesController(req: Request, res: Response): Promise<void> {
   try {
     const { status, category, search, sortBy, page, limit } = req.query;
+    const userId: string | undefined = (req as any).user?.id;
 
     const result = await getFeatures({
       status: status as string,
@@ -67,6 +68,7 @@ export async function getFeaturesController(req: Request, res: Response): Promis
       sortBy: (sortBy as 'votes' | 'date' | 'comments') || 'votes',
       page: parseInt(page as string) || 1,
       limit: parseInt(limit as string) || 20,
+      userId,
     });
 
     res.json(result);
@@ -79,7 +81,8 @@ export async function getFeaturesController(req: Request, res: Response): Promis
 export async function getFeatureController(req: Request, res: Response): Promise<void> {
   try {
     const { id } = req.params;
-    const feature = await getFeature(id);
+    const userId: string | undefined = (req as any).user?.id;
+    const feature = await getFeature(id, userId);
 
     if (!feature) {
       res.status(404).json({ error: 'Фича не найдена' });

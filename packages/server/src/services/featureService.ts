@@ -21,6 +21,8 @@ export interface UpdateFeatureInput {
   priority?: string;
   motivation?: string;
   status?: string;
+  /** U4: номер волны для статуса planned */
+  wave?: number | null;
 }
 
 // --- Создание фич-реквеста ---
@@ -38,6 +40,8 @@ export async function createFeature(
       priority: input.priority || null,
       motivation: input.motivation?.trim() || null,
       status: 'idea',
+      createdAt: BigInt(Math.floor(Date.now() / 1000)),
+      updatedAt: BigInt(Math.floor(Date.now() / 1000)),
     },
     include: {
       author: {
@@ -59,9 +63,11 @@ export async function getFeatures(
     sortBy?: 'votes' | 'date' | 'comments';
     page?: number;
     limit?: number;
+    /** Текущий пользователь — чтобы вернуть hasVoted по каждой фиче (F6). */
+    userId?: string;
   } = {}
 ) {
-  const { status, category, search, sortBy = 'votes', page = 1, limit = 20 } = params;
+  const { status, category, search, sortBy = 'votes', page = 1, limit = 20, userId } = params;
   const where: any = {};
 
   if (status) where.status = status;
@@ -94,17 +100,31 @@ export async function getFeatures(
     prisma.featureRequest.count({ where }),
   ]);
 
+  // F6: если userId передан — вычислить hasVoted по каждой фиче.
+  let votedFeatureIds: Set<string> | null = null;
+  if (userId) {
+    const votes = await prisma.featureVote.findMany({
+      where: { userId },
+      select: { featureId: true },
+    });
+    votedFeatureIds = new Set(votes.map((v) => v.featureId));
+  }
+
+  const itemsWithHasVoted = items.map((item: any) => ({
+    ...item,
+    hasVoted: votedFeatureIds ? votedFeatureIds.has(item.id) : false,
+  }));
+
   return {
-    items,
+    items: itemsWithHasVoted,
     total,
     page,
     limit,
     totalPages: Math.ceil(total / limit),
   };
 }
-
 // --- Детальная страница фич-реквеста ---
-export async function getFeature(id: string) {
+export async function getFeature(id: string, userId?: string) {
   const feature = await prisma.featureRequest.findUnique({
     where: { id },
     include: {
@@ -133,6 +153,7 @@ export async function getFeature(id: string) {
     ...feature,
     voteCount: feature._count.votes,
     commentCount: feature._count.comments,
+    hasVoted: userId ? feature.votes.some((v) => v.userId === userId) : false,
   };
 }
 
@@ -161,6 +182,7 @@ export async function updateFeature(
       ...(input.priority && { priority: input.priority }),
       ...(input.motivation !== undefined && { motivation: input.motivation?.trim() || null }),
       ...(input.status && { status: input.status }),
+      ...(input.wave !== undefined && { wave: input.wave }),
     },
     include: {
       author: {

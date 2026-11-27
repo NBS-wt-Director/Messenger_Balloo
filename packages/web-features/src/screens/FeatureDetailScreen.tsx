@@ -25,10 +25,12 @@ interface Feature {
   priority?: string;
   motivation?: string;
   status: string;
+  wave?: number | null;
+  hasVoted?: boolean;
   isAnonymous?: boolean;
   createdAt: number;
   updatedAt: number;
-  author: { id: string; username: string; displayName: string; avatarUrl?: string };
+  author: { id: string; username: string; displayName: string; avatarUrl?: string } | null;
   voteCount: number;
   commentCount: number;
   comments: Comment[];
@@ -158,12 +160,12 @@ export function FeatureDetailScreen() {
                 <FeatureVoteButton
                   featureId={feature.id}
                   initialVoteCount={feature.voteCount}
-                  hasVoted={false}
+                  hasVoted={feature.hasVoted ?? false}
                   size="lg"
                 />
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    <FeatureStatusBadge status={feature.status} size="md" />
+                    <FeatureStatusBadge status={feature.status} wave={feature.wave} size="md" />
                     <span className="chip">{feature.category}</span>
                     {feature.priority && (
                       <span className="chip" style={{ fontSize: '10px' }}>
@@ -210,11 +212,22 @@ export function FeatureDetailScreen() {
                 </>
               )}
 
+              {/* U4: в плане — номер волны */}
+              {feature.status === 'planned' && feature.wave != null && (
+                <>
+                  <div className="section-title">Когда ждать</div>
+                  <p className="card__body" style={{ fontSize: 15, lineHeight: 1.7 }}>
+                    Запланировано в <strong>волне {feature.wave}</strong>. Порядок волн
+                    определяет команда — голоса помогают поднять фичу выше.
+                  </p>
+                </>
+              )}
+
               {/* Meta info */}
               <div className="flex gap-4 mt-6" style={{ flexWrap: 'wrap' }}>
                 <div className="meta-item">
                   <span className="meta-item__label">Статус</span>
-                  <FeatureStatusBadge status={feature.status} size="md" />
+                  <FeatureStatusBadge status={feature.status} wave={feature.wave} size="md" />
                 </div>
                 <div className="meta-item">
                   <span className="meta-item__label">Автор</span>
@@ -259,7 +272,7 @@ export function FeatureDetailScreen() {
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
                         <strong>{comment.author.displayName || comment.author.username}</strong>
-                        {(comment.author.id === feature.author.id) && (
+                        {(comment.author.id === feature.author?.id) && (
                           <span className="chip chip--accent" style={{ fontSize: 10 }}>автор</span>
                         )}
                         <span className="text-xs text-muted">{timeAgo(comment.createdAt)}</span>

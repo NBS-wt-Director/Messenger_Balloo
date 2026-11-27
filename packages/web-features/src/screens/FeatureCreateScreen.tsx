@@ -5,6 +5,7 @@ import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '@/services/api';
 import { Topbar, Footer } from '@balloo/ui';
+import { FeaturesSidebar } from '../components/FeaturesSidebar';
 import { useAuth } from '../hooks/useAuth';
 
 const CATEGORIES = [
@@ -81,11 +82,30 @@ export function FeatureCreateScreen() {
     <Topbar auth={{ isAuthenticated: auth.isAuthenticated, initials: auth.initials, onLogout: auth.logout }} />
   );
 
+  // Левая панель раздела — та же, что у списка (U8/F5).
+  const sidebar = (
+    <FeaturesSidebar
+      searchQuery=""
+      onSearchChange={() => {}}
+      activeStatus="all"
+      onStatusChange={() => {}}
+      sortBy="votes"
+      onSortChange={() => {}}
+      showFilters={false}
+      footer={
+        <button className="btn btn--secondary btn--block" onClick={() => navigate('/features')}>
+          ← Все фичи
+        </button>
+      }
+    />
+  );
+
   if (success) {
     return (
-      <>
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
         {topbar}
-        <div className="main">
+        <div className="main" style={{ flex: 1, minHeight: 0 }}>
+          {sidebar}
           <div className="content overflow-y-auto">
             <div className="page-container page-container--narrow">
               <div className="card text-center py-8">
@@ -102,14 +122,15 @@ export function FeatureCreateScreen() {
           </div>
         </div>
         <Footer />
-      </>
+      </div>
     );
   }
 
   return (
-    <>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
       {topbar}
-      <div className="main">
+      <div className="main" style={{ flex: 1, minHeight: 0 }}>
+        {sidebar}
         <div className="content overflow-y-auto">
           <div className="page-container page-container--narrow">
             <button
@@ -271,6 +292,6 @@ export function FeatureCreateScreen() {
         </div>
       </div>
       <Footer />
-    </>
+    </div>
   );
 }

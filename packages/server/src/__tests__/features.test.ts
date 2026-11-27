@@ -205,6 +205,83 @@ describe('Features API (фич-реквесты)', () => {
     });
   });
 
+  // Тикет 1795683301 (U4, F2, F3, F6):
+  //  - createdAt больше не 0 (список показывает «обновлено N назад»);
+  //  - planned-фича хранит номер волны;
+  //  - hasVoted возвращается и в списке, и в детальной карточке.
+  describe('nodes consistency (U4/F2/F3/F6)', () => {
+    let featureId: string;
+
+    beforeAll(async () => {
+      const res = await request(app)
+        .post('/api/features')
+        .set('Authorization', `Bearer ${user.accessToken}`)
+        .send({ title: 'Wave Feature', description: 'desc', category: 'uiux' });
+      featureId = res.body.id;
+    });
+
+    it('sets createdAt on create (not zero)', async () => {
+      const res = await request(app).get(`/api/features/${featureId}`);
+
+      expect(res.status).toBe(200);
+      expect(Number(res.body.createdAt)).toBeGreaterThan(0);
+    });
+
+    it('stores wave for planned features', async () => {
+      const res = await request(app)
+        .put(`/api/features/${featureId}`)
+        .set('Authorization', `Bearer ${user.accessToken}`)
+        .send({ status: 'planned', wave: 2 });
+
+      expect(res.status).toBe(200);
+      expect(res.body.status).toBe('planned');
+      expect(res.body.wave).toBe(2);
+    });
+
+    it('returns hasVoted=false before voting (detail)', async () => {
+      const res = await request(app)
+        .get(`/api/features/${featureId}`)
+        .set('Authorization', `Bearer ${user.accessToken}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body.hasVoted).toBe(false);
+    });
+
+    it('returns hasVoted=true after voting (detail and list)', async () => {
+      await request(app)
+        .post(`/api/features/${featureId}/vote`)
+        .set('Authorization', `Bearer ${user.accessToken}`);
+
+      const detail = await request(app)
+        .get(`/api/features/${featureId}`)
+        .set('Authorization', `Bearer ${user.accessToken}`);
+      expect(detail.body.hasVoted).toBe(true);
+
+      const list = await request(app)
+        .get('/api/features')
+        .query({ status: 'planned', limit: 50 })
+        .set('Authorization', `Bearer ${user.accessToken}`);
+      expect(list.status).toBe(200);
+      const found = list.body.items.find((f: any) => f.id === featureId);
+      expect(found).toBeDefined();
+      expect(found.hasVoted).toBe(true);
+
+      // Убираем голос, чтобы не влиять на статистику следующих прогонов
+      await request(app)
+        .delete(`/api/features/${featureId}/vote`)
+        .set('Authorization', `Bearer ${user.accessToken}`);
+    });
+
+    it('returns hasVoted=false for anonymous list requests', async () => {
+      const res = await request(app).get('/api/features').query({ limit: 5 });
+
+      expect(res.status).toBe(200);
+      for (const item of res.body.items) {
+        expect(item.hasVoted).toBe(false);
+      }
+    });
+  });
+
   // В-117 (тикет 1790707718): FeatureDetailScreen.handleComment постит
   // POST /api/features/:id/comments {content} — маршрута не было, комментарий
   // не добавлялся. Модель FeatureComment в схеме существовала.

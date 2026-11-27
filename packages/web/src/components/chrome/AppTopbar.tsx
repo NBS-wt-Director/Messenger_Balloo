@@ -19,6 +19,7 @@ import { useNavigate } from 'react-router-dom';
 import { Topbar, type RightMenuAuth } from '@balloo/ui';
 import { useAuthStore } from '@/store/authStore';
 import { useUIStore } from '@/store/uiStore';
+import { useStoriesStore } from '@/store/storiesStore';
 import { NotificationsBell } from '@/components/topbar/NotificationsBell';
 import { LearningHelp } from './LearningHelp';
 
@@ -80,6 +81,8 @@ export function AppTopbar({
   const toggleLearningMode = useUIStore((s) => s.toggleLearningMode);
   const notice = useUIStore((s) => s.notice);
   const showNotice = useUIStore((s) => s.showNotice);
+  // U10: точка «есть новые истории» на аватарке правого меню
+  const hasUnviewedStories = useStoriesStore((s) => s.hasUnviewed);
 
   // auth === undefined — из стора; auth === null — гость принудительно.
   const menuAuth: RightMenuAuth | undefined =
@@ -89,6 +92,7 @@ export function AppTopbar({
           initials: initialsOf(user),
           avatarUrl: user?.avatarUrl ?? null,
           balancePoints: user?.balancePoints,
+          storiesBadge: hasUnviewedStories,
           onLogout: () => {
             logout();
             navigate('/');

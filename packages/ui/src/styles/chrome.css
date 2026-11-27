@@ -263,6 +263,25 @@
   background: var(--bg-hover);
 }
 
+/* U10 (тик. 1795683301): красная точка — есть непросмотренные истории.
+   Бейдж ставится на триггер правого меню (аватарку), чтобы индикация была
+   видна на всех узлах, где используется PrivateRightMenu. */
+.topbar__menu-btn--badge {
+  position: relative;
+}
+
+.topbar__menu-btn--badge::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #e53e3e;
+  box-shadow: 0 0 0 2px var(--bg-primary);
+}
+
 /* ============================================
    Right Dropdown Menu (avatar / mascot trigger)
    Дословный перенос mockups/assets/common.css:1842-1966 (источник правды).
@@ -341,6 +360,14 @@
   font-weight: 600;
   color: var(--text-muted);
   white-space: nowrap;
+}
+
+/* U10 (тик. 1795683301): точка «есть новые истории» в пункте «Истории» */
+.right-menu__item-badge {
+  margin-left: auto;
+  color: #e53e3e;
+  font-size: 20px;
+  line-height: 1;
 }
 
 .right-menu__item--active {

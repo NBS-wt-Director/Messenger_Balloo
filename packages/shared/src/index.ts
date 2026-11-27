@@ -11,6 +11,7 @@ export * from './types/index';
 export * from './utils/date';
 export * from './utils/validation';
 export * from './utils/strings';
+export * from './utils/morse';
 
 // Constants
 export * from './constants/languages';

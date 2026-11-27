@@ -54,6 +54,8 @@ export interface RightMenuAuth {
   avatarUrl?: string | null;
   /** Баланс баллов (тик. 1795686329) — показывается в частном меню, пункт «Баланс» */
   balancePoints?: number;
+  /** U10 (тик. 1795683301): есть непросмотренные истории — точка-бейдж */
+  storiesBadge?: boolean;
   /** Клик по «Выйти» (авторизованный) */
   onLogout?: () => void;
 }
@@ -85,6 +87,8 @@ export interface PrivateRightMenuProps {
   items?: RightMenuItem[];
   /** SPA-навигация (react-router navigate). Нет — переход location.href. */
   onNavigate?: (to: string) => void;
+  /** U10: показать красную точку-бейдж на аватарке триггера (есть непросмотренные истории) */
+  storiesBadge?: boolean;
 }
 
 // Темы ровно 3, лейблы — BALLOO_THEMES из common.js:7–11
@@ -374,6 +378,7 @@ export function PrivateRightMenu({
   balancePoints,
   items,
   onNavigate,
+  storiesBadge = false,
 }: PrivateRightMenuProps) {
   const { t, locale } = useI18n();
   const hostDefaults = rightMenuTargetsForHost();
@@ -404,8 +409,8 @@ export function PrivateRightMenu({
       <button
         type="button"
         id="balloo-private-menu-btn"
-        className={`topbar__menu-btn${open ? ' topbar__menu-btn--open' : ''}`}
-        title={t('menu.button')}
+        className={`topbar__menu-btn${open ? ' topbar__menu-btn--open' : ''}${storiesBadge ? ' topbar__menu-btn--badge' : ''}`}
+        title={storiesBadge ? `${t('menu.button')} · есть новые истории` : t('menu.button')}
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
@@ -439,6 +444,9 @@ export function PrivateRightMenu({
             >
               <span className="right-menu__item-icon">{item.icon}</span>
               <span className="right-menu__item-label">{t(item.key)}</span>
+              {item.key === 'menu.stories' && storiesBadge && (
+                <span className="right-menu__item-badge" aria-label="есть новые истории">•</span>
+              )}
               {isBalance && balanceLabel && (
                 <span className="right-menu__item-value">{balanceLabel}</span>
               )}

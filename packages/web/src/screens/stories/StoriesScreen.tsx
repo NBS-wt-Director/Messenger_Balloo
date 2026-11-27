@@ -6,6 +6,10 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '@/services/api';
+import { StoriesEmptyState } from './StoriesEmptyState';
+import { StoriesInfoModal } from './StoriesInfoModal';
+import { DEMO_STORIES } from './demoStories';
+import { useStoriesStore } from '@/store/storiesStore';
 
 // --- Types ---
 
@@ -470,12 +474,17 @@ function StoryViewer({
 
 function StoriesScreen() {
   const navigate = useNavigate();
+  const refreshStoriesBadge = useStoriesStore((s) => s.refresh);
   const [users, setUsers] = useState<StoryUser[]>([]);
   const [viewer, setViewer] = useState<{
     userId: string;
     storyIndex: number;
   } | null>(null);
   const [loading, setLoading] = useState(false);
+  // T4: «Что это?» — доступно и когда истории есть, и когда их нет.
+  const [infoOpen, setInfoOpen] = useState(false);
+  // T2: демо-ролик открыт крупно
+  const [demoIndex, setDemoIndex] = useState<number | null>(null);
 
   const loadStories = async () => {
     setLoading(true);
@@ -487,6 +496,8 @@ function StoriesScreen() {
       );
       const list = Array.isArray(res) ? res : res?.stories ?? [];
       setUsers(groupStories(list));
+      // U10: после загрузки обновляем бейдж «есть новые истории» во всех меню.
+      void refreshStoriesBadge();
     } catch {
       setUsers([]);
     } finally {
@@ -542,51 +553,63 @@ function StoriesScreen() {
 
   return (
     <div className="stories-screen">
-      {/* Header */}
-      <div className="stories-screen__header">
+      {/* Header: T6 — «Добавить» активная (primary) кнопка; T4 — «Что это?» */}
+      <div
+        className="stories-screen__header"
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}
+      >
         <h2 style={{ margin: 0, fontSize: 20 }}>Истории</h2>
-      </div>
-
-      {/* Story circles */}
-      <div className="stories-screen__circles">
-        {/* Add story */}
-        <div className="story-circle" onClick={handleCreateStory}>
-          <div className="story-circle__ring story-circle__ring--add">
-            <div className="story-circle__avatar">
-              <div className="avatar avatar--md">
-                <div className="avatar__inner">
-                  <span>Я</span>
-                </div>
-                <div className="story-circle__add">+</div>
-              </div>
-            </div>
-          </div>
-          <div className="story-circle__name">Добавить</div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button type="button" className="btn btn--primary btn--sm" onClick={handleCreateStory}>
+            + Добавить
+          </button>
+          <button type="button" className="btn btn--secondary btn--sm" onClick={() => setInfoOpen(true)}>
+            ❓ Что это?
+          </button>
         </div>
-
-        {/* Other users */}
-        {usersWithStories.map((user) => (
-          <StoryCircle
-            key={user.id}
-            user={user}
-            onClick={() => handleOpenStory(user.id, 0)}
-          />
-        ))}
       </div>
 
-      {/* Stories list */}
-      <div className="stories-screen__list">
-        {loading ? (
-          <div className="text-muted" style={{ padding: 24, textAlign: 'center' }}>
-            Загрузка историй...
+      {/* T1–T3: пустое состояние с демо-видео и призывом к действию */}
+      {!loading && usersWithStories.length === 0 ? (
+        <StoriesEmptyState onOpenDemo={(index) => setDemoIndex(index)} />
+      ) : (
+        <>
+          {/* Story circles */}
+          <div className="stories-screen__circles">
+            {/* Add story */}
+            <div className="story-circle" onClick={handleCreateStory}>
+              <div className="story-circle__ring story-circle__ring--add">
+                <div className="story-circle__avatar">
+                  <div className="avatar avatar--md">
+                    <div className="avatar__inner">
+                      <span>Я</span>
+                    </div>
+                    <div className="story-circle__add">+</div>
+                  </div>
+                </div>
+              </div>
+              <div className="story-circle__name">Добавить</div>
+            </div>
+
+            {/* Other users */}
+            {usersWithStories.map((user) => (
+              <StoryCircle
+                key={user.id}
+                user={user}
+                onClick={() => handleOpenStory(user.id, 0)}
+              />
+            ))}
           </div>
-        ) : usersWithStories.length === 0 ? (
-          <div className="text-muted" style={{ padding: 24, textAlign: 'center' }}>
-            У ваших контактов пока нет историй
-          </div>
-        ) : (
-          usersWithStories.map((user) =>
-            user.stories.map((story) => (
+
+          {/* Stories list */}
+          <div className="stories-screen__list">
+            {loading ? (
+              <div className="text-muted" style={{ padding: 24, textAlign: 'center' }}>
+                Загрузка историй...
+              </div>
+            ) : (
+              usersWithStories.map((user) =>
+                user.stories.map((story) => (
               <div
                 key={story.id}
                 className="card story-item"
@@ -646,7 +669,9 @@ function StoriesScreen() {
             ))
           )
         )}
-      </div>
+          </div>
+        </>
+      )}
 
       {/* Story Viewer Overlay */}
       {viewer && (
@@ -658,6 +683,49 @@ function StoriesScreen() {
           onReact={handleReact}
           onView={handleView}
         />
+      )}
+
+      {/* T4: «Что это?» */}
+      <StoriesInfoModal open={infoOpen} onClose={() => setInfoOpen(false)} />
+
+      {/* T2: демо-ролик крупно */}
+      {demoIndex != null && DEMO_STORIES[demoIndex] && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={DEMO_STORIES[demoIndex].title}
+          onClick={() => setDemoIndex(null)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.85)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: 16,
+          }}
+        >
+          <div onClick={(e) => e.stopPropagation()} style={{ maxWidth: 480, width: '100%' }}>
+            <video
+              src={DEMO_STORIES[demoIndex].src}
+              poster={DEMO_STORIES[demoIndex].poster}
+              controls
+              autoPlay
+              playsInline
+              style={{ width: '100%', maxHeight: '80vh', background: '#000' }}
+            />
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginTop: 8 }}>
+              <div style={{ color: '#fff' }}>
+                <div style={{ fontWeight: 700 }}>{DEMO_STORIES[demoIndex].title}</div>
+                <div style={{ fontSize: 12, opacity: 0.7 }}>{DEMO_STORIES[demoIndex].credit}</div>
+              </div>
+              <button type="button" className="btn btn--secondary btn--sm" onClick={() => setDemoIndex(null)}>
+                Закрыть
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

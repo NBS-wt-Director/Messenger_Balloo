@@ -75,6 +75,7 @@ export function Topbar({
             initials={auth.initials}
             avatarUrl={auth.avatarUrl}
             balancePoints={auth.balancePoints}
+            storiesBadge={auth.storiesBadge}
             onNavigate={onNavigate}
           />
         )}

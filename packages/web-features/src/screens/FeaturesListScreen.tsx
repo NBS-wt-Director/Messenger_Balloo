@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import { Topbar, Footer } from '@balloo/ui';
 import { FeatureStatusBadge } from './FeatureStatusBadge';
 import { FeatureVoteButton } from './FeatureVoteButton';
+import { FeaturesSidebar } from '../components/FeaturesSidebar';
+import type { FeatureStatusKey, FeatureSortKey } from '../components/FeaturesSidebar';
 import { api } from '@/services/api';
 import { useAuth } from '../hooks/useAuth';
 
@@ -16,24 +18,12 @@ interface Feature {
   category: string;
   priority?: string;
   status: string;
+  wave?: number | null;
+  hasVoted?: boolean;
   createdAt: number;
-  author: { id: string; username: string; displayName: string; avatarUrl?: string };
+  author: { id: string; username: string; displayName: string; avatarUrl?: string } | null;
   _count: { votes: number; comments: number };
 }
-
-const STATUS_SIDEBAR = [
-  { key: 'all', label: '📋 Все фичи', count: null },
-  { key: 'done', label: '✅ Готово', count: null },
-  { key: 'in_progress', label: '🔄 В работе', count: null },
-  { key: 'planned', label: '📌 Запланировано', count: null },
-  { key: 'idea', label: '💡 Идеи', count: null },
-];
-
-const SORT_OPTIONS = [
-  { key: 'votes', label: '🏆 Топ голосов' },
-  { key: 'comments', label: '🔥 Обсуждаемые' },
-  { key: 'date', label: '⏱ Свежие' },
-];
 
 const CATEGORY_TABS = [
   { key: '', label: 'Все' },
@@ -56,9 +46,9 @@ export function FeaturesListScreen() {
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeStatus, setActiveStatus] = useState('all');
+  const [activeStatus, setActiveStatus] = useState<FeatureStatusKey>('all');
   const [activeCategory, setActiveCategory] = useState('');
-  const [sortBy, setSortBy] = useState<'votes' | 'date' | 'comments'>('votes');
+  const [sortBy, setSortBy] = useState<FeatureSortKey>('votes');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
@@ -100,12 +90,6 @@ export function FeaturesListScreen() {
     });
   }
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    setPage(1);
-    loadFeatures();
-  };
-
   const totalFeatures = stats?.total || 0;
   const totalVotes = stats?.totalVotes || 0;
   const doneCount = sidebarCounts['done'] || 0;
@@ -133,50 +117,25 @@ export function FeaturesListScreen() {
       <Topbar auth={{ isAuthenticated: auth.isAuthenticated, initials: auth.initials, onLogout: auth.logout }} />
 
       <div className="main" style={{ flex: 1, minHeight: 0 }}>
-        {/* Sidebar */}
-        <div className="sidebar sidebar--narrow">
-          <div className="sidebar__search">
-            <form onSubmit={handleSearch}>
-              <input
-                type="text"
-                className="search-input"
-                placeholder="🔍 Поиск фич..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </form>
-          </div>
-          <div className="list">
-            {STATUS_SIDEBAR.map((item) => (
-              <div
-                key={item.key}
-                className={`list__item ${activeStatus === item.key ? 'list__item--active' : ''}`}
-                onClick={() => { setActiveStatus(item.key); setPage(1); }}
-                style={{ cursor: 'pointer' }}
-              >
-                {item.label}
-                {item.key !== 'all' && (
-                  <span className="badge" style={{ marginLeft: 'auto' }}>
-                    {sidebarCounts[item.key] || 0}
-                  </span>
-                )}
-              </div>
-            ))}
-
-            <div style={{ borderTop: '1px solid var(--border-color)', marginTop: '8px', paddingTop: '12px' }}>
-              {SORT_OPTIONS.map((sort) => (
-                <div
-                  key={sort.key}
-                  className={`list__item ${sortBy === sort.key ? 'list__item--active' : ''}`}
-                  onClick={() => setSortBy(sort.key as any)}
-                  style={{ cursor: 'pointer' }}
-                >
-                  {sort.label}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        {/* Sidebar — общий компонент раздела (U8) */}
+        <FeaturesSidebar
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          onSearchSubmit={() => { setPage(1); loadFeatures(); }}
+          activeStatus={activeStatus}
+          onStatusChange={(s) => { setActiveStatus(s); setPage(1); }}
+          sortBy={sortBy}
+          onSortChange={setSortBy}
+          counts={sidebarCounts}
+          footer={
+            <button
+              className="btn btn--primary btn--block"
+              onClick={() => navigate('/features/create')}
+            >
+              ✏ Предложить фичу
+            </button>
+          }
+        />
 
         {/* Content */}
         <div className="content overflow-y-auto">
@@ -257,12 +216,12 @@ export function FeaturesListScreen() {
                     <FeatureVoteButton
                       featureId={feature.id}
                       initialVoteCount={feature._count.votes}
-                      hasVoted={false}
+                      hasVoted={feature.hasVoted ?? false}
                       size="sm"
                     />
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <FeatureStatusBadge status={feature.status} />
+                        <FeatureStatusBadge status={feature.status} wave={feature.wave} />
                         <span className="chip">{feature.category}</span>
                         {feature.priority && (
                           <span className="chip" style={{ fontSize: '9px' }}>

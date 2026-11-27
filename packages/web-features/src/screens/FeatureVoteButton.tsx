@@ -49,7 +49,10 @@ export function FeatureVoteButton({
       setVoteCount((prev) => (voted ? prev - 1 : prev + 1));
       onVoteChange?.(!voted, voted ? voteCount - 1 : voteCount + 1);
     } catch (err: any) {
-      setError(err.message || 'Ошибка голосования');
+      const message = err?.message === 'UNAUTHORIZED'
+        ? 'Войдите, чтобы голосовать'
+        : err?.message || 'Ошибка голосования';
+      setError(message);
     } finally {
       setLoading(false);
     }

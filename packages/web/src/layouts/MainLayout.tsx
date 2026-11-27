@@ -7,6 +7,7 @@
 import { useEffect, useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useUIStore } from '@/store/uiStore';
+import { useStoriesStore } from '@/store/storiesStore';
 import { Sidebar } from '@/components/sidebar/Sidebar';
 import { ChatList } from '@/components/chat/ChatList';
 import { AppTopbar } from '@/components/chrome/AppTopbar';
@@ -18,6 +19,8 @@ function MainLayout() {
   const location = useLocation();
   const isSidebarOpen = useUIStore((s) => s.isSidebarOpen);
   const setSidebarOpen = useUIStore((s) => s.setSidebarOpen);
+  // U10: индикация новых историй на кнопке шапки
+  const hasUnviewedStories = useStoriesStore((s) => s.hasUnviewed);
 
   // Responsive handling — реактивно (state), чтобы поворот/ресайз перерисовывал колонки
   const [viewport, setViewport] = useState<'mobile' | 'tablet' | 'desktop'>(() =>
@@ -81,10 +84,25 @@ function MainLayout() {
             <button
               type="button"
               className="topbar__actions-btn"
-              title="Истории"
+              title={hasUnviewedStories ? 'Истории — есть новые' : 'Истории'}
               onClick={() => navigate('/stories')}
+              style={{ position: 'relative' }}
             >
               📷
+              {hasUnviewedStories && (
+                <span
+                  aria-hidden="true"
+                  style={{
+                    position: 'absolute',
+                    top: 2,
+                    right: 2,
+                    width: 7,
+                    height: 7,
+                    borderRadius: '50%',
+                    background: '#e53e3e',
+                  }}
+                />
+              )}
             </button>
             <button
               type="button"

@@ -5,6 +5,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
 import { useUIStore } from '@/store/uiStore';
+import { useStoriesStore } from '@/store/storiesStore';
 import { UserCard } from './UserCard';
 import { NavItem } from './NavItem';
 import { SearchBar } from './SearchBar';
@@ -14,6 +15,11 @@ export function Sidebar() {
   const user = useAuthStore((s) => s.user);
   const isSidebarOpen = useUIStore((s) => s.isSidebarOpen);
   const toggleSidebar = useUIStore((s) => s.toggleSidebar);
+  // U10: бейдж новых историй
+  const hasUnviewedStories = useStoriesStore((s) => s.hasUnviewed);
+  const refreshStories = useStoriesStore((s) => s.refresh);
+
+  React.useEffect(() => { void refreshStories(); }, [refreshStories]);
 
   if (!user) return null;
 
@@ -25,7 +31,8 @@ export function Sidebar() {
     { icon: '💬', label: 'Чаты', path: '/chat' },
     { icon: '👥', label: 'Контакты', path: '/contacts' },
     // Истории и Приглашения — по запросу владельца (тик. 1795282577)
-    { icon: '📷', label: 'Истории', path: '/stories' },
+    // U10: бейдж, если есть непросмотренные истории.
+    { icon: '📷', label: 'Истории', path: '/stories', badge: hasUnviewedStories ? '•' : undefined },
     { icon: '📨', label: 'Приглашения', path: '/invites' },
     { icon: '📞', label: 'Звонки', path: '/calls' },
     { icon: '🎧', label: 'Поддержка', path: '/support' },
@@ -124,6 +131,7 @@ export function Sidebar() {
             icon={item.icon}
             label={item.label}
             active={false}
+            badge={item.badge}
             onClick={() => handleNavClick(item.path)}
           />
         ))}

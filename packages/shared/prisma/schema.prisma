@@ -1037,6 +1037,8 @@ model FeatureRequest {
   priority    String?           @db.VarChar(50)
   motivation  String?           @db.Text
   status      String            @default("idea")
+  // Тикет 1795683301 (U4): для статуса planned — номер волны реализации.
+  wave        Int?
   votesCount  Int               @default(0)
   // Тикет 1790480787-04: анонимные фич-предложения (features.balloo.su).
   // isAnonymous=true — автор не показывается в публичном API, userId обнуляется.
