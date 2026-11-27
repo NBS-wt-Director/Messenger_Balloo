@@ -198,8 +198,9 @@
 - [x] `jest` (server) — 806/54
 - [x] `vitest` (web) — 409/55
 - [x] `vitest` (shared) — 97/5
-- [ ] `vite build` — будет в финальном прогоне
+- [x] `vite build` — прогон 27.11.2026: web ✓ 8.54s (`index-BT-1pVP-.js`), web-admin ✓ 2.37s, features ✓ 1.99s, history ✓ 1.92s, download ✓ 2.12s
 - [x] `pnpm db:migrate` — миграция применена
+- [x] `jest` полный прогон 27.11.2026 — 825/56, 0 failed; `vitest web` — 440/58, 0 failed
 
 ## Критерии готовности
 

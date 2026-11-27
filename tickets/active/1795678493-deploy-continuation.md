@@ -128,6 +128,87 @@ Workers → **Unregister** → Application → Storage → **Clear site data** �
 
 **R1 (фикс чата-сироты) — на проде.** Осталось: удалить саму запись-сироту.
 
+### R5. Третий батч (27.11.2026) — готов к деплою владельцем
+
+**Объём:** `85103b8..c79640c` (2 коммита: `96011e6` кнопка «Позвонить», `c79640c`
+features/истории/docs).
+
+| Пакет | Что изменилось | Образ |
+|---|---|---|
+| shared | миграция `20261127120000_feature_request_wave` (+`wave` в FeatureRequest), `toMorse` переехал в `utils/morse.ts` | — |
+| server | `featureService`/`featureController` (`hasVoted`, `wave`, `createdAt`), `routes/features.ts` (`optionalAuth`), `docsHtmlController` (единые шапка/подвал), seed 19 фич | `server` |
+| ui | `PrivateRightMenu.storiesBadge`, `Topbar`, `chrome.css` (бейдж), `lib/morse` → реэкспорт | все 5 SPA |
+| web | истории: пустое состояние + 3 демо-видео + «Что это?» + бейдж новых, `store/storiesStore`, `AppTopbar`, `Sidebar`, `MainLayout` | `web` |
+| web-features | `FeaturesSidebar`, статусы/волны, `hasVoted`, левая панель на `/features/create` | `web-features` |
+| web-history, web-download, web-admin | пересобираются из общего builder-стейджа (`@balloo/ui` изменился) | 3 SPA |
+
+**Миграция аддитивная:** `ALTER TABLE "feature_requests" ADD COLUMN "wave" INTEGER;`
+(nullable, существующие строки не меняются). Seed идемпотентен (upsert по id).
+
+**Префлайт (локально, вывод команд):**
+
+```
+tsc --noEmit shared/server/ui/web/web-features → exit 0
+vite build web/web-features/web-history/web-download/web-admin → exit 0
+vitest shared 97 / web 440 / web-admin 36 → 0 failed
+jest server 825 (56 наборов) → 0 failed
+node scripts/check-i18n.cjs → расхождений 0
+prisma migrate deploy → применено; prisma db seed → FeatureRequest: 19 фич
+```
+
+**Команды (выполняет владелец, батчами):**
+
+```bash
+# C. Факты (read-only)
+cd /data/balloo/repo && git fetch origin && git log --oneline -3 origin/main
+
+# D. Переключение на main
+git checkout -B main origin/main && git log --oneline -1 && git status --porcelain
+
+# E. Откатный тег + бэкап БД (перед миграцией — обязателен)
+git tag -f deploy-rollback-c79640c HEAD~2
+docker compose -f docker/prod/docker-compose.local.yml --env-file .env.production \
+  exec -T postgres pg_dump -U balloo balloo > /data/balloo/backups/pre-c79640c-$(date +%Y%m%d-%H%M).sql
+
+# F. Сборка и подъём (сначала API, затем SPA)
+docker compose -f docker/prod/docker-compose.local.yml --env-file .env.production build server web web-admin features web-history web-download
+docker compose -f docker/prod/docker-compose.local.yml --env-file .env.production up -d --no-deps --force-recreate server
+# дождаться Healthy, затем:
+docker compose -f docker/prod/docker-compose.local.yml --env-file .env.production up -d --no-deps --force-recreate web web-admin features web-history web-download
+
+# G. Доказательства
+docker compose -f docker/prod/docker-compose.local.yml ps
+docker compose -f docker/prod/docker-compose.local.yml logs --tail=40 server   # миграция + seed
+curl -s -o /dev/null -w "%{http_code}\n" https://balloo.su
+curl -s -o /dev/null -w "%{http_code}\n" https://admin.balloo.su
+curl -s -o /dev/null -w "%{http_code}\n" https://features.balloo.su
+curl -s -o /dev/null -w "%{http_code}\n" https://history.balloo.su
+curl -s -o /dev/null -w "%{http_code}\n" https://download.balloo.su
+curl -s https://api.balloo.su/api/features/stats
+curl -s https://api.balloo.su/docs | grep -c 'balloo-footer__morse'
+curl -sI https://balloo.su/download/demo-stories/taiga.mp4 | head -3   # если demo-stories отдаётся из web
+```
+
+> ⚠️ **Имена сервисов в compose.** В команде F использованы имена, как в
+> `docker/prod/docker-compose.local.yml`; если сервис называется иначе —
+> взять фактические из `docker compose config --services`.
+>
+> ⚠️ **`docker/prod/.env.production`** на сервере помечен `M` — не коммитить
+> и не перезаписывать.
+
+**Приёмка (батч H, браузер владельца; сначала Unregister SW + Clear site data):**
+
+| № | Что | Ожидаем |
+|---|---|---|
+| A1 | `features.balloo.su` | 19 фич, слева статусы со счётчиками (11/4/4), у «в плане» — чип «волна 2/3» |
+| A2 | `features.balloo.su/features/create` | слева та же панель, справа форма, прокрутка без полосы |
+| A3 | Голосование | «▲» увеличивает счётчик и остаётся после перезагрузки (под авторизацией) |
+| A4 | `balloo.su/#/stories` (пусто) | объяснение + 3 демо-видео + «Загрузить свою историю»/«Настроить приватность»/«Что это?» |
+| A5 | `balloo.su/#/stories` (есть новые) | бейдж на «Истории» в левой панели, 📷 в шапке и в правом меню |
+| A6 | `api.balloo.su/docs` | шапка с меню, подвал: copyright→меню 5 пунктов, «Поддержка», морзе-тикеры, правовой блок; прокрутка без полосы |
+| A7 | `balloo.su/#/calls` | кнопка «📞 Позвонить» открывает выбор контакта, звонок создаётся (переход на `/active-call`) |
+| A8 | Все узлы | контент не прилипает к правому краю (24px / 16px на мобиле) |
+
 ## Порядок выполнения (батчи)
 
 1. **E4:** коммит (фикс + тикеты + docs) → `git push origin main` — *по команде владельца «Деплой»*.
