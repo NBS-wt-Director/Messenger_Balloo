@@ -2,13 +2,17 @@
    Токены тем и шапка/подвал приходят из @balloo/ui (themes.css / chrome.css),
    здесь — только классы контента и требование U2 (прокрутка без полосы). */
 
+/* U2 (тик. 1795683301): прокрутка есть, полоса не видна.
+   width:0 вместо display:none — display:none ломает прокрутку в Chromium. */
 * {
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
 
 ::-webkit-scrollbar {
-  display: none;
+  width: 0;
+  height: 0;
+  background: transparent;
 }
 
 html,

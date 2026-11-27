@@ -209,6 +209,97 @@ curl -sI https://balloo.su/download/demo-stories/taiga.mp4 | head -3   # есл�
 | A7 | `balloo.su/#/calls` | кнопка «📞 Позвонить» открывает выбор контакта, звонок создаётся (переход на `/active-call`) |
 | A8 | Все узлы | контент не прилипает к правому краю (24px / 16px на мобиле) |
 
+### R6. Четвёртый батч (27.11.2026) — текущий деплой
+
+**Источник:** владелец «деплой через меня» (27.11.2026).
+
+**Диапазон:** `6afdce0..0751ee4` (7 коммитов; последний `0751ee4` — docs-only).
+Код: `4140721` (docs), `3070519` fix(web,ui), `85103b8` docs, `2838853`, `96011e6`,
+`c79640c` feat, `0751ee4` docs.
+
+**Миграция:** только `20261127120000_feature_request_wave`
+(`ALTER TABLE "feature_requests" ADD COLUMN "wave" INTEGER;` — аддитивная).
+`20261126120000_user_balance_points` уже применена батчем 2.
+
+**Префлайт (локально, 27.11.2026):**
+
+```
+tsc --noEmit shared/server/web → exit 0
+pnpm test → shared 97/97, server 825/825 (56 наборов), web 440/440 (58 файлов)
+pnpm build → BUILD_EXIT=0
+```
+
+**Ход (доказано выводом сервера 27.11.2026):**
+
+| Батч | Результат |
+|---|---|
+| C | `HEAD=85103b8` (был ещё деплой после батча 2, в тикете не отражён), `ORIGIN_MAIN=0751ee4`, диск 55G свободно, все контейнеры `Up`, `api=200`, бандль web `index-Dzj91TqP.js` |
+| D | `HEAD=0751ee4`, `BEHIND=0`, `git status` = `M docker/prod/.env.production` + `?? docker/prod/backups/` |
+| E | теги `rollback-85103b8` на 6 образах (ID совпали с C); дамп `pre-0751ee4-20261127-2214.sql` — **210 863 Б**, `dump complete`=1, `CREATE TABLE`=83; миграций в БД до деплоя **23**, в репо **24** (ожидалась 1 новая) |
+| F1 | 6 образов собраны за **8m43s**, все `:local` с новыми ID: server `b510d88e1fe3`, web `1cb0b2219301`, web-admin `9da2d65155a2`, features `4185011c8554`, web-history `9d87ed56f975`, web-download `189552b65905` |
+| F2 | `balloo-server` healthy через ~9 с, `restarts=0`, образ `b510d88e1fe3`; лог: `24 migrations found` → `Applying migration 20261127120000_feature_request_wave` → `All migrations have been successfully applied`, `Seed completed successfully`, `[Push] VAPID Web Push initialized` |
+| F3 | 5 SPA `Up`, `restarts=0`, образы = F1; бандли: web `index-CWxK1CyE.js`, admin `index-Bql6Kr6i.js`, features `index-BkYidYI9.js`, history `index-BzcqaH7Z.js`, download `index-CvlYoYTr.js`; postgres/redis/minio не тронуты |
+| G (1) | `HEAD=0751ee4`; 5 доменов `200`; `etag 6b09bbd6-66e` (было `6b0534cf-66e`), `last-modified 27 Nov 17:20`; `api=200`, `notifications=401`, `features/stats=200`; миграций **24** |
+| G (диагностика) | `8090→CWxK1CyE`, `8091→BkYidYI9`, `8092→Bql6Kr6i`, `8093→BzcqaH7Z`, `8094→CvlYoYTr` — все контейнеры отдают свой код |
+
+**Находка G3 (не следствие деплоя):** `history.balloo.su` и `download.balloo.su`
+отдают бандль основного web. Причина — хостовый
+`/etc/nginx/sites-enabled/balloo-docker.conf:183`: `server_name history.balloo.su
+download.balloo.su command.balloo.su blog.balloo.su docs.balloo.su;` →
+`:216 proxy_pass http://127.0.0.1:8090/`. Все пять доменов проксируются на
+основной web, контейнеры `web-history`/`web-download` живы, но их домены на них
+не смотрят. Отдельно: `docker/prod/nginx/balloo-docker.conf` в репозитории
+(231 строка) **не содержит** этого блока — файл в репо расходится с хостовым,
+синхронизировать отдельной задачей.
+
+**G-финал (доказано выводом сервера 27.11.2026):**
+
+| # | Проверка | Результат |
+|---|---|---|
+| D4 | колонка `wave` | `wave` — миграция применилась реально, не только запись в `_prisma_migrations` |
+| D5 | прод-бандль web `index-CWxK1CyE.js` | 289 873 Б, `morse=1`, `stories=2`, `startCall=1` |
+| D5 | прод-бандль features `index-BkYidYI9.js` | 219 283 Б, `wave=1`, `hasVoted=1` |
+| D6 | `https://api.balloo.su/docs` | `200`, `balloo-footer__morse`=15, `balloo-footer`=54 — единая шапка/подвал с морзе-тикерами |
+| D7 | аптаймы | `balloo-postgres`/`balloo-redis`/`balloo-minio` — `Up 2 weeks` (не перезапускались) |
+
+**Батч G закрыт.** Все критерии §5 AGENTS.md по серверной части выполнены:
+HEAD = цель деплоя, образы новые, `restarts=0`, маркеры нового кода в прод-бандлах,
+миграция + колонка, API-роуты, соседние контейнеры не тронуты.
+
+**Осталось:** батч H — браузерная приёмка владельцем (A1–A8).
+
+**ОТКАТ 27.11.2026 (по команде владельца, причина в чате не названа).**
+Выполнено `$DC up -d --no-deps --force-recreate` на тегах
+`rollback-85103b8` (перетегированы на `:local`), 6/6 контейнеров поднялись,
+`balloo-server Healthy` за 35.4 с.
+
+| Проверка после отката | Результат |
+|---|---|
+| Образы контейнеров | `5b9c2a407dca`, `03cfbe154870`, `17def82ac0a7`, `cb2be1d9638d`, `02767c56026d`, `67876201bd0e` = `85103b8`, `restarts=0` |
+| Бандль web снаружи | `index-Dzj91TqP.js` — старый ✓ |
+| `HEAD` на диске | `0751ee4` (образы откатились, git — нет) |
+| Миграция `feature_request_wave` | **осталась применённой** (24 миграции, колонка `wave`); nullable аддитивная, старому коду безразлична — сервер поднялся healthy, БД из дампа НЕ откатывалась |
+| Образы `0751ee4` | **не удалены**, стали dangling (`docker images -f dangling=true`): server `b510d88e1fe3` 1.52G, web `1cb0b2219301` 114M, admin `9da2d65155a2` 106M, features `4185011c8554` 105M, history `9d87ed56f975` 104M, download `189552b65905` 104M |
+
+> `grep` по `docker images -q --no-trunc` даёт 0 совпадений на этом хосте
+> (containerd image store, другой формат вывода) — проверять через
+> `docker images -f dangling=true`, а не grep'ом по ID.
+
+**Повторный деплой `0751ee4` НЕ требует сборки** (если образы закреплены тегом
+`deploy-0751ee4` и не удалены prune'ом):
+
+```bash
+cd /data/balloo/repo/docker/prod
+DC="docker compose -f docker-compose.local.yml --env-file .env.production"
+for i in server web web-admin features web-history web-download; do docker tag balloo/$i:deploy-0751ee4 balloo/$i:local; done
+$DC up -d --no-deps --force-recreate server
+$DC up -d --no-deps --force-recreate web web-admin features web-history web-download
+```
+
+**Миграция при повторном заходе = no-op** (уже применена).
+**Открыто:** причина отката не названа → правки кода не делаются, приёмка A1–A8
+не выполнена.
+
 ## Порядок выполнения (батчи)
 
 1. **E4:** коммит (фикс + тикеты + docs) → `git push origin main` — *по команде владельца «Деплой»*.

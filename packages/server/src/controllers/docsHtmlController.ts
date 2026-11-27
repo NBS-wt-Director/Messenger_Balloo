@@ -157,9 +157,11 @@ export function getDocsHtml(_req: Request, res: Response): void {
             --shadow: 0 8px 24px rgba(0, 0, 0, 0.45); }
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* U2 (тик. 1795683301): прокрутка есть всегда, полоса не видна. */
+    /* U2 (тик. 1795683301): прокрутка есть всегда, полоса не видна.
+       width:0 + height:0 вместо display:none — display:none ломает прокрутку
+       в некоторых Chromium (элемент становится непрокручиваемым). */
     * { scrollbar-width: none; -ms-overflow-style: none; }
-    ::-webkit-scrollbar { display: none; }
+    ::-webkit-scrollbar { width: 0; height: 0; background: transparent; }
 
     html, body { height: 100%; }
     body { color: var(--text);
