@@ -350,3 +350,78 @@ CSS с новым правилом подтверждён в образах feat
 ## Результат
 
 _(заполняется по ходу)_
+
+### R7. Пятый батч (28.11.2026) — текущий деплой
+
+**Объём:** `a90eba6` (2 коммита):
+- `179aa90` feat: многотипные вложения (15 типов), доступ в админку (суперадмин + заявки в команду).
+- `a90eba6` docs(tickets): закрытие тикетов.
+
+**Миграции (4 новые, все аддитивные/идемпотентные):**
+
+| Миграция | SQL | Безопасность |
+|---|---|---|
+| `20261128161509_message_attachment_data` | `ALTER TABLE "message_attachments" ADD COLUMN "data" JSONB;` | без UPDATE, nullable |
+| `20261128172000_message_type_nonfile` | `ALTER TYPE "MessageType" ADD VALUE ...` | enum-аддитив, не откатывается, старый код не ломает |
+| `20261128180000_team_applications` | `CREATE TABLE "team_applications"` + индексы | пустая таблица |
+| `20261128180001_first_user_superadmin` | `UPDATE "users" SET "role" = 'superadmin' WHERE id = (SELECT …) AND NOT EXISTS (…)` | идемпотент: если суперадмин уже есть (`o8eryuhtin`) — 0 строк |
+
+**Затронутые образы:** `server` + все 5 SPA (web, admin, features, history, download — все зависят от `@balloo/ui`).
+
+**Префлайт (локально, вывод команд):**
+
+```
+tsc --noEmit  shared / server / ui / web / web-admin / web-features / web-history / web-download → exit 0
+vitest shared 97 (5 файлов) / web 456 (59 файлов) / web-admin 36 (4 файла) → 0 failed
+jest server 843 (57 наборов) → 0 failed
+vite build web / web-features / web-admin / web-history / web-download → exit 0
+tsc (build server) → exit 0
+node scripts/check-i18n.cjs → словарь 151 / TranslationKey 151, расхождений 0
+pnpm db:migrate → 28 migrations found, pending нет
+```
+
+**Команды (выполняет владелец, батчами):**
+
+```bash
+# C. Факты (read-only)
+cd /data/balloo/repo && git fetch origin && git log --oneline -2 origin/main
+
+# D. Переключение на main
+git checkout -B main origin/main && git log --oneline -2 && git status --porcelain
+
+# E. Откатный тег + бэкап БД (перед миграцией — обязателен)
+git tag -f deploy-rollback-a90eba6 HEAD~1
+docker compose -f docker/prod/docker-compose.local.yml --env-file .env.production \
+  exec -T postgres pg_dump -U balloo balloo > /data/balloo/backups/pre-a90eba6-$(date +%Y%m%d-%H%M).sql
+
+# F. Сборка и подъём (сначала API, затем SPA)
+docker compose -f docker/prod/docker-compose.local.yml --env-file .env.production build server web web-admin features web-history web-download
+docker compose -f docker/prod/docker-compose.local.yml --env-file .env.production up -d --no-deps --force-recreate server
+# дождаться Healthy, затем:
+docker compose -f docker/prod/docker-compose.local.yml --env-file .env.production up -d --no-deps --force-recreate web web-admin features web-history web-download
+
+# G. Доказательства
+docker compose -f docker/prod/docker-compose.local.yml ps
+docker compose -f docker/prod/docker-compose.local.yml logs --tail=40 server   # 4 миграции + seed
+curl -s -o /dev/null -w "%{http_code}\n" https://balloo.su
+curl -s -o /dev/null -w "%{http_code}\n" https://admin.balloo.su
+curl -s -o /dev/null -w "%{http_code}\n" https://features.balloo.su
+curl -s -o /dev/null -w "%{http_code}\n" https://history.balloo.su
+curl -s -o /dev/null -w "%{http_code}\n" https://download.balloo.su
+# новый роут существует и защищён (404 = кода на проде нет)
+curl -s -o /dev/null -w "%{http_code}\n" https://api.balloo.su/api/admin/team-applications
+```
+
+> ⚠️ **Имена сервисов в compose** — взять фактические из `docker compose config --services`.
+> ⚠️ **`docker/prod/.env.production`** — не коммитить, не перезаписывать.
+
+**Приёмка (батч H, браузер владельца; сначала Unregister SW + Clear site data):**
+
+| № | Что | Ожидаем |
+|---|---|---|
+| A1 | `admin.balloo.su` | вход под `o8eryuhtin` → дашборд; в шапке «👑 Суперадминистратор» |
+| A2 | Правое меню | «Админ-панель» видна только администратору, в лого-меню её нет |
+| A3 | `/team-applications` | раздел открывается, список заявок |
+| A4 | Заявка из-под обычного пользователя | экран отказа без редиректа, форма заявки, id Balloo виден |
+| A5 | Принятие заявки | роль admin выдана, заявителю пришло сообщение в чат |
+| A6 | Панель вложений | `/poll_`, `/quiz_` открывают форму; файлы + не-файловые в одном списке |
