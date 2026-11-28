@@ -68,52 +68,53 @@
 
 ### Шаг 1: Утилита Морзе
 
-- [ ] `packages/ui/src/lib/morse.ts` (новый): `toMorse(text: string): string` — русский + латиница + цифры; возвращает строку из `.`/`-`/` `/`/` (паузы).
-- [ ] Экспорт `MORSE_TIMING` (dot=1, dash=3, symbol gap=1, letter gap=3, word gap=7).
-- [ ] Юнит-тесты: «SOS» → `... --- ...`, «переверни общение» → непустой валидный паттерн, неизвестный символ → пропуск.
+- [x] `toMorse(text: string): string` — русский + латиница + цифры; возвращает строку из `.`/`-`/` `/`/` (паузы). **Факт:** `packages/shared/src/utils/morse.ts` (утилита переехала в shared, тик. 1795683301), реэкспорт `packages/ui/src/lib/morse.ts`.
+- [x] Экспорт `MORSE_TIMING` (dot=1, dash=3, symbol gap=1, letter gap=3, word gap=7) — в том же файле.
+- [x] Юнит-тесты — `packages/web/src/__tests__/lib/morse.test.ts` (SOS, русский текст, неизвестный символ).
 
 ### Шаг 2: Компонент `FooterMorseTicker`
 
-- [ ] `packages/ui/src/components/FooterMorseTicker.tsx` (новый): props `{ text: string; direction: 'ltr' | 'rtl'; variant?: 'default' | 'emergency' }`.
-- [ ] CSS-анимация по `MORSE_TIMING`: точка = 4px, тире = 12px; движение от края к центру (`direction`).
-- [ ] `prefers-reduced-motion` → статичный паттерн без анимации.
-- [ ] Мобилка: тикер показывается (сейчас точки скрыты) — компактный вариант.
+- [x] `packages/ui/src/components/FooterMorseTicker.tsx` — props `{ text, direction, variant }`.
+- [x] CSS-анимация: `packages/ui/src/styles/chrome.css:574-583` (`balloo-morse-to-center-left/right`), точка 4px / тире 12px.
+- [x] `prefers-reduced-motion` → статичный паттерн (`chrome.css:197-199`).
+- [x] Мобилка — компактный вариант.
+- [x] Тест компонента — `packages/web/src/__tests__/components/FooterMorseTicker.test.tsx`.
 
 ### Шаг 3: Определение часового пояса и города
 
-- [ ] `packages/web/src/lib/locale.ts` (новый): `detectTimeZone()` через `Intl.DateTimeFormat().resolvedOptions().timeZone`; `tzToCity(tz)` — карта IANA → русское название города (Europe/Moscow → Москва, Asia/Yekaterinburg → Екатеринбург и т.д.); fallback — сам tz.
-- [ ] Формат: `UTC+5 Екатеринбург`.
+- [x] `detectTimeZone()` через `Intl.DateTimeFormat().resolvedOptions().timeZone` + карта IANA → город. **Факт:** реализовано в `packages/ui/src/lib/locale.ts` (не в `web/src/lib`, чтобы узлы тоже использовали), функция называется `formatTimeZoneCity` (вместо `tzToCity`), fallback — сам tz. Экспорт через `@balloo/ui`.
+- [x] Формат: `UTC+5 Екатеринбург` — `formatTimeZoneCity()`.
 
 ### Шаг 4: Состояние тикера (zustand)
 
-- [ ] `packages/web/src/store/footerTickerStore.ts` (новый): `{ mode: 'idle' | 'notification' | 'update' | 'emergency'; left: string; right: string; priority: number }`.
-- [ ] `setNotification({ source, body })`, `setUpdate(text)`, `clear()` — с приоритетами (emergency > update > notification > idle).
-- [ ] Автосброс уведомления через N секунд (или при прочтении).
+- [x] `packages/ui/src/store/footerTickerStore.ts` — `{ mode, left, right, _timer }` + `setNotification/setUpdate/setEmergency/clear`.
+- [x] Приоритеты `emergency > update > notification > idle` (PRIORITY, понижение запрещено).
+- [x] Автосброс через `ttlMs` (DEFAULT_TTL_MS = 20 000).
 
 ### Шаг 5: Подключение к подвалу
 
-- [ ] `Footer.tsx`: заменить `<span className="balloo-footer__dots">` на `<FooterMorseTicker>` — левый/правый.
-- [ ] `Footer` получает тексты из `footerTickerStore`; при `idle` — слоган слева, «UTC+5 Город» справа.
+- [x] `Footer.tsx` использует `FooterMorseTicker` вместо `balloo-footer__dots` (импорт `useFooterTickerStore` — `Footer.tsx:20`).
+- [x] `idle` — слоган слева, «UTC+5 Город» справа через `formatTimeZoneCity()`.
 
 ### Шаг 6: Источник уведомлений
 
-- [ ] Сервер: `GET /api/notifications` (список) + `POST /api/notifications/:id/read` — по модели `Notification` (уже есть).
-- [ ] WS: событие `notification.new` (тип `WsNotificationNew` в `ws/types.ts`) — рассылка адресату; клиент кладёт в `footerTickerStore` + `NotificationsBell`.
-- [ ] Заменить заглушку `NotificationsBell` реальными данными.
-- [ ] Триггеры `notification.new`: новое сообщение в неактивном чате, приглашение, входящий вызов, заявка в контакт.
+- [x] Сервер: `GET /api/notifications` + `POST /api/notifications/:id/read` — `packages/server/src/routes/notifications.ts`, подключён в `routes/index.ts`.
+- [x] WS `notification.new` — тип `WsNotificationNew` (`ws/types.ts:278`), `notificationService.notifyUser` шлёт кадр, клиент подписан (`PresenceProvider.tsx:52`).
+- [x] `NotificationsBell` на реальных данных — `packages/web/src/components/topbar/NotificationsBell.tsx`.
+- [~] Триггеры `notification.new`: **есть только «новое сообщение в неактивном чате»** (`messageService.ts:246`). **Не реализованы:** приглашение, входящий вызов, заявка в контакт.
 
 ### Шаг 7: Уведомление об обновлении
 
-- [ ] Сервер: `POST /api/service/announce-update` (заголовок `X-Service-Key`) → WS `notification.new` всем онлайн с `type: 'update'`.
-- [ ] Клиент: `mode: 'update'`, левый — «Обновление», правый — время/суть.
+- [x] Сервер: `POST /api/service/announce-update` (`routes/service.ts:79`) → `announceUpdate` → WS всем онлайн.
+- [x] Клиент: `mode: 'update'`, левый «Обновление», правый — суть.
 
 ### Шаг 8: Проверки
 
-- [ ] `tsc --noEmit` (ui, web, server)
-- [ ] `vitest` (ui/web) — утилита Морзе, tzToCity, store-приоритеты
-- [ ] `jest` (server) — notifications REST + WS
-- [ ] `vite build`
-- [ ] e2e Cypress: подвал показывает морзе-паттерн; при `setNotification` меняются оба тикера; направление к центру.
+- [x] `tsc --noEmit` (ui, web, server) — зелёный (прогоны 26–27.11).
+- [~] `vitest` — утилита Морзе (`morse.test.ts`), компонент тикера; **тестов store-приоритетов и `formatTimeZoneCity` нет**.
+- [x] `jest` (server) — `notifications.test.ts` (REST + запись + WS-кадр).
+- [x] `vite build` — зелёный (прогон 27.11: web/features/history/download).
+- [ ] e2e Cypress: подвал показывает морзе-паттерн; при `setNotification` меняются оба тикера; направление к центру — **не запускался**.
 
 ## Критерии готовности (MVP1)
 
@@ -127,10 +128,30 @@
 ## Открытые вопросы к владельцу
 
 1. Длительность цикла тикера (сколько секунд на один проход текста)?
-2. Нужен ли tooltip с расшифровкой морзе при наведении (для доступности)?
+2. ~~Нужен ли tooltip с расшифровкой морзе при наведении (для доступности)?~~ — **решено 27.11.2026**: tooltip сделан (тик. 1795721513, коммит `3070519`).
 3. «Предполагаемый город» в MVP1 — только по часовому поясу (без IP)? Если по IP — нужен сервис геолокации.
-4. Порог/таймаут автосброса уведомления в подвале.
+4. Порог/таймаут автосброса уведомления в подвале — принято 20 с (`DEFAULT_TTL_MS`).
 
 ## Результат
 
-_(заполняется по завершении)_
+**Выполнено (MVP1) — 26–27.11.2026, задеплоено 27.11.2026 (коммит `0751ee4`, прод
+`index-CWxK1CyE.js`).** Все 8 шагов плана реализованы и есть в коде; шаги 6 и 8
+закрыты частично:
+
+| Шаг | Статус | Доказательство |
+|---|---|---|
+| 1. Утилита Морзе | [x] | `shared/src/utils/morse.ts`, `ui/src/lib/morse.ts`, `web/src/__tests__/lib/morse.test.ts` |
+| 2. `FooterMorseTicker` | [x] | `ui/src/components/FooterMorseTicker.tsx`, `chrome.css:574-583`, тест компонента |
+| 3. Часовой пояс/город | [x] | `ui/src/lib/locale.ts` (`detectTimeZone`, `formatTimeZoneCity`) |
+| 4. `footerTickerStore` | [x] | `ui/src/store/footerTickerStore.ts` (приоритеты, автосброс 20 с) |
+| 5. Подключение к подвалу | [x] | `Footer.tsx:20` (`useFooterTickerStore`) |
+| 6. Источник уведомлений | [~] | REST+WS+Bell есть; **триггер только «новое сообщение»**, нет приглашений/вызовов/заявок |
+| 7. Уведомление об обновлении | [x] | `routes/service.ts:79` (`announce-update`) |
+| 8. Проверки | [~] | tsc/vitest/jest/build зелёные; **нет тестов store-приоритетов и `formatTimeZoneCity`**, e2e не запускался |
+
+**Прод-подтверждение:** `/docs` — `balloo-footer__morse` = 15 вхождений;
+`balloo.su` — бандль `index-CWxK1CyE.js`, `morse=1`.
+
+**Остаток (не блокирует MVP1):** триггеры `notification.new` для приглашений,
+входящих вызовов и заявок в контакт; тесты store/`formatTimeZoneCity`; e2e Cypress.
+Тикет остаётся в `active/` до закрытия остатка.

@@ -161,10 +161,20 @@
 
 ### U2 — прокрутка без видимой полосы
 
-- [x] `web/src/styles/global.css` — `*{scrollbar-width:none}` + `::-webkit-scrollbar{display:none}`
+- [x] `web/src/styles/global.css` — `*{scrollbar-width:none}` + `::-webkit-scrollbar{width:0;height:0;background:transparent}`
       (раньше полоса была видимой, 6px).
 - [x] `web-features/src/styles/global.css` — то же.
 - [x] `web-history`, `web-download` — новый `global.css` с тем же правилом.
+- [x] `server/src/controllers/docsHtmlController.ts` — то же правило в HTML `/docs`.
+- [!] **ИСПРАВЛЕНО 28.11.2026 (коммит `7dc043f`).** Первая версия правила была
+      `::-webkit-scrollbar{display:none}` — на части Chromium это делает элемент
+      **непрокручиваемым**. Владелец сообщил: «страница истории без прокрутки».
+      Заменено на `width:0;height:0;background:transparent` во всех 5 местах.
+      Задеплоено: `HEAD=7dc043f`, образы server `44d739cf4f75`, web `1dd08831a2b0`,
+      features `0f5f826209ab`, history `b61f09520adc`, download `3a3c16e27950`.
+- [!] **Прокрутка на странице историй (`balloo.su/#/stories`) всё ещё не работает**
+      после фикса — причина другая (не скроллбар: раскладка экрана). Отложено
+      владельцем 28.11.2026, вынесено в отдельный тикет `1795859968`.
 
 ---
 

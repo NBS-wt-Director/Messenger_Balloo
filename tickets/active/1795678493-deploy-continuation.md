@@ -300,6 +300,37 @@ $DC up -d --no-deps --force-recreate web web-admin features web-history web-down
 **Открыто:** причина отката не названа → правки кода не делаются, приёмка A1–A8
 не выполнена.
 
+### Возврат на `0751ee4` + деплой `7dc043f` (28.11.2026)
+
+Откат был выполнен по недоразумению (команда отката стояла в конце сообщения с
+чек-листом приёмки и была прочитана как следующий шаг). Владелец подтвердил:
+«как я сделал откат? я этого не хотел...».
+
+| Шаг | Доказательство (вывод сервера) |
+|---|---|
+| Перетегирование `deploy-0751ee4` → `:local` | 6 образов вернулись: server `b510d88e1fe3`, web `1cb0b2219301`, admin `9da2d65155a2`, features `4185011c8554`, history `9d87ed56f975`, download `189552b65905` |
+| `up -d --no-deps --force-recreate` (server → 5 SPA) | 6 контейнеров `Up`, `balloo-server (healthy)`, `restarts=0` у всех |
+| Миграция при старте | `24 migrations found` → `No pending migrations to apply` (no-op) |
+| Seed | `Seed OK` |
+| Бандль снаружи | `index-CWxK1CyE.js` (было `index-Dzj91TqP.js`) |
+| Файлы историй | `demo-stories/{taiga,ural,spb}.{mp4,jpg}` — все 6 → `200` |
+| Маркеры в бандле web | `stories=2`, `calls=1` |
+| `/docs` | `200`, `balloo-footer__morse`=15 |
+
+**Деплой `0751ee4` подтверждён сервером (батч G закрыт).**
+
+Затем задеплоен `7dc043f` (фикс `display:none` → `width:0` в 5 файлах):
+`HEAD=7dc043f`, сборка 48 с, образы server `44d739cf4f75`, web `1dd08831a2b0`,
+features `0f5f826209ab`, history `b61f09520adc`, download `3a3c16e27950`;
+CSS с новым правилом подтверждён в образах features/history/download
+(`index-7hrY2btP.css`, `index-BR9ePEGg.css`). `server` с фиксом `/docs`
+пересобирался, но в момент записи **не пересоздан** — нужно `up -d --no-deps
+--force-recreate server`.
+
+**Найдено при приёмке:** прокрутка на `balloo.su/#/stories` не работает и после
+фикса скроллбара — причина не в скроллбаре. Владелец отложил на следующий этап,
+заведён тикет `1795859968`.
+
 ## Порядок выполнения (батчи)
 
 1. **E4:** коммит (фикс + тикеты + docs) → `git push origin main` — *по команде владельца «Деплой»*.
