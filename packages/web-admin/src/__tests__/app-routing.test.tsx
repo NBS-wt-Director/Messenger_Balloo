@@ -16,6 +16,7 @@ vi.mock('@/services/api', async () => {
 
 import App from '../App';
 import { useAuthStore } from '@/store/authStore';
+import { useSessionStore } from '../sessionStore';
 
 const adminUser = {
   id: 'u-admin',
@@ -32,6 +33,13 @@ const adminUser = {
 describe('App (роутер админки)', () => {
   beforeEach(() => {
     useAuthStore.setState({ user: adminUser, isAuthenticated: true, isLoading: false });
+    // Тик. 1795888510: AdminGuard читает сессию из sessionStore (GET /api/users/me).
+    // В тесте сессия уже загружена — loadSession не делает запрос.
+    useSessionStore.setState({
+      user: { ...adminUser, role: 'superadmin', isAdmin: true },
+      status: 'ready',
+      error: null,
+    });
     window.history.pushState({}, '', '/');
   });
 

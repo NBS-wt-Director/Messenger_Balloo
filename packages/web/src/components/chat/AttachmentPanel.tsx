@@ -2,6 +2,11 @@
 // Макет: mockups/balloo-su/attachment-panel.html (принят владельцем
 // 16.10.2026, 1.1.12 → 6.36), задание: attachment-panel.md, тикет 1792124253.
 //
+// Тикет 1795677071: панель собирает ОДИН массив вложений любых типов —
+// файлы (фото/видео/документ/аудио/файл/с камеры) и не-файловые формы
+// (опрос, квиз, активный/пассивный список, персонали). Лимиты: 15 вложений
+// бесплатно, до 50 за баллы (стоимость n + 5).
+//
 // Реальный цикл: выбор/drag&drop/Ctrl+V → POST /api/upload/file (chatId
 // обязателен) → POST /api/chats/:id/messages с attachments[].
 // Секции «Недавние» и «Хранилище» из макета не реализованы: сервер не имеет
@@ -10,6 +15,20 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { api } from '@/services/api';
+import {
+  type PendingAttachment,
+  type PendingFile,
+  type PendingNonFile,
+  type NonFileAttachmentType,
+  type ReadyAttachment,
+  FREE_ATTACHMENT_LIMIT,
+  MAX_ATTACHMENT_LIMIT,
+  attachmentCost,
+  attachmentTypeIcon,
+  attachmentTypeLabel,
+  messageTypeFor,
+  nextAttachmentId,
+} from './attachmentTypes';
 
 interface AttachmentPanelProps {
   open: boolean;
@@ -19,11 +38,15 @@ interface AttachmentPanelProps {
   onSent: () => void;
   /** Тикет 1795560006: открыть модалку текстовой заметки. */
   onTextNote?: () => void;
-}
-
-interface PickedFile {
-  id: string;
-  file: File;
+  /** Тикет 1795677071: открыть форму не-файлового вложения. */
+  onNonFileAction?: (type: NonFileAttachmentType) => void;
+  /**
+   * Тикет 1795677071: вложение, созданное в форме (slash-команда или кнопка
+   * «Добавить»), кладётся в общий массив панели. После добавления родитель
+   * сбрасывает проп (onIncomingConsumed).
+   */
+  incomingNonFile?: PendingNonFile | null;
+  onIncomingConsumed?: () => void;
 }
 
 function formatSize(bytes: number): string {
@@ -32,25 +55,15 @@ function formatSize(bytes: number): string {
   return `${bytes} Б`;
 }
 
-// тип вложения по MIME — как принимает messageService.attachments[].type
+// тип файлового вложения по MIME — как принимает messageService.attachments[].type
 // (text — текстовые вложения: txt/md/csv/json/log, тик. 1795456886)
-function attachmentType(mime: string, name?: string): string {
+function fileAttachmentType(mime: string, name?: string): PendingFile['type'] {
   if (mime.startsWith('image/')) return 'image';
   if (mime.startsWith('video/')) return 'video';
   if (mime.startsWith('audio/')) return 'audio';
   if (mime.startsWith('text/') || /\.(txt|md|csv|json|log|xml|yml|yaml|ini)$/i.test(name || '')) {
     return 'text';
   }
-  return 'file';
-}
-
-// тип самого сообщения (messageController допускает: text, image, file, voice,
-// video, poll, system). audio → voice.
-function messageTypeFor(attachments: Array<{ type: string }>): string {
-  const t = attachments[0]?.type;
-  if (t === 'image') return 'image';
-  if (t === 'video') return 'video';
-  if (t === 'audio') return 'voice';
   return 'file';
 }
 
@@ -64,17 +77,37 @@ const QUICK_ACTIONS: Array<{ icon: string; label: string; accept: string | null;
   { icon: '📷', label: 'С камеры', accept: 'image/*', capture: 'environment' },
 ];
 
-// Не-файловые вложения (замечание 1.1.18): опросы, геолокация, контакты, заметка
-const NON_FILE_ACTIONS: Array<{ icon: string; label: string; route?: string; action?: 'note' }> = [
-  { icon: '📊', label: 'Опрос', route: 'poll' },
-  // Тикет 1795560006: текстовое вложение (заметка) — модалка TextNoteModal.
+// Не-файловые вложения (тик. 1795677071): форма открывается модалкой,
+// результат кладётся в общий массив. Геолокация/контакт пока не реализованы —
+// показываем неактивными, чтобы не было мёртвых кнопок с ложным поведением.
+const NON_FILE_ACTIONS: Array<{
+  icon: string;
+  label: string;
+  type?: NonFileAttachmentType;
+  action?: 'note';
+  disabled?: boolean;
+}> = [
+  { icon: '📊', label: 'Опрос', type: 'poll' },
+  { icon: '🎯', label: 'Квиз', type: 'quiz' },
+  { icon: '☑️', label: 'Активный список', type: 'list_active' },
+  { icon: '📋', label: 'Пассивный список', type: 'list_passive' },
+  { icon: '🙋', label: 'Персонали', type: 'personali' },
   { icon: '📝', label: 'Текст', action: 'note' },
-  { icon: '📍', label: 'Геолокация' },
-  { icon: '👤', label: 'Контакт' },
+  { icon: '📍', label: 'Геолокация', disabled: true },
+  { icon: '👤', label: 'Контакт', disabled: true },
 ];
 
-export function AttachmentPanel({ open, chatId, onClose, onSent, onTextNote }: AttachmentPanelProps) {
-  const [selected, setSelected] = useState<PickedFile[]>([]);
+export function AttachmentPanel({
+  open,
+  chatId,
+  onClose,
+  onSent,
+  onTextNote,
+  onNonFileAction,
+  incomingNonFile,
+  onIncomingConsumed,
+}: AttachmentPanelProps) {
+  const [attachments, setAttachments] = useState<PendingAttachment[]>([]);
   const [dragOver, setDragOver] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -83,14 +116,38 @@ export function AttachmentPanel({ open, chatId, onClose, onSent, onTextNote }: A
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
   const addFiles = useCallback((files: FileList | File[]) => {
-    const picked = Array.from(files).map((file) => ({
-      id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+    const picked: PendingFile[] = Array.from(files).map((file) => ({
+      kind: 'file',
+      id: nextAttachmentId(),
+      type: fileAttachmentType(file.type, file.name),
       file,
     }));
-    if (picked.length > 0) {
-      setSelected((prev) => [...prev, ...picked]);
-    }
+    if (picked.length === 0) return;
+    setAttachments((prev) => {
+      const next = [...prev, ...picked];
+      if (next.length > MAX_ATTACHMENT_LIMIT) {
+        setError(`Максимум ${MAX_ATTACHMENT_LIMIT} вложений в одном сообщении`);
+        return next.slice(0, MAX_ATTACHMENT_LIMIT);
+      }
+      return next;
+    });
   }, []);
+
+  // Вложение из формы (slash-команда в поле ввода или кнопка панели).
+  useEffect(() => {
+    if (!incomingNonFile) return;
+    setAttachments((prev) => {
+      if (prev.length >= MAX_ATTACHMENT_LIMIT) {
+        setError(`Максимум ${MAX_ATTACHMENT_LIMIT} вложений в одном сообщении`);
+        return prev;
+      }
+      return [...prev, incomingNonFile];
+    });
+    onIncomingConsumed?.();
+  }, [incomingNonFile, onIncomingConsumed]);
+
+  const removeAttachment = (id: string) =>
+    setAttachments((prev) => prev.filter((a) => a.id !== id));
 
   const openQuickPicker = (accept: string | null) => {
     // accept проставляется императивно до .click(): state-accept читался бы
@@ -112,16 +169,19 @@ export function AttachmentPanel({ open, chatId, onClose, onSent, onTextNote }: A
   }, [open, onClose]);
 
   const handleSend = async () => {
-    if (selected.length === 0 || sending) return;
+    if (attachments.length === 0 || sending) return;
     try {
       setSending(true);
       setError(null);
-      const uploaded = await Promise.all(
-        selected.map(async ({ file }) => {
+
+      // 1) Файлы — на CDN, получаем url.
+      const files = attachments.filter((a): a is PendingFile => a.kind === 'file');
+      const uploadedFiles = await Promise.all(
+        files.map(async ({ file, type }) => {
           const res = await api.uploadFile(file, chatId);
-          const d = res?.data ?? res;
+          const d = (res as any)?.data ?? res;
           return {
-            type: attachmentType(file.type, file.name),
+            type,
             url: d.url,
             thumbnail: d.thumbnailUrl || undefined,
             size: d.size ?? file.size,
@@ -129,23 +189,34 @@ export function AttachmentPanel({ open, chatId, onClose, onSent, onTextNote }: A
             width: d.width || undefined,
             height: d.height || undefined,
             duration: d.duration || undefined,
-          };
+          } as ReadyAttachment;
         })
       );
+
+      // 2) Не-файловые — данные формы, url пустой (сервер хранит в data).
+      const readyNonFile: ReadyAttachment[] = attachments
+        .filter((a): a is PendingNonFile => a.kind === 'non-file')
+        .map((a) => ({ type: a.type, url: '', data: a.data }));
+
+      const ready: ReadyAttachment[] = [...uploadedFiles, ...readyNonFile];
+
       await api.sendMessage(chatId, {
-        type: messageTypeFor(uploaded),
+        type: messageTypeFor(ready),
         content: '',
-        attachments: uploaded,
+        attachments: ready,
       });
-      setSelected([]);
+      setAttachments([]);
       onSent();
       onClose();
     } catch (e: any) {
-      setError(e?.message || 'Не удалось отправить файлы');
+      setError(e?.message || 'Не удалось отправить вложения');
     } finally {
       setSending(false);
     }
   };
+
+  const cost = attachmentCost(attachments.length);
+  const overFreeLimit = attachments.length > FREE_ATTACHMENT_LIMIT;
 
   return (
     <>
@@ -330,43 +401,42 @@ export function AttachmentPanel({ open, chatId, onClose, onSent, onTextNote }: A
               marginBottom: 16,
             }}
           >
-            {NON_FILE_ACTIONS.map((na) => (
-              <div
-                key={na.label}
-                role="button"
-                tabIndex={0}
-                title={na.label}
-                onClick={() => {
-                  if (na.route === 'poll') {
-                    onClose();
-                    window.location.hash = `/chat/${chatId}/poll`;
-                  } else if (na.action === 'note') {
-                    // Тикет 1795560006: открываем модалку текстовой заметки.
-                    onTextNote?.();
-                  }
-                }}
-                onKeyDown={(e) => {
-                  if (e.key !== 'Enter') return;
-                  if (na.route === 'poll') {
-                    onClose();
-                    (window.location.hash = `/chat/${chatId}/poll`);
-                  } else if (na.action === 'note') {
-                    onTextNote?.();
-                  }
-                }}
-                style={{
-                  textAlign: 'center',
-                  padding: '14px 8px',
-                  cursor: 'pointer',
-                }}
-                className="card card--hover"
-              >
-                <div style={{ fontSize: 24, marginBottom: 6 }}>{na.icon}</div>
-                <div className="text-xs font-bold" style={{ color: 'var(--text-primary)' }}>
-                  {na.label}
+            {NON_FILE_ACTIONS.map((na) => {
+              const handleClick = () => {
+                if (na.disabled) return;
+                if (na.type) {
+                  onNonFileAction?.(na.type);
+                } else if (na.action === 'note') {
+                  // Тикет 1795560006: модалка текстовой заметки.
+                  onTextNote?.();
+                }
+              };
+              return (
+                <div
+                  key={na.label}
+                  role="button"
+                  tabIndex={na.disabled ? -1 : 0}
+                  aria-disabled={na.disabled || undefined}
+                  title={na.disabled ? `${na.label} — скоро` : na.label}
+                  onClick={handleClick}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleClick();
+                  }}
+                  style={{
+                    textAlign: 'center',
+                    padding: '14px 8px',
+                    cursor: na.disabled ? 'not-allowed' : 'pointer',
+                    opacity: na.disabled ? 0.45 : 1,
+                  }}
+                  className={na.disabled ? 'card' : 'card card--hover'}
+                >
+                  <div style={{ fontSize: 24, marginBottom: 6 }}>{na.icon}</div>
+                  <div className="text-xs font-bold" style={{ color: 'var(--text-primary)' }}>
+                    {na.label}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {error && (
@@ -376,8 +446,8 @@ export function AttachmentPanel({ open, chatId, onClose, onSent, onTextNote }: A
           )}
         </div>
 
-        {/* Footer — выбрано файлов (макет: показывается при выборе) */}
-        {selected.length > 0 && (
+        {/* Footer — выбрано вложений (макет: показывается при выборе) */}
+        {attachments.length > 0 && (
           <div style={{ padding: 16, borderTop: '1px solid var(--border-color)' }}>
             <div
               style={{
@@ -387,29 +457,42 @@ export function AttachmentPanel({ open, chatId, onClose, onSent, onTextNote }: A
                 marginBottom: 8,
               }}
             >
-              <span className="text-sm font-bold">📎 Выбрано: {selected.length}</span>
-              <button className="btn btn--tertiary btn--sm" onClick={() => setSelected([])}>
+              <span className="text-sm font-bold">📎 Выбрано: {attachments.length}</span>
+              <button className="btn btn--tertiary btn--sm" onClick={() => setAttachments([])}>
                 Очистить
               </button>
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
-              {selected.map((p) => (
+              {attachments.map((a) => (
                 <span
-                  key={p.id}
+                  key={a.id}
                   role="button"
                   tabIndex={0}
-                  title="Убрать файл"
-                  onClick={() => setSelected((prev) => prev.filter((x) => x.id !== p.id))}
-                  onKeyDown={(e) =>
-                    e.key === 'Enter' && setSelected((prev) => prev.filter((x) => x.id !== p.id))
-                  }
+                  title="Убрать вложение"
+                  onClick={() => removeAttachment(a.id)}
+                  onKeyDown={(e) => e.key === 'Enter' && removeAttachment(a.id)}
                   className="chip"
                   style={{ cursor: 'pointer' }}
                 >
-                  {p.file.name} ({formatSize(p.file.size)}) ✕
+                  {attachmentTypeIcon(a.type)}{' '}
+                  {a.kind === 'file'
+                    ? `${a.file.name} (${formatSize(a.file.size)})`
+                    : attachmentTypeLabel(a.type)}
+                  {' ✕'}
                 </span>
               ))}
             </div>
+
+            {/* MVP2: платность свыше 15 вложений (стоимость n + 5 баллов) */}
+            {overFreeLimit && (
+              <div
+                className="text-xs"
+                style={{ color: 'var(--warning, #d97706)', marginBottom: 8 }}
+              >
+                ⚠ Сообщение будет платным: {cost} баллов (бесплатно до {FREE_ATTACHMENT_LIMIT})
+              </div>
+            )}
+
             <button
               className="btn btn--primary btn--block"
               onClick={handleSend}

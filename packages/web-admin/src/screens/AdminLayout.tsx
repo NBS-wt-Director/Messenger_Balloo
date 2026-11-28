@@ -3,7 +3,8 @@
 // P35: единая шапка (@balloo/ui) — Topbar с лого-меню и breadcrumb в title
 
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { useAuthStore } from '@/store/authStore';
+import { useSessionStore } from '../sessionStore';
+import { clearAuthCookies } from '@/services/api';
 import { AppTopbar } from '@/components/chrome/AppTopbar';
 import { AppFooter } from '@/components/chrome/AppFooter';
 
@@ -11,6 +12,8 @@ import { AppFooter } from '@/components/chrome/AppFooter';
 const NAV_ITEMS = [
   { path: '/', label: 'Дашборд', icon: '📊', exact: true },
   { path: '/users', label: 'Пользователи', icon: '👤' },
+  // Тик. 1795888510: заявки в команду — сразу после пользователей
+  { path: '/team-applications', label: 'Заявки в команду', icon: '📨' },
   { path: '/reports', label: 'Жалобы', icon: '🚩' },
   { path: '/support', label: 'Поддержка', icon: '🛠️' },
   { path: '/bans', label: 'Баны', icon: '🔨' },
@@ -44,6 +47,7 @@ const NAV_ITEMS = [
 const BREADCRUMBS: Record<string, string> = {
   '/': 'Дашборд',
   '/users': 'Пользователи',
+  '/team-applications': 'Заявки в команду',
   '/reports': 'Жалобы',
   '/support': 'Поддержка',
   '/bans': 'Баны и обжалования',
@@ -72,8 +76,9 @@ const BREADCRUMBS: Record<string, string> = {
 
 export function AdminLayout() {
   const location = useLocation();
-  const user = useAuthStore((s) => s.user);
-  const logout = useAuthStore((s) => s.logout);
+  const navigate = useNavigate();
+  const user = useSessionStore((s) => s.user);
+  const clearSession = useSessionStore((s) => s.logout);
 
   // Доступ проверяет AdminGuard (обёртка в App.tsx). Дублировать проверку
   // здесь не нужно: прежний navigate('/login') вёл на несуществующий маршрут
@@ -258,11 +263,17 @@ export function AdminLayout() {
                 color: 'var(--text-muted)',
               }}
             >
-              🛡️ Администратор
+              {user?.role === 'superadmin' ? '👑 Суперадминистратор' : '🛡️ Администратор'}
             </div>
           </div>
           <button
-            onClick={logout}
+            onClick={() => {
+              // Тик. 1795888510: выход чистит cookie основного домена
+              // (/api/auth/clear-cookie), затем guard перепроверит сессию и
+              // покажет экран отказа — без перехода на чужой домен.
+              clearAuthCookies().catch(() => {});
+              clearSession();
+            }}
             title="Выйти"
             style={{
               background: 'none',
@@ -288,8 +299,22 @@ export function AdminLayout() {
           overflow: 'hidden',
         }}
       >
-        {/* P35: единая шапка (@balloo/ui) — лого-меню + breadcrumb в title */}
-        <AppTopbar title={`Admin / ${breadcrumb}`} />
+        {/* P35: единая шапка (@balloo/ui) — лого-меню + breadcrumb в title.
+            Тик. 1795888510: авторизация передаётся явно из sessionStore —
+            web-стор в админке пуст, без этого правое меню выглядело гостевым. */}
+        <AppTopbar
+          title={`Admin / ${breadcrumb}`}
+          auth={{
+            isAuthenticated: true,
+            isAdmin: true,
+            initials: (user?.displayName || user?.username || 'A').slice(0, 2).toUpperCase(),
+            avatarUrl: user?.avatarUrl ?? null,
+            onLogout: () => {
+              clearAuthCookies().catch(() => {});
+              clearSession();
+            },
+          }}
+        />
 
         {/* Page content */}
         <div

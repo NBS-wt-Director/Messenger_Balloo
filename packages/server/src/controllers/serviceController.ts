@@ -26,7 +26,19 @@ const USER_STATUSES = ['active', 'banned', 'suspended', 'deleted'] as const;
 const CHAT_TYPES = ['direct', 'group', 'channel'] as const;
 const GROUP_TYPES = ['ordinary', 'public', 'media', 'corporate'] as const;
 const CHAT_MEMBER_ROLES = ['owner', 'admin', 'moderator', 'member'] as const;
-const MESSAGE_TYPES = ['text', 'image', 'file', 'voice', 'video', 'poll', 'system'] as const;
+const MESSAGE_TYPES = [
+  'text',
+  'image',
+  'file',
+  'voice',
+  'video',
+  'poll',
+  'quiz',
+  'list_active',
+  'list_passive',
+  'personali',
+  'system',
+] as const;
 const CALL_TYPES = ['audio', 'video'] as const;
 const CALL_STATUSES = ['ongoing', 'ended', 'missed', 'declined'] as const;
 const STORY_TYPES = ['image', 'video'] as const;
@@ -63,7 +75,8 @@ const handlePrismaError = (res: Response, error: any, notFoundMessage: string): 
 
 const attachmentSchema = z.object({
   type: z.string().min(1).max(20),
-  url: z.string().min(1).max(500),
+  // Не-файловые вложения (тик. 1795677071) приходят без ссылки — данные в `data`.
+  url: z.string().max(500).optional().default(''),
   thumbnail: z.string().max(500).optional(),
   size: z.number().int().nonnegative().optional(),
   name: z.string().max(255).optional(),
@@ -72,6 +85,7 @@ const attachmentSchema = z.object({
   duration: z.number().int().optional(),
   storage: z.string().max(20).optional(),
   meta: z.any().optional(),
+  data: z.any().optional(),
 });
 
 const attachmentsSchema = z.array(attachmentSchema).min(1).max(50);
@@ -88,6 +102,7 @@ const attachmentCreateData = (att: z.infer<typeof attachmentSchema>, createdAt: 
   duration: att.duration ?? null,
   storage: att.storage ?? null,
   meta: att.meta ?? undefined,
+  data: att.data ?? undefined,
   createdAt,
 });
 

@@ -34,6 +34,7 @@ import { channelRouter, followRouter, blockedChannelRouter } from './channels';
 import { router as searchRouter } from './search';
 import { router as serviceRouter } from './service';
 import { router as notificationsRouter } from './notifications';
+import { router as teamApplicationsRouter } from './teamApplications';
 
 const router = Router() as import('express').Router;
 
@@ -65,6 +66,9 @@ router.use('/api/blog', blogRouter);
 router.use('/api/knowledge', knowledgeRouter);
 router.use('/api/hiring', knowledgeRouter);
 router.use('/api/admin', adminRouter);
+// Заявки в команду Balloo (тик. 1795888510): публичная подача — до /api-роутов
+// с общим префиксом, админские операции подключены в adminRouter.
+router.use('/api/team-applications', teamApplicationsRouter);
 router.use('/api/payments', paymentsRouter);
 router.use('/api/downloads', downloadRouter);
 router.use('/api/install', installRouter);

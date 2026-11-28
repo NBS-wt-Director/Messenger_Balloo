@@ -6,7 +6,20 @@ export type UserRole = 'owner' | 'admin' | 'moderator' | 'member';
 
 export type MessageStatus = 'sent' | 'delivered' | 'read' | 'failed';
 
-export type MessageType = 'text' | 'image' | 'file' | 'voice' | 'video' | 'poll' | 'system';
+// Не-файловые вложения (тик. 1795677071): сообщение с опросом/квизом/списком/
+// персонали получает соответствующий тип — данные формы лежат в attachment.data.
+export type MessageType =
+  | 'text'
+  | 'image'
+  | 'file'
+  | 'voice'
+  | 'video'
+  | 'poll'
+  | 'quiz'
+  | 'list_active'
+  | 'list_passive'
+  | 'personali'
+  | 'system';
 
 export interface Chat {
   id: string;
@@ -35,7 +48,7 @@ export interface Message {
 export interface Attachment {
   id: string;
   messageId: string;
-  type: 'image' | 'file' | 'voice' | 'video';
+  type: 'image' | 'file' | 'voice' | 'video' | 'text' | 'poll' | 'quiz' | 'list_active' | 'list_passive' | 'personali';
   url: string;
   thumbnail?: string;
   size: number; // bytes
@@ -43,4 +56,6 @@ export interface Attachment {
   width?: number;
   height?: number;
   duration?: number; // seconds
+  /** Не-файловые вложения (тик. 1795677071): данные формы, url пустой. */
+  data?: Record<string, unknown>;
 }

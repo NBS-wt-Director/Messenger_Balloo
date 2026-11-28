@@ -18,6 +18,12 @@ interface MessageInputProps {
   onTyping?: () => void;
   onCancelReply?: () => void;
   isTyping?: boolean;
+  /**
+   * Slash-команда (`/poll_`, `/quiz_`, `/list_active_`, `/list_passive_`,
+   * `/personali_`) — тик. 1795677071: вместо отправки текста в чат открываем
+   * форму вложения. Без обработчика — прежнее поведение (отправка текстом).
+   */
+  onSlashCommand?: (cmd: string) => void;
 }
 
 export const MessageInput: React.FC<MessageInputProps> = ({
@@ -25,6 +31,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   onAttachClick,
   onVoiceClick,
   onTyping,
+  onSlashCommand,
   isTyping = false,
 }) => {
   const [content, setContent] = useState('');
@@ -69,12 +76,29 @@ export const MessageInput: React.FC<MessageInputProps> = ({
     const text = content.trim();
     if (!text) return;
 
-    // Slash-команды — тип slash
+    // Slash-команды (тик. 1795677071): распознаём команду и отдаём её родителю
+    // для открытия формы вложения. Раньше текст уходил в чат как сообщение
+    // «/poll_ …» — владелец видел это как «нет рендеров».
     if (text.startsWith('/')) {
-      const parts = text.split('_');
-      const cmd = parts[0].slice(1).toLowerCase();
+      // Команда пишется как `/<cmd>_` + аргументы (например
+      // `/poll_Вопрос;Да;Нет`). Сравниваем по префиксу, а не по первому
+      // токену: у `list_active`/`list_passive` подчёркивание внутри имени,
+      // а после имени идёт разделитель `_`, который нельзя путать с ним.
+      const matched = slashCommands.find(
+        (c) =>
+          text === `/${c.cmd}` ||
+          text.startsWith(`/${c.cmd}_`) ||
+          text.startsWith(`/${c.cmd} `)
+      );
 
-      if (slashCommands.find((c) => c.cmd === cmd)) {
+      if (matched) {
+        if (onSlashCommand) {
+          onSlashCommand(matched.cmd);
+          setContent('');
+          setShowSlashHint(false);
+          return;
+        }
+        // Без обработчика — обратная совместимость: отправляем как текст.
         onSend(text, 'slash');
         setContent('');
         setShowSlashHint(false);

@@ -232,6 +232,33 @@ export const adminOnly = (
   next();
 };
 
+// Middleware для проверки роли superadmin (тик. 1795888510).
+// Нужен там, где admin недостаточно: назначение ролей другим пользователям,
+// то есть выдача доступа в админку.
+export const superadminOnly = (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): void => {
+  if (!req.user) {
+    res.status(401).json({
+      error: 'Unauthorized',
+      message: 'Требуется авторизация',
+    });
+    return;
+  }
+
+  if (req.user.role !== 'superadmin') {
+    res.status(403).json({
+      error: 'Forbidden',
+      message: 'Доступ разрешён только суперадминистраторам',
+    });
+    return;
+  }
+
+  next();
+};
+
 // Доступ для модераторов и администраторов (command-портал, база знаний)
 export const moderatorOnly = (
   req: AuthenticatedRequest,

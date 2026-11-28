@@ -197,6 +197,115 @@ describe('MessageBubble', () => {
     expect(screen.getByText('No')).toBeInTheDocument();
   });
 
+  // Тик. 1795677071: не-файловые вложения (опрос/квиз/списки/персонали)
+  // хранят данные формы в attachment.data, url пустой.
+  describe('не-файловые вложения (data)', () => {
+    it('одиночный опрос рендерится карточкой с вопросом и вариантами', () => {
+      const msg = {
+        ...baseMessage,
+        type: 'poll' as const,
+        content: '',
+        attachments: [
+          {
+            id: 'a1',
+            type: 'poll',
+            url: '',
+            data: { question: 'Где встречаемся?', options: ['Парк', 'Кафе'], multiple: true },
+          },
+        ],
+      };
+      render(<MessageBubble message={msg} isOwn={false} />);
+
+      const card = screen.getByTestId('nonfile-poll');
+      expect(card).toHaveTextContent('Опрос');
+      expect(card).toHaveTextContent('Где встречаемся?');
+      expect(card).toHaveTextContent('Парк');
+      expect(card).toHaveTextContent('Можно выбрать несколько');
+    });
+
+    it('квиз отмечает правильный вариант галочкой', () => {
+      const msg = {
+        ...baseMessage,
+        type: 'quiz' as const,
+        content: '',
+        attachments: [
+          {
+            id: 'a1',
+            type: 'quiz',
+            url: '',
+            data: { question: '2+2?', options: ['3', '4'], multiple: false, correctIndex: 1 },
+          },
+        ],
+      };
+      render(<MessageBubble message={msg} isOwn={false} />);
+
+      const card = screen.getByTestId('nonfile-quiz');
+      expect(card).toHaveTextContent('Квиз');
+      expect(card).toHaveTextContent('2+2?');
+      const correct = screen.getByText('✓');
+      expect(correct.parentElement).toHaveTextContent('4');
+    });
+
+    it('активный список рендерится заголовком и пунктами', () => {
+      const msg = {
+        ...baseMessage,
+        type: 'list_active' as const,
+        content: '',
+        attachments: [
+          { id: 'a1', type: 'list_active', url: '', data: { title: 'Дела', items: ['Хлеб', 'Молоко'] } },
+        ],
+      };
+      render(<MessageBubble message={msg} isOwn={false} />);
+
+      const card = screen.getByTestId('nonfile-list_active');
+      expect(card).toHaveTextContent('Активный список');
+      expect(card).toHaveTextContent('Дела');
+      expect(card).toHaveTextContent('Хлеб');
+      expect(card).toHaveTextContent('Молоко');
+    });
+
+    it('несколько вложений: файлы в миниатюрах, опрос — карточкой без дубля', () => {
+      const msg = {
+        ...baseMessage,
+        type: 'poll' as const,
+        content: '',
+        attachments: [
+          { id: 'a1', type: 'image', url: 'https://cdn/1.png', name: '1.png' },
+          { id: 'a2', type: 'image', url: 'https://cdn/2.png', name: '2.png' },
+          { id: 'a3', type: 'poll', url: '', data: { question: 'Да или нет?', options: ['Да', 'Нет'] } },
+        ],
+      };
+      const { container } = render(<MessageBubble message={msg} isOwn={false} />);
+
+      expect(screen.getByText('📎 3 вложений')).toBeInTheDocument();
+      // В ленте миниатюр — только два файла, опрос туда не попадает
+      expect(container.querySelectorAll('.message__attachment-thumb').length).toBe(2);
+      expect(screen.getByTestId('nonfile-poll')).toHaveTextContent('Да или нет?');
+    });
+
+    it('клик по миниатюре передаёт только файловые вложения', () => {
+      const onFileView = vi.fn();
+      const msg = {
+        ...baseMessage,
+        type: 'poll' as const,
+        content: '',
+        attachments: [
+          { id: 'a1', type: 'image', url: 'https://cdn/1.png', name: '1.png' },
+          { id: 'a3', type: 'poll', url: '', data: { question: 'Q', options: ['A', 'B'] } },
+        ],
+      };
+      const { container } = render(
+        <MessageBubble message={msg} isOwn={false} onFileView={onFileView} />
+      );
+      fireEvent.click(container.querySelector('.message__attachment-thumb')!);
+
+      expect(onFileView).toHaveBeenCalledTimes(1);
+      const [, , all] = onFileView.mock.calls[0];
+      expect(all).toHaveLength(1);
+      expect(all[0]).toMatchObject({ type: 'image' });
+    });
+  });
+
   /**
    * Регрессия приёмки «два окна» (тик. 1793567633, 15.11.2026).
    *

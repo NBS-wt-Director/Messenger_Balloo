@@ -23,7 +23,14 @@ import {
   getTicketCtrl,
   replyCtrl,
 } from '../controllers/supportController';
-import { authRequired, adminOnly } from '../middleware/auth';
+import {
+  listTeamApplicationsCtrl,
+  acceptTeamApplicationCtrl,
+  rejectTeamApplicationCtrl,
+  messageTeamApplicantCtrl,
+  setUserRoleCtrl,
+} from '../controllers/teamApplicationController';
+import { authRequired, adminOnly, superadminOnly } from '../middleware/auth';
 
 const router = Router() as import('express').Router;
 
@@ -111,6 +118,26 @@ router.get('/metrics', authRequired, adminOnly, getMetrics);
 // GET /api/admin/audit-logs — логи действий
 router.get('/audit-logs', authRequired, adminOnly, listAuditLogs);
 router.get('/employees', authRequired, adminOnly, listEmployees);
+
+// ----------------------------------------------------------
+// Заявки в команду Balloo (тик. 1795888510)
+// Доступ: admin и superadmin (adminOnly) — «те, кому суперадмин дал доступ».
+// ----------------------------------------------------------
+
+// GET /api/admin/team-applications?status=new|accepted|rejected|all
+router.get('/team-applications', authRequired, adminOnly, listTeamApplicationsCtrl);
+
+// POST /api/admin/team-applications/:id/accept — принять (выдаёт роль admin)
+router.post('/team-applications/:id/accept', authRequired, adminOnly, acceptTeamApplicationCtrl);
+
+// POST /api/admin/team-applications/:id/reject — отклонить
+router.post('/team-applications/:id/reject', authRequired, adminOnly, rejectTeamApplicationCtrl);
+
+// POST /api/admin/team-applications/:id/message — написать заявителю
+router.post('/team-applications/:id/message', authRequired, adminOnly, messageTeamApplicantCtrl);
+
+// PATCH /api/admin/users/:id/role — назначение роли: только суперадмин
+router.patch('/users/:id/role', authRequired, superadminOnly, setUserRoleCtrl);
 
 // ----------------------------------------------------------
 // Поддержка (ответ В-33: страница в дашборде админки)

@@ -93,6 +93,9 @@ export function AppTopbar({
           avatarUrl: user?.avatarUrl ?? null,
           balancePoints: user?.balancePoints,
           storiesBadge: hasUnviewedStories,
+          // Тик. 1795888510: пункт «Админ-панель» в частном меню — только
+          // пользователям с ролью admin/superadmin (сервер отдаёт isAdmin).
+          isAdmin: !!user?.isAdmin,
           onLogout: () => {
             logout();
             navigate('/');

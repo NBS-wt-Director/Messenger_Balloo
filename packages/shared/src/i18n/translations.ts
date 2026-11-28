@@ -2644,10 +2644,12 @@ export const translations: Translations = {
     fr: 'Balloo (messagerie)',
   },
   // Названия разделов сайта — как в макетах (латиницей), одинаковы для всех языков
+  // Тик. 1795888510: пункт входа в админку появился в частном правом меню
+  // (только для администраторов) — русская подпись понятнее, чем «Admin».
   'menu.admin': {
-    ru: 'Admin', en: 'Admin', tt: 'Admin', ba: 'Admin', ce: 'Admin', cv: 'Admin', av: 'Admin',
-    dar: 'Admin', udm: 'Admin', lez: 'Admin', kbd: 'Admin', chm: 'Admin', os: 'Admin',
-    sah: 'Admin', bua: 'Admin', uk: 'Admin', zh: 'Admin', hi: 'Admin', be: 'Admin', fr: 'Admin',
+    ru: 'Админ-панель', en: 'Admin panel', tt: 'Админ-панель', ba: 'Админ-панель', ce: 'Админ-панель', cv: 'Админ-панель', av: 'Админ-панель',
+    dar: 'Админ-панель', udm: 'Админ-панель', lez: 'Админ-панель', kbd: 'Админ-панель', chm: 'Админ-панель', os: 'Админ-панель',
+    sah: 'Админ-панель', bua: 'Админ-панель', uk: 'Панель адміністратора', zh: '管理面板', hi: 'एडमिन पैनल', be: 'Панэль адміністратара', fr: "Panneau d'administration",
   },
   'menu.features': {
     ru: 'Features', en: 'Features', tt: 'Features', ba: 'Features', ce: 'Features', cv: 'Features', av: 'Features',

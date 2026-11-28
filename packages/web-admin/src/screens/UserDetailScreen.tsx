@@ -4,6 +4,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '@/services/api';
+import { adminApi, AdminApiError } from '../api';
+import { useSessionStore } from '../sessionStore';
 
 interface UserDetail {
   id: string;
@@ -13,7 +15,7 @@ interface UserDetail {
   avatarUrl?: string;
   phone?: string;
   status: 'active' | 'banned' | 'suspended' | 'deleted';
-  role: 'user' | 'mod' | 'admin' | 'super_admin';
+  role: 'user' | 'mod' | 'admin' | 'superadmin' | 'super_admin';
   language: string;
   createdAt: number;
   updatedAt: number;
@@ -61,6 +63,7 @@ const ROLE_LABELS: Record<string, string> = {
   user: 'User',
   mod: 'Moderator',
   admin: 'Admin',
+  superadmin: 'Super Admin',
   super_admin: 'Super Admin',
 };
 
@@ -88,6 +91,31 @@ export function UserDetailScreen() {
   const [deleteProcessing, setDeleteProcessing] = useState(false);
 
   const [showPromoteMenu, setShowPromoteMenu] = useState(false);
+
+  // Тик. 1795888510: назначение ролей — только суперадмин (сервер вернёт 403).
+  const currentRole = useSessionStore((s) => s.user?.role);
+  const isSuperadmin = currentRole === 'superadmin';
+  const [roleProcessing, setRoleProcessing] = useState(false);
+  const [roleError, setRoleError] = useState<string | null>(null);
+
+  const changeRole = async (role: 'admin' | 'user') => {
+    if (!user || roleProcessing) return;
+    setRoleProcessing(true);
+    setRoleError(null);
+    try {
+      await adminApi.setUserRole(user.id, role);
+      setUser({ ...user, role });
+    } catch (e) {
+      setRoleError(
+        e instanceof AdminApiError
+          ? e.message
+          : 'Не удалось изменить роль'
+      );
+    } finally {
+      setRoleProcessing(false);
+      setShowPromoteMenu(false);
+    }
+  };
 
   useEffect(() => {
     if (!userId) return;
@@ -518,6 +546,60 @@ export function UserDetailScreen() {
                     >
                       {user.isEmployee ? '🔽 Снять с должности' : '👔 Сделать сотрудником'}
                     </button>
+
+                    {/* Тик. 1795888510: доступ в админку выдаёт только суперадмин.
+                        Роль admin открывает панель и раздел заявок в команду. */}
+                    {roleError && (
+                      <div style={{ padding: '6px 12px', fontSize: 12, color: 'var(--danger)' }}>
+                        ⚠ {roleError}
+                      </div>
+                    )}
+                    {isSuperadmin && user.role !== 'admin' && user.role !== 'superadmin' && (
+                      <button
+                        onClick={() => changeRole('admin')}
+                        disabled={roleProcessing}
+                        style={{
+                          display: 'block',
+                          width: '100%',
+                          padding: '8px 12px',
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          fontSize: 13,
+                          color: 'var(--text-primary)',
+                          fontFamily: 'var(--font-primary)',
+                          textAlign: 'left',
+                          borderRadius: 4,
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--bg-tertiary)')}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = 'none')}
+                      >
+                        🛡️ Дать доступ в админку
+                      </button>
+                    )}
+                    {isSuperadmin && user.role === 'admin' && (
+                      <button
+                        onClick={() => changeRole('user')}
+                        disabled={roleProcessing}
+                        style={{
+                          display: 'block',
+                          width: '100%',
+                          padding: '8px 12px',
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          fontSize: 13,
+                          color: 'var(--danger)',
+                          fontFamily: 'var(--font-primary)',
+                          textAlign: 'left',
+                          borderRadius: 4,
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--bg-tertiary)')}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = 'none')}
+                      >
+                        🚫 Снять доступ в админку
+                      </button>
+                    )}
                   </div>
                 )}
               </div>

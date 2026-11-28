@@ -90,6 +90,12 @@ enum MessageType {
   video
   poll
   system
+  // Тик. 1795677071: не-файловые вложения задают тип сообщения. Добавлены
+  // после system — тот же порядок, что у ALTER TYPE в миграции.
+  quiz
+  list_active
+  list_passive
+  personali
 }
 
 enum DonationStatus {
@@ -192,8 +198,38 @@ model User {
     banAppeals          BanAppeal[]
     inviteAcceptances      InviteAcceptance[] @relation("InviteAcceptedBy")
     inviteAcceptancesMade  InviteAcceptance[] @relation("InviteAcceptedInviter")
+    teamApplications       TeamApplication[] @relation("TeamApplicationUser")
+    reviewedTeamApplications TeamApplication[] @relation("TeamApplicationReviewer")
 
     @@map("users")
+}
+
+// ============================================================
+// Заявки в команду Balloo (тик. 1795888510)
+// ============================================================
+// Подаётся с экрана отказа админки (admin.balloo.su) авторизованным
+// пользователем. Хранит id Balloo (userId + username на момент заявки),
+// обрабатывается в админке: принятие выдаёт роль admin и отправляет
+// заявителю сообщение в direct-чат.
+model TeamApplication {
+  id            String   @id @default(cuid()) @db.VarChar(25)
+  userId        String
+  username      String?  @db.VarChar(255)
+  message       String?  @db.Text
+  status        String   @default("new") @db.VarChar(20) // new | accepted | rejected
+  reviewedById  String?
+  reviewedAt    BigInt?
+  lastMessageAt BigInt?
+  createdAt     BigInt   @default(0)
+  updatedAt     BigInt   @default(0)
+
+  // Relations
+  user       User  @relation("TeamApplicationUser", fields: [userId], references: [id], onDelete: Cascade)
+  reviewedBy User? @relation("TeamApplicationReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([userId])
+  @@map("team_applications")
 }
 
 // ============================================================
@@ -432,7 +468,7 @@ model Message {
 model MessageAttachment {
   id        String   @id @default(cuid()) @db.VarChar(25)
   messageId String
-  type      String   @db.VarChar(20) // image, file, voice, video
+  type      String   @db.VarChar(20) // image, file, voice, video, text, poll, quiz, list_active, list_passive, personali
   url       String   @db.VarChar(500)
   thumbnail String?  @db.VarChar(500)
   size      BigInt   @default(0) // bytes
@@ -443,6 +479,9 @@ model MessageAttachment {
   // Поля Attachment (data_schema, тик. 1792160009):
   storage   String?  @db.VarChar(20) // minio | yandex_disk
   meta      Json?    // размер, длительность, координаты и т.д.
+  // Не-файловые вложения (тик. 1795677071): poll / quiz / list_active /
+  // list_passive / personali. Данные формы лежат здесь, url пустой.
+  data      Json?
   createdAt BigInt   @default(0)
 
   // Relations

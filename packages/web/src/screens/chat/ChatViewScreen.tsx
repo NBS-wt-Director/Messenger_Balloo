@@ -9,6 +9,13 @@ import { seedPresenceFromRest } from '@/store/presenceStore';
 import { MessageList } from '@/components/chat/MessageList';
 import { MessageInput } from '@/components/chat/MessageInput';
 import { AttachmentPanel } from '@/components/chat/AttachmentPanel';
+import { AttachmentFormModal } from '@/components/chat/AttachmentFormModal';
+import {
+  type NonFileAttachmentType,
+  type PendingNonFile,
+  isNonFileType,
+  nextAttachmentId,
+} from '@/components/chat/attachmentTypes';
 import { VoiceMessageModal } from '@/components/chat/VoiceMessageModal';
 import { TextNoteModal } from '@/components/chat/TextNoteModal';
 import { FileViewer } from '@/components/chat/FileViewer';
@@ -92,12 +99,51 @@ export const ChatViewScreen: React.FC = () => {
   const [voiceModalOpen, setVoiceModalOpen] = useState(false);
   // Тикет 1795560006: модалка текстовой заметки.
   const [textNoteOpen, setTextNoteOpen] = useState(false);
+  // Тикет 1795677071: форма не-файлового вложения (slash-команда или панель)
+  const [formType, setFormType] = useState<NonFileAttachmentType | null>(null);
+  // Готовое не-файловое вложение ждёт добавления в массив панели
+  const [incomingNonFile, setIncomingNonFile] = useState<PendingNonFile | null>(null);
   // Полноэкранный просмотрщик вложений (макет file-viewer.html, тик. 1795456886)
   const [viewer, setViewer] = useState<{ attachments: MessageAttachment[]; index: number } | null>(null);
 
   const handleFileView = useCallback(
     (attachment: MessageAttachment, index: number, all: MessageAttachment[]) => {
-      setViewer({ attachments: all.length > 0 ? all : [attachment], index });
+      // Тик. 1795677071: не-файловые вложения (опрос/квиз/списки/персонали) не
+      // имеют url — просмотрщик по ним показал бы пустой файл. Открываем только
+      // файловые и пересчитываем индекс выбранного элемента.
+      const files = all.filter((a) => !isNonFileType(a.type));
+      const picked = files.findIndex(
+        (a) => a === attachment || (!!a.id && a.id === attachment.id)
+      );
+      setViewer({
+        attachments: files.length > 0 ? files : [attachment],
+        index: picked >= 0 ? picked : Math.max(0, Math.min(index, files.length - 1)),
+      });
+    },
+    []
+  );
+
+  // Тикет 1795677071: открыть форму не-файлового вложения. Панель тоже
+  // открываем — пользователь сразу видит, куда попадёт вложение.
+  const openAttachmentForm = useCallback((type: NonFileAttachmentType) => {
+    setFormType(type);
+    setAttachmentPanelOpen(true);
+  }, []);
+
+  // Slash-команда из поля ввода: /poll_ и т.п. — открываем форму, не отправляем.
+  const handleSlashCommand = useCallback(
+    (cmd: string) => {
+      if (isNonFileType(cmd)) openAttachmentForm(cmd);
+    },
+    [openAttachmentForm]
+  );
+
+  // Подтверждение формы: вложение кладётся в общий массив панели.
+  const handleAddNonFile = useCallback(
+    (type: NonFileAttachmentType, data: Record<string, unknown>) => {
+      setIncomingNonFile({ kind: 'non-file', id: nextAttachmentId(), type, data });
+      setFormType(null);
+      setAttachmentPanelOpen(true);
     },
     []
   );
@@ -484,10 +530,16 @@ export const ChatViewScreen: React.FC = () => {
               />
 
               {/* Message input */}
-              <MessageInput onSend={handleSend} onTyping={handleTyping} onAttachClick={() => setAttachmentPanelOpen(true)} onVoiceClick={() => setVoiceModalOpen(true)} />
+              <MessageInput
+                onSend={handleSend}
+                onTyping={handleTyping}
+                onAttachClick={() => setAttachmentPanelOpen(true)}
+                onVoiceClick={() => setVoiceModalOpen(true)}
+                onSlashCommand={handleSlashCommand}
+              />
             </div>
 
-            {/* Панель вложений (тик. 1792124253) */}
+            {/* Панель вложений (тик. 1792124253, 1795677071) */}
             {chatId && (
               <AttachmentPanel
                 open={attachmentPanelOpen}
@@ -495,8 +547,19 @@ export const ChatViewScreen: React.FC = () => {
                 onClose={() => setAttachmentPanelOpen(false)}
                 onSent={refreshMessages}
                 onTextNote={() => setTextNoteOpen(true)}
+                onNonFileAction={openAttachmentForm}
+                incomingNonFile={incomingNonFile}
+                onIncomingConsumed={() => setIncomingNonFile(null)}
               />
             )}
+
+            {/* Тикет 1795677071: форма не-файлового вложения */}
+            <AttachmentFormModal
+              open={formType !== null}
+              type={formType}
+              onClose={() => setFormType(null)}
+              onAdd={handleAddNonFile}
+            />
 
             {/* Модалка записи голосового (тик. 1792160023) */}
             {chatId && (

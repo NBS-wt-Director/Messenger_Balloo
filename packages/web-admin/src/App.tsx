@@ -96,6 +96,9 @@ const AdminGroupsMgmtScreen = lazy(() =>
 const AdminServiceStatusScreen = lazy(() =>
   import('./screens/AdminServiceStatusScreen').then((m) => ({ default: m.AdminServiceStatusScreen }))
 );
+const TeamApplicationsScreen = lazy(() =>
+  import('./screens/TeamApplicationsScreen').then((m) => ({ default: m.TeamApplicationsScreen }))
+);
 
 // Layout
 const AdminLayout = lazy(() =>
@@ -135,6 +138,8 @@ export default function App() {
               <Route index element={<DashboardScreen />} />
               <Route path="users" element={<UsersScreen />} />
               <Route path="users/:userId" element={<UserDetailScreen />} />
+              {/* Тик. 1795888510: заявки в команду Balloo */}
+              <Route path="team-applications" element={<TeamApplicationsScreen />} />
               <Route path="reports" element={<ReportsScreen />} />
               <Route path="bans" element={<BansScreen />} />
               <Route path="analytics" element={<AnalyticsScreen />} />

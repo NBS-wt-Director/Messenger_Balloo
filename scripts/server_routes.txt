@@ -48,6 +48,7 @@ GET /api/admin/metrics
 GET /api/admin/reports
 GET /api/admin/support/tickets
 GET /api/admin/support/tickets/:id
+GET /api/admin/team-applications
 GET /api/admin/users
 GET /api/admin/versions
 GET /api/archive
@@ -166,6 +167,7 @@ GET /docs
 GET /health
 GET /health/ready
 PATCH /api/accounts/:userId/notifications
+PATCH /api/admin/users/:id/role
 PATCH /api/devices/:id
 PATCH /api/onboarding/me
 PATCH /api/users/contact-groups/:id
@@ -175,6 +177,9 @@ POST /api/admin/announcements
 POST /api/admin/feature-flags/:id/toggle
 POST /api/admin/reports/:id/resolve
 POST /api/admin/support/tickets/:id/reply
+POST /api/admin/team-applications/:id/accept
+POST /api/admin/team-applications/:id/message
+POST /api/admin/team-applications/:id/reject
 POST /api/admin/users/:id/ban
 POST /api/admin/users/:id/delete
 POST /api/admin/users/:id/suspend
@@ -274,6 +279,7 @@ POST /api/stories
 POST /api/stories/:id/reactions
 POST /api/stories/:id/view
 POST /api/support/chat
+POST /api/team-applications
 POST /api/upload/avatar
 POST /api/upload/chat-avatar
 POST /api/upload/file

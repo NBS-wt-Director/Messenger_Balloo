@@ -9,6 +9,13 @@
 
 import React, { useState, useMemo } from 'react';
 import type { MessageWithSender, MessageAttachment } from '@/store/chatStore';
+import {
+  isNonFileType,
+  attachmentTypeIcon,
+  attachmentTypeLabel,
+  type PollData,
+  type ListData,
+} from './attachmentTypes';
 
 interface MessageBubbleProps {
   message: MessageWithSender;
@@ -147,6 +154,9 @@ export const MessageBubble = React.memo<MessageBubbleProps>(({
 
   // Одиночное вложение — превью по типу (изображение/видео/аудио/файл)
   const renderSingleAttachment = (att: MessageAttachment, index: number, all: MessageAttachment[]) => {
+    // Не-файловое вложение (тик. 1795677071) — карточка формы, без url.
+    if (isNonFileType(att.type)) return renderNonFileAttachment(att);
+
     const open = () => onFileView?.(att, index, all);
 
     if (isImageAtt(att)) {
@@ -196,6 +206,10 @@ export const MessageBubble = React.memo<MessageBubbleProps>(({
     if (list.length === 1) {
       return <div style={{ marginTop: 6 }}>{renderSingleAttachment(list[0], 0, list)}</div>;
     }
+    // Не-файловые вложения (тик. 1795677071) не открываются просмотрщиком
+    // (url пустой) — в ленту миниатюр не попадают, рендерятся карточками.
+    const files = list.filter((att) => !isNonFileType(att.type));
+    const nonFiles = list.filter((att) => isNonFileType(att.type));
     return (
       <div className={`message__attachments${attachmentsOpen ? ' message__attachments--open' : ''}`}>
         <div className="message__attachments-toggle" onClick={() => setAttachmentsOpen((v) => !v)}>
@@ -203,30 +217,90 @@ export const MessageBubble = React.memo<MessageBubbleProps>(({
           <span>{attachmentsOpen ? '▲' : '▼'}</span>
         </div>
         <div className="message__attachments-content">
-          {list.map((att, i) =>
+          {files.map((att, i) =>
             isImageAtt(att) ? (
               <img
                 key={att.id || i}
                 src={att.thumbnail || att.url}
                 alt={att.name || ''}
                 className="message__attachment-thumb"
-                onClick={() => onFileView?.(att, i, list)}
+                onClick={() => onFileView?.(att, i, files)}
               />
             ) : (
               <div
                 key={att.id || i}
                 className="message__attachment-thumb message__attachment-thumb--file"
                 title={att.name || 'Файл'}
-                onClick={() => onFileView?.(att, i, list)}
+                onClick={() => onFileView?.(att, i, files)}
               >
                 <span>{attachmentIcon(att)}</span>
               </div>
             )
           )}
         </div>
+        {/* Не-файловые вложения внутри свёрнутого блока не видны — показываем
+            их карточками под списком, чтобы опрос/список читались сразу. */}
+        {nonFiles.length > 0 && (
+          <div style={{ padding: '0 14px 10px' }}>
+            {nonFiles.map((att, i) => (
+              <div key={`nf-${att.id || i}`}>{renderNonFileAttachment(att)}</div>
+            ))}
+          </div>
+        )}
       </div>
     );
   };
+
+  // Карточка не-файлового вложения: опрос/квиз (вопрос + варианты) или
+  // список/персонали (заголовок + пункты). Данные — в attachment.data.
+  function renderNonFileAttachment(att: MessageAttachment) {
+    const data = (att.data || {}) as Partial<PollData & ListData>;
+    const isPollLike = att.type === 'poll' || att.type === 'quiz';
+    const items = isPollLike ? data.options || [] : data.items || [];
+    const heading = isPollLike ? data.question : data.title;
+
+    return (
+      <div
+        className="message__nonfile"
+        data-testid={`nonfile-${att.type}`}
+        style={{
+          marginTop: 6,
+          border: '1px solid var(--border-color)',
+          background: 'var(--bg-secondary)',
+          padding: '10px 12px',
+          maxWidth: 320,
+        }}
+      >
+        <div className="text-xs text-muted" style={{ marginBottom: 4 }}>
+          {attachmentTypeIcon(att.type)} {attachmentTypeLabel(att.type)}
+        </div>
+        {heading && (
+          <div className="text-sm font-bold" style={{ marginBottom: 6 }}>
+            {heading}
+          </div>
+        )}
+        {items.length > 0 ? (
+          <ul style={{ margin: 0, paddingLeft: 18, fontSize: 13 }}>
+            {items.map((item, i) => (
+              <li key={i} style={{ marginBottom: 2 }}>
+                {item}
+                {att.type === 'quiz' && data.correctIndex === i && (
+                  <span style={{ color: 'var(--accent)', marginLeft: 6 }}>✓</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="text-xs text-muted">Нет данных</div>
+        )}
+        {(att.type === 'poll' || att.type === 'personali') && data.multiple && (
+          <div className="text-xs text-muted" style={{ marginTop: 6 }}>
+            Можно выбрать несколько
+          </div>
+        )}
+      </div>
+    );
+  }
 
   const renderPollMessage = () => {
     const poll = message.poll || (message.content ? parsePollContent(message.content) : null);

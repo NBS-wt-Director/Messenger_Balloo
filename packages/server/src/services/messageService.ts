@@ -12,18 +12,31 @@ const prisma = new PrismaClient();
 
 export interface SendMessageInput {
   chatId: string;
-  type: 'text' | 'image' | 'file' | 'voice' | 'video' | 'poll' | 'system';
+  type:
+    | 'text'
+    | 'image'
+    | 'file'
+    | 'voice'
+    | 'video'
+    | 'poll'
+    | 'quiz'
+    | 'list_active'
+    | 'list_passive'
+    | 'personali'
+    | 'system';
   content?: string;
   replyToId?: string;
   attachments?: Array<{
     type: string;
-    url: string;
+    url?: string;
     thumbnail?: string;
     size?: number;
     name?: string;
     width?: number;
     height?: number;
     duration?: number;
+    /** Не-файловые вложения (тик. 1795677071): данные формы. */
+    data?: Record<string, unknown>;
   }>;
 }
 
@@ -109,13 +122,15 @@ export const sendMessage = async (userId: string, input: SendMessageInput) => {
         ? {
             create: input.attachments.map((att) => ({
               type: att.type,
-              url: att.url,
+              // Не-файловые вложения (тик. 1795677071) не имеют файла: url пустой.
+              url: att.url || '',
               thumbnail: att.thumbnail || null,
               size: BigInt(att.size || 0),
               name: att.name || null,
               width: att.width || null,
               height: att.height || null,
               duration: att.duration || null,
+              data: (att.data as any) ?? undefined,
             })),
           }
         : undefined,
@@ -189,6 +204,7 @@ export const sendMessage = async (userId: string, input: SendMessageInput) => {
       width: att.width,
       height: att.height,
       duration: att.duration,
+      data: att.data ?? undefined,
     })),
     editCount: message.editCount,
     deleted: message.deleted,
@@ -404,6 +420,7 @@ export const getMessages = async ({ chatId, userId, cursor, limit = 50, before, 
         width: att.width,
         height: att.height,
         duration: att.duration,
+        data: att.data ?? undefined,
       })),
       // Тик. 1795094089 (A2): форма идентична getReactions() ниже — клиент
       // получает один и тот же объект и из истории, и из точечного запроса.

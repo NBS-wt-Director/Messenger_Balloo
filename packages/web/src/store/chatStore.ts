@@ -30,7 +30,7 @@ export interface UserChat extends Chat {
  */
 export interface MessageAttachment {
   id?: string;
-  /** image | video | audio | file */
+  /** image | video | audio | file | text | poll | quiz | list_active | list_passive | personali */
   type: string;
   url: string;
   thumbnail?: string | null;
@@ -39,6 +39,8 @@ export interface MessageAttachment {
   width?: number | null;
   height?: number | null;
   duration?: number | null;
+  /** Не-файловые вложения (тик. 1795677071): данные формы. */
+  data?: Record<string, unknown> | null;
 }
 
 export interface MessageWithSender extends Message {

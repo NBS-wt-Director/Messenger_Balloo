@@ -31,8 +31,27 @@ export const sendMessage = async (req: AuthenticatedRequest, res: Response, next
       return;
     }
 
-    if (!type || !['text', 'image', 'file', 'voice', 'video', 'poll', 'system'].includes(type)) {
-      res.status(400).json({ error: 'Bad Request', message: 'Поле type обязательно (text, image, file, voice, video, poll, system)' });
+    // Типы сообщений (тик. 1795677071): не-файловые вложения задают тип
+    // сообщения (poll/quiz/list_active/list_passive/personali).
+    const MESSAGE_TYPES = [
+      'text',
+      'image',
+      'file',
+      'voice',
+      'video',
+      'poll',
+      'quiz',
+      'list_active',
+      'list_passive',
+      'personali',
+      'system',
+    ];
+
+    if (!type || !MESSAGE_TYPES.includes(type)) {
+      res.status(400).json({
+        error: 'Bad Request',
+        message: `Поле type обязательно (${MESSAGE_TYPES.join(', ')})`,
+      });
       return;
     }
 

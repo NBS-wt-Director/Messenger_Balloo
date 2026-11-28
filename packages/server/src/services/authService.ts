@@ -23,13 +23,28 @@ const prisma = new PrismaClient();
 // Утилиты
 // ============================================================
 
-// Проверка: есть ли в системе хотя бы один админ
+// Проверка: есть ли в системе хотя бы один администратор.
+// Тик. 1795888510: superadmin — надмножество admin, поэтому учитываем обе роли.
+// Иначе при наличии только суперадмина система считала бы, что админов нет,
+// и раздавала бы роль первому новому пользователю.
 export const hasAdmin = async (): Promise<boolean> => {
   const count = await prisma.user.count({
-    where: { role: 'admin' },
+    where: { role: { in: ['admin', 'superadmin'] } },
   });
   return count > 0;
 };
+
+/**
+ * Роль нового пользователя по числу администраторов в системе (тик. 1795888510).
+ * Первый зарегистрированный (админов ещё нет) становится суперадминистратором —
+ * иначе админку некому открыть, а заявки в команду некому принимать.
+ */
+export const registrationRole = (adminCount: number): 'superadmin' | 'user' =>
+  adminCount === 0 ? 'superadmin' : 'user';
+
+/** Число администраторов (admin + superadmin) — вход для registrationRole. */
+export const countAdmins = async (): Promise<number> =>
+  prisma.user.count({ where: { role: { in: ['admin', 'superadmin'] } } });
 
 // ============================================================
 // Авто-вступление в новостной канал (NEWS_CHAT_ID)
@@ -263,6 +278,9 @@ export const register = async (input: RegisterInput) => {
   // а не в 500 (тик. а-04, п.1).
   let user;
   try {
+    // Тик. 1795888510: первый пользователь в системе — суперадминистратор.
+    // Считаем до create(): после создания пользователь уже существует.
+    const role = registrationRole(await countAdmins());
     user = await prisma.user.create({
       data: {
         email,
@@ -270,6 +288,7 @@ export const register = async (input: RegisterInput) => {
         username: input.username || null,
         language: 'ru',
         status: 'active',
+        role,
         createdAt: BigInt(Math.floor(Date.now() / 1000)),
         balancePoints: REGISTRATION_BONUS,
         updatedAt: BigInt(Math.floor(Date.now() / 1000)),
@@ -1112,8 +1131,9 @@ export const oauthLogin = async (input: OAuthLoginInput) => {
   if (!user) {
     const passwordHash = crypto.randomBytes(32).toString('hex');
 
-    // Первый пользователь через OAuth становится админом, если админов еще нет
-    const isAdmin = await hasAdmin();
+    // Первый пользователь через OAuth становится суперадминистратором,
+    // если администраторов ещё нет (тик. 1795888510).
+    const role = registrationRole(await countAdmins());
 
     // username @unique: логин провайдера может совпадать с существующим —
     // проверяем и добавляем суффикс (иначе create падает P2002)
@@ -1131,7 +1151,7 @@ export const oauthLogin = async (input: OAuthLoginInput) => {
         avatarUrl: input.avatarUrl || null,
         language: 'ru',
         status: 'active',
-        role: isAdmin ? 'user' : 'admin',
+        role,
         createdAt: BigInt(Math.floor(Date.now() / 1000)),
         balancePoints: REGISTRATION_BONUS,
         updatedAt: BigInt(Math.floor(Date.now() / 1000)),

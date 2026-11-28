@@ -61,7 +61,9 @@ describe('GET /docs — единая шапка/подвал (P1–P3)', () => {
   it('U2: прокрутка внутри страницы, полоса скрыта', () => {
     expect(html).toContain('overflow-y: auto');
     expect(html).toContain('scrollbar-width: none');
-    expect(html).toContain('::-webkit-scrollbar { display: none; }');
+    // display:none ломал прокрутку в Chromium — заменено на нулевой размер
+    // (коммит 7dc043f: width:0 + height:0, полоса по-прежнему невидима).
+    expect(html).toContain('::-webkit-scrollbar { width: 0; height: 0; background: transparent; }');
     expect(html).toContain('class="page-container"');
   });
 

@@ -270,4 +270,112 @@ describe('Messages API', () => {
       expect(res.status).toBe(404);
     });
   });
+
+  // Тик. 1795677071: не-файловые вложения (опрос/квиз/списки/персонали) —
+  // url пустой, данные формы в attachment.data.
+  describe('не-файловые вложения', () => {
+    it('принимает poll-вложение с data и отдаёт его в ответе', async () => {
+      const user = await registerTestUser();
+      const chatId = await createChatAndGetId(user.accessToken);
+
+      const res = await request(app)
+        .post(`/api/chats/${chatId}/messages`)
+        .set('Authorization', `Bearer ${user.accessToken}`)
+        .send({
+          type: 'poll',
+          content: '',
+          attachments: [
+            {
+              type: 'poll',
+              url: '',
+              data: { question: 'Где встречаемся?', options: ['Парк', 'Кафе'], multiple: false },
+            },
+          ],
+        });
+
+      expect(res.status).toBe(201);
+      expect(res.body.type).toBe('poll');
+      expect(res.body.attachments).toHaveLength(1);
+      expect(res.body.attachments[0]).toMatchObject({
+        type: 'poll',
+        url: '',
+        data: { question: 'Где встречаемся?', options: ['Парк', 'Кафе'], multiple: false },
+      });
+    });
+
+    it('сохраняет data в истории сообщений', async () => {
+      const user = await registerTestUser();
+      const chatId = await createChatAndGetId(user.accessToken);
+
+      await request(app)
+        .post(`/api/chats/${chatId}/messages`)
+        .set('Authorization', `Bearer ${user.accessToken}`)
+        .send({
+          type: 'quiz',
+          content: '',
+          attachments: [
+            {
+              type: 'quiz',
+              url: '',
+              data: { question: '2+2?', options: ['3', '4'], multiple: false, correctIndex: 1 },
+            },
+          ],
+        });
+
+      const res = await request(app)
+        .get(`/api/chats/${chatId}/messages`)
+        .set('Authorization', `Bearer ${user.accessToken}`);
+
+      expect(res.status).toBe(200);
+      const msg = res.body.messages.find((m: any) => m.type === 'quiz');
+      expect(msg).toBeDefined();
+      expect(msg.attachments[0].data).toMatchObject({
+        question: '2+2?',
+        options: ['3', '4'],
+        correctIndex: 1,
+      });
+    });
+
+    it('файл + опрос в одном сообщении: оба вложения сохраняются', async () => {
+      const user = await registerTestUser();
+      const chatId = await createChatAndGetId(user.accessToken);
+
+      const res = await request(app)
+        .post(`/api/chats/${chatId}/messages`)
+        .set('Authorization', `Bearer ${user.accessToken}`)
+        .send({
+          type: 'poll',
+          content: '',
+          attachments: [
+            { type: 'image', url: 'https://cdn.example.com/pic.png', name: 'pic.png', size: 100 },
+            { type: 'poll', url: '', data: { question: 'Q?', options: ['A', 'B'], multiple: true } },
+          ],
+        });
+
+      expect(res.status).toBe(201);
+      expect(res.body.attachments).toHaveLength(2);
+      expect(res.body.attachments[0]).toMatchObject({ type: 'image', url: 'https://cdn.example.com/pic.png' });
+      expect(res.body.attachments[1]).toMatchObject({ type: 'poll', url: '' });
+      expect(res.body.attachments[1].data.question).toBe('Q?');
+    });
+
+    it('принимает все не-файловые типы сообщений', async () => {
+      const user = await registerTestUser();
+      const chatId = await createChatAndGetId(user.accessToken);
+
+      for (const type of ['poll', 'quiz', 'list_active', 'list_passive', 'personali']) {
+        const res = await request(app)
+          .post(`/api/chats/${chatId}/messages`)
+          .set('Authorization', `Bearer ${user.accessToken}`)
+          .send({
+            type,
+            content: '',
+            attachments: [{ type, url: '', data: { title: 'T', items: ['A'] } }],
+          });
+
+        expect(res.status).toBe(201);
+        expect(res.body.type).toBe(type);
+      }
+    });
+  });
 });

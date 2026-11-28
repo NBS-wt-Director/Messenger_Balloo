@@ -41,10 +41,14 @@ export function mainSiteUrl(path: string, host?: string): string {
 
 // ─── Лого-меню разделов (TopbarMenu) ────────────────────────────────────────
 
-/** Внутренние пункты — поведение до тик. 1794575221 (dev/localhost). */
+/**
+ * Внутренние пункты — поведение до тик. 1794575221 (dev/localhost).
+ * Тик. 1795888510: пункта «Admin» здесь больше НЕТ. Вход в админку — только
+ * в правом меню и только пользователям с правами (решение владельца
+ * 28.11.2026), иначе узел был виден всем гостям через лого-меню.
+ */
 export const SPA_TOPBAR_ITEMS: TopbarMenuItem[] = [
   { key: 'menu.balloo', to: '/chat', emoji: '💬' },
-  { key: 'menu.admin', to: '/admin', emoji: '🛡️', dividerBefore: true },
   { key: 'menu.features', to: '/features', emoji: '💡' },
   { key: 'menu.history', to: '/history', emoji: '📜' },
   { key: 'menu.download', to: '/download', emoji: '⬇️' },
@@ -59,6 +63,9 @@ export const SPA_TOPBAR_ITEMS: TopbarMenuItem[] = [
  * command/history/download: их поддомены (nginx → :8090) отдают тот же SPA,
  * поэтому hash-роутер открывает нужный экран.
  * API docs: бэкенд-маршрут GET /docs (точка у_07 — docsController).
+ *
+ * Тик. 1795888510: admin исключён — ссылка на админку живёт только в частном
+ * правом меню (PrivateRightMenu) и только для администраторов.
  */
 export function topbarItemsForHost(host?: string): TopbarMenuItem[] {
   const h = host ?? (typeof window !== 'undefined' ? window.location.hostname : '');
@@ -68,12 +75,22 @@ export function topbarItemsForHost(host?: string): TopbarMenuItem[] {
 
   return [
     { key: 'menu.balloo', to: onMain ? '/chat' : `${MAIN_ORIGIN}/#/chat`, emoji: '💬' },
-    { key: 'menu.admin', to: `${ADMIN_ORIGIN}/`, emoji: '🛡️', dividerBefore: true },
     { key: 'menu.features', to: `${FEATURES_ORIGIN}/`, emoji: '💡' },
     { key: 'menu.history', to: `${HISTORY_ORIGIN}/#/history`, emoji: '📜' },
     { key: 'menu.download', to: `${DOWNLOAD_ORIGIN}/#/download`, emoji: '⬇️' },
     { key: 'menu.docs', to: `${API_ORIGIN}/docs`, emoji: '📚' },
   ];
+}
+
+/**
+ * Ссылка на админ-панель (тик. 1795888510).
+ * Прод — отдельный домен admin.balloo.su; dev — vite-сервер web-admin (:5174).
+ * Пункт показывается только администратору (см. PrivateRightMenu).
+ */
+export function adminSiteUrl(host?: string): string {
+  const h = host ?? (typeof window !== 'undefined' ? window.location.hostname : '');
+  if (!isBallooProdHost(h)) return 'http://localhost:5174/';
+  return `${ADMIN_ORIGIN}/`;
 }
 
 // ─── Правое меню (RightMenu) ────────────────────────────────────────────────
@@ -119,6 +136,8 @@ export function rightMenuTargetsForHost(host?: string): {
   account: RightMenuItem[];
   aboutUs: RightMenuItem[];
   guest: { loginTo: string; registerTo: string };
+  /** Тик. 1795888510: цель пункта «Админ-панель» (только для админов). */
+  admin: string;
 } {
   const h = host ?? (typeof window !== 'undefined' ? window.location.hostname : '');
   return {
@@ -129,6 +148,7 @@ export function rightMenuTargetsForHost(host?: string): {
       loginTo: mainSiteUrl(SPA_GUEST_ACTIONS.loginTo, h),
       registerTo: mainSiteUrl(SPA_GUEST_ACTIONS.registerTo, h),
     },
+    admin: adminSiteUrl(h),
   };
 }
 

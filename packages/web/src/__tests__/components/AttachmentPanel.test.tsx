@@ -156,4 +156,84 @@ describe('AttachmentPanel', () => {
     fireEvent.click(screen.getByRole('button', { name: '✕' }));
     expect(props.onClose).toHaveBeenCalled();
   });
+
+  // Тикет 1795677071: единый массив вложений + не-файловые формы.
+  describe('не-файловые вложения (1795677071)', () => {
+    it('кнопка «Опрос» вызывает onNonFileAction("poll")', () => {
+      const onNonFileAction = vi.fn();
+      renderPanel({ onNonFileAction });
+      fireEvent.click(screen.getByText('Опрос'));
+      expect(onNonFileAction).toHaveBeenCalledWith('poll');
+    });
+
+    it('входящее вложение из формы попадает в выбор и сбрасывается через onIncomingConsumed', async () => {
+      const onIncomingConsumed = vi.fn();
+      const incomingNonFile = {
+        kind: 'non-file' as const,
+        id: 'nf1',
+        type: 'poll' as const,
+        data: { question: 'Вопрос?', options: ['Да', 'Нет'], multiple: false },
+      };
+      renderPanel({ incomingNonFile, onIncomingConsumed });
+      await waitFor(() => expect(screen.getByText('📎 Выбрано: 1')).toBeInTheDocument());
+      expect(screen.getAllByText(/Опрос/).length).toBeGreaterThan(0);
+      expect(onIncomingConsumed).toHaveBeenCalled();
+    });
+
+    it('отправка не-файлового вложения: url пустой, data в attachments, тип сообщения poll', async () => {
+      const incomingNonFile = {
+        kind: 'non-file' as const,
+        id: 'nf1',
+        type: 'poll' as const,
+        data: { question: 'Вопрос?', options: ['Да', 'Нет'], multiple: false },
+      };
+      renderPanel({ incomingNonFile, onIncomingConsumed: vi.fn() });
+      await waitFor(() => expect(screen.getByText('📎 Выбрано: 1')).toBeInTheDocument());
+
+      fireEvent.click(screen.getByRole('button', { name: /Отправить/ }));
+
+      await waitFor(() => expect(sendMessage).toHaveBeenCalledTimes(1));
+      const [, payload] = sendMessage.mock.calls[0];
+      expect(payload.type).toBe('poll');
+      expect(payload.attachments).toHaveLength(1);
+      expect(payload.attachments[0]).toMatchObject({
+        type: 'poll',
+        url: '',
+        data: { question: 'Вопрос?', options: ['Да', 'Нет'], multiple: false },
+      });
+    });
+
+    it('файл + опрос в одном сообщении: оба вложения уходят, тип задаёт не-файловое', async () => {
+      const incomingNonFile = {
+        kind: 'non-file' as const,
+        id: 'nf1',
+        type: 'quiz' as const,
+        data: { question: '2+2?', options: ['3', '4'], multiple: false, correctIndex: 1 },
+      };
+      renderPanel({ incomingNonFile, onIncomingConsumed: vi.fn() });
+      await waitFor(() => expect(screen.getByText('📎 Выбрано: 1')).toBeInTheDocument());
+
+      const input = document.querySelector('input[type=file][multiple]') as HTMLInputElement;
+      fireEvent.change(input, { target: { files: [makeFile('pic.png', 'image/png')] } });
+      await waitFor(() => expect(screen.getByText('📎 Выбрано: 2')).toBeInTheDocument());
+
+      fireEvent.click(screen.getByRole('button', { name: /Отправить/ }));
+
+      await waitFor(() => expect(sendMessage).toHaveBeenCalledTimes(1));
+      const [, payload] = sendMessage.mock.calls[0];
+      expect(payload.type).toBe('quiz');
+      expect(payload.attachments).toHaveLength(2);
+      expect(payload.attachments[0].type).toBe('image');
+      expect(payload.attachments[1].type).toBe('quiz');
+    });
+
+    it('свыше 15 вложений показывает предупреждение о платности', async () => {
+      renderPanel();
+      const input = document.querySelector('input[type=file][multiple]') as HTMLInputElement;
+      const files = Array.from({ length: 16 }, (_, i) => makeFile(`f${i}.png`, 'image/png', 10));
+      fireEvent.change(input, { target: { files } });
+      await waitFor(() => expect(screen.getByText('📎 Выбрано: 16')).toBeInTheDocument());
+      expect(screen.getByText(/Сообщение будет платным: 21 баллов/)).toBeInTheDocument();
+    });
+  });
 });

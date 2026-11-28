@@ -66,7 +66,7 @@ describe('MessageInput (сценарий чата)', () => {
     expect(onSend).toHaveBeenCalledWith('hello', 'text');
   });
 
-  it('sends slash command with type=slash', () => {
+  it('sends slash command with type=slash (без onSlashCommand — совместимость)', () => {
     render(<MessageInput onSend={onSend} />);
     const textarea = screen.getByPlaceholderText(/напишите сообщение/i);
 
@@ -74,6 +74,21 @@ describe('MessageInput (сценарий чата)', () => {
     fireEvent.keyDown(textarea, { key: 'Enter' });
 
     expect(onSend).toHaveBeenCalledWith('/poll_Вопрос;Да;Нет', 'slash');
+  });
+
+  // Тикет 1795677071: с onSlashCommand команда открывает форму вложения,
+  // а не отправляет текст в чат.
+  it('slash command opens the attachment form via onSlashCommand', () => {
+    const onSlashCommand = vi.fn();
+    render(<MessageInput onSend={onSend} onSlashCommand={onSlashCommand} />);
+    const textarea = screen.getByPlaceholderText(/напишите сообщение/i);
+
+    fireEvent.change(textarea, { target: { value: '/list_active_Пункт 1;Пункт 2' } });
+    fireEvent.keyDown(textarea, { key: 'Enter' });
+
+    expect(onSlashCommand).toHaveBeenCalledWith('list_active');
+    expect(onSend).not.toHaveBeenCalled();
+    expect((textarea as HTMLTextAreaElement).value).toBe('');
   });
 
   it('unknown slash command sent as plain text', () => {

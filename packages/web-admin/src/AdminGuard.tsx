@@ -1,33 +1,49 @@
-// AdminGuard — блокирует доступ не-администраторам.
-// Неавторизованный → вход на главном сайте (balloo.su/#/login): в админке
-//   своего маршрута /login нет, попытка Navigate('/login') давала 404.
-// Не-админ → чаты главного сайта.
-// Оба перехода — полной навигацией (window.location), т.к. это другой домен.
-// Тикет 1793259599.
+// AdminGuard — доступ в админ-панель (тик. 1795888510, переписан с 1793259599).
+//
+// Решение владельца 28.11.2026: НЕ перенаправляем. Неавторизованный или
+// пользователь без прав видит экран с объяснением и кнопками (заявка в команду,
+// поддержать, общаться) — см. AccessDeniedScreen.
+//
+// Авторизация переносится с основного домена: cookie с domain=.balloo.su,
+// сессия проверяется запросом GET /api/users/me (sessionStore).
+// Права: сервер отдаёт isAdmin для ролей admin/superadmin.
 
 import { useEffect } from 'react';
-import { useAuthStore } from '@/store/authStore';
-import { MAIN_SITE_LOGIN_URL, MAIN_SITE_CHAT_URL } from './config/mainSite';
+import { useSessionStore } from './sessionStore';
+import { AccessDeniedScreen } from './components/AccessDeniedScreen';
 
 export function AdminGuard({ children }: { children: React.ReactNode }) {
-  const user = useAuthStore((s) => s.user);
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const isAdmin = user?.isAdmin ?? false;
-
-  const shouldLogin = !user && !isAuthenticated;
-  const shouldLeave = !shouldLogin && !isAdmin;
+  const user = useSessionStore((s) => s.user);
+  const status = useSessionStore((s) => s.status);
+  const loadSession = useSessionStore((s) => s.loadSession);
 
   useEffect(() => {
-    if (shouldLogin) {
-      window.location.replace(MAIN_SITE_LOGIN_URL);
-    } else if (shouldLeave) {
-      window.location.replace(MAIN_SITE_CHAT_URL);
-    }
-  }, [shouldLogin, shouldLeave]);
+    loadSession();
+  }, [loadSession]);
 
-  if (shouldLogin || shouldLeave) {
-    // Пока идёт переход — пустой экран вместо мигания чужого контента.
-    return null;
+  // Пока сессия проверяется — спиннер, без мигания чужого контента.
+  if (status === 'idle' || status === 'loading') {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '100vh',
+          background: 'var(--app-bg)',
+        }}
+      >
+        <div className="spinner" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <AccessDeniedScreen reason="guest" user={null} />;
+  }
+
+  if (!user.isAdmin) {
+    return <AccessDeniedScreen reason="no-access" user={user} />;
   }
 
   return <>{children}</>;

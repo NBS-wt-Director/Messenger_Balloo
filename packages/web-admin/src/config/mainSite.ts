@@ -16,3 +16,9 @@ export const MAIN_SITE_LOGIN_URL = `${MAIN_SITE_ORIGIN}/#/login`;
 
 /** Ссылка на чаты главного сайта — для не-админов. */
 export const MAIN_SITE_CHAT_URL = `${MAIN_SITE_ORIGIN}/#/chat`;
+
+/**
+ * Страница поддержки команды (тик. 1795888510) — экран донатов основного сайта.
+ * Маршрут `/donat` уже используется в правом меню (SPA_ABOUT_ITEMS).
+ */
+export const MAIN_SITE_DONATE_URL = `${MAIN_SITE_ORIGIN}/#/donat`;

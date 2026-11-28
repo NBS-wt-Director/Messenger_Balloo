@@ -29,8 +29,12 @@ describe('ecosystem — хост-осознанные ссылки (тик. 1794
     const byKey = Object.fromEntries(items.map((i) => [String(i.key), i.to]));
     // главное SPA — остаётся внутренним маршрутом (пользователь уже здесь)
     expect(byKey['menu.balloo']).toBe('/chat');
+    // Тик. 1795888510: «Админ» убран из лого-меню — вход только в правом меню
+    // и только администраторам (см. PrivateRightMenu). Ссылка на узел живёт
+    // в rightMenuTargetsForHost().admin.
+    expect(byKey['menu.admin']).toBeUndefined();
+    expect(rightMenuTargetsForHost('balloo.su').admin).toBe('https://admin.balloo.su/');
     // все узлы — абсолютные URL своих поддоменов
-    expect(byKey['menu.admin']).toBe('https://admin.balloo.su/');
     expect(byKey['menu.features']).toBe('https://features.balloo.su/');
     expect(byKey['menu.history']).toBe('https://history.balloo.su/#/history');
     expect(byKey['menu.download']).toBe('https://download.balloo.su/#/download');

@@ -98,6 +98,10 @@ export const ChatItem = React.memo<ChatItemProps>(({ chat, active = false, onCli
       if (t === 'voice') return '🎤 Голосовое';
       if (t === 'file') return `📄 ${att?.name || 'Файл'}`;
       if (t === 'poll') return '📊 Опрос';
+      if (t === 'quiz') return '🎯 Квиз';
+      if (t === 'list_active') return '☑️ Активный список';
+      if (t === 'list_passive') return '📋 Пассивный список';
+      if (t === 'personali') return '🙋 Персонали';
       if (t === 'text') return 'Текст';
       return 'Сообщение';
     })();

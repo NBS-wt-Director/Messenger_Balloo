@@ -376,6 +376,8 @@ export const api = {
         width?: number;
         height?: number;
         duration?: number;
+        /** Не-файловые вложения (тик. 1795677071): данные формы. */
+        data?: Record<string, unknown>;
       }>;
     }
   ) =>

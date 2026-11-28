@@ -58,6 +58,12 @@ export interface RightMenuAuth {
   storiesBadge?: boolean;
   /** Клик по «Выйти» (авторизованный) */
   onLogout?: () => void;
+  /**
+   * Тик. 1795888510: есть доступ в админку (роль admin/superadmin).
+   * Только тогда в частном меню появляется пункт «Админ-панель»: вход в узел
+   * не должен быть виден обычным пользователям и гостям.
+   */
+  isAdmin?: boolean;
 }
 
 export interface RightMenuProps {
@@ -89,6 +95,12 @@ export interface PrivateRightMenuProps {
   onNavigate?: (to: string) => void;
   /** U10: показать красную точку-бейдж на аватарке триггера (есть непросмотренные истории) */
   storiesBadge?: boolean;
+  /**
+   * Тик. 1795888510: есть доступ в админку. Пункт «Админ-панель» рисуется
+   * только при true — вход в узел живёт только в правом меню и только у тех,
+   * кому выдан доступ.
+   */
+  isAdmin?: boolean;
 }
 
 // Темы ровно 3, лейблы — BALLOO_THEMES из common.js:7–11
@@ -379,6 +391,7 @@ export function PrivateRightMenu({
   items,
   onNavigate,
   storiesBadge = false,
+  isAdmin = false,
 }: PrivateRightMenuProps) {
   const { t, locale } = useI18n();
   const hostDefaults = rightMenuTargetsForHost();
@@ -453,6 +466,23 @@ export function PrivateRightMenu({
             </div>
           );
         })}
+
+        {/* Тик. 1795888510: вход в админку — только в частном меню и только
+            тем, кому выдан доступ. Пункт идёт отдельной секцией внизу. */}
+        {isAdmin && (
+          <>
+            <div className="right-menu__divider" />
+            <div
+              className="right-menu__item"
+              role="menuitem"
+              tabIndex={open ? 0 : -1}
+              onClick={() => go(hostDefaults.admin)}
+            >
+              <span className="right-menu__item-icon">🛡️</span>
+              <span className="right-menu__item-label">{t('menu.admin')}</span>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
