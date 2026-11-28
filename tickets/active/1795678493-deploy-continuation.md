@@ -425,3 +425,26 @@ curl -s -o /dev/null -w "%{http_code}\n" https://api.balloo.su/api/admin/team-ap
 | A4 | Заявка из-под обычного пользователя | экран отказа без редиректа, форма заявки, id Balloo виден |
 | A5 | Принятие заявки | роль admin выдана, заявителю пришло сообщение в чат |
 | A6 | Панель вложений | `/poll_`, `/quiz_` открывают форму; файлы + не-файловые в одном списке |
+
+### R7 — ход деплоя (доказано выводом сервера 29.11.2026)
+
+| Батч | Результат |
+|---|---|
+| C | `origin/main` = `bc3c95d` (3 коммита после `7dc043f`), fetch прошёл |
+| D | `git checkout -B main origin/main` → `HEAD=bc3c95d`, в рабочем дереве только `M docker/prod/.env.production` + `?? docker/prod/backups/` |
+| E | бэкап `/data/balloo/backups/pre-a90eba6-20261129-0002.sql` — **228 148 Б**, `CREATE TABLE`=83; откатный тег перенацелен на `7dc043f` (первая попытка ставила `HEAD~1`=`a90eba6`, т.е. на коммит деплоя — исправлено); образы текущего прода закреплены тегом `balloo/*:rollback-before-a90eba6` |
+| E (находка) | первая команда `pg_dump` шла из корня репо, поэтому `--env-file .env.production` указывал на старый `/data/balloo/repo/.env.production` (2816 Б, сен 10) → WARN про `MINIO_ROOT_PASSWORD`/`JWT_ACCESS_SECRET`/`ADMIN_INSTALL_PASSWORD`. Настоящий файл — `docker/prod/.env.production` (10 341 Б, 69 ключей). Все команды F–G выполнялись из `docker/prod`, `config --quiet` → `ENV_OK` |
+| F1 | 6 образов собраны за **305 с**: server, web, web-admin, features, web-history, web-download — все `:local` |
+| F2 | `balloo-server Started`, через ~1 мин `Up (healthy)`, `restarts=0`; лог: `28 migrations found` → 4 × `Applying migration` → `All migrations have been successfully applied` → `Seed completed successfully` → `Seed OK` |
+| F3 | 5 SPA пересозданы, `Up`, порты 8090/8092/8093/8094/8091 |
+| G (БД) | `_prisma_migrations` сверху: `20261128180001_first_user_superadmin`, `20261128180000_team_applications`, `20261128172000_message_type_nonfile`, `20261128161509_message_attachment_data`; `message_attachments.data` = **jsonb** |
+| G (домены) | `balloo.su` / `admin` / `features` / `history` / `download` → все **200** |
+| G (роуты) | `GET /api/admin/team-applications` → **401** (код есть, защищён); `POST /api/team-applications` → **401**; `/health` через nginx → 401 (basic auth probes), напрямую `127.0.0.1:3100/health` → **200** `{"status":"ok"}` |
+| G (бандли) | web `index-EsguFP2u.js` (был `index-Dzj91TqP.js`), admin `index-VCO88rXg.js`; маркер `team-applications` в admin-бандле = 1 |
+| G (соседи) | `balloo-postgres` / `balloo-redis` / `balloo-minio` — `Up 3 weeks`, не перезапускались |
+
+**Находка (не следствие деплоя):** `history.balloo.su` и `download.balloo.su` по-прежнему
+отдают бандль основного web (`index-EsguFP2u.js`), хотя контейнеры 8093/8094 отдают
+свои (`index-BeNp08Uk.js`, `index-BU7tnQuA.js`). Причина прежняя — хостовый
+`/etc/nginx/sites-enabled/balloo-docker.conf` проксирует эти домены на `:8090`.
+Это H5/D4 мультитикета `1795683301`, правка владельца отдельным шагом.
